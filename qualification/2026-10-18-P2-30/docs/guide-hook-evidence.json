@@ -1,0 +1,249 @@
+{
+  "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "executionSourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+  "executionState": "Own four working-copy edits before the parent committed them; not a final-source test execution.",
+  "sourceEquivalence": [
+    {
+      "path": "scripts/gen-industry-guides.mts",
+      "recordedSha256": "c6891027b84edf7f29a43b0230dcc86c6f98f8e4cf2b67e84f2072a03bfdbda9",
+      "finalSha256": "c6891027b84edf7f29a43b0230dcc86c6f98f8e4cf2b67e84f2072a03bfdbda9",
+      "equal": true
+    },
+    {
+      "path": "tests/industryGuidesGenerator.test.ts",
+      "recordedSha256": "e2573000eaa16d2c61dbfc0a70ff7d8590e0459a95b94fbc8abbb0b85412d1dc",
+      "finalSha256": "e2573000eaa16d2c61dbfc0a70ff7d8590e0459a95b94fbc8abbb0b85412d1dc",
+      "equal": true
+    },
+    {
+      "path": "docs/catalog/technology/guide-section.md",
+      "recordedSha256": "bcd63349d70b0e919d926810481f53de5270bddc49f2ddc14fe51be5f15f1d59",
+      "finalSha256": "bcd63349d70b0e919d926810481f53de5270bddc49f2ddc14fe51be5f15f1d59",
+      "equal": true
+    },
+    {
+      "path": "docs/industries/technology.md",
+      "recordedSha256": "91028560d6e61a1678c72a513b2082ee264c5bf2483d84c5dfec4088e117b815",
+      "finalSha256": "91028560d6e61a1678c72a513b2082ee264c5bf2483d84c5dfec4088e117b815",
+      "equal": true
+    }
+  ],
+  "runs": [
+    {
+      "name": "red-behavior",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/red-behavior.json",
+      "inputRecordSha256": "a3f4b812aa525e3633dbc1fc7cbfa06a69bcbf6e5ab986a64baf7c2c1cc7ecba",
+      "record": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/industryGuidesGenerator.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/red-behavior-report.json",
+          "-t",
+          "station-owned overlay guide sections"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "workingTreeStatus": " M tests/catalog/stations/technology/overlay.test.ts\n M tests/industryGuidesGenerator.test.ts\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "startedAt": "2026-10-18T11:28:02.677103+00:00",
+        "exitCode": 1,
+        "durationMs": 2620,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/red-behavior.log",
+        "rawLogSha256": "f0ee4b8cc1088c631fc8dc7b8a3345b39d2949a04f3f286bad6d1877531fe417",
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/red-behavior-report.json",
+        "numFailedTests": 2,
+        "numPassedTests": 0,
+        "numPendingTests": 4,
+        "failures": [
+          "station-owned overlay guide sections includes Technology prose once before its appendix and leaves every other guide unchanged",
+          "station-owned overlay guide sections does not suppress a station-owned section read error other than ENOENT"
+        ]
+      }
+    },
+    {
+      "name": "green",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/green.json",
+      "inputRecordSha256": "6ce88161c8310f32116d563891b13c449cc0c61084c53da407c49ac795859667",
+      "record": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/industryGuidesGenerator.test.ts",
+          "tests/industryGuides.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/green-report.json"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "workingTreeStatus": " M docs/industries/technology.md\n M scripts/gen-industry-guides.mts\n M tests/catalog/stations/technology/overlay.test.ts\n M tests/industryGuidesGenerator.test.ts\n?? docs/catalog/technology/guide-section.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "startedAt": "2026-10-18T11:28:49.894229+00:00",
+        "exitCode": 0,
+        "durationMs": 4440,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/green.log",
+        "rawLogSha256": "ce20669576233a77f8fe12a7275713c1fc328076a5c64706fb2c3d9712bb5d1b",
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/green-report.json",
+        "numPassedTests": 53,
+        "numFailedTests": 0
+      }
+    },
+    {
+      "name": "check-industry-guides",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/check-industry-guides.json",
+      "inputRecordSha256": "7631bdf459b01188a003ce8e5041935c8028cab1ad4295aeb048c7aa4883d81b",
+      "record": {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:industry-guides"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "workingTreeStatus": " M docs/industries/technology.md\n M scripts/gen-industry-guides.mts\n M tests/catalog/stations/technology/overlay.test.ts\n M tests/industryGuidesGenerator.test.ts\n?? docs/catalog/technology/guide-section.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "startedAt": "2026-10-18T11:28:54.448424+00:00",
+        "exitCode": 0,
+        "durationMs": 622,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/check-industry-guides.log",
+        "rawLogSha256": "b16dd6d03fd61ab36e7c740d6f27d2f2f9855baf72d88e8fd66a4a86fa49f5a8"
+      }
+    },
+    {
+      "name": "read-error-mutation",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/read-error-mutation.json",
+      "inputRecordSha256": "2175346899fe6d1a149277a8157b2102766e65e6988eecec01fcc602d644ac98",
+      "record": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/industryGuidesGenerator.test.ts",
+          "-t",
+          "does not suppress a station-owned section read error",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/read-error-mutation-report.json"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "exitCode": 1,
+        "durationMs": 2012,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/read-error-mutation.log",
+        "rawLogSha256": "65563f861bb75650d1d22e9a19e9b3050333bee71669579ad42406f1b1b8252e",
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/read-error-mutation-report.json",
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 5
+      }
+    },
+    {
+      "name": "restored-regressions",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/restored-regressions.json",
+      "inputRecordSha256": "6116d0f17e58546a334c0ab8c3d46c905a78c96c3ac5640246cf9008cea98a97",
+      "record": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/industryGuidesGenerator.test.ts",
+          "-t",
+          "station-owned overlay guide sections",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/restored-regressions-report.json"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "exitCode": 0,
+        "durationMs": 2439,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/restored-regressions.log",
+        "rawLogSha256": "7f40360d0c85b41bf62df2584e5d1a7e986762aeba33fbb7954bbf3eead6fdfb",
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/restored-regressions-report.json",
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 4
+      }
+    },
+    {
+      "name": "public-docs-graph",
+      "inputRecordPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/public-docs-graph.json",
+      "inputRecordSha256": "a8efd6bd0544d2208d275d769c9bd6f2e3ec706a7cf2df99f40b51900c3a1e47",
+      "record": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/publicDocsGraph.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/public-docs-graph-report.json"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+        "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "exitCode": 1,
+        "durationMs": 721,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/public-docs-graph.log",
+        "rawLogSha256": "d2eb9a833a2b2475b79ba8413af2cea7a98a4a44fe100d22db9fdb30f7345a58",
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/public-docs-graph-report.json",
+        "numPassedTests": 5,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      }
+    }
+  ],
+  "mutation": {
+    "mutation": "suppress non-ENOENT section read failures",
+    "file": "scripts/gen-industry-guides.mts",
+    "exitCode": 1,
+    "killed": true,
+    "restoredExactly": true,
+    "beforeSha256": "c6891027b84edf7f29a43b0230dcc86c6f98f8e4cf2b67e84f2072a03bfdbda9",
+    "restoredSha256": "c6891027b84edf7f29a43b0230dcc86c6f98f8e4cf2b67e84f2072a03bfdbda9",
+    "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+    "note": "Ancillary generator error-handling proof; primary Technology three-mutation index unchanged."
+  },
+  "generationEquivalence": {
+    "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+    "industryGuideChanges": [
+      "docs/industries/technology.md"
+    ],
+    "otherIndustryGuidesUnchanged": true,
+    "allIncomingGuideBytesPreserved": true,
+    "fragmentAppearsExactlyOnce": true,
+    "fragmentSha256": "bcd63349d70b0e919d926810481f53de5270bddc49f2ddc14fe51be5f15f1d59",
+    "publicLocalLinkAdjustment": "Unpromoted catalog/technology/README hyperlink became an explicit source-path code literal; no other promotion/guide edit.",
+    "inventory": "No obsolete 75/0 count in owned fragment; tracked incoming guide retains97pack questions. Refreshed97pack/16deep inventory belongs to content agent."
+  },
+  "excludedCliDiagnostic": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/guide-hook/red.json",
+    "sha256": "ccbf2cdbc1947de977d3beb07933955f39a3e21d3fa35159d6d2b7fb7c1caf22",
+    "reason": "Unsupported --minWorkers launch failed before tests ran; excluded from behavior TDD."
+  },
+  "note": "Two intended red failures, then 53 passing generator/guide tests; ancillary error-guard mutation killed/restored. Public graph reported only the existing MCP edge. Exact original execution pins and raw log hashes are retained; no re-execution is inferred."
+}

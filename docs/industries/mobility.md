@@ -203,7 +203,7 @@ No output above was produced for this guide. Each row names the function that pr
 | C73 | runAssurance definition | `src/assurance/assuranceRunner.ts` | `export async function runAssurance` |
 | C74 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts` | `await responder.respond(prompt)` |
 | C75 | Domain report builder | `src/domains/domainCliIntegration.ts` | `export function buildDomainReportForAgent` |
-| C76 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(params.outputPath` |
+| C76 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(outputPath, reportMarkdown)` |
 | C77 | compliance command and comply alias | `src/cli.ts` | `program.command("compliance").alias("comply")` |
 | C78 | Compliance report writer | `src/compliance/complianceReport.ts` | `export function writeComplianceReport` |
 | C79 | Not-legal-advice line | `src/compliance/complianceReport.ts` | `This appendix is not legal advice.` |

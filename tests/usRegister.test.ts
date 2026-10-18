@@ -16,6 +16,12 @@ const catalog = loadCatalog();
 const raw = JSON.parse(readFileSync(join(process.cwd(), "catalog/registers/us.json"), "utf8")) as Record<string, unknown>;
 const us = catalog.registers?.get("us");
 const entries: RegisterEntry[] = us?.entries ?? [];
+/** P2-30 owns exactly these federal rows; the CCPA control reuses P1-18's existing state entry. */
+const TECHNOLOGY_ROWS: Record<string, string> = {
+  "technology-us-ftc-proposed-accuracy": "P2-30 Technology: Policy Statement Concerning the Suppression of Accuracy in Artificial Intelligence Systems",
+  "technology-us-tcpa": "P2-30 Technology: TCPA applied to AI-generated voices (Declaratory Ruling) and proposed AI-call disclosure rules",
+  "us-coppa-third-party-consent": "P2-30 Technology: Children's Online Privacy Protection Rule (as amended 2025)"
+};
 const ALL = ["education", "environment", "health", "wealth", "technology", "mobility", "governance"];
 /** The strategy's US register rows and their stations (P1-18 step 3). */
 const ROWS: Record<string, string[]> = {
@@ -56,7 +62,16 @@ describe("catalog/registers/us.json encodes the US register (P1-18)", () => {
       expect(own.length, row).toBeGreaterThan(0);
       for (const e of own) expect(sorted(e.stations), e.id).toEqual(sorted(stations));
     }
-    for (const e of entries) expect(Object.keys({ ...ROWS, ...ADDED_ROWS }), e.id).toContain(e.row);
+    for (const e of entries) {
+      if (Object.hasOwn(TECHNOLOGY_ROWS, e.id)) {
+        expect(e.row, e.id).toBe(TECHNOLOGY_ROWS[e.id]);
+        expect(e.stations, e.id).toEqual(["technology"]);
+      } else {
+        expect(Object.keys({ ...ROWS, ...ADDED_ROWS }), e.id).toContain(e.row);
+      }
+    }
+    const technology = entries.filter((entry) => Object.hasOwn(TECHNOLOGY_ROWS, entry.id));
+    expect(technology.map((entry) => entry.id)).toEqual(Object.keys(TECHNOLOGY_ROWS));
     expect(new Set(entries.map((e) => e.id)).size).toBe(entries.length);
   });
 

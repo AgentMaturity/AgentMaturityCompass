@@ -1,0 +1,51 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (135 tests | 1 failed | 134 skipped) 14ms
+     × binds the NIS2 local warning to its own clock, incident, UTC awareness and typed draft fields 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > binds the NIS2 local warning to its own clock, incident, UTC awareness and typed draft fields
+AssertionError: expected [ { result: 'pass', …(1) }, …(2) ] to deeply equal [ { result: 'fail', …(1) }, …(2) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "reasonCode": "warning_incomplete",
+-     "result": "fail",
++     "reasonCode": "warning_on_time",
++     "result": "pass",
+    },
+    {
+-     "reasonCode": "awareness_missing",
+-     "result": "not_evaluated",
++     "reasonCode": "warning_on_time",
++     "result": "pass",
+    },
+    {
+-     "reasonCode": "awareness_missing",
+-     "result": "not_evaluated",
++     "reasonCode": "warning_on_time",
++     "result": "pass",
+    },
+  ]
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:140:9
+    138|       const result = at(awareAt, createdAt);
+    139|       return { result: result.result, reasonCode: result.reasonCode };
+    140|     })).toEqual([
+       |         ^
+    141|       { result: "fail", reasonCode: "warning_incomplete" },
+    142|       { result: "not_evaluated", reasonCode: "awareness_missing" },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 134 skipped (135)
+   Start at  17:02:06
+   Duration  3.99s (transform 2.96s, setup 67ms, import 3.78s, tests 14ms, environment 0ms)
+

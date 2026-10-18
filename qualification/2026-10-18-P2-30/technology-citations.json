@@ -1,0 +1,314 @@
+{
+  "technology-us-ftc-proposed-accuracy": {
+    "key": "technology-us-ftc-proposed-accuracy",
+    "registerId": "us-ftc-ai-accuracy-policy",
+    "instrument": "Policy Statement Concerning the Suppression of Accuracy in Artificial Intelligence Systems",
+    "clause": "Proposed AI accuracy policy; distinct from the FTC Act Section 5",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "US",
+    "statusType": "draft",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://www.federalregister.gov/documents/full_text/text/2026/07/07/2026-13628.txt",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "US"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "technology-us-tcpa": {
+    "key": "technology-us-tcpa",
+    "registerId": "us-fcc-tcpa-ai",
+    "instrument": "TCPA applied to AI-generated voices (Declaratory Ruling) and proposed AI-call disclosure rules",
+    "clause": "FCC 24-17; exact consent scope requires re-verification",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "US",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://docs.fcc.gov/public/attachments/FCC-24-17A1.pdf",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "US"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "us-coppa-third-party-consent": {
+    "key": "us-coppa-third-party-consent",
+    "registerId": "us-coppa",
+    "instrument": "Children's Online Privacy Protection Rule (as amended 2025)",
+    "clause": "16 CFR 312.5(a)(2); 312.10 (candidate clause pins, unverified here)",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "US",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://www.govinfo.gov/content/pkg/FR-2025-04-22/html/2025-05904.htm",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "US"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "us-ccpa-admt": {
+    "key": "us-ccpa-admt",
+    "registerId": "us-ca-cppa-admt",
+    "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits",
+    "clause": "ADMT notice, opt-out and qualifying human appeal; paragraph pins unverified here",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "US-CA",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://cppa.ca.gov/regulations/ccpa_updates.html",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "US-CA"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "eu-ai-act-art50": {
+    "key": "eu-ai-act-art50",
+    "registerId": "eu-ai-act",
+    "instrument": "Artificial Intelligence Act",
+    "clause": "Article 50(2), candidate pin",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32024R1689",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "eu-ai-act-gpai": {
+    "key": "eu-ai-act-gpai",
+    "registerId": "eu-ai-act",
+    "instrument": "Artificial Intelligence Act",
+    "clause": "GPAI documentation duties; exact paragraphs unverified",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32024R1689",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "technology-eu-ai-omnibus": {
+    "key": "technology-eu-ai-omnibus",
+    "registerId": "eu-ai-omnibus",
+    "instrument": "Digital Omnibus on AI",
+    "clause": "Amendments and transitional provisions; exact paragraphs unverified",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32026R1744",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "technology-eu-dsa": {
+    "key": "technology-eu-dsa",
+    "registerId": "eu-dsa",
+    "instrument": "Digital Services Act",
+    "clause": "Platform duties; exact paragraphs unverified",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32022R2065",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "technology-eu-data-act": {
+    "key": "technology-eu-data-act",
+    "registerId": "eu-data-act",
+    "instrument": "Data Act",
+    "clause": "Data access and sharing duties; exact paragraphs unverified",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32023R2854",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "eu-cra-art14": {
+    "key": "eu-cra-art14",
+    "registerId": "eu-cra",
+    "instrument": "Cyber Resilience Act",
+    "clause": "Article 14, candidate early-warning pin; content not read",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32024R2847",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "eu-nis2-art23": {
+    "key": "eu-nis2-art23",
+    "registerId": "eu-nis2",
+    "instrument": "NIS2 Directive",
+    "clause": "Article 23, candidate reporting pin",
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+    "jurisdiction": "EU",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://publications.europa.eu/resource/celex/32022L2555",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "EU"
+      ]
+    },
+    "legalReview": null,
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+  },
+  "technology-ftc-act-section5": {
+    "key": "technology-ftc-act-section5",
+    "registerId": null,
+    "instrument": "Federal Trade Commission Act, Section 5",
+    "clause": "Section 5; unsourced clause mapping pending primary-text read",
+    "edition": "Unverified; no edition pinned",
+    "jurisdiction": "US",
+    "statusType": "binding-now",
+    "superseded": null,
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review.",
+    "url": "https://www.ftc.gov/",
+    "retrieval": {
+      "state": "unverified",
+      "reason": "Unverified: official publisher homepage is a discovery locator only. No Section 5 primary-text URL or content was read or pinned in P2-30."
+    },
+    "appliesWhen": {
+      "fact": "jurisdictions",
+      "includesAny": [
+        "US"
+      ]
+    },
+    "legalReview": null,
+    "note": "The S5 register has no FTC Act entry. The proposed AI accuracy policy is separate and is not used as a substitute legal basis."
+  }
+}

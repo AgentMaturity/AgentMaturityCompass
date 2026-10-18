@@ -1,0 +1,6 @@
+citations: errors=0 ratcheted=623 baseline=623
+  CIT001 superseded-as-live: findings=0 zero-tolerance=0 baseline=0
+  CIT002 framework-id: findings=3 zero-tolerance=0 baseline=3
+  CIT003 pack-reference: findings=0 zero-tolerance=0 baseline=0
+  CIT004 record-incomplete: findings=620 zero-tolerance=0 baseline=620
+  CIT005 status-type: findings=0 zero-tolerance=0 baseline=0

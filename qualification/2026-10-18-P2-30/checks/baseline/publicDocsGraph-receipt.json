@@ -1,0 +1,49 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/publicDocsGraph.test.ts",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=verbose",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph-report.json"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+  "startedAt": "2026-10-18T09:25:14.414Z",
+  "finishedAt": "2026-10-18T09:25:18.675Z",
+  "exitCode": 1,
+  "signal": null,
+  "before": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "status": ""
+  },
+  "after": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "status": ""
+  },
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph.log",
+  "logSha256": "e05db0ce02fb1e4357c988832875b47ce168a4742d3e504f359ef399fd8b85fa",
+  "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph-report.json",
+  "totals": {
+    "tests": 6,
+    "passed": 5,
+    "failed": 1,
+    "pending": 0
+  },
+  "failures": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/publicDocsGraph.test.ts",
+      "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "duration": 138.31754199999995,
+      "messages": [
+        "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    }
+  ]
+}

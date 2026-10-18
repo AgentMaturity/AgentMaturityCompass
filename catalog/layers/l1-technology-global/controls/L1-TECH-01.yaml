@@ -1,0 +1,172 @@
+# technology.synthetic-media-marked. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-01"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "synthetic-content"
+"stations":
+  - "technology"
+"title": "Verify synthetic-media marking before publication"
+"statement": "An image or audio publish attempt proceeds only when the marking signature verifies over the
+  published bytes against the pinned issuer key."
+"riskRationale": "A present but stripped, altered or unknown-issuer marking can misrepresent the origin of
+  published synthetic media."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "EU"
+      - "fact": "useCases"
+        "includesAny":
+          - "publishes_synthetic_content"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "EU"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "eu-ai-act-art50"
+    "registerId": "eu-ai-act"
+    "instrument": "Artificial Intelligence Act"
+    "clause": "Article 50(2), candidate pin"
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "jurisdiction": "EU"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://publications.europa.eu/resource/celex/32024R1689"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
+        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "EU"
+    "legalReview": null
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+"binding":
+  "kind": "enforcement_point"
+  "points":
+    - "tool_pipeline"
+  "mechanism": "Target boundary: publication in the tool pipeline. Only the local synthetic marking verifier and
+    publish simulator exist in this draft; no production marking guard is connected, and missing production
+    receipts remain not evaluated."
+  "parameters": []
+  "manualDuty": null
+"tests":
+  - "id": "L1-TECH-01-T1"
+    "type": "runtime_enforced"
+    "oracle":
+      "kind": "enforcement_receipt"
+      "observes": "The local image and audio signature verification and simulated publish decision, including the
+        bytes presented for publication; production evidence is evaluated separately."
+    "fixtures":
+      "positive":
+        - "L1-TECH-01/positive/evidence-valid.json"
+        - "L1-TECH-01/positive/oracle-marking-valid.json"
+      "negative":
+        - "L1-TECH-01/negative/evidence-stale.json"
+        - "L1-TECH-01/negative/evidence-replayed.json"
+        - "L1-TECH-01/negative/evidence-contradictory.json"
+        - "L1-TECH-01/negative/evidence-cross-tenant.json"
+        - "L1-TECH-01/negative/evidence-empty.json"
+        - "L1-TECH-01/negative/evidence-violation.json"
+        - "L1-TECH-01/negative/oracle-marking-absent.json"
+        - "L1-TECH-01/negative/oracle-marking-stripped.json"
+        - "L1-TECH-01/negative/oracle-marking-unknown-key.json"
+        - "L1-TECH-01/negative/oracle-marking-receipts-missing.json"
+        - "L1-TECH-01/negative/oracle-marking-verifier-down.json"
+    "passCriteria": "Synthetic fixture only: allow when both image and audio markings verify against the pinned
+      issuer; refuse absent, altered or unknown-issuer markings. Missing receipts or verifier availability are
+      not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-01-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+  - "id": "L1-TECH-01-E2"
+    "producer": "amc.transparency.outputCheck"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "LOGGING_MONITORING.TRANSPARENCY_SEAL"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null
