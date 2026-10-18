@@ -166,11 +166,12 @@ at the start, so a different instrument (`NIST CSF 2.0`, `ISO/IEC 27701:2019`,
 `HITECH Act`, `CCPA/CPRA`) stays unresolved. `classifyFrameworkString` returns
 the framework and how it resolved (`exact`, `alias`, `pattern`), or
 `sector-standard-not-modelled`, or `descoped-source-unreachable` for an
-ISO/IEC 42005 name. On 2026-10-18 the packs on the integration branch cite 224
-distinct strings: 31 resolve and 193 do not. The 193 are committed in
+ISO/IEC 42005 name. On 2026-10-18, after P1-42 landed, the packs cite 224
+distinct strings: 32 resolve and 192 do not. The 192 are committed in
 `tests/fixtures/packFrameworkStrings.unresolved.json`, and
 `tests/packFrameworkAliases.test.ts` fails if the set changes. Regenerate the
-fixture from the packs on `main` after P1-42 lands.
+fixture with `npm run gen:pack-framework-strings` after a build, and check
+that every new string is genuinely unmodelled.
 
 ### Clause-level controls and crosswalk links
 
