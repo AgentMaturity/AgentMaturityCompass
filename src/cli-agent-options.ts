@@ -209,6 +209,8 @@ export function paramsFor(providerId: string, maxTokens: number, options: Pick<R
   if (providerId !== "deepseek" && (options.thinking !== undefined || options.reasoningEffort !== undefined)) {
     throw new Error("--thinking and --reasoning-effort on this surface require --provider deepseek; unused options are not ignored.");
   }
+  // P1-38: pi-ai encoders own stream and stream_options; only the output bound is passed.
+  if (providerId.startsWith(PI_AI_ROUTE_PREFIX)) return { max_tokens: maxTokens };
   switch (providerId) {
     case "ollama":
       // The native contract validates the bound and maps it to options.num_predict.
@@ -403,8 +405,31 @@ export function registerNativeProviderCommands(program: Command, io: AgentLoopCl
   const help = "\nNative provider routes: " + NATIVE_ADAPTERS.map(entry => entry.providerId).join(", ")
     + ".\nUse amc agent-loop providers --json for adapter contracts, not model availability. "
     + "Ollama requires an explicit model and defaults to its native local origin without a credential.";
-  agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help);
+  agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help + PI_AI_ROUTES_HELP);
   acp.addHelpText("after", help);
+}
+
+/** P1-38. Kept literal so selecting a native route never loads the pi-ai modules; a test pins it to piAiRouteIds(). */
+const PI_AI_ROUTE_PREFIX = "pi-ai:";
+export const PI_AI_ROUTES_HELP = "\nThird-party library routes (agent-loop run only): pi-ai:groq, pi-ai:huggingface, pi-ai:together. "
+  + "Requests are built by @earendil-works/pi-ai@1.3.0, an optional peer pinned to a reviewed version and not installed with AMC; "
+  + "native routes stay the default. See docs/providers/CAPABILITY_MATRIX.md.";
+
+/**
+ * A pi-ai route and the encoder registry its runtime must use; undefined for any other provider, null after a refusal
+ * was reported. The pi modules, and the optional peer they load, are imported only here and only for a pi route.
+ */
+export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: Pick<RunOptions, "baseUrl" | "credential">,
+  model: string | undefined): Promise<Awaited<ReturnType<typeof import("./llm/providers/piAi/piAiAdapter.js").piAiRouteFor>> | null | undefined> {
+  if (!providerId.startsWith(PI_AI_ROUTE_PREFIX)) return undefined;
+  try {
+    const { piAiRouteFor } = await import("./llm/providers/piAi/piAiAdapter.js");
+    return await piAiRouteFor(providerId, options, model);
+  } catch (error) {
+    io.error(chalk.red(error instanceof Error ? error.message : "pi-ai route selection failed."));
+    io.fail();
+    return null;
+  }
 }
 
 /** Build the route the operator asked for, or explain why it cannot be built. */

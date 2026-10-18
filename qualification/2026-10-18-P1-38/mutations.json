@@ -1,0 +1,48 @@
+[
+  {
+    "guard": "capability admission for pi routes (src/llm/adapter/llmRuntime.ts, assertRequest: assertRequestCapabilities skipped when providerId starts with pi-ai:)",
+    "command": "npx vitest run tests/piAi/piAiAdapterContract.test.ts -t \"refused before\"",
+    "failingTests": [
+      "groq: a failed tool result is refused before a header, because the pinned encoding cannot carry it",
+      "huggingface: a failed tool result is refused before a header, because the pinned encoding cannot carry it",
+      "together: a failed tool result is refused before a header, because the pinned encoding cannot carry it",
+      "groq: image input is refused before any request/header row exists",
+      "huggingface: image input is refused before any request/header row exists",
+      "together: image input is refused before any request/header row exists"
+    ],
+    "result": "6 failed, 1 passed, 14 skipped by -t; restored, git diff empty"
+  },
+  {
+    "guard": "derivation honesty (src/llm/request/deriveRequest.ts: a pi-ai encoder with no registered encoder reported as reconstructed)",
+    "command": "npx vitest run tests/piAi/piAiDerivation.test.ts",
+    "failingTests": [
+      "without the pinned library a pi request is unreconstructable, never reconstructed"
+    ],
+    "result": "1 failed, 3 passed; restored, git diff empty"
+  },
+  {
+    "guard": "exact version pin (src/llm/providers/piAi/piAiLoader.ts: installed !== PI_AI_VERSION check disabled)",
+    "command": "npx vitest run tests/piAi/piAiLoader.test.ts",
+    "failingTests": [
+      "any version other than the pin refuses, newer included"
+    ],
+    "result": "1 failed, 6 passed; restored, git diff empty"
+  },
+  {
+    "guard": "matrix truth (scripts/gen-capability-matrix.mjs buildMatrix: failed claims counted as passed)",
+    "command": "npx vitest run tests/capabilityMatrix.test.ts",
+    "failingTests": [
+      "a cited test that fails flips its cell to unknown, and one that did not run is not run",
+      "the check refuses a committed matrix that differs from the run, cites a test that did not pass, or is rendered stale"
+    ],
+    "result": "2 failed, 3 passed; restored, git diff empty. RED first: all 5 tests failed against the previous generator before it consumed the vitest report."
+  },
+  {
+    "guard": "end to end: pi envelope path changed to /chat/completion (src/llm/providers/piAi/piAiAdapter.ts), so the pi text contract tests fail",
+    "command": "npm run -s check:capability-matrix",
+    "failingTests": [
+      "groq|huggingface|together: the fixture receives exactly the bytes the signed header commits to, and text and usage decode"
+    ],
+    "result": "exit 1 with 9 \"cites a test that did not pass\" problems (3 routes x text-input, text-output, usage) and their cells reported unknown; restored, the clean check exits 0"
+  }
+]

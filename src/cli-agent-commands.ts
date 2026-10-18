@@ -74,7 +74,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
+  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -373,7 +373,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const compaction = compactionOption(io, opts);
       if (compaction === null) return;
-      const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
+      const piRoute = await piAiRouteSelection(io, providerId, opts, opts.model ?? preset?.model);
+      if (piRoute === null) return;
+      const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
       let images: ReturnType<typeof loadNativeImageFiles>;
       let audioParts: readonly NativeAudioPart[] | undefined;
@@ -474,6 +476,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
       let foreignRunnerDescription = "";
+      // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
+      const lease = runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }); // In-process children inherit it.
       if (toolMode === "workspace") {
         let boundSession: ComposedToolSession | null = null;
         const actualSession = (): ComposedToolSession => {
@@ -487,8 +491,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
-          // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
-          ...runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }),
+          ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...shellOptIn
         });
@@ -691,7 +694,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(audioParts === undefined ? {} : { audioParts }),
           route: { providerId, model, params: requestParams },
           routes: [route],
-          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }),
+          ...(piRoute === undefined ? {} : { encoders: piRoute.encoders }),
+          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }), ...lease,
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),

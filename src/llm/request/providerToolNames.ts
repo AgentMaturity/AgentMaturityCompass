@@ -104,5 +104,7 @@ export function usesProviderToolNames(encoderId: string, version: number): boole
     || (encoderId === "openai-responses" && (version === 2 || version === 3))
     || (encoderId === "deepseek-chat" && version === 1)
     || (encoderId === "ollama-chat" && version === 1)
-    || (encoderId === "gemini-generate-content" && (version === 1 || version === 2));
+    || (encoderId === "gemini-generate-content" && (version === 1 || version === 2))
+    // P1-38: pi-ai encoders alias through encodeProviderToolNames(request, "openai-chat").
+    || (/^pi-ai:[a-z]+$/.test(encoderId) && version === 1);
 }
