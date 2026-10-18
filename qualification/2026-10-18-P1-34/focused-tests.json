@@ -1,14 +1,8 @@
 {
   "command": "npx vitest run tests/catalog/ tests/trust/ tests/verifier/ tests/starterProfiles.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/runPrincipalLease.test.ts tests/freezeGuard.test.ts tests/claims/d03Gates.test.ts",
   "files": 37,
-  "total": 1080,
-  "passed": 1079,
-  "failed": 1,
-  "failures": [
-    {
-      "file": "trust/embeddedKeyForgery.test.ts",
-      "test": "backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr"
-    }
-  ],
-  "failureNote": "tests/trust/embeddedKeyForgery.test.ts timed out at 30 s under load average 24-28; rerun alone with --testTimeout=180000 it passes."
+  "total": 1091,
+  "passed": 1091,
+  "failed": 0,
+  "failures": []
 }

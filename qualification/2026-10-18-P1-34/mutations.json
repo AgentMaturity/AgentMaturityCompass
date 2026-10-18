@@ -2,6 +2,7 @@
   {
     "guard": "record: agent identity refused",
     "file": "src/catalog/governance/reviewRecord.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "an agent identity promotes nothing"
@@ -10,6 +11,7 @@
   {
     "guard": "record: signature required",
     "file": "src/catalog/governance/reviewRecord.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a missing signature promotes nothing"
@@ -18,6 +20,7 @@
   {
     "guard": "record: non-blank credential/conflicts",
     "file": "src/catalog/governance/reviewRecord.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a blank conflicts declaration promotes nothing"
@@ -26,6 +29,7 @@
   {
     "guard": "verify: other subjects kept out of rejected",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "two pinned, independent reviewers of the current content let declared reviewed support stand"
@@ -34,6 +38,7 @@
   {
     "guard": "verify: subject digest = current content",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a review of older content (digest mismatch) promotes nothing"
@@ -42,6 +47,7 @@
   {
     "guard": "verify: not dated after the server clock",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a review dated after the server's clock promotes nothing"
@@ -50,6 +56,7 @@
   {
     "guard": "verify: signature verifies",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a forged record (edited after signing) promotes nothing",
@@ -59,6 +66,7 @@
   {
     "guard": "verify: signer pinned by a list entry",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "an unpinned key promotes nothing",
@@ -67,6 +75,7 @@
       "a key pinned for another purpose promotes nothing",
       "a review dated before its key was valid promotes nothing",
       "a trust list that does not verify (m-of-n unmet, tampered) or does not exist promotes nothing",
+      "a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry",
       "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates",
       "a catalog-review key that a list also pins for another purpose is refused for every purpose"
     ]
@@ -74,11 +83,13 @@
   {
     "guard": "verify: admitted only (revoked, distrusted, purpose)",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a revoked key promotes nothing",
       "a key pinned for another purpose promotes nothing",
       "a review dated before its key was valid promotes nothing",
+      "a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry",
       "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates",
       "a catalog-review key that a list also pins for another purpose is refused for every purpose"
     ]
@@ -86,6 +97,7 @@
   {
     "guard": "verify: claimed time inside key validity",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a review dated before its key was valid promotes nothing"
@@ -94,165 +106,69 @@
   {
     "guard": "verify: reviewer from the key, not the record",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a record naming someone other than its signer promotes nothing"
     ]
   },
   {
+    "guard": "verify: reviewer on the roster",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count"
+    ]
+  },
+  {
+    "guard": "verify: roster git identities checked",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
+      "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping",
+      "reviewers who share any normalized identifier (subject or roster git identity) are one person"
+    ]
+  },
+  {
+    "guard": "verify: declared name checked",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count"
+    ]
+  },
+  {
     "guard": "verify: independent of authors",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a self-review by a pinned author promotes nothing",
       "a self-review matched by the author's git email promotes nothing",
-      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count"
-    ]
-  },
-  {
-    "guard": "F2 verify: reviewer must be on the roster",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count"
-    ]
-  },
-  {
-    "guard": "F2 verify: roster git identities checked",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
       "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
-      "reviewers who share any normalized identifier (subject or roster git identity) are one person"
-    ]
-  },
-  {
-    "guard": "F2 verify: declared name checked",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count"
-    ]
-  },
-  {
-    "guard": "F3 quorum: shared identifiers are one person",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "reviewers who share any normalized identifier (subject or roster git identity) are one person"
-    ]
-  },
-  {
-    "guard": "F4 compile judged at asOf, not the clock",
-    "file": "src/catalog/compiler/compile.ts",
-    "killed": true,
-    "failingTests": [
-      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
-    ]
-  },
-  {
-    "guard": "F4 promotions bound into the digest",
-    "file": "src/catalog/compiler/compile.ts",
-    "killed": true,
-    "failingTests": [
-      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
-    ]
-  },
-  {
-    "guard": "F4 standing: promotion bound to current content",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
-    ]
-  },
-  {
-    "guard": "F4 standing: promotion overdue at asOf",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
-    ]
-  },
-  {
-    "guard": "F5 trust and signatures at the server clock",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates"
-    ]
-  },
-  {
-    "guard": "F5 asOf never looks back",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates"
-    ]
-  },
-  {
-    "guard": "F6 draft confirmation names the control",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "AI-drafted content needs a confirmation naming this control (id@version or digest); any verified objection blocks"
-    ]
-  },
-  {
-    "guard": "F7 catalog-review key has no other purpose",
-    "file": "src/trust/admissionRule.ts",
-    "killed": true,
-    "failingTests": [
-      "a catalog-review key that a list also pins for another purpose is refused for every purpose"
-    ]
-  },
-  {
-    "guard": "F1 OSCAL review status shown",
-    "file": "src/exports/oscal/oscalCatalog.ts",
-    "killed": true,
-    "failingTests": [
-      "the OSCAL export never shows an approval, approver or legal review that did not stand",
-      "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
-    ]
-  },
-  {
-    "guard": "F1 OSCAL approver shown",
-    "file": "src/exports/oscal/oscalCatalog.ts",
-    "killed": true,
-    "failingTests": [
-      "the OSCAL export never shows an approval, approver or legal review that did not stand",
-      "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
-    ]
-  },
-  {
-    "guard": "F1 OSCAL citation legal review shown",
-    "file": "src/exports/oscal/oscalCatalog.ts",
-    "killed": true,
-    "failingTests": [
-      "the OSCAL export never shows an approval, approver or legal review that did not stand"
-    ]
-  },
-  {
-    "guard": "F1 shownReviewBlocks withholds the approver",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "the OSCAL export never shows an approval, approver or legal review that did not stand"
+      "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping"
     ]
   },
   {
     "guard": "verify: author matched by email",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a self-review matched by the author's git email promotes nothing",
       "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
+      "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping",
       "reviewers who share any normalized identifier (subject or roster git identity) are one person"
     ]
   },
   {
     "guard": "verify: F5 confirmation row",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "an unconfirmed F5 verdict promotes nothing"
@@ -261,6 +177,7 @@
   {
     "guard": "verify: review is current",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "an overdue review promotes nothing",
@@ -270,6 +187,7 @@
   {
     "guard": "verify: unschedulable review refused",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "a lapsed, future-dated or unschedulable review never lets support stand"
@@ -278,14 +196,16 @@
   {
     "guard": "trust: list must verify",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "a trust list that does not verify (m-of-n unmet, tampered) or does not exist promotes nothing"
     ]
   },
   {
-    "guard": "quorum: two humans",
+    "guard": "quorum: two people",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "an unpinned key promotes nothing",
@@ -311,8 +231,18 @@
     ]
   },
   {
+    "guard": "quorum: shared identifiers are one person",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "reviewers who share any normalized identifier (subject or roster git identity) are one person"
+    ]
+  },
+  {
     "guard": "quorum: domain expert",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "needs a reviewer the D-08 roster credentials for the control's domain; the roster is empty until D-08"
@@ -321,6 +251,7 @@
   {
     "guard": "quorum: legal reviewer",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "content that cites law needs a credentialed legal reviewer, and no open re-verify item"
@@ -329,6 +260,16 @@
   {
     "guard": "quorum: AI draft confirmed",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "AI-drafted content needs a confirmation naming this control (id@version or digest); any verified objection blocks"
+    ]
+  },
+  {
+    "guard": "quorum: draft confirmation names the control",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "AI-drafted content needs a confirmation naming this control (id@version or digest); any verified objection blocks"
@@ -337,30 +278,142 @@
   {
     "guard": "quorum: objection blocks",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "AI-drafted content needs a confirmation naming this control (id@version or digest); any verified objection blocks"
     ]
   },
   {
-    "guard": "support: no promotion, nothing stands",
-    "file": "src/catalog/governance/support.ts",
-    "killed": true,
-    "failingTests": [
-      "without review authority nothing stronger than experimental stands; it never raises a declaration"
-    ]
-  },
-  {
     "guard": "support: open re-verify item blocks",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
     "killed": true,
     "failingTests": [
       "content that cites law needs a credentialed legal reviewer, and no open re-verify item"
     ]
   },
   {
+    "guard": "support: no promotion, nothing stands",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "without review authority nothing stronger than experimental stands; it never raises a declaration"
+    ]
+  },
+  {
+    "guard": "clock: trust and signatures at the server clock",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates"
+    ]
+  },
+  {
+    "guard": "clock: asOf never looks back",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates"
+    ]
+  },
+  {
+    "guard": "promotion: only minted promotions stand",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "promotion: empty promotions refused",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "promotion: record digests bound",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "promotion: frozen",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "promotion: bound to current content",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
+    ]
+  },
+  {
+    "guard": "promotion: not reviewed after asOf",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "promotion: overdue at asOf",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state"
+    ]
+  },
+  {
+    "guard": "identity: NFKC, whitespace, casefold",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping"
+    ]
+  },
+  {
+    "guard": "identity: +tag and trailing dot",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping"
+    ]
+  },
+  {
+    "guard": "identity: roster entry needs an identity",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "a roster entry without a git identity cannot vouch for independence, so its reviewer never counts"
+    ]
+  },
+  {
     "guard": "view: approved shown only where support stood",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "the OSCAL export never shows an approval, approver or legal review that did not stand",
@@ -370,8 +423,28 @@
     ]
   },
   {
+    "guard": "view: no named review in exports",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
+    "killed": true,
+    "failingTests": [
+      "the OSCAL export never shows an approval, approver or legal review that did not stand",
+      "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
+    ]
+  },
+  {
+    "guard": "view: approver withheld",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
+    "killed": true,
+    "failingTests": [
+      "the OSCAL export never shows an approval, approver or legal review that did not stand"
+    ]
+  },
+  {
     "guard": "view: legal review shown only where support stood",
     "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "the OSCAL export never shows an approval, approver or legal review that did not stand",
@@ -379,8 +452,9 @@
     ]
   },
   {
-    "guard": "route: compile writes the result",
+    "guard": "route: compile writes the verdict",
     "file": "src/catalog/compiler/compile.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "compilePlan: a row is reviewed only where supportStanding let a promotion from effectiveSupport stand",
@@ -388,8 +462,29 @@
     ]
   },
   {
+    "guard": "route: compile judged at asOf, not the clock",
+    "file": "src/catalog/compiler/compile.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state",
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
+    "guard": "route: promotions bound into the plan digest",
+    "file": "src/catalog/compiler/compile.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state",
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
+    ]
+  },
+  {
     "guard": "route: OSCAL support prop",
     "file": "src/exports/oscal/oscalCatalog.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "the OSCAL export never shows an approval, approver or legal review that did not stand",
@@ -398,8 +493,38 @@
     ]
   },
   {
+    "guard": "route: OSCAL review block",
+    "file": "src/exports/oscal/oscalCatalog.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
+    "killed": true,
+    "failingTests": [
+      "the OSCAL export never shows an approval, approver or legal review that did not stand",
+      "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
+    ]
+  },
+  {
+    "guard": "route: OSCAL approver",
+    "file": "src/exports/oscal/oscalCatalog.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
+    "killed": true,
+    "failingTests": [
+      "the OSCAL export never shows an approval, approver or legal review that did not stand",
+      "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
+    ]
+  },
+  {
+    "guard": "route: OSCAL citation legal review",
+    "file": "src/exports/oscal/oscalCatalog.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
+    "killed": true,
+    "failingTests": [
+      "the OSCAL export never shows an approval, approver or legal review that did not stand"
+    ]
+  },
+  {
     "guard": "route: activate shows the routed status",
     "file": "src/catalog/compiler/activate.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
@@ -408,6 +533,7 @@
   {
     "guard": "route: A4 conformance support",
     "file": "src/a4/a4Conformance.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
@@ -416,6 +542,7 @@
   {
     "guard": "route: A4 why-view legal review",
     "file": "src/a4/adaptPolicy.ts",
+    "test": "tests/catalog/governance/promotion.test.ts",
     "killed": true,
     "failingTests": [
       "no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist"
@@ -424,6 +551,7 @@
   {
     "guard": "report: unverified reviewed content is an error",
     "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "a reviewed control citing an instrument tied to an open item is an error; experimental content is not",
@@ -434,6 +562,7 @@
   {
     "guard": "report: declared approval without record warned",
     "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "an approved review the YAML declares without a verified record is never hidden: an error when it claims reviewed support, else a warning"
@@ -442,6 +571,7 @@
   {
     "guard": "report: lapsed review is GOV_REVIEW_OVERDUE",
     "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "lapsed reviewed content is an error, a review falling due is a warning, and so are register status reviews"
@@ -450,14 +580,34 @@
   {
     "guard": "report: review falling due warned",
     "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "lapsed reviewed content is an error, a review falling due is a warning, and so are register status reviews"
     ]
   },
   {
+    "guard": "git: authors follow renames",
+    "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
+    "killed": true,
+    "failingTests": [
+      "a control's git authors follow renames (git log --follow), and no history is refused"
+    ]
+  },
+  {
+    "guard": "git: no history refused",
+    "file": "src/catalog/governance/index.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
+    "killed": true,
+    "failingTests": [
+      "a control's git authors follow renames (git log --follow), and no history is refused"
+    ]
+  },
+  {
     "guard": "cadence: US state monthly",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "a US state citation is monthly"
@@ -466,6 +616,7 @@
   {
     "guard": "cadence: EU guidance monthly",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "EU guidance (an EU register entry with voluntary binding force) is monthly",
@@ -475,22 +626,25 @@
   {
     "guard": "cadence: Indian draft monthly",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "an Indian draft is monthly; a binding Indian instrument is not"
     ]
   },
   {
-    "guard": "cap: register entry next review",
+    "guard": "cadence: register entry next review caps",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "a binding EU regulation is quarterly, never later than the register entry's own next review"
     ]
   },
   {
-    "guard": "cap: register window",
+    "guard": "cadence: register window caps",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "a shorter register window shortens the cadence"
@@ -499,6 +653,7 @@
   {
     "guard": "cadence: invalid anchor unresolved",
     "file": "src/catalog/governance/currency.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
     "killed": true,
     "failingTests": [
       "an invalid review date, an unusable window or an unknown register entry is unresolved, never a default"
@@ -507,6 +662,7 @@
   {
     "guard": "changelog: append-only",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "editing, truncating or reordering an old entry fails"
@@ -515,6 +671,7 @@
   {
     "guard": "changelog: entry required",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "a digest change without a changelog entry fails and names the expected entry"
@@ -523,6 +680,7 @@
   {
     "guard": "changelog: catalog id/version/digest",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "an entry that misses a changed control, or names the wrong version or digest, fails"
@@ -531,6 +689,7 @@
   {
     "guard": "changelog: control coverage",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "an entry that misses a changed control, or names the wrong version or digest, fails"
@@ -539,6 +698,7 @@
   {
     "guard": "changelog: review ids for reviewed content",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "a change to reviewed content needs review record ids; experimental content may have none"
@@ -547,6 +707,7 @@
   {
     "guard": "changelog: removal unresolved",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "retirement is a support transition; a removed control is unresolved, never treated as retired"
@@ -555,6 +716,7 @@
   {
     "guard": "changelog: retirement is a support transition",
     "file": "src/catalog/governance/changelogGuard.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [
       "retirement is a support transition; a removed control is unresolved, never treated as retired"
@@ -563,6 +725,7 @@
   {
     "guard": "loader: governance files outside digest",
     "file": "src/catalog/loader.ts",
+    "test": "tests/catalog/governance/changelogGuard.test.ts",
     "killed": true,
     "failingTests": [],
     "suiteError": "the test file fails to load"
@@ -570,6 +733,7 @@
   {
     "guard": "reverify: only open items block",
     "file": "src/catalog/governance/reverify.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "matches a citation's register id or instrument exactly"
@@ -578,6 +742,7 @@
   {
     "guard": "reverify: exact match",
     "file": "src/catalog/governance/reverify.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "matches a citation's register id or instrument exactly"
@@ -586,9 +751,28 @@
   {
     "guard": "reverify: closed items name date and record",
     "file": "src/catalog/governance/reverify.ts",
+    "test": "tests/catalog/governance/reverify.test.ts",
     "killed": true,
     "failingTests": [
       "a confirmed or changed item names its check date and review record; ids are unique"
+    ]
+  },
+  {
+    "guard": "trust: catalog-review entry has no other purpose",
+    "file": "src/trust/admissionRule.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "a catalog-review key that a list also pins for another purpose is refused for every purpose"
+    ]
+  },
+  {
+    "guard": "trust: split lists, no catalog-review for a shared key",
+    "file": "src/trust/admissionRule.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry"
     ]
   }
 ]

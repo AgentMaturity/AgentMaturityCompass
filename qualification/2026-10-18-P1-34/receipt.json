@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-34",
   "date": "2026-10-18",
-  "commit": "9d632e411dbf9bb9da8cee22db2316aa110120da",
+  "commit": "aea46aeedd52567caafe961eeed1cf142b35e090",
   "branch": "rtd/p1-34-catalog-governance",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,122 +12,137 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 167759
+      "durationMs": 95417
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 69912
+      "durationMs": 95391
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 116281
+      "durationMs": 200527
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 5175
+      "durationMs": 7050
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 1848
+      "durationMs": 2536
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 777
+      "durationMs": 723
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 3485
+      "durationMs": 5450
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 2839
+      "durationMs": 4644
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 950
+      "durationMs": 733
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 1379
+      "durationMs": 1966
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 1666
+      "durationMs": 392
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 874
+      "durationMs": 435
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1240
+      "durationMs": 1429
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 6247
+      "durationMs": 13302
     },
     {
       "cmd": "npm run -s check:catalog-currency -- --as-of 2027-01-15",
       "exit": 0,
-      "durationMs": 693
+      "durationMs": 958
     },
     {
       "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
       "exit": 0,
-      "durationMs": 2413
+      "durationMs": 1719
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 1,
+      "durationMs": 554
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 635
+    },
+    {
+      "cmd": "npm run -s release:notes",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check (after regenerating)",
+      "exit": 0,
+      "durationMs": 3000
     },
     {
       "cmd": "npx vitest run tests/catalog/ tests/trust/ tests/verifier/ tests/starterProfiles.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/runPrincipalLease.test.ts tests/freezeGuard.test.ts tests/claims/d03Gates.test.ts --reporter=json",
-      "exit": 1,
-      "durationMs": 534000
+      "exit": 0,
+      "durationMs": 252000
     },
     {
-      "cmd": "npx vitest run tests/trust/embeddedKeyForgery.test.ts -t \"backup restore with --allow-unpinned\" --testTimeout=180000",
+      "cmd": "python3 P1-34-work/mutate.py (80 mutations, one vitest file each)",
       "exit": 0,
-      "durationMs": 60000
-    },
-    {
-      "cmd": "python3 mutate.py (68 mutations, one vitest file each; scratchpad harness)",
-      "exit": 0,
-      "durationMs": 1800000
+      "durationMs": 2400000
     }
   ],
   "tests": {
-    "total": 1080,
-    "passed": 1079,
-    "failed": 1,
+    "total": 1091,
+    "passed": 1091,
+    "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "4f44bc2f8360a773ff258700597c0d153a4107d00f55d757532bf6925bbeb62b"
+      "sha256": "38184022be5fae772017642f8ee75bda4cfa46b5481395b0eb99c6e2cab7cc92"
     },
     {
       "path": "focused-tests.json",
-      "sha256": "58cff22a1cd903411fa3e1250f7cf837297e1a55942c3b72d3aa0b427fb58a94"
+      "sha256": "b7b72ce19da5bf94e942ba413b93ba15016ff790e73eec92a1c6eb4d1b89e4f5"
     },
     {
       "path": "int-comparison.json",
-      "sha256": "e0aff2ad3018e87607df9445d9351660f6e8915fa3793f217b4f41a1841e18c4"
+      "sha256": "d228bdbb3c76371711f3713162b7e7c3086ac60db5faa47de1faa4cd1a9a5ab3"
     },
     {
       "path": "mutations.json",
-      "sha256": "2bba72f388c86794face27816bd9b6359a6043b67fc0e7323634896132fefd52"
+      "sha256": "4c22abb144fc96304d98952602909f10f942ec03062c27e03e5bea14e51d505a"
     }
   ],
-  "notes": "Focused tests only; the full suite was not run here. The one focused failure, tests/trust/embeddedKeyForgery.test.ts, timed out at 30 s under load and passes alone with a longer timeout; the vitest row exits 1 for it. Durations of the last three rows are approximate. All 68 mutations killed. No content is promoted: every control stays experimental and GOVERNANCE.md awaits Sid's approval. See README.md."
+  "notes": "Focused tests only; the full suite was not run here. The release:notes --check row exits 1 until npm run release:notes adds the P1-34 changeset; the rerun exits 0. Durations of the last four rows are approximate. All 80 mutations killed. No content is promoted: every control stays experimental and GOVERNANCE.md awaits Sid's approval. See README.md for the unsigned-identity limit."
 }
