@@ -1207,7 +1207,8 @@
                                     "notary",
                                     "evidence-authority",
                                     "independent-attestation",
-                                    "trust-list-root"
+                                    "trust-list-root",
+                                    "catalog-review"
                                   ],
                                   "type": "string"
                                 },
@@ -2225,7 +2226,8 @@
                                     "notary",
                                     "evidence-authority",
                                     "independent-attestation",
-                                    "trust-list-root"
+                                    "trust-list-root",
+                                    "catalog-review"
                                   ],
                                   "type": "string"
                                 },

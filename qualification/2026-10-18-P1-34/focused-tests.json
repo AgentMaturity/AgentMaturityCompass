@@ -1,0 +1,8 @@
+{
+  "command": "npx vitest run tests/catalog/ tests/trust/ tests/verifier/ tests/starterProfiles.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/runPrincipalLease.test.ts tests/freezeGuard.test.ts tests/claims/d03Gates.test.ts",
+  "files": 37,
+  "total": 1093,
+  "passed": 1093,
+  "failed": 0,
+  "failures": []
+}

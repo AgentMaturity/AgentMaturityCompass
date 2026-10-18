@@ -1,0 +1,128 @@
+# Facts to re-verify against the primary source before publishing packs (the strategy's list; P1-34). Experimental
+# draft: every item is open until a named human expert checks the primary text and records a review record
+# (docs/catalog/GOVERNANCE.md). Keep an item open while no primary text exists; a secondary source never closes it.
+# A reviewed or qualified control citing an instrument an open item affects fails check:catalog-currency
+# (GOV_REVERIFY_OPEN). `affects` names S5 register ids (src/compliance/regulatory/register.json) where an entry exists,
+# taken from the P1-18 register's own reverify flags, and otherwise the instrument by name; matching is exact.
+checklistVersion: 1
+items:
+  - id: mas-ai-risk-guidelines
+    fact: The MAS AI risk management guidelines, final text
+    sourceToCheck: The final guidelines as published by the Monetary Authority of Singapore
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [MAS AI risk management guidelines]
+  - id: rbi-model-risk-guidance
+    fact: The RBI model-risk guidance, final text
+    sourceToCheck: The final guidance as published by the Reserve Bank of India
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [RBI model risk management guidance]
+  - id: sebi-ai-ml-rules
+    fact: The SEBI AI/ML rules, final text
+    sourceToCheck: The final rules or circular as published by the Securities and Exchange Board of India
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [SEBI AI/ML rules]
+  - id: rbi-master-directions-consolidation
+    fact: RBI's November 2025 consolidation of its rules into master directions
+    sourceToCheck: The master directions as published by the Reserve Bank of India, and what each one replaced
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [RBI master directions]
+  - id: sebi-irdai-circular-chains
+    fact: The SEBI and IRDAI circular chains
+    sourceToCheck: Each circular's current version and what it supersedes, as published by SEBI and by IRDAI
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [SEBI circulars, IRDAI circulars]
+  - id: dpdp-dates
+    fact: The DPDP dates, counted from 13 or 14 November 2025
+    sourceToCheck: The DPDP Rules notification as published in the Gazette of India
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [in-dpdp]
+  - id: en-18286-official-journal
+    fact: The EN 18286 citation in the Official Journal
+    sourceToCheck: The Official Journal of the European Union
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [EN 18286]
+  - id: eu-ai-act-art6-art73-guidance
+    fact: The final EU guidance on AI Act Article 6 and Article 73
+    sourceToCheck: The European Commission's final guidelines on Article 6 and Article 73 of Regulation (EU) 2024/1689
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [eu-ai-act]
+  - id: hti-5-final-rule
+    fact: The HTI-5 final rule
+    sourceToCheck: The final rule as published in the Federal Register
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [HTI-5]
+  - id: sr-23-4-replacement
+    fact: SR 23-4's replacement
+    sourceToCheck: The final interagency third-party risk management guidance from the Federal Reserve, OCC and FDIC
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [us-sr-23-4, us-tprm-proposal-2026]
+  - id: colorado-sb26-189-final-text
+    fact: Colorado SB 26-189, final text
+    sourceToCheck: The enrolled act as published by the Colorado General Assembly
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [us-co-sb26-189]
+  - id: eeoc-doj-ai-guidance-status
+    fact: The status of the EEOC and DOJ AI guidance
+    sourceToCheck: Whether each EEOC and DOJ AI guidance document is still published by the issuing agency
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [us-eeoc-ai-ta, DOJ AI guidance]
+  - id: us-banking-ai-rfi
+    fact: The US banking agencies' AI request for information
+    sourceToCheck: The request for information as published in the Federal Register, and anything issued after it
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [us-sr-26-2]
+  - id: card-network-agent-payments
+    fact: Card-network liability for agent-initiated payments
+    sourceToCheck: The card networks' current operating rules on agent-initiated transactions
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [card-network operating rules]
+  - id: reg-e-delegated-credentials
+    fact: How Reg E applies to agents holding delegated credentials
+    sourceToCheck: Regulation E (12 CFR Part 1005), its official interpretations, and any CFPB statement on agent-initiated transfers
+    owner: null
+    status: open
+    checkedAt: null
+    reviewRecordId: null
+    affects: [us-reg-e]

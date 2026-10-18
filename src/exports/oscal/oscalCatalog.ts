@@ -6,6 +6,7 @@
  * compliance statement.
  */
 import { controlDigest } from "../../catalog/digest.js";
+import { effectiveSupport, shownLegalReview, shownReviewBlocks } from "../../catalog/governance/support.js";
 import { buildCatalogLock } from "../../catalog/lockfile.js";
 import type { LoadedCatalog } from "../../catalog/loader.js";
 import type { Citation, ControlRecord } from "../../catalog/types.js";
@@ -21,8 +22,11 @@ const REMARKS = "Experimental AMC Regulated Control Catalog content, agent-draft
   + "metadata.last-modified is the latest draftedAt or reviewedAt date in the controls: AMC records no catalog modification time.";
 
 function controlProps(r: ControlRecord) {
+  // P1-34: support, the review status and the approver as effectiveSupport lets them show, never the YAML's own claim.
+  const support = effectiveSupport(r).support;
+  const shown = shownReviewBlocks(r, support);
   return [
-    prop("version", r.version), prop("support", r.support), prop("layer", String(r.layer)),
+    prop("version", r.version), prop("support", support), prop("layer", String(r.layer)),
     ...(r.family ? [prop("family", r.family)] : []),
     ...r.stations.map((s) => prop("station", s)),
     prop("mandatory", String(r.mandatory)),
@@ -36,8 +40,8 @@ function controlProps(r: ControlRecord) {
     prop("owner-role", r.owner.role),
     ...(r.clock ? [jsonProp("clock", r.clock)] : []),
     ...r.crosswalk.map((x) => jsonProp("crosswalk", x)),
-    jsonProp("review", r.review),
-    jsonProp("provenance", r.provenance),
+    jsonProp("review", shown.review),
+    jsonProp("provenance", shown.provenance),
     prop("control-digest", controlDigest(r))
   ];
 }
@@ -58,7 +62,8 @@ function oscalControl(r: ControlRecord) {
 /** A citation's URL and, once retrieved and hashed, its content SHA-256; the full citation record as a prop. */
 function citationResource(r: ControlRecord, c: Citation) {
   const hashes = c.retrieval.state === "verified" ? { hashes: [{ algorithm: "SHA-256", value: c.retrieval.contentSha256 }] } : {};
-  return { uuid: citationUuid(r, c), title: line(`${c.instrument}, ${c.clause}`), props: [prop("control-id", r.id), jsonProp("citation", c)], rlinks: [{ href: c.url, ...hashes }] };
+  const shown = { ...c, legalReview: shownLegalReview(c, effectiveSupport(r).support) }; // P1-34: none | recorded | unverified
+  return { uuid: citationUuid(r, c), title: line(`${c.instrument}, ${c.clause}`), props: [prop("control-id", r.id), jsonProp("citation", shown)], rlinks: [{ href: c.url, ...hashes }] };
 }
 
 function catalogLosses(cat: LoadedCatalog, controls: ControlRecord[]): OscalLoss[] {
