@@ -18,7 +18,6 @@ import { resolveNotaryBindHost, startNotaryServer } from "./notaryServer.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { assertFileNotExample } from "../claims/eligibility/exampleMode.js";
-import { artifactClaim, withClaimFields } from "../cli/claimOutput.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 function loadPassphraseForInit(): string {
@@ -194,8 +193,7 @@ export function notaryAttestCli(params: {
 }
 
 export function notaryVerifyAttestCli(file: string, trust: TrustContext, pubkeyPath?: string) {
-  return withClaimFields(verifyNotaryAttestationBundle(resolve(file), trust, pubkeyPath ? readFileSync(resolve(pubkeyPath), "utf8") : null),
-    artifactClaim("notary:attestation"));
+  return verifyNotaryAttestationBundle(resolve(file), trust, pubkeyPath ? readFileSync(resolve(pubkeyPath), "utf8") : null);
 }
 
 export function notarySignCli(params: {

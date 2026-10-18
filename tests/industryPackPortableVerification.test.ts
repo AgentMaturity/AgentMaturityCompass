@@ -162,6 +162,8 @@ describe("Industry Pack portable Ed25519 verification (P0-51)", () => {
     expect(result.valid).toBe(false);
     expect(result.report.integrity.status).toBe("fail");
     expect(result.report.integrity.errors).toContain("license signature mismatch");
+    // No key verified the tampered signature, so none is reported as its admitted signer.
+    expect(result.report.issuerAdmission.signatures).toEqual([expect.objectContaining({ keyId: null, status: "not-pinned" })]);
     expect(result.report.overrides).toEqual([]);
     expect(verdictExitCode(result.report)).toBe(1);
   });

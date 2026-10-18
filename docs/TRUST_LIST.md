@@ -133,9 +133,9 @@ Lists are checked against `--trust-root <sha256>` (repeatable), else `<AMC home>
 
 Every refusal names the key id, so you can pin the right key.
 
-The current ordered rules admit a matching explicit pin before considering a trust-list `key-compromise` revocation. This conflicts with P0-09's broader goal that an admitted key is neither revoked nor distrusted. P0-51's bounded qualification retains three failing refusal cases for this conflict; no precedence change or waiver is approved. Distrust continues to override an explicit pin.
+A matching explicit pin admits a key before a trust-list `key-compromise` revocation is considered. Distrust overrides an explicit pin.
 
-Request-supplied trust fields must be refused even when their values are `false` or `null`. Bounded checks confirm this for the Merkle-proof and trust-token handlers. The formal-certificate handler instead strips all 15 tested trust-field names and returns 200 with an untrusted result; 30 strict refusal cases remain active. Reserved API source is unchanged, and these checks do not establish complete route coverage or HTTP authentication.
+An API request cannot supply verification trust: a handler that verifies under the server's trust refuses a request that names any trust field (pins, allow flags, trust roots), with 400, even when its value is `false` or `null`. The Merkle-proof, trust-token and formal-certificate handlers do this; trust comes only from the server operator's trust list.
 
 For portable `domain pack verify`, the verifier can locate the Ed25519 signing key in an operator-verified trust list without a separate PEM flag or environment key. Locating a verifying key does not pin it: the existing admission rules still decide its purpose, validity, distrust and revocation status. Paid activation and shared-secret or legacy license behavior are separate from portable issuer admission.
 

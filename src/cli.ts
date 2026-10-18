@@ -11709,8 +11709,8 @@ withTrustFlags(notary
   .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
-    printClaimResult(artifactClaim("notary:attestation"), { json: opts.json });
-    finishVerify("Notary attestation", result.report, { json: opts.json, result });
+    // finishVerify prints the claim, downgraded when verification fails.
+    finishVerify("Notary attestation", result.report, { json: opts.json, result, claim: artifactClaim("notary:attestation") });
   });
 
 notary
@@ -12447,8 +12447,7 @@ withTrustFlags(transparency
   .action((file: string, opts: TrustFlags) => {
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
       opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
-    printClaimResult(artifactClaim("transparency:log"), { json: opts.json });
-    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
+    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified, claim: artifactClaim("transparency:log") });
   });
 
 transparencyMerkle

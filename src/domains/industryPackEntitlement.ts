@@ -312,7 +312,8 @@ export function verifyIndustryPackLicenseReport(licenseKey: string, trust: Trust
     : verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer ?? keys[0] }, now);
   const report = buildVerifierReport({ artifact: { kind: "industry-pack-license", path: "--key", sha256: sha256Hex(licenseKey.trim()) },
     context, integrityErrors: result.valid ? [] : [result.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
-    signatures: [admitKey({ publicKeyPem: signer ?? keys[0] ?? null, purpose: "artifact-seal", signature: "license signature", context,
+    // No key verified the signature: report it unadmitted rather than admitting whichever key came first.
+    signatures: [admitKey({ publicKeyPem: signer, purpose: "artifact-seal", signature: "license signature", context,
       claimedSignedAt: result.payload?.issuedAt ?? null })] });
   return { ...result, valid: report.trusted, report };
 }
