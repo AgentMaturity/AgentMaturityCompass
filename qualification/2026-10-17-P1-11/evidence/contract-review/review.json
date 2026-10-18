@@ -1,0 +1,158 @@
+{
+  "schema": "p111-independent-contract-review/1",
+  "at": "2026-10-16T19:24:27.774436+00:00",
+  "allReadsFinished": true,
+  "blockersForBoundedUnitLane": [],
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headFromRootBranchAdoption": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+    "branch": "codex/p1-11-evidence-qualification",
+    "noGitRecheckByReviewer": true
+  },
+  "scope": "Private static contract/source-control review only. New sole test target tests/catalog/evidence/decisive.test.ts; no allocation, implementation or runtime by this task.",
+  "mandatoryDecisiveRows": [
+    {
+      "case": "empty audit stream",
+      "isolatedInput": "No items with at least one required contract/minItems1",
+      "unitWitness": "evidence incomplete; result not_evaluated; no vacuous pass"
+    },
+    {
+      "case": "another subject",
+      "isolatedInput": "One otherwise valid item with wrong known subjectId",
+      "unitWitness": "binding_mismatch; no admitted ref; not_evaluated"
+    },
+    {
+      "case": "another control or policy",
+      "isolatedInput": "Separate wrong controlId/controlVersion/policyDigest one at a time",
+      "unitWitness": "binding_mismatch with exact field detail; not_evaluated"
+    },
+    {
+      "case": "stale",
+      "isolatedInput": "31days old inside a wider window, maxAgeDays30; fresh claimedAt",
+      "unitWitness": "stale rejection and evidence stale; not_evaluated; recorded time controls freshness"
+    },
+    {
+      "case": "replayed",
+      "isolatedInput": "Same prefixed ref or receipt id under different actual useKey; first valid use and same-key prior-use controls",
+      "unitWitness": "replayed rejection; no timestamp-only replay substitute"
+    },
+    {
+      "case": "cross-workspace receipt",
+      "isolatedInput": "Typed foreignReceipt true after otherwise-valid bindings/provenance",
+      "unitWitness": "replayed at this unit seam; actual event_hash/workspace verification remains loader integration gap"
+    },
+    {
+      "case": "contradictory",
+      "isolatedInput": "Two unique admitted refs, same observationKey, different observations, neither verdict violates",
+      "unitWitness": "evidence contradictory; result not_evaluated; separate admitted violation must still fail"
+    },
+    {
+      "case": "cross-tenant",
+      "isolatedInput": "Wrong tenant with all other bindings valid",
+      "unitWitness": "cross_tenant; evidence untrusted; not_evaluated"
+    },
+    {
+      "case": "forged producer",
+      "isolatedInput": "Claimed known producer with provenance verifiedfalse, plus mismatched proved producer/null derived tier edges",
+      "unitWitness": "producer_unverified; evidence untrusted; unit seam does not verify real forgery"
+    },
+    {
+      "case": "operator tier",
+      "isolatedInput": "Derived SELF_REPORTED provenance versus ignored attributes.trustTier OBSERVED",
+      "unitWitness": "Admitted tier stays SELF_REPORTED; self_reported claim; no regulated positive; real meta derivation unqualified here"
+    },
+    {
+      "case": "invalidated",
+      "isolatedInput": "Relevant policy_version invalidation strictly after recorded time",
+      "unitWitness": "invalidated rejection; not_evaluated; irrelevant/equal-time invalidations are distinct controls"
+    },
+    {
+      "case": "not applicable",
+      "isolatedInput": "Otherwise perfect admitted evidence and not_applicable plan",
+      "unitWitness": "not_evaluated, never pass; evidence may remain sufficient/observed kind"
+    },
+    {
+      "case": "violation",
+      "isolatedInput": "One admitted violates item, another required different-producer contract missing",
+      "unitWitness": "result fail despite incomplete evidence; no contradiction blanket overriding trusted failure"
+    },
+    {
+      "case": "system session",
+      "isolatedInput": "Positive system session for agent contract, paired workspace-scope/system violation-only boundaries",
+      "unitWitness": "Positive rejects binding_mismatch; admitted system violation intentionally fails, including missing agentId exemption"
+    },
+    {
+      "case": "valid",
+      "isolatedInput": "Fresh fully bound observed producer/provenance, applicable unit plan, matching policy/allow or deny at binding point",
+      "unitWitness": "All five dimensions; pass; enforced tool_pipeline; observed; exact admitted refs and pending review"
+    }
+  ],
+  "additionalFiniteAssertions": [
+    "Producer absent/planned/contract mismatch rejects before provenance; provenance producerId mismatch/null tier rejects before binding. Required binding absence must remain distinct from mismatches.",
+    "Window and freshness inclusive boundaries, sampling minItems/minObservedRatio, producer maxClaimKind cap, synthetic claim cap, no-plan unresolved, warn/observed/none enforcement and digest-bound pending/approved/rejected/expired review are useful finite adjacent cases without approval-signature credit.",
+    "Digest and admitted/rejected reference order deterministic for distinct refs; evaluatedAt/review digest rules are checked without replacing Date.now. No general tie-order/replay determinism claim beyond fixtures."
+  ],
+  "dependencies": {
+    "P0-08": "Current ClaimKind/StatusDimensions and evaluateClaimEligibility imported; P1-11 provides only sufficient/all-observed tiers to permit observed. Review does not create independently_reviewed kind.",
+    "P1-09": "Current EvaluableControl/EvidenceContract/ProducerRecord types, catalog schema/docs and producer registry are present. amc.toolPipeline.guard,amc.ledger,amc.assuranceRunner are available; amc.toolPipeline.receipt is planned and must not be falsely admitted from registry. Typed fixture registry rows are unit inputs, not loader validation.",
+    "P0-17": "Current mappingAdapter and report/scorer preserve empty/no-audit/control/subject/provenance refusals, system-violation-only behavior and pass-only credit.",
+    "P0-18": "effectiveTrustTier derives imports/manual/external to SELF_REPORTED and synthetic to none; runtime declared tiers remain current documented behavior. Pure admission consumes an already-derived tier, not a real writer or loader proof."
+  },
+  "regressions": {
+    "primaryUnchangedFiles": [
+      {
+        "path": "tests/compliance/complianceFailClosed.test.ts",
+        "purpose": "Real local workspace ledger/map/assurance adapters; empty/untrusted/system/subject/window fail-closed behavior and public plan:null/no PARTIAL."
+      },
+      {
+        "path": "tests/compliance/evidenceBinding.test.ts",
+        "purpose": "P0-17 producer/binding/subject/assurance reader rules. Its source-literal census reads R/src from retained cwd, not S; do not relabel it S inventory."
+      },
+      {
+        "path": "tests/compliance/coverageScorer.test.ts",
+        "purpose": "PARTIAL/UNKNOWN/NOT_EVALUATED earn zero and remain denominator; score null when evaluated0."
+      }
+    ],
+    "rootReportedBaseline": "Root reported actual63/63 for these three files; no execution or independent runtime audit claimed by this reviewer.",
+    "optionalRelatedOnly": [
+      {
+        "path": "tests/claims/claimEligibility.test.ts",
+        "purpose": "P0-08 independent eligibility table; useful if shared claim semantics are later changed."
+      },
+      {
+        "path": "tests/compliance/complianceMatrix.test.ts",
+        "purpose": "Framework/category dimensions and labels, plan:null/no score, failures versus unevaluated; useful separate surface regression."
+      },
+      {
+        "path": "tests/complianceReportReadability.test.ts",
+        "purpose": "Markdown claim labels and evidence drilldown; no Studio/browser runtime credit."
+      },
+      {
+        "path": "tests/catalog/controlRecordSchema.test.ts",
+        "purpose": "P1-09 contract/producer schema dependency; not a requirement to widen the pure cohort now."
+      },
+      {
+        "path": "tests/catalog/catalogLoader.test.ts",
+        "purpose": "P1-09 actual catalog loader registry/schema; no predecessor full acceptance inference."
+      }
+    ],
+    "noNewGate": "Root chooses finite canonical corpus; no universal full-suite credit or extra mandatory validation invented."
+  },
+  "controls": "controls.json has four exact one-occurrence source recipes/hashes. No mutant written or predicted pass/failure count; candidate exact identity/line mapping remains pending.",
+  "publicReportLimits": [
+    "complianceContext returns plan:null and unknown tenant/deployment/subject. Public reports intentionally cannot earn positive applicability/pass from otherwise sufficient rows. Unit applicable plan is not compiled/signed-plan integration.",
+    "Spec empty-ledger score0 conflicts with current explicit null for nothing evaluated. Preserve current fail-closed regression and record this unqualified whole-issue spec gap, not a human hold.",
+    "Current report status uses NOT_EVALUATED for unevaluated; spec says UNKNOWN compatibility field. Legacy PARTIAL/UNKNOWN remain recognized by scorer, but engine no longer emits PARTIAL.",
+    "Mapping adapter reads ledger/assurance and local monitor-signed chain, not portable independent trust. Synthetic ItemProvenanceverifiedtrue and foreignReceipt flags do not prove signatures, receipt/event_hash/workspace checks or external authorities."
+  ],
+  "wholeIssueGaps": [
+    "All15 cases through generateComplianceReport with actual stale/replay/cross-tenant/forged/operator fixtures compared against origin/main afterP0-17 are not established by this unit lane.",
+    "Compiled applicability/policy plan, review-engine signature integration and complete bound loader routes for receipt/external/config/review items remain outside these pure tests.",
+    "Sampling method/rate execution and actual control oracle/passCriteria execution are not established by minItems/derived verdict unit inputs. Same-producer multiple-contract behavior is not universally qualified: evaluator selects first producer contract and dimensions count by producer.",
+    "All result surfaces including CLI/Studio/unified/matrix, full npm test, full required checks/docs/changeset/merged PR and all four spec-level mutation proofs remain whole-issue acceptance work.",
+    "No source-owner release, predecessor full closure, package approval, F37 skip resolution, quality waiver, held decision resolution, release or complete-plan claim."
+  ],
+  "ownership": "Adopt B30 finite next-p111-admission only as history. Root owns new current admission/freeze/hosted/D15; live RES remains missing with last-known binding. Source evaluator/claims/runtime and all Claude variants remain read-only.",
+  "graph": "Existing B30 admission records stale graph navigation resolving an older binder evaluateControl; no current-source authority or refresh/query run by this task.",
+  "execution": "No Git/index/hosted/D15/freeze/network/Claude messaging/product/parser/compiler/native/SQL or test execution; private JSON/prose/pins only."
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "p107-raw-evidence-representation-adoption/1",
+  "reason": "Default Git trailing/EOF/space-before-tab-sensitive text is represented losslessly; no original bytes or whitespace checks are changed.",
+  "changes": [
+    {
+      "original": {
+        "relativePath": "commands/p107-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      },
+      "envelope": {
+        "relativePath": "commands/p107-build/stdout-stderr.log.evidence.json",
+        "bytes": 1721,
+        "sha256": "b577c0d00567d2b3815930f3ebe7df600396b047f29912bd8dc5ec082dd87eda"
+      },
+      "defaultGitWhitespaceRules": [
+        "blank-at-eof"
+      ],
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "commands/p107-tests-typecheck/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      },
+      "envelope": {
+        "relativePath": "commands/p107-tests-typecheck/stdout-stderr.log.evidence.json",
+        "bytes": 671,
+        "sha256": "4302c2e2ae6ee7370ccab90b80c14550d6a58d8b9484601543bcdd88c570eec6"
+      },
+      "defaultGitWhitespaceRules": [
+        "blank-at-eof"
+      ],
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "commands/p107-typecheck/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      },
+      "envelope": {
+        "relativePath": "commands/p107-typecheck/stdout-stderr.log.evidence.json",
+        "bytes": 649,
+        "sha256": "3666736fc386b3f1e55fb71c85cc6e7ce136ce8d552e05abc36aa453b4d78554"
+      },
+      "defaultGitWhitespaceRules": [
+        "blank-at-eof"
+      ],
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "evidence/count-surface.patch",
+        "bytes": 20310,
+        "sha256": "615d58bf948994eb38f9f898e5aea5750b975b94776cf8bb9c113ffe60b2e1c1"
+      },
+      "envelope": {
+        "relativePath": "evidence/count-surface.patch.evidence.json",
+        "bytes": 27518,
+        "sha256": "e3de8fc9f3850baaaf544f1a4e413e290ec4de48b837b77d1369912eb0c61c28"
+      },
+      "defaultGitWhitespaceRules": [
+        "blank-at-eol",
+        "blank-at-eof"
+      ],
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "controls/M2-register-seeder.patch",
+        "bytes": 872,
+        "sha256": "ccacc51c961cc87b6fa386688b628d517e666e4d85eff9cfa647e98509a7d300"
+      },
+      "envelope": {
+        "relativePath": "controls/M2-register-seeder.patch.evidence.json",
+        "bytes": 1605,
+        "sha256": "fc7818c8ff826b15e676c88169f72b18bb728b28db42dbd4f6b43928bec4d849"
+      },
+      "defaultGitWhitespaceRules": [
+        "blank-at-eol"
+      ],
+      "roundTripVerified": true
+    }
+  ],
+  "losslessRoundTripVerified": true,
+  "commandOutcomesUnchanged": true
+}

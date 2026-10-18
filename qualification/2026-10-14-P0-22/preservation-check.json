@@ -1,0 +1,36 @@
+{
+  "atUtc": "2026-10-14T16:56:49.625117+00:00",
+  "source": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "checkouts": {
+    "primary": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "trackedStatus": ""
+    },
+    "Claude": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "trackedStatus": ""
+    }
+  },
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "protectedEqualAcceptedMain": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "scripts/per-file-coverage.mjs": "ce5b1fcaa4d81cfb7c14cd6fe3d9f26d0563f9ce7f19f9a746cdcf8b817cffb3",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    ".oxlintrc.json": "9b76abe409fe9ef1b72d0a68ce051e3c0860b9ca472d6174b6e47ad9e6d1c450",
+    "scripts/lint-contract.mjs": "d6dae456e92b3ec85d7bd911d39776e9558ebb7443f2b1bb0cdd83b34810d169",
+    "scripts/check-no-fabrication.mjs": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+  },
+  "heldClaudeRoot": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+  "policy": "No reset, stash, cleanup, source overlay, freeze exception, gate/floor/baseline relaxation, external message, tracker closure, push or publication."
+}

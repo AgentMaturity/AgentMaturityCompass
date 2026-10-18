@@ -58,7 +58,7 @@ function buildArtifact(env: Record<string, string> = {}): string {
 
 afterAll(() => {
   for (const directory of temporaryRoots) rmSync(directory, { recursive: true, force: true });
-});
+}, 120_000);
 
 describe("public Docs Pages artifact", () => {
   test("uses only same-origin runtime inputs and a lockfile-pinned renderer", () => {
@@ -159,6 +159,10 @@ describe("public Docs Pages artifact", () => {
     const serialized = JSON.stringify(reflection);
     for (const symbol of ["initWorkspace", "InitWorkspaceOptions", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
     expect(serialized).toContain(`/blob/${revision}/`);
+    const sourceUrls = [...serialized.matchAll(/"url":"([^"]+)"/g)].map(match => match[1]!);
+    for (const source of ["src/workspace.ts", "src/adapters/pi/amcPiExtension.ts"]) {
+      expect(sourceUrls.some(url => url.startsWith(`https://github.com/AgentMaturity/AgentMaturityCompass/blob/${revision}/${source}#L`)), source).toBe(true);
+    }
     expect(pnpmIntegrityFor("typedoc", String(pkg.devDependencies.typedoc), root)).not.toBeNull();
     const initPage = readFileSync(resolve(withApi, "api/functions/index.initWorkspace.html"), "utf8");
     expect(initPage).toContain("interfaces/index.InitWorkspaceOptions.html");

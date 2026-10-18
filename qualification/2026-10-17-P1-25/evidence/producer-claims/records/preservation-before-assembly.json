@@ -1,0 +1,14 @@
+{
+  "schema": "p125pc-root-current-preservation/1",
+  "at": "2026-10-17T02:18:50.342531+00:00",
+  "mode": "before-metadata",
+  "sourceHead": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "all175ActivePhysicalPinsExact": true,
+  "other172OriginalAndThreeAdmittedMetadataSuccessorsExact": false,
+  "all102SourceFreshPairs23CompiledPairs204DistinctPhysicalFilesExact": true,
+  "all13DistinctNativesExact": true,
+  "freshCleanIndexEmpty": true,
+  "heldR18RowsHeadIndexExact": true,
+  "sourceCleanIndexEmptyRequired": true,
+  "noUniversalIsolationClaim": true
+}

@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "reviewer": "/root/failure_diagnosis",
+  "capturedUtc": "2026-10-15T07:30:08.686646+00:00",
+  "decision": "V1_BASELINE_UNQUALIFIED_FIXTURE_PRECONDITION_ERROR; V2_DELTA_NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [
+    {
+      "scope": "Frozen v1 fixture only",
+      "classification": "fixture-expectation-error",
+      "file": {
+        "path": "/private/tmp/p0-41-program-metrics-qualification-prepared.test.ts",
+        "bytes": 37984,
+        "sha256": "98ed903d584d706f08323abbd4b584350f5c5a8dd18587dca93ee5ea178049f0"
+      },
+      "line": 508,
+      "column": 94,
+      "expectedStatus": 128,
+      "actualStatus": 1,
+      "message": "Exact128 is not the Git -e existence contract. Q12d product CLI/refusal at509 was not executed. Preserve failed baseline; do not resume or relabel it."
+    }
+  ],
+  "blockingFindings": [],
+  "v1Baseline": {
+    "qualified": false,
+    "sameNamespaceContinuationApproved": false,
+    "counts": {
+      "numTotalTests": 27,
+      "numPassedTests": 26,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 2
+    },
+    "rawSuccess": false,
+    "failedCase": {
+      "ancestorTitles": [
+        "P041 supplied-input and genuine local Git qualification"
+      ],
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12d a nonexistent full merged SHA refuses with a committed evidence path",
+      "status": "failed",
+      "title": "Q12d a nonexistent full merged SHA refuses with a committed evidence path",
+      "duration": 194.52891699999964,
+      "failureMessages": [
+        "AssertionError: expected 1 to be 128 // Object.is equality\n    at /private/tmp/p0-41-causal-qualification-20261015/source/tests/p041ProgramMetricsQualification.test.ts:508:94\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "meta": {},
+      "tags": []
+    },
+    "process": {
+      "pid": 28685,
+      "pgid": 28685,
+      "exit": 1,
+      "durationMs": 6084,
+      "recordedGroupAbsentByESRCH": true,
+      "probes": [
+        {
+          "capturedUtc": "2026-10-15T07:25:37.332250+00:00",
+          "pgid": 28685,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3
+        }
+      ],
+      "newProbeOrSignalByReviewer": false
+    },
+    "observerPidMatched": true,
+    "unhandledErrors": [],
+    "hookAndNonBodyErrorsAbsent": true,
+    "knownLateDiagnosticMatches": [],
+    "producerFrozenPairsByteExact": true,
+    "phasePins": [
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/command.json",
+        "bytes": 1946,
+        "sha256": "2ed1434820f0b46922b0178b2fc4763687e5f43c88f99fc0b9ebd3c57686ff56"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/inputs-before.json",
+        "bytes": 881,
+        "sha256": "1e937dc0970688aaf0bb5395a813c3db6994875287598ac3a9d26e4aa66f2f6d"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/observer-producer.json",
+        "bytes": 16517,
+        "sha256": "45a01aff62979aadc60fed5f31672957388af36ec92a2f268492c91c9c838260"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/observer.json",
+        "bytes": 16517,
+        "sha256": "45a01aff62979aadc60fed5f31672957388af36ec92a2f268492c91c9c838260"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/owned-process.json",
+        "bytes": 1579,
+        "sha256": "347cff59c89811358a77d830e5960065cf6276ae86608b473ef443308d26ba5f"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/raw-producer.json",
+        "bytes": 12603,
+        "sha256": "5da72813fddc2bdaf25d302039c3636e5e1483d4cb7e93a0a15a917f7cce4ed8"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/raw.json",
+        "bytes": 12603,
+        "sha256": "5da72813fddc2bdaf25d302039c3636e5e1483d4cb7e93a0a15a917f7cce4ed8"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/stdout-stderr-frozen.log",
+        "bytes": 5177,
+        "sha256": "f11a79b851131d6393dbc166531d8c35462afab0beb0160751a44fd6ded74a07"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/stdout-stderr.log",
+        "bytes": 5177,
+        "sha256": "f11a79b851131d6393dbc166531d8c35462afab0beb0160751a44fd6ded74a07"
+      }
+    ],
+    "markers": [
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/ACTIVE",
+        "bytes": 216,
+        "sha256": "cc2aae4fe4d385e01c1ee1ff890236aeba50e04ac7069e05b4ccf67569f3fcea"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/HALTED.json",
+        "bytes": 288,
+        "sha256": "86bdfab8265284d92a659a8a50a9f9348698be2941a52b81d5761db77d8b5f11"
+      }
+    ],
+    "noMutantCreatedOrLaunched": true,
+    "noRestorationOccurred": true
+  },
+  "q12dEvidence": {
+    "root": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k",
+    "fixtureMetadata": {
+      "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/fixture.json",
+      "bytes": 976,
+      "sha256": "b487b4531dce170ae7d3f8e466bc6f818f10dbd301b5e6341b0c7dbdfb986d26"
+    },
+    "completedCommands": 12,
+    "commandResultPins": [
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/001/result.json",
+        "bytes": 1053,
+        "sha256": "0e7efc2bc0e7850eff85d31f10fa88c0231e5d1c45d0ed237c1d41c0c1c86cf4"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/002/result.json",
+        "bytes": 353,
+        "sha256": "c6308a2385cc21eeaf605211dc924bd6bd5b2c2997f3ad91cda881a50fdc5213"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/003/result.json",
+        "bytes": 360,
+        "sha256": "5c1c37eef0f53b76e6dc1a1262a04bda0432993b7c48af4984c2b30bb097eafd"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/004/result.json",
+        "bytes": 436,
+        "sha256": "ce6c785af56e802c5a28f529281a5ddd4844c9a84ddac816f22db7b2d006d976"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/005/result.json",
+        "bytes": 634,
+        "sha256": "afa386be071f3b62b5b168efc2a5128ea41ae041ce6d1d62616406c91315fa12"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/006/result.json",
+        "bytes": 364,
+        "sha256": "888d2496ef7a8a75c43b7feab5b54b235d63006702d1800b871659e2f81be811"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/007/result.json",
+        "bytes": 368,
+        "sha256": "0910d2ccf96b44e6ab25a339c461cee3c44b530edc8c6b3f4d13f2be6a0ee826"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/008/result.json",
+        "bytes": 376,
+        "sha256": "c3227a1d792337ab69e17401609cc91e93bddced148198853f7d61101fca94f2"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/009/result.json",
+        "bytes": 530,
+        "sha256": "0c83bf833d8c477d22321757aa8b1d790f500aa385eaec8344a0f6a68c558739"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/010/result.json",
+        "bytes": 364,
+        "sha256": "281be5c0efdabf6d341feb487398563b409b25b87cb2384b4103d03537eec736"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/011/result.json",
+        "bytes": 408,
+        "sha256": "26883fd6956b7c59cc4359f80a69c2c5eb57a8af84b446ed1933bf148b6770c0"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/012/result.json",
+        "bytes": 351,
+        "sha256": "79fedfc93aa8495cd7ecb12847f30bdce9316b442db72c763c9adf45577ba3f6"
+      }
+    ],
+    "absenceCommand": {
+      "argv": [
+        "git",
+        "cat-file",
+        "-e",
+        "ffffffffffffffffffffffffffffffffffffffff"
+      ],
+      "cwd": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/fixture",
+      "pid": 29008,
+      "status": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "",
+      "error": null
+    },
+    "actualProductCliInvocations": 0,
+    "masking": "The failure at508 prevented line509. A script path staged by git add is not an actual CLI invocation.",
+    "productRefusalMeasured": false
+  },
+  "preservation": {
+    "parentTrackedFilesReadAndHashed": 8574,
+    "parentCompiledFilesReadAndHashed": 4529,
+    "privateRegularFilesReadAndHashed": 13104,
+    "physicalParentCopyPairsModeAndIdentityChecked": 13103,
+    "allBaselineBytesPreserved": true,
+    "copyIdentitiesSingleLinkUniqueAndDisjoint": true,
+    "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+    "nativeHashDeviceInodeAndNlinkUnchanged": true,
+    "originalSource": {
+      "path": "/private/tmp/p0-41-causal-qualification-20261015/original-source--P041-M1-missing-source-zero.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    "originalSourceIsBaselineNotRestoration": true,
+    "mutantSourceAndResultFilesAbsent": true,
+    "activeHaltedUntouched": true,
+    "sourceManifest": {
+      "bytes": 1073886,
+      "path": "/private/tmp/p0-41-qualification-20261015/tracked-source-before.json",
+      "sha256": "6a87be623c9a996b469a0cee493c308224c6dd338a1e6a8da5f89d9dcc9e80aa"
+    },
+    "compiledManifest": {
+      "bytes": 485185,
+      "path": "/private/tmp/p0-41-qualification-20261015/compiled-after-build.json",
+      "sha256": "7366e9fb3ab0c66386420af2a5794f55899a78854aabc7a0a92a17af0b70f879"
+    },
+    "physicalManifest": {
+      "bytes": 4232642,
+      "path": "/private/tmp/p0-41-causal-qualification-20261015/physical-source-dist-manifest.json",
+      "sha256": "49ab024af81d499a5cf835f45d4785823fd78b0701c0c1361c40578956bdfc6d"
+    }
+  },
+  "installedGitDocumentation": {
+    "pin": {
+      "path": "/Library/Developer/CommandLineTools/usr/share/man/man1/git-cat-file.1",
+      "bytes": 18818,
+      "sha256": "b668e6bfdbf5be738c407a60cb32f32488ee92d6f57e24402981ab5ff1584064"
+    },
+    "lines": "74-80 and480",
+    "meaning": "-e exits zero for an existing valid object; the documented option does not mandate failure128. Observed missing full hash returned1."
+  },
+  "v2StaticReview": {
+    "candidate": {
+      "path": "/private/tmp/p0-41-program-metrics-qualification-v2-prepared.test.ts",
+      "bytes": 38030,
+      "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+    },
+    "preparation": {
+      "path": "/private/tmp/p0-41-program-metrics-qualification-v2-preparation-20261015.json",
+      "bytes": 6189,
+      "sha256": "3a59d49e71e5e272dcd57303956b486763d264f10d77506aa1d4a27beb8ff974"
+    },
+    "blockingFindings": [],
+    "entireSourceExactInverseReplacementVerified": true,
+    "exactChange": {
+      "occurrences": 1,
+      "before": "expect(absent.error).toBeNull(); expect(absent.signal).toBeNull(); expect(absent.status).toBe(128);",
+      "after": "expect(absent.error).toBeNull(); expect(absent.signal).toBeNull(); expect(absent.status).toBeTypeOf(\"number\"); expect(absent.status).not.toBe(0);",
+      "scope": "Only the Q12d native Git absence precondition. All bytes outside that exact anchor are unchanged.",
+      "justification": "The actual retained native git cat-file -e child returned1 with no error/signal. An absent object requires nonzero status;128 is not the contract. A numeric nonzero expectation rejects null andzero while retaining exact following product CLI refusal andallotheroracles.",
+      "sourceCorrection": false,
+      "generalOracleRelaxation": false
+    },
+    "literalDefinitionsUnchanged": 27,
+    "allNamesQ2Q6aAndOtherBytesUnchanged": true,
+    "errorAndSignalNullChecksPreserved": true,
+    "immediateProductRefusalPreserved": "refusal(cli(owned, [\"--json\"]), CLOSED_ERROR);",
+    "matcherAvailabilityPins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.d.ts",
+        "bytes": 31498,
+        "sha256": "5c935b7fc4ddc1410ea1cd7cd4e35ed106a6e4920dd27a9480a40fd224359dc3"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js",
+        "bytes": 72296,
+        "sha256": "b177ca97952f1d65d3d2691edbc31ab1af56ac36b3cf08d7f56ad0ca69f07a45"
+      }
+    ],
+    "actualRuntimeOrPasses": null,
+    "separateNamespaceSetupControllerAndReleaseRequired": true,
+    "priorFullContextReview": {
+      "path": "/private/tmp/p0-41-new-fixture-static-review-20261015.json",
+      "bytes": 8434,
+      "sha256": "5eb7477bf175b237626ca0aad213f330ffa5c90757c23743c46d99cfddedbb88"
+    }
+  },
+  "reviewObserverHistory": [
+    "An initial in-memory delta check assumed an alternative typeof assertion spelling and stopped; the final exact comparison uses the authored toBeTypeOf anchor from the sealed v2 note. This was a reviewer metadata check, not product or test execution."
+  ],
+  "limits": [
+    "v1 is a failed baseline, not an expected mutation kill or product defect.",
+    "Q12d product refusal is masked in v1 and unmeasured in unexecuted v2.",
+    "Recorded process-group absence is scoped to the finished owned group; no new probe, universal descendants or cleanup claim.",
+    "V2 static correctness does not establish imports, TypeScript, runtime, actual sensitivity or restoration.",
+    "No formal acceptance, full suite, Node24, release, Done, inherited-debt or human-choice closure."
+  ],
+  "performed": {
+    "closedRawObserverStreamsAndQ12dEvidenceRead": true,
+    "fullParentAndPrivatePreservationReads": true,
+    "v2FullContextAndExactDeltaRead": true,
+    "productOrGitRuntime": false,
+    "codeParserImportTypecheckCollection": false,
+    "signalsRetriesCleanupOrSourceChanges": false,
+    "oldNamespaceWrites": false,
+    "writes": "Only this new review JSON and Markdown pair."
+  },
+  "runtimeAuthorizationProvided": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-41-v1-baseline-failure-review-20261015.md",
+    "bytes": 3273,
+    "sha256": "787c8e64227b582d9fb9b35978c2fead52e4d41a9126605ba915e4d9005e9348"
+  }
+}

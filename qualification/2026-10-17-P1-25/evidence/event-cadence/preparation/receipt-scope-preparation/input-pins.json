@@ -1,0 +1,159 @@
+{
+  "schema": "p125ec-receipt-scope-readonly-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/observations.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 4832134,
+      "sha256": "15cda5ac62b4bac7286470d6623ad22c356ccb275ed540a0cbab632ab0947bdb",
+      "dev": 16777231,
+      "inode": 543820302,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/observations.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/observations.json",
+      "bytes": 1674075,
+      "sha256": "70d199c3d2b821be705cb7c0a96a1fa94afff477c78aaf0c56b41f2bd6ab477a",
+      "dev": 16777231,
+      "inode": 543826126,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/seal-v2.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/seal-v2.json",
+      "bytes": 3469,
+      "sha256": "038a9411972d150259615df4dd9d06608c17eb9484e6b495e44752a21d9ae1f6",
+      "dev": 16777231,
+      "inode": 543820469,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 1477,
+      "sha256": "edaf6249d211041538ab48ca46b8bdc57cef46c44ab909b1e1600d8b582eef32",
+      "dev": 16777231,
+      "inode": 543820311,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 12821,
+      "sha256": "0356aa901047919eea12c5f332b1e259739ce382ae9d2460f64d502795e1c1ef",
+      "dev": 16777231,
+      "inode": 543820397,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "bytes": 85886,
+      "sha256": "5706fc8ed1bc5ba6285a7a40509e9954d04dda2edce32a5a8432155a65e657b1",
+      "dev": 16777231,
+      "inode": 543820400,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/README-v2.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/README-v2.md",
+      "bytes": 3221,
+      "sha256": "35b82969b2c88ac5ddd9f952f01b873aeb4dafb5dd84abb1ded0b49fa6e5f4db",
+      "dev": 16777231,
+      "inode": 543820467,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/pending-reservation-entry-v2.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/pending-reservation-entry-v2.md",
+      "bytes": 727,
+      "sha256": "216e0b4b891c1b6181f06a34aa9c2e81b668fe516794918bf8be818d339663a6",
+      "dev": 16777231,
+      "inode": 543820468,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal-v2.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal-v2.json",
+      "bytes": 2240,
+      "sha256": "a5805c9e89c6c29a6e97207413a6ddce81bcfb7e153b13630feb1686f28fdaed",
+      "dev": 16777231,
+      "inode": 543829007,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+      "bytes": 13290,
+      "sha256": "cd938738e1a50c8129e3bd677dfe0a53f7eacb84bd2bbaa76439b42a0f870f3a",
+      "dev": 16777231,
+      "inode": 543829006,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal.json",
+      "bytes": 2314,
+      "sha256": "5cb41ebb8090e033cf88e442180dc9fdcecc4d89b8d8d4c30a70609d2a4f420e",
+      "dev": 16777231,
+      "inode": 543826614,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/read-tool-results.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/read-tool-results.json",
+      "bytes": 603,
+      "sha256": "15f57a16794b8080b6d9dec9ed9bcd33b3e0a6f53cef23cca72206f7076629b5",
+      "dev": 16777231,
+      "inode": 543826610,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/README.md",
+      "bytes": 1615,
+      "sha256": "fb9ae50f3b359b83cb41b9e1a052321e215f644efe1f77778d9492688460916b",
+      "dev": 16777231,
+      "inode": 543826612,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 80498,
+      "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+      "dev": 16777231,
+      "inode": 543829387,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "bytes": 122294,
+      "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935",
+      "dev": 16777231,
+      "inode": 543898614,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "bytes": 541,
+      "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103",
+      "dev": 16777231,
+      "inode": 543836072,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/bounded-closure.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/bounded-closure.json",
+      "bytes": 1321,
+      "sha256": "bdb1e3e582f711b7a7edb70002c4a6326b90150b22119f8323b0d64d3bee19e5",
+      "dev": 16777231,
+      "inode": 543829185,
+      "nlink": 1
+    }
+  ],
+  "underlyingRuntimeSourceNativeFilesNotReaudited": true
+}

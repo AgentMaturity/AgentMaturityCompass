@@ -1,0 +1,4118 @@
+{
+  "key": "P0-30",
+  "oldIssue": "AMC-1517",
+  "date": "2026-10-15",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1517-qualification-20261015",
+  "releaseAndActualLiveBaseline": {
+    "runtimeAllowed": true,
+    "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "authorization": "ROOT1517RUNTIMEPASS after independent1516 review and actual live13 baseline",
+    "recordedUtc": "2026-10-15T00:19:08.308077+00:00",
+    "rootBaseline": {
+      "path": "/private/tmp/p0-30-AMC-1517-unchanged-two-file-baseline-20261015.json",
+      "bytes": 5964,
+      "sha256": "668ab84fba36dfab779181dd6cc3340bb5e80029b89974a6e4bf3713cbc2b551"
+    },
+    "actualCounts": {
+      "numTotalTests": 13,
+      "numPassedTests": 13,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "rootReportedDurationMs": 1084
+  },
+  "originalRegisteredCases": 13,
+  "supplementalDistinctCases": 3,
+  "currentScopeDistinctCases": 16,
+  "files": [
+    "tests/neutralImportMapping.test.ts",
+    "tests/callbackTelemetryCapture.test.ts"
+  ],
+  "originalMatrices": [
+    {
+      "id": "S7-M20-callback-allowlist-66",
+      "recipe": {
+        "id": "S7-M20-callback-allowlist-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY",
+        "sourceReplace": "if ((SENSITIVE_KEY",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY",
+        "compiledReplace": "if ((SENSITIVE_KEY",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/S7-M20-callback-allowlist-66-matrix.json",
+        "bytes": 9316,
+        "sha256": "660c5c279a1dd2c46e368713f5b7f8ae38760960eed8087be6cd326b82cb5bf6"
+      },
+      "baseline": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-baseline/raw-tests.json",
+          "bytes": 5947,
+          "sha256": "8ff24f4d132cd9070413162d7690b94f76c53fe9ded9c07effe10bea8f0b6e83"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-baseline/command.json",
+          "bytes": 1882,
+          "sha256": "d4ef3d4f0d5cb4a37ae0e731aa287a59a23354303bf3c1bd53d468e881cec236"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 13,
+        "numPassedTests": 12,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-mutant/raw-tests.json",
+          "bytes": 6360,
+          "sha256": "c83e676d575f106dafe695995745b34cff9908eac6d99583b0bd471921bf72b6"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-mutant/command.json",
+          "bytes": 1868,
+          "sha256": "84ac9005730d74d7cc44de9c4cd729e4791c3ee017458399cce8be09d84b6830"
+        }
+      },
+      "restored": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-restored/raw-tests.json",
+          "bytes": 5949,
+          "sha256": "bc2ce5f8f24ae1a3ea770ec3be3a28d074b8a0abb70cbb53626855b68848cd9c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M20-callback-allowlist-66-restored/command.json",
+          "bytes": 1882,
+          "sha256": "02497f2b96ac08e9d3a8f7f9ef04b3bd8714027bea6cf6ce28d20d5074266b49"
+        }
+      },
+      "caseNames": [
+        "callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events",
+        "callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys",
+        "callback capture attribute admission known token counters stay admitted although their names contain input/output",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator"
+      ],
+      "failedAssertions": [
+        {
+          "name": "callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events",
+          "messages": [
+            "AssertionError: expected { \u2026(5) } to deeply equal { 'pi.tool.name': 'read', \u2026(1) }\n    at /private/tmp/p0-30-AMC-1517-qualification-20261015/closure/tests/callbackTelemetryCapture.test.ts:19:30\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "classification": "assertion-specific behavioral sensitivity",
+      "historicalExpectationRetained": "killed"
+    },
+    {
+      "id": "S7-M21-callback-sensitive-extension-66",
+      "recipe": {
+        "id": "S7-M21-callback-sensitive-extension-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "|| (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))) { filtered++",
+        "sourceReplace": ") { filtered++",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key)))",
+        "compiledReplace": "if (!this.allowed.has(key))",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/S7-M21-callback-sensitive-extension-66-matrix.json",
+        "bytes": 9482,
+        "sha256": "11b44b2b194b4473fa26b90cb63709facbd077204b4d2bf15faccb0dbcdb08e1"
+      },
+      "baseline": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-baseline/raw-tests.json",
+          "bytes": 5937,
+          "sha256": "064ab2bdc0bc007106167ef64fea6638d91d489ce815338be7f6e388912d6216"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-baseline/command.json",
+          "bytes": 1952,
+          "sha256": "03f410e0a557a7430695a7cf4fd75ba3bc006221cc82e38a4b1cec4c6344f82d"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 13,
+        "numPassedTests": 12,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-mutant/raw-tests.json",
+          "bytes": 6374,
+          "sha256": "a75f2539abdd3a0470ce49112d5599254986b5dde55029e9a22317e9fcbab9ad"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-mutant/command.json",
+          "bytes": 1938,
+          "sha256": "9cd0214f46e4a8ee1539d9415018d69f45a03c0ffa01fa01fa94e2a1de171175"
+        }
+      },
+      "restored": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-restored/raw-tests.json",
+          "bytes": 5944,
+          "sha256": "0f9ecf8c15c67d86fbe66fda022d371e4f46eb3c4b9f60518c8c9f070436816e"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M21-callback-sensitive-extension-66-restored/command.json",
+          "bytes": 1952,
+          "sha256": "3de5ae4d01d0448073b896799b196048a0f0375196e7bc189735b7b6e1534fa3"
+        }
+      },
+      "caseNames": [
+        "callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events",
+        "callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys",
+        "callback capture attribute admission known token counters stay admitted although their names contain input/output",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator"
+      ],
+      "failedAssertions": [
+        {
+          "name": "callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys",
+          "messages": [
+            "AssertionError: expected { 'app.region': 'eu', \u2026(2) } to deeply equal { 'app.region': 'eu' }\n    at /private/tmp/p0-30-AMC-1517-qualification-20261015/closure/tests/callbackTelemetryCapture.test.ts:28:53\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "classification": "assertion-specific behavioral sensitivity",
+      "historicalExpectationRetained": "killed"
+    },
+    {
+      "id": "S7-M22-callback-token-counter-exemption-66",
+      "recipe": {
+        "id": "S7-M22-callback-token-counter-exemption-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))",
+        "sourceReplace": "SENSITIVE_KEY.test(key)",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))",
+        "compiledReplace": "SENSITIVE_KEY.test(key)",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/S7-M22-callback-token-counter-exemption-66-matrix.json",
+        "bytes": 9459,
+        "sha256": "cca034daec6f7c2cc99f2a48f1389d2de91be761e3c229362c65360f4c4b7964"
+      },
+      "baseline": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-baseline/raw-tests.json",
+          "bytes": 5947,
+          "sha256": "b981f1195117cad04654c65c464844ead8e17dd2f03c8f1cf639bc9a0df94868"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-baseline/command.json",
+          "bytes": 1980,
+          "sha256": "4de4626cfb1ae9dbe11fbe184c3034c888a507af4caf9ca9b4d5a67759bd45f9"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 13,
+        "numPassedTests": 12,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-mutant/raw-tests.json",
+          "bytes": 6356,
+          "sha256": "5af303746033c04e794fd61043c6a15bd7dae4d0b86bb7109e0723e456a3add5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-mutant/command.json",
+          "bytes": 1967,
+          "sha256": "096a7ac074455c2892f3745b18f48eb725ff242c845832a0e2937abdbcfa686d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-restored/raw-tests.json",
+          "bytes": 5943,
+          "sha256": "35aceea8fa8bf9db19546f9b346a1534c5b2fe44f80828bff271f324192d417b"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M22-callback-token-counter-exemption-66-restored/command.json",
+          "bytes": 1980,
+          "sha256": "770041883b54b231f2a33e21f8917e4f2ef887d6869d05caa66ed3bc61d702c6"
+        }
+      },
+      "caseNames": [
+        "callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events",
+        "callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys",
+        "callback capture attribute admission known token counters stay admitted although their names contain input/output",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator"
+      ],
+      "failedAssertions": [
+        {
+          "name": "callback capture attribute admission known token counters stay admitted although their names contain input/output",
+          "messages": [
+            "AssertionError: expected {} to deeply equal { 'pi.ai.usage.input_tokens': 3, \u2026(1) }\n    at /private/tmp/p0-30-AMC-1517-qualification-20261015/closure/tests/callbackTelemetryCapture.test.ts:34:53\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "classification": "assertion-specific behavioral sensitivity",
+      "historicalExpectationRetained": "killed"
+    },
+    {
+      "id": "S7-M23-callback-closed-113-equivalent",
+      "recipe": {
+        "id": "S7-M23-callback-closed-113-equivalent",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "equivalent",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "      if (this.closed || entry.ended) return;\n      try { operation(); }",
+        "sourceReplace": "      if (entry.ended) return;\n      try { operation(); }",
+        "sourceOccurrences": 1,
+        "sourceLine": 113,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "const recordCall = (operation) => {\n            if (this.closed || entry.ended)",
+        "compiledReplace": "const recordCall = (operation) => {\n            if (entry.ended)",
+        "compiledOccurrences": 1,
+        "compiledLine": 140,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/S7-M23-callback-closed-113-equivalent-matrix.json",
+        "bytes": 8886,
+        "sha256": "ec8915f3081896e3cd126d1e8aa9738b1a9f63abff4a8d635c743b5e639f1081"
+      },
+      "baseline": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-baseline/raw-tests.json",
+          "bytes": 5945,
+          "sha256": "0eb5121c5f570439d4ccebf1ccf307a45326012893bd30965f649b8ecb861164"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-baseline/command.json",
+          "bytes": 1945,
+          "sha256": "e98bd89b785968e7f18cde7d7c151a06ced8a7bc287558352060b583ba7b3a92"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-mutant/raw-tests.json",
+          "bytes": 5944,
+          "sha256": "d3dbc0725c0e227d3c44e123291e4fa87c54ed71ae9a0a9c50420e2e6b4f9ae0"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-mutant/command.json",
+          "bytes": 1931,
+          "sha256": "e3969b6a62d043d3e27ec9d478e6ade668bfe15c6706fffe6284629a32d78c7d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 13,
+        "numPassedTests": 13,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-restored/raw-tests.json",
+          "bytes": 5948,
+          "sha256": "c4cd605f886a7c11371e122dd87fbf905c6824ca4335b3846c9e8c70b20d4f25"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/S7-M23-callback-closed-113-equivalent-restored/command.json",
+          "bytes": 1945,
+          "sha256": "40cc6dd565d1de85829c173807498bfb9fe8bbc6a6742b3d9669c8cede1d6833"
+        }
+      },
+      "caseNames": [
+        "callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events",
+        "callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys",
+        "callback capture attribute admission known token counters stay admitted although their names contain input/output",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator"
+      ],
+      "failedAssertions": [],
+      "classification": "survived original13 corpus only; these original cases never call close or flush",
+      "historicalExpectationRetained": "equivalent"
+    }
+  ],
+  "supplementalM23": {
+    "matrix": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/supplemental-S7-M23-callback-closed-113-equivalent-matrix.json",
+      "bytes": 140046,
+      "sha256": "cd0a9cd1a6884591ab29ae1b0bf93c7ee36b52cc7d55da2be9faade331161920"
+    },
+    "actual": {
+      "recipe": {
+        "id": "S7-M23-callback-closed-113-equivalent",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "equivalent",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "      if (this.closed || entry.ended) return;\n      try { operation(); }",
+        "sourceReplace": "      if (entry.ended) return;\n      try { operation(); }",
+        "sourceOccurrences": 1,
+        "sourceLine": 113,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "const recordCall = (operation) => {\n            if (this.closed || entry.ended)",
+        "compiledReplace": "const recordCall = (operation) => {\n            if (entry.ended)",
+        "compiledOccurrences": 1,
+        "compiledLine": 140,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "baseline": {
+        "counts": {
+          "tests": 3,
+          "suites": 0,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "caseResults": [
+          {
+            "name": "close while callback is pending preserves recorded state and original fulfillment",
+            "status": "passed"
+          },
+          {
+            "name": "close during explicit flush preserves its batch and original callback rejection",
+            "status": "passed"
+          },
+          {
+            "name": "a public name getter closes before admission and later recording keeps the initial state",
+            "status": "passed"
+          }
+        ],
+        "names": [
+          "close while callback is pending preserves recorded state and original fulfillment",
+          "close during explicit flush preserves its batch and original callback rejection",
+          "a public name getter closes before admission and later recording keeps the initial state"
+        ],
+        "observations": [
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "pending-close-fulfillment",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-close",
+                  "sha256": "d95b7798d5c6f5354311fd1ac4bb5adc2e3d45bec575422c40ee4a7db4786df1",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "b4986133-4cea-4776-8c3e-24e73c3f24e3",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-close",
+                  "sha256": "bb62af0af47dbca2018a53860b160a7e98ea5e397e81c7d67f2558f1b67b9c86",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "b4986133-4cea-4776-8c3e-24e73c3f24e3",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-calls-and-fulfillment",
+                  "sha256": "bb62af0af47dbca2018a53860b160a7e98ea5e397e81c7d67f2558f1b67b9c86",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "b4986133-4cea-4776-8c3e-24e73c3f24e3",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-root",
+                  "sha256": "bb62af0af47dbca2018a53860b160a7e98ea5e397e81c7d67f2558f1b67b9c86",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "b4986133-4cea-4776-8c3e-24e73c3f24e3",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "b4986133-4cea-4776-8c3e-24e73c3f24e3:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "childCalls": 1,
+              "rootCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "in-flight-flush-close-rejection",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-explicit-flush",
+                  "sha256": "7e0ad57c0c22e77d8ab494194884f743a9913521b39581cc4e967e6283618223",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "close-while-sink-in-flight",
+                  "sha256": "cb19f0754f7f5ac046a3bba81e604dd01b60430b3b698b27fdeef5c3a908da2e",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-rejection-sink-still-blocked",
+                  "sha256": "cb19f0754f7f5ac046a3bba81e604dd01b60430b3b698b27fdeef5c3a908da2e",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-first-flush",
+                  "sha256": "5d339969ddac6f0dd5871619da3d4f78d20cfc888082905e6e4d68dd968885de",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 1
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-second-explicit-flush",
+                  "sha256": "52ebd0d8e8f56cccecf86213e7ee3413daf154cbe786ad510414e58014c682e8",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 2
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "sinkCalls": 2,
+              "sinkDocuments": [
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:1",
+                      "parentId": null,
+                      "name": "healthy",
+                      "attributes": {
+                        "pi.tool.name": "owned-tool"
+                      },
+                      "events": [
+                        {
+                          "name": "healthy-event",
+                          "attributes": {
+                            "pi.event.type": "complete"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": true,
+                      "settlement": "fulfilled",
+                      "rejectionKind": null,
+                      "endSequence": 1,
+                      "timestamp": null,
+                      "durationMs": null
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 0
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                  ]
+                },
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "974be876-d4ef-4403-8c8a-41b0d11cae08",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "974be876-d4ef-4403-8c8a-41b0d11cae08:2",
+                      "parentId": null,
+                      "name": "pending",
+                      "attributes": {
+                        "amc.source.timestamp": 1000,
+                        "amc.source.duration_ms": 7,
+                        "pi.step.kind": "model"
+                      },
+                      "events": [
+                        {
+                          "name": "before-close",
+                          "attributes": {
+                            "pi.event.type": "start"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": false,
+                      "settlement": "closed-before-settlement",
+                      "rejectionKind": null,
+                      "endSequence": null,
+                      "timestamp": 1000,
+                      "durationMs": 7
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 1
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                    "Capture is closed; unsettled callbacks have no asserted final outcome."
+                  ]
+                }
+              ],
+              "childCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_REENTRANT_OBSERVATION",
+            "data": {
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "completed": true,
+              "getterCalls": 1,
+              "callbackCalls": 1,
+              "callbackOutcome": "fulfilled",
+              "valueIdentityPreserved": true,
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "callback-before-late-recording",
+                  "sha256": "c202dbbe0cb00c972bd11a573f9309bc8323d7802ec087cdb8e136135d7cc367",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "478db166-6cff-4b92-96fb-b2420068ba81",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "478db166-6cff-4b92-96fb-b2420068ba81:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "callback-after-all-three-late-calls",
+                  "sha256": "c202dbbe0cb00c972bd11a573f9309bc8323d7802ec087cdb8e136135d7cc367",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "478db166-6cff-4b92-96fb-b2420068ba81",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "478db166-6cff-4b92-96fb-b2420068ba81:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-callback-fulfillment",
+                  "sha256": "c202dbbe0cb00c972bd11a573f9309bc8323d7802ec087cdb8e136135d7cc367",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "478db166-6cff-4b92-96fb-b2420068ba81",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "478db166-6cff-4b92-96fb-b2420068ba81:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "name-getter-entered",
+                "public-close-returned",
+                "callback-entered",
+                "late-attributes-called",
+                "late-event-called",
+                "late-status-called"
+              ],
+              "observerError": null
+            }
+          }
+        ],
+        "infrastructureFailure": false,
+        "exit": 0,
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-baseline/command.json",
+          "bytes": 1909,
+          "sha256": "4bda226d0212d9ce09dd0308297069a4251b58a093d12c16fde00e8c1bf03875"
+        },
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-baseline/stdout.log",
+          "bytes": 23771,
+          "sha256": "e26be86e94b0e2c31e263f6142a623ff4ff0d883b85ed8894451ee74fa25ccb8"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Three separate private public-API cases, exact staged bodies. Only recordedAt excluded; UUIDs retained and no across-phase hash equality claim."
+      },
+      "mutant": {
+        "counts": {
+          "tests": 3,
+          "suites": 0,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "caseResults": [
+          {
+            "name": "close while callback is pending preserves recorded state and original fulfillment",
+            "status": "passed"
+          },
+          {
+            "name": "close during explicit flush preserves its batch and original callback rejection",
+            "status": "passed"
+          },
+          {
+            "name": "a public name getter closes before admission and later recording keeps the initial state",
+            "status": "failed"
+          }
+        ],
+        "names": [
+          "close while callback is pending preserves recorded state and original fulfillment",
+          "close during explicit flush preserves its batch and original callback rejection",
+          "a public name getter closes before admission and later recording keeps the initial state"
+        ],
+        "observations": [
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "pending-close-fulfillment",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-close",
+                  "sha256": "3bdc66bb1aa1c6c1c111b38abc71cbc9c0ea5ac17733960ecf47eb79fbd3351e",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01ab0e7d-e979-4f02-9355-5a4d5d489f64",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-close",
+                  "sha256": "c2e7d08e9ffb31bdad6a1948c9ec50a71e410cf12aa8c15959c57dbc9f2819a6",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01ab0e7d-e979-4f02-9355-5a4d5d489f64",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-calls-and-fulfillment",
+                  "sha256": "c2e7d08e9ffb31bdad6a1948c9ec50a71e410cf12aa8c15959c57dbc9f2819a6",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01ab0e7d-e979-4f02-9355-5a4d5d489f64",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-root",
+                  "sha256": "c2e7d08e9ffb31bdad6a1948c9ec50a71e410cf12aa8c15959c57dbc9f2819a6",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01ab0e7d-e979-4f02-9355-5a4d5d489f64",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "01ab0e7d-e979-4f02-9355-5a4d5d489f64:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "childCalls": 1,
+              "rootCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "in-flight-flush-close-rejection",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-explicit-flush",
+                  "sha256": "baf9127605f9185a094a7c69b73f0392045dadcbbbf6f7dce34175be8466b864",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "close-while-sink-in-flight",
+                  "sha256": "d362f685121388f2e3b127286e8bad46bee494fe8cf1f7bcc6044c1364395a58",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-rejection-sink-still-blocked",
+                  "sha256": "d362f685121388f2e3b127286e8bad46bee494fe8cf1f7bcc6044c1364395a58",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-first-flush",
+                  "sha256": "d1c3322cd992e36a7468a00c674a97589f08482f830152c6ca2d14a4245f0265",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "493429f1-da5d-4299-a59c-b61bd96a3050:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 1
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-second-explicit-flush",
+                  "sha256": "0fd8d004b6996b68a2e7dd5e92fdbc8d6c88d1fa6579582b0413605ad97734b9",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 2
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "sinkCalls": 2,
+              "sinkDocuments": [
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "493429f1-da5d-4299-a59c-b61bd96a3050:1",
+                      "parentId": null,
+                      "name": "healthy",
+                      "attributes": {
+                        "pi.tool.name": "owned-tool"
+                      },
+                      "events": [
+                        {
+                          "name": "healthy-event",
+                          "attributes": {
+                            "pi.event.type": "complete"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": true,
+                      "settlement": "fulfilled",
+                      "rejectionKind": null,
+                      "endSequence": 1,
+                      "timestamp": null,
+                      "durationMs": null
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 0
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                  ]
+                },
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "493429f1-da5d-4299-a59c-b61bd96a3050",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "493429f1-da5d-4299-a59c-b61bd96a3050:2",
+                      "parentId": null,
+                      "name": "pending",
+                      "attributes": {
+                        "amc.source.timestamp": 1000,
+                        "amc.source.duration_ms": 7,
+                        "pi.step.kind": "model"
+                      },
+                      "events": [
+                        {
+                          "name": "before-close",
+                          "attributes": {
+                            "pi.event.type": "start"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": false,
+                      "settlement": "closed-before-settlement",
+                      "rejectionKind": null,
+                      "endSequence": null,
+                      "timestamp": 1000,
+                      "durationMs": 7
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 1
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                    "Capture is closed; unsettled callbacks have no asserted final outcome."
+                  ]
+                }
+              ],
+              "childCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_REENTRANT_OBSERVATION",
+            "data": {
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "completed": false,
+              "getterCalls": 1,
+              "callbackCalls": 1,
+              "callbackOutcome": "fulfilled",
+              "valueIdentityPreserved": true,
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "callback-before-late-recording",
+                  "sha256": "23897510457a07a41d3f5803bc9efb2b212035015603d01e706251748085431d",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "8dc3e4ee-9542-4492-88de-4d632d6c2552",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "8dc3e4ee-9542-4492-88de-4d632d6c2552:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "callback-after-all-three-late-calls",
+                  "sha256": "e4c998269f8903ce9e1a11ead44d184f64dc1df7e2b8f0c03fbe5cd275c296d7",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "8dc3e4ee-9542-4492-88de-4d632d6c2552",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "8dc3e4ee-9542-4492-88de-4d632d6c2552:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "late-tool",
+                          "pi.step.kind": "late"
+                        },
+                        "events": [
+                          {
+                            "name": "late-event",
+                            "attributes": {
+                              "pi.event.type": "late"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "error"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-callback-fulfillment",
+                  "sha256": "e4c998269f8903ce9e1a11ead44d184f64dc1df7e2b8f0c03fbe5cd275c296d7",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "8dc3e4ee-9542-4492-88de-4d632d6c2552",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "8dc3e4ee-9542-4492-88de-4d632d6c2552:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "late-tool",
+                          "pi.step.kind": "late"
+                        },
+                        "events": [
+                          {
+                            "name": "late-event",
+                            "attributes": {
+                              "pi.event.type": "late"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "error"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "name-getter-entered",
+                "public-close-returned",
+                "callback-entered",
+                "late-attributes-called",
+                "late-event-called",
+                "late-status-called"
+              ],
+              "observerError": {
+                "name": "AssertionError",
+                "message": "original closed guard must refuse all subsequent recording effects\\n+ actual - expected\\n... Skipped lines\\n\\n  {\\n    captureId: '8dc3e4ee-9542-4492-88de-4d632d6c2552',\\n    format: 'amc-callback-telemetry',\\n    losses: [\\n      'In-process callback reports are unsigned and independently unverified.',\\n...\\n        attributes: {\\n+         'pi.step.kind': 'late',\\n+         'pi.tool.name': 'late-tool'\\n-         'pi.tool.name': 'initial-tool'\\n        },\\n        durationMs: null,\\n        endSequence: null,\\n+       events: [\\n+         {\\n+           attributes: {\\n+             'pi.event.type': 'late'\\n+           },\\n+           name: 'late-event',\\n+           timestamp: null\\n+         }\\n+       ],\\n+       explicitStatus: true,\\n-       events: [],\\n-       explicitStatus: false,\\n        id: '8dc3e4ee-9542-4492-88de-4d632d6c2552:1',\\n        name: 'reentrant',\\n        parentId: null,\\n        rejectionKind: null,\\n        settlement: 'pending',\\n        status: {\\n+         status: 'error'\\n-         status: 'ok'\\n        },\\n        timestamp: null\\n      }\\n    ],\\n    stats: {\\n"
+              }
+            }
+          }
+        ],
+        "infrastructureFailure": false,
+        "exit": 1,
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-mutant/command.json",
+          "bytes": 1897,
+          "sha256": "db39ade50117fa4273be61e39ddbf609e9dcb361d8540361aecc7649cf1de68c"
+        },
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-mutant/stdout.log",
+          "bytes": 29856,
+          "sha256": "3f58aa265b9b5b927811ce6bd60ffffc43acc9037e71d1fe24854ee4aa6c93ca"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-mutant/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Three separate private public-API cases, exact staged bodies. Only recordedAt excluded; UUIDs retained and no across-phase hash equality claim."
+      },
+      "restored": {
+        "counts": {
+          "tests": 3,
+          "suites": 0,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "caseResults": [
+          {
+            "name": "close while callback is pending preserves recorded state and original fulfillment",
+            "status": "passed"
+          },
+          {
+            "name": "close during explicit flush preserves its batch and original callback rejection",
+            "status": "passed"
+          },
+          {
+            "name": "a public name getter closes before admission and later recording keeps the initial state",
+            "status": "passed"
+          }
+        ],
+        "names": [
+          "close while callback is pending preserves recorded state and original fulfillment",
+          "close during explicit flush preserves its batch and original callback rejection",
+          "a public name getter closes before admission and later recording keeps the initial state"
+        ],
+        "observations": [
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "pending-close-fulfillment",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-close",
+                  "sha256": "9556a65b6c285de86e62decd56b4119e9cf7b1c903eb291b679a3c3ed032fcd1",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-close",
+                  "sha256": "b4e7cb26826cf462f99b5347892765f7ac18680a7a5ea1224b00f83eea33f507",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-calls-and-fulfillment",
+                  "sha256": "b4e7cb26826cf462f99b5347892765f7ac18680a7a5ea1224b00f83eea33f507",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-late-root",
+                  "sha256": "b4e7cb26826cf462f99b5347892765f7ac18680a7a5ea1224b00f83eea33f507",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "95f2f9ba-8f63-4aaa-a3b1-9a414d475a8b:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "close-returned",
+                "late-recording",
+                "callback-finished"
+              ],
+              "childCalls": 1,
+              "rootCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_OBSERVATION",
+            "data": {
+              "name": "in-flight-flush-close-rejection",
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "before-explicit-flush",
+                  "sha256": "751324c1306c42252ad6e78869c8a11239faed234aeb6b2e8036048bca6354bf",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                    ]
+                  }
+                },
+                {
+                  "label": "close-while-sink-in-flight",
+                  "sha256": "d4964c1001e1df5923c413dac7fb0eac6715bce8907d45b92091eec6e4930554",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-rejection-sink-still-blocked",
+                  "sha256": "d4964c1001e1df5923c413dac7fb0eac6715bce8907d45b92091eec6e4930554",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:1",
+                        "parentId": null,
+                        "name": "healthy",
+                        "attributes": {
+                          "pi.tool.name": "owned-tool"
+                        },
+                        "events": [
+                          {
+                            "name": "healthy-event",
+                            "attributes": {
+                              "pi.event.type": "complete"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": true,
+                        "settlement": "fulfilled",
+                        "rejectionKind": null,
+                        "endSequence": 1,
+                        "timestamp": null,
+                        "durationMs": null
+                      },
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-first-flush",
+                  "sha256": "26a74e7da054a81249e79bb3c2a3c0a2a312128de3ab936dc36402de0d093ccb",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:2",
+                        "parentId": null,
+                        "name": "pending",
+                        "attributes": {
+                          "amc.source.timestamp": 1000,
+                          "amc.source.duration_ms": 7,
+                          "pi.step.kind": "model"
+                        },
+                        "events": [
+                          {
+                            "name": "before-close",
+                            "attributes": {
+                              "pi.event.type": "start"
+                            },
+                            "timestamp": null
+                          }
+                        ],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "closed-before-settlement",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": 1000,
+                        "durationMs": 7
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 1
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-second-explicit-flush",
+                  "sha256": "0672f3c80d4d275e33bb33c74593f5b560612befc68f2caffa20812a260a8f07",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [],
+                    "stats": {
+                      "admittedSpans": 2,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 2
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "completed": true,
+              "traceBeforeCleanup": [
+                "callback-ready",
+                "sink-entered",
+                "close-returned",
+                "late-recording",
+                "callback-finished",
+                "sink-returned"
+              ],
+              "sinkCalls": 2,
+              "sinkDocuments": [
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:1",
+                      "parentId": null,
+                      "name": "healthy",
+                      "attributes": {
+                        "pi.tool.name": "owned-tool"
+                      },
+                      "events": [
+                        {
+                          "name": "healthy-event",
+                          "attributes": {
+                            "pi.event.type": "complete"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": true,
+                      "settlement": "fulfilled",
+                      "rejectionKind": null,
+                      "endSequence": 1,
+                      "timestamp": null,
+                      "durationMs": null
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 0
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id."
+                  ]
+                },
+                {
+                  "format": "amc-callback-telemetry",
+                  "version": 1,
+                  "captureId": "c82f774f-c825-42c4-8aeb-2a0ff8b87975",
+                  "source": {
+                    "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                    "trust": "SELF_REPORTED",
+                    "signed": false,
+                    "evaluation": "NOT_EVALUATED"
+                  },
+                  "spans": [
+                    {
+                      "id": "c82f774f-c825-42c4-8aeb-2a0ff8b87975:2",
+                      "parentId": null,
+                      "name": "pending",
+                      "attributes": {
+                        "amc.source.timestamp": 1000,
+                        "amc.source.duration_ms": 7,
+                        "pi.step.kind": "model"
+                      },
+                      "events": [
+                        {
+                          "name": "before-close",
+                          "attributes": {
+                            "pi.event.type": "start"
+                          },
+                          "timestamp": null
+                        }
+                      ],
+                      "status": {
+                        "status": "ok"
+                      },
+                      "explicitStatus": false,
+                      "settlement": "closed-before-settlement",
+                      "rejectionKind": null,
+                      "endSequence": null,
+                      "timestamp": 1000,
+                      "durationMs": 7
+                    }
+                  ],
+                  "stats": {
+                    "admittedSpans": 2,
+                    "droppedSpans": 0,
+                    "droppedRecordingCalls": 0,
+                    "filteredAttributes": 0,
+                    "flushFailures": 0,
+                    "exportedSpans": 1
+                  },
+                  "losses": [
+                    "In-process callback reports are unsigned and independently unverified.",
+                    "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                    "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                    "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                    "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                    "Capture is closed; unsettled callbacks have no asserted final outcome."
+                  ]
+                }
+              ],
+              "childCalls": 1
+            }
+          },
+          {
+            "marker": "AMC1517_REENTRANT_OBSERVATION",
+            "data": {
+              "node": "v22.23.3",
+              "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "modulesABI": "127",
+              "completed": true,
+              "getterCalls": 1,
+              "callbackCalls": 1,
+              "callbackOutcome": "fulfilled",
+              "valueIdentityPreserved": true,
+              "metadataOnlyExcluded": [
+                "recordedAt"
+              ],
+              "evidence": [
+                {
+                  "label": "callback-before-late-recording",
+                  "sha256": "9256deb54bdd6231215cf9c0b4af29ce489b8ae0b8bd2282b102c6f0b3696280",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01857d12-210b-47dc-8043-b918692a2f8e",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01857d12-210b-47dc-8043-b918692a2f8e:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "callback-after-all-three-late-calls",
+                  "sha256": "9256deb54bdd6231215cf9c0b4af29ce489b8ae0b8bd2282b102c6f0b3696280",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01857d12-210b-47dc-8043-b918692a2f8e",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01857d12-210b-47dc-8043-b918692a2f8e:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                },
+                {
+                  "label": "after-original-callback-fulfillment",
+                  "sha256": "9256deb54bdd6231215cf9c0b4af29ce489b8ae0b8bd2282b102c6f0b3696280",
+                  "document": {
+                    "format": "amc-callback-telemetry",
+                    "version": 1,
+                    "captureId": "01857d12-210b-47dc-8043-b918692a2f8e",
+                    "source": {
+                      "contract": "pi-telemetry@b2602be77cb7b0de45dd616407fd210daa48aa75",
+                      "trust": "SELF_REPORTED",
+                      "signed": false,
+                      "evaluation": "NOT_EVALUATED"
+                    },
+                    "spans": [
+                      {
+                        "id": "01857d12-210b-47dc-8043-b918692a2f8e:1",
+                        "parentId": null,
+                        "name": "reentrant",
+                        "attributes": {
+                          "pi.tool.name": "initial-tool"
+                        },
+                        "events": [],
+                        "status": {
+                          "status": "ok"
+                        },
+                        "explicitStatus": false,
+                        "settlement": "pending",
+                        "rejectionKind": null,
+                        "endSequence": null,
+                        "timestamp": null,
+                        "durationMs": null
+                      }
+                    ],
+                    "stats": {
+                      "admittedSpans": 1,
+                      "droppedSpans": 0,
+                      "droppedRecordingCalls": 0,
+                      "filteredAttributes": 0,
+                      "flushFailures": 0,
+                      "exportedSpans": 0
+                    },
+                    "losses": [
+                      "In-process callback reports are unsigned and independently unverified.",
+                      "Source timestamps and durations remain null unless explicitly supplied; capture time is separate.",
+                      "Prompts, completions, tool arguments/results and credentials are excluded by default.",
+                      "Parent spans may be in earlier flush batches; missing parents are not reconstructed.",
+                      "Flush is at-least-once on uncertain sink failure; deduplicate by captureId and span id.",
+                      "Capture is closed; unsettled callbacks have no asserted final outcome."
+                    ]
+                  }
+                }
+              ],
+              "trace": [
+                "name-getter-entered",
+                "public-close-returned",
+                "callback-entered",
+                "late-attributes-called",
+                "late-event-called",
+                "late-status-called"
+              ],
+              "observerError": null
+            }
+          }
+        ],
+        "infrastructureFailure": false,
+        "exit": 0,
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-restored/command.json",
+          "bytes": 1909,
+          "sha256": "d9ea2fc439884661c56fc63debc5078aba2d264d575f7223cdb700da4041f18a"
+        },
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-restored/stdout.log",
+          "bytes": 23769,
+          "sha256": "1035827f4761795b4960aa1002ab2d358fba4030b2efc5b59fe312d161d4dbb4"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/supplemental-S7-M23-callback-closed-113-equivalent-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Three separate private public-API cases, exact staged bodies. Only recordedAt excluded; UUIDs retained and no across-phase hash equality claim."
+      },
+      "classification": "behavior-failure-needs-classification",
+      "sourceRestoreExact": true,
+      "fullCompiledRestoreExact": true,
+      "originalCriteriaAndCases": true,
+      "distinctSupplementalCorpus": true,
+      "historicalExpectationUnchanged": "equivalent"
+    },
+    "classification": "ordinary two lifecycle cases survive; public name-getter case exposes exact M23 recording sensitivity",
+    "failedCaseNames": [
+      "a public name getter closes before admission and later recording keeps the initial state"
+    ],
+    "observationsVerified": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/supplemental-observations-verified.json",
+      "bytes": 126826,
+      "sha256": "30491f65d1f19957830fc5efbc3c43b72b1fb21c462c8853c47ee9c15a64baa0"
+    },
+    "publicGetterWitness": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/public-getter-witness.json",
+      "bytes": 2013,
+      "sha256": "9912a191572f0d9ddd0f63584150ce2f2a7bd22b58d98bb1f76020b712b22782"
+    },
+    "scope": "Two ordinary promise/barrier lifecycle cases and one public getter-before-registration case. No initial no-admission policy assertion, private-field/prototype patch or forced kill. Faithful value/error identity, public snapshots and full stats remain checked by exact authored bodies."
+  },
+  "proposalInputs": {
+    "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/proposal-pins.json",
+    "bytes": 2249,
+    "sha256": "874dbc17848bb68dec379902a40988e43f02950ae7d55523b1abbc7f13aa1d43"
+  },
+  "sourceAndCompiledRecipes": {
+    "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/recipes.json",
+    "bytes": 4167,
+    "sha256": "159ac13116195107fa962b1146dbec322e3f54778b23d79bb31570fec591d93c"
+  },
+  "runtime": {
+    "freshActual": {
+      "version": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "actualRaw": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/AMC1517-actual-runtime-fingerprint/stdout.log",
+      "bytes": 117,
+      "sha256": "96244d74ca49e11cdb347e199df073bdcd4029de495cd6098f84d03aa16ab878"
+    },
+    "freshPerSupplementalCaseVersionExecutableAndAbi": true,
+    "originalVitestPerChildAbi": "Not recorded per case; inferred from explicit same Node launcher, not fabricated.",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "noNativeRebuildOrDependencyInstall": true
+  },
+  "preservation": {
+    "final": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/final-input-preservation.json",
+      "bytes": 566,
+      "sha256": "c52c34cc45df768cf5078c5d2785d24f929c60cadbb866048114f895c0b77792"
+    },
+    "initialSourceManifest": {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    "rootPreflight": {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    "fullClosure": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    "liveStatus": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/phases/AMC1517-final-live-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "journal": {
+    "frozen": {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 48153,
+      "sha256": "33580a3b3571376d7b177284af224e4ca1a6beafb1ebfb553d577a1cb06f856d"
+    },
+    "phaseCount": 29,
+    "phases": [
+      {
+        "phase": "AMC1517-verify-prepared",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 957
+      },
+      {
+        "phase": "AMC1517-actual-runtime-fingerprint",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 90
+      },
+      {
+        "phase": "S7-M20-callback-allowlist-66-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 932
+      },
+      {
+        "phase": "S7-M20-callback-allowlist-66-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29336
+      },
+      {
+        "phase": "S7-M20-callback-allowlist-66-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 982
+      },
+      {
+        "phase": "S7-M20-callback-allowlist-66-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28579
+      },
+      {
+        "phase": "S7-M20-callback-allowlist-66-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 937
+      },
+      {
+        "phase": "S7-M21-callback-sensitive-extension-66-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 879
+      },
+      {
+        "phase": "S7-M21-callback-sensitive-extension-66-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29073
+      },
+      {
+        "phase": "S7-M21-callback-sensitive-extension-66-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 971
+      },
+      {
+        "phase": "S7-M21-callback-sensitive-extension-66-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28658
+      },
+      {
+        "phase": "S7-M21-callback-sensitive-extension-66-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 994
+      },
+      {
+        "phase": "S7-M22-callback-token-counter-exemption-66-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 912
+      },
+      {
+        "phase": "S7-M22-callback-token-counter-exemption-66-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29026
+      },
+      {
+        "phase": "S7-M22-callback-token-counter-exemption-66-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 1002
+      },
+      {
+        "phase": "S7-M22-callback-token-counter-exemption-66-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28784
+      },
+      {
+        "phase": "S7-M22-callback-token-counter-exemption-66-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 962
+      },
+      {
+        "phase": "S7-M23-callback-closed-113-equivalent-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 887
+      },
+      {
+        "phase": "S7-M23-callback-closed-113-equivalent-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29292
+      },
+      {
+        "phase": "S7-M23-callback-closed-113-equivalent-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 991
+      },
+      {
+        "phase": "S7-M23-callback-closed-113-equivalent-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28960
+      },
+      {
+        "phase": "S7-M23-callback-closed-113-equivalent-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 922
+      },
+      {
+        "phase": "supplemental-S7-M23-callback-closed-113-equivalent-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 317
+      },
+      {
+        "phase": "supplemental-S7-M23-callback-closed-113-equivalent-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28573
+      },
+      {
+        "phase": "supplemental-S7-M23-callback-closed-113-equivalent-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 326
+      },
+      {
+        "phase": "supplemental-S7-M23-callback-closed-113-equivalent-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28548
+      },
+      {
+        "phase": "supplemental-S7-M23-callback-closed-113-equivalent-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 312
+      },
+      {
+        "phase": "AMC1517-final-preservation",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 2358
+      },
+      {
+        "phase": "AMC1517-final-live-status",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 44
+      }
+    ]
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/artifact-index.json",
+    "bytes": 45637,
+    "sha256": "ece9597aee903d7788f836a0610ece5bd3bf32c3c8b4fac99d22075fdd705331"
+  },
+  "artifactCount": 186,
+  "limits": [
+    "No live source, original test/helper, CLI, guard, archive, counter, dependency/native, Git or canonical qualification edit was made.",
+    "Historical M23 expected equivalence is retained as historical metadata. Survival in the original13 or ordinary2 does not establish universal equivalence; a getter case outcome has its own explicit scope.",
+    "Only recordedAt is excluded from supplemental snapshots. Real UUIDs and every semantic/stat field remain; no across-phase snapshot-hash or physical-identity equality is asserted.",
+    "The new cases exercise public API close/flush, callback barriers and one name getter. They do not establish external producer conformance, authenticated identities, real provider behavior, all races or cross-process concurrency.",
+    "Callback capture remains unsigned SELF_REPORTED/NOT_EVALUATED. Faithful callback execution is not measured agent/model ability.",
+    "The ten mapping cases are shared with AMC1516. Current13+3 is16, not additional distinct cases to add again to that prior corpus.",
+    "No AMC1546 or other old-issue controls, old held runner transfer, full76 batch, wholeP030, Node24, fullsuite, coverage, hostedCI, release, source fix or Done approval is inferred."
+  ]
+}

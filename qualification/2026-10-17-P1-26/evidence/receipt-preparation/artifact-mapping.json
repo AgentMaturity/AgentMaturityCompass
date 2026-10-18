@@ -1,0 +1,55 @@
+{
+  "schema": "p126-private-receipt-artifact-mapping-proposal/1",
+  "status": "Proposed mapping only; not an assembly manifest or adopted packet.",
+  "candidateSources": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "target": "evidence/test-design/rfc9162.test.ts.source.txt",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "originalFilename": "rfc9162.test.ts",
+      "representation": "Byte-exact inert source text; not executable qualification evidence.",
+      "currentCopyPerformed": false
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "target": "evidence/test-design/legacyAmbiguity.test.ts.source.txt",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "originalFilename": "legacyAmbiguity.test.ts",
+      "representation": "Byte-exact inert source text; not executable qualification evidence.",
+      "currentCopyPerformed": false
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "target": "evidence/upstream/LICENSE.transparency-dev-merkle.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "originalFilename": "LICENSE",
+      "representation": "Exact upstream Apache licence text.",
+      "currentCopyPerformed": false
+    }
+  ],
+  "mandatoryRules": [
+    "Every copied candidate .test.ts maps to an inert .source.txt filename; preserve exact original bytes, byte count, SHA and original filename metadata.",
+    "Any other adopted TypeScript source backup must also use an inert source-text target, not a discoverable code suffix.",
+    "Existing lossless JSON envelopes may retain logs and patches without normalizing original bytes; final packet review must decode/hash-check every selected representation.",
+    "Pin assembler path/bytes/SHA only. Do not copy or encode its source to evade its own forbidden-marker check.",
+    "Preserve historical V1/V2 P1-12 packets and V3 correction as distinct evidence; do not rewrite failed command outcomes."
+  ],
+  "assemblerPinnedOnly": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+    "bytes": 4099,
+    "sha256": "9266e852cb73180b3ddb6b98a2dbc6966f56bfdc600cff968604e54c47ca2914",
+    "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+    "dev": 16777231,
+    "inode": 543401344,
+    "nlink": 1
+  },
+  "pendingFinalInputs": [
+    "Manual classification, exact restoration and matching-cohort reruns for both actual controls.",
+    "Final independent causal review, source/compiled/native/runner and held-state preservation.",
+    "Actual final fresh counts/gates/freeze and later real receipt validation/staging commands."
+  ],
+  "noSourceOrPacketWrite": true
+}

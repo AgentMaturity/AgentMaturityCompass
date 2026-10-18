@@ -1,0 +1,25 @@
+{
+  "schema": "p107-two-unit-static-review-seal/1",
+  "at": "2026-10-16T17:45:49.416017+00:00",
+  "privateOnly": true,
+  "runtimeExecuted": false,
+  "inputCount": 45,
+  "blockers": [],
+  "files": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-static-review/review.json",
+      "bytes": 4576,
+      "sha256": "26ac56b67f9716e5e02034f43e0c5e4fb10f0f9568d33e57ae75a2b337abd685"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-static-review/README.md",
+      "bytes": 1712,
+      "sha256": "c7670d18d17f93af1fca9f14325fd7eee7590770d8cc15b400c906f7926f43be"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-static-review/pins.json",
+      "bytes": 10725,
+      "sha256": "a9bf85362dafd62929169c3b3a5aaa77a75ff3f62cdc8df5c64b3bbf9054876f"
+    }
+  ]
+}

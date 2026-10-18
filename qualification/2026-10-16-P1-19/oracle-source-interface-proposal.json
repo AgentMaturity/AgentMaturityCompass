@@ -1,0 +1,148 @@
+{
+  "schema": "lighthouse-finance-oracle-interface/1",
+  "state": "proposed-for-root-review-not-executed",
+  "formalAcceptanceClosed": false,
+  "entrypoint": {
+    "args": [
+      "cli",
+      "workspace",
+      "case-file",
+      "provider-run-dir"
+    ],
+    "stdin": {
+      "schemaVersion": "2026-09-08",
+      "taskId": "select exact unique cases[].id",
+      "stdout": "untrusted, not consulted for proof",
+      "stderr": "untrusted",
+      "otherHarnessFields": "permitted but never authority"
+    },
+    "pinsEnvironment": "AMC_FINANCE_ORACLE_PINS_FILE",
+    "output": {
+      "schemaVersion": "2026-09-08",
+      "verdict": "pass only when every returned check.passed is true; otherwise fail",
+      "checks": "[{id,passed:boolean,evidence:string}]"
+    },
+    "normalOracleExit": 0
+  },
+  "manifest": {
+    "schema": "lighthouse-finance-oracle-pins/1",
+    "workspace": "absolute real owned workspace",
+    "providerRunDir": "absolute real owned provider directory",
+    "cli": {
+      "path": "absolute actual dist/cli.js",
+      "sha256": "exact executable bytes"
+    },
+    "node": {
+      "path": "absolute actual Node executable",
+      "sha256": "exact executable bytes"
+    },
+    "caseFile": {
+      "path": "absolute selected case file",
+      "sha256": "exact bytes"
+    },
+    "home": "absolute fresh private HOME used by verifier child",
+    "monitor": {
+      "publicKeyPem": "operator-captured public PEM before producer artifacts",
+      "sha256": "SHA256 exact PEM UTF8"
+    },
+    "auditor": {
+      "publicKeyPem": "operator-captured public PEM before producer artifacts",
+      "sha256": "SHA256 exact PEM UTF8"
+    },
+    "agentId": "actual scoped agent id",
+    "tenantId": "actual provider fixture tenant",
+    "clientId": "actual provider executor client",
+    "toolName": "actual signed registered FINANCIAL tool name",
+    "toolsConfigSha256": "operator-reviewed exact signed tools.yaml bytes with the fixed binding fields below",
+    "preimagesDir": "absolute owned workspace directory of untrusted digest-checked preimages",
+    "approvalsDir": "absolute actual agent approvals directory beneath workspace"
+  },
+  "preimage": {
+    "filename": "<executionId>.json (safe exec_ identifier)",
+    "schema": "lighthouse-finance-preimage/1",
+    "authorizationRecord": "exact full genuine record, independently hashed with AMC_AUTHZ_V1 NUL domain separator",
+    "arguments": {
+      "kind": "refund|payout",
+      "sourceAccountId": "provider account id",
+      "payeeId": "provider payee id",
+      "amountMinor": "positive safe integer cents",
+      "amount": "matching canonical decimal string",
+      "currency": "USD",
+      "reference": "provider reference",
+      "originalTxnId": "optional provider transaction id",
+      "payeeVersion": "positive safe integer serialized as decimal string",
+      "destinationTokenSha256": "lowercase 64 hex"
+    },
+    "extraFields": "refused",
+    "storageOrder": "producer durably writes before first provider POST; its file is untrusted until authenticated receipt digest and generic argument digest independently match"
+  },
+  "bindingFields": {
+    "amount": "amount",
+    "currency": "currency",
+    "recipient": "payeeId",
+    "destination": "destinationTokenSha256",
+    "resourceId": "payeeId",
+    "resourceVersion": "payeeVersion"
+  },
+  "normalizer": "Strict flat finance envelope; normalize NFC strings, amount decimal and USD; generic digest is SHA256(canonical({normalizer:amc.args/v1,arguments:<envelope>})). Provider projection selects only actual PaymentArgs keys. No fake equality between the two digests.",
+  "caseShape": {
+    "schemaVersion": "lighthouse-finance-cases/1",
+    "cases": "array, unique id selected by stdin.taskId",
+    "expected": {
+      "decision": "completed|denied|other unsupported value fails",
+      "terminalReceiptState": "completed|denied|cancelled|outcome_unknown",
+      "posts": {
+        "exact": "nonnegative integer"
+      },
+      "commits": {
+        "exact": "nonnegative integer"
+      },
+      "controlDimensions": "presence of any dimension expectation fails until real evaluator exists"
+    }
+  },
+  "checkIds": [
+    "inputs",
+    "txlog-chain",
+    "post-count",
+    "commit-count",
+    "no-duplicate",
+    "no-dispatch-on-deny",
+    "payload-bound",
+    "payload-minimal",
+    "receipt-state",
+    "unauthorized-effects",
+    "action-evidence-coverage",
+    "control-result",
+    "cold-ledger-verifier",
+    "snapshot-stable",
+    "action-chain",
+    "authorization"
+  ],
+  "coldProof": {
+    "argv": [
+      "<manifest.node.path>",
+      "<manifest.cli.path>",
+      "session",
+      "verify",
+      "--expect-monitor",
+      "<manifest.monitor.sha256>",
+      "--json"
+    ],
+    "cwd": "manifest.workspace",
+    "result": "natural close, exit0, no signal, own PID/PGID absent, parsed ok+chain.ok+governance.ok all true, each errors[] empty, matching anchored monitor fingerprint; no allow overrides",
+    "snapshot": "DB+WAL exact presence, regular-file identity/size/SHA256 before cold CLI and after readonly action extraction; key/history inputs also pinned stable. Record SHM as coordination only; do not require its bytes stable. Reject external/pruned/encrypted ACTION_STATE payload proof; use inline genuine fixtures. Files used for policy/approval/preimages are independently hashed/signature-verified and checked stable around extraction.",
+    "reuse": "Do not duplicate ledger writer/v2/session-seal crypto. Decode already authenticated signed-v2 raw payload and independently compare every action-specific member to canonical action bytes and intent. Auditor artifact signatures/quorum remain independently verified.",
+    "boundary": "No existing AMC CLI verifies action tables. Helper implements independent cold action-state checks; preserve literal installed-action-CLI acceptance gap and stale verifier/source threat limitations."
+  },
+  "dependency": "Oracle helper may import existing better-sqlite3 directly readonly only; no AMC src/dist or provider helper imports. No Ajv/YAML dependency needed: fixed finance shapes and operator-reviewed signed tools byte pin avoid generic YAML reimplementation.",
+  "lifecycle": "No auto-kill or signals. Verifier stdout/stderr bounded; over-limit/uncertain lifecycle fails and records it. Do not resolve the promise before actual natural close. A normal protocol error emits explicit failed check with bounded error text; it cannot pass.",
+  "positive": "Test producer uses actual signed public APIs/default P102+journal/recorder and real provider. Captures operator public keys before grant, persists exact record/envelope before POST, closes all writers/pools/child before oracle. No fabricated AUTHORIZATION_RECORD/approval/state rows.",
+  "limits": [
+    "provider chain plain SHA local fixture, not external signature",
+    "tenantId in generic record is null; trust manifest supplies explicit fixture tenant association only",
+    "same UID OS isolation not claimed",
+    "literal generic/provider hash equality not implemented because false in current contracts",
+    "F12 cancellation, F30/F31 binding, control evaluator and full F cases remain open",
+    "restored raw receipt proof is authenticated by actual pinned CLI plus stable snapshot, not driver verified:true"
+  ]
+}

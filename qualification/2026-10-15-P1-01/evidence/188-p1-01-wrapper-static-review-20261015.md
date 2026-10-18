@@ -1,0 +1,7 @@
+# P1-01 wrapper static review
+
+No blocking static findings. The 10,488-byte wrapper is exactly its fully reviewed P0-41 predecessor with only P1-01 namespace substitutions in the label, private base, repository, journal and terminal diagnostic. All preflight pins and the unchanged 2,110-byte observer reporter match.
+
+Original argv, deadlines, inherited environment with scoped Node 22/private HOME, exclusive process/evidence records, new session, unbounded normal wait, bounded signal-0 owned-group polling and positive ESRCH requirement are unchanged. No terminating signal, automatic retry, cleanup or restoration is introduced. ACTIVE/HALTED preserve uncertainty. Observed raw bytes are snapshotted only after normal exit and owned-group absence; observer PID/cwd and Git HEAD binding remain.
+
+This is static process-wrapper review, not product or test qualification. Exit 0/1, group absence and reporter completion do not establish body acceptance or complete teardown; actual raw/observer/full streams and known late diagnostics need later review. The wrapper inherits environment values and makes no credential, network, cache, native ABI or universal detached-descendant isolation claim. The legacy observer key remains intentional. No import, parser, syntax check, runtime, fixture setup, Git command or repository change was performed by this review. All reads are finished. Root separately owns activation and commands under the user's existing authorization.

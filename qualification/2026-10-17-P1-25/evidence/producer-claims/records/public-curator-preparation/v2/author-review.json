@@ -1,0 +1,45 @@
+{
+  "schema": "p125pc-actual-input-public-curator-successor-author-review/2",
+  "at": "2026-10-17T02:07:13.043216+00:00",
+  "blockers": [],
+  "preservedUnreadyV1Seal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/seal.json",
+    "bytes": 2237,
+    "sha256": "9ea64e5173aeeeee33cd128af412e50f679b1137623bb2bf362db2c700deb6eb"
+  },
+  "actualRootRuntimeReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+    "bytes": 30212,
+    "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214"
+  },
+  "actualFinalPreservation": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+    "bytes": 1794,
+    "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41"
+  },
+  "actualPhaseInputs": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+    "bytes": 4256,
+    "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+  },
+  "allSixOutcomeAndPublicAuditPinsMatchRootActualRecords": true,
+  "allSixActualTestCommandAndResourceProjectionsMatch": true,
+  "allActualProducerPerGrantProofsIncludeStoredTokenPinAndActualStagesMatch": true,
+  "onlyChanges": [
+    "exact actual phase-input path and SHA",
+    "actual root schema completed-runtime-review (no chain infix)",
+    "actual quality-red field name",
+    "actual allHoldsRetained field name",
+    "actual wholeP1_25Complete field name",
+    "actualResources phase field name"
+  ],
+  "noWrapperReportAliasOrInputReshape": true,
+  "allProducerWindowCadenceNonwindowGuardBodiesUnchanged": true,
+  "exactReverseOfNamedDeltaRecoversV1": true,
+  "allSevenV1OutputsAndSealStillExact": true,
+  "fullActualInputSchemaAndExactDeltaSelfRead": true,
+  "rootReviewIsRootActualEvidenceNotAnIndependentPeerSubstitute": true,
+  "noCodeParserImportCompileHelperProductOpenSslSslNativeSqlNetworkKeyPrivateStreamSourceIndexQaOrReservationOperations": true,
+  "publicCopiesOrAllowlistProduced": false,
+  "requiresRootFullReadIndependentStaticReviewAndSeparateAdoption": true
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "private-static-contract-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/review.json",
+      "bytes": 7917,
+      "sha256": "8b01ba979a46c5f960272854bed53da5d341f1bf3ad421abc61093bbb60538b2"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+      "bytes": 4715,
+      "sha256": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/README.md",
+      "bytes": 1329,
+      "sha256": "2287501ec4a2de17939a127634d891f230b3bd2d2924a0bf65c1ddfb71112d80"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/input-pins.json",
+      "bytes": 7303,
+      "sha256": "d768e86eeefd9ac237db83954b924ac0b0099b66e8e8bd2fdc780115135cc7ee"
+    }
+  ],
+  "allReadsFinished": true,
+  "executionByReviewer": false
+}

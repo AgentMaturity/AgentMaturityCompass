@@ -1,0 +1,4106 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-22",
+  "createdAtUtc": "2026-10-14T16:57:13.197231+00:00",
+  "mode": "Read-only index of existing receipts; only these private index files written. No repository/canonical qualification edits or tests/builds executed.",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+  "initialSourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "finalBoundedSourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "status": "blocked_not_done; user directed empty-array interfaces remain unresolved and continuation follows bounded qualification",
+  "userDisposition": {
+    "text": "Leave this unresolved and continue after bounded qualification.",
+    "scope": "Successful empty passport search and leaderboard show arrays; no interface change, exemption, skip, fabricated envelope or approval inferred."
+  },
+  "latestBoundedBoundary": {
+    "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json",
+    "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+    "bytes": 181700,
+    "counts": {
+      "success": false,
+      "numTotalTests": 512,
+      "numPassedTests": 510,
+      "numFailedTests": 2,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 2
+    },
+    "startedUtc": "2026-10-14T16:51:14.123000+00:00",
+    "durationMs": 159092.556640625,
+    "failedCases": [
+      "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+      "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+    ],
+    "snapshots": {
+      "total": 23,
+      "matched": 23,
+      "added": 0,
+      "updated": 0,
+      "unchecked": 0,
+      "unmatched": 0,
+      "filesAdded": 0,
+      "filesUpdated": 0,
+      "filesRemoved": 0,
+      "didUpdate": false
+    },
+    "qualification": "Latest committed-source bounded Node22 boundary512total510pass2empty-arrayfail0pending/todo;23snapshots matched. No full-platform/coverage/Node24/hosted claim."
+  },
+  "preFinalGuardCliBoundary": {
+    "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-cli-corpus.json",
+    "sha256": "891455b06a21802d9d438ad42469a0e91ce8566383d4a0cd240fe66d980a3744",
+    "bytes": 82859,
+    "counts": {
+      "success": false,
+      "numTotalTests": 186,
+      "numPassedTests": 184,
+      "numFailedTests": 2,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 2
+    },
+    "startedUtc": "2026-10-14T16:19:32.607000+00:00",
+    "durationMs": 148038.64428710938,
+    "failedCases": [
+      "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+      "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+    ],
+    "snapshots": {
+      "total": 0,
+      "matched": 0,
+      "added": 0,
+      "updated": 0,
+      "unchecked": 0,
+      "unmatched": 0,
+      "filesAdded": 0,
+      "filesUpdated": 0,
+      "filesRemoved": 0,
+      "didUpdate": false
+    },
+    "qualification": "186-case CLI/registry boundary184pass2fail0pending/todo before final durable lab shape/own-key guards."
+  },
+  "finalLabSourceBoundary": {
+    "path": "/private/tmp/p0-22-cognition-lab-final-own-keys-whole-file-node22-20261014.json",
+    "sha256": "fef1354b368e9372e136790429af6e5998e837e4303e43a604b0334ae3beda7e",
+    "bytes": 14328,
+    "counts": {
+      "success": true,
+      "numTotalTests": 49,
+      "numPassedTests": 49,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 0
+    },
+    "startedUtc": "2026-10-14T16:40:59.234000+00:00",
+    "durationMs": 289.232666015625,
+    "failedCases": [],
+    "snapshots": {
+      "total": 0,
+      "matched": 0,
+      "added": 0,
+      "updated": 0,
+      "unchecked": 0,
+      "unmatched": 0,
+      "filesAdded": 0,
+      "filesUpdated": 0,
+      "filesRemoved": 0,
+      "didUpdate": false
+    },
+    "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+  },
+  "reportSnapshotScope": {
+    "builders": 13,
+    "snapshots": 23,
+    "remainingTwelveBuildersFinal": {
+      "path": "/private/tmp/p0-22-report-contracts-final-20261014.json",
+      "sha256": "edf158ddc335748dec2eebb9656b77c844aead338d7a47b737c00fb4cec2d8c7",
+      "bytes": 35432,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:07:21.459000+00:00",
+      "durationMs": 5092.599853515625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 22,
+        "matched": 22,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "fleetBuilderFinal": {
+      "path": "/private/tmp/p0-22-fleet-snapshot-final-20261014.json",
+      "sha256": "6b32847ecc0e164d428f876a065941c8f10bcaae92da94e3019df680745eb0d5",
+      "bytes": 3342,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:15:50.919000+00:00",
+      "durationMs": 5962.1025390625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 1,
+        "matched": 1,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "latestBoundedMatched": 23,
+    "latestBoundedAdded": 0,
+    "latestBoundedUpdated": 0,
+    "latestBoundedUnchecked": 0,
+    "qualification": "Distinct component runs; do not sum overlapping tests as a platform-wide count."
+  },
+  "abiRepair": {
+    "cause": "Unqualified Node25 CLI import via nonexistent nvm PATH adapted owned ignored native dependency; initial Node25 registry attempt and signature-only inventory observation are not qualification.",
+    "unqualifiedInventory": {
+      "path": "/private/tmp/p0-22-command-signatures-20261014.json",
+      "sha256": "bbf75265313da651144350d54c5751c1c1df86eebf6f4b5509f9579f1fe05b5b",
+      "bytes": 120226
+    },
+    "unqualifiedRegistry": {
+      "path": "/private/tmp/p0-22-cli-result-registry-red-20261014.json",
+      "sha256": "d8653d0d2042f9f3ad1d4cd4ff28d9151461d6fa90386c4f40b2c1cc3465e4c7",
+      "bytes": 3600,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:45:20.825000+00:00",
+      "durationMs": 5340.161865234375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename, success8/8 on initial unqualified Node25; environment observer only, not Node22 qualification."
+    },
+    "environmentFailure": {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-20261014.json",
+      "sha256": "4edf213bddaded345ec94a41a4a95758783c014e8bd866a7e95c323e293f00c4",
+      "bytes": 17002,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 0,
+        "numFailedTests": 10,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:45:50.468000+00:00",
+      "durationMs": 3031.758544921875,
+      "failedCases": [
+        "Fleet Scoring evaluateFleet with single default agent",
+        "Fleet Scoring evaluateFleet with multiple agents detects weak links",
+        "Fleet Scoring evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent",
+        "Fleet Scoring pairwise comparisons are capped by maxComparisons",
+        "Fleet Scoring maxComparisons 0 skips comparisons",
+        "Fleet Scoring renderFleetScoringMarkdown produces valid markdown",
+        "Fleet Scoring fleet report preserves each legacy member's claim label",
+        "Fleet Scoring evaluateFleet writes output file when outputPath set",
+        "Fleet Scoring agent summary includes strongest and weakest questions",
+        "Fleet Scoring fleet aggregate layer averages cover all layers"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename,0/10 passed: Node22 ABI127 attempted a Node25 ABI141 binary. Environment failure, not product behavior."
+    },
+    "repairCommand": {
+      "name": "own-node22-sqlite-rebuild",
+      "cmd": "pnpm rebuild better-sqlite3",
+      "exit": 0,
+      "durationMs": 518,
+      "startedUtc": "2026-10-14T15:48:47.593228+00:00",
+      "log": "/private/tmp/p0-22-own-node22-sqlite-rebuild-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "ce1d8a40b3cb227cba3179cb13ddee92406dce57a9e28d53d86fff6ff6074f95",
+      "logBytes": 126
+    },
+    "nativeMetadata": {
+      "scope": "owned P0-22 worktree only",
+      "repairPerformedBy": "root",
+      "rootReportedCause": "A signature-only helper fell through an absent nvm PATH to Node25 and the CLI adapted the owned native dependency.",
+      "beforeSha256": "381dcb4cc3bc2bed1ae5457313bdd58501b8365c4c36c0c347fec2db7b77ebbc",
+      "afterSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "afterLinks": 1,
+      "runtime": "Node22.23.3 ABI127; executable and PATH explicitly pinned for final green"
+    },
+    "repairedFleet": {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.json",
+      "sha256": "a791c1c51a9e333b071ef886474f3b7b668e74366c676dc3c570067871e36841",
+      "bytes": 3353,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:19.081000+00:00",
+      "durationMs": 6310.7666015625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "repairedRegistry": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/registry-after-abi-repair.json",
+      "sha256": "3d7936cddae4393747b8b3bdf829767ec10a4d8c2c4dc17b2030cef5d6b11b22",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:30.523000+00:00",
+      "durationMs": 3076.5458984375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "qualification": "Owned fixture only. Node22.23.3 ABI127, repaired native SHA1946ab...; actual DB-using fleet tests10/10 and registry8/8 pass. Source/package/lock baselines unchanged."
+  },
+  "mutationProof": {
+    "receipt": {
+      "path": "/private/tmp/p0-22-actual-mutations-20261014.json",
+      "sha256": "ecf47435fa749e8626d26e9a7ec6f47a08b7307be2faa8189b3da98f748bae06",
+      "bytes": 6078
+    },
+    "refinedSummary": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/refined-mutation-summary.json",
+      "sha256": "f541f35f7268e4c282b0198e21551650d2b32e4b35270d7664d910ef8bd0e7d9",
+      "bytes": 1289
+    },
+    "installerDisabled": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.json",
+      "sha256": "f634078b12df219f9b3e7532be8fd88e328b46d47badc7dc8ab0166ddaddd86b",
+      "bytes": 7520,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 5,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 3
+      },
+      "startedUtc": "2026-10-14T16:30:59.518000+00:00",
+      "durationMs": 3430.604736328125,
+      "failedCases": [
+        "result command registry covers the built CLI installs a postAction hook in the actual CLI entrypoint without changing its inventory output",
+        "built claim label hooks fails a successful unlabelled result with exit 70 and a stderr diagnostic in strict mode",
+        "built claim label hooks adds the self-reported fallback line to successful unlabelled text outside strict mode"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual compiled hook installer body disabled; focused negative detects actual CLI installation plus strict70/fallback. Not a source entrypoint edit."
+    },
+    "initialArrayOmission": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.json",
+      "sha256": "faa97ad16cd763ef3c5eafbf413d035ed1ad0bfee3f8ad34b2c4db5e6185efcb",
+      "bytes": 4893,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:31:03.164000+00:00",
+      "durationMs": 3032.5224609375,
+      "failedCases": [
+        "result command registry covers the built CLI keeps the hook index complete and supplies an explicit reason for every exclusion"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Initial runtime array omission caught array/map consistency only; not keyword omission proof."
+    },
+    "refinedKeywordOmission": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-keyword-omission.json",
+      "sha256": "687f981843d010872949f989e5d324dd1e849cfb077f7db9bc83dcb0323c3c22",
+      "bytes": 4968,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:34:41.024000+00:00",
+      "durationMs": 3098.814697265625,
+      "failedCases": [
+        "result command registry covers the built CLI has unique canonical paths and exactly one classification for every keyword description"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Refined actual array AND map omission of score fail-secure fails keyword inventory coverage."
+    },
+    "restoredBaseline": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.json",
+      "sha256": "67b671c70c4b08f1def85add451e15d7c1325aed5880438930c31d406d9165a6",
+      "bytes": 3604,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:31:06.423000+00:00",
+      "durationMs": 3011.953369140625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "finalRestoredRegistry": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/final-restored-registry.json",
+      "sha256": "a61898e2134891a428753b35de819a81f1010ff9802d30f21c36c8ba3dc1110f",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:38:57.601000+00:00",
+      "durationMs": 3142.6279296875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    "compiledHookBytesRestored": true,
+    "protectedSourceBytesUntouched": true,
+    "protectedHashesBefore": {
+      "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+      "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    "protectedHashesAfter": {
+      "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+      "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    "qualification": "Installer disabled in compiled owned hook artifact, restored in finally. Omission faults mutate actual runtime exports via isolated setup; protected source/freeze/Vitest files remain byte-identical. Initial array-only omission proves consistency; refined array+map omission proves keyword coverage. Negative controls are not positive whole qualification."
+  },
+  "unresolved": [
+    {
+      "path": "passport search",
+      "actualSuccessOutput": "[]",
+      "literalAcceptance": "Successful JSON result has no claim fields; test remains RED."
+    },
+    {
+      "path": "leaderboard show",
+      "actualSuccessOutput": "[]",
+      "literalAcceptance": "Successful JSON result has no claim fields; test remains RED."
+    }
+  ],
+  "finalChecks": [
+    {
+      "name": "final-source-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31168,
+      "startedUtc": "2026-10-14T16:50:16.602584+00:00",
+      "log": "/private/tmp/p0-22-final-source-build-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "name": "final-typecheck",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 33580,
+      "startedUtc": "2026-10-14T16:51:13.427386+00:00",
+      "log": "/private/tmp/p0-22-final-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "logBytes": 75
+    },
+    {
+      "name": "final-test-typecheck",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38764,
+      "startedUtc": "2026-10-14T16:51:47.060135+00:00",
+      "log": "/private/tmp/p0-22-final-test-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "logBytes": 87
+    },
+    {
+      "name": "final-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3060,
+      "startedUtc": "2026-10-14T16:52:25.881518+00:00",
+      "log": "/private/tmp/p0-22-final-lint-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "logBytes": 373
+    },
+    {
+      "name": "final-freeze",
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1285,
+      "startedUtc": "2026-10-14T16:52:28.985592+00:00",
+      "log": "/private/tmp/p0-22-final-freeze-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811",
+      "logBytes": 194
+    },
+    {
+      "name": "final-architecture",
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1640,
+      "startedUtc": "2026-10-14T16:52:30.319176+00:00",
+      "log": "/private/tmp/p0-22-final-architecture-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "273eafb01e0f6a883ccb28c3eaa5842b760db3aec8534890a6839f057276b534",
+      "logBytes": 95489
+    },
+    {
+      "name": "final-counts",
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 344,
+      "startedUtc": "2026-10-14T16:52:32.004776+00:00",
+      "log": "/private/tmp/p0-22-final-counts-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630",
+      "logBytes": 165
+    },
+    {
+      "name": "final-docs-drift",
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 279,
+      "startedUtc": "2026-10-14T16:52:32.394119+00:00",
+      "log": "/private/tmp/p0-22-final-docs-drift-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0",
+      "logBytes": 131
+    },
+    {
+      "name": "final-source-duplicates",
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1334,
+      "startedUtc": "2026-10-14T16:52:32.718448+00:00",
+      "log": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "f2b9bac234b5ea83ee70cc0928bb26b945a42d288825600a635a2cae99c0c504",
+      "logBytes": 1939
+    },
+    {
+      "name": "final-source-dead-code",
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3401,
+      "startedUtc": "2026-10-14T16:52:34.099613+00:00",
+      "log": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "05a90bcd522819feb90bd3a49ae027eac3e1c9dfbbdf470a791ad013639c6998",
+      "logBytes": 1055
+    },
+    {
+      "name": "final-clean-source",
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 54100,
+      "startedUtc": "2026-10-14T16:52:37.548607+00:00",
+      "log": "/private/tmp/p0-22-final-clean-source-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "bc1945632dc7fa560ce282a7ae6b060adaefae02ba4a954aa8b39a15118dc832",
+      "logBytes": 863
+    },
+    {
+      "name": "final-bounded-node22",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts tests/fleetScoring.test.ts tests/cognitionLab.test.ts tests/diagnosticReportStatus.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/assuranceReportProvenance.test.ts tests/executiveBrief.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/benchmarks/benchRunner.test.ts tests/complianceReportReadability.test.ts tests/compliance/complianceMatrix.test.ts tests/dataResidency.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 159953,
+      "startedUtc": "2026-10-14T16:51:13.391911+00:00",
+      "log": "/private/tmp/p0-22-final-bounded-node22-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "c6a3b562b26b7f860e37a9567fbc306ac87e8b1d652cc89675339f7fbdfed004",
+      "logBytes": 26929
+    }
+  ],
+  "sourceQualityDebt": {
+    "duplicates": {
+      "status": "failed",
+      "exit": 1,
+      "findingCount": 1270,
+      "duplicatedLines": 14786,
+      "newClones": 0,
+      "log": {
+        "path": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+        "sha256": "f2b9bac234b5ea83ee70cc0928bb26b945a42d288825600a635a2cae99c0c504",
+        "bytes": 1939
+      }
+    },
+    "deadCode": {
+      "status": "failed",
+      "exit": 1,
+      "findingCount": 2784,
+      "log": {
+        "path": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+        "sha256": "05a90bcd522819feb90bd3a49ae027eac3e1c9dfbbdf470a791ad013639c6998",
+        "bytes": 1055
+      }
+    }
+  },
+  "labLimits": [
+    "Typed guard validates returned parseable records; unchanged generic reader still skips unreadable/unparsable JSON.",
+    "Signatures are not authenticated by this guard and synthetic data does not gain observed/reviewed trust.",
+    "Every raw own score value is validated finite0..1; raw metadata/wrapper keys retained; valid own score0.7 retained with unchanged object prototypes and mean math."
+  ],
+  "notInferred": [
+    "No full-platform suite or coverage result at the final source.",
+    "No Node24 or hosted CI qualification from these Node22 receipts.",
+    "No release, publish, merge, tracker closure or whole-issue Done claim.",
+    "No waived empty-array contract or global coverage/source-quality threshold change."
+  ],
+  "chronologicalTestPhases": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/current-focused.json",
+      "sha256": "8a0fcb37f5f53783600f7b7540d565803184a1c53f5b77cd25f6388548bac427",
+      "bytes": 51739,
+      "counts": {
+        "success": true,
+        "numTotalTests": 162,
+        "numPassedTests": 162,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:41:44.102000+00:00",
+      "durationMs": 18881.7578125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-red-20261014.json",
+      "sha256": "12f71859128142c5caedb9258ad34b9f336be0d0d67b597ca8211bb9d12c1dab",
+      "bytes": 3782,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 9,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:45:01.441000+00:00",
+      "durationMs": 6029.54541015625,
+      "failedCases": [
+        "Fleet Scoring fleet report preserves each legacy member's claim label"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-red-20261014.json",
+      "sha256": "d8653d0d2042f9f3ad1d4cd4ff28d9151461d6fa90386c4f40b2c1cc3465e4c7",
+      "bytes": 3600,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:45:20.825000+00:00",
+      "durationMs": 5340.161865234375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename, success8/8 on initial unqualified Node25; environment observer only, not Node22 qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-20261014.json",
+      "sha256": "4edf213bddaded345ec94a41a4a95758783c014e8bd866a7e95c323e293f00c4",
+      "bytes": 17002,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 0,
+        "numFailedTests": 10,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:45:50.468000+00:00",
+      "durationMs": 3031.758544921875,
+      "failedCases": [
+        "Fleet Scoring evaluateFleet with single default agent",
+        "Fleet Scoring evaluateFleet with multiple agents detects weak links",
+        "Fleet Scoring evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent",
+        "Fleet Scoring pairwise comparisons are capped by maxComparisons",
+        "Fleet Scoring maxComparisons 0 skips comparisons",
+        "Fleet Scoring renderFleetScoringMarkdown produces valid markdown",
+        "Fleet Scoring fleet report preserves each legacy member's claim label",
+        "Fleet Scoring evaluateFleet writes output file when outputPath set",
+        "Fleet Scoring agent summary includes strongest and weakest questions",
+        "Fleet Scoring fleet aggregate layer averages cover all layers"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename,0/10 passed: Node22 ABI127 attempted a Node25 ABI141 binary. Environment failure, not product behavior."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-node22-20261014.json",
+      "sha256": "7bde1611781ecb2fe87d6f76fc58d171e2ab607c6c46ced454c553c4d1f5a02e",
+      "bytes": 3596,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:45:59.415000+00:00",
+      "durationMs": 5100.9287109375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.json",
+      "sha256": "a791c1c51a9e333b071ef886474f3b7b668e74366c676dc3c570067871e36841",
+      "bytes": 3353,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:19.081000+00:00",
+      "durationMs": 6310.7666015625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/registry-after-abi-repair.json",
+      "sha256": "3d7936cddae4393747b8b3bdf829767ec10a4d8c2c4dc17b2030cef5d6b11b22",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:30.523000+00:00",
+      "durationMs": 3076.5458984375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.json",
+      "sha256": "59db0dd9aca33ecbde989c5fe98357ac81fcf6d0c19468f35349aab8b3ea0300",
+      "bytes": 107349,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 150,
+        "numFailedTests": 28,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:54:52.181000+00:00",
+      "durationMs": 143624.88842773438,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc verify all \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance toctou \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance compound-threats \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance shutdown-compliance \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance advanced-threats \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance scheduler run-now \u2014 fixture refusal permitted: No assurance scheduler policy or live agent adapter is registered.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc loop run \u2014 fixture refusal permitted: The fixture has no live execution adapter; no provider may be contacted.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc transparency report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc audit binder verify \u2014 fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport create \u2014 fixture refusal permitted: The seeded run is signed but has no observed evidence; it cannot create a qualified Passport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport badge \u2014 fixture refusal permitted: No qualified Passport exists in this private fixture.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc fleet report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc transform attest \u2014 fixture refusal permitted: No matching transformation task exists.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc residency-report \u2014 fixture refusal permitted: No signed data residency policy has been configured for this tenant.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc domain conformance \u2014 fixture refusal permitted: No signed active station operating profile or conformance responses exist.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc score simulation-lane \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc executive brief \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard export \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard public-export \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc badge \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc session verify \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace domain baseline emits self-reported claim fields and eligibleLevel at most one",
+        "actual strict CLI result labels in a signed, keyless private workspace a real stored 1.1.1 run fixture prints the legacy self-reported boundary"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Initial full E2E observer:178 total150pass28fail. Includes demonstrated recipe/format errors, not28 product defects."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.json",
+      "sha256": "058ec512778f442d27eae8276e901fa8f9965af31f9cecb1e4e72632fc6389f2",
+      "bytes": 81993,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 173,
+        "numFailedTests": 5,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:01:00.948000+00:00",
+      "durationMs": 142680.5087890625,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc executive brief \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Refined whole E2E observer:173pass5fail; two final recipe issues, durable-lab restart and two empty arrays remained."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-first-20261014.json",
+      "sha256": "417572b906133afc819a05687601cf9493948296446c1f49a7b55964e782086e",
+      "bytes": 35426,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:02:14.136000+00:00",
+      "durationMs": 5481.111572265625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-recipes-node22-20261014.json",
+      "sha256": "b0b05d121d25ec962b56a54d6eee02f400b8839dd744c7b3ff2210a4c07448cd",
+      "bytes": 73169,
+      "counts": {
+        "success": true,
+        "numTotalTests": 178,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 175,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:05:10.849000+00:00",
+      "durationMs": 7203.86669921875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Selected recipe control3pass175filtered; not whole acceptance."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.json",
+      "sha256": "95a303615365ca82b3441079c44fa426e019864df6ae8cf4241918bd152943b6",
+      "bytes": 35431,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:06:04.256000+00:00",
+      "durationMs": 4980.75244140625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 22,
+        "matched": 0,
+        "added": 22,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 10,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": true
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.json",
+      "sha256": "745e1ef781d0d576982f8f9c2808dfbadfff5ae04256757c8ce06d85d90faeec",
+      "bytes": 73967,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 174,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:07:08.287000+00:00",
+      "durationMs": 7495.20458984375,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Earlier selected4-case observer:3pass1labfail174filtered. Not latest full corpus."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-final-20261014.json",
+      "sha256": "edf158ddc335748dec2eebb9656b77c844aead338d7a47b737c00fb4cec2d8c7",
+      "bytes": 35432,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:07:21.459000+00:00",
+      "durationMs": 5092.599853515625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 22,
+        "matched": 22,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-red-node22-20261014.json",
+      "sha256": "b3789b2acb1c5a7cd74c5d52c476072fb9a6bd68d722ad888a9e0e282cf730bb",
+      "bytes": 10823,
+      "counts": {
+        "success": false,
+        "numTotalTests": 38,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:11:03.698000+00:00",
+      "durationMs": 232.75,
+      "failedCases": [
+        "experiment simulation simulates a persisted experiment after a cold restart and retains its synthetic results"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-green-node22-20261014.json",
+      "sha256": "0236c222d3c014aa93247b55cacb125562b2e3370f18e43115db67ee31271d2c",
+      "bytes": 10934,
+      "counts": {
+        "success": false,
+        "numTotalTests": 38,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:12:32.395000+00:00",
+      "durationMs": 239.35009765625,
+      "failedCases": [
+        "experiment simulation simulates a persisted experiment after a cold restart and retains its synthetic results"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Intermediate post-fix source run failed on UUID file enumeration order; retained; exact per-probe comparison corrected afterward."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-final-green-node22-20261014.json",
+      "sha256": "4a1a794890363551c922ebab40e704448bf7c3ca0caf83ae02388be1413d04a7",
+      "bytes": 9439,
+      "counts": {
+        "success": true,
+        "numTotalTests": 38,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:13:14.807000+00:00",
+      "durationMs": 242.296875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-whole-file-node22-20261014.json",
+      "sha256": "464fdcd687ec4b84f579b27b44479a8319e2cd3b7886476fb637481fdd870c59",
+      "bytes": 10526,
+      "counts": {
+        "success": true,
+        "numTotalTests": 38,
+        "numPassedTests": 38,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:13:20.884000+00:00",
+      "durationMs": 250.129638671875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-seed-20261014.json",
+      "sha256": "cbc9b516d72d1c82dedd79f28eaa234c43aa2b4fee41f24371d873315293c741",
+      "bytes": 3349,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:14:48.643000+00:00",
+      "durationMs": 6143.18212890625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 1,
+        "matched": 0,
+        "added": 1,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 1,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": true
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-final-20261014.json",
+      "sha256": "6b32847ecc0e164d428f876a065941c8f10bcaae92da94e3019df680745eb0d5",
+      "bytes": 3342,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:15:50.919000+00:00",
+      "durationMs": 5962.1025390625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 1,
+        "matched": 1,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-cli-corpus.json",
+      "sha256": "891455b06a21802d9d438ad42469a0e91ce8566383d4a0cd240fe66d980a3744",
+      "bytes": 82859,
+      "counts": {
+        "success": false,
+        "numTotalTests": 186,
+        "numPassedTests": 184,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:19:32.607000+00:00",
+      "durationMs": 148038.64428710938,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "186-case CLI/registry boundary184pass2fail0pending/todo before final durable lab shape/own-key guards."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-red-node22-20261014.json",
+      "sha256": "09cfd0599188c1ddee2338734ecce37e6272c6ca01c5853fde916c51bc9d8314",
+      "bytes": 20297,
+      "counts": {
+        "success": false,
+        "numTotalTests": 45,
+        "numPassedTests": 1,
+        "numFailedTests": 6,
+        "numPendingTests": 38,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:30:36.213000+00:00",
+      "durationMs": 409.796875,
+      "failedCases": [
+        "durable probe record validation refuses a malformed persisted probe record: null without an identifiable experiment",
+        "durable probe record validation refuses a malformed persisted probe record: matching scores null",
+        "durable probe record validation refuses a malformed persisted probe record: matching numeric-string score",
+        "durable probe record validation refuses a malformed persisted probe record: matching nonfinite score",
+        "durable probe record validation refuses a malformed persisted probe record: matching missing probe identity",
+        "durable probe record validation refuses a malformed persisted probe record: matching metadata null"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.json",
+      "sha256": "f634078b12df219f9b3e7532be8fd88e328b46d47badc7dc8ab0166ddaddd86b",
+      "bytes": 7520,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 5,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 3
+      },
+      "startedUtc": "2026-10-14T16:30:59.518000+00:00",
+      "durationMs": 3430.604736328125,
+      "failedCases": [
+        "result command registry covers the built CLI installs a postAction hook in the actual CLI entrypoint without changing its inventory output",
+        "built claim label hooks fails a successful unlabelled result with exit 70 and a stderr diagnostic in strict mode",
+        "built claim label hooks adds the self-reported fallback line to successful unlabelled text outside strict mode"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual compiled hook installer body disabled; focused negative detects actual CLI installation plus strict70/fallback. Not a source entrypoint edit."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.json",
+      "sha256": "faa97ad16cd763ef3c5eafbf413d035ed1ad0bfee3f8ad34b2c4db5e6185efcb",
+      "bytes": 4893,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:31:03.164000+00:00",
+      "durationMs": 3032.5224609375,
+      "failedCases": [
+        "result command registry covers the built CLI keeps the hook index complete and supplies an explicit reason for every exclusion"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Initial runtime array omission caught array/map consistency only; not keyword omission proof."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.json",
+      "sha256": "67b671c70c4b08f1def85add451e15d7c1325aed5880438930c31d406d9165a6",
+      "bytes": 3604,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:31:06.423000+00:00",
+      "durationMs": 3011.953369140625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-green-node22-20261014.json",
+      "sha256": "8e1b6979836b17010dd4b7d0b9148f4b459c2c6d4142382b7cf15bc2a2f017e5",
+      "bytes": 12217,
+      "counts": {
+        "success": true,
+        "numTotalTests": 46,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 38,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:33:06.262000+00:00",
+      "durationMs": 252.17578125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-shape-whole-file-node22-20261014.json",
+      "sha256": "338c46be86ca54fa730c9530d8e8234e2cc5de481d2402b16e6b8940c08b2791",
+      "bytes": 13334,
+      "counts": {
+        "success": true,
+        "numTotalTests": 46,
+        "numPassedTests": 46,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:33:12.167000+00:00",
+      "durationMs": 280.1591796875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-keyword-omission.json",
+      "sha256": "687f981843d010872949f989e5d324dd1e849cfb077f7db9bc83dcb0323c3c22",
+      "bytes": 4968,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:34:41.024000+00:00",
+      "durationMs": 3098.814697265625,
+      "failedCases": [
+        "result command registry covers the built CLI has unique canonical paths and exactly one classification for every keyword description"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Refined actual array AND map omission of score fail-secure fails keyword inventory coverage."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-red-node22-20261014.json",
+      "sha256": "8e9f5710659d3db8f47e422615371d2559d2aeeb6b4368b73c886e50014b1e70",
+      "bytes": 13601,
+      "counts": {
+        "success": false,
+        "numTotalTests": 47,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 46,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:35:50.765000+00:00",
+      "durationMs": 250.839599609375,
+      "failedCases": [
+        "durable probe record validation preserves own __proto__ metadata without changing object prototypes"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-green-node22-20261014.json",
+      "sha256": "fc4ad76bda137186e89b96793001967badde484df4b97b4a1db424cce5e7b8d6",
+      "bytes": 12323,
+      "counts": {
+        "success": true,
+        "numTotalTests": 47,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 46,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:36:16.217000+00:00",
+      "durationMs": 245.982421875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-whole-file-node22-20261014.json",
+      "sha256": "5147675f983574be21d6191586d45cdd5211292c200319823806c1ebe941c614",
+      "bytes": 13669,
+      "counts": {
+        "success": true,
+        "numTotalTests": 47,
+        "numPassedTests": 47,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:36:24.345000+00:00",
+      "durationMs": 301.158447265625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-node22-20261014.json",
+      "sha256": "a0e83d8269e08913c56237c0049f7d7d8e264aefb11a764656fba7e4aab0f10a",
+      "bytes": 15618,
+      "counts": {
+        "success": false,
+        "numTotalTests": 49,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:38:37.731000+00:00",
+      "durationMs": 260.50341796875,
+      "failedCases": [
+        "durable probe record validation preserves a numeric own __proto__ score in the stored result and aggregate",
+        "durable probe record validation refuses a nonnumeric own __proto__ score in a stored result"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/final-restored-registry.json",
+      "sha256": "a61898e2134891a428753b35de819a81f1010ff9802d30f21c36c8ba3dc1110f",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:38:57.601000+00:00",
+      "durationMs": 3142.6279296875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-quality-node22-20261014.json",
+      "sha256": "d7b0aedd73c5f9a4499c1d98cfc19ab6986d8d0ef236015b2525f1dcedd99e37",
+      "bytes": 15619,
+      "counts": {
+        "success": false,
+        "numTotalTests": 49,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:40:02.764000+00:00",
+      "durationMs": 254.56640625,
+      "failedCases": [
+        "durable probe record validation preserves a numeric own __proto__ score in the stored result and aggregate",
+        "durable probe record validation refuses a nonnumeric own __proto__ score in a stored result"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-green-node22-20261014.json",
+      "sha256": "8e2ddc2a505ccbacc4ce850a161ffb47ade2fc17089b0fe82a2a82cfab46e295",
+      "bytes": 12962,
+      "counts": {
+        "success": true,
+        "numTotalTests": 49,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:40:52.393000+00:00",
+      "durationMs": 252.47314453125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-final-own-keys-whole-file-node22-20261014.json",
+      "sha256": "fef1354b368e9372e136790429af6e5998e837e4303e43a604b0334ae3beda7e",
+      "bytes": 14328,
+      "counts": {
+        "success": true,
+        "numTotalTests": 49,
+        "numPassedTests": 49,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:40:59.234000+00:00",
+      "durationMs": 289.232666015625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json",
+      "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+      "bytes": 181700,
+      "counts": {
+        "success": false,
+        "numTotalTests": 512,
+        "numPassedTests": 510,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:51:14.123000+00:00",
+      "durationMs": 159092.556640625,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 23,
+        "matched": 23,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Latest committed-source bounded Node22 boundary512total510pass2empty-arrayfail0pending/todo;23snapshots matched. No full-platform/coverage/Node24/hosted claim."
+    }
+  ],
+  "commandChronology": [
+    {
+      "name": "frozen-install",
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 1692,
+      "startedUtc": "2026-10-14T15:39:04.781098+00:00",
+      "log": "/private/tmp/p0-22-frozen-install-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "5b438f8b07ff4b6a07f9443a313c8cc8de45762e890ac85a68bfbee1125f93e5",
+      "logBytes": 1900
+    },
+    {
+      "name": "current-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31351,
+      "startedUtc": "2026-10-14T15:40:29.351949+00:00",
+      "log": "/private/tmp/p0-22-current-build-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "name": "current-command-inventory",
+      "cmd": "node dist/cli.js commands --json",
+      "exit": 0,
+      "durationMs": 1199,
+      "startedUtc": "2026-10-14T15:41:42.613314+00:00",
+      "log": "/private/tmp/p0-22-current-command-inventory-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "4e5c9d578ebad93685d9e69296948170307ed5d3f83b6bd560c9429643de2bb6",
+      "logBytes": 351307
+    },
+    {
+      "name": "current-focused",
+      "cmd": "pnpm exec vitest run tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/complianceReportReadability.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/current-focused.json",
+      "exit": 0,
+      "durationMs": 20438,
+      "startedUtc": "2026-10-14T15:41:42.613316+00:00",
+      "log": "/private/tmp/p0-22-current-focused-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "1a4f7a486d568b4427474dbb63184000267047232fe34ebe1d85c10e79491592",
+      "logBytes": 1793
+    },
+    {
+      "name": "own-node22-sqlite-rebuild",
+      "cmd": "pnpm rebuild better-sqlite3",
+      "exit": 0,
+      "durationMs": 518,
+      "startedUtc": "2026-10-14T15:48:47.593228+00:00",
+      "log": "/private/tmp/p0-22-own-node22-sqlite-rebuild-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "ce1d8a40b3cb227cba3179cb13ddee92406dce57a9e28d53d86fff6ff6074f95",
+      "logBytes": 126
+    },
+    {
+      "name": "registry-after-abi-repair",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/registry-after-abi-repair.json",
+      "exit": 0,
+      "durationMs": 3683,
+      "startedUtc": "2026-10-14T15:49:29.939445+00:00",
+      "log": "/private/tmp/p0-22-registry-after-abi-repair-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "a6a2f635ae07250fff1d1039a2e62c62dfacb2191b81f3117e2c331d8c0c9034",
+      "logBytes": 570
+    },
+    {
+      "name": "fleet-repaired-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 30162,
+      "startedUtc": "2026-10-14T15:52:59.672369+00:00",
+      "log": "/private/tmp/p0-22-fleet-repaired-build-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "name": "fleet-repaired-freeze",
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1630,
+      "startedUtc": "2026-10-14T15:54:41.627089+00:00",
+      "log": "/private/tmp/p0-22-fleet-repaired-freeze-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811",
+      "logBytes": 194
+    },
+    {
+      "name": "fleet-repaired-architecture",
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2090,
+      "startedUtc": "2026-10-14T15:54:41.627144+00:00",
+      "log": "/private/tmp/p0-22-fleet-repaired-architecture-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "80e1ad675bd8140607d9dfbbacca172465f5ba5315de68d10c5a65ffb6c3aef8",
+      "logBytes": 95489
+    },
+    {
+      "name": "current-counts",
+      "cmd": "npm run check:counts",
+      "exit": 1,
+      "durationMs": 612,
+      "startedUtc": "2026-10-14T15:54:41.629186+00:00",
+      "log": "/private/tmp/p0-22-current-counts-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "db0d94007aa10e2773436003ad9c675c1011feba6e0460f8926e6700317bb612",
+      "logBytes": 1312
+    },
+    {
+      "name": "fleet-repaired-source-typecheck",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 27227,
+      "startedUtc": "2026-10-14T15:54:41.633697+00:00",
+      "log": "/private/tmp/p0-22-fleet-repaired-source-typecheck-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "logBytes": 75
+    },
+    {
+      "name": "factual-counts-refresh",
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 267,
+      "startedUtc": "2026-10-14T16:00:13.630853+00:00",
+      "log": "/private/tmp/p0-22-factual-counts-refresh-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+      "logBytes": 20
+    },
+    {
+      "name": "refreshed-counts",
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 412,
+      "startedUtc": "2026-10-14T16:00:14.147148+00:00",
+      "log": "/private/tmp/p0-22-refreshed-counts-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630",
+      "logBytes": 165
+    },
+    {
+      "name": "current-docs-drift",
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 356,
+      "startedUtc": "2026-10-14T16:00:14.150556+00:00",
+      "log": "/private/tmp/p0-22-current-docs-drift-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0",
+      "logBytes": 131
+    },
+    {
+      "name": "current-source-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4675,
+      "startedUtc": "2026-10-14T16:00:14.150557+00:00",
+      "log": "/private/tmp/p0-22-current-source-lint-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "logBytes": 373
+    },
+    {
+      "name": "current-test-typecheck",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 35637,
+      "startedUtc": "2026-10-14T16:03:30.883965+00:00",
+      "log": "/private/tmp/p0-22-current-test-typecheck-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "logBytes": 87
+    },
+    {
+      "name": "lab-repaired-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 29725,
+      "startedUtc": "2026-10-14T16:17:36.730797+00:00",
+      "log": "/private/tmp/p0-22-lab-repaired-build-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "name": "final-cli-corpus",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-cli-corpus.json",
+      "exit": 1,
+      "durationMs": 148672,
+      "startedUtc": "2026-10-14T16:19:32.079113+00:00",
+      "log": "/private/tmp/p0-22-final-cli-corpus-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "2c382994d476d5989c033fd436bc18d43633951a5a5e4adbba36b49a6f696d39",
+      "logBytes": 20318
+    },
+    {
+      "name": "lab-repaired-test-types",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 41019,
+      "startedUtc": "2026-10-14T16:19:33.351947+00:00",
+      "log": "/private/tmp/p0-22-lab-repaired-test-types-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "logBytes": 87
+    },
+    {
+      "name": "lab-repaired-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4060,
+      "startedUtc": "2026-10-14T16:19:33.353936+00:00",
+      "log": "/private/tmp/p0-22-lab-repaired-lint-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "logBytes": 373
+    },
+    {
+      "name": "lab-repaired-typecheck",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 30996,
+      "startedUtc": "2026-10-14T16:19:33.356874+00:00",
+      "log": "/private/tmp/p0-22-lab-repaired-typecheck-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "logBytes": 75
+    },
+    {
+      "name": "registry-keyword-omission-mutant",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --config tmp/p0-22-qualification/mutations/registry-coverage-mutation.config.mjs --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/mutations/registry-keyword-omission.json",
+      "exit": 1,
+      "durationMs": 3535,
+      "startedUtc": "2026-10-14T16:34:40.613514+00:00",
+      "log": "/private/tmp/p0-22-registry-keyword-omission-mutant-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "e0f3ba476ad930004124d16288f76e5c1c7a1892a7cb368bf761de3a6b32fba1",
+      "logBytes": 2400
+    },
+    {
+      "name": "final-restored-registry",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/mutations/final-restored-registry.json",
+      "exit": 0,
+      "durationMs": 3610,
+      "startedUtc": "2026-10-14T16:38:57.156771+00:00",
+      "log": "/private/tmp/p0-22-final-restored-registry-20261014.log",
+      "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "logSha256": "73eb5fd07a8333bfda1d2df7edb4fd0204bf6824180731787cdf39e67bed2751",
+      "logBytes": 654
+    },
+    {
+      "name": "final-source-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31168,
+      "startedUtc": "2026-10-14T16:50:16.602584+00:00",
+      "log": "/private/tmp/p0-22-final-source-build-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "name": "final-bounded-node22",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts tests/fleetScoring.test.ts tests/cognitionLab.test.ts tests/diagnosticReportStatus.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/assuranceReportProvenance.test.ts tests/executiveBrief.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/benchmarks/benchRunner.test.ts tests/complianceReportReadability.test.ts tests/compliance/complianceMatrix.test.ts tests/dataResidency.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 159953,
+      "startedUtc": "2026-10-14T16:51:13.391911+00:00",
+      "log": "/private/tmp/p0-22-final-bounded-node22-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "c6a3b562b26b7f860e37a9567fbc306ac87e8b1d652cc89675339f7fbdfed004",
+      "logBytes": 26929
+    },
+    {
+      "name": "final-typecheck",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 33580,
+      "startedUtc": "2026-10-14T16:51:13.427386+00:00",
+      "log": "/private/tmp/p0-22-final-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "logBytes": 75
+    },
+    {
+      "name": "final-test-typecheck",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38764,
+      "startedUtc": "2026-10-14T16:51:47.060135+00:00",
+      "log": "/private/tmp/p0-22-final-test-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "logBytes": 87
+    },
+    {
+      "name": "final-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3060,
+      "startedUtc": "2026-10-14T16:52:25.881518+00:00",
+      "log": "/private/tmp/p0-22-final-lint-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "logBytes": 373
+    },
+    {
+      "name": "final-freeze",
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1285,
+      "startedUtc": "2026-10-14T16:52:28.985592+00:00",
+      "log": "/private/tmp/p0-22-final-freeze-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811",
+      "logBytes": 194
+    },
+    {
+      "name": "final-architecture",
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1640,
+      "startedUtc": "2026-10-14T16:52:30.319176+00:00",
+      "log": "/private/tmp/p0-22-final-architecture-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "273eafb01e0f6a883ccb28c3eaa5842b760db3aec8534890a6839f057276b534",
+      "logBytes": 95489
+    },
+    {
+      "name": "final-counts",
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 344,
+      "startedUtc": "2026-10-14T16:52:32.004776+00:00",
+      "log": "/private/tmp/p0-22-final-counts-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630",
+      "logBytes": 165
+    },
+    {
+      "name": "final-docs-drift",
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 279,
+      "startedUtc": "2026-10-14T16:52:32.394119+00:00",
+      "log": "/private/tmp/p0-22-final-docs-drift-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0",
+      "logBytes": 131
+    },
+    {
+      "name": "final-source-duplicates",
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1334,
+      "startedUtc": "2026-10-14T16:52:32.718448+00:00",
+      "log": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "f2b9bac234b5ea83ee70cc0928bb26b945a42d288825600a635a2cae99c0c504",
+      "logBytes": 1939
+    },
+    {
+      "name": "final-source-dead-code",
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3401,
+      "startedUtc": "2026-10-14T16:52:34.099613+00:00",
+      "log": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "05a90bcd522819feb90bd3a49ae027eac3e1c9dfbbdf470a791ad013639c6998",
+      "logBytes": 1055
+    },
+    {
+      "name": "final-clean-source",
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 54100,
+      "startedUtc": "2026-10-14T16:52:37.548607+00:00",
+      "log": "/private/tmp/p0-22-final-clean-source-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "logSha256": "bc1945632dc7fa560ce282a7ae6b060adaefae02ba4a954aa8b39a15118dc832",
+      "logBytes": 863
+    }
+  ],
+  "generatedRawArtifacts": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993293458-44082/qualification-summary.json",
+      "sha256": "7822fba558b72192851a261a9024f4f69b1d865348eec61fba5540d88132850b",
+      "bytes": 11840318
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993293458-44082/commands.json",
+      "sha256": "c714a968cd0bd4ba74cfeb14de573a5e7ea3e1cec34df5b50778b16702fd06d5",
+      "bytes": 11829945
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993912198-45655/qualification-summary.json",
+      "sha256": "0c14f495fb4689dfd27f47a257ed986230f7f22836ef74a6b5a6938d15a6ab65",
+      "bytes": 21168
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993912198-45655/commands.json",
+      "sha256": "646bfd0b24ff91680f6d36d28e008f8abbc85cb2a4925c07e10889b3263c1459",
+      "bytes": 16459
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993662207-45032/qualification-summary.json",
+      "sha256": "0f8d46c7e89f0bc4c8c849f0e6b063f1e3133821ead3f849cb7e9e05407db7bc",
+      "bytes": 12061195
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791993662207-45032/commands.json",
+      "sha256": "fa9cfb3592970e2ff02571720bed2072403fac8aa47173846785d02cba523031",
+      "bytes": 12050766
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994774992-47150/persisted-lab-fixture.json",
+      "sha256": "24d7de4a69f4481a265aabcfbb801b8d1aeae9db79486899eb2705a5c548ac8f",
+      "bytes": 1958
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994774992-47150/qualification-summary.json",
+      "sha256": "b17aa4517ad3738e9a07578ea85e1b573cc5d3b148f64a1a42bb21f786641c9b",
+      "bytes": 12061816
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994774992-47150/commands.json",
+      "sha256": "ea60a2d4d23aa596a78cea9cd94a5e4418210be270a8b78d362226badd26b074",
+      "bytes": 12051391
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791996676616-50841/persisted-lab-fixture.json",
+      "sha256": "05cc57af9641c5008ddf20bcae9169dd9da7969501342c719008adde55313da2",
+      "bytes": 1958
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791996676616-50841/qualification-summary.json",
+      "sha256": "ef78c2608d9dc0fb803981e2d9540abf6bf209f7d20b88f3558cfb652cb28f0d",
+      "bytes": 12061821
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791996676616-50841/commands.json",
+      "sha256": "e498fa0e511caf687dcc9b19e52e814e52310e2c19017af039421119d69eb6e9",
+      "bytes": 12051396
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994029518-45875/persisted-lab-fixture.json",
+      "sha256": "df20729e2812e87aaa4c1b18d5dda12a2b4c8c0f74a9eefc5f3bd9407d18d632",
+      "bytes": 1958
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994029518-45875/qualification-summary.json",
+      "sha256": "bf39ed6bea059a25328ffec878cb671eae02baba6eb4eaa809767e0b9b5ef9a3",
+      "bytes": 14713
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994029518-45875/commands.json",
+      "sha256": "004a34fb7915f98dd93c9b47df56adcbc88a3d118702849a7d7560548a668894",
+      "bytes": 9954
+    }
+  ],
+  "rawOutputPolicy": "No stdout/stderr bodies embedded. Raw command summaries remain in owned ignored tmp; retain exact complete-file hash/bytes here. Canonical per-command records must omit stdout/stderr and preserve each original stream SHA256/byte size.",
+  "assets": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/current-command-inventory.json",
+      "sha256": "4e5c9d578ebad93685d9e69296948170307ed5d3f83b6bd560c9429643de2bb6",
+      "bytes": 351307
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/current-focused.json",
+      "sha256": "8a0fcb37f5f53783600f7b7540d565803184a1c53f5b77cd25f6388548bac427",
+      "bytes": 51739,
+      "counts": {
+        "success": true,
+        "numTotalTests": 162,
+        "numPassedTests": 162,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:41:44.102000+00:00",
+      "durationMs": 18881.7578125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/empty-array-user-disposition.json",
+      "sha256": "fadca576cd50c33484dcd8531013053620008cba23fac9184e71347bd93c8c5b",
+      "bytes": 863
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json",
+      "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+      "bytes": 181700,
+      "counts": {
+        "success": false,
+        "numTotalTests": 512,
+        "numPassedTests": 510,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:51:14.123000+00:00",
+      "durationMs": 159092.556640625,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 23,
+        "matched": 23,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Latest committed-source bounded Node22 boundary512total510pass2empty-arrayfail0pending/todo;23snapshots matched. No full-platform/coverage/Node24/hosted claim."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-cli-corpus.json",
+      "sha256": "891455b06a21802d9d438ad42469a0e91ce8566383d4a0cd240fe66d980a3744",
+      "bytes": 82859,
+      "counts": {
+        "success": false,
+        "numTotalTests": 186,
+        "numPassedTests": 184,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:19:32.607000+00:00",
+      "durationMs": 148038.64428710938,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "186-case CLI/registry boundary184pass2fail0pending/todo before final durable lab shape/own-key guards."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-source-manifest.json",
+      "sha256": "cb6524a8b07795a897cd69edbf4682c4455a4d916ab899973efec8e3b6276a5f",
+      "bytes": 7023
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/initial-source-inputs.json",
+      "sha256": "481fc2b1e0c251f94e97d167ee99c2f453062807439866e7bd9a1773a166fa07",
+      "bytes": 2532
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/final-restored-registry.json",
+      "sha256": "a61898e2134891a428753b35de819a81f1010ff9802d30f21c36c8ba3dc1110f",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:38:57.601000+00:00",
+      "durationMs": 3142.6279296875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.json",
+      "sha256": "f634078b12df219f9b3e7532be8fd88e328b46d47badc7dc8ab0166ddaddd86b",
+      "bytes": 7520,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 5,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 3
+      },
+      "startedUtc": "2026-10-14T16:30:59.518000+00:00",
+      "durationMs": 3430.604736328125,
+      "failedCases": [
+        "result command registry covers the built CLI installs a postAction hook in the actual CLI entrypoint without changing its inventory output",
+        "built claim label hooks fails a successful unlabelled result with exit 70 and a stderr diagnostic in strict mode",
+        "built claim label hooks adds the self-reported fallback line to successful unlabelled text outside strict mode"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual compiled hook installer body disabled; focused negative detects actual CLI installation plus strict70/fallback. Not a source entrypoint edit."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.log",
+      "sha256": "39933339f07ec5b05146951dc1af3f7533c655179aef5c2693f6e72080564426",
+      "bytes": 3535
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/omit-matched-registry-entry.mjs",
+      "sha256": "5a82806d779a9b1e9e6a003645bece87ad4221c2d7db9a33c74582275d8e986e",
+      "bytes": 433
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/omit-registry-entry.mjs",
+      "sha256": "7518a306c9e92917f3f311ec50c6bdee301f642c44f7bb8f99e5084db00b49af",
+      "bytes": 318
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/refined-mutation-summary.json",
+      "sha256": "f541f35f7268e4c282b0198e21551650d2b32e4b35270d7664d910ef8bd0e7d9",
+      "bytes": 1289
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-coverage-mutation.config.mjs",
+      "sha256": "76d2762882c43ed0a7fa6858af8593750e278b2f7920b7876feb044f1928b16e",
+      "bytes": 326
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.json",
+      "sha256": "faa97ad16cd763ef3c5eafbf413d035ed1ad0bfee3f8ad34b2c4db5e6185efcb",
+      "bytes": 4893,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:31:03.164000+00:00",
+      "durationMs": 3032.5224609375,
+      "failedCases": [
+        "result command registry covers the built CLI keeps the hook index complete and supplies an explicit reason for every exclusion"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Initial runtime array omission caught array/map consistency only; not keyword omission proof."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.log",
+      "sha256": "9f00741f776e3310da00b4757f9317de7898a975201703adac012d67967cc987",
+      "bytes": 2086
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-keyword-omission.json",
+      "sha256": "687f981843d010872949f989e5d324dd1e849cfb077f7db9bc83dcb0323c3c22",
+      "bytes": 4968,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:34:41.024000+00:00",
+      "durationMs": 3098.814697265625,
+      "failedCases": [
+        "result command registry covers the built CLI has unique canonical paths and exactly one classification for every keyword description"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Refined actual array AND map omission of score fail-secure fails keyword inventory coverage."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-mutation.config.mjs",
+      "sha256": "ddaa6d09c2f79a5892fb269f61c51870d317144b3272c6203b67df4332b9ca6a",
+      "bytes": 318
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.json",
+      "sha256": "67b671c70c4b08f1def85add451e15d7c1325aed5880438930c31d406d9165a6",
+      "bytes": 3604,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:31:06.423000+00:00",
+      "durationMs": 3011.953369140625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.log",
+      "sha256": "7ce1db25e268c18480ae923f35fafcec17d47cfa720885c1130bc7496805b84b",
+      "bytes": 572
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/registry-after-abi-repair.json",
+      "sha256": "3d7936cddae4393747b8b3bdf829767ec10a4d8c2c4dc17b2030cef5d6b11b22",
+      "bytes": 3597,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:30.523000+00:00",
+      "durationMs": 3076.5458984375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/sqlite-abi-after-repair.json",
+      "sha256": "1d98b1a993beb8138dab37f519ef2f7b126b368156f2bac4d5fe72b2988a62ae",
+      "bytes": 440
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/sqlite-abi-before-repair.json",
+      "sha256": "24cc6a65e6c43bc373c0feb3278c949ce01ff6a47419c6c9f7860a28f7e36552",
+      "bytes": 557
+    },
+    {
+      "path": "/private/tmp/p0-22-actual-mutations-20261014.json",
+      "sha256": "ecf47435fa749e8626d26e9a7ec6f47a08b7307be2faa8189b3da98f748bae06",
+      "bytes": 6078
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.json",
+      "sha256": "59db0dd9aca33ecbde989c5fe98357ac81fcf6d0c19468f35349aab8b3ea0300",
+      "bytes": 107349,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 150,
+        "numFailedTests": 28,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:54:52.181000+00:00",
+      "durationMs": 143624.88842773438,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc verify all \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance toctou \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance compound-threats \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance shutdown-compliance \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance advanced-threats \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc assurance scheduler run-now \u2014 fixture refusal permitted: No assurance scheduler policy or live agent adapter is registered.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc loop run \u2014 fixture refusal permitted: The fixture has no live execution adapter; no provider may be contacted.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc transparency report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc audit binder verify \u2014 fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport create \u2014 fixture refusal permitted: The seeded run is signed but has no observed evidence; it cannot create a qualified Passport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport badge \u2014 fixture refusal permitted: No qualified Passport exists in this private fixture.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc fleet report \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc transform attest \u2014 fixture refusal permitted: No matching transformation task exists.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc residency-report \u2014 fixture refusal permitted: No signed data residency policy has been configured for this tenant.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc domain conformance \u2014 fixture refusal permitted: No signed active station operating profile or conformance responses exist.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc score simulation-lane \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc executive brief \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard export \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard public-export \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc badge \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc session verify \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace domain baseline emits self-reported claim fields and eligibleLevel at most one",
+        "actual strict CLI result labels in a signed, keyless private workspace a real stored 1.1.1 run fixture prints the legacy self-reported boundary"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Initial full E2E observer:178 total150pass28fail. Includes demonstrated recipe/format errors, not28 product defects."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.log",
+      "sha256": "84730a9347b8efe8f47a86c1a0ffd34a769485b1b2163f2ee8c1b5e4a52646fe",
+      "bytes": 82
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.json",
+      "sha256": "058ec512778f442d27eae8276e901fa8f9965af31f9cecb1e4e72632fc6389f2",
+      "bytes": 81993,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 173,
+        "numFailedTests": 5,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:01:00.948000+00:00",
+      "durationMs": 142680.5087890625,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "actual strict CLI result labels in a signed, keyless private workspace amc executive brief \u2014 actual result required",
+        "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Refined whole E2E observer:173pass5fail; two final recipe issues, durable-lab restart and two empty arrays remained."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.log",
+      "sha256": "9ac7e880f9385efcb1e771fdaeae3f07864e438a0d6afe9b308598182eb7f502",
+      "bytes": 86
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.json",
+      "sha256": "745e1ef781d0d576982f8f9c2808dfbadfff5ae04256757c8ce06d85d90faeec",
+      "bytes": 73967,
+      "counts": {
+        "success": false,
+        "numTotalTests": 178,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 174,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:07:08.287000+00:00",
+      "durationMs": 7495.20458984375,
+      "failedCases": [
+        "actual strict CLI result labels in a signed, keyless private workspace amc lab-simulate \u2014 actual result required"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Earlier selected4-case observer:3pass1labfail174filtered. Not latest full corpus."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.log",
+      "sha256": "119e34969da40b62811d33bf1ea9c7d434fdc51c15b16d3ee1aca9dfb48ad4bf",
+      "bytes": 89
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-recipes-node22-20261014.json",
+      "sha256": "b0b05d121d25ec962b56a54d6eee02f400b8839dd744c7b3ff2210a4c07448cd",
+      "bytes": 73169,
+      "counts": {
+        "success": true,
+        "numTotalTests": 178,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 175,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:05:10.849000+00:00",
+      "durationMs": 7203.86669921875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Selected recipe control3pass175filtered; not whole acceptance."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-claims-recipes-node22-20261014.log",
+      "sha256": "8592192e77cf75f301895f6ac1261f8cc1b3fcf7dbf30c1b0ad3795d645e9d58",
+      "bytes": 82
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-node22-20261014.json",
+      "sha256": "7bde1611781ecb2fe87d6f76fc58d171e2ab607c6c46ced454c553c4d1f5a02e",
+      "bytes": 3596,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:45:59.415000+00:00",
+      "durationMs": 5100.9287109375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-node22-20261014.log",
+      "sha256": "403a9ba7e32fe6c1cc031357b98289b39beef4934640d598198c8674328d17a0",
+      "bytes": 83
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-red-20261014.json",
+      "sha256": "d8653d0d2042f9f3ad1d4cd4ff28d9151461d6fa90386c4f40b2c1cc3465e4c7",
+      "bytes": 3600,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:45:20.825000+00:00",
+      "durationMs": 5340.161865234375,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename, success8/8 on initial unqualified Node25; environment observer only, not Node22 qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cli-result-registry-red-20261014.log",
+      "sha256": "40e08fc3e28e103ee9cfaef4a6e2708760212c809197c2ebf78e43103c25eab0",
+      "bytes": 80
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-final-own-key-validation-20261014.patch",
+      "sha256": "c2a0008d578ae86bb1f84307975f3585db4c5ea2b79263d15ac289cb0a1dece4",
+      "bytes": 17964
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-final-own-keys-whole-file-node22-20261014.json",
+      "sha256": "fef1354b368e9372e136790429af6e5998e837e4303e43a604b0334ae3beda7e",
+      "bytes": 14328,
+      "counts": {
+        "success": true,
+        "numTotalTests": 49,
+        "numPassedTests": 49,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:40:59.234000+00:00",
+      "durationMs": 289.232666015625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-final-own-keys-whole-file-node22-20261014.log",
+      "sha256": "e5c5a0d54e54206d2e6b34277da4f0f53a35e2914364b7ea9e46b6af9de832fa",
+      "bytes": 103
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-20261014.patch",
+      "sha256": "80d8f4fbf2ee36008a07c92a53194c4ce0378f74052a94e54001fe3c7f07b6f6",
+      "bytes": 15208
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-green-node22-20261014.json",
+      "sha256": "fc4ad76bda137186e89b96793001967badde484df4b97b4a1db424cce5e7b8d6",
+      "bytes": 12323,
+      "counts": {
+        "success": true,
+        "numTotalTests": 47,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 46,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:36:16.217000+00:00",
+      "durationMs": 245.982421875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-green-node22-20261014.log",
+      "sha256": "72d2451b919d93ba568002e4d1896e3de0ef1567b9e4002c21e8cacca468e12c",
+      "bytes": 105
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-red-node22-20261014.json",
+      "sha256": "8e9f5710659d3db8f47e422615371d2559d2aeeb6b4368b73c886e50014b1e70",
+      "bytes": 13601,
+      "counts": {
+        "success": false,
+        "numTotalTests": 47,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 46,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:35:50.765000+00:00",
+      "durationMs": 250.839599609375,
+      "failedCases": [
+        "durable probe record validation preserves own __proto__ metadata without changing object prototypes"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-preservation-red-node22-20261014.log",
+      "sha256": "b88819b171044a2141829fbdfa9c4e06251629b22cc14b283529d7460b1b8053",
+      "bytes": 103
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-whole-file-node22-20261014.json",
+      "sha256": "5147675f983574be21d6191586d45cdd5211292c200319823806c1ebe941c614",
+      "bytes": 13669,
+      "counts": {
+        "success": true,
+        "numTotalTests": 47,
+        "numPassedTests": 47,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:36:24.345000+00:00",
+      "durationMs": 301.158447265625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-metadata-whole-file-node22-20261014.log",
+      "sha256": "d3690447cf7d170c463c5594c9246cee60a26e2b2f6f9d17cde4345e99682389",
+      "bytes": 97
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-green-node22-20261014.json",
+      "sha256": "8e1b6979836b17010dd4b7d0b9148f4b459c2c6d4142382b7cf15bc2a2f017e5",
+      "bytes": 12217,
+      "counts": {
+        "success": true,
+        "numTotalTests": 46,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 38,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:33:06.262000+00:00",
+      "durationMs": 252.17578125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-green-node22-20261014.log",
+      "sha256": "c6ca193ad5dcf88434f602254e4bd48f8310dcd14b5b06a0d5dd7d1def5b1129",
+      "bytes": 100
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-red-node22-20261014.json",
+      "sha256": "09cfd0599188c1ddee2338734ecce37e6272c6ca01c5853fde916c51bc9d8314",
+      "bytes": 20297,
+      "counts": {
+        "success": false,
+        "numTotalTests": 45,
+        "numPassedTests": 1,
+        "numFailedTests": 6,
+        "numPendingTests": 38,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:30:36.213000+00:00",
+      "durationMs": 409.796875,
+      "failedCases": [
+        "durable probe record validation refuses a malformed persisted probe record: null without an identifiable experiment",
+        "durable probe record validation refuses a malformed persisted probe record: matching scores null",
+        "durable probe record validation refuses a malformed persisted probe record: matching numeric-string score",
+        "durable probe record validation refuses a malformed persisted probe record: matching nonfinite score",
+        "durable probe record validation refuses a malformed persisted probe record: matching missing probe identity",
+        "durable probe record validation refuses a malformed persisted probe record: matching metadata null"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-probe-validation-red-node22-20261014.log",
+      "sha256": "e14bda7ed86f07226418fe625da55e9a6142ed92dcc8128e7140913ad3448730",
+      "bytes": 98
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-20261014.patch",
+      "sha256": "a4845702e95b9d055872ef855c2352e7eef91b2db93f26e3c0aa0e1542a41649",
+      "bytes": 8320
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-final-green-node22-20261014.json",
+      "sha256": "4a1a794890363551c922ebab40e704448bf7c3ca0caf83ae02388be1413d04a7",
+      "bytes": 9439,
+      "counts": {
+        "success": true,
+        "numTotalTests": 38,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:13:14.807000+00:00",
+      "durationMs": 242.296875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-final-green-node22-20261014.log",
+      "sha256": "7ee164ec28d74cca6e9ab5ca67224fe0c24b3b330615da222a3e75253a12b1e4",
+      "bytes": 97
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-green-node22-20261014.json",
+      "sha256": "0236c222d3c014aa93247b55cacb125562b2e3370f18e43115db67ee31271d2c",
+      "bytes": 10934,
+      "counts": {
+        "success": false,
+        "numTotalTests": 38,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:12:32.395000+00:00",
+      "durationMs": 239.35009765625,
+      "failedCases": [
+        "experiment simulation simulates a persisted experiment after a cold restart and retains its synthetic results"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Intermediate post-fix source run failed on UUID file enumeration order; retained; exact per-probe comparison corrected afterward."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-green-node22-20261014.log",
+      "sha256": "b606b2e97851187421a59ef460916965a217305fedc1f7d3c817929a6bb6d662",
+      "bytes": 91
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-red-node22-20261014.json",
+      "sha256": "b3789b2acb1c5a7cd74c5d52c476072fb9a6bd68d722ad888a9e0e282cf730bb",
+      "bytes": 10823,
+      "counts": {
+        "success": false,
+        "numTotalTests": 38,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 37,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:11:03.698000+00:00",
+      "durationMs": 232.75,
+      "failedCases": [
+        "experiment simulation simulates a persisted experiment after a cold restart and retains its synthetic results"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-restart-red-node22-20261014.log",
+      "sha256": "47dbc83de60d2bb2eb0d43118dcd3e6bb2f189c6f6a22c54d4dc7aea2bde0a5c",
+      "bytes": 89
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-green-node22-20261014.json",
+      "sha256": "8e2ddc2a505ccbacc4ce850a161ffb47ade2fc17089b0fe82a2a82cfab46e295",
+      "bytes": 12962,
+      "counts": {
+        "success": true,
+        "numTotalTests": 49,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:40:52.393000+00:00",
+      "durationMs": 252.47314453125,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-green-node22-20261014.log",
+      "sha256": "ece43fe4c71d4cbaa7ad5869e220199861122e08409af19de0fe98f724fcee04",
+      "bytes": 97
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-node22-20261014.json",
+      "sha256": "a0e83d8269e08913c56237c0049f7d7d8e264aefb11a764656fba7e4aab0f10a",
+      "bytes": 15618,
+      "counts": {
+        "success": false,
+        "numTotalTests": 49,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:38:37.731000+00:00",
+      "durationMs": 260.50341796875,
+      "failedCases": [
+        "durable probe record validation preserves a numeric own __proto__ score in the stored result and aggregate",
+        "durable probe record validation refuses a nonnumeric own __proto__ score in a stored result"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-node22-20261014.log",
+      "sha256": "6a2071e7671bed7c5814e5fe3d95ec2f86aabb4f94d5352888225edcb2a363a6",
+      "bytes": 95
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-quality-node22-20261014.json",
+      "sha256": "d7b0aedd73c5f9a4499c1d98cfc19ab6986d8d0ef236015b2525f1dcedd99e37",
+      "bytes": 15619,
+      "counts": {
+        "success": false,
+        "numTotalTests": 49,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 47,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T16:40:02.764000+00:00",
+      "durationMs": 254.56640625,
+      "failedCases": [
+        "durable probe record validation preserves a numeric own __proto__ score in the stored result and aggregate",
+        "durable probe record validation refuses a nonnumeric own __proto__ score in a stored result"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Focused execution; pending count is filtered cases. Not whole-file qualification."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-score-own-key-red-quality-node22-20261014.log",
+      "sha256": "1c6aa0f8d1a5b83abfb8993ecdf08ed1551ef1c13f51ffb973e52989165f4a12",
+      "bytes": 103
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-shape-whole-file-node22-20261014.json",
+      "sha256": "338c46be86ca54fa730c9530d8e8234e2cc5de481d2402b16e6b8940c08b2791",
+      "bytes": 13334,
+      "counts": {
+        "success": true,
+        "numTotalTests": 46,
+        "numPassedTests": 46,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:33:12.167000+00:00",
+      "durationMs": 280.1591796875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-shape-whole-file-node22-20261014.log",
+      "sha256": "92dc53fdc462714b73388e3280213f46351092d9b5c42b94681993da6d96b8c0",
+      "bytes": 94
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-typed-probe-validation-20261014.patch",
+      "sha256": "0e70c79758526ed17f9ce1ff3e04545a040d764b05268ca1de1a11f5aeb1da9a",
+      "bytes": 13754
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-whole-file-node22-20261014.json",
+      "sha256": "464fdcd687ec4b84f579b27b44479a8319e2cd3b7886476fb637481fdd870c59",
+      "bytes": 10526,
+      "counts": {
+        "success": true,
+        "numTotalTests": 38,
+        "numPassedTests": 38,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:13:20.884000+00:00",
+      "durationMs": 250.129638671875,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-cognition-lab-whole-file-node22-20261014.log",
+      "sha256": "824c3e23a48000e2a8e5895888555f6b2257a393cd6c02c91b8ff2d60871bcc0",
+      "bytes": 88
+    },
+    {
+      "path": "/private/tmp/p0-22-command-signatures-20261014.json",
+      "sha256": "bbf75265313da651144350d54c5751c1c1df86eebf6f4b5509f9579f1fe05b5b",
+      "bytes": 120226
+    },
+    {
+      "path": "/private/tmp/p0-22-commands-20261014.jsonl",
+      "sha256": "8209ef1b9ff725331eb5b90747bfe47e4bf5778dd9a057f3b06b6263110479d9",
+      "bytes": 11262
+    },
+    {
+      "path": "/private/tmp/p0-22-current-build-20261014.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "bytes": 807
+    },
+    {
+      "path": "/private/tmp/p0-22-current-command-inventory-20261014.log",
+      "sha256": "4e5c9d578ebad93685d9e69296948170307ed5d3f83b6bd560c9429643de2bb6",
+      "bytes": 351307
+    },
+    {
+      "path": "/private/tmp/p0-22-current-counts-20261014.log",
+      "sha256": "db0d94007aa10e2773436003ad9c675c1011feba6e0460f8926e6700317bb612",
+      "bytes": 1312
+    },
+    {
+      "path": "/private/tmp/p0-22-current-docs-drift-20261014.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0",
+      "bytes": 131
+    },
+    {
+      "path": "/private/tmp/p0-22-current-focused-20261014.log",
+      "sha256": "1a4f7a486d568b4427474dbb63184000267047232fe34ebe1d85c10e79491592",
+      "bytes": 1793
+    },
+    {
+      "path": "/private/tmp/p0-22-current-source-lint-20261014.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "bytes": 373
+    },
+    {
+      "path": "/private/tmp/p0-22-current-test-typecheck-20261014.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "bytes": 87
+    },
+    {
+      "path": "/private/tmp/p0-22-empty-passport-behavior-20261014.json",
+      "sha256": "7105d22c6366f595b73f259b0135a4a9663f07c3ad48c696d6b25563d8773d41",
+      "bytes": 876
+    },
+    {
+      "path": "/private/tmp/p0-22-empty-passport-current-20261014.json",
+      "sha256": "4bd352158a8c94c90e162a1f8f009f689f988dadeeb4b7b7e122128dfa913cdf",
+      "bytes": 949
+    },
+    {
+      "path": "/private/tmp/p0-22-factual-counts-refresh-20261014.log",
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+      "bytes": 20
+    },
+    {
+      "path": "/private/tmp/p0-22-final-architecture-20261014.log",
+      "sha256": "273eafb01e0f6a883ccb28c3eaa5842b760db3aec8534890a6839f057276b534",
+      "bytes": 95489
+    },
+    {
+      "path": "/private/tmp/p0-22-final-bounded-node22-20261014.log",
+      "sha256": "c6a3b562b26b7f860e37a9567fbc306ac87e8b1d652cc89675339f7fbdfed004",
+      "bytes": 26929
+    },
+    {
+      "path": "/private/tmp/p0-22-final-clean-source-20261014.log",
+      "sha256": "bc1945632dc7fa560ce282a7ae6b060adaefae02ba4a954aa8b39a15118dc832",
+      "bytes": 863
+    },
+    {
+      "path": "/private/tmp/p0-22-final-cli-corpus-20261014.log",
+      "sha256": "2c382994d476d5989c033fd436bc18d43633951a5a5e4adbba36b49a6f696d39",
+      "bytes": 20318
+    },
+    {
+      "path": "/private/tmp/p0-22-final-counts-20261014.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630",
+      "bytes": 165
+    },
+    {
+      "path": "/private/tmp/p0-22-final-docs-drift-20261014.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0",
+      "bytes": 131
+    },
+    {
+      "path": "/private/tmp/p0-22-final-freeze-20261014.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811",
+      "bytes": 194
+    },
+    {
+      "path": "/private/tmp/p0-22-final-lint-20261014.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "bytes": 373
+    },
+    {
+      "path": "/private/tmp/p0-22-final-restored-registry-20261014.log",
+      "sha256": "73eb5fd07a8333bfda1d2df7edb4fd0204bf6824180731787cdf39e67bed2751",
+      "bytes": 654
+    },
+    {
+      "path": "/private/tmp/p0-22-final-source-build-20261014.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "bytes": 807
+    },
+    {
+      "path": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+      "sha256": "05a90bcd522819feb90bd3a49ae027eac3e1c9dfbbdf470a791ad013639c6998",
+      "bytes": 1055
+    },
+    {
+      "path": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+      "sha256": "f2b9bac234b5ea83ee70cc0928bb26b945a42d288825600a635a2cae99c0c504",
+      "bytes": 1939
+    },
+    {
+      "path": "/private/tmp/p0-22-final-test-typecheck-20261014.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "bytes": 87
+    },
+    {
+      "path": "/private/tmp/p0-22-final-typecheck-20261014.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "bytes": 75
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-20261014.json",
+      "sha256": "4edf213bddaded345ec94a41a4a95758783c014e8bd866a7e95c323e293f00c4",
+      "bytes": 17002,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 0,
+        "numFailedTests": 10,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:45:50.468000+00:00",
+      "durationMs": 3031.758544921875,
+      "failedCases": [
+        "Fleet Scoring evaluateFleet with single default agent",
+        "Fleet Scoring evaluateFleet with multiple agents detects weak links",
+        "Fleet Scoring evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent",
+        "Fleet Scoring pairwise comparisons are capped by maxComparisons",
+        "Fleet Scoring maxComparisons 0 skips comparisons",
+        "Fleet Scoring renderFleetScoringMarkdown produces valid markdown",
+        "Fleet Scoring fleet report preserves each legacy member's claim label",
+        "Fleet Scoring evaluateFleet writes output file when outputPath set",
+        "Fleet Scoring agent summary includes strongest and weakest questions",
+        "Fleet Scoring fleet aggregate layer averages cover all layers"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Despite filename,0/10 passed: Node22 ABI127 attempted a Node25 ABI141 binary. Environment failure, not product behavior."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-20261014.log",
+      "sha256": "9dfb47bee40091eaa6dd0288c6a94a173f1ab1d2174ad362634a7dacabc3d09b",
+      "bytes": 3106
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.json",
+      "sha256": "a791c1c51a9e333b071ef886474f3b7b668e74366c676dc3c570067871e36841",
+      "bytes": 3353,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T15:49:19.081000+00:00",
+      "durationMs": 6310.7666015625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.log",
+      "sha256": "48ec5d05534b1df4bfc8a6d1e9d3246a840934479aa3aac7aefa8ca1a4b787dc",
+      "bytes": 3605
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-red-20261014.json",
+      "sha256": "12f71859128142c5caedb9258ad34b9f336be0d0d67b597ca8211bb9d12c1dab",
+      "bytes": 3782,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 9,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "startedUtc": "2026-10-14T15:45:01.441000+00:00",
+      "durationMs": 6029.54541015625,
+      "failedCases": [
+        "Fleet Scoring fleet report preserves each legacy member's claim label"
+      ],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-red-20261014.log",
+      "sha256": "df344617f29e0c18af105332abb0183b013482cda0898530a7c987182ed32559",
+      "bytes": 4635
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-repair-20261014.json",
+      "sha256": "5a4ba23676de627585b94ec5c2a1dbd8c21cf8a62a598ab7c9e487d2b6bdeb44",
+      "bytes": 6848
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-repair-20261014.md",
+      "sha256": "12ed0e107c82868c317ff88d07c49ad645d656e43734dd025f5780bb38be7dbe",
+      "bytes": 1536
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-legacy-repair-20261014.patch",
+      "sha256": "2d4a9faf8bced05bc9c4d4880639e6aaafe066ada0d908fd47c8bd079950480c",
+      "bytes": 3020
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-repaired-architecture-20261014.log",
+      "sha256": "80e1ad675bd8140607d9dfbbacca172465f5ba5315de68d10c5a65ffb6c3aef8",
+      "bytes": 95489
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-repaired-build-20261014.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "bytes": 807
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-repaired-freeze-20261014.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811",
+      "bytes": 194
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-repaired-source-typecheck-20261014.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "bytes": 75
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-20261014.json",
+      "sha256": "064957588bcb331b0623bb397e4ef822ea91504a52d025d1ab316e8d397f2624",
+      "bytes": 4775
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-20261014.md",
+      "sha256": "d6deb8b6d250ea6c9fbe9cb78af77198c288bcca3208bb340e960bebb96affeb",
+      "bytes": 1319
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-final-20261014.json",
+      "sha256": "6b32847ecc0e164d428f876a065941c8f10bcaae92da94e3019df680745eb0d5",
+      "bytes": 3342,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:15:50.919000+00:00",
+      "durationMs": 5962.1025390625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 1,
+        "matched": 1,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-final-20261014.log",
+      "sha256": "0afdb9f8a531a61c4949b25f2b66fe43fdebcd53042c1a28ed1cf73b304aa0bb",
+      "bytes": 3460
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-seed-20261014.json",
+      "sha256": "cbc9b516d72d1c82dedd79f28eaa234c43aa2b4fee41f24371d873315293c741",
+      "bytes": 3349,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:14:48.643000+00:00",
+      "durationMs": 6143.18212890625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 1,
+        "matched": 0,
+        "added": 1,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 1,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": true
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-fleet-snapshot-seed-20261014.log",
+      "sha256": "2f2c2979e2323c70568e57c1ca5782bb6a1d5c13cf637215bb4a0cba07e6aa7f",
+      "bytes": 3553
+    },
+    {
+      "path": "/private/tmp/p0-22-frozen-install-20261014.log",
+      "sha256": "5b438f8b07ff4b6a07f9443a313c8cc8de45762e890ac85a68bfbee1125f93e5",
+      "bytes": 1900
+    },
+    {
+      "path": "/private/tmp/p0-22-graph-navigation-20261014.log",
+      "sha256": "aab530a21b61116e4afe4598aef416b9fd2250e12dcef7cf761e8dd387b4766d",
+      "bytes": 1382
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-final-guard-review-20261014.json",
+      "sha256": "bced0d018ec83c814c98408d3ff111966970714161e7ef608cc86e3bb86dd848",
+      "bytes": 5142
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-final-guard-review-20261014.md",
+      "sha256": "97b05017ada53cc1da4bbb7eaaf5ed7486837486e8b50ae208196e7b1782ee84",
+      "bytes": 1651
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-graph-navigation-20261014.log",
+      "sha256": "b1b86c06b089389cd047cc6731535e3bf96cab94c3803f4905c66787ce4637df",
+      "bytes": 4942
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-independent-review-20261014.json",
+      "sha256": "35680bc7c5f0d83d1e3b80ac189524155f2dde1cffe12c7d9d5b31ae7215db38",
+      "bytes": 14023
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-independent-review-20261014.md",
+      "sha256": "646a83e526d5a591781eed9d23fc0585e0794fa541305716eee5c3df0ea705a4",
+      "bytes": 2460
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-repaired-build-20261014.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "bytes": 807
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-repaired-lint-20261014.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898",
+      "bytes": 373
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-repaired-test-types-20261014.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b",
+      "bytes": 87
+    },
+    {
+      "path": "/private/tmp/p0-22-lab-repaired-typecheck-20261014.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d",
+      "bytes": 75
+    },
+    {
+      "path": "/private/tmp/p0-22-new-test-design-20261014.json",
+      "sha256": "64ae9b35399f9e1587cd49ef2b6c6861855f0d84af4878a8c7e91b0ef42a3135",
+      "bytes": 13440
+    },
+    {
+      "path": "/private/tmp/p0-22-new-test-design-20261014.md",
+      "sha256": "52e0ada4ef467a798886133b72a54c9c973ebce2d8d050ee9e97d98439232e8c",
+      "bytes": 3564
+    },
+    {
+      "path": "/private/tmp/p0-22-new-test-typecheck-node22-20261014.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-22-own-node22-sqlite-rebuild-20261014.log",
+      "sha256": "ce1d8a40b3cb227cba3179cb13ddee92406dce57a9e28d53d86fff6ff6074f95",
+      "bytes": 126
+    },
+    {
+      "path": "/private/tmp/p0-22-readonly-preflight-20261014.json",
+      "sha256": "98a4ac6c8bf87280af689ab0b57daed24f61b14a5fceb0bf100764ea969ea0d8",
+      "bytes": 19235
+    },
+    {
+      "path": "/private/tmp/p0-22-readonly-preflight-20261014.md",
+      "sha256": "ac135d096ddd4c2f42c029d225dd28ada9d1a52d79244a902c2265615644520d",
+      "bytes": 2693
+    },
+    {
+      "path": "/private/tmp/p0-22-refreshed-counts-20261014.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630",
+      "bytes": 165
+    },
+    {
+      "path": "/private/tmp/p0-22-registry-after-abi-repair-20261014.log",
+      "sha256": "a6a2f635ae07250fff1d1039a2e62c62dfacb2191b81f3117e2c331d8c0c9034",
+      "bytes": 570
+    },
+    {
+      "path": "/private/tmp/p0-22-registry-keyword-omission-mutant-20261014.log",
+      "sha256": "e0f3ba476ad930004124d16288f76e5c1c7a1892a7cb368bf761de3a6b32fba1",
+      "bytes": 2400
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-20261014.json",
+      "sha256": "450fc6df48fdd01df9646b89c147dd66d2d7c9c91f5d12a5eee1ed16469ed351",
+      "bytes": 19552
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-20261014.md",
+      "sha256": "e60008c16dfae08c9a22d341ea145d782e6731ab2c63731a4ce1597152e6f729",
+      "bytes": 5507
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-20261014.patch",
+      "sha256": "49332d022f7d9352f45a3a922840e9962e1ca82a2781e64492cbf8c7da73619c",
+      "bytes": 45223
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-final-20261014.json",
+      "sha256": "edf158ddc335748dec2eebb9656b77c844aead338d7a47b737c00fb4cec2d8c7",
+      "bytes": 35432,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:07:21.459000+00:00",
+      "durationMs": 5092.599853515625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 22,
+        "matched": 22,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-final-20261014.log",
+      "sha256": "11ca15057371261a817e4f4860424f4b9d918600408d6d6c5d5c2f710a4b11bb",
+      "bytes": 1464
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-first-20261014.json",
+      "sha256": "417572b906133afc819a05687601cf9493948296446c1f49a7b55964e782086e",
+      "bytes": 35426,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:02:14.136000+00:00",
+      "durationMs": 5481.111572265625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 0,
+        "matched": 0,
+        "added": 0,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 0,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": false
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-first-20261014.log",
+      "sha256": "0d1383dc9b15919552fa90dc61dafd85d43fe3348bb9dd5e4967a78ddfc71c7e",
+      "bytes": 1465
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.json",
+      "sha256": "95a303615365ca82b3441079c44fa426e019864df6ae8cf4241918bd152943b6",
+      "bytes": 35431,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "startedUtc": "2026-10-14T16:06:04.256000+00:00",
+      "durationMs": 4980.75244140625,
+      "failedCases": [],
+      "snapshots": {
+        "total": 22,
+        "matched": 0,
+        "added": 22,
+        "updated": 0,
+        "unchecked": 0,
+        "unmatched": 0,
+        "filesAdded": 10,
+        "filesUpdated": 0,
+        "filesRemoved": 0,
+        "didUpdate": true
+      },
+      "qualification": "Actual component phase; source/runtime/other acceptance limits remain separately recorded."
+    },
+    {
+      "path": "/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.log",
+      "sha256": "74271424f9d9a71ba71c8f43b4a796b0e34c3f3f460a4697474d2c5447a50587",
+      "bytes": 1424
+    },
+    {
+      "path": "/private/tmp/p0-22-report-renderer-audit-20261014.json",
+      "sha256": "2d5521827ffbd83b4c26fb125e18df3b76741f4dc49a19cc0709554a2ecf4318",
+      "bytes": 27495
+    },
+    {
+      "path": "/private/tmp/p0-22-report-renderer-audit-20261014.md",
+      "sha256": "41581947e7760e2705342f6aea3028e6158f4fdd6ef2132ef6604ba8d2484b8e",
+      "bytes": 7719
+    },
+    {
+      "path": "/private/tmp/p0-22-zod-own-score-key-probe-20261014.json",
+      "sha256": "8c10c18ae17b0b3cb786afd075b938bce2f7cb4454146072ebcfb1c167deb65a",
+      "bytes": 506
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass
+
+ ✓ tests/reconciliationDefectsReleaseGate.test.ts (4 tests) 32ms
+I checked 40 rows.
+goal was: count the anomalies
+half an ans
+my token is [amc:redacted]
+40 rows, two anomalies.
+half
+ ✓ tests/foreignSubagentRunner.test.ts (12 tests) 26301ms
+     ✓ returns the child's own words, folded from its recorded output  907ms
+     ✓ passes the goal to the foreign command  691ms
+     ✓ refuses when the child exits non-zero, rather than returning partial words  760ms
+     ✓ refuses a child that said nothing  392ms
+     ✓ keeps the child's lease out of the recorded output  689ms
+     ✓ refuses on the deadline, and says it was the deadline  10735ms
+     ✓ refuses rather than reporting the part that fit  1098ms
+     ✓ kills the process on the signal rather than running to completion  9232ms
+     ✓ runs through spawnSubagent with a signed packet and an announced session  744ms
+     ✓ settles a crashed foreign child as failed, not as a silent success  648ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  20:04:45
+   Duration  29.38s (transform 2.24s, setup 44ms, import 2.97s, tests 26.33s, environment 0ms)
+
+JSON report written to /private/tmp/p0-48-matrix-and-foreign-green-20261014.json

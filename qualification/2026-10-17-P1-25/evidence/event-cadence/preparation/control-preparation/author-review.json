@@ -1,0 +1,55 @@
+{
+  "schema": "p125ec-inert-source-controls-author-static-review/1",
+  "at": "2026-10-17T01:05:12.329484+00:00",
+  "blockers": [],
+  "state": "UNREADY private helper/recipes; no future qualification or mutation performed.",
+  "sourceParentKnownActual": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "sourceCommitAdopted": null,
+  "freshRootOrBindingAdopted": null,
+  "operations": [
+    "COUNT-CHECKPOINT-ROWS",
+    "STRICT-THRESHOLD"
+  ],
+  "targetOnly": "later actual freshQ/src/time/checkpoint.ts",
+  "prospectiveWitnesses": [
+    582,
+    597
+  ],
+  "fullBase402LineCandidateAndCompleteDeltaTextSelfRead": true,
+  "unchangedCriticalFunctions": [
+    "sha",
+    "load",
+    "pin",
+    "verify",
+    "git",
+    "inactive",
+    "closed",
+    "green",
+    "write_json"
+  ],
+  "allPriorGuardsPreserved": true,
+  "active161PhysicalVerificationStrengthened": true,
+  "selectionConsumedNotDuplicated": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+    "exactPrior94PlusFourNames": true,
+    "exactPrior19PlusTwoPairs": true,
+    "actualFreshCompiledAndNativePinsRequired": true
+  },
+  "oneAdmittedSourceSuccessorAndInitial161MappingExact": true,
+  "nativeCounts": "11existing current pins plus actual later distinct fresh native; no future native hash supplied.",
+  "actualActionClosureGateAdded": {
+    "restoreRequiresActualApplyActionBeforeMutantStart": true,
+    "apply2RequiresActualPriorRestoreActionBeforeRestorationGreenStart": true,
+    "rootMustAwaitEachDirectNaturalClosureBeforeDependentTests": true,
+    "actionPinRecheckedImmediatelyBeforeWrite": true,
+    "noFutureActionHashes": true
+  },
+  "manualAllFailureMessageClassificationAndExactSameInodeRestorePreserved": true,
+  "sourceOnlyNoCompiledNativeOriginalSourceMutation": true,
+  "sourceProjectionHashes": "Exact computed recipe bytes only; no full mutant source stored or applied.",
+  "wrapperActiveHaltedNoSignalRetryAutomaticRestoreChecksPreserved": true,
+  "preparedTemplateUnreadyWithNullSourceFreshOutcomeFields": true,
+  "noHelperImportParseCompileExecutionOrProductTestsNetworkKeysQaReservationOrPriorArtifactMutation": true,
+  "rootFullReadIndependentReviewActualBindingsAndSeparateExplicitOperationsRequired": true
+}

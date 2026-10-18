@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-22",
+  "createdAt": "2026-10-14T16:10:41.888610+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+  "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "scope": "Remaining 12 spec-listed report builders; owned tests and new snapshots only. The fleet fix and CLI acceptance are separate work.",
+  "componentTestsPassed": true,
+  "wholeIssueQualified": false,
+  "committed": false,
+  "newTestCases": 15,
+  "finalCases": 115,
+  "testFilesChanged": 10,
+  "newSnapshotFiles": 10,
+  "snapshotEntries": 22,
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/assuranceReportProvenance.test.ts",
+      "beforeSha256": "50863ec542e35e582d9c36ce104721008616deb34995f0d7e7e053ef3558c214",
+      "afterSha256": "8554f630256d7d24ef595ab908c5d850c71833dafa8b41541c143617c799c834",
+      "newCases": 3,
+      "finalCases": 8,
+      "originalCases": 5
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/benchmarks/benchRunner.test.ts",
+      "beforeSha256": "ac9edb655b127c587806c2a4e1f5e03887641a5b952cc9d6628541d8e02331a1",
+      "afterSha256": "a7b4004ad2d1ad3e74ebb98495874b1b9fec8e519a57afed47bdc80139053bed",
+      "newCases": 0,
+      "finalCases": 6,
+      "originalCases": 6
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/compliance/complianceMatrix.test.ts",
+      "beforeSha256": "78e732ec09b5c119d283e40b16981f7d17f25531c01627e4499fd53895579d6b",
+      "afterSha256": "d960de084c1fc9de424b03dbd6bbf8cb90e65e69eb91436154c5f0b49a403e74",
+      "newCases": 0,
+      "finalCases": 10,
+      "originalCases": 10
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/complianceReportReadability.test.ts",
+      "beforeSha256": "fa206bdef4b1d82870fe5fc30eafbf60cc3cef2d98abcce2899ffa47cc9ba243",
+      "afterSha256": "c6da723a87542a0c70e07d477c62d3aec332f09d27e6b0e45851ae0f1f2971da",
+      "newCases": 1,
+      "finalCases": 4,
+      "originalCases": 3
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/dataResidency.test.ts",
+      "beforeSha256": "2873be40f9f79a394835316d97dad24e147970516198345cda996a8577aa2f84",
+      "afterSha256": "30ef3fa8cb20921b03965332e3d5349e9a88325311ddd6e6c87ab0168f0ce410",
+      "newCases": 0,
+      "finalCases": 42,
+      "originalCases": 42
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/diagnosticReportStatus.test.ts",
+      "beforeSha256": "883f0530d1af58b07c1b5bf0728dbad3e55b2789c12df86259b46eae33eb5d63",
+      "afterSha256": "4655042f5e76b46270e22c0b72f75f03d2f938d68c9f538b179775e600ebe099",
+      "newCases": 3,
+      "finalCases": 7,
+      "originalCases": 4
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/executiveBrief.test.ts",
+      "beforeSha256": "406ff87773767799259d69e8e40614effaac1634d0b98216a942ec4a58ce9397",
+      "afterSha256": "a8ec0c1a95328ce2d0c2fd4adb14144ed4cf0db2ec3f8978fbdd9a2f264c4f9b",
+      "newCases": 4,
+      "finalCases": 7,
+      "originalCases": 3
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/industryPackAudit.test.ts",
+      "beforeSha256": "f44430c3c2ea906237462de316fe0ae5568cab0ce4fa721d92d4fd9d2943de93",
+      "afterSha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "newCases": 1,
+      "finalCases": 9,
+      "originalCases": 8
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+      "beforeSha256": "aee68e82516aa990e5712a4e518846bd7b845c9e0aae336cc7dd677c09733bb8",
+      "afterSha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102",
+      "newCases": 0,
+      "finalCases": 7,
+      "originalCases": 7
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+      "beforeSha256": "bd04933e1b1bbcacb814543c3d8ec4c0e5542545f8e1356e8e2d1c5bb79bb7eb",
+      "afterSha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c",
+      "newCases": 3,
+      "finalCases": 15,
+      "originalCases": 12
+    }
+  ],
+  "snapshots": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/assuranceReportProvenance.test.ts.snap",
+      "bytes": 1468,
+      "sha256": "ca097374c93e4dd4b841f6139d5f9ff0d5e112762d8604ba88ac68458000cf9e",
+      "entries": 4
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/benchmarks/__snapshots__/benchRunner.test.ts.snap",
+      "bytes": 1413,
+      "sha256": "6effe656d64e566325f478d05399fa99b483c6e2beb9533629052852e13ceee6",
+      "entries": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/compliance/__snapshots__/complianceMatrix.test.ts.snap",
+      "bytes": 801,
+      "sha256": "e9f05b8846294e233a29b03cb29474a1d5664c22d656f5221a7ad94226020b22",
+      "entries": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/complianceReportReadability.test.ts.snap",
+      "bytes": 707,
+      "sha256": "91fe71d25414d03e25c87b26788bc05ac3b0dd2b6ae6648aaa0df4924be58680",
+      "entries": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/dataResidency.test.ts.snap",
+      "bytes": 581,
+      "sha256": "0d4154445e51cafe6bf498a591a107ef49e2ad79c6f3bd0a1022c39c2bc2d3f1",
+      "entries": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/diagnosticReportStatus.test.ts.snap",
+      "bytes": 1029,
+      "sha256": "542f3516e01e43d1c95ebdf3f4e23cdfb26fcc69846668eb0d35ff2ead941147",
+      "entries": 3
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/executiveBrief.test.ts.snap",
+      "bytes": 1554,
+      "sha256": "1bce7bf464aff5b1c145a942c03326c33c08ede1e0c5721c8c9fe8b672bb54c1",
+      "entries": 4
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/industryPackAudit.test.ts.snap",
+      "bytes": 7883,
+      "sha256": "e7ffd9fd7ecb9e1cd71b1c1427f0f9b0ab3205376c389479146883e504471fd9",
+      "entries": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/noCertificationFromSelfAssessment.test.ts.snap",
+      "bytes": 594,
+      "sha256": "ca5723141f633590744c4a9fa9c3c6f93af89cfa720e236fbf23dfce58763fac",
+      "entries": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/transparencyReport.test.ts.snap",
+      "bytes": 623,
+      "sha256": "92703544cbc8217c0bed9128e213112164ab933ee7951945007e5493cdcfac9a",
+      "entries": 2
+    }
+  ],
+  "phases": [
+    {
+      "phase": "first",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/diagnosticReportStatus.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/benchmarks/benchRunner.test.ts tests/dataResidency.test.ts tests/compliance/complianceMatrix.test.ts tests/executiveBrief.test.ts tests/assuranceReportProvenance.test.ts tests/complianceReportReadability.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-report-contracts-first-20261014.json > /private/tmp/p0-22-report-contracts-first-20261014.log 2>&1",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshots": {
+        "added": 0,
+        "failure": false,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesRemovedList": [],
+        "filesUnmatched": 0,
+        "filesUpdated": 0,
+        "matched": 0,
+        "total": 0,
+        "unchecked": 0,
+        "uncheckedKeysByFile": [],
+        "unmatched": 0,
+        "updated": 0,
+        "didUpdate": false
+      },
+      "report": "/private/tmp/p0-22-report-contracts-first-20261014.json",
+      "reportSha256": "417572b906133afc819a05687601cf9493948296446c1f49a7b55964e782086e",
+      "log": "/private/tmp/p0-22-report-contracts-first-20261014.log",
+      "logSha256": "0d1383dc9b15919552fa90dc61dafd85d43fe3348bb9dd5e4967a78ddfc71c7e"
+    },
+    {
+      "phase": "snapshot-seed",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/diagnosticReportStatus.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/benchmarks/benchRunner.test.ts tests/dataResidency.test.ts tests/compliance/complianceMatrix.test.ts tests/executiveBrief.test.ts tests/assuranceReportProvenance.test.ts tests/complianceReportReadability.test.ts --update --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.json > /private/tmp/p0-22-report-contracts-snapshot-seed-20261014.log 2>&1",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshots": {
+        "added": 22,
+        "failure": false,
+        "filesAdded": 10,
+        "filesRemoved": 0,
+        "filesRemovedList": [],
+        "filesUnmatched": 0,
+        "filesUpdated": 0,
+        "matched": 0,
+        "total": 22,
+        "unchecked": 0,
+        "uncheckedKeysByFile": [],
+        "unmatched": 0,
+        "updated": 0,
+        "didUpdate": true
+      },
+      "report": "/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.json",
+      "reportSha256": "95a303615365ca82b3441079c44fa426e019864df6ae8cf4241918bd152943b6",
+      "log": "/private/tmp/p0-22-report-contracts-snapshot-seed-20261014.log",
+      "logSha256": "74271424f9d9a71ba71c8f43b4a796b0e34c3f3f460a4697474d2c5447a50587"
+    },
+    {
+      "phase": "final",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/diagnosticReportStatus.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/benchmarks/benchRunner.test.ts tests/dataResidency.test.ts tests/compliance/complianceMatrix.test.ts tests/executiveBrief.test.ts tests/assuranceReportProvenance.test.ts tests/complianceReportReadability.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-report-contracts-final-20261014.json > /private/tmp/p0-22-report-contracts-final-20261014.log 2>&1",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 115,
+        "numPassedTests": 115,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshots": {
+        "added": 0,
+        "failure": false,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesRemovedList": [],
+        "filesUnmatched": 0,
+        "filesUpdated": 0,
+        "matched": 22,
+        "total": 22,
+        "unchecked": 0,
+        "uncheckedKeysByFile": [],
+        "unmatched": 0,
+        "updated": 0,
+        "didUpdate": false
+      },
+      "report": "/private/tmp/p0-22-report-contracts-final-20261014.json",
+      "reportSha256": "edf158ddc335748dec2eebb9656b77c844aead338d7a47b737c00fb4cec2d8c7",
+      "log": "/private/tmp/p0-22-report-contracts-final-20261014.log",
+      "logSha256": "11ca15057371261a817e4f4860424f4b9d918600408d6d6c5d5c2f710a4b11bb"
+    }
+  ],
+  "acceptance": [
+    {
+      "builder": "generateReport (Markdown)",
+      "testFile": "tests/diagnosticReportStatus.test.ts",
+      "proof": "Actual report labels and complete legend for 1.1.1, absent version and unsealed current runs; no observed or independent-review promotion; canonical claim-line snapshots."
+    },
+    {
+      "builder": "renderDomainReportMarkdown",
+      "testFile": "tests/noCertificationFromSelfAssessment.test.ts",
+      "proof": "The same real assessment fixture renders default self-reported and explicitly synthetic-example report claims, both not evaluated, with complete legend and snapshots."
+    },
+    {
+      "builder": "renderIndustryPackAuditMarkdown",
+      "testFile": "tests/industryPackAudit.test.ts",
+      "proof": "Every actual control section is labelled self-reported/not evaluated; label count includes every control plus the aggregate; real auditor signing in an owned temporary workspace preserves all kinds; complete legend and per-result claim snapshots."
+    },
+    {
+      "builder": "renderTransparencyReportMarkdown",
+      "testFile": "tests/transparencyReport.test.ts",
+      "proof": "Actual generated label is preserved verbatim in rendered output for 1.1.1, absent-version and unsealed current runs; complete legend and legacy/current line snapshots."
+    },
+    {
+      "builder": "complianceReportToMarkdown",
+      "testFile": "tests/complianceReportReadability.test.ts",
+      "proof": "A mixed report preserves each service-decided category kind/result under its own heading, apart from the aggregate; exact line count, complete legend and three-result snapshots."
+    },
+    {
+      "builder": "renderAssuranceMarkdown",
+      "testFile": "tests/assuranceReportProvenance.test.ts",
+      "proof": "Typed renderer fixtures reuse the existing provenance fixture. Checked/unverified seal context is reflected in report and pack labels without independent-review promotion; empty/inconclusive-only reports have no passing canonical claim; complete legend and pack/header snapshots."
+    },
+    {
+      "builder": "renderExecutiveBriefMarkdown",
+      "testFile": "tests/executiveBrief.test.ts",
+      "proof": "Actual written/read-back Markdown artifact preserves a 1.1.1 legacy envelope and complete legend; unsealed current run remains self-reported/not evaluated/pending; rendered-line snapshots."
+    },
+    {
+      "builder": "renderExecutiveBriefHtml",
+      "testFile": "tests/executiveBrief.test.ts",
+      "proof": "Actual written/read-back HTML artifact carries the exact canonical formatter output and full HTML legend for legacy and unsealed current runs; rendered markup snapshots. Existing compiled-CLI missing-version case now also checks legacy wording and legend."
+    },
+    {
+      "builder": "renderBenchRunMarkdown",
+      "testFile": "tests/benchmarks/benchRunner.test.ts",
+      "proof": "Actual empty-import benchmark result is self-reported/not evaluated, with a claim kind on each of five category rows and full legend; claim and category-row snapshots."
+    },
+    {
+      "builder": "renderBenchCompareMarkdown",
+      "testFile": "tests/benchmarks/benchRunner.test.ts",
+      "proof": "Actual comparison result is self-reported/not evaluated, with a claim kind on every category row and full legend; comparison snapshots."
+    },
+    {
+      "builder": "renderCoverageMatrixMarkdown",
+      "testFile": "tests/compliance/complianceMatrix.test.ts",
+      "proof": "Existing real ledger/compliance-map fixture checks every framework's exact canonical line and table-row kind; full legend, unresolved applicability and aggregate/member label counts; framework snapshots."
+    },
+    {
+      "builder": "renderResidencyReportMarkdown",
+      "testFile": "tests/dataResidency.test.ts",
+      "proof": "Real configuration reports retain self-reported/not-evaluated claims when no violation is found and self-reported/fail claims for violations, with complete legend and snapshots."
+    }
+  ],
+  "protectedInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "matchesHead": true
+    }
+  ],
+  "patch": "/private/tmp/p0-22-report-contracts-20261014.patch",
+  "patchSha256": "49332d022f7d9352f45a3a922840e9962e1ca82a2781e64492cbf8c7da73619c",
+  "limits": [
+    "Only Node22.23.3 was executed for this subtask; no Node24 or hosted CI claim.",
+    "Full report bodies were not snapshotted. Stable claim lines and explicit result rows were snapshotted; complete legends are separately asserted against the shared canonical renderer.",
+    "The assurance renderer accepts the caller's sealVerified context; these two renderer fixtures do not independently verify a real signature. Existing provenance-gate tests in the same file exercise actual signed report admission. The industry-audit case calls the real signer in an owned temporary workspace.",
+    "Service-decided category fixture labels test renderer preservation, not independent evidence admission. Existing engine/ledger tests supply that separate proof.",
+    "Diagnostic, domain, transparency, executive and residency nested score/configuration rows still inherit the report claim rather than gaining new claim columns. Their precise per-result scope remains the source audit's open interpretation; no row eligibility was invented.",
+    "The fleet missing-map dash and aggregate policy are unchanged.",
+    "Root review, rebuild/source-test types/lint/freeze/architecture and remaining CLI/full-suite/coverage acceptance are still required."
+  ]
+}

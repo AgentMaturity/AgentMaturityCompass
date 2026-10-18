@@ -1,0 +1,210 @@
+{
+  "schema": "p125f-generated-counts-actual/1",
+  "surfaces": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d",
+      "numericSpans": [
+        {
+          "kind": "encoded-badge",
+          "line": 17,
+          "byteStart": 1345,
+          "byteEnd": 1352,
+          "before": "1%2C692",
+          "anticipatedAfter": "1%2C693"
+        },
+        {
+          "kind": "marker-testFiles",
+          "line": 918,
+          "byteStart": 58651,
+          "byteEnd": 58656,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a",
+      "numericSpans": [
+        {
+          "kind": "marker-testFiles",
+          "line": 54,
+          "byteStart": 1886,
+          "byteEnd": 1891,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d",
+      "numericSpans": [
+        {
+          "kind": "website-stat",
+          "line": 90,
+          "byteStart": 5872,
+          "byteEnd": 5877,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0",
+      "numericSpans": [
+        {
+          "kind": "lite-stat",
+          "line": 74,
+          "byteStart": 4426,
+          "byteEnd": 4431,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 17,
+          "byteStart": 789,
+          "byteEnd": 794,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 33,
+          "byteStart": 1734,
+          "byteEnd": 1739,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 25,
+          "byteStart": 1341,
+          "byteEnd": 1346,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        },
+        {
+          "kind": "prose-source-inventory",
+          "line": 49,
+          "byteStart": 2892,
+          "byteEnd": 2897,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 57,
+          "byteStart": 2871,
+          "byteEnd": 2876,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 6,
+          "byteStart": 206,
+          "byteEnd": 211,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6",
+      "numericSpans": [
+        {
+          "kind": "prose-source-inventory",
+          "line": 22,
+          "byteStart": 3964,
+          "byteEnd": 3969,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        },
+        {
+          "kind": "prose-source-inventory",
+          "line": 415,
+          "byteStart": 42275,
+          "byteEnd": 42280,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        },
+        {
+          "kind": "prose-source-inventory",
+          "line": 423,
+          "byteStart": 42797,
+          "byteEnd": 42802,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        },
+        {
+          "kind": "prose-source-inventory",
+          "line": 873,
+          "byteStart": 88911,
+          "byteEnd": 88916,
+          "before": "1,692",
+          "anticipatedAfter": "1,693"
+        }
+      ],
+      "allOtherAuthoredBytesExact": true
+    }
+  ],
+  "pathCount": 10,
+  "numericSpans": 15,
+  "allTwentyClaudeRPinsExact": true,
+  "sourceStatus": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? tests/time/tsaFallback.test.ts\n",
+  "indexUntouched": true
+}

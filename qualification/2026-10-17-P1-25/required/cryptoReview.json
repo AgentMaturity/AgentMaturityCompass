@@ -1,0 +1,33 @@
+{
+  "schema": "p125-root-generation-byte-review/1",
+  "at": "2026-10-16T18:45:37.727781+00:00",
+  "completedPrivateGeneration": true,
+  "opensslCommands": 41,
+  "zeroExits": 40,
+  "expectedTamperedRefusalExit": 4,
+  "all82StreamsExact": true,
+  "publicFiles": 11,
+  "publicBytes": 105252,
+  "allPublicHashesExact": true,
+  "noPrivateKeyExport": true,
+  "all4CmsRecoveredExactTstInfo": true,
+  "all4EssCertHashesMatchActualLeaves": true,
+  "primaryTsQueryPathOracle": "Verification: OK",
+  "responseTokenRoundtripExact": true,
+  "tamperedAttribute": {
+    "signedAttrsTlvOffset": 1889,
+    "signedAttrsContentEnd": 2081,
+    "attributeOidOffset": 1922,
+    "octetStringTlvOffset": 1935,
+    "valueOffset": 1937,
+    "length": 32,
+    "exactOriginalDigestHex": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35",
+    "onlyByteChanged": 1937,
+    "xor": 1,
+    "asn1MetadataVerified": true
+  },
+  "AMCExecuted": false,
+  "sourceMaterialized": false,
+  "scope": "Real local RSA/SHA256 test corpus. Negative-cert CMS checks isolate signatures/content and do not imply PKI acceptance. Fixed test genTime does not prove historical existence.",
+  "generationResultSha256": "193afe2f43f4f318f4fe9888ca2907896117cc10a0ded7b115dd0c8bcb1ff3c9"
+}

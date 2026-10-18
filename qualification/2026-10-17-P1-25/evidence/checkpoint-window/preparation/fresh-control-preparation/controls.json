@@ -1,0 +1,85 @@
+{
+  "schema": "p125k-future-source-control-recipes/1",
+  "at": "2026-10-16T23:27:13.094171+00:00",
+  "operators": [
+    {
+      "id": "OMIT-CHECKPOINT-EVENT",
+      "target": "src/time/checkpoint.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "before": "  appendCheckpointEvent(workspace, { checkpointSequence: sequence, checkpointSha256: entry.sha256, tokenSha256: sha256Hex(grant.tokenDer) });\n",
+      "after": "  // Source-only control: deliberately omit the checkpoint ledger event.\n",
+      "matchCountRequired": 1,
+      "beforeLine": 118,
+      "beforeSha256": "77b6aca6675f5bff82aa7f5be7ad27dcd59e641684ef6a1ebc7eaad36c7c6c2c",
+      "afterSha256": "5396196a8921e6fcca5b122916fa6ae14f38dc27c03a88b7e65dc9d6dbbe5dff",
+      "proposedWholeFile": {
+        "bytes": 20936,
+        "sha256": "fefeac16fb15749529fb997c69f3aa4937139ea5605785f2fa79ddf3ad88898a"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-CHECKPOINT-EVENT.patch.txt",
+        "bytes": 692,
+        "sha256": "306cdbc514e272f0840850d28f82f2f9dff5c5c48311e596613292bbfbfea222"
+      },
+      "witness": {
+        "candidateLines": [
+          268
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        },
+        "masking": "Independent captured-query OpenSSL and AMC token positives plus unchanged signed checkpoint/stored token precede the direct row-count assertion. Exact metadata/count/ledger/timeline assertions are later masks.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "OMIT-REQUIRED-PENDING-REFUSAL",
+      "target": "src/time/checkpoint.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "before": "  if (result.status === \"pending\" && config.required) {\n    throw new Error(`time.required: checkpoint ${checkpoint.sequence} has no verified token (${result.failures.join(\"; \") || \"no TSA answered\"})`);\n  }\n",
+      "after": "  // Source-only control: deliberately omit the required pending refusal.\n",
+      "matchCountRequired": 1,
+      "beforeLine": 152,
+      "beforeSha256": "a45266f808d489865ede6a8ce3bae6f1d5f4cc45b62a9d95586ff8e613ec5798",
+      "afterSha256": "575579459de9db4ddf0fd4439e1e22c895adc26f098a1ed927748da2a8fd7e29",
+      "proposedWholeFile": {
+        "bytes": 20871,
+        "sha256": "2f9bb3e0b69395c2ddbf4106e64116ad1cc0d7c20361fa457ecaaef26d1857ea"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-REQUIRED-PENDING-REFUSAL.patch.txt",
+        "bytes": 656,
+        "sha256": "11d398c5b5ac9e64079e217bfb241be3ff0e5cb572405fe35a47cc6bb86b7b62"
+      },
+      "witness": {
+        "candidateLines": [
+          316
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        },
+        "masking": "Actual HTTP500 dispatch, signed pending checkpoint, absent token, unchanged ledger and pending timeline/verification positives precede rejection assertion. Exact error text is masked after a failed rejection flag.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "noSourceMutantStored": true,
+  "futureQualificationHashesNotPredicted": true,
+  "noPredictedFailuresHooksOrQualificationCredit": true
+}

@@ -1,0 +1,1242 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 83341,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpClient.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpHttp.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcp.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcpHttp.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/toolEvidenceRecording.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/workflowTool.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts"
+  ],
+  "testCount": 81,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-831213267",
+      "name": "tests/nativeMcpClient.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpClient.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-831213267_0",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_0",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration valid schemas execute through the signed allowlist; invalid arguments never reach the server",
+      "fullName": "native MCP pinned stdio integration valid schemas execute through the signed allowlist; invalid arguments never reach the server",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_1",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration a mounted capability cannot bypass the independent signed allowlist",
+      "fullName": "native MCP pinned stdio integration a mounted capability cannot bypass the independent signed allowlist",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_2",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration wrong catalog pins and absent remote grants leave no mounted capability",
+      "fullName": "native MCP pinned stdio integration wrong catalog pins and absent remote grants leave no mounted capability",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_3",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration catalog drift is refused before dispatch and list-change notifications revoke active grants",
+      "fullName": "native MCP pinned stdio integration catalog drift is refused before dispatch and list-change notifications revoke active grants",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_4",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration output schemas on earlier catalog pages are enforced",
+      "fullName": "native MCP pinned stdio integration output schemas on earlier catalog pages are enforced",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_5",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration input schemas sharing an id cannot reuse another tool's validator",
+      "fullName": "native MCP pinned stdio integration input schemas sharing an id cannot reuse another tool's validator",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_6",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration output schemas sharing an id stay independent of SDK cache state",
+      "fullName": "native MCP pinned stdio integration output schemas sharing an id stay independent of SDK cache state",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_7",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration remote errors retain structured details and timeouts retain their separate failure fact",
+      "fullName": "native MCP pinned stdio integration remote errors retain structured details and timeouts retain their separate failure fact",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_8",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration required task execution is explicitly refused instead of dispatching a synchronous call",
+      "fullName": "native MCP pinned stdio integration required task execution is explicitly refused instead of dispatching a synchronous call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_9",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration explicit secrets are child-only, scrubbed from results and catalog leakage refuses",
+      "fullName": "native MCP pinned stdio integration explicit secrets are child-only, scrubbed from results and catalog leakage refuses",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_10",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration cancellation disposes the connection and prevents later calls",
+      "fullName": "native MCP pinned stdio integration cancellation disposes the connection and prevents later calls",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_0_11",
+      "name": "tests/nativeMcpClient.test.ts native MCP pinned stdio integration output schema validation precedes secret redaction",
+      "fullName": "native MCP pinned stdio integration output schema validation precedes secret redaction",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-831213267_1",
+      "name": "tests/nativeMcpClient.test.ts native MCP configuration admission",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_1_0",
+      "name": "tests/nativeMcpClient.test.ts native MCP configuration admission a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool",
+      "fullName": "native MCP configuration admission a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_1_1",
+      "name": "tests/nativeMcpClient.test.ts native MCP configuration admission an explicitly wrong MCP context cannot qualify a reviewed subset",
+      "fullName": "native MCP configuration admission an explicitly wrong MCP context cannot qualify a reviewed subset",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-831213267_1_2",
+      "name": "tests/nativeMcpClient.test.ts native MCP configuration admission pins exact config bytes, refuses literal secrets and checks the signed grant class",
+      "fullName": "native MCP configuration admission pins exact config bytes, refuses literal secrets and checks the signed grant class",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1204358614",
+      "name": "tests/nativeMcpHttp.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpHttp.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1204358614_0",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_0",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP executes false SSE with pinned origin/session and private header redaction",
+      "fullName": "governed native Streamable HTTP executes false SSE with pinned origin/session and private header redaction",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_1",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP executes true SSE with pinned origin/session and private header redaction",
+      "fullName": "governed native Streamable HTTP executes true SSE with pinned origin/session and private header redaction",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_2",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP configuration resolves header references only, pins bytes and refuses control/origin fields",
+      "fullName": "governed native Streamable HTTP configuration resolves header references only, pins bytes and refuses control/origin fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_3",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP redirects never send credentials to a second origin",
+      "fullName": "governed native Streamable HTTP redirects never send credentials to a second origin",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_4",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP authentication challenges do not enroll OAuth or expose response credentials",
+      "fullName": "governed native Streamable HTTP authentication challenges do not enroll OAuth or expose response credentials",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_5",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP session replacement is refused without using the replacement identity",
+      "fullName": "governed native Streamable HTTP session replacement is refused without using the replacement identity",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_6",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP bounds declared oversized bodies",
+      "fullName": "governed native Streamable HTTP bounds declared oversized bodies",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_7",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP bounds streamed oversized bodies",
+      "fullName": "governed native Streamable HTTP bounds streamed oversized bodies",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_8",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP catalog changes and credential leaks do not reach a remote tool",
+      "fullName": "governed native Streamable HTTP catalog changes and credential leaks do not reach a remote tool",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_9",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP catalog notifications dispose the grant without automatic reconnect",
+      "fullName": "governed native Streamable HTTP catalog notifications dispose the grant without automatic reconnect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_10",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP idle notifications outlive request timeout, then expire at the independently configured bound",
+      "fullName": "governed native Streamable HTTP idle notifications outlive request timeout, then expire at the independently configured bound",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_11",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP protocol failure tolerates reentrant error and close handlers with one bounded termination",
+      "fullName": "governed native Streamable HTTP protocol failure tolerates reentrant error and close handlers with one bounded termination",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_12",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP a notification flood exhausts the bounded connection instead of accumulating state",
+      "fullName": "governed native Streamable HTTP a notification flood exhausts the bounded connection instead of accumulating state",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_13",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP cancellation aborts the active stream, terminates the session and removes the grant",
+      "fullName": "governed native Streamable HTTP cancellation aborts the active stream, terminates the session and removes the grant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1204358614_0_14",
+      "name": "tests/nativeMcpHttp.test.ts governed native Streamable HTTP timeouts and remote error results retain distinct failure facts",
+      "fullName": "governed native Streamable HTTP timeouts and remote error results retain distinct failure facts",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1813519114",
+      "name": "tests/reconciliationDefectsMcp.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcp.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1813519114_0",
+      "name": "tests/reconciliationDefectsMcp.test.ts AMC-1515 nativeMcpClient.ts:264 — a received result discarded after grant disposal",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1813519114_0_0",
+      "name": "tests/reconciliationDefectsMcp.test.ts AMC-1515 nativeMcpClient.ts:264 — a received result discarded after grant disposal a discarded received result says the remote tool executed and was not replayed",
+      "fullName": "AMC-1515 nativeMcpClient.ts:264 — a received result discarded after grant disposal a discarded received result says the remote tool executed and was not replayed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1813519114_1",
+      "name": "tests/reconciliationDefectsMcp.test.ts AMC-1515 nativeMcpClient.ts:236 — schema validation precedes simulation",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1813519114_1_0",
+      "name": "tests/reconciliationDefectsMcp.test.ts AMC-1515 nativeMcpClient.ts:236 — schema validation precedes simulation simulation refuses arguments that the reviewed schema refuses",
+      "fullName": "AMC-1515 nativeMcpClient.ts:236 — schema validation precedes simulation simulation refuses arguments that the reviewed schema refuses",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "879381790",
+      "name": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcpHttp.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "879381790_0",
+      "name": "tests/reconciliationDefectsMcpHttp.test.ts AMC-1535 Streamable HTTP — AMC-1515 outcomes",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "879381790_0_0",
+      "name": "tests/reconciliationDefectsMcpHttp.test.ts AMC-1535 Streamable HTTP — AMC-1515 outcomes a non-EXECUTE call with schema-invalid arguments is refused without a remote call",
+      "fullName": "AMC-1535 Streamable HTTP — AMC-1515 outcomes a non-EXECUTE call with schema-invalid arguments is refused without a remote call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "879381790_0_1",
+      "name": "tests/reconciliationDefectsMcpHttp.test.ts AMC-1535 Streamable HTTP — AMC-1515 outcomes a result received after grant disposal is reported as executed and discarded",
+      "fullName": "AMC-1535 Streamable HTTP — AMC-1515 outcomes a result received after grant disposal is reported as executed and discarded",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1533357729",
+      "name": "tests/toolEvidenceRecording.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/toolEvidenceRecording.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_0",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_0",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence records an ALLOWED call",
+      "fullName": "a governed call leaves evidence records an ALLOWED call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_1",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence records a DENIED call, with which guard refused and why",
+      "fullName": "a governed call leaves evidence records a DENIED call, with which guard refused and why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_2",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence writes an audit row AND a metric row per call",
+      "fullName": "a governed call leaves evidence writes an audit row AND a metric row per call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_3",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence correlates a call to its token, so a denial can be traced",
+      "fullName": "a governed call leaves evidence correlates a call to its token, so a denial can be traced",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_4",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence does NOT copy the arguments into the audit row",
+      "fullName": "a governed call leaves evidence does NOT copy the arguments into the audit row",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_1",
+      "name": "tests/toolEvidenceRecording.test.ts recording never breaks the call",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_1_0",
+      "name": "tests/toolEvidenceRecording.test.ts recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_2",
+      "name": "tests/toolEvidenceRecording.test.ts the projection itself",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_2_0",
+      "name": "tests/toolEvidenceRecording.test.ts the projection itself labels the three outcomes distinctly",
+      "fullName": "the projection itself labels the three outcomes distinctly",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_3",
+      "name": "tests/toolEvidenceRecording.test.ts keeps a real journaled effect when recording fails, signs the gap and blocks the next financial call",
+      "fullName": "keeps a real journaled effect when recording fails, signs the gap and blocks the next financial call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "579260306",
+      "name": "tests/workflowTool.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/workflowTool.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "579260306_0",
+      "name": "tests/workflowTool.test.ts two parties must agree before an agent can run a workflow",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_0_0",
+      "name": "tests/workflowTool.test.ts two parties must agree before an agent can run a workflow is not offered unless the integrator composed the capability",
+      "fullName": "two parties must agree before an agent can run a workflow is not offered unless the integrator composed the capability",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_0_1",
+      "name": "tests/workflowTool.test.ts two parties must agree before an agent can run a workflow is denied by the signed allowlist even when the capability is granted",
+      "fullName": "two parties must agree before an agent can run a workflow is denied by the signed allowlist even when the capability is granted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_0_2",
+      "name": "tests/workflowTool.test.ts two parties must agree before an agent can run a workflow runs once both parties have agreed",
+      "fullName": "two parties must agree before an agent can run a workflow runs once both parties have agreed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "579260306_1",
+      "name": "tests/workflowTool.test.ts the model gets its own structure back, labelled by its own ids",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_1_0",
+      "name": "tests/workflowTool.test.ts the model gets its own structure back, labelled by its own ids returns each node's answer under the id the model chose",
+      "fullName": "the model gets its own structure back, labelled by its own ids returns each node's answer under the id the model chose",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_1_1",
+      "name": "tests/workflowTool.test.ts the model gets its own structure back, labelled by its own ids keeps answers and failures apart instead of concatenating them",
+      "fullName": "the model gets its own structure back, labelled by its own ids keeps answers and failures apart instead of concatenating them",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "579260306_2",
+      "name": "tests/workflowTool.test.ts a plan the model got wrong is refused, not attempted",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_2_0",
+      "name": "tests/workflowTool.test.ts a plan the model got wrong is refused, not attempted refuses an invalid plan without spawning anything",
+      "fullName": "a plan the model got wrong is refused, not attempted refuses an invalid plan without spawning anything",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_2_1",
+      "name": "tests/workflowTool.test.ts a plan the model got wrong is refused, not attempted refuses a plan past the fan-out cap without spawning anything",
+      "fullName": "a plan the model got wrong is refused, not attempted refuses a plan past the fan-out cap without spawning anything",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_2_2",
+      "name": "tests/workflowTool.test.ts a plan the model got wrong is refused, not attempted refuses arguments that are not a plan at all",
+      "fullName": "a plan the model got wrong is refused, not attempted refuses arguments that are not a plan at all",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "579260306_3",
+      "name": "tests/workflowTool.test.ts a workflow stops when the turn is cancelled",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "579260306_3_0",
+      "name": "tests/workflowTool.test.ts a workflow stops when the turn is cancelled gives up the plan on the turn's signal",
+      "fullName": "a workflow stops when the turn is cancelled gives up the plan on the turn's signal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1152513869",
+      "name": "tests/mcp/mcp20260728.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1152513869_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "fullName": "P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_1",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "fullName": "P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_2",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "fullName": "P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_3",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow one finite tools/list EOF is reissued once with a new wire id",
+      "fullName": "P1-39 governed stateless MCP public flow one finite tools/list EOF is reissued once with a new wire id",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_4",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow two finite tools/list EOFs exhaust the single reissue allowance",
+      "fullName": "P1-39 governed stateless MCP public flow two finite tools/list EOFs exhaust the single reissue allowance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_5",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow catalog and explicit grant admission refuse before dispatch and ignore a long TTL after catalog drift",
+      "fullName": "P1-39 governed stateless MCP public flow catalog and explicit grant admission refuse before dispatch and ignore a long TTL after catalog drift",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_6",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow missing resultType remains complete for the real catalog and governed call",
+      "fullName": "P1-39 governed stateless MCP public flow missing resultType remains complete for the real catalog and governed call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_7",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow tools/list input_required resultType is refused before a catalog or tool call",
+      "fullName": "P1-39 governed stateless MCP public flow tools/list input_required resultType is refused before a catalog or tool call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_8",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow tools/list invalid resultType is refused before a catalog or tool call",
+      "fullName": "P1-39 governed stateless MCP public flow tools/list invalid resultType is refused before a catalog or tool call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_9",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow tools/call input_required resultType cannot complete or trigger a replay",
+      "fullName": "P1-39 governed stateless MCP public flow tools/call input_required resultType cannot complete or trigger a replay",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_10",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow tools/call invalid resultType cannot complete or trigger a replay",
+      "fullName": "P1-39 governed stateless MCP public flow tools/call invalid resultType cannot complete or trigger a replay",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_11",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a tools/list response for another id is refused without response remapping",
+      "fullName": "P1-39 governed stateless MCP public flow a tools/list response for another id is refused without response remapping",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_12",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow untrusted unknown-marker text in a received tool error stays ERROR",
+      "fullName": "P1-39 governed stateless MCP public flow untrusted unknown-marker text in a received tool error stays ERROR",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1048432945",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1048432945_0",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1048432945_0_0",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery unpinned method-not-found probe discovers the negotiated legacy catalog",
+      "fullName": "P1-39 explicit legacy MCP discovery unpinned method-not-found probe discovers the negotiated legacy catalog",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1048432945_0_1",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery an exact modern pin refuses the same legacy endpoint before initialization",
+      "fullName": "P1-39 explicit legacy MCP discovery an exact modern pin refuses the same legacy endpoint before initialization",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1048432945_0_2",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery an exact supported legacy pin initializes without a discover probe",
+      "fullName": "P1-39 explicit legacy MCP discovery an exact supported legacy pin initializes without a discover probe",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1048432945_0_3",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery a different supported initialize version refuses an exact legacy pin before catalog discovery",
+      "fullName": "P1-39 explicit legacy MCP discovery a different supported initialize version refuses an exact legacy pin before catalog discovery",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1048432945_0_4",
+      "name": "tests/mcp/mcpLegacyFallback.test.ts P1-39 explicit legacy MCP discovery legacy mount receipts bind the reviewed version and a version-only change requires a new digest",
+      "fullName": "P1-39 explicit legacy MCP discovery legacy mount receipts bind the reviewed version and a version-only change requires a new digest",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-156354419",
+      "name": "tests/mcp/mcpOauth.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-156354419_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_0_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification discovers explicit and fallback protected-resource metadata and ordered issuer metadata",
+      "fullName": "P1-39 first local OAuth qualification discovers explicit and fallback protected-resource metadata and ordered issuer metadata",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_0_1",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification refuses a literal issuer mismatch after a matching issuer positive",
+      "fullName": "P1-39 first local OAuth qualification refuses a literal issuer mismatch after a matching issuer positive",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_0_2",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification requires advertised S256 without masking its finite negative rows",
+      "fullName": "P1-39 first local OAuth qualification requires advertised S256 without masking its finite negative rows",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_0_3",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification validates the public RFC9207 iss table, exact state and fixed errors",
+      "fullName": "P1-39 first local OAuth qualification validates the public RFC9207 iss table, exact state and fixed errors",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_0_4",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 first local OAuth qualification performs real S256 resource-bound authorization and persists the real grant",
+      "fullName": "P1-39 first local OAuth qualification performs real S256 resource-bound authorization and persists the real grant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-156354419_1",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth registration and redirect qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_1_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth registration and redirect qualification honors client priority and explicit dynamic registration opt-in",
+      "fullName": "P1-39 OAuth registration and redirect qualification honors client priority and explicit dynamic registration opt-in",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_1_1",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth registration and redirect qualification refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch",
+      "fullName": "P1-39 OAuth registration and redirect qualification refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-156354419_2",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real-store refresh and binding qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_2_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real-store refresh and binding qualification refreshes an expired real grant with resource binding, preserves an omitted refresh token and refuses unusable refresh",
+      "fullName": "P1-39 OAuth real-store refresh and binding qualification refreshes an expired real grant with resource binding, preserves an omitted refresh token and refuses unusable refresh",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_2_1",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real-store refresh and binding qualification separates real issuer and resource entries and resolves the selected token only into the MCP Authorization header",
+      "fullName": "P1-39 OAuth real-store refresh and binding qualification separates real issuer and resource entries and resolves the selected token only into the MCP Authorization header",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-156354419_3",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real catalog scope qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_3_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real catalog scope qualification unions operator, granted and new challenge scopes through two real catalog step-ups",
+      "fullName": "P1-39 OAuth real catalog scope qualification unions operator, granted and new challenge scopes through two real catalog step-ups",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_3_1",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth real catalog scope qualification stops after two real catalog reauthorizations when another scope challenge remains",
+      "fullName": "P1-39 OAuth real catalog scope qualification stops after two real catalog reauthorizations when another scope challenge remains",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-156354419_4",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth governed evidence secrecy qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-156354419_4_0",
+      "name": "tests/mcp/mcpOauth.test.ts P1-39 OAuth governed evidence secrecy qualification redacts a real header token echoed by a governed tool from the outcome and committed evidence payloads",
+      "fullName": "P1-39 OAuth governed evidence secrecy qualification redacts a real header token echoed by a governed tool from the outcome and committed evidence payloads",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

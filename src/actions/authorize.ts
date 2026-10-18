@@ -86,7 +86,15 @@ type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindin
   readonly effects: EffectDeclaration | null;
 };
 
-const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
+/**
+ * A failure reason reaches model-visible denials, approval questions and API responses, and an error's text can carry an
+ * absolute host path (an fs error, a verifier naming its file). Name the failure by its class only: the errno code, else
+ * the error's name.
+ */
+const message = (error: unknown): string => {
+  const code = (error as NodeJS.ErrnoException | null)?.code;
+  return typeof code === "string" ? code : error instanceof Error ? error.name : "unknown error";
+};
 const failed = (failure: RecheckFailure, reason: string): Failed => ({ ok: false, failures: [failure], reason });
 
 /** The digest of a policy file as the approvals engine binds it; absent is a named sentinel, unreadable throws. */
@@ -215,6 +223,13 @@ export function leasePrincipal(workspace: string, payload: Pick<LeasePayload, "p
 
 /** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
 const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
+
+/** A record re-derived from a bound one (the journal admission's fresh IDs) keeps the principal state its recheck needs. */
+export function carryBoundPrincipal(from: AuthorizationRecordV1, to: AuthorizationRecordV1): AuthorizationRecordV1 {
+  const state = boundPrincipalState.get(from);
+  if (state !== undefined) boundPrincipalState.set(to, state);
+  return to;
+}
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {

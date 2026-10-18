@@ -1,0 +1,56 @@
+{
+  "schema": "p126-private-receipt-prose-preparation-seal/1",
+  "at": "2026-10-16T20:57:09.728634+00:00",
+  "inputCount": 34,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/README.proposal.md",
+      "bytes": 5838,
+      "sha256": "0cdcec8caf8e82d3ac404ed66e5fb8c82af95fba16b25bea6f1f3cfe008b149c",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/README.proposal.md",
+      "dev": 16777231,
+      "inode": 543433410,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/artifact-mapping.json",
+      "bytes": 2990,
+      "sha256": "cee7e3749369e09287b261ba11d6ccac9b42159f8ea2845494e4e16a8d259ec3",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/artifact-mapping.json",
+      "dev": 16777231,
+      "inode": 543433411,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/whole-issue-gaps.proposal.json",
+      "bytes": 3677,
+      "sha256": "5b5196f24f19d5d6e81092708f20ba34f0393a82b7ad83a812b7b7335472b7e6",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/whole-issue-gaps.proposal.json",
+      "dev": 16777231,
+      "inode": 543433412,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/preparation-review.json",
+      "bytes": 1748,
+      "sha256": "26f83ede351e701419a4a915eb12a95e05717d5c55716fcc0164d6aa169578ac",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/preparation-review.json",
+      "dev": 16777231,
+      "inode": 543433413,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/input-pins.json",
+      "bytes": 13201,
+      "sha256": "809aadba9953f8c8cc8d81b12b5fe30f0ce2f4166fba14fa39c8408f02590111",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-preparation/input-pins.json",
+      "dev": 16777231,
+      "inode": 543433414,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputPinsRechecked": true,
+  "finalReceiptReady": false,
+  "unfinishedPlaceholdersExplicit": true,
+  "noHelperProductOrCheckoutAction": true
+}

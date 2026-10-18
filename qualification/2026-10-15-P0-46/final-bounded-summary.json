@@ -1,0 +1,75 @@
+{
+  "source": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "counts": {
+    "numTotalTests": 33,
+    "numPassedTests": 33,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numFailedTestSuites": 0,
+    "numPendingTestSuites": 0,
+    "success": true
+  },
+  "files": 3,
+  "components": {
+    "actionShellObservers": 13,
+    "originalPublicationContracts": 20
+  },
+  "rawReportSha256": "a93ccdd0d3dbc1a6d7f3c52a683f7e038b724cad43eeb1ecd44fb8d4da090ed4",
+  "realInstall": {
+    "sourceDuringRun": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+    "commands": [
+      {
+        "name": "exact-local-install",
+        "argv": [
+          "bash",
+          "/private/tmp/p0-46-local-install-b9uqoofn/local-install-block.sh"
+        ],
+        "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+        "exit": 0,
+        "durationMs": 36056,
+        "startedUtc": "2026-10-14T18:40:44.150875+00:00",
+        "log": "/private/tmp/p0-46-local-install-b9uqoofn/exact-local-install.log",
+        "logSha256": "570a81c460552b78a2f729ef91b151b4e16aede07b8c066c843de673ac5e4f47",
+        "logBytes": 2118
+      },
+      {
+        "name": "installed-version",
+        "argv": [
+          "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+          "--version"
+        ],
+        "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+        "exit": 0,
+        "durationMs": 1355,
+        "startedUtc": "2026-10-14T18:41:20.210506+00:00",
+        "log": "/private/tmp/p0-46-local-install-b9uqoofn/installed-version.log",
+        "logSha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d",
+        "logBytes": 6
+      },
+      {
+        "name": "installed-help",
+        "argv": [
+          "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+          "--help"
+        ],
+        "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+        "exit": 0,
+        "durationMs": 695,
+        "startedUtc": "2026-10-14T18:41:21.565840+00:00",
+        "log": "/private/tmp/p0-46-local-install-b9uqoofn/installed-help.log",
+        "logSha256": "cc01a17b8d8d85c5ad052d2b0b1d02c0ca8c27498820f72df3014b43c9f436f7",
+        "logBytes": 3050
+      }
+    ],
+    "inputHashesUnchanged": true,
+    "installedLauncher": {
+      "launcher": "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+      "isLink": true,
+      "realPath": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass/dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+      "compiledCliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    }
+  },
+  "limits": "Actual local install on earlier d8e product source, unchanged in final4c8. Shell observers are inert. SelectedNode22/macOSarm64 only, linkedcheckout notpackedrelease. Default20/Node24/hostedUbuntu/fullCI/release remain open."
+}

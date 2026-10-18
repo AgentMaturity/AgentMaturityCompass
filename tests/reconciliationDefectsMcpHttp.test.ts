@@ -83,7 +83,7 @@ describe("AMC-1535 Streamable HTTP — AMC-1515 outcomes", () => {
     const f = await fixture(true);
     const outcome = await f.call();
     expect(f.remoteCalls()).toBe(1);
-    expect(outcome.outcome).toBe("ERROR");
+    expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(outcome.content)).toContain("the remote tool executed and its received result was discarded");
   });
 });

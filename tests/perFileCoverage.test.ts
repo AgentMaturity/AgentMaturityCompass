@@ -1,5 +1,8 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { coverageFiles, checkPerFileCoverage } from "../scripts/per-file-coverage.mjs";
+import { coverageFiles, coverageSourceFiles, checkPerFileCoverage } from "../scripts/per-file-coverage.mjs";
 
 const measures = (covered: number, total = 10) => Object.fromEntries(["lines", "functions", "branches", "statements"]
   .map(metric => [metric, { total, covered }]));
@@ -37,6 +40,53 @@ describe("per-file coverage ratchet", () => {
   it("normalizes paths to the exact clone root and rejects outside files", () => {
     expect(coverageFiles({ total: {}, "/tmp/clone/src/a.ts": measures(8) }, "/tmp/clone")).toEqual({ "src/a.ts": measures(8) });
     expect(() => coverageFiles({ "/tmp/other/src/a.ts": measures(8) }, "/tmp/clone")).toThrow(/outside/);
+  });
+  it("normalizes verifier evidence alongside AMC source without changing file identity", () => {
+    expect(coverageFiles({ total: {}, "src/a.ts": measures(8),
+      "/tmp/clone/packages/verifier/src/index.ts": measures(8),
+      "packages/verifier/src/records/evidence.ts": measures(8) }, "/tmp/clone"))
+      .toEqual({ "src/a.ts": measures(8), "packages/verifier/src/index.ts": measures(8),
+        "packages/verifier/src/records/evidence.ts": measures(8) });
+  });
+  it.each(["/tmp/other/packages/verifier/src/index.ts", "packages/other/src/index.ts",
+    "packages/verifier/src-extra/index.ts", "packages/verifier/index.ts", "src-extra/index.ts",
+    "packages/verifier/src/../../other/index.ts"])("rejects coverage outside the two exact source roots: %s", path => {
+    expect(() => coverageFiles({ [path]: measures(8) }, "/tmp/clone")).toThrow(/outside source scope/);
+  });
+  it("inventories both source roots while preserving existing coverage exclusions", () => {
+    const root = mkdtempSync(join(tmpdir(), "amc-coverage-inventory-"));
+    try {
+      for (const file of ["src/existing.ts", "src/console/view.ts", "src/dashboard/view.ts", "src/types.d.ts",
+        "src/nested/tests/fixture.ts", "packages/verifier/src/index.ts", "packages/verifier/src/records/evidence.ts",
+        "packages/verifier/src/types.d.ts", "packages/verifier/src/tests/fixture.ts", "packages/other/src/ignored.ts"]) {
+        const path = join(root, file);
+        mkdirSync(dirname(path), { recursive: true });
+        writeFileSync(path, "export const fixture = true;\n");
+      }
+      expect(coverageSourceFiles(root)).toEqual([
+        "packages/verifier/src/index.ts", "packages/verifier/src/records/evidence.ts", "src/existing.ts"
+      ]);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+  it("requires verifier files to meet the unchanged new-source minimums", () => {
+    const file = "packages/verifier/src/index.ts";
+    const files = coverageFiles({ "src/existing.ts": measures(8), [file]: measures(0) }, "/tmp/clone");
+    const expected = ["src/existing.ts", file];
+    expect(checkPerFileCoverage(files, baseline, expected)).toEqual([
+      { file, metric: "lines", actual: 0, minimum: 65 },
+      { file, metric: "functions", actual: 0, minimum: 75 },
+      { file, metric: "branches", actual: 0, minimum: 59 },
+      { file, metric: "statements", actual: 0, minimum: 64 }
+    ]);
+    expect(checkPerFileCoverage({ ...files, [file]: measures(8) }, baseline, expected)).toEqual([]);
+  });
+  it("refuses missing verifier evidence and stale verifier inventory", () => {
+    const file = "packages/verifier/src/index.ts";
+    const files = coverageFiles({ "src/existing.ts": measures(8) }, "/tmp/clone");
+    expect(checkPerFileCoverage(files, baseline, ["src/existing.ts", file]))
+      .toEqual([{ file, reason: "New source file has no coverage evidence" }]);
+    expect(checkPerFileCoverage({ ...files, [file]: measures(8) }, baseline, ["src/existing.ts"]))
+      .toEqual([{ file, reason: "Coverage evidence does not match the current source inventory" }]);
   });
   it("refuses empty evidence and impossible counts", () => {
     expect(() => coverageFiles({ total: {} }, "/tmp/clone")).toThrow(/no source files/);

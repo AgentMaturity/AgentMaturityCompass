@@ -1,0 +1,1 @@
+check-threat-model: channel network-egress: hostAllowedX does not occur in src/gateway/server.ts

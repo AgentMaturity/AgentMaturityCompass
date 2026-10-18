@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-17T01:00:08.384189+00:00",
+  "all12ActualNormalChecksZero": true,
+  "checks": [
+    {
+      "phase": "p125ec-test-types",
+      "exit": 0,
+      "durationMs": 36233
+    },
+    {
+      "phase": "p125ec-source-types",
+      "exit": 0,
+      "durationMs": 25374
+    },
+    {
+      "phase": "p125ec-source-lint",
+      "exit": 0,
+      "durationMs": 2933
+    },
+    {
+      "phase": "p125ec-source-build",
+      "exit": 0,
+      "durationMs": 29760
+    },
+    {
+      "phase": "p125ec-source-counts",
+      "exit": 0,
+      "durationMs": 610
+    },
+    {
+      "phase": "p125ec-source-gates",
+      "exit": 0,
+      "durationMs": 479
+    },
+    {
+      "phase": "p125ec-source-threat-model",
+      "exit": 0,
+      "durationMs": 294
+    },
+    {
+      "phase": "p125ec-source-architecture",
+      "exit": 0,
+      "durationMs": 1627
+    },
+    {
+      "phase": "p125ec-source-docs-drift",
+      "exit": 0,
+      "durationMs": 337
+    },
+    {
+      "phase": "p125ec-source-freeze",
+      "exit": 0,
+      "durationMs": 1231
+    },
+    {
+      "phase": "p125ec-source-notices",
+      "exit": 0,
+      "durationMs": 241
+    },
+    {
+      "phase": "p125ec-source-qualification",
+      "exit": 0,
+      "durationMs": 1011
+    }
+  ],
+  "countRegeneration": false,
+  "qualityNotIncludedAsPass": true
+}

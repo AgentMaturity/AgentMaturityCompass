@@ -1,0 +1,47 @@
+{
+  "schema": "p125-checkpoint-private-receipt-v3-inputs/1",
+  "at": "2026-10-16T23:43:29.700681+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 29622,
+      "sha256": "2f2948263766271b9bb4e5a48167ca48b38449e770a585083ab710adb7cb5e7d"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+      "bytes": 2201,
+      "sha256": "4faded5f01c2ba609fefed140c5380dcaaabaf83cf46f7990c9404912fde2daf"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v2/input-template.json",
+      "bytes": 5867,
+      "sha256": "de06cf0c0079614899fd50a504b44c507d5b6f515aee55f6ff765f6c7caa0bd6"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-source-binding.json",
+      "bytes": 115780,
+      "sha256": "293fe1f5f9a650148e2b329d966fca27b9a1d48cc54e357eae81e29bd5a693c3"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-fresh-canonical-outcome.json",
+      "bytes": 11612,
+      "sha256": "8d1ea920cad90d82c68f7453ed939ab278e72b27e6c4de81dcfa000879d51881"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-launcher-path-diagnosis.json",
+      "bytes": 6985,
+      "sha256": "b988395576e96f525b6f9891dde570eda8128529c00468013863d22789822cbf"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+      "bytes": 19281,
+      "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27"
+    }
+  ],
+  "existingV2FullInputPinsRetained": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+    "bytes": 2482,
+    "sha256": "9c552a470492e8163b672a236379c427e437c9a7cef9ca3f2a17f1dca860b6a2"
+  },
+  "noPrivateKeyChildStreamOrRuntimeExecution": true
+}

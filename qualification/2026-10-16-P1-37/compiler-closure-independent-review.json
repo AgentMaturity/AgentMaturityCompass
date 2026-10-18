@@ -1,0 +1,189 @@
+{
+  "schema": "p137-compiler-natural-closure-independent-audit/1",
+  "capturedUtc": "2026-10-16T10:51:35.276923+00:00",
+  "certificate": {
+    "path": "/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json",
+    "bytes": 4968,
+    "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+  },
+  "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+  "allCertificatePinsMatch": true,
+  "matchingPinCount": 16,
+  "markerPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/ACTIVE.json",
+      "bytes": 251,
+      "sha256": "90eb356b14c052743c5f405c514b52a1c3132b2c3d578bc7e2e70b573672ed13"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/HALTED.json",
+      "bytes": 291,
+      "sha256": "8d778f747a485c094f78a74863ed7e6fb331b4ca6494b5dc35d3251327d6cfcf"
+    }
+  ],
+  "markerHashesUnchangedBeforeAfterAudit": true,
+  "ownedProcess": {
+    "pid": 38063,
+    "ownedPgid": 38063,
+    "observedPgidAfterLaunch": 38063,
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "argv": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "tsconfig.tests.json",
+      "--noEmit"
+    ],
+    "startedUtc": "2026-10-16T10:46:40.070752+00:00",
+    "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+    "overriddenEnvironmentKeys": [
+      "PATH",
+      "HOME",
+      "GIT_NO_LAZY_FETCH"
+    ]
+  },
+  "originalOwnedClosure": {
+    "exit": 2,
+    "processDurationMs": 37776,
+    "observations": [
+      {
+        "capturedUtc": "2026-10-16T10:47:17.846976+00:00",
+        "pgid": 38063,
+        "signal": 0,
+        "absentByESRCH": true,
+        "errno": 3
+      }
+    ],
+    "maxPollingSeconds": 5,
+    "pollIntervalSeconds": 0.05,
+    "signalsOtherThanZeroSent": false
+  },
+  "certificateFreshProbes": [
+    {
+      "kind": "pid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    },
+    {
+      "kind": "pgid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "independentFreshProbes": [
+    {
+      "capturedUtc": "2026-10-16T10:50:59.972327+00:00",
+      "kind": "pid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    },
+    {
+      "capturedUtc": "2026-10-16T10:50:59.972458+00:00",
+      "kind": "pgid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "childExit": 2,
+  "wrapperExit": 70,
+  "wrapperExitEvidence": "Certificate records 70; preserved HALTED RuntimeError and the byte-pinned wrapper path establish the branch that catches the rejected positive child exit2 and returns70. No separate command.json is produced on that branch.",
+  "compilerDiagnostic": "tests/autoCompaction.test.ts(345,42): error TS2339: Property 'encodedSha256' does not exist on type 'SpillRef'.\n  Property 'encodedSha256' does not exist on type 'SpillRefV1'.",
+  "failureClass": "Actual test TypeScript diagnostic; not a passed check or process signal.",
+  "frozenHarness": {
+    "pin": {
+      "path": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+      "bytes": 12312,
+      "sha256": "90501440d5e16ff4584faa673e5c02bbae6a306a2052421fd2243dce062044fd"
+    },
+    "normalExitWhitelist": [
+      0,
+      1
+    ],
+    "wait": "unbounded child.wait; no added process deadline",
+    "launch": "Popen start_new_session=True",
+    "closure": "owned PGID signal0 bounded polling, final ESRCH errno3",
+    "failureMarkers": "ACTIVE and HALTED retained; no restoration/retry/cleanup branch"
+  },
+  "sourceAndGuards": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts",
+      "bytes": 44169,
+      "sha256": "de82e627018a708ea131fa7a23ac0a02d21413e88cf09fa11e759283ee4ea6c9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/autoCompact.ts",
+      "bytes": 15090,
+      "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceCompactionValidation.ts",
+      "bytes": 11644,
+      "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    }
+  ],
+  "phaseRegularMembers": [
+    "owned-group-after-exit.json",
+    "owned-process.json",
+    "stdout-stderr.log"
+  ],
+  "commandReceiptAbsent": true,
+  "ownedProcessUncertaintyResolved": true,
+  "admissionConclusion": "The recorded owned compiler child and group are positively closed. A separately authorized test-only type repair and new namespace may be prepared with this certificate, original markers and a fresh zero-signal closure precondition pinned. The old halted namespace must not be resumed or erased, and exit2 remains failed evidence.",
+  "oldNamespaceMayResume": false,
+  "typecheckPassed": false,
+  "signalsOtherThanZeroSent": false,
+  "runtimeOrProductExecutedByAuditor": false,
+  "repositoryWrites": false,
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "limits": [
+    "Positive absence covers only this owned PID/PGID at the recorded observations, not all possible detached descendants.",
+    "The compiler failed; this audit establishes natural closure and preservation only.",
+    "The wrapper exit70 is corroborated by the certificate, preserved exception marker and exact wrapper control flow, not an invented normal command receipt.",
+    "No source fix, guard change, harness relaxation, retry or restoration was performed."
+  ]
+}

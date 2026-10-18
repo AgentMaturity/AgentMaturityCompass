@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:docs-drift
+> node scripts/docs-drift-check.mjs
+
+Docs drift check passed (336 files scanned).

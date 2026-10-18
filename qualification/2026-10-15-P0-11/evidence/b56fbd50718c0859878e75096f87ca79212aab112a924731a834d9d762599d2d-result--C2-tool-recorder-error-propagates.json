@@ -1,0 +1,104 @@
+{
+  "control": "C2-tool-recorder-error-propagates",
+  "baseline": {
+    "classification": "passed",
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "mutant": {
+    "classification": "body-failures-observed",
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "failures": [
+      {
+        "file": "tests/toolEvidenceRecording.test.ts",
+        "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+        "failureKind": "exact-genuine-recorder-error-propagation",
+        "rawFailureMessages": [
+          "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "observerErrors": [
+          {
+            "stack": "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+            "message": "the evidence store is unreachable",
+            "constructor": "Function<Error>",
+            "name": "Error",
+            "toString": "Function<toString>",
+            "stacks": [
+              {
+                "method": "Object.record",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                "line": 202,
+                "column": 15
+              },
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts",
+                "line": 306,
+                "column": 19
+              },
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                "line": 206,
+                "column": 21
+              }
+            ]
+          }
+        ],
+        "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+      }
+    ],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "restored": {
+    "classification": "passed",
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "finalPreservation": {
+    "capturedUtc": "2026-10-15T06:44:12.298908+00:00",
+    "parentTrackedChecked": 8362,
+    "parentCompiledChecked": 4529,
+    "privateFilesChecked": 12891,
+    "parentDelta": [],
+    "privateUnexpectedDelta": [],
+    "immutableExternalDelta": [],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538824643,
+      "nlink": 1,
+      "mode": 493
+    },
+    "expectedSourceDeviations": [],
+    "privateHashMapSha256": "077f8f1bff61ce2e7548c4b4284a6be59651bee4392b17adad54ad39dcc23961",
+    "processBoundary": "File bytes only; dependency/cache universe and detached descendants are not proven absent."
+  },
+  "restoredExactly": true,
+  "verdict": "body-error-or-assertion-sensitivity-awaiting-root-attribution",
+  "corpusKey": "recording",
+  "historicalLiteralBoundary": "Distinct semantic/source guard control.",
+  "limits": [
+    "No compiler, dist edit, import rewrite or original criteria/config/deadline change.",
+    "Each phase repeats its actual original seven cases; no additional unique tests or full P011 acceptance.",
+    "Ordinary recorder fixture batch transaction completes before queue; nested callers may use a savepoint, not an outer durable commit.",
+    "Only the owned process group was probed after exit; detached descendants are not universally excluded.",
+    "The root observer precedes global teardown; raw process exit and full streams were separately checked."
+  ]
+}

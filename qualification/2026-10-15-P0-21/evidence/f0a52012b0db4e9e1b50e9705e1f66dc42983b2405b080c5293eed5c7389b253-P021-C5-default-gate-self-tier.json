@@ -1,0 +1,52 @@
+{
+  "authorization": "START_P021_CAUSAL_P021-C5-default-gate-self-tier",
+  "control": "P021-C5-default-gate-self-tier",
+  "closureRoot": "/private/tmp/p0-21-causal-qualification-20261015/closure",
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+  "setupPath": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+  "setupIndexPath": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+  "controllerPath": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+  "setupSha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d",
+  "controllerSha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68",
+  "proposalSha256": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2",
+  "sourceManifestSha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf",
+  "compiledManifestSha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+  "preservationSha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3",
+  "observerSha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+  "setupIndexSha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5",
+  "releasedUtc": "2026-10-15T05:23:05.167376+00:00",
+  "rootAuthor": "Root; user-authorized bounded P0-21 qualification only",
+  "staticCodeReview": {
+    "path": "/private/tmp/p0-21-controller-v3-code-static-review-20261015.json",
+    "bytes": 14466,
+    "sha256": "8b0f658b8e954c00edba3a527a1d297ae729589a33bfc187143e4c77584c7b35"
+  },
+  "sealedSetupReview": {
+    "path": "/private/tmp/p0-21-controller-v3-sealed-setup-review-20261015.json",
+    "bytes": 18494,
+    "sha256": "9a51eaa47f0be94fab4bf7dba9e2a2082298c079d0a0b51105d8c83ee3592fbd"
+  },
+  "rootInputVerification": {
+    "path": "/private/tmp/p0-21-causal-root-sealed-input-verification-20261015.json",
+    "bytes": 1193,
+    "sha256": "4b6b71bf946f3edfaf4a60ec24349c4f14c976374917a571826e12340ae9faa9"
+  },
+  "recipeReview": {
+    "path": "/private/tmp/p0-21-recipes-static-review-20261015.json",
+    "bytes": 35844,
+    "sha256": "ea8358143ca8508452a9ae99ee53903ab0d276e0ba17bc9c77d333d1d0c95135"
+  },
+  "releaseAuthor": {
+    "path": "/private/tmp/p0-21-author-causal-release-20261015.py",
+    "bytes": 3064,
+    "sha256": "d891aa8a37fcfc83bfb1b4dddd8925eb53c357190c3987ec11f7ea392e20dcfc"
+  },
+  "scope": "Only this complete source-mode original37 baseline/mutant/restored control; no source ownership transfer or qualification waiver.",
+  "priorControlsCompleted": [
+    "P021-C1-likert-origin",
+    "P021-C2-L2-threshold",
+    "P021-C3-numeric-self-eligible-cap",
+    "P021-C4-base-L3-self-tier"
+  ],
+  "boundaries": "Borrowed dependencies; seven-key child environment; no independent install or OS isolation. Actual failures, source frames, masking and survivors require root review. No original criteria/config/deadlines/dist changes or signals/unsafe restoration."
+}

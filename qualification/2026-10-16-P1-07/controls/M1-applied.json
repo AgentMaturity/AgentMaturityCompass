@@ -1,0 +1,21 @@
+{
+  "schema": "p107-owned-source-control-operation/1",
+  "at": "2026-10-16T18:13:45.537897+00:00",
+  "operation": "apply",
+  "number": 1,
+  "name": "M1-highest-pass",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "target": "src/diagnostic/levelSemantics.ts",
+  "actualBytes": 12304,
+  "actualSha256": "923d8204905bb192a266857be27ec7a22842e0b1533f62fbf46057db169543fb",
+  "expected": {
+    "bytes": 12304,
+    "sha256": "923d8204905bb192a266857be27ec7a22842e0b1533f62fbf46057db169543fb"
+  },
+  "otherBound32InputsExactExceptOwnedTarget": true,
+  "allThreeNativePinsExact": true,
+  "sourceAndBorrowedCheckoutUnmodified": true,
+  "compiledOutputMutation": false,
+  "forceResetRestoreNoVerifyBaselineOrWaiver": false
+}

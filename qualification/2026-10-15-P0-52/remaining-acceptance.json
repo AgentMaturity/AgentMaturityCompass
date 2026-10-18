@@ -1,0 +1,58 @@
+{
+  "status": "bounded qualification completed with seven active failures; not Done",
+  "failures": [
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked inbox before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked publisher before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked federation-root before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains replay refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains rollback refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's replay refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's rollback refusal",
+      "status": "failed"
+    }
+  ],
+  "sourceRepair": "Not applied. Root requested a scope decision for only federationSync.ts because the generic historical Claude reservation is unresolved. This is an ownership uncertainty, not a freeze refusal or claim that the historical file supersedes current human authority.",
+  "open": [
+    "seven destination/history failures",
+    "current source mutation witnesses",
+    "cross-store later IO and concurrent destination replacement guarantees",
+    "Node24 and whole-suite/coverage on exact source",
+    "hosted fullCI/release gate",
+    "source-quality1269duplicates/2780dead-code"
+  ],
+  "inherited": "P0-51 three trust precedence conflicts and30 formal API refusals; P0-22 two successful empty arrays; P0-23 seven API/Studio failures; P0-29 skipped successor debt remain active and are not counted in these418 cases.",
+  "observerFailures": [
+    "First history fixture assumed a nested export root:13 setup failures, corrected only to actual flat root;9pass4fail afterward.",
+    "First final test run overlapped normal build cleanup:401pass/17pending with setup failures, invalid for product qualification. Rebuilt then reran separately:411pass7fail0pending/todo.",
+    "Initial CLI harness checked ten exit codes and recorded effects; corrected harness adds ten executable effect assertions, verified result and exact member checks plus real HEAD/module pins. Both phases retained."
+  ],
+  "freeze": "Normal check passed at1236/1236 commands,41 packs,632 questions; no P0-52 exception or guard change.",
+  "nextKey": "P0-54",
+  "nextScope": "Qualification of accepted guard wiring only, before P0-55 per Workstreams, due12October. A4/shared routes remain read-only; metrics duty stays P0-41."
+}

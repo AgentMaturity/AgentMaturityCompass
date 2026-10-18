@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "commands/p126-metadata-quality-after-diagnostic/stdout-stderr.log",
+    "bytes": 114,
+    "sha256": "6f69a017bd39461882a60c85cd5e338eb68ee06ebb22a54319e550d5cfc650ab"
+  },
+  "dataBase64": "eyJyb2xlIjoiYWZ0ZXIiLCJ0b29sIjoia25pcCIsInZlcnNpb24iOiI2LjM5LjAiLCJmaW5kaW5ncyI6MjcyMywiZGlhZ25vc3RpY09ubHkiOnRydWUsInF1YWxpdHlHYXRlUGFzc2VkIjpmYWxzZX0K",
+  "boundary": "Exact original bytes, including whitespace, are preserved by base64. Decode and verify original.bytes and original.sha256. The original producer remains retained privately; no normalization or command-result change."
+}

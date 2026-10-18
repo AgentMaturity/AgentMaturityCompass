@@ -1,0 +1,41 @@
+{
+  "schema": "p125-next-fallback-candidate-seal/1",
+  "at": "2026-10-16T22:00:46.733035+00:00",
+  "status": "sealed private unexecuted candidate",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/tsaFallback.test.ts",
+      "bytes": 16974,
+      "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+      "readScope": "sealed unexecuted private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/README.md",
+      "bytes": 3062,
+      "sha256": "575c1d5457baf0d06b243d12343ebef13cdd1c97596889e81c7a8479ee421c3c",
+      "readScope": "sealed unexecuted private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/matrix.json",
+      "bytes": 4886,
+      "sha256": "e160d9ae06b6c6395557795f1ef398feb971c69f77f06c890e5f2de8fb029cd0",
+      "readScope": "sealed unexecuted private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/author-static-review.json",
+      "bytes": 1742,
+      "sha256": "66730365bf85ae1398d2edf5b16a2f682a938317a251895f9e594e95cf9f39f0",
+      "readScope": "sealed unexecuted private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/input-pins.json",
+      "bytes": 14801,
+      "sha256": "c4dce3f64410fa3bdd37f67542a8ab89802d4dc3dc95d77fcfa9c5a603b6a016",
+      "readScope": "sealed unexecuted private proposal output"
+    }
+  ],
+  "sourceAllocation": false,
+  "executedParsedOrCompiled": false,
+  "sourceCheckoutIndexOrQAWrites": false,
+  "rootReviewAndFreshAdmissionRequired": true
+}

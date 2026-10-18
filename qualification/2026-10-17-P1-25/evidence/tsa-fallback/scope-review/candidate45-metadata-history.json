@@ -1,0 +1,44 @@
+{
+  "schema": "p125f-old-candidate45-history-classification/1",
+  "currentExactPins": 43,
+  "authorizedHistoricalMetadataSuccessors": 2,
+  "unexpectedDrift": [],
+  "gitProofs": [
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/README.md",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "5beb3eae69b08f2e895520c7f459e1465780beeb:qualification/2026-10-17-P1-25/README.md"
+      ],
+      "exit": 0,
+      "bytes": 9421,
+      "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+      "matchesOldCandidate": true
+    },
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "5beb3eae69b08f2e895520c7f459e1465780beeb:qualification/2026-10-17-P1-25/receipt.json"
+      ],
+      "exit": 0,
+      "bytes": 66214,
+      "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496",
+      "matchesOldCandidate": true
+    }
+  ],
+  "originalManifest": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/input-pins.json",
+    "bytes": 11482,
+    "sha256": "fe7e0d968c15e2c27274d08eabb8e990b892e1c0fce6d043e201036e2976b6d4"
+  },
+  "oldManifestAndSealsNotRewritten": true
+}

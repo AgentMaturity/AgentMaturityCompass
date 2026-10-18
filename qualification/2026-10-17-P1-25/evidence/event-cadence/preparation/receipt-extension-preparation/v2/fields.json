@@ -1,0 +1,74 @@
+{
+  "schema": "p125ec-private-extension-v2-field-contract/1",
+  "futureManifestSchema": "p125ec-private-extension-input/1",
+  "allRootFlagsFalseAndRuntimePinsNullInTemplate": true,
+  "requiredRoles": [
+    "sourceCheckpoint",
+    "sourceOutcome",
+    "freshBinding",
+    "canonicalOutcome",
+    "m1Outcome",
+    "restore1Outcome",
+    "m2Outcome",
+    "restore2Outcome",
+    "independentChainReview",
+    "finalPreservation",
+    "wholeIssueGaps",
+    "protectedInputs",
+    "controlRootBindings"
+  ],
+  "controlOperators": [
+    "COUNT-CHECKPOINT-ROWS",
+    "STRICT-THRESHOLD"
+  ],
+  "baseRetentionContract": {
+    "futurePrivateBaseMustBeUnderC": true,
+    "sourceHead": "m.sourceCommit, actual current source80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+    "retainedRoot": "actual private base path supplied by root",
+    "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25",
+    "files": "exact1917-row list of relativePath/bytes/sha256",
+    "all1917Exact": true,
+    "prior1914NonIndexPayloads": true,
+    "prior214CommandsAnd2916OrderedPinsRetained": true,
+    "schema": "p125ec-prior-packet-byte-preservation/1",
+    "previousMetadataCommit": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+    "priorSemanticSourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+    "all1917SourceHeadBlobsExact": true
+  },
+  "sourceCheckpointSchema": "p125ec-source-checkpoint/1",
+  "sourceCheckpointCommitField": "sourceCommit",
+  "protectedSchema": "p125ec-runtime-protected-inputs-after-one-own-test-successor/1",
+  "protectedInitialPinKey": "initial161Pinset",
+  "protectedSuccessorKey": "oneAdmittedOwnSourceSuccessor",
+  "bindingSchema": "p125ec-actual-fresh-source-binding/1",
+  "sourceSelectionPinRequired": true,
+  "rootBindingsSchema": "p125ec-control-root-bindings/1",
+  "actionFields": [
+    "argv",
+    "startedUtc",
+    "endedUtc",
+    "exit",
+    "stdout",
+    "stderr",
+    "naturalDirectReturnObserved"
+  ],
+  "finalPreservationSchema": "p125ec-preservation-after-controls/1",
+  "peerSchema": "manifest-named actual completed peer schema, with blockers[] and exact source/root bindings; no report alias is manufactured.",
+  "noCurrentDiagnosticRole": true,
+  "prospectivePrefix": "evidence/event-cadence/",
+  "onlyExistingSuccessors": [
+    "README.md",
+    "receipt.json",
+    "assembly-inputs.json"
+  ],
+  "requiredLaterActualChecks": [
+    "independent helper/filled-manifest review",
+    "private and source validators",
+    "fresh hosted scope/D15/freeze as root admits",
+    "exact entire Git index blobs and changed path set",
+    "default staged and full-range whitespace against actual source checkpoint",
+    "sequential guarded ordinary commit",
+    "actual HEAD-only export and validator"
+  ],
+  "noLaterChecksCreditedByHelper": true
+}

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import { nativeTaskEndpoints, nativeTaskSchemas } from "../dist/studio/nativeTaskOpenapi.js";
 import { a4Endpoints, a4Schemas } from "../dist/studio/a4Openapi.js";
-import { API_RESULT_ROUTES, withClaimResponses } from "../dist/api/resultRouteRegistry.js";
+import { API_RESULT_ROUTES, claimResultOperation, withClaimResponses } from "../dist/api/resultRouteRegistry.js";
 
 function schema30(value) {
   if (Array.isArray(value)) return value.map(schema30);
@@ -85,6 +85,21 @@ let output = publishBlock(original, "SCHEMAS", schema30(nativeTaskSchemas()), 4,
 output = publishBlock(output, "PATHS", paths, 2, appendPaths);
 output = publishBlock(output, "SCHEMAS", schema30(a4Schemas()), 4, insertSchemas, "A4");
 output = publishBlock(output, "PATHS", a4Paths, 2, appendPaths, "A4");
+// P0-23: every registered result route is in the public document. Routes the hand-written part does not describe are
+// published as claim-labelled stubs (claimResultOperation); this block's own earlier output does not count as described.
+const RESULT_LABEL = "RESULT ROUTE", resultBegin = `  # BEGIN GENERATED ${RESULT_LABEL} PATHS\n`;
+const previousStart = original.indexOf(resultBegin), previousEnd = original.indexOf(`  # END GENERATED ${RESULT_LABEL} PATHS\n`);
+const previous = previousStart < 0 ? {} : YAML.parse(original.slice(previousStart + resultBegin.length, previousEnd)
+  .split("\n").map(line => line.slice(2)).join("\n")) ?? {};
+const shapeOf = (route) => route.replace(/^\/api(?=\/v1\/)/, "").replace(/:\w+|\{[^}]+\}/g, "{}");
+const described = new Set(Object.keys(document.paths).filter(key => !Object.hasOwn(previous, key)).map(shapeOf));
+const resultPaths = {};
+for (const route of API_RESULT_ROUTES) {
+  if (described.has(shapeOf(route.path))) continue;
+  const key = route.path.replace(/^\/api\//, "/").replace(/:(\w+)/g, "{$1}");
+  resultPaths[key] = { ...resultPaths[key], [route.method.toLowerCase()]: schema30(claimResultOperation(route, true)) };
+}
+output = publishBlock(output, "PATHS", resultPaths, 2, appendPaths, RESULT_LABEL);
 const proofHeaders = paths["/v1/native-tasks"].post.parameters.filter(parameter => parameter.in === "header");
 for (const action of ["decide", "cancel"]) {
   output = publishBlock(output, `APPROVAL ${action.toUpperCase()} HEADERS`, proofHeaders, 8, (source, block) => {

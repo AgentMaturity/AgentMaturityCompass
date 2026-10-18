@@ -82,6 +82,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
   // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
   "source_unavailable", "value_contract",
+  // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
+  // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
+  "dataflow",
   // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
   "signed-tools-yaml",
 ]);

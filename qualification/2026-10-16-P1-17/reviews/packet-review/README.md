@@ -1,0 +1,5 @@
+The inspected 26-file P1-17 packet has no blocking finding. The receipt binds source commit `3ebf7cbae4023a130ce9db5c9fe304010cd2e5db` and counts only the fresh 68 passing cases. Copied raw and observer records agree for all eight runs: the original 65/64/1 red, the three private mutant outcomes of 62/6, 65/3 and 66/2, and three 68/68 restorations. All 26 command triples and receipt artifact hashes match, including eight recorded nonzero exits.
+
+This snapshot contains 932,656 bytes across 26 regular files. Static inspection found no symlinks or obvious secret bodies. Root's later peer-review and metadata-error additions need a final size and hash check. The metadata error record correctly gives no qualification credit to the earlier validator exit against a missing parent with zero receipts; actual folder validation remains pending.
+
+The packet preserves source-versus-built limits, masked assertions, dated precommit observations, unwaived quality failures and formal acceptance gaps. This review executed no AMC command, validator, SQL or test and wrote nothing to the repository. All review reads are finished.

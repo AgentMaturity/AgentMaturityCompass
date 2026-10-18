@@ -1,0 +1,938 @@
+{
+  "scope": {
+    "at": "2026-10-16T13:49:53.478179+00:00",
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "base": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "branch": "codex/p2-07-scim-handler-qualification",
+    "exactSourceTestDocsPaths": [
+      "src/identity/scim/scimUsers.ts",
+      "src/identity/scim/scimGroups.ts",
+      "src/identity/scim/scimPatch.ts",
+      "tests/identity/scimHardening.test.ts",
+      "docs/SCIM.md",
+      ".changeset/p2-07-scim-handler-qualification.md"
+    ],
+    "originals": [
+      {
+        "relative": "src/identity/scim/scimUsers.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/identity/scim/scimUsers.ts",
+          "bytes": 8785,
+          "sha256": "26a58e8b615cd199fbfd52770e13036c85c7808f9d652c95a57a11f540885a60"
+        },
+        "private": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/source-originals/src/identity/scim/scimUsers.ts",
+          "bytes": 8785,
+          "sha256": "26a58e8b615cd199fbfd52770e13036c85c7808f9d652c95a57a11f540885a60"
+        }
+      },
+      {
+        "relative": "src/identity/scim/scimGroups.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/identity/scim/scimGroups.ts",
+          "bytes": 7267,
+          "sha256": "4167136fb7173ceac4a4168e64024d1b6fe3d1293f2c1d0a6b496d2da12ab154"
+        },
+        "private": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/source-originals/src/identity/scim/scimGroups.ts",
+          "bytes": 7267,
+          "sha256": "4167136fb7173ceac4a4168e64024d1b6fe3d1293f2c1d0a6b496d2da12ab154"
+        }
+      },
+      {
+        "relative": "src/identity/scim/scimPatch.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/identity/scim/scimPatch.ts",
+          "bytes": 1038,
+          "sha256": "cb998c77e0a2517559adec8b0080eed8dac8a9c19d463ccc36bae267faa046ef"
+        },
+        "private": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/source-originals/src/identity/scim/scimPatch.ts",
+          "bytes": 1038,
+          "sha256": "cb998c77e0a2517559adec8b0080eed8dac8a9c19d463ccc36bae267faa046ef"
+        }
+      },
+      {
+        "relative": "docs/SCIM.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/SCIM.md",
+          "bytes": 1659,
+          "sha256": "d104b45f642f98696d91712270d982e8ffcaa463931c400b6b2f11dd67479ff5"
+        },
+        "private": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/source-originals/docs/SCIM.md",
+          "bytes": 1659,
+          "sha256": "d104b45f642f98696d91712270d982e8ffcaa463931c400b6b2f11dd67479ff5"
+        }
+      }
+    ],
+    "registeredRoots": 170,
+    "previousRegisteredRoots": 169,
+    "onlyAddedRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "registries": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "stdout": "worktree /Users/sid/AgentMaturityCompass\nHEAD 5ea5e866a42acd5c8228a712e9b8c1d9f18c745c\nbranch refs/heads/main\n\nworktree /Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass\nHEAD 5effb59c8f5a31e7e6b8c7285d4f94986af4ea4f\nbranch refs/heads/codex/p2-28-claude-feedback\n\nworktree /Users/sid/.codex/worktrees/finance-fixture/AgentMaturityCompass\nHEAD b6d199ff55afdb459962c2357b39f5523ab441d5\nbranch refs/heads/rtd/p2-02-protected-data-admission\n\nworktree /Users/sid/.codex/worktrees/global-regulatory-guidance/AgentMaturityCompass\nHEAD 044abba186cca9003fec1a73f1a87e55ea40d98a\nbranch refs/heads/codex/global-regulatory-guidance\n\nworktree /Users/sid/.codex/worktrees/low-priority-jurisdictions/AgentMaturityCompass\nHEAD e25cce1a03b17a023d4aadfbcdb71dfe653db87a\nbranch refs/heads/codex/p3-12-watch-jurisdictions\n\nworktree /Users/sid/.codex/worktrees/oidc-hardening/AgentMaturityCompass\nHEAD a0a0f28e51f9591e23948f357c759e68e046f893\nbranch refs/heads/codex/p2-07-oidc-hardening\n\nworktree /Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass\nHEAD 33a8e20bf340f2f9c717bb813f95de3b648a4ad4\nbranch refs/heads/codex/p0-11-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass\nHEAD ba7726c79133ba41295500fa8eff1f6b7a9f1fab\nbranch refs/heads/codex/p0-18-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass\nHEAD 6e50f76734fcf10001f843c87f685a044824bfd8\nbranch refs/heads/codex/p0-19-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass\nHEAD e901e9816a4bdff835ea3c71fcec035535049e9d\nbranch refs/heads/codex/p0-20-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass\nHEAD 2024f25c79973987b44a4a1298488d55ee0d6227\nbranch refs/heads/codex/p0-21-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass\nHEAD 00fd180431317c253da6bcbd38f564d1a7f4f26b\nbranch refs/heads/codex/p0-22-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass\nHEAD 874e1131d3ec078ca03b6b6629c1b69dbb877baa\nbranch refs/heads/codex/p0-23-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass\nHEAD dc12702718bbbfbf7f37ef46d7df6e19c17e08c7\nbranch refs/heads/codex/p0-24-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass\nHEAD f58d88d80ab490490184354cc8665631d6999cc1\nbranch refs/heads/codex/p0-25-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass\nHEAD c89c5a6e6ad5f6af8f24dede3243a59a127c3bcc\nbranch refs/heads/codex/p0-27-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass\nHEAD add3b6f59390d74b9561a739feb53169e70b19db\nbranch refs/heads/codex/p0-27-node-runtime-compatibility\n\nworktree /Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass\nHEAD 8b8f480ce91a4d2bd0d07ed0489c86f9f4043994\nbranch refs/heads/codex/p0-29-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass\nHEAD 2d552741d727aaf3a26759b9df9343f7804d157a\nbranch refs/heads/codex/p0-30-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass\nHEAD 559fafc4fb52e586606f5fdf471ce65f44c5cf58\nbranch refs/heads/codex/p0-41-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass\nHEAD fa3c3e5554f8a4013fb50cc373a4b5d644e6924e\nbranch refs/heads/codex/p0-45-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass\nHEAD 2dedd6c80af9b953ab8aa10a858f4f4644e30d63\nbranch refs/heads/codex/p0-46-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass\nHEAD b552b69cd220d7d73b63a58685f77bb2bbb26c8f\ndetached\n\nworktree /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass\nHEAD c4be164ea12d358ea30451391a6df29429fc6a7e\ndetached\n\nworktree /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass\nHEAD 13bb8f543b1b3894426b06f16e25078753b4c605\nbranch refs/heads/codex/p0-47-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass\nHEAD 22bd7f35f151249557b06c43fe9a2dd56ecfafe5\nbranch refs/heads/codex/p0-48-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-49-qualification/AgentMaturityCompass\nHEAD ab475ec81dc1f83745221efb34d35b9838428602\nbranch refs/heads/codex/p0-49-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass\nHEAD 941f5d243d76dffb7e113856529f3c35063a183e\nbranch refs/heads/codex/p0-50-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass\nHEAD d11fcfc66f871b0888197d85771f8d47c836dfea\nbranch refs/heads/codex/p0-51-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass\nHEAD 06217dd2bcdc1817eb2b189b7571bd3ed27c0950\nbranch refs/heads/codex/p0-52-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass\nHEAD 4b6756224d62b346946bc734abb9536431020f03\nbranch refs/heads/codex/p0-54-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass\nHEAD 7293e9596f6ac529c66546becbb09fb0a628cd50\nbranch refs/heads/codex/p1-01-current-qualification\n\nworktree /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\nHEAD bf3b7766e7b2e70d8e72135773a5c0e612ae013d\nbranch refs/heads/codex/p2-07-provider-validation\n\nworktree /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass\nHEAD bf3b7766e7b2e70d8e72135773a5c0e612ae013d\nbranch refs/heads/codex/p2-07-scim-handler-qualification\n\nworktree /Users/sid/.codex/worktrees/toolhub-journal/AgentMaturityCompass\nHEAD 1e493e80f07be0a8bad482cf83e6192b5fa796a1\nbranch refs/heads/codex/p1-54-claude-feedback\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-operator\nHEAD 6ee3a0e0719f38b87b5177fbda17b46f1ffe3653\nbranch refs/heads/codex/amc-1545-stop-operator\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-runtime\nHEAD 0d1565d4cafe7aad2467a0d7f6ea6e7410a5d0e7\nbranch refs/heads/codex/amc-1545-stop-runtime\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1546-agent-auth-tests\nHEAD 7c18ce6490bfe391a42dbaf910d1fe8d38ad2e7a\nbranch refs/heads/codex/amc-1546-agent-auth-tests\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-lifecycle\nHEAD 7f2e38e3ed027e2bf4d52bea950cff4d2bccad25\nbranch refs/heads/codex/amc-1547-spill-lifecycle\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-mutation-prep\nHEAD f145ea1ee97b00db8643fb0de5e1355a9fd78228\nbranch refs/heads/codex/amc-1547-spill-mutation-prep\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-session-tests\nHEAD 603b9f37efd2a26369b791d060e6e6ae30d96bb3\nbranch refs/heads/codex/amc-1547-spill-session-tests\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-storage\nHEAD e89f4842892c1eae4e4acf6996c7d0d31a4b229e\nbranch refs/heads/codex/amc-1547-spill-storage\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-cancellation-candidate-prep\nHEAD 6c55771ca409ae34ef2efc2194e758f7995e4ebf\nbranch refs/heads/codex/amc-cancellation-candidate-prep\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/amc-stop-auth-mutation-prep\nHEAD 3f955a338a2d0a011926f6d4fefd33aeb2aee1d1\nbranch refs/heads/codex/amc-stop-auth-mutation-prep\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-closure-map\nHEAD 4967f97541140fcd5d5b18360e9953006c061500\nbranch refs/heads/codex/cos-closure-map\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-human-first-use\nHEAD 0030c2b5cf087291384859f8d0238055a2caff49\nbranch refs/heads/codex/cos-human-first-use\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-installed-spill\nHEAD a5987643ef6c26b01f687226fbc6a6709fc182cb\nbranch refs/heads/codex/cos-installed-spill\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-observer-guide\nHEAD 71a81a966188f044c124e09ccc6bca0a45ed9dfb\nbranch refs/heads/codex/cos-observer-guide\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-spill-boundaries\nHEAD 491a5077e83d889cc7c333a027ec27bbcde718ed\nbranch refs/heads/codex/cos-spill-boundaries\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-spill-commands\nHEAD 7c0f01bf73fb64845362bda20cd456e9bc6af31e\nbranch refs/heads/codex/cos-spill-commands\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/cos-study-capture\nHEAD 745893115193834ddbbadfd0accec37a69f71e72\nbranch refs/heads/codex/cos-study-capture\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane\nHEAD 3157fe22b01ec9e09563870afe08dabed86de51b\nbranch refs/heads/agent/domain-proof-lane\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0635\nHEAD ef23ca72a27f907d37eaee72e190f933510f15dd\nbranch refs/heads/agent/gap-0635\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0636\nHEAD 827e5d25ec00d0f9f0618b9f556e5ec8d78673f4\nbranch refs/heads/agent/gap-0636\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0637\nHEAD beec6117aaf0169d7d17922c649fbb9f00828b3e\nbranch refs/heads/agent/gap-0637\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0638\nHEAD dc839606c8f70c0206d61d22a6a91e6211e054a8\nbranch refs/heads/agent/gap-0638\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0639\nHEAD d05356313a2f9120aeeba64134fbc7b205c55766\nbranch refs/heads/agent/gap-0639\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0640\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0640\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0641\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0641\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0642\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0642\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0643\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0643\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0644\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0644\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0645\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0645\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0646\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0646\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0647\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0647\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0648\nHEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5\nbranch refs/heads/agent/gap-0648\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0649\nHEAD a984023ec0a11d2229ab533fed5fdbb2699f2348\nbranch refs/heads/agent/gap-0649\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0650\nHEAD 98da12c0a15d4a281c55bd3a92e3e2a1bf5a9604\nbranch refs/heads/agent/gap-0650\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0651\nHEAD 0cbffc03df5c3d583c9fc3ae4f093516ab79a7c6\nbranch refs/heads/agent/gap-0651\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0652\nHEAD d225299636418148b42217387fa82710aa86ebe3\nbranch refs/heads/agent/gap-0652\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0653\nHEAD 0020199ef90026390b95f2fe616b83f4c6739946\nbranch refs/heads/agent/gap-0653\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0654\nHEAD 2efcaa3e3c662afe0558dbc1065676a78b6a6e6c\nbranch refs/heads/agent/gap-0654\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0655\nHEAD 4af70f4d0fc97417b8ff954fca78cd7a69269aa2\nbranch refs/heads/agent/gap-0655\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0656\nHEAD d7cf71b21ec215125ccd1945e1237f99485b3bb8\nbranch refs/heads/agent/gap-0656\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0657\nHEAD 39606508fb979cdb87eb98ea9658cc78c79935a6\nbranch refs/heads/agent/gap-0657\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0658\nHEAD 2f587bdc942c3b45e53c56d8808c2a53bf230b4a\nbranch refs/heads/agent/gap-0658\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0659\nHEAD bfb4bbb2123cf87d72fd1dbb4b4517e0a496e004\nbranch refs/heads/agent/gap-0659\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0660\nHEAD 1cadbe4933350f4532c853fa870e5f36f3e5e76f\nbranch refs/heads/agent/gap-0660\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0661\nHEAD 17f595e252db6001031d016770bb345ac5fc179b\nbranch refs/heads/agent/gap-0661\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0662\nHEAD 15b5c0263beba6910fb78a222c5180e932b63fe0\nbranch refs/heads/agent/gap-0662\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0663\nHEAD fca3c0736661258725fd8a619af348413f3d0899\nbranch refs/heads/agent/gap-0663\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0664\nHEAD 6f52c9079b606ebd672f58d5ca8ed09eee9805b6\nbranch refs/heads/agent/gap-0664\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0665\nHEAD 00f73fa1c65bb8d9c95cf72848a3714fc1a0e2f3\nbranch refs/heads/agent/gap-0665\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0666\nHEAD b9d63bdb3facf3afed272c9c9d255f32727d1ff3\nbranch refs/heads/agent/gap-0666\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0667\nHEAD c2d11191f120d9884290235fb1f3df20656d9744\nbranch refs/heads/agent/gap-0667\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/gap-0668\nHEAD b253cc171f35eab4c06b0ca323b8f8924962097b\nbranch refs/heads/agent/gap-0668\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713\nHEAD 987f0de7a2ac87f64dbef61b7e5380b0a9ed974c\nbranch refs/heads/hermes/knowledge-refresh-20260713\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713\nHEAD ef5486c302c15d43504e30061cae3fc19b0f7784\nbranch refs/heads/hermes/state-of-art-20260713\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/interesting-haslett-d9efa9\nHEAD ed98e4335d56c519600e07767e9cd04a2e36ee2c\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713\nHEAD 360b41669cab760273f3199ba4eec2bc49d7f3ea\nbranch refs/heads/hermes/state-of-art-20260713-v2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/sweet-merkle-71246c\nHEAD 828df0dc6a7d652b2db0e6ba7035dd32c76e81f4\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/vigilant-merkle-2d8549\nHEAD 952ce02eb7245c968f1c87815851ac71da2a8ba4\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_0b845f07-2cd-4\nHEAD 43f61d5eaabccc5652e1021e439cefbed6901eae\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-17\nHEAD 580b1876dffde315590cf863c3c3c5ca48d7efcd\nbranch refs/heads/worktree-wf_3cbab9c8-0f5-17\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-18\nHEAD 84a422adb1554e0dfcd9019afb99f613125d4255\nbranch refs/heads/worktree-wf_3cbab9c8-0f5-18\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-19\nHEAD 9b1de17a0c4093d28a77abff3951a20bd20c2728\nbranch refs/heads/worktree-wf_3cbab9c8-0f5-19\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-20\nHEAD 3b243feb08a46bc3f0b3070377c5a0b6a3279085\nbranch refs/heads/worktree-wf_3cbab9c8-0f5-20\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-1\nHEAD 7180bd0c4e92d7ba2676758f4e6f72b391b6fe3c\nbranch refs/heads/worktree-wf_5210e2f4-3ea-1\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-10\nHEAD 8383e4cad89d31ac8f4cfffbfc54bec4bc459408\nbranch refs/heads/worktree-wf_5210e2f4-3ea-10\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-2\nHEAD 0d1bb10a32d73dfe8a9bf26524858774dc2511b5\nbranch refs/heads/worktree-wf_5210e2f4-3ea-2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-20\nHEAD fefc204a8f8c20310a158d748ec47e1c2c1e2d54\nbranch refs/heads/worktree-wf_5210e2f4-3ea-20\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-3\nHEAD a54b88fc94fc181a87c3d1d1bff9160040589610\nbranch refs/heads/worktree-wf_5210e2f4-3ea-3\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-4\nHEAD 76569f23cf34253134f220111701355f05656f99\nbranch refs/heads/worktree-wf_5210e2f4-3ea-4\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-5\nHEAD 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0\nbranch refs/heads/worktree-wf_5210e2f4-3ea-5\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-6\nHEAD 653e3eeeb429b730d53963c2b6c86b91e09926dc\nbranch refs/heads/worktree-wf_5210e2f4-3ea-6\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-7\nHEAD 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347\nbranch refs/heads/worktree-wf_5210e2f4-3ea-7\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-8\nHEAD 0c7421f8413adb41b5ed40996501372dc3c4fecc\nbranch refs/heads/worktree-wf_5210e2f4-3ea-8\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-9\nHEAD 5a29f5c45d13dfd23a8165d5355ddbe959c0164c\nbranch refs/heads/worktree-wf_5210e2f4-3ea-9\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-15\nHEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f\nbranch refs/heads/worktree-wf_75d332bf-2ec-15\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-16\nHEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f\nbranch refs/heads/worktree-wf_75d332bf-2ec-16\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-5\nHEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f\nbranch refs/heads/worktree-wf_75d332bf-2ec-5\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-6\nHEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f\nbranch refs/heads/worktree-wf_75d332bf-2ec-6\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-5\nHEAD 43f61d5eaabccc5652e1021e439cefbed6901eae\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-6\nHEAD 43f61d5eaabccc5652e1021e439cefbed6901eae\ndetached\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-1\nHEAD 67d73223897008ca4ed8baf81c970020b4bf944d\nbranch refs/heads/worktree-wf_b05b1ca6-169-1\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-10\nHEAD 1962e06cf3b82e46811305c6583478dffe06edf1\nbranch refs/heads/worktree-wf_b05b1ca6-169-10\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-2\nHEAD f2387813bc4f5c6fa6cbd26c4a28e0c21ba57c44\nbranch refs/heads/worktree-wf_b05b1ca6-169-2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-3\nHEAD aa918c78447642303198036525818eb5a98add98\nbranch refs/heads/worktree-wf_b05b1ca6-169-3\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-4\nHEAD 1bfcf99cdc4788d4d3f29f741e8e3146b0f995d9\nbranch refs/heads/worktree-wf_b05b1ca6-169-4\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-5\nHEAD 857b4b63b4f3595fb698cdf0c83b0927c1eb9818\nbranch refs/heads/worktree-wf_b05b1ca6-169-5\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-6\nHEAD 725ccc39c4eff49556831e7096122c926f5e697d\nbranch refs/heads/worktree-wf_b05b1ca6-169-6\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-7\nHEAD bc23de20e2a7306538cb043acc0ffb77ae9e493c\nbranch refs/heads/worktree-wf_b05b1ca6-169-7\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-8\nHEAD 2d1948c04c6cde8907e2d229424d0434e808cec3\nbranch refs/heads/worktree-wf_b05b1ca6-169-8\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-9\nHEAD f4441b065a645ab621d8905bf7715710377c7009\nbranch refs/heads/worktree-wf_b05b1ca6-169-9\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-1\nHEAD a40829277d194ef787f4877873b213f53643b7fa\nbranch refs/heads/worktree-wf_bea95acb-47c-1\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-2\nHEAD 96e04e7b6db40b876bf8998b4f0e1f28c5187913\nbranch refs/heads/worktree-wf_bea95acb-47c-2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-3\nHEAD 1c9bf11f082b23e6bb538aee88156ac37115f0d6\nbranch refs/heads/worktree-wf_bea95acb-47c-3\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-4\nHEAD daf2633cb88f531a93bcae6cab505ea784ee6b82\nbranch refs/heads/worktree-wf_bea95acb-47c-4\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-1\nHEAD 0b72371f26c560d0a92a67a7e8c0eab1663c33fe\nbranch refs/heads/worktree-wf_fc54d4b0-c89-1\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-2\nHEAD 91b434b825fa59bbedaef79e0eb0d209c200c8d8\nbranch refs/heads/worktree-wf_fc54d4b0-c89-2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-3\nHEAD 8ceeaa6565a864910182c569915c6a54a8038c53\nbranch refs/heads/worktree-wf_fc54d4b0-c89-3\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-4\nHEAD ed9b45a252c76ad2c260dd7226b8d50dbe088a32\nbranch refs/heads/worktree-wf_fc54d4b0-c89-4\n\nworktree /Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f\nHEAD fc447dd1232a5b021530aa175f2bccbc89303da3\nbranch refs/heads/rtd/p1-59-enforce-graph-digest\n\n"
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "stdout": "worktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone\nHEAD 990cb586fb481bb7db75977a4e5d332c6fd1ddb4\nbranch refs/heads/int\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014\nHEAD 7d5d8335bf973900fb9a9d9d331471b1b366ef8b\nbranch refs/heads/codex/p0-33-current-qualification\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/combine1\nHEAD 5cc3693e2d6d2f1332b04b6e09d0acf34425cab7\nbranch refs/heads/rtd/combine1-int-pending-main\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-14\nHEAD f46489331ae58bfb53020ae2f2916d3ec7421c33\nbranch refs/heads/rtd/p0-14-slice-c-deploy-hardening\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-26\nHEAD 5ea85c31466d22b237f3d87168e4d1eb5e7e3941\nbranch refs/heads/rtd/p0-26-f5-drop-review\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28\nHEAD c6cf1a6e4f5ebb24b7bac1476aebf850fb6f504b\nbranch refs/heads/rtd/p0-28-docs-truth-reset\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28f\nHEAD 6fc6ffa5bdd3e21b8fc5fa6328460405f9d73835\nbranch refs/heads/rtd/p0-28f-claim-truth-fixes\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30\nHEAD 16cc087453f8bf7305c91233ab1131b8ea67f285\nbranch refs/heads/rtd/p0-30-security-mutations\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30f\nHEAD 796c42935e48a8aa53d4cc4b767b60e108e4fe28\nbranch refs/heads/rtd/p0-30f-lease-hardening\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31\nHEAD 42562deed4cd82cce6011a87c224961b17065aad\nbranch refs/heads/rtd/p0-31-suite-green\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b\nHEAD cfef81f415936cba7916d42c782bcabddac23d30\nbranch refs/heads/rtd/p0-31b-installed-acceptance\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31c\nHEAD f68a42d7ef2ebef6b66590b30c0cf1fa7821e8b8\nbranch refs/heads/rtd/p0-31c-suite-green-2\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-32\nHEAD 52240a5d4c4220c7ff8c647430ad5a0ba40b17fb\nbranch refs/heads/rtd/p0-32-done-contract\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-34\nHEAD f260723ee888aa929e3f97426bddc6545bf559a8\nbranch refs/heads/rtd/p0-34-release-surface\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-35\nHEAD 4193b0fcc9d915cc370738f264abfde51f6b33be\nbranch refs/heads/rtd/p0-35-image-digests-quickstart\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36\nHEAD 1d12e46ff0a3a05c1e7e0d91c9e3909d497b1b8b\nbranch refs/heads/rtd/p0-36-advisory-draft\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36f\nHEAD dab30cf87d954017a40dc4b774ad7c1d5dcc0b5c\nbranch refs/heads/rtd/p0-36f-vault-cert-followups\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-56\nHEAD 8e9030a879124f650b08bb01a5f2527e23d56f57\nbranch refs/heads/rtd/p0-56-acceptance-followups\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-06\nHEAD 2df63f9b52b3b95b7f52b01c5a3de625e18615a1\nbranch refs/heads/rtd/p1-06-pinned-issuer-verifier\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-08\nHEAD 3654570b14e71c01dcb4ec66040a485d5634cc76\nbranch refs/heads/rtd/p1-08-key-lifecycle\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-14\nHEAD 4d2a68ac77cf5288abea6dc93ff804a84379fbc9\nbranch refs/heads/rtd/p1-14-layer0-baseline\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-18\nHEAD d12a5ae793069de76e110347cc65f8be37d89889\nbranch refs/heads/rtd/p1-18-wealth-overlay\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-22\nHEAD b79bf535fe0c6df69a913c3aba1f4f85940a3e40\nbranch refs/heads/rtd/p1-22-pi-tool-call-package\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-23\nHEAD 585b5212a93e50c2f06bc07c3008a25d3a95b114\nbranch refs/heads/rtd/p1-23-claude-code-hooks\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-27\nHEAD 9429437a752bc76b75659e7fb53c38857b04cdcb\nbranch refs/heads/rtd/p1-27-intoto-aibom\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-40\nHEAD 6f8ea1bd86dbee5c4cd79dfd4bc10c64a539f30d\nbranch refs/heads/rtd/p1-40-ts-sdk-starter-profiles\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-41\nHEAD 079b4e852486bc6c5bc55b2df3f1d6ddef2130a2\nbranch refs/heads/rtd/p1-41-weekly-release-train\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-48\nHEAD b4677a5fbc351b91bdd20dbca8ec735a864ded57\nbranch refs/heads/rtd/p1-48-adversarial-effects-suite\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-52\nHEAD db45d558799a5872e55dc0d42abdb7e1aeb2ac71\nbranch refs/heads/rtd/p1-52-source-quality-ratchet\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-78\nHEAD 4c35fa283281d137cc9b0b4d79794ad4fe475caf\nbranch refs/heads/rtd/p1-78-layer0-enforcement-gaps\n\nworktree /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p2-01t\nHEAD 1bb9c83edeb102a06e325e1711c07140fa7d90f0\nbranch refs/heads/rtd/p2-01t-legal-hold-test\n\n"
+      },
+      {
+        "root": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch",
+        "stdout": "worktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/main\n\nworktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p0-29-gap-reconciliation\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/rtd/p0-29-gap-reconciliation\n\nworktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p1-34-catalog-currency\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/rtd/p1-34-catalog-currency\n\nworktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/rtd/p2-07-scim-patch\n\nworktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-18-oscal-v1\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/rtd/p2-18-oscal-v1\n\nworktree /Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p3-12-source-reconciliation\nHEAD 55a5f121d50647c0b87f1f705586cf12e35784a2\nbranch refs/heads/rtd/p3-12-source-reconciliation\n\n"
+      }
+    ],
+    "freshRootsRechecked": 3,
+    "previousFilePresenceAndHashChecks": 1032,
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "donorPinsPreserved": [
+      {
+        "expected": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/docs/SCIM.md",
+          "bytes": 5496,
+          "sha256": "241a05ec886d7aedfe773a630ed5df0a6ff3bb17d18d71ce2eb9c8acb4b63e9c"
+        },
+        "actual": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/docs/SCIM.md",
+          "bytes": 5496,
+          "sha256": "241a05ec886d7aedfe773a630ed5df0a6ff3bb17d18d71ce2eb9c8acb4b63e9c"
+        },
+        "matches": true
+      },
+      {
+        "expected": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/identityConfig.ts",
+          "bytes": 13663,
+          "sha256": "ee346b97f40e07c752137aa1ef697a7d5dba824b1c06fc181138f0a151b74f28"
+        },
+        "actual": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/identityConfig.ts",
+          "bytes": 13663,
+          "sha256": "ee346b97f40e07c752137aa1ef697a7d5dba824b1c06fc181138f0a151b74f28"
+        },
+        "matches": true
+      },
+      {
+        "expected": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimGroups.ts",
+          "bytes": 8432,
+          "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+        },
+        "actual": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimGroups.ts",
+          "bytes": 8432,
+          "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+        },
+        "matches": true
+      },
+      {
+        "expected": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimPatch.ts",
+          "bytes": 1158,
+          "sha256": "69da6e8cae202d9d6c086c7cfeaa12f9d5119a32fee000e6b14f6ebd6e300cc6"
+        },
+        "actual": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimPatch.ts",
+          "bytes": 1158,
+          "sha256": "69da6e8cae202d9d6c086c7cfeaa12f9d5119a32fee000e6b14f6ebd6e300cc6"
+        },
+        "matches": true
+      },
+      {
+        "expected": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimUsers.ts",
+          "bytes": 10295,
+          "sha256": "9d651393ea1c59f764ca66437a18c6438791084384c8a18ca278791004228c62"
+        },
+        "actual": {
+          "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/src/identity/scim/scimUsers.ts",
+          "bytes": 10295,
+          "sha256": "9d651393ea1c59f764ca66437a18c6438791084384c8a18ca278791004228c62"
+        },
+        "matches": true
+      }
+    ],
+    "ordinaryD15Needs": "none",
+    "preflight": {
+      "p207s-pre-write-d15": {
+        "phase": "p207s-pre-write-d15",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths src/identity/scim/scimUsers.ts src/identity/scim/scimGroups.ts src/identity/scim/scimPatch.ts tests/identity/scimHardening.test.ts docs/SCIM.md .changeset/p2-07-scim-handler-qualification.md",
+        "exit": 0,
+        "durationMs": 353,
+        "startedUtc": "2026-10-16T13:47:08.874593+00:00",
+        "endedUtc": "2026-10-16T13:47:09.239280+00:00",
+        "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-pre-write-d15/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 64894,
+          "ownedPgid": 64894,
+          "observedPgidAfterLaunch": 64894,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "exec",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+            "--paths",
+            "src/identity/scim/scimUsers.ts",
+            "src/identity/scim/scimGroups.ts",
+            "src/identity/scim/scimPatch.ts",
+            "tests/identity/scimHardening.test.ts",
+            "docs/SCIM.md",
+            ".changeset/p2-07-scim-handler-qualification.md"
+          ],
+          "startedUtc": "2026-10-16T13:47:08.874593+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "p207s-baseline-freeze": {
+        "phase": "p207s-baseline-freeze",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+        "exit": 0,
+        "durationMs": 1284,
+        "startedUtc": "2026-10-16T13:47:09.340213+00:00",
+        "endedUtc": "2026-10-16T13:47:10.636928+00:00",
+        "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-baseline-freeze/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 64918,
+          "ownedPgid": 64918,
+          "observedPgidAfterLaunch": 64918,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "exec",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-freeze.mjs"
+          ],
+          "startedUtc": "2026-10-16T13:47:09.340213+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      }
+    },
+    "hosted": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/hosted-source-pre-admission.json",
+      "bytes": 11033,
+      "sha256": "08e92adcb4be068573060668e16760deeb02b063489b62a284aea11b7070bad2"
+    },
+    "rootFullSourceAndCallerRead": true,
+    "currentPermission": "Private candidate authoring and root-reviewed new-test materialization on unchanged production for failing-before evidence. Three source materialization needs exact review and actual red classification first. Docs changes must stay scoped; no blanket donor docs copy.",
+    "excluded": [
+      "held provider/config/archive/manifest",
+      "digest changes",
+      "OIDC",
+      "SAML",
+      "HTTPS/shared router",
+      "hostDb/roleMapping/session changes",
+      "existing tests",
+      "guards/baselines/budgets"
+    ],
+    "historicalSourceOnlyNarrowingNotHumanHold": true,
+    "formalDone": false
+  },
+  "hosted": {
+    "at": "2026-10-16T14:25:47.049491+00:00",
+    "query": "query { repository(owner:\"AgentMaturity\", name:\"AgentMaturityCompass\") { pullRequests(states:OPEN, first:100) { totalCount pageInfo { hasNextPage } nodes { number title isDraft updatedAt author { __typename login } files(first:100) { totalCount pageInfo { hasNextPage } nodes { path } } } } } }",
+    "response": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "totalCount": 13,
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 3,
+                "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:22Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 4,
+                "title": "ci: bump actions/upload-artifact from 4 to 7",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:23Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 5,
+                "title": "ci: bump actions/deploy-pages from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:24Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 1,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/pages.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 6,
+                "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:25Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/docker-runner.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 7,
+                "title": "ci: bump azure/setup-helm from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:26Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 8,
+                "title": "ci: bump actions/setup-node from 4 to 6",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:27Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 6,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/amc-score.yml"
+                    },
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    },
+                    {
+                      "path": ".github/workflows/npm-publish.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 17,
+                "title": "deps: bump zod from 4.3.6 to 4.4.3",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:35Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 19,
+                "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 20,
+                "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 21,
+                "title": "deps: bump commander from 14.0.3 to 15.0.0",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:37Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 27,
+                "title": "deps: bump semver from 7.7.4 to 7.8.5",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:25:16Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 28,
+                "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:27:11Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 33,
+                "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+                "isDraft": false,
+                "updatedAt": "2026-07-10T20:35:08Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "openCount": 13,
+    "excludedDependabotOnly": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      17,
+      19,
+      20,
+      21,
+      27,
+      28,
+      33
+    ],
+    "countedWip": [],
+    "allFilePagesRead": true,
+    "totalChangedPaths": 30,
+    "prospectiveExactScope": [
+      "qualification/2026-10-16-P2-07"
+    ],
+    "touchConflictsIncludingBots": [],
+    "exclusionOnlyAffectsWip": true
+  },
+  "countOverlay": {
+    "at": "2026-10-16T14:11:37.729031+00:00",
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "exactPaths": [
+      {
+        "path": "README.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "61ed6ec9aae91864037b1b55f941c60ec8b1bbbaf05ac296e3ca412ad8bf9989"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/README.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+        "commaReplacements": 1,
+        "encodedReplacements": 1
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "6fc608a839029e49d21b49477e01ab91e6a26a41adf6130c62afe6c2c5a9f6e5"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/CONTRIBUTING.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "website/index.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "06f0370cd4f81cc45e76b2871fa3e83cfb6427cfa90e320337b4807c15f6b3b1"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/website/index.html",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "website/lite.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "b1d9f08780a73bdf9c691febbdb522611c1bbd6118c8fcf7f9f00c38d34f6f4f"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/website/lite.html",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "website/i18n.js",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "34b00de636de70560af566a817ddaa382d8e1f3c677311fbad4b6b7c9a7425d8"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/website/i18n.js",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "677f1fecd2a38bbb23a3540c4b54a26a66cbb906bbb57065dbbb6f7546f1f6ff"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/docs/content/show-hn-draft.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "f56b451edf2ffdd65981d0cd5915d9eabbf5954f61492635af88a51745fd8936"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/docs/content/reddit-launch-drafts.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+        "commaReplacements": 2,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "3ee5ce3616de7f79700b8203efe7ba3bca44eafc5c178c67467cd3d4784139c5"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/docs/internal/competitive-landscape.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "6df6d517048d1b0c176d96a0c09991807f2b696f8180f727de155bc8ac70a342"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/docs/internal/mirofish-simulation-council.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+        "commaReplacements": 1,
+        "encodedReplacements": 0
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "43c5c4c533f0d3d25d8056e000b715d077afb7552f9b393525b1b7b20398adb3"
+        },
+        "privateOriginal": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/originals/whitepaper/AMC_WHITEPAPER_v1.md",
+        "exactBf3AndB25Original": true,
+        "permittedAfterSha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+        "commaReplacements": 4,
+        "encodedReplacements": 0
+      }
+    ],
+    "permittedDelta": "14 comma literals1678\u21921679 and1 encodedbadge only; surroundingbytesexact.",
+    "fullPeerReportRead": true,
+    "verifiedPeerPins": 65,
+    "peerReport": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/count-overlay-static-admission/review.json",
+      "bytes": 10634,
+      "sha256": "c30c3ce2268c0761f46ba7db52487eb035549695d6190fa3badea2aec75863d4"
+    },
+    "D15": {
+      "phase": "p207s-count-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 356,
+      "startedUtc": "2026-10-16T14:11:08.623122+00:00",
+      "endedUtc": "2026-10-16T14:11:08.990789+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-count-scope-d15/stdout-stderr.log",
+      "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "ownedProcess": {
+        "pid": 68373,
+        "ownedPgid": 68373,
+        "observedPgidAfterLaunch": 68373,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/bin/pnpm",
+          "--dir",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "exec",
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "README.md",
+          "CONTRIBUTING.md",
+          "website/index.html",
+          "website/lite.html",
+          "website/i18n.js",
+          "docs/content/show-hn-draft.md",
+          "docs/content/reddit-launch-drafts.md",
+          "docs/internal/competitive-landscape.md",
+          "docs/internal/mirofish-simulation-council.md",
+          "whitepaper/AMC_WHITEPAPER_v1.md"
+        ],
+        "startedUtc": "2026-10-16T14:11:08.623122+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "hosted": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/hosted-count-overlay.json",
+      "bytes": 11094,
+      "sha256": "cb7d1dc48ee91cc5bec3596422c8d8ff7d90369b9e5059e8d3ad8bbc61854043"
+    },
+    "managedBefore": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "6fc608a839029e49d21b49477e01ab91e6a26a41adf6130c62afe6c2c5a9f6e5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "61ed6ec9aae91864037b1b55f941c60ec8b1bbbaf05ac296e3ca412ad8bf9989"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/API_REFERENCE.md",
+        "bytes": 397101,
+        "sha256": "6462bd25db24f1da08ab6cc3efae1ba8ea3795f0c25a199cc4f0a53924ea6bd3"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/BENCHMARK_GALLERY.md",
+        "bytes": 3903,
+        "sha256": "44bf0c0d6939500ca6d71c3f73c771ba213a6eba80b0dda07f31766b1f9916e3"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/CLI_COMMAND_INVENTORY.md",
+        "bytes": 151350,
+        "sha256": "50ff5a00a38c60b555e9e697e3ae9e969490a9d061f58dc54f3b817e13032a47"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/ENTERPRISE.md",
+        "bytes": 1988,
+        "sha256": "51d05bb69f90eb7c53a27bf8a38c6cb188146182a0d296c255f2171031ae5f07"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/PRICING.md",
+        "bytes": 5238,
+        "sha256": "a3d1652ff8da26745f891f204833e5ea1923e5f5b5a71cf7ec069b72d02396dc"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/PRICING_FAQ.md",
+        "bytes": 1473,
+        "sha256": "7ace0fa8ca78ae4c2726ce4184efdeea1b1bd1e2fb92086d1642556e104ee1c6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/PRODUCT_EDITIONS.md",
+        "bytes": 1882,
+        "sha256": "075e3c03978f91d822dbfc6b738af66c09179819502b70734e478732047a86c2"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "f56b451edf2ffdd65981d0cd5915d9eabbf5954f61492635af88a51745fd8936"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "677f1fecd2a38bbb23a3540c4b54a26a66cbb906bbb57065dbbb6f7546f1f6ff"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "3ee5ce3616de7f79700b8203efe7ba3bca44eafc5c178c67467cd3d4784139c5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "6df6d517048d1b0c176d96a0c09991807f2b696f8180f727de155bc8ac70a342"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/console/assets/app.js",
+        "bytes": 182091,
+        "sha256": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/docs/cli.html",
+        "bytes": 59059,
+        "sha256": "db49f3834388a63e38de94154027880aaa594544c3713ee01631b7438b88ed1f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/docs/competitive-analysis.md",
+        "bytes": 31638,
+        "sha256": "65e55a744d4bb2d218d8924fec6dfe729e568b3125651b6a96692dd32e79a0df"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "34b00de636de70560af566a817ddaa382d8e1f3c677311fbad4b6b7c9a7425d8"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "06f0370cd4f81cc45e76b2871fa3e83cfb6427cfa90e320337b4807c15f6b3b1"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "b1d9f08780a73bdf9c691febbdb522611c1bbd6118c8fcf7f9f00c38d34f6f4f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "43c5c4c533f0d3d25d8056e000b715d077afb7552f9b393525b1b7b20398adb3"
+      }
+    ],
+    "heldRSourceUntouched": true,
+    "noDocumentTransplant": true,
+    "noFreezeOrQualityWaiver": true
+  }
+}

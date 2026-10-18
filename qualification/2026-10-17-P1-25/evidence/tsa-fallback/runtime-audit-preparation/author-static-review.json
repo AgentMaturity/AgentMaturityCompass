@@ -1,0 +1,54 @@
+{
+  "schema": "p125f-runtime-audit-preparation-author-static-review/1",
+  "at": "2026-10-16T22:09:34.659873+00:00",
+  "blockers": [],
+  "independentPeerReviewClaim": false,
+  "fullTwoWrapperTextRead": true,
+  "adapterImportedParsedOrExecuted": false,
+  "qualityWrapperImportedParsedOrExecuted": false,
+  "exactDelta": {
+    "audit": "B35 private destination, fallback rather than client path, explicit absolute existing canonical physical root; existing pinned observed() body unchanged.",
+    "quality": "Only the private B35 output destination changes from B34. Existing scanner/import, finite roles, exclusive600output and diagnostic flags are unchanged."
+  },
+  "prospectiveCohorts": {
+    "unchanged": [
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "combined": [
+      "tests/time/tsaFallback.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "literalBodyInventoryOnly": [
+      17,
+      21
+    ],
+    "newFallbackBodies": 4,
+    "runtimePassOrHookPrediction": false
+  },
+  "existingAuditorContract": [
+    "Actual physical root must match owned command argv and raw relative file identities.",
+    "Pinned raw producer/snapshot/observer bytes are checked; ordered file/fullName/state join and unique observer IDs remain unchanged.",
+    "Actual hook task entries and individual values are retained; original hook-pass checks, actual task/unhandled/late errors, natural owned group ESRCH/no signals and 0/1 outcome checks remain unchanged.",
+    "Outcome file is exclusive; there is no test/helper runner invocation, retry, rewrite, signal or extra timeout in this adapter."
+  ],
+  "baselineReuse": "The exact B34 after-metadata report is hash-pinned as the a0 parent before-source baseline. Its stored role is not rewritten and no new scanner run is claimed.",
+  "frozenHarnessAndObserverPinsVerifiedUnchanged": [
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    }
+  ],
+  "limits": [
+    "No actual B35 runtime, compiler, parser, product, helper, native, SQL, network, process-probe or quality scan ran by this author.",
+    "Protected128/seven-natives describe the supplied current metadata; no new full physical or ownership audit is implied.",
+    "Root must fully read, admit and copy the exact adapter to B35/audit-observed.py, then invoke it only after actual naturally closed phases.",
+    "Capture wrapper completion exits normally to retain a report; diagnosticOnly:true and qualityGatePassed:false do not pass a RED quality gate.",
+    "Future receipt copies of selected code remain inert .source.txt. All existing guards, deadlines, quality baselines, Claude work and held decisions remain intact."
+  ]
+}

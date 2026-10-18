@@ -1,0 +1,23 @@
+{
+  "schema": "p125pc-root-actual-binder-adoption/1",
+  "at": "2026-10-17T01:57:54.600996+00:00",
+  "rootFullyRead9352HelperAnd13555Delta": true,
+  "helper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/bind-fresh.py",
+    "bytes": 9352,
+    "sha256": "0ea9b25dc1a08dd53b7ae3b4d98e360e79977ed991c96b46974910def7ed45bb"
+  },
+  "independentStaticReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/review.json",
+    "bytes": 4280,
+    "sha256": "a7b0b1d16eda9eb5f4c88ea108651fb8fe95ebe28d21d807f033606f0a3e6467"
+  },
+  "independentActualInputReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/actual-input-compatibility/review.json",
+    "bytes": 1566,
+    "sha256": "8c065ed97b6dfd7a98e1160917a943946162696cf4504441abacb19150c090fd"
+  },
+  "actualCleanSource0NaturalClosureObserved": true,
+  "namespaceInactiveBeforeDirectExecution": true,
+  "noFreshVitestOrControlsCredit": true
+}

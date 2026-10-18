@@ -1,0 +1,1054 @@
+{
+  "issue": "P0-23",
+  "mode": "independent read-only canonical receipt review",
+  "atUtc": "2026-10-14T17:42:48.375216+00:00",
+  "measuredSource": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "headAtReview": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "folder": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-23",
+  "findings": [],
+  "checks": {
+    "artifacts": {
+      "listed": 54,
+      "allMatches": true,
+      "unlisted": [],
+      "totalFiles": 55,
+      "totalBytes": 700550,
+      "largest": [
+        {
+          "path": "final-architecture.log",
+          "exists": true,
+          "hashMatches": true,
+          "bytes": 95489
+        },
+        {
+          "path": "final-bounded-node22.json",
+          "exists": true,
+          "hashMatches": true,
+          "bytes": 81061
+        },
+        {
+          "path": "studio-test-design-red.json",
+          "exists": true,
+          "hashMatches": true,
+          "bytes": 47422
+        }
+      ]
+    },
+    "rawCounts": {
+      "header": {
+        "success": false,
+        "numTotalTests": 229,
+        "numPassedTests": 222,
+        "numFailedTests": 7,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "actualAssertionCount": 229,
+      "assertionsPassed": 222,
+      "assertionsFailed": 7,
+      "statusSet": [
+        "failed",
+        "passed"
+      ],
+      "sourceFileCount": 13,
+      "byFile": {
+        "apiClaimLabels.test.ts": {
+          "total": 8,
+          "passed": 5,
+          "failed": 3
+        },
+        "claimBadge.test.ts": {
+          "total": 9,
+          "passed": 9,
+          "failed": 0
+        },
+        "industryPackCli.test.ts": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0
+        },
+        "industryPackEntitlement.test.ts": {
+          "total": 13,
+          "passed": 13,
+          "failed": 0
+        },
+        "industryPackSchema.test.ts": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0
+        },
+        "mcpClaimLabels.test.ts": {
+          "total": 23,
+          "passed": 23,
+          "failed": 0
+        },
+        "mcpServer.test.ts": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0
+        },
+        "mcpServerTools.test.ts": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "openapiContracts.test.ts": {
+          "total": 8,
+          "passed": 8,
+          "failed": 0
+        },
+        "studioClaimLabels.test.ts": {
+          "total": 15,
+          "passed": 11,
+          "failed": 4
+        },
+        "claimAdapters.test.ts": {
+          "total": 39,
+          "passed": 39,
+          "failed": 0
+        },
+        "claimEligibility.test.ts": {
+          "total": 76,
+          "passed": 76,
+          "failed": 0
+        },
+        "claimLabels.test.ts": {
+          "total": 8,
+          "passed": 8,
+          "failed": 0
+        }
+      },
+      "matchesSummary": true,
+      "matchesReceipt": true,
+      "summaryHashMatches": true,
+      "remainingFailuresMatch": true
+    },
+    "mutation": {
+      "sourceMatches": true,
+      "testMatchesCurrent": true,
+      "restoredSourceMatchesCurrent": true,
+      "rawReportHashMatches": true,
+      "countsMatch": true,
+      "counts": {
+        "numTotalTests": 23,
+        "numPassedTests": 7,
+        "numFailedTests": 16,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "finalBaseline": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0
+      }
+    },
+    "chronology": {
+      "finalCommandCount": 13,
+      "allFinalCommandsAtMeasuredSource": true,
+      "receiptCommandsMatchSummary": true,
+      "finalMutationBeforeBaseline": true,
+      "initialNamedRedDiffExit": 0,
+      "preParserTestTypesExit": 2,
+      "preBuildCountsExit": 1
+    },
+    "sourceQuality": {
+      "duplicates": {
+        "count": 1270,
+        "status": "failed",
+        "matchesCanonical": true
+      },
+      "deadCode": {
+        "count": 2780,
+        "status": "failed",
+        "matchesCanonical": true
+      }
+    },
+    "secretAndSize": {
+      "highConfidenceSecretPatternMatches": [],
+      "inlineStdoutStderrBodies": [],
+      "largestFileBytes": 95489,
+      "privateResponsesOutsideCanonicalCount": 32,
+      "privateResponsesOutsideCanonicalBytes": 24173445
+    },
+    "reservationHashMatches": true,
+    "preservation": {
+      "heldPrimaryRef": {
+        "cwd": "/Users/sid/AgentMaturityCompass",
+        "command": [
+          "git",
+          "rev-parse",
+          "refs/heads/pending-main-442cd919"
+        ],
+        "exit": 0,
+        "stdout": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+        "stderr": ""
+      },
+      "heldPrimaryObject": {
+        "cwd": "/Users/sid/AgentMaturityCompass",
+        "command": [
+          "git",
+          "cat-file",
+          "-t",
+          "3b4a673c8f6fc11a947279054979e977f95b34d1"
+        ],
+        "exit": 0,
+        "stdout": "commit",
+        "stderr": ""
+      },
+      "heldDurableCloneObject": {
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "command": [
+          "git",
+          "cat-file",
+          "-e",
+          "3b4a673c8f6fc11a947279054979e977f95b34d1^{commit}"
+        ],
+        "exit": 128,
+        "stdout": "",
+        "stderr": "fatal: Not a valid object name 3b4a673c8f6fc11a947279054979e977f95b34d1^{commit}"
+      },
+      "primaryCheckout": {
+        "path": "/Users/sid/AgentMaturityCompass",
+        "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "headMatches": true,
+        "trackedStatus": "",
+        "statusMatches": true
+      },
+      "ClaudeCheckout": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+        "headMatches": true,
+        "trackedStatus": "",
+        "statusMatches": true
+      },
+      "wrapperDirectoryHasGit": false,
+      "historicalHeldMetadataMatchesPrimaryTip": true,
+      "noCloneAncestryClaim": true
+    }
+  },
+  "canonicalArtifactChecks": [
+    {
+      "path": "README.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 4658
+    },
+    {
+      "path": "api-claim-responses-refined-red-generated-openapi-accounting.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 28304
+    },
+    {
+      "path": "api-claim-responses-refined-red-saved-openapi-accounting.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 34436
+    },
+    {
+      "path": "api-final-red.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 7092
+    },
+    {
+      "path": "api-test-design-red.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 26669
+    },
+    {
+      "path": "api-test-design-red.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 3559
+    },
+    {
+      "path": "badge-component-tests.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 4224
+    },
+    {
+      "path": "cli-pack-guard-receipt.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 13599
+    },
+    {
+      "path": "cli-pack-guard-tests.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 2416
+    },
+    {
+      "path": "command-phases.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 12824
+    },
+    {
+      "path": "committed-source-build.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 807
+    },
+    {
+      "path": "final-architecture.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 95489
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 81061
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 25305
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 14364
+    },
+    {
+      "path": "final-clean-source.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 863
+    },
+    {
+      "path": "final-counts.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 165
+    },
+    {
+      "path": "final-docs-drift.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 131
+    },
+    {
+      "path": "final-freeze.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 194
+    },
+    {
+      "path": "final-lint.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 373
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 1055
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 1939
+    },
+    {
+      "path": "final-source-manifest.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 4963
+    },
+    {
+      "path": "final-source-types.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 75
+    },
+    {
+      "path": "final-test-types.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 87
+    },
+    {
+      "path": "graph-navigation.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 5908
+    },
+    {
+      "path": "mcp-final-labels-removed-mutant.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 7276
+    },
+    {
+      "path": "mcp-final-mutant.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 24149
+    },
+    {
+      "path": "mcp-final-mutation-summary.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 738
+    },
+    {
+      "path": "mcp-first-green.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 1412
+    },
+    {
+      "path": "mcp-first-red.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 2308
+    },
+    {
+      "path": "mcp-fixture-corrected-green.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 8340
+    },
+    {
+      "path": "mcp-label-removal.patch",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 509
+    },
+    {
+      "path": "mcp-repair-review.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 37030
+    },
+    {
+      "path": "mcp-repair-review.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 3238
+    },
+    {
+      "path": "mcp-sdk-early-contracts.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 29933
+    },
+    {
+      "path": "mcp-standard-parser-and-cli-preparation.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 9990
+    },
+    {
+      "path": "mcp-standard-parser-green.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 8347
+    },
+    {
+      "path": "next-priority-audit.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 19266
+    },
+    {
+      "path": "next-priority-audit.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 5469
+    },
+    {
+      "path": "pre-parser-test-type-errors.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 1987
+    },
+    {
+      "path": "prebuild-count-refusal.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 265
+    },
+    {
+      "path": "precommit-built-count-update.log",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 20
+    },
+    {
+      "path": "preservation-check.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 3410
+    },
+    {
+      "path": "private-response-assets.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 6928
+    },
+    {
+      "path": "readonly-preflight.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 36187
+    },
+    {
+      "path": "readonly-preflight.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 12683
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 9815
+    },
+    {
+      "path": "slice-routing.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 21600
+    },
+    {
+      "path": "slice-routing.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 4584
+    },
+    {
+      "path": "source-quality.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 2933
+    },
+    {
+      "path": "studio-final-red.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 10031
+    },
+    {
+      "path": "studio-test-design-red.json",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 47422
+    },
+    {
+      "path": "studio-test-design-red.md",
+      "exists": true,
+      "hashMatches": true,
+      "bytes": 3444
+    }
+  ],
+  "sourceChecks": [
+    {
+      "path": "src/mcp/mcpClaimOutput.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "tests/mcpClaimLabels.test.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "tests/apiClaimLabels.test.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "tests/studioClaimLabels.test.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "tests/industryPackCli.test.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "tests/claimBadge.test.ts",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "docs/CLAIM_KINDS.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": ".changeset/p0-23-mcp-stored-run-claims.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "README.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "website/index.html",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "website/lite.html",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "website/i18n.js",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "hashMatches": true,
+      "lineCountMatches": true,
+      "matchesMeasuredCommit": true
+    }
+  ],
+  "protectedSourceChecks": [
+    {
+      "path": "src/api/index.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/accessPolicy.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/resultRouteRegistry.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/studio/openapi.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "website/openapi.yaml",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/console/assets/app.js",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/console/assets/components/claimBadge.js",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/mcp/amcMcpServer.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/mcp/a4Tools.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "package.json",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "scripts/check-freeze.mjs",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "scripts/release-gate.mjs",
+      "hashMatches": true,
+      "matchesAcceptedMain": true
+    }
+  ],
+  "privateResponseChecks": [
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-sealed-api.json",
+      "matches": true,
+      "bytes": 1764115
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-tampered-api.json",
+      "matches": true,
+      "bytes": 1764291
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-unsealed-api.json",
+      "matches": true,
+      "bytes": 1763987
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/generated-openapi-accounting.json",
+      "matches": true,
+      "bytes": 28304
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/legacy-1-1-1-api.json",
+      "matches": true,
+      "bytes": 1764111
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/missing-api-run.json",
+      "matches": true,
+      "bytes": 217
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/saved-openapi-accounting.json",
+      "matches": true,
+      "bytes": 34436
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-control-stored.json",
+      "matches": true,
+      "bytes": 897307
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-invalid.json",
+      "matches": true,
+      "bytes": 259
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-missing.json",
+      "matches": true,
+      "bytes": 259
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-paid.json",
+      "matches": true,
+      "bytes": 123061
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-unpaid.json",
+      "matches": true,
+      "bytes": 69512
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness-stored.json",
+      "matches": true,
+      "bytes": 896661
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness.json",
+      "matches": true,
+      "bytes": 1756433
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed-stored.json",
+      "matches": true,
+      "bytes": 897309
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed.json",
+      "matches": true,
+      "bytes": 1756243
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered-stored.json",
+      "matches": true,
+      "bytes": 897311
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered.json",
+      "matches": true,
+      "bytes": 1756421
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed-stored.json",
+      "matches": true,
+      "bytes": 897160
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed.json",
+      "matches": true,
+      "bytes": 1756117
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1-stored.json",
+      "matches": true,
+      "bytes": 896653
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1.json",
+      "matches": true,
+      "bytes": 1756409
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness-stored.json",
+      "matches": true,
+      "bytes": 897316
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness.json",
+      "matches": true,
+      "bytes": 1756264
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-missing-run.json",
+      "matches": true,
+      "bytes": 251
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-__proto__.json",
+      "matches": true,
+      "bytes": 249
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-constructor.json",
+      "matches": true,
+      "bytes": 251
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-hasOwnProperty.json",
+      "matches": true,
+      "bytes": 254
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-toString.json",
+      "matches": true,
+      "bytes": 248
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-paid.json",
+      "matches": true,
+      "bytes": 40034
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-unpaid-refusal.json",
+      "matches": true,
+      "bytes": 1780
+    },
+    {
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-unknown-route.json",
+      "matches": true,
+      "bytes": 222
+    }
+  ],
+  "privateCliStreamChecks": [
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-entitlement.stdout",
+      "matches": true,
+      "bytes": 383
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-entitlement.stderr",
+      "matches": true,
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-valid-pack.stdout",
+      "matches": true,
+      "bytes": 4449
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-valid-pack.stderr",
+      "matches": true,
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-__proto__.stdout",
+      "matches": true,
+      "bytes": 43
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-__proto__.stderr",
+      "matches": true,
+      "bytes": 26
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-constructor.stdout",
+      "matches": true,
+      "bytes": 43
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-constructor.stderr",
+      "matches": true,
+      "bytes": 28
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-toString.stdout",
+      "matches": true,
+      "bytes": 43
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-toString.stderr",
+      "matches": true,
+      "bytes": 25
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-hasOwnProperty.stdout",
+      "matches": true,
+      "bytes": 43
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-hasOwnProperty.stderr",
+      "matches": true,
+      "bytes": 31
+    }
+  ],
+  "privateCliMetadataChecks": [
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/commands.json",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/fixture.json",
+      "matches": true
+    }
+  ],
+  "sevenActiveFailures": [
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) saved OpenAPI has every registered result operation and its ClaimResult JSON schema"
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) generated OpenAPI has every registered result operation and its ClaimResult JSON schema"
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response"
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a sealed legacy run retains the canonical legacy claim after Studio report decoration"
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a legacy version cannot become observed even when its stored readiness also verifies"
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) adding display readiness does not invalidate a current report's valid stored seal"
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a missing stored run returns 404 without a fabricated result claim"
+    }
+  ],
+  "reviewLimits": [
+    "No tests, builds, dependency changes, source edits or canonical metadata edits ran. This is source/retained-file validation only.",
+    "High-confidence private-key/credential patterns found no canonical leak; this is a bounded content scan, not proof that all possible secret formats are absent. Large original response/CLI payloads remain outside the canonical folder and their current bytes/hashes were verified.",
+    "P0-50/P0-22 evidence remains contextual; final current-source raw report is a13-file229-case run, not a full suite or measured coverage report. Node24/hosted/browser/all-route acceptance remains explicitly open.",
+    "Primary held reference/object is pinned independently; no clone ancestry is asserted. The held SHA 3b4a673c8f6fc11a947279054979e977f95b34d1 is the exact current primary refs/heads/pending-main-442cd919 tip, observed unchanged and verified as a commit object in primary. It is absent from the durable clone, and the s7fccbbfa wrapper directory is non-Git. No ownership clearance, active wrapper checkout or source overlay is inferred."
+  ],
+  "gitStatus": [
+    "?? qualification/2026-10-14-P0-23/"
+  ],
+  "currentCanonicalReceipt": {
+    "sha256": "eb58f514661be7ae1cf7c5c55800f4019c7f3ada8431ce57258ccc89182bd7e5",
+    "bytes": 10676
+  },
+  "heldReferenceRawEvidence": {
+    "path": "/private/tmp/p0-23-canonical-held-reference-verification-20261014.json",
+    "sha256": "54c792e45d477d9bcd7b5aee1a374f3cc3cb3b60d87e7ec4dace1383c5286d41"
+  }
+}

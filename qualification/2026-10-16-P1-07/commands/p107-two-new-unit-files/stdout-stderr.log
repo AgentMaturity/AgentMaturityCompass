@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+No test files found, exiting with code 1
+
+filter: tests/diagnostic/levelCumulative.test.ts, tests/diagnostic/evidenceEmitterRegistry.test.ts
+include: tests/**/*.test.ts
+exclude:  **/node_modules/**, **/.git/**
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p107-two-new-unit-files.raw.json

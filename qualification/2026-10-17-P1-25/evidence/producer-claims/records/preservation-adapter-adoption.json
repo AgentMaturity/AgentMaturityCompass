@@ -1,0 +1,34 @@
+{
+  "schema": "p125pc-root-preservation-helper-adoption/1",
+  "at": "2026-10-17T02:18:45.604890+00:00",
+  "activeHelperPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/check-preservation.py",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/check-preservation.py",
+    "bytes": 7209,
+    "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a",
+    "dev": 16777231,
+    "inode": 544002885,
+    "nlink": 1
+  },
+  "candidatePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "bytes": 7209,
+    "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a",
+    "dev": 16777231,
+    "inode": 544002640,
+    "nlink": 1
+  },
+  "rootFullV1SourceCompleteDeltaAndV2NarrowCorrectionRead": true,
+  "peerV2ReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/review.json",
+    "bytes": 3097,
+    "sha256": "834b7dd9c716fb1686286e45bc34001ae9952c069ce339925e47c0a3c18b1d69",
+    "dev": 16777231,
+    "inode": 544002769,
+    "nlink": 1
+  },
+  "v1UnexecutedReadonlyConcernPreserved": true,
+  "noMetadataSuccessorAdmissionOrExecutionYet": true
+}

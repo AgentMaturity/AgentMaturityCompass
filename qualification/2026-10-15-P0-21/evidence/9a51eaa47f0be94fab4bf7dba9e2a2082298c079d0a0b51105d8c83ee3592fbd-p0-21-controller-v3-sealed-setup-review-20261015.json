@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21-v3-sealed-setup-independent-review",
+  "reviewer": "native_race_static_review",
+  "scope": "Bounded read-only final sealed preparation/index/physical-copy review. Prior frozen v3 code assessment reused, not repeated.",
+  "decision": "NO_BLOCKING_STATIC_SETUP_FINDING; root runtime release remains separate and absent",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "productExecutionPerformed": false,
+  "controllerExecutionPerformed": false,
+  "syntaxImportOrCompilePerformed": false,
+  "mutationsPerformed": false,
+  "sourceEditsPerformed": false,
+  "processEnumerationOrSignalsPerformed": false,
+  "networkOrGitPerformed": false,
+  "sourceAttribution": {
+    "parentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "declaredParentSource": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "declaredProductionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "attributionLimit": "Declared commit attribution inherited from frozen manifest provenance; no current Git query. Current manifest bytes independently rehashed."
+  },
+  "methods": [
+    "Read sealed JSON/text only; validate byte lengths and SHA-256 with standard-library file operations.",
+    "Compare all 12,474 parent/private file hashes and recorded device/inode/nlink fields; enumerate private inventory without following borrowed dependency link.",
+    "Compare retained 37 file/fullName identities with earlier original core raw JSON, without product execution.",
+    "Validate final template's eight hashes and version/closure/parent paths; observe pending-runtime namespace."
+  ],
+  "findings": [
+    {
+      "id": "S1",
+      "severity": "info",
+      "finding": "All sealed own/index/preservation/summary/seal pins and exact version paths agree."
+    },
+    {
+      "id": "S2",
+      "severity": "info",
+      "finding": "All current source/dist copy bytes and physical identity fields match; borrowed dependencies/native accurately disclosed."
+    },
+    {
+      "id": "S3",
+      "severity": "info",
+      "finding": "Original37 corpus is exact; historical parent result is retained input, not a private runtime result."
+    },
+    {
+      "id": "S4",
+      "severity": "info",
+      "finding": "No activation/phase/release artifact exists at read completion; v1/v2 frozen references remain preserved and superseded."
+    },
+    {
+      "id": "S5",
+      "severity": "info",
+      "finding": "Historical inbox prefix and documented append exact; no old transitive receipt was refreshed."
+    }
+  ],
+  "verification": {
+    "own": {
+      "count": 23,
+      "uniquePaths": 23,
+      "failed": []
+    },
+    "index": {
+      "count": 24,
+      "uniquePaths": 24,
+      "failed": []
+    },
+    "preservationInputs": {
+      "count": 32,
+      "uniquePaths": 32,
+      "failed": []
+    },
+    "summaryPins": {
+      "count": 8,
+      "uniquePaths": 8,
+      "failed": []
+    },
+    "sealPins": {
+      "count": 5,
+      "uniquePaths": 5,
+      "failed": []
+    },
+    "indexEqualsOwnPlusSetup": true,
+    "copy": {
+      "sourceCount": 7945,
+      "compiledCount": 4529,
+      "unionCount": 12474,
+      "manifestCount": 12474,
+      "manifestUniquePaths": 12474,
+      "actualPrivateCount": 12474,
+      "membershipExact": true,
+      "rootDistMembershipExact": true,
+      "actualDistinctPrivateInodes": 12474,
+      "privateRootInodeIntersectionCount": 0,
+      "summedBytes": 200152632,
+      "failed": [],
+      "links": [
+        {
+          "path": "node_modules",
+          "target": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+          "resolved": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules"
+        }
+      ],
+      "privateGitExists": false
+    },
+    "native": {
+      "actual": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "device": 16777231,
+        "inode": 538645305,
+        "nlink": 1,
+        "mode": 493
+      },
+      "matches": true
+    },
+    "cases": {
+      "retainedCount": 37,
+      "originalRawCount": 37,
+      "uniqueRetained": 37,
+      "uniqueRaw": 37,
+      "identitiesExact": true,
+      "counts": {
+        "tests/domainAssessmentUnits.test.ts": 4,
+        "tests/logisticsIndustryPack.test.ts": 2,
+        "tests/noCertificationFromSelfAssessment.test.ts": 7,
+        "tests/scoreUnits.test.ts": 4,
+        "tests/selfReportedLevelCap.test.ts": 5,
+        "tests/transparencyReport.test.ts": 15
+      },
+      "originalRawTotal": 37,
+      "originalRawPassed": 37,
+      "allOriginalRawStatusesPassed": true
+    },
+    "releaseHashFields": {
+      "setupSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+        "actual": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d",
+        "matches": true
+      },
+      "controllerSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+        "actual": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68",
+        "matches": true
+      },
+      "proposalSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/proposal.json",
+        "actual": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2",
+        "matches": true
+      },
+      "sourceManifestSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+        "actual": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf",
+        "matches": true
+      },
+      "compiledManifestSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+        "actual": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+        "matches": true
+      },
+      "preservationSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+        "actual": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3",
+        "matches": true
+      },
+      "observerSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "actual": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+        "matches": true
+      },
+      "setupIndexSha256": {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+        "actual": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5",
+        "matches": true
+      }
+    },
+    "releasePathsExact": true,
+    "releaseAuthorizationIsPlaceholder": true,
+    "absence": {
+      "activeExists": false,
+      "haltedExists": false,
+      "startedMarkers": [],
+      "phaseEntries": [],
+      "releaseEntries": []
+    },
+    "inbox": {
+      "bytes": 872054,
+      "wholeMatch": true,
+      "prefixMatch": true,
+      "appendMatch": true
+    },
+    "metadataPins": [
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+        "bytes": 15393,
+        "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+        "bytes": 5376,
+        "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/sealed-preparation-v3.json",
+        "bytes": 1654,
+        "sha256": "f7abb8894955dbabce3e3d878e0d6123a3915cd46b188072418d704dc84e0050"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v3.json",
+        "bytes": 2080,
+        "sha256": "f8525dd117a3a103f0d2d1f3f55d0a97e1804efaabb48b430f0ed700afcae7dd"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v3.json",
+        "bytes": 1425,
+        "sha256": "a2c9083dc31082589d16a7290f3e51217889cef19ebca2ebac12e5745959e986"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v3.md",
+        "bytes": 1387,
+        "sha256": "8d4553fb18818dce26f8131167b77feddcfac762da76bb2feb4dbf3022fe997e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v3-change-note.json",
+        "bytes": 3507,
+        "sha256": "b3d54ca7895f0a03888a5d3fc6987cdc74d847085f2b199dfd955f484512bd15"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+        "bytes": 948064,
+        "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+        "bytes": 485185,
+        "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+        "bytes": 3978574,
+        "sha256": "58ef19180c72f3818b797f6e37de6b7700d07604d6be019f3df05211c8547416"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/case-identities.json",
+        "bytes": 6257,
+        "sha256": "a820cd5df029a9481785484541f6c5f1ca1b8e3bbfd0cc0a3483209931d2921d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+        "bytes": 8436,
+        "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+      }
+    ],
+    "priorReviewPins": [
+      {
+        "path": "/private/tmp/p0-21-controller-v3-code-static-review-20261015.json",
+        "bytes": 14466,
+        "sha256": "8b0f658b8e954c00edba3a527a1d297ae729589a33bfc187143e4c77584c7b35"
+      },
+      {
+        "path": "/private/tmp/p0-21-controller-v3-code-static-review-20261015.md",
+        "bytes": 1876,
+        "sha256": "299b2b9853169db1b0944d9ef3758322b9283e4277a989c59f841c5f07447978"
+      }
+    ]
+  },
+  "selectedSealedMetadata": {
+    "sameSourceTestsAndSetup": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "originalCoreCases": 37,
+    "corpus": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "executionPlan": "One root-released control per controller invocation, baseline→one target TS mutation→restored original37. C6 has two exact anchors in one target file. All4,529 compiled files remain unchanged.",
+    "controlIds": [
+      "P021-C1-likert-origin",
+      "P021-C2-L2-threshold",
+      "P021-C3-numeric-self-eligible-cap",
+      "P021-C4-base-L3-self-tier",
+      "P021-C5-default-gate-self-tier",
+      "P021-C6-representative-raw-size"
+    ],
+    "releaseRule": "Exact per-control START_P021_CAUSAL_<control-id> plus setup/controller/proposal/source/compiled/preservation/observer/setup-index hashes required. No release exists now.",
+    "privateStateDirs": {
+      "home": [],
+      "tmp": []
+    }
+  },
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+      "bytes": 15393,
+      "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+      "bytes": 5376,
+      "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/sealed-preparation-v3.json",
+      "bytes": 1654,
+      "sha256": "f7abb8894955dbabce3e3d878e0d6123a3915cd46b188072418d704dc84e0050"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v3.json",
+      "bytes": 2080,
+      "sha256": "f8525dd117a3a103f0d2d1f3f55d0a97e1804efaabb48b430f0ed700afcae7dd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v3.json",
+      "bytes": 1425,
+      "sha256": "a2c9083dc31082589d16a7290f3e51217889cef19ebca2ebac12e5745959e986"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v3.md",
+      "bytes": 1387,
+      "sha256": "8d4553fb18818dce26f8131167b77feddcfac762da76bb2feb4dbf3022fe997e"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v3-change-note.json",
+      "bytes": 3507,
+      "sha256": "b3d54ca7895f0a03888a5d3fc6987cdc74d847085f2b199dfd955f484512bd15"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+      "bytes": 948064,
+      "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 3978574,
+      "sha256": "58ef19180c72f3818b797f6e37de6b7700d07604d6be019f3df05211c8547416"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 6257,
+      "sha256": "a820cd5df029a9481785484541f6c5f1ca1b8e3bbfd0cc0a3483209931d2921d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 8436,
+      "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+    },
+    {
+      "path": "/private/tmp/p0-21-controller-v3-code-static-review-20261015.json",
+      "bytes": 14466,
+      "sha256": "8b0f658b8e954c00edba3a527a1d297ae729589a33bfc187143e4c77584c7b35"
+    },
+    {
+      "path": "/private/tmp/p0-21-controller-v3-code-static-review-20261015.md",
+      "bytes": 1876,
+      "sha256": "299b2b9853169db1b0944d9ef3758322b9283e4277a989c59f841c5f07447978"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+      "relativePath": "tests/domainAssessmentUnits.test.ts",
+      "bytes": 1890,
+      "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+      "relativePath": "tests/logisticsIndustryPack.test.ts",
+      "bytes": 2360,
+      "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+      "relativePath": "tests/noCertificationFromSelfAssessment.test.ts",
+      "bytes": 8422,
+      "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+      "relativePath": "tests/scoreUnits.test.ts",
+      "bytes": 1934,
+      "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+      "relativePath": "tests/selfReportedLevelCap.test.ts",
+      "bytes": 4018,
+      "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+      "relativePath": "tests/transparencyReport.test.ts",
+      "bytes": 11833,
+      "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    }
+  ],
+  "remainingLimits": [
+    "Static preparation clearance only. Root must independently author an exact per-control START release; this review provides none.",
+    "No private child runtime ABI, actual assertion, causal kill/survivor, masking, lifecycle, cache or post-execution preservation measurement.",
+    "Frozen v3 code review remains the code assessment; actual future assertion stack/source attribution remains necessary.",
+    "Borrowed node_modules is not an independent install, operating-system sandbox, transport isolation or universal dependency/cache proof.",
+    "Empty marker/phase observations and sealed producer statements do not prove arbitrary historical process absence.",
+    "No normal freeze/quality floor, held scope, release or formal acceptance is waived."
+  ],
+  "markdownPin": {
+    "path": "/private/tmp/p0-21-controller-v3-sealed-setup-review-20261015.md",
+    "bytes": 2304,
+    "sha256": "fbc5746092cbaa7c6b0bd6b8bc54d124a29242165eb8753447896f300707259d"
+  }
+}

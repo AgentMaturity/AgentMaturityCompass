@@ -1,0 +1,14 @@
+{
+  "schema": "p125pc-source-checkpoint/1",
+  "at": "2026-10-17T01:54:16.106734+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "parent": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+  "branch": "codex/p1-25-producer-qualification",
+  "paths": [
+    "tests/time/checkpointWindow.test.ts"
+  ],
+  "source24AndTwelveChecks": 0,
+  "ordinaryCommitExit": 0,
+  "sourceCleanIndexEmpty": true,
+  "noFreshControlOrWholeIssueCredit": true
+}

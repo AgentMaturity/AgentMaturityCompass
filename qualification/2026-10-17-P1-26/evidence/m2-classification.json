@@ -1,0 +1,34 @@
+{
+  "phase": "p126-m2",
+  "rootAllFailuresRead": true,
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "operator": "M2-inclusion-terminal-size",
+  "outcomeSha256": "ce3d9b4586141d499d6ecbc2a3f305da89c579135af041c38489020b167759cf",
+  "noHookOrEnvironmentFailure": true,
+  "tests": {
+    "total": 54,
+    "passed": 53,
+    "failed": 1,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "name": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 337,
+        "column": 56
+      },
+      "assertion": "expected true to be false // Object.is equality",
+      "classification": "The one-sibling size-2 proof shape passed at line335 and valid-size verifier control passed at336. Changing only declared treeSize to3 was accepted by the mutant; rejection assertion failed at337. No earlier assertion masks this witness.",
+      "environmentOrHookFailure": false
+    }
+  ],
+  "unchangedCohort": {
+    "passed": 41,
+    "total": 41
+  },
+  "boundary": "Concrete size2 to3 witness sensitivity only. Proof shapes can overlap for other declared sizes; no every-alternate-size claim. Other53 bodies passed;46 individual hook values, ordered raw/observer join, no unhandled/late errors, natural1/ESRCH/no signals. No retry or automatic restore.",
+  "at": "2026-10-16T20:55:11.975273+00:00"
+}

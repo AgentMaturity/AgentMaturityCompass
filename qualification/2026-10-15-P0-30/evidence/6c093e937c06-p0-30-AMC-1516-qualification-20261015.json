@@ -1,0 +1,1818 @@
+{
+  "key": "P0-30",
+  "oldIssue": "AMC-1516",
+  "date": "2026-10-15",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-30-current-qualification",
+  "privateRoot": "/private/tmp/p0-30-AMC-1516-qualification-20261015",
+  "liveBaseline": {
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1516-unchanged-five-file-baseline-20261015.json",
+      "bytes": 16872,
+      "sha256": "35aa2c24a0184af50838ee3a6902844748b3194d159a0e98eeb4c2d8f6896b80"
+    },
+    "counts": {
+      "numTotalTests": 44,
+      "numPassedTests": 44,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootReportedDurationMs": 5052
+  },
+  "uniqueCurrentCases": 44,
+  "files": [
+    "tests/externalEvidenceProfile.test.ts",
+    "tests/importProvenance.test.ts",
+    "tests/neutralImporter.test.ts",
+    "tests/neutralImportMapping.test.ts",
+    "tests/externalEvidenceExport.test.ts"
+  ],
+  "profileCorpusCases": 18,
+  "exportCorpusCases": 26,
+  "sameCorpusMeaning": "Unchanged assertions, generator inputs, configuration, setup, cleanup and deadlines. Fixtures generate fresh physical random keys, UUIDs and times per run; no identical-key claim across phases.",
+  "adaptations": {
+    "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/adaptations.json",
+    "bytes": 2388,
+    "sha256": "7f977947525346773bd77b7f8fa82a1cc775b64a079660b8c161014e39910feb"
+  },
+  "readiness": {
+    "path": "/private/tmp/p0-30-AMC-1516-1517-readiness-20261015.json",
+    "bytes": 46924,
+    "sha256": "9d2532f772e119416606fa32464c04b3b75aaad76a573bb7236c054a044c608e"
+  },
+  "actualDistinctGuardCount": 9,
+  "historicalIdCount": 10,
+  "matrices": [
+    {
+      "id": "S7-M11-profile-import-gate-221",
+      "recipe": {
+        "id": "S7-M11-profile-import-gate-221",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/standard/externalEvidenceProfile.ts",
+        "sourceFind": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n        && authority",
+        "sourceReplace": "if (signatureVerified\n        && authority",
+        "sourceOccurrences": 1,
+        "sourceLine": 221,
+        "compiledTarget": "dist/standard/externalEvidenceProfile.js",
+        "compiledFind": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n                && authority",
+        "compiledReplace": "if (signatureVerified && authority",
+        "compiledOccurrences": 1,
+        "compiledLine": 215,
+        "historicalExactCorpus": [
+          "tests/externalEvidenceProfile.test.ts",
+          "tests/importProvenance.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/parser-emitted-S7-M11-profile-import-gate-221-matrix.json",
+        "bytes": 11289,
+        "sha256": "e2b3986dee829fe07bfd130bece8efd5cdc6d199c953f736cdfd5f7eb758f7a8"
+      },
+      "baseline": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/raw-tests.json",
+          "bytes": 6749,
+          "sha256": "ec72d38534dae4718bce4c77936b8757dc8461b23528a02c215302c492ba0dd5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/command.json",
+          "bytes": 1997,
+          "sha256": "752c9b0fa2fde4eac4cc6611365abad2a9f3960bebc0e46ac39d4f1b80f81599"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 18,
+        "numPassedTests": 17,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/raw-tests.json",
+          "bytes": 8195,
+          "sha256": "f510ca1a211955f9e281e1038a7e4c1fcc0279f2c6e724ad4674cd1398bbaf2f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/command.json",
+          "bytes": 1983,
+          "sha256": "a88a7f084648143b9e74178b1625673102a67cbfe376937b65da58a3a9bfe01d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/raw-tests.json",
+          "bytes": 6749,
+          "sha256": "f3492c0dcfc8e4c794de86cab1212de2ad50c488d4c78c60328c63f866e05ab5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/command.json",
+          "bytes": 1996,
+          "sha256": "452dfe4b0c49f3d44c29fc9ddeeba660dc14a25fdc10b42a036c01cbefdf476f"
+        }
+      },
+      "caseNames": [
+        "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+        "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+        "external evidence profile rejects corrupt id without accepting a trust claim",
+        "external evidence profile rejects corrupt parent without accepting a trust claim",
+        "external evidence profile rejects corrupt tool without accepting a trust claim",
+        "external evidence profile rejects corrupt duration without accepting a trust claim",
+        "external evidence profile rejects corrupt calendar without accepting a trust claim",
+        "external evidence profile rejects corrupt digest without accepting a trust claim",
+        "external evidence profile rejects corrupt unicode without accepting a trust claim",
+        "external evidence profile a signing key cannot promote imports or self-admit",
+        "external evidence profile independent authority is scoped to producer and capture method",
+        "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+        "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+        "external evidence profile the verifier never raises a producer's own lower declaration",
+        "external evidence profile future fields/versions and duplicate tool settlements refuse",
+        "AMC-1506 \u2014 imports invent nothing a failed Pi v3 session yields zero inferred maturity and no observed evidence",
+        "AMC-1506 \u2014 imports invent nothing an arbitrary config file yields the same zeros",
+        "AMC-1506 \u2014 imports invent nothing episode and lifecycle views disclose import-only measurement, no positive Score/Shield verdict"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+          "messages": [
+            "AssertionError: expected { ok: true, errors: [], \u2026(4) } to match object { ok: false, \u2026(3) }\n(2 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceProfile.test.ts:76:76\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "emitted-JS runtime guard sensitivity; exact TS mutant intentionally fails typecheck",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "6edb9c4e82da50e788b355317485435c527721f46799fd3cb5002d294c51e2a1"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "594c5e9561835720b9f57e4f84633558f55e07c6242261337cafd5f244d67af3"
+      }
+    },
+    {
+      "id": "S7-M12-profile-lower-clamp-230",
+      "recipe": {
+        "id": "S7-M12-profile-lower-clamp-230",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/standard/externalEvidenceProfile.ts",
+        "sourceFind": "if (ranks[profile.provenance.trustTier] < ranks[trustTier]) trustTier = profile.provenance.trustTier;",
+        "sourceReplace": "if (false) trustTier = profile.provenance.trustTier;",
+        "sourceOccurrences": 1,
+        "sourceLine": 230,
+        "compiledTarget": "dist/standard/externalEvidenceProfile.js",
+        "compiledFind": "if (ranks[profile.provenance.trustTier] < ranks[trustTier])\n        trustTier = profile.provenance.trustTier;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 225,
+        "historicalExactCorpus": [
+          "tests/externalEvidenceProfile.test.ts",
+          "tests/importProvenance.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M12-profile-lower-clamp-230-matrix.json",
+        "bytes": 11162,
+        "sha256": "ad2469d2db296089048b53c7a7959c7b4c8d4edc7f207b520e557dcd025d8615"
+      },
+      "baseline": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/raw-tests.json",
+          "bytes": 6739,
+          "sha256": "3cb3a3cd568c847dab037124e29c7f5ac58c44761690efe8591e78dd3221299c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/command.json",
+          "bytes": 1891,
+          "sha256": "7d476ff75c8bd5e9e21337cca7f29b197524e46a49ff7b7e7ca808dec626336a"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 18,
+        "numPassedTests": 17,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/raw-tests.json",
+          "bytes": 8206,
+          "sha256": "932f6075e78a6d59e805ba2a52da86711b72128c292d155d4afc45ba7c4faff8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/command.json",
+          "bytes": 1877,
+          "sha256": "7da61e9720e426b2290c9f2ff9a7a0550d807b3335826ac0dc6e28a2dfb701a8"
+        }
+      },
+      "restored": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/raw-tests.json",
+          "bytes": 6736,
+          "sha256": "256e2411672018b7d6e93958d4c60cf9ec0079ba2039241ec389f2aada2df19a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/command.json",
+          "bytes": 1891,
+          "sha256": "421491bfbd4e3508b5272b7cc4b4efe0ae896ecd7ce19230eaf32e37a792222b"
+        }
+      },
+      "caseNames": [
+        "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+        "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+        "external evidence profile rejects corrupt id without accepting a trust claim",
+        "external evidence profile rejects corrupt parent without accepting a trust claim",
+        "external evidence profile rejects corrupt tool without accepting a trust claim",
+        "external evidence profile rejects corrupt duration without accepting a trust claim",
+        "external evidence profile rejects corrupt calendar without accepting a trust claim",
+        "external evidence profile rejects corrupt digest without accepting a trust claim",
+        "external evidence profile rejects corrupt unicode without accepting a trust claim",
+        "external evidence profile a signing key cannot promote imports or self-admit",
+        "external evidence profile independent authority is scoped to producer and capture method",
+        "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+        "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+        "external evidence profile the verifier never raises a producer's own lower declaration",
+        "external evidence profile future fields/versions and duplicate tool settlements refuse",
+        "AMC-1506 \u2014 imports invent nothing a failed Pi v3 session yields zero inferred maturity and no observed evidence",
+        "AMC-1506 \u2014 imports invent nothing an arbitrary config file yields the same zeros",
+        "AMC-1506 \u2014 imports invent nothing episode and lifecycle views disclose import-only measurement, no positive Score/Shield verdict"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "external evidence profile the verifier never raises a producer's own lower declaration",
+          "messages": [
+            "AssertionError: expected { ok: true, errors: [], \u2026(4) } to match object { ok: true, \u2026(2) }\n(3 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceProfile.test.ts:81:75\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "398bb16b5b5d16d5d5acaff2862a1475d42d27bc621455d61a0f53c728522e68"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "594c5e9561835720b9f57e4f84633558f55e07c6242261337cafd5f244d67af3"
+      }
+    },
+    {
+      "id": "S7-M13-export-chunk-bound",
+      "recipe": {
+        "id": "S7-M13-export-chunk-bound",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "Math.ceil(input.traces.length / 1000)",
+        "sourceReplace": "Math.ceil(input.traces.length / 2000)",
+        "sourceOccurrences": 1,
+        "sourceLine": 13,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "Math.ceil(input.traces.length / 1000)",
+        "compiledReplace": "Math.ceil(input.traces.length / 2000)",
+        "compiledOccurrences": 1,
+        "compiledLine": 5,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M13-export-chunk-bound-matrix.json",
+        "bytes": 15029,
+        "sha256": "aff29a2399e4bee41fdf85c7ab468f6e7822c0629cc98c041fc33ed460658581"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/raw-tests.json",
+          "bytes": 10569,
+          "sha256": "a418da7f7656953101fdadb5bf08554d9fd8bae8f2014ae582dde958ebb15d60"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/command.json",
+          "bytes": 1897,
+          "sha256": "e6437bc047f25069ef96df71947419d34f4d15eb6c7cb2cb0a88a949ea800958"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/raw-tests.json",
+          "bytes": 11846,
+          "sha256": "1d86f05f219d6e2f050d88c53ae7d0f055d41b0aa27b8320c105180e1c85756e"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/command.json",
+          "bytes": 1883,
+          "sha256": "4373bc038d9ee3059aee0de7130b143fd2e7d35356c68c21f34164d2dc20e30d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "5391775021b144c7b21028398a52995e26e7f9a46695211ecc778c7c9efd74b2"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/command.json",
+          "bytes": 1897,
+          "sha256": "04c96ddd35908bd7ea8ebf5ce96fd4e8a3557ee5064ddb33407b41f0fe8fd12a"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+          "messages": [
+            "AssertionError: expected [ 1000 ] to deeply equal [ 1000, 1 ]\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:71:51\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M14-export-callback-cancel",
+      "recipe": {
+        "id": "S7-M14-export-callback-cancel",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "callback.cancelled === true || ",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 51,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "callback.cancelled === true || ",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 52,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M14-export-callback-cancel-matrix.json",
+        "bytes": 15008,
+        "sha256": "1346fcc956e0f86d793d99396391aea9b6d7c13f87f3d8b09b9994d6dae97805"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/raw-tests.json",
+          "bytes": 10563,
+          "sha256": "50e585c1a544f7516fd1ea2b6144721ef169ed7276500f7b66c280266446cda5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/command.json",
+          "bytes": 1925,
+          "sha256": "de70e01ab499020a69683dfcfac461604c99311ebbaccd4b8650011a2fb6c267"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/raw-tests.json",
+          "bytes": 11888,
+          "sha256": "10bd0ce25d771f9dd7dcd6040299c9a0b3b14c496f598c3c033a874be9521f3a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/command.json",
+          "bytes": 1911,
+          "sha256": "fa317b4310ef8c1ef091a81973326735534d12c2c8e1e63c184a9d4e682b451c"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/raw-tests.json",
+          "bytes": 10576,
+          "sha256": "bd9e65f0292e63e428b02da2a410bfba816b1763d353a8fcb6c0826833f93108"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/command.json",
+          "bytes": 1925,
+          "sha256": "b41f53ad78057aeee6e9e508018260a445ac54960558ddfc75f97db16852cdb7"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+          "messages": [
+            "AssertionError: expected [ [ 'metadata', 'unknown' ], \u2026(3) ] to deeply equal [ [ 'cancel', 'cancelled' ], \u2026(3) ]\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:47:62\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M15-export-unicode-replace",
+      "recipe": {
+        "id": "S7-M15-export-unicode-replace",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, \"\\uFFFD\"))",
+        "sourceReplace": "Array.from(value)",
+        "sourceOccurrences": 1,
+        "sourceLine": 29,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, \"\\uFFFD\"))",
+        "compiledReplace": "Array.from(value)",
+        "compiledOccurrences": 1,
+        "compiledLine": 23,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M15-export-unicode-replace-matrix.json",
+        "bytes": 15111,
+        "sha256": "5af314037825da21a1dac1db22d396bf3c7435f8f9ef62b87440a9d210a4a41d"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/raw-tests.json",
+          "bytes": 10567,
+          "sha256": "708ee581543dcec866488a5244d53b9a0e498c9c142bbe027188dcd45695c6bc"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/command.json",
+          "bytes": 1925,
+          "sha256": "bb3d965b9d84e6ae49ce34b9d937c41f9d4d8dd842f177e41de04f32b8bc93dd"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/raw-tests.json",
+          "bytes": 11771,
+          "sha256": "347be133a2317cc1167b279dc74f1c202bf7d27c3687cbbce57ca878442a2314"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/command.json",
+          "bytes": 1911,
+          "sha256": "76ed630162378a07bba93544a85804ea7b187d43fbb5a93c237efc31d9790762"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/raw-tests.json",
+          "bytes": 10571,
+          "sha256": "8f3f8d638f40955886a2e426827d262f829f60aca0494570bd8d7b1684af08b8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/command.json",
+          "bytes": 1925,
+          "sha256": "34234b19cbba0856660efbaeba9b53669f7f37a3de54f5cd8771b4dc7521ebc0"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+          "messages": [
+            "Error: Invalid imported evidence: events[0]: invalid attributes\n    at createImportedExternalEvidence (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/standard/externalEvidenceProfile.js:179:15)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/importers/externalEvidenceExport.js:63:16\n    at Function.from (<anonymous>)\n    at neutralExternalEvidenceProfiles (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/importers/externalEvidenceExport.js:6:18)\n    at project (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:19:3)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:64:23\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "runtime normalization refusal for previously handled malformed-Unicode input; no unsafe output acceptance",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M16-export-time-range",
+      "recipe": {
+        "id": "S7-M16-export-time-range",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": " && time <= 253402300799999 ?",
+        "sourceReplace": " ?",
+        "sourceOccurrences": 1,
+        "sourceLine": 45,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": " && time <= 253402300799999 ?",
+        "compiledReplace": " ?",
+        "compiledOccurrences": 1,
+        "compiledLine": 44,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M16-export-time-range-matrix.json",
+        "bytes": 14667,
+        "sha256": "25cddbcc58f61fb1e35f88676cf7cbc86855e502bd3d0351bbf02f83d3bec89f"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/raw-tests.json",
+          "bytes": 10573,
+          "sha256": "570b773a02603982e125790261ef397c5ce2a71a7388426b58031b0d33ba9f61"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/command.json",
+          "bytes": 1890,
+          "sha256": "f03ee56eaf5fbc0986f1899d55222293ac1e2868a3b23949047f2beca1f16012"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/raw-tests.json",
+          "bytes": 11600,
+          "sha256": "3daf7c94c8f4fb7b60414daf5891a479da3813b526b9ecc7729a7ae939f529fa"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/command.json",
+          "bytes": 1876,
+          "sha256": "8c05bba42b507be3c4f849cb4ec31d8df0db3fa7ea72dd49194d8e6332217a8b"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/raw-tests.json",
+          "bytes": 10574,
+          "sha256": "96ad6be8487ff5eea64e1325f2e583e2d499a8309eea326037b7923e6f582f60"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/command.json",
+          "bytes": 1890,
+          "sha256": "d6f86f725d2f6b925642afd987f714f5e9ef1ae71d9fc7d4becbe7a00d04c087"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "RangeError: Invalid time value\n    at Date.toISOString (<anonymous>)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/importers/externalEvidenceExport.js:58:35\n    at Array.map (<anonymous>)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/importers/externalEvidenceExport.js:18:77\n    at Function.from (<anonymous>)\n    at neutralExternalEvidenceProfiles (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/importers/externalEvidenceExport.js:6:18)\n    at project (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:19:3)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:51:23\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "runtime RangeError for previously handled out-of-range timestamp fixture; not invalid timestamp acceptance",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M17-export-duration-loss",
+      "recipe": {
+        "id": "S7-M17-export-duration-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (ns !== null && durationNs === null) precisionLoss = true;",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 50,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (ns !== null && durationNs === null)\n                precisionLoss = true;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 50,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M17-export-duration-loss-matrix.json",
+        "bytes": 15013,
+        "sha256": "1c21545c2db54643db9feb02976f612a8190dba558381282d2a6d4556a04bfac"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/raw-tests.json",
+          "bytes": 10562,
+          "sha256": "851a600a76b8976b3ee5f1a029da020d7ff1b12e9170b2ef4eb590796ef35f4f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/command.json",
+          "bytes": 1911,
+          "sha256": "0010475bed0160f8495a9edf329fdf93305607e8645dcf114392b7b4090c9751"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/raw-tests.json",
+          "bytes": 11849,
+          "sha256": "f854cc03b2aaf15e1d90ecacde50ea4001bdaed8730a569a6a59ba44342fe133"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/command.json",
+          "bytes": 1897,
+          "sha256": "d6083c0f571b807b624f6b32d97822e9775e0fafd8ea04cfba5c8e93283aa2b5"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/raw-tests.json",
+          "bytes": 10570,
+          "sha256": "9076f7096881dcc8126e051e7f12f7fb4b01b99b80b03ec970bf4c37524dafa1"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/command.json",
+          "bytes": 1911,
+          "sha256": "e2737061ae791b3190a9846f400283dff319632388daba563718cbb4e16375e7"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:58:73\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M18-export-redaction-loss",
+      "recipe": {
+        "id": "S7-M18-export-redaction-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (candidate.redactionCount > 0) losses.push",
+        "sourceReplace": "if (false) losses.push",
+        "sourceOccurrences": 1,
+        "sourceLine": 21,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (candidate.redactionCount > 0)\n            losses.push",
+        "compiledReplace": "if (false)\n            losses.push",
+        "compiledOccurrences": 1,
+        "compiledLine": 13,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M18-export-redaction-loss-matrix.json",
+        "bytes": 15209,
+        "sha256": "abcfe97b090487d4f17264ac82a0fe6b7b7e6639659a9932872bb0bdd74b3d84"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "38ca46f0f1672b5752cdfdae314a3d4b6066472aec3a2dc3adcbde0bb6afcd8a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/command.json",
+          "bytes": 1918,
+          "sha256": "4d15ce9eed48bd7ff8a73eaecdf129f5fa41a3a41e6541dd5f082eea3494c5e2"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/raw-tests.json",
+          "bytes": 11958,
+          "sha256": "7ef330359867a103026d4551bf9b124552ccc0ea096cc7b841325ee295439c2c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/command.json",
+          "bytes": 1904,
+          "sha256": "cd723c2a16a8e05fa5d5d22b4faf6e48a1e02181b856d70d001b84ba0645ea65"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "ffc89e5652b21b0d294ff51af8b3427cd683708fa303181b2ff472fd8034d3ae"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/command.json",
+          "bytes": 1918,
+          "sha256": "6b7a176f1bf2587317f1e1f7ca5cd1cb0ff0a0898dd1de48d9530ec8e291092b"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+          "messages": [
+            "AssertionError: expected [ \u2026(5) ] to include 'Known sensitive source fields were re\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:76:41\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    },
+    {
+      "id": "S7-M19-export-time-loss",
+      "recipe": {
+        "id": "S7-M19-export-time-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (time !== null && time !== undefined && date === null) precisionLoss = true;",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 46,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (time !== null && time !== undefined && date === null)\n                precisionLoss = true;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 45,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M19-export-time-loss-matrix.json",
+        "bytes": 15021,
+        "sha256": "08aa81722b29b4efd94d19d8c9d6fceb8d53d09c8673fef475be27ba6384bdfe"
+      },
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/raw-tests.json",
+          "bytes": 10571,
+          "sha256": "bf8b123e84cf3a7eaf070412428080de1cdcb399cb3e51f5f7f40ded33376cd1"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/command.json",
+          "bytes": 1883,
+          "sha256": "a8edc39c9434cb3a23d6154c94fd5866ab042565cd3192f0787a833e85158fb2"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/raw-tests.json",
+          "bytes": 11840,
+          "sha256": "07a5718926be45ad7bf376d23b624b2fc8366f97143cbc7e545d6a49d5e36c5d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/command.json",
+          "bytes": 1869,
+          "sha256": "4532040dfb471e29cbfbe8d3074e9ecd6860c23ec30d6bf536ae4a2fd0e48f9f"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/raw-tests.json",
+          "bytes": 10568,
+          "sha256": "bec801cb697e5fdf766f5f55dba425ab0fe597f27f44ace5509ec44380646119"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/command.json",
+          "bytes": 1883,
+          "sha256": "333c6d69efe2c3780484118f0d0f2c3f33873d41aa6837817c3f730a59dfdf1e"
+        }
+      },
+      "caseNames": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "failedAssertionsOrRuntimeErrors": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:59:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "classification": "assertion-specific runtime sensitivity",
+      "mutantEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-compile-mutant/emit-isolation.json",
+        "bytes": 612,
+        "sha256": "748b5bbc917836b4b34755a9d14547541a064c0ccca6a0d20183efb0ca8e6a07"
+      },
+      "restoredEmission": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-compile-restored/emit-isolation.json",
+        "bytes": 524,
+        "sha256": "3e98efd69846753bd8581535622cb3096ecbb39ebbdaddd044f955d52deee6cf"
+      }
+    }
+  ],
+  "historicalDuplicateAliases": [
+    {
+      "id": "S7-M17b-export-duration-loss",
+      "measuredId": "S7-M17-export-duration-loss",
+      "reason": "Exact duplicate source guard and unchanged corpus; historical ID retained without redundant run or distinct-guard inflation.",
+      "measuredMatrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M17-export-duration-loss-matrix.json",
+        "bytes": 15013,
+        "sha256": "1c21545c2db54643db9feb02976f612a8190dba558381282d2a6d4556a04bfac"
+      },
+      "measuredCounts": {
+        "baseline": {
+          "numTotalTests": 26,
+          "numPassedTests": 26,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/raw-tests.json",
+            "bytes": 10562,
+            "sha256": "851a600a76b8976b3ee5f1a029da020d7ff1b12e9170b2ef4eb590796ef35f4f"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/command.json",
+            "bytes": 1911,
+            "sha256": "0010475bed0160f8495a9edf329fdf93305607e8645dcf114392b7b4090c9751"
+          }
+        },
+        "mutant": {
+          "numTotalTests": 26,
+          "numPassedTests": 25,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/raw-tests.json",
+            "bytes": 11849,
+            "sha256": "f854cc03b2aaf15e1d90ecacde50ea4001bdaed8730a569a6a59ba44342fe133"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/command.json",
+            "bytes": 1897,
+            "sha256": "d6083c0f571b807b624f6b32d97822e9775e0fafd8ea04cfba5c8e93283aa2b5"
+          }
+        },
+        "restored": {
+          "numTotalTests": 26,
+          "numPassedTests": 26,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/raw-tests.json",
+            "bytes": 10570,
+            "sha256": "9076f7096881dcc8126e051e7f12f7fb4b01b99b80b03ec970bf4c37524dafa1"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/command.json",
+            "bytes": 1911,
+            "sha256": "e2737061ae791b3190a9846f400283dff319632388daba563718cbb4e16375e7"
+          }
+        }
+      },
+      "distinctGuard": false
+    }
+  ],
+  "M11CompilerAndObserverChronology": {
+    "firstCompileStopped": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/first-M11-compiler-observer.json",
+      "bytes": 1613,
+      "sha256": "7692c30280ce46115584c7a8ca842083c4f5a51957c91f7d27d805fc2ea2cb4a"
+    },
+    "scannerObserverStopped": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/scanner-proof-observer.json",
+      "bytes": 1873,
+      "sha256": "767099027fc6f22e20fbd14eda6c340ff2d1d99fabab73f41e17ec9970769d11"
+    },
+    "finalParserProof": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/stdout.log",
+      "bytes": 1793,
+      "sha256": "89f7bde23078b4d2087a6e1ad7aa7cc126c30eb558ee93ccbcab17f2a8cd3550"
+    },
+    "exactExpectedAndActualDiff": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/expected-actual.diff",
+      "bytes": 593,
+      "sha256": "dab93cbf4b228fdd98fd5d8103c03c22081064429ac58a7da1b736783307ce43"
+    },
+    "expectedBodyPrivateReference": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/expected-target.js",
+      "bytes": 15242,
+      "sha256": "17c5f3504830309bfc4024260776e2f9939b26e2f114b6809bae3d2171c6c43d"
+    },
+    "actualBodyPrivateReference": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/actual-target.js",
+      "bytes": 15258,
+      "sha256": "0b6d363c415c21c74f0a034fecc02b8c58abec1705b66b40824416f82428b361"
+    },
+    "parentReviewClearance": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/proof-review-clearance.json",
+      "bytes": 685,
+      "sha256": "abcbe69dd42f151279f2c2734609ada184b008838733101d36b6c7a418907d11"
+    },
+    "scope": "Both stopped attempts remain unqualified with no mutant or restored corpus execution. Final exact TS recipe still has the intentional TS2345 diagnostic. Actual emitted JS is measured only after whole-file parser leaf equality and reviewed trivia-only difference; successful mutant compilation/typecheck/full build is not claimed."
+  },
+  "maskingAndLimits": {
+    "S7-M11": {
+      "decisiveTest": "an authority that a direct JS caller admits for imports still cannot promote an import",
+      "test": "tests/externalEvidenceProfile.test.ts:72-77",
+      "nonvacuity": "The ordinary imported OBSERVED negative at54 is masked by authority.captureMethods excluding import. The existing72 case intentionally supplies a direct-JS permissive import authority, verifies a genuine local signature, and requires the exact declared-trust error and SELF_REPORTED tier. Do not remove its type-cast fixture as a repair.",
+      "limit": "Caller-provided authority fixture, not actual signed default trust-list loading, authenticated external producer or external truth."
+    },
+    "S7-M12": {
+      "decisiveTest": "the verifier never raises a producer's own lower declaration",
+      "test": "tests/externalEvidenceProfile.test.ts:79-83",
+      "nonvacuity": "Governed-capture declares ATTESTED under OBSERVED authority; first assertion requires ATTESTED. Private clamp removal returns OBSERVED and fails there. The second producer-callback SELF_REPORTED branch is not independently killed because the first assertion stops the case.",
+      "conditionalSupplement": "Only if root wants independently measured second-branch sensitivity, add one newly owned separate case with the existing SELF_REPORTED producer-callback recipe; never edit or split the original file."
+    },
+    "S7-M13": {
+      "test": "tests/externalEvidenceExport.test.ts:69-78",
+      "nonvacuity": "1001 traces require exactly two parts of1000 and1, stable second-part trace id, two session ids and per-part loss notices. Ceil/2000 drops the final trace while slices stay1000; exact part assertions catch it."
+    },
+    "S7-M14": {
+      "test": "tests/externalEvidenceExport.test.ts:40-47",
+      "nonvacuity": "The first trace has callback.cancelled=true without other cancellation flags; removing that path changes cancel/cancelled to metadata/unknown. Other cancellation branches must not be reported independently killed."
+    },
+    "S7-M15": {
+      "test": "tests/externalEvidenceExport.test.ts:63-66",
+      "nonvacuity": "Malformed surrogate in source id requires replacement and bounded safe text. Guard removal may be caught by actual profile validation rather than accepted unsafe output; retain the exact runtime error/assertion and do not call it setup failure or privacy leakage."
+    },
+    "S7-M16": {
+      "test": "tests/externalEvidenceExport.test.ts:50-60",
+      "nonvacuity": "Out-of-range8.64e15+1 timestamp must yield null. Removing the date cap may produce a substantive RangeError from invalid Date.toISOString; record actual failure, not accepted invalid timestamp or universal temporal safety."
+    },
+    "S7-M17_and_M17b": {
+      "test": "tests/externalEvidenceExport.test.ts:57-59",
+      "nonvacuity": "The isolated MAX_SAFE_INTEGER duration control requires the precision-loss notice without an invalid timestamp masking it. M17 andM17b are byte-identical recipes/corpora in the held batch; retain both ids and disclose duplication, never count two distinct guards or silently drop/reclassify one."
+    },
+    "S7-M18": {
+      "test": "tests/externalEvidenceExport.test.ts:69-77",
+      "nonvacuity": "Explicit redactionCount2 requires the redaction loss in every part. This is a disclosed caller redaction count, not a fresh content scan or proof all secrets were removed."
+    },
+    "S7-M19": {
+      "test": "tests/externalEvidenceExport.test.ts:57-60",
+      "nonvacuity": "The isolated invalid timestamp control at59 requires a precision-loss notice with duration absent; no duration/string loss masks that assertion."
+    }
+  },
+  "runtime": {
+    "actualCurrentLauncher": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "launcherRaw": {
+      "path": "/private/tmp/p0-30-actual-runtime-fingerprint-20261015.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    "scope": "Current launcher ABI127 is observed; earlier child ABI is inferred from version/executable, not invented as a recorded field.",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeRebuiltOrDependenciesInstalled": false
+  },
+  "preservation": {
+    "root31Pins": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/source-after.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    },
+    "readiness32Pins": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/readiness-pins-after.json",
+      "bytes": 7214,
+      "sha256": "03eeeef1fc4d9e68ae8f561320286bb9c6992f117eae836a1778aa8bdd5ba3fa"
+    },
+    "source7739RootAndPrivateExact": true,
+    "compiled4529RootAndPrivateExact": true,
+    "full12268Closure": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    "nativeBytesDeviceInodeLinksExact": true,
+    "initialSourceManifest": {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    "rootPreflight": {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    "priorPackets": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/prior-packets-after.json",
+      "bytes": 436,
+      "sha256": "0a03437b9e4c5a75357828fa0065873332e6b85b06e2485b9a234f0cd1cb9aa1"
+    },
+    "liveStatus": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/AMC1516-final-live-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "journal": {
+    "frozen": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 93010,
+      "sha256": "f4f80d974bc7edba545b6684dd4dc11891080d54dff83a0a319e372f46b78159"
+    },
+    "phaseCount": 56,
+    "phases": [
+      {
+        "phase": "AMC1516-private-copy-setup",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 3777
+      },
+      {
+        "phase": "S7-M11-profile-import-gate-221-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 959
+      },
+      {
+        "phase": "S7-M11-profile-import-gate-221-compile-mutant",
+        "exit": 2,
+        "executionError": null,
+        "durationMs": 28857
+      },
+      {
+        "phase": "S7-M11-profile-import-gate-221-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29053
+      },
+      {
+        "phase": "emitted-S7-M11-profile-import-gate-221-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 1042
+      },
+      {
+        "phase": "emitted-S7-M11-profile-import-gate-221-compile-mutant",
+        "exit": 2,
+        "executionError": null,
+        "durationMs": 29075
+      },
+      {
+        "phase": "emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 318
+      },
+      {
+        "phase": "emitted-S7-M11-profile-import-gate-221-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28699
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 1000
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-mutant",
+        "exit": 2,
+        "executionError": null,
+        "durationMs": 28438
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 312
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 1006
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28524
+      },
+      {
+        "phase": "parser-emitted-S7-M11-profile-import-gate-221-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 980
+      },
+      {
+        "phase": "S7-M12-profile-lower-clamp-230-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 965
+      },
+      {
+        "phase": "S7-M12-profile-lower-clamp-230-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28580
+      },
+      {
+        "phase": "S7-M12-profile-lower-clamp-230-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 965
+      },
+      {
+        "phase": "S7-M12-profile-lower-clamp-230-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28846
+      },
+      {
+        "phase": "S7-M12-profile-lower-clamp-230-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 940
+      },
+      {
+        "phase": "S7-M13-export-chunk-bound-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4347
+      },
+      {
+        "phase": "S7-M13-export-chunk-bound-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28840
+      },
+      {
+        "phase": "S7-M13-export-chunk-bound-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4242
+      },
+      {
+        "phase": "S7-M13-export-chunk-bound-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28763
+      },
+      {
+        "phase": "S7-M13-export-chunk-bound-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4259
+      },
+      {
+        "phase": "S7-M14-export-callback-cancel-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4315
+      },
+      {
+        "phase": "S7-M14-export-callback-cancel-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28625
+      },
+      {
+        "phase": "S7-M14-export-callback-cancel-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4228
+      },
+      {
+        "phase": "S7-M14-export-callback-cancel-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28825
+      },
+      {
+        "phase": "S7-M14-export-callback-cancel-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4340
+      },
+      {
+        "phase": "S7-M15-export-unicode-replace-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4299
+      },
+      {
+        "phase": "S7-M15-export-unicode-replace-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28837
+      },
+      {
+        "phase": "S7-M15-export-unicode-replace-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4381
+      },
+      {
+        "phase": "S7-M15-export-unicode-replace-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28598
+      },
+      {
+        "phase": "S7-M15-export-unicode-replace-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4219
+      },
+      {
+        "phase": "S7-M16-export-time-range-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4226
+      },
+      {
+        "phase": "S7-M16-export-time-range-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29375
+      },
+      {
+        "phase": "S7-M16-export-time-range-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4280
+      },
+      {
+        "phase": "S7-M16-export-time-range-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28776
+      },
+      {
+        "phase": "S7-M16-export-time-range-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4282
+      },
+      {
+        "phase": "S7-M17-export-duration-loss-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4212
+      },
+      {
+        "phase": "S7-M17-export-duration-loss-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 29500
+      },
+      {
+        "phase": "S7-M17-export-duration-loss-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4295
+      },
+      {
+        "phase": "S7-M17-export-duration-loss-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28563
+      },
+      {
+        "phase": "S7-M17-export-duration-loss-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4208
+      },
+      {
+        "phase": "S7-M18-export-redaction-loss-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4217
+      },
+      {
+        "phase": "S7-M18-export-redaction-loss-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28474
+      },
+      {
+        "phase": "S7-M18-export-redaction-loss-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4259
+      },
+      {
+        "phase": "S7-M18-export-redaction-loss-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28827
+      },
+      {
+        "phase": "S7-M18-export-redaction-loss-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4334
+      },
+      {
+        "phase": "S7-M19-export-time-loss-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4261
+      },
+      {
+        "phase": "S7-M19-export-time-loss-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28580
+      },
+      {
+        "phase": "S7-M19-export-time-loss-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 4239
+      },
+      {
+        "phase": "S7-M19-export-time-loss-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28749
+      },
+      {
+        "phase": "S7-M19-export-time-loss-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 4396
+      },
+      {
+        "phase": "AMC1516-final-preservation",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 2496
+      },
+      {
+        "phase": "AMC1516-final-live-status",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 46
+      }
+    ]
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+    "bytes": 83180,
+    "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903"
+  },
+  "artifactCount": 344,
+  "limits": [
+    "No live source, original test/helper, CLI, guard, archive, counter, dependency/native module, Git or canonical qualification edit was made.",
+    "Historical M17b maps transparently to one measured M17 guard; no duplicate run or inflated distinct guard count.",
+    "M11 uses the original direct-JS permissive authority fixture, not a real default signed trust-list loader or authenticated external identity.",
+    "M12 first assertion masks independent execution of its lower SELF_REPORTED branch; that branch is not claimed independently killed.",
+    "Runtime validation refusal/RangeError is retained as actual behavior, not accepted unsafe data or unrelated infrastructure.",
+    "The API test uses mocked request/response transport with the actual dispatcher; no real HTTP/authentication/tenant deployment claim.",
+    "No old P0-18 59-case totals are added to current44, no shared mapping is double-counted as57 future cases, and no AMC1517 guard or lifecycle control was run. The original mapping tests can exercise unchanged callback capture.",
+    "No old held runner transfer, full76 batch, wholeP030/native/race acceptance, Node24, fullsuite, coverage, hostedCI, release, source fix or Done approval is inferred."
+  ]
+}

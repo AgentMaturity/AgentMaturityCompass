@@ -1,0 +1,88 @@
+{
+  "schema": "p111-source-run-independent-review/1",
+  "at": "2026-10-16T19:29:05.567174+00:00",
+  "blockers": [],
+  "phase": "p111-source-combined",
+  "source": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceBaseCommit": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "target": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts",
+    "bytes": 18998,
+    "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts",
+    "dev": 16777231,
+    "inode": 543140046,
+    "nlink": 1
+  },
+  "exactPreferredV2": true,
+  "tests": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0,
+    "newTypedUnit": 25,
+    "unchanged": 63
+  },
+  "files": {
+    "tests/compliance/complianceFailClosed.test.ts": 21,
+    "tests/compliance/coverageScorer.test.ts": 2,
+    "tests/compliance/evidenceBinding.test.ts": 40,
+    "tests/catalog/evidence/decisive.test.ts": 25
+  },
+  "identityJoin": {
+    "rawAndObserverOrderedOccurrenceExact": true,
+    "outcomeIdentityListExact": true,
+    "uniqueObserverTestIds": 88,
+    "orderedIdentitySha256": "91591da07b9206e3dfa34975eecc2183f7c9121d43415f504fa8da548675499a",
+    "observerTestFilepathNullHandledByUniqueActualFilePrefix": true
+  },
+  "hookTaskEntries": 29,
+  "individualPassingHookValues": 29,
+  "allRawFailureMessages": [],
+  "allRawFileMessages": [],
+  "allObserverTaskErrors": [],
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "fullOuterStreamRead": true,
+  "publicEvidencePaths": [],
+  "naturalClosure": {
+    "exit": 0,
+    "durationMs": 6852,
+    "pid": 17548,
+    "ownedPgid": 17548,
+    "recordedGroupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "noNewProbeByReviewer": true
+  },
+  "preservation": {
+    "protectedBytePinsMatched": 88,
+    "candidateInputBytePinsMatched": 31,
+    "nativePhysicalPinsMatched": 3,
+    "nativeInodesDistinct": [
+      542501039,
+      539175547,
+      543125595
+    ],
+    "nativeNlinkOne": true,
+    "heldStatusAndIndex": "Held R18/indexempty retained in root protected snapshot; this review rechecks its finite bytes, not a fresh Git status.",
+    "reservation": "Last-known missing reservation binding remains retained; no release/delta claim."
+  },
+  "testSpecificBoundaries": [
+    "The25new cases consume typed already-derived provenance, verdict, foreignReceipt, plan and review inputs. They do not verify loader/receipt/ledger/external signatures or raw meta.trustTier derivation.",
+    "attributes.trustTier is an ignored caller label contrast against supplied SELF_REPORTED provenance; its passing assertion is consumption evidence only.",
+    "Applicability fixture is a supplied decision. Review signature verification is upstream. No compiler plan, independent-review, real report positive or portable-trust proof.",
+    "Trusted-violation assertions use applicable context; no universal violation precedence is inferred.",
+    "Fixed25case inventory passed; finite internal table rows are observations, not tests. No source-control result is yet claimed."
+  ],
+  "sourceAuthorityBoundary": {
+    "selectedRawAndObserverFilesRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "importResolution": "Reviewed candidate relative source imports resolve the selected S checkout; its relevant source bytes match author pins.",
+    "runnerCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "runnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "sourceLiteralCensus": "Existing evidenceBinding sourceFiles(\"src\") reads the borrowed R cwd/src. Its passing census is not S source-literal census coverage.",
+    "environment": "Runner records inherited environment with private HOME/Node22 PATH; no isolation or per-test exact-environment-restoration claim.",
+    "native": "Static physical preservation only; no per-test native module load identity proof.",
+    "scope": "Working-tree source cohort only. Compiler/build/fresh controls/quality/full issue/holds are separate."
+  },
+  "authorshipDisclosure": "Reviewer authored the new test; this is independent verification of root-run evidence, not independent test authorship. Sibling static review remains separate."
+}

@@ -1,0 +1,411 @@
+{
+  "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "node": "v22.23.3",
+  "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+  "harnessSha256": "20b13c0dcc01bf5410570baf36497f9e0bc16f119569032d927b34c223a6ff09",
+  "evidence": "/private/tmp/p0-20-compiled-cli-kffWOd",
+  "inputs": [
+    {
+      "path": "dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "dist/domains/domainApplyCli.js",
+      "sha256": "6658e3c22f07f473ad3ae75407df8b67628d34843fa3ebc5b8e97e2962e5e113"
+    },
+    {
+      "path": "dist/domains/industryPackAudit.js",
+      "sha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f"
+    },
+    {
+      "path": "dist/audit/auditApi.js",
+      "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304"
+    },
+    {
+      "path": "dist/audit/binderSigner.js",
+      "sha256": "1242f865d6c2a3a14dee9d6800e8d1b671a6691b68542efcec79ee4ceec425fd"
+    },
+    {
+      "path": "dist/crypto/signing/signerVault.js",
+      "sha256": "a34222d3d003d7246fc12f15e13d1b6e404aa44dc5d61658074e3953a29b820d"
+    }
+  ],
+  "unchangedInputs": true,
+  "operatorPins": {
+    "capturedBeforeAuditSigning": true,
+    "auditorPublicKeySha256": "e0febda99deeac35629a8c786c70f7dfd2306d75eb1154ac20c6b48a5dc60290",
+    "foreignPublicKeySha256": "745befda1c202477da8aab71097b81e2919abf630233341fa1432c567a7b9168",
+    "independentPublicPinFile": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub"
+  },
+  "paidGate": {
+    "genuineLocalEd25519License": true,
+    "issuerPublicKeySha256": "765e2726c8bffa04fa2f95100fcd372cebee7d0e3d5cbcc28b4df6d32659bbfe",
+    "privateKeyPassedToChild": false,
+    "activation": false,
+    "transportDenied": true
+  },
+  "commands": [
+    {
+      "name": "paid-gate-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/gate-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 896,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/paid-gate-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/paid-gate-refusal.stderr",
+      "stderrSha256": "dd26db6c2c5acef02566f05f8973068392d8eb7be46c44c1dff1f961b953406b",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/paid-gate-refusal.effects.json",
+      "effectsSha256": "724d27415afb0f9b341f65f37225365e92559ec81861a1c4dd1496cf94645e00"
+    },
+    {
+      "name": "signed-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/signed.json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== null\n",
+      "durationMs": 744,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/signed-text-write.stdout",
+      "stdoutSha256": "b3f0408a0e6f962e8c76aac69d29fd3cff685c6626a637f4cf66443013acee98",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/signed-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/signed-text-write.effects.json",
+      "effectsSha256": "fd2be5d60b06497765157643a47b5b082f4fef0a45919dcf51f89c6ef8665658"
+    },
+    {
+      "name": "trusted-text-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub"
+      ],
+      "exit": 70,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n70 !== 0\n",
+      "durationMs": 724,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-text-verify.stdout",
+      "stdoutSha256": "d7108aa6d9b56a4e663f139436293790e1d27fcaf4e9c55668adca45c0ca15a7",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-text-verify.stderr",
+      "stderrSha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-text-verify.effects.json",
+      "effectsSha256": "cca705f7a8ea9f461373e3337420f6d95dd5d6858f506a464ef8a352c5e8895b"
+    },
+    {
+      "name": "trusted-json-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 70,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n70 !== 0\n",
+      "durationMs": 883,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-json-verify.stdout",
+      "stdoutSha256": "fe1008a3d74914adb7eafecce254572b81e4ac2453974e83292f8def15cd018d",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-json-verify.stderr",
+      "stderrSha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-json-verify.effects.json",
+      "effectsSha256": "cca705f7a8ea9f461373e3337420f6d95dd5d6858f506a464ef8a352c5e8895b"
+    },
+    {
+      "name": "unpinned-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/signed.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 694,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/unpinned-refusal.stdout",
+      "stdoutSha256": "d232ecc58da71aad54bb06ab2d3ecfcff395d4fa9599e451fb42bd30933ca139",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/unpinned-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/unpinned-refusal.effects.json",
+      "effectsSha256": "cca705f7a8ea9f461373e3337420f6d95dd5d6858f506a464ef8a352c5e8895b"
+    },
+    {
+      "name": "unsigned-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/unsigned.json",
+        "--no-sign"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "durationMs": 701,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-text-write.stdout",
+      "stdoutSha256": "2642fc88fe40a548b7972f5b7986e3118dd4cd1560c8e373cbfab789a35044c6",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-text-write.effects.json",
+      "effectsSha256": "117a4479faf0d087b8ed67eb5048281468fed49249a3d97c42d6da44513a2d2c"
+    },
+    {
+      "name": "unsigned-verify-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/unsigned.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 706,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-verify-refusal.stdout",
+      "stdoutSha256": "854481e3d916a307f9fcdef005e199e001b41aa547e559a6e6cab36a1e6bd8f9",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-verify-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/unsigned-verify-refusal.effects.json",
+      "effectsSha256": "94e5d870cd5178ecf199ff4b850fe61dca0cf9a60f9abf7145aab4d3de84e4a6"
+    },
+    {
+      "name": "baseline-checksum-json",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/baseline.json",
+        "--no-sign",
+        "--json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "durationMs": 711,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-checksum-json.stdout",
+      "stdoutSha256": "30a6a0c71fe5843f97f57d474983300fd528c88d8d87ae09fa02b88b20102a51",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-checksum-json.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-checksum-json.effects.json",
+      "effectsSha256": "387b9d9f3fdee33a54d106675f399ef61094d39d0b1b7953c27599f01fd7722b"
+    },
+    {
+      "name": "baseline-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/baseline-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 704,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-sign-refusal.stderr",
+      "stderrSha256": "e453fb0f2a9a81147efb088e1792637498fc722945223ea9687c8a088252e8a5",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/baseline-sign-refusal.effects.json",
+      "effectsSha256": "542181b228f85c0e0ee4e6a828f52650c8bf4a74282721b5ce03fb418b79054c"
+    },
+    {
+      "name": "locked-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/locked-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 746,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/locked-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/locked-sign-refusal.stderr",
+      "stderrSha256": "1396c3557f68695ad1ffa597f293817d18999ab0a89ee1232fd06d32eb5b112d",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/locked-sign-refusal.effects.json",
+      "effectsSha256": "542181b228f85c0e0ee4e6a828f52650c8bf4a74282721b5ce03fb418b79054c"
+    },
+    {
+      "name": "tamper-rechecksum-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/tampered-rechecksummed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 742,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/tamper-rechecksum-refusal.stdout",
+      "stdoutSha256": "c2c6b66c38ecd95b335db4510e5fb7684df36fcbd367a83a95ee7fd825ea9402",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/tamper-rechecksum-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/tamper-rechecksum-refusal.effects.json",
+      "effectsSha256": "9cf358d7a70b7c48a10031037dac648983e11ee618fc7e25b1be760fccd6a44f"
+    },
+    {
+      "name": "foreign-signer-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/foreign-signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 721,
+      "stdout": "/private/tmp/p0-20-compiled-cli-kffWOd/foreign-signer-refusal.stdout",
+      "stdoutSha256": "ae982d34774c76b9a782bd3f2829c93da8506ef0fb4be0a409a1ac3b510671b6",
+      "stderr": "/private/tmp/p0-20-compiled-cli-kffWOd/foreign-signer-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-kffWOd/foreign-signer-refusal.effects.json",
+      "effectsSha256": "ab8ec0af4069b80e8d6881e73928fa224831a5ede430663c3a1044813da2b1c5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/signed.json",
+      "sha256": "f9a66848bf66201f18d225fbb8f2a6436a55579f38751af8837c4c118ffe20c8"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/unsigned.json",
+      "sha256": "d630e7ed6c4892fb45854e891632b93ab9e19d3f08cbed2dd52d6aaa219ef1eb"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/baseline.json",
+      "sha256": "20e7e9f55c66c12dcc301fb855184d6a5ef9136133e22e16ef1a8bc72c42e4b4"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/tampered-rechecksummed.json",
+      "sha256": "ce622c08e6009724badd6378a4f956fcde98b61249efaf9ed71f508b2cb61d6b"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/outputs/foreign-signed.json",
+      "sha256": "695f190b2487552504a538fb70a98c6d9bed35a423fbce0e3278a913b57e056d"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-kffWOd/owned-state/responses.json",
+      "sha256": "1dcaadc51d4896e88a0e04c18935daad7b650673a9e3fcbf99f6491eb6b49ffc"
+    }
+  ],
+  "limits": "Actual compiled local CLI with private HOME/workspaces and genuine fixture license. No activation, live provider, authenticated HTTP, notary/HSM, whole-suite/coverage/hosted/release claim."
+}

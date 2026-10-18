@@ -1,0 +1,167 @@
+"""UNEXECUTED metadata builder. Root must provide final review/outcome pins; no fallback authorization."""
+from pathlib import Path
+import argparse, hashlib, json, os, platform, shlex, stat, subprocess
+
+T = Path('/private/tmp')
+R = Path('/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass')
+B = T / 'p0-41-qualification-20261015'
+C = T / 'p0-41-causal-qualification-v2-20261015'
+V1 = T / 'p0-41-causal-qualification-20261015'
+Q = R / 'qualification/2026-10-15-P0-41'
+SOURCE = '33a8e20bf340f2f9c717bb813f95de3b648a4ad4'
+BRANCH = 'codex/p0-41-current-qualification'
+CAP = 1024 * 1024
+PACKET_SHA = '7a61cc8015d362cf12e856f9e2870a63c17058b89d7aeaa42eb27ba82754198d'
+JOURNAL_SHA = 'a39835c4d8a574a293a43a7355415baf6981d080cb0fdf430ef094270e5d1e33'
+ORDER = ('P041-M1-missing-source-zero', 'P041-M2-vacuous-file-pass')
+
+def pin(p):
+    p = Path(p); data = p.read_bytes()
+    return {'path': str(p), 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+
+def load(p):
+    return json.loads(Path(p).read_text())
+
+def verified(p, digest, size=None):
+    value = pin(p)
+    assert value['sha256'] == digest and (size is None or value['bytes'] == size), str(p)
+    return value
+
+def bounded(data):
+    assert len(data) <= CAP and b'PRIVATE ' + b'KEY-----' not in data
+    return data
+
+def git(*args):
+    return subprocess.check_output(['git', *args], cwd=R, env=os.environ | {'GIT_NO_LAZY_FETCH': '1'}, text=True).strip()
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    for arg in ('review-json', 'review-sha', 'review-md', 'review-md-sha', 'outcome', 'outcome-sha'):
+        ap.add_argument('--' + arg, required=True)
+    ap.add_argument('--outcome-bytes', type=int, required=True)
+    args = ap.parse_args()
+    packet_path = T / 'p0-41-bounded-qualification-20261015.json'
+    packet_pin = verified(packet_path, PACKET_SHA, 36601); packet = load(packet_path)
+    review_pin = verified(args.review_json, args.review_sha)
+    review_md = verified(args.review_md, args.review_md_sha)
+    outcome_pin = verified(args.outcome, args.outcome_sha, args.outcome_bytes)
+    review, outcome = load(args.review_json), load(args.outcome)
+    assert review['allReadsFinished'] is True and review['formalAcceptanceClosed'] is False
+    blocks = [review[k] for k in ('blockingFindings', 'blockingPacketFindings') if k in review]
+    assert blocks and all(value == [] for value in blocks)
+    assert PACKET_SHA in json.dumps(review) and PACKET_SHA in json.dumps(outcome)
+    assert args.review_sha in json.dumps(outcome) and outcome.get('formalAcceptanceClosed') is False
+    assert packet['source'] == SOURCE and packet['branch'] == BRANCH and packet['formalAcceptanceClosed'] is False
+    for entry in packet['privateRefs']: verified(entry['path'], entry['sha256'], entry['bytes'])
+    for phase in packet['newCorpus']['phases']:
+        for key in ('command', 'raw', 'observer', 'log', 'classification'):
+            entry = phase[key]; verified(entry['path'], entry['sha256'], entry['bytes'])
+    for control in packet['newCorpus']['controls']:
+        entry = control['result']; verified(entry['path'], entry['sha256'], entry['bytes'])
+    for entry in (packet['newCorpus']['candidate'], packet['v1FailedBaseline']['fixture']): verified(entry['path'], entry['sha256'], entry['bytes'])
+    assert git('rev-parse', 'HEAD') == SOURCE and git('branch', '--show-current') == BRANCH
+    assert git('status', '--porcelain', '--untracked-files=all') == '' and not Q.exists() and not Q.is_symlink()
+    setup = load(C / 'setup-bound-inputs.json'); private_only = []
+    plan = load(C / 'plan-bound.json'); verified(C / 'driver/controller.py', plan['preparedControllerSha256'])
+    for key, count in (('sourceManifest', 8574), ('compiledManifest', 4529)):
+        entry = setup[key]; verified(entry['path'], entry['sha256'], entry['bytes']); private_only.append(entry)
+        rows = load(entry['path']); assert len(rows) == count
+        assert all(pin(R / name)['sha256'] == digest for name, digest in rows.items())
+    assert {str(p.relative_to(R)) for p in (R / 'dist').rglob('*') if p.is_file()} == set(load(setup['compiledManifest']['path']))
+    native = setup['native']; verified(native['path'], native['sha256'], native['bytes']); ns = Path(native['path']).stat()
+    assert (ns.st_dev, ns.st_ino, ns.st_nlink) == (native['device'], native['inode'], native['nlink'])
+    assert stat.S_IMODE(ns.st_mode) == native['mode']
+    verified(V1 / 'ACTIVE', 'cc2aae4fe4d385e01c1ee1ff890236aeba50e04ac7069e05b4ccf67569f3fcea', 216)
+    verified(V1 / 'HALTED.json', '86bdfab8265284d92a659a8a50a9f9348698be2941a52b81d5761db77d8b5f11', 288)
+    assert not (C / 'ACTIVE').exists() and not (C / 'HALTED.json').exists()
+    journal = B / 'commands-frozen.jsonl'; verified(journal, JOURNAL_SHA, 15558)
+    originals = [json.loads(line) for line in journal.read_text().splitlines()]
+    assert len(originals) == 13 and all(row['exit'] == 0 for row in originals)
+    phases = [C / 'phases' / (control + '--' + stage) for control in ORDER for stage in ('baseline', 'mutant', 'restored')]
+    raws = [load(p / 'raw.json') for p in phases]
+    assert all(r['numTotalTests'] == 27 and r['numPendingTests'] == r['numTodoTests'] == 0 for r in raws)
+    assert sum(r['numPassedTests'] for r in raws) == 153 and sum(r['numFailedTests'] for r in raws) == 9
+    assert raws[-1]['success'] is True and raws[-1]['numPassedTests'] == 27 and raws[-1]['numFailedTests'] == 0
+    for control in ORDER:
+        assert load(C / ('result--' + control + '.json'))['restoredExactly'] is True
+    selected = {}
+    def add(path, label=None):
+        path = Path(path); assert stat.S_ISREG(path.lstat().st_mode) and not path.is_symlink(), str(path)
+        assert '.git' not in path.parts and 'node_modules' not in path.parts and path.suffix != '.node'
+        for root in (B, C, V1):
+            if path.is_relative_to(root):
+                assert path.relative_to(root).parts[0] not in ('source', 'home', 'store', 'tmp')
+        assert path.name not in ('tracked-source-before.json', 'compiled-after-build.json', 'physical-source-dist-manifest.json')
+        assert 'runtime-artifact-index' not in path.name
+        data = bounded(path.read_bytes()); selected[str(path)] = (label or path.name, data, pin(path))
+    for path in (packet_path, Path(args.review_json), Path(args.review_md), Path(args.outcome), journal): add(path)
+    for row in originals:
+        for name in ('command.json', 'stdout-stderr.log', 'owned-process.json', 'owned-group-after-exit.json'):
+            add(B / ('command-' + row['phase']) / name)
+    for phase in phases:
+        for name in ('raw.json', 'observer.json', 'stdout-stderr-frozen.log', 'command.json', 'classification.json', 'inputs-before.json', 'inputs-after.json'):
+            add(phase / name)
+    for control in ORDER:
+        for prefix in ('result--', 'release--'): add(C / (prefix + control + '.json'))
+    for name in ('plan-bound.json', 'setup-bound-inputs.json', 'setup-index.json', 'new-fixture-expected-case-identities.json'): add(C / name)
+    add(C / 'driver/controller.py', 'controller-v2.py.txt')
+    for name in ('p0-41-program-metrics-qualification-v2-preparation-20261015.json', 'p0-41-v2-preparation-derivation-20261015.json', 'p0-41-causal-recipe-static-preparation-20261015.json', 'p0-41-v2-controller-setup-static-review-20261015.json', 'p0-41-new-fixture-static-review-20261015.json', 'p0-41-v1-baseline-failure-review-20261015.json', 'p0-41-wrapper-static-review-20261015.json'):
+        add(T / name); partner = T / name.replace('.json', '.md')
+        if partner.exists(): add(partner)
+    for version, name in (('v1', 'p0-41-program-metrics-qualification-prepared.test.ts'), ('v2', 'p0-41-program-metrics-qualification-v2-prepared.test.ts')):
+        add(T / name, 'fixture-' + version + '.test.ts.txt')
+    for name in ('raw.json', 'observer.json', 'stdout-stderr-frozen.log', 'command.json'):
+        add(V1 / 'phases/P041-M1-missing-source-zero--baseline' / name)
+    for name in ('ACTIVE', 'HALTED.json'): add(V1 / name)
+    for name in ('initial-preflight.json', 'post-build-preservation.json', 'actual-source-cli-and-guards-summary.json', 'final-source-preservation.json'): add(B / name)
+    wip = T / 'amc-current-wip-classification-readonly-20261015.json'
+    verified(wip, 'dfa37bfd359c951685d3931d4d5c368f144a51bd614114a0668c821f57ce0432', 23469)
+    add(wip); add(wip.with_suffix('.md'))
+    witnesses = Path(load(phases[-1] / 'command.json')['cliArtifactRoot'])
+    for pattern in ('Q12-nonexistent-p041-*', 'Q12-ancestor-p041-*', 'Q10-head-json-p041-*', 'Q13-render-p041-*'):
+        fixtures = list(witnesses.glob(pattern)); assert len(fixtures) == 1
+        evidence = fixtures[0] / 'evidence'; add(evidence / 'fixture.json')
+        for path in sorted(evidence.glob('commit-*.json')): add(path)
+        for path in sorted(evidence.glob('*/result.json')):
+            result = load(path)
+            if result['argv'][0] == setup['node']['path'] and result['argv'][1].endswith('/scripts/program-metrics.mjs'):
+                add(path); add(path.with_name('intent.json'))
+    private_only += [setup['physicalManifest']]
+    private_only += [pin(T / ('p0-41-' + version + '-runtime-artifact-index-20261015.json')) for version in ('v1', 'v2')]
+    for entry in private_only: verified(entry['path'], entry['sha256'], entry['bytes'])
+    commands = [{'cmd': row['cmd'], 'exit': row['exit'], 'durationMs': row['durationMs']} for row in originals]
+    commands += [{'cmd': shlex.join(load(path / 'command.json')['argv']), 'exit': load(path / 'command.json')['exit'], 'durationMs': load(path / 'command.json')['durationMs']} for path in phases]
+    old_command = load(V1 / 'phases/P041-M1-missing-source-zero--baseline/command.json')
+    commands += [{'cmd': shlex.join(old_command['argv']), 'exit': old_command['exit'], 'durationMs': old_command['durationMs']}]
+    assert len(commands) == 20 and old_command['exit'] == 1
+    Q.mkdir(); (Q / 'evidence').mkdir(); copied = []
+    def write(name, data):
+        with (Q / name).open('xb') as stream: stream.write(bounded(data))
+        assert (Q / name).read_bytes() == data
+    for number, (source, (label, data, entry)) in enumerate(sorted(selected.items())):
+        name = 'evidence/' + str(number).zfill(3) + '-' + label
+        write(name, data); copied.append({'source': entry, 'copiedPath': name, 'sha256': hashlib.sha256(data).hexdigest()})
+    write('private-references.json', (json.dumps({'copiedSources': copied, 'privateOnlyUnsplit': private_only, 'packet': packet_pin, 'actualReview': review_pin, 'actualReviewMarkdown': review_md, 'rootOutcome': outcome_pin, 'formalAcceptanceClosed': False}, indent=2) + '\n').encode())
+    readme = '''# P0-41 bounded qualification — 15 October 2026
+
+The latest corrected private corpus passed 27 of 27 cases on measured source 33a8e20bf340f2f9c717bb813f95de3b648a4ad4. These are 12 supplied-input and 15 genuine local Git/CLI cases, not adopted permanent regression coverage or current program measurements. No tracked source or test was changed.
+
+Thirteen original commands passed. The two private controls measured 27→19→27 and 27→26→27. Their six phases repeat the same 27 cases: 162 executions, 153 passes and nine body assertion failures across eight distinct names. Later assertions can be masked. The primary receipt records only the latest 27 passes; its 20 command rows retain the 13 original commands, six causal phases and one separately failed v1 baseline.
+
+The v1 attempt remains 27 total, 26 passed and one fixture error: Git returned 1 where Q12d incorrectly demanded 128. Its following product refusal was masked; no mutant or restoration ran there. Only that Git precondition changed in a fresh v2 namespace, retaining the exact product refusal. Restored samples preserve actual missing-SHA refusal, genuine-ancestor structural acceptance, committed JSON zero despite working-copy changes/deletion, and Markdown escaping. They do not authenticate declarations or approved merges.
+
+The empty-assertion control is a supplied-report unit computation. No successful CLI --vitest-json case, online cadence query, real owner measurement, full suite, coverage, Node 24, hosted CI or formal acceptance is claimed. All 15 current metric rows, 90 target cells, funded selection and unspecified A4 targets remain. Monday posting remains Sid's task. Required quality debt remains 1269 duplicate and 2751 dead-code findings, without waiver. P0-29's skipped unresolved routes and P0-22's successful empty passport-array contract remain unrelated and unresolved.
+
+The WIP snapshot records 13 unreviewed bot PRs with no documented exemption; conservative new-admission hold remains. P0-57 is not activated: P1-65 freeze-exception and accepted-base barriers remain. All prior user holds, ownership, expert/ISO, release and source-transfer gaps remain. Review and root outcome retain detailed limits. Large manifests and both full runtime indices remain unsplit private references. This packet is qualification evidence, not Done, dependency closure or permission to publish.
+'''
+    write('README.md', readme.encode())
+    receipt = {'schemaVersion': 1, 'key': 'P0-41', 'date': '2026-10-15', 'commit': SOURCE, 'branch': BRANCH, 'node': 'v22.23.3', 'pnpm': '10.33.0', 'os': platform.system() + ' ' + platform.release(), 'arch': platform.machine(), 'commands': commands, 'tests': {'total': 27, 'passed': 27, 'failed': 0, 'skipped': 0}, 'artifacts': [], 'notes': readme}
+    assert receipt['arch'] in ('arm64', 'x64')
+    receipt['artifacts'] = [{'path': str(p.relative_to(Q)), 'sha256': pin(p)['sha256']} for p in sorted(Q.rglob('*')) if p.is_file()]
+    write('receipt.json', (json.dumps(receipt, indent=2) + '\n').encode())
+    assert git('rev-parse', 'HEAD') == SOURCE
+    assert all(line.startswith('?? qualification/2026-10-15-P0-41/') for line in git('status', '--porcelain', '--untracked-files=all').splitlines())
+    print(json.dumps({'qualification': str(Q), 'files': len(receipt['artifacts']) + 1, 'receipt': pin(Q / 'receipt.json'), 'formalAcceptanceClosed': False}))
+
+if __name__ == '__main__':
+    main()

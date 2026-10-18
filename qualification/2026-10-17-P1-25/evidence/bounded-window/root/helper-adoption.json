@@ -1,0 +1,107 @@
+{
+  "at": "2026-10-17T00:12:41.257607+00:00",
+  "rootFullReadOldBinderAndExactNewDeltasAndOldAuditGuards": true,
+  "independentBlockers": [],
+  "seals": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/seal.json",
+      "bytes": 2368,
+      "sha256": "75e8b6bef1d9d8f0029f7214042cc24c65a5396bf1f11286d3a0544644d25981",
+      "dev": 16777231,
+      "inode": 543743027,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/seal.json",
+      "bytes": 1437,
+      "sha256": "e6e36d26205f969dbc1cc61cd47e1b66adb8c30faa8fd3c2e0cc2e1d6f44811c",
+      "dev": 16777231,
+      "inode": 543750134,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+      "bytes": 1618,
+      "sha256": "8b54e2f44fd03d55921bf35fd8a29e8f3e58b9bdf6cc7464e7b7fb5b10d89a58",
+      "dev": 16777231,
+      "inode": 543748143,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/seal.json",
+      "bytes": 2641,
+      "sha256": "2ab398d89e66f70b7133b017cd03eb10b68180ad1bed1acffa6b8098b6fe60a7",
+      "dev": 16777231,
+      "inode": 543750044,
+      "nlink": 1
+    }
+  ],
+  "activeExactPrivateCopies": [
+    {
+      "inert": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+        "bytes": 2195,
+        "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88",
+        "dev": 16777231,
+        "inode": 543743019,
+        "nlink": 1
+      },
+      "active": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+        "bytes": 2195,
+        "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88",
+        "dev": 16777231,
+        "inode": 543750154,
+        "nlink": 1
+      }
+    },
+    {
+      "inert": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+        "bytes": 14619,
+        "sha256": "bfafc3c25fa9c1f5f15da69b7dca818e63ddfb78bda66ae74a2965e31b11a0f5",
+        "dev": 16777231,
+        "inode": 543743020,
+        "nlink": 1
+      },
+      "active": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/audit-public.py",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/audit-public.py",
+        "bytes": 14619,
+        "sha256": "bfafc3c25fa9c1f5f15da69b7dca818e63ddfb78bda66ae74a2965e31b11a0f5",
+        "dev": 16777231,
+        "inode": 543750155,
+        "nlink": 1
+      }
+    },
+    {
+      "inert": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+        "bytes": 4948,
+        "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+        "dev": 16777231,
+        "inode": 543748138,
+        "nlink": 1
+      },
+      "active": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+        "bytes": 4948,
+        "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+        "dev": 16777231,
+        "inode": 543750156,
+        "nlink": 1
+      }
+    }
+  ],
+  "runtime151Immutable": true,
+  "noSourceWritesNoFutureFreshOutcomesClaimed": true
+}

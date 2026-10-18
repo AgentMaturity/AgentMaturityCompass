@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-16T20:39:49.576926+00:00",
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "admittedNumericSpans": 15,
+  "actualCountCheck": "p126-counts-before",
+  "actualInventory": 1691,
+  "publishedBefore": 1689,
+  "hostedAndD15Reviewed": true,
+  "generatorExact": true,
+  "allOtherAuthoredBytesMustStayExact": true,
+  "claudeAndHeldRVariantsExact": true,
+  "rootOwnsOnlyNumericSpans": true,
+  "noIgnoreOrBaselineChange": true
+}

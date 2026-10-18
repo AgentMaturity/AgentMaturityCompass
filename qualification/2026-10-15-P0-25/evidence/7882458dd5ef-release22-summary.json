@@ -1,0 +1,19 @@
+{
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "raw": {
+    "path": "/private/tmp/p0-25-release-executor-contracts-20261015.json",
+    "bytes": 8707,
+    "sha256": "7fceee2436c1b18c27ab8016a00d8bffa5ee5f304c51a7e6acd496bc8a5c0b12"
+  },
+  "observer": {
+    "path": "/private/tmp/p0-25-qualification-20261015/observers/release-executor-contracts.json",
+    "bytes": 11918,
+    "sha256": "a5452d57d332269d5472f0f4fe2e89fd9dfea808abf9a96592bdf90307ba49ee"
+  },
+  "registered": 22,
+  "passed": 22,
+  "failed": 0,
+  "pending": 0,
+  "todo": 0,
+  "boundary": "All22 original injected-executor release-gate contracts pass. Citation failure/needs-build and build-failure blocking are checked against supported execute injection. Fixture passed steps/fullsuite reports are simulated data, not executed gates, real build/pack, deployment/live health, hosted CI or production readiness. Separate from focused32 and actual collector/package processes."
+}

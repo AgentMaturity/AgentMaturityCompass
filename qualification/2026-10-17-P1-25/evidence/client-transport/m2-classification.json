@@ -1,0 +1,37 @@
+{
+  "schema": "p125c-root-control-failure-classification/1",
+  "at": "2026-10-16T21:50:00.269339+00:00",
+  "phase": "p125c-m2",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "operator": "C2-ignore-response-MIME",
+  "outcomeSha256": "136eeb32d61d5142d3621f24f2453c20b77f2b0d54e7658de25df321c35a0536",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "tests/time/tsaClient.test.ts:280:102 is the first project frame for the intended rejects matcher at280-281. Adjacent real valid response positive278 passed; wrong-MIME request resolves Buffer[0,255,128,129,127] rather than rejecting.",
+  "masking": [
+    "The intended rejection assertion stops the body; later request-path/count equality282 is masked and has no executed assertion credit.",
+    "The finally block runs natural listener/socket/request/response closure and owned-temp cleanup. Its clean path rethrows the primary assertion unchanged at181; no cleanup AggregateError or unexpected hook/environment failure occurred.",
+    "Raw byte resolution is transport evidence only; these five synthetic public bytes are not CMS, a timestamp token, a trust grant or AttestedTime."
+  ],
+  "actualFailures": [
+    {
+      "test": "P1-25 request DER and configured raw HTTP transport refuses wrong response MIME after the adjacent real positive",
+      "firstProjectFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/tests/time/tsaClient.test.ts",
+        "line": 280,
+        "column": 102
+      },
+      "classification": "intended wrong-MIME promise refusal assertion",
+      "message": "promise resolved \"Buffer[ 0, 255, 128, 129, 127 ]\" instead of rejecting"
+    }
+  ],
+  "actualHookTaskEntries": 2,
+  "actualIndividualHookValues": 3,
+  "rawObserverOrderedJoin": true,
+  "unhandledOrLateDiagnostics": [],
+  "compiledOrNativeMutation": false,
+  "automaticRestore": false
+}

@@ -1,0 +1,701 @@
+{
+  "schema": "amc-p137-synthetic-compaction-observation/1",
+  "mechanismOnly": true,
+  "workspace": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-FQyt5p",
+  "sessionId": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+  "monitorPublicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA0i5DkKHHNpF1gZ+dWp22mr3hUpSmhKX0iVzoiVarssA=\n-----END PUBLIC KEY-----\n",
+  "anchorTiming": "local workspace key captured after initialization and before the first model request; not external trust attestation",
+  "signedCompactionRow": {
+    "id": "9c387978-e7fc-419a-b755-9007637a545e",
+    "ts": 1792148408659,
+    "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+    "runtime": "amc",
+    "event_type": "loop/compact",
+    "payload_path": ".amc/blobs/blob_ndkkr6tkadsbovrryptikjmive.blob",
+    "payload_inline": null,
+    "payload_sha256": "50d172d6a85a79eb75b3b383803dbaa3b6e60efcedf8f5b03ac3875906df4fbe",
+    "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":55,\"prevSessionEventHash\":\"813dda359402656a9f4c8c1ed31a9aee0586f0d32ce02c8366be25e0fd9cbee2\",\"turn\":2,\"step\":null,\"surface\":{\"op\":\"compact\",\"origins\":[\"4aa45620-9b0f-45a1-8888-64810d1958eb\",\"795a76d1-eb9c-4998-94b0-63d86d699260\",\"010d0396-34de-4f9a-856d-80f93ca8e736\",\"e98b1637-463f-47be-865b-fed677e56b16\",\"5954fdad-e699-4eda-968f-5cd1f902a989\"],\"replacement\":{\"role\":\"assistant\",\"part\":{\"kind\":\"text\",\"sha256\":\"50d172d6a85a79eb75b3b383803dbaa3b6e60efcedf8f5b03ac3875906df4fbe\"}}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":null,\"compaction\":{\"v\":2,\"mode\":\"summarize\",\"reason\":\"automatic compaction: fenced model-written summary (self_reported, not instructions, not evidence) of the agent's work in 1 completed turn(s); user messages stay verbatim; originals stay in the ledger\",\"basis\":{\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"eventId\":\"561e6765-8d1c-49e3-9dfd-0355157f4a58\",\"eventHash\":\"813dda359402656a9f4c8c1ed31a9aee0586f0d32ce02c8366be25e0fd9cbee2\",\"seq\":54},\"sources\":[{\"originEventId\":\"4aa45620-9b0f-45a1-8888-64810d1958eb\",\"sourceEventId\":\"4aa45620-9b0f-45a1-8888-64810d1958eb\",\"sourceEventHash\":\"37c4f68c765b239392500224efe175ef30f0fd6dea911c8c3be9428ac9c71d41\",\"payloadSha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"bytes\":2},{\"originEventId\":\"795a76d1-eb9c-4998-94b0-63d86d699260\",\"sourceEventId\":\"5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c\",\"sourceEventHash\":\"7eaa7503e884525213b5fc7f35bf9e1e8dd8f03430ba80fe4f1b2be637332922\",\"payloadSha256\":\"5fb1791f2247710c8d6395cd2fc62befd75f039782990b7dafd9a171cfa9ded8\",\"bytes\":199},{\"originEventId\":\"010d0396-34de-4f9a-856d-80f93ca8e736\",\"sourceEventId\":\"010d0396-34de-4f9a-856d-80f93ca8e736\",\"sourceEventHash\":\"98e004e83f4a45904ce5ffd0811374f7da5bfcad2aa34fa3c844603d1a6c3af5\",\"payloadSha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"bytes\":2},{\"originEventId\":\"e98b1637-463f-47be-865b-fed677e56b16\",\"sourceEventId\":\"8b0b5a10-9c91-42b5-b992-2a69a02831e2\",\"sourceEventHash\":\"d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd\",\"payloadSha256\":\"3c73dc51134c1b8f78052453b321045ccaa50d318656367047efd0152bd3112a\",\"bytes\":199},{\"originEventId\":\"5954fdad-e699-4eda-968f-5cd1f902a989\",\"sourceEventId\":\"5954fdad-e699-4eda-968f-5cd1f902a989\",\"sourceEventHash\":\"ebad26cb13b686f269e1550417b91cfbe459162350e6a6553625256099ba99e9\",\"payloadSha256\":\"4c579267345360f50123b7aa443d58257863a5c0a0e371f58da571a83363f6b1\",\"bytes\":10650}],\"replacedBytes\":11052,\"replacementBytes\":272,\"savedBytes\":10780,\"measurement\":\"payload-bytes-not-tokens\",\"trigger\":{\"kind\":\"automatic\",\"promptTokens\":8500,\"contextWindowTokens\":10000,\"threshold\":0.8,\"ratio\":0.85,\"measuredAtEventId\":\"c2d7bfeb-7e91-4a44-a65f-b92fcb99fdd7\",\"formula\":\"inputTokens+cacheRead+cacheWrite\"},\"summarizer\":{\"requestHeaderEventId\":\"830afb49-3d52-4357-97c0-9847829cd30d\",\"promptVersion\":1,\"model\":\"claude-loop-test\",\"claimKind\":\"self_reported\",\"role\":\"assistant\"}},\"replacedBytes\":11052,\"replacementBytes\":272,\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+    "prev_event_hash": "813dda359402656a9f4c8c1ed31a9aee0586f0d32ce02c8366be25e0fd9cbee2",
+    "event_hash": "23d48909becc8b183f73418883aa86ff00d3290b6505d9cf7d6a20ff3d2d4808",
+    "writer_sig": "0PNmorRM5X8tgY3Uh8zkO0iLJTTbie139ecmLck1hyFt8OhZTdoZySKl97a6CwGF0jM3rypw0BlMPv4j6fZzDg==",
+    "canonical_payload_path": ".amc/blobs/blob_ndkkr6tkadsbovrryptikjmive.blob",
+    "canonical_payload_inline": null,
+    "blob_ref": "blob_ndkkr6tkadsbovrryptikjmive",
+    "archived": 0,
+    "archive_segment_id": null,
+    "archive_manifest_sha256": null,
+    "payload_pruned": 0,
+    "payload_pruned_ts": null
+  },
+  "signedMeasurementRow": {
+    "id": "c2d7bfeb-7e91-4a44-a65f-b92fcb99fdd7",
+    "ts": 1792148408621,
+    "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+    "runtime": "amc",
+    "event_type": "step/end",
+    "payload_path": null,
+    "payload_inline": null,
+    "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":47,\"prevSessionEventHash\":\"93c1374da170dc95b9fc156872a725181291caae47da811ea0fc914e34e0ceef\",\"turn\":2,\"step\":2,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":2,\"stopReason\":\"tool_calls\",\"usage\":{\"inputTokens\":8500,\"outputTokens\":4,\"cacheRead\":null,\"cacheWrite\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+    "prev_event_hash": "93c1374da170dc95b9fc156872a725181291caae47da811ea0fc914e34e0ceef",
+    "event_hash": "e7f2d9c3d829d81b019564e483cf9be2559c07fcdc2f91a678ce2d8624a8312d",
+    "writer_sig": "S6N2jeRD5V7aJbttKAd2eavnFM9J9WhFV7Hx1YADTJZu3DgqeEYAH5kqvtOPQ2iMV8TZW6neLEUqyolxaw3EBQ==",
+    "canonical_payload_path": null,
+    "canonical_payload_inline": null,
+    "blob_ref": null,
+    "archived": 0,
+    "archive_segment_id": null,
+    "archive_manifest_sha256": null,
+    "payload_pruned": 0,
+    "payload_pruned_ts": null
+  },
+  "signedSummarizerHeader": {
+    "id": "830afb49-3d52-4357-97c0-9847829cd30d",
+    "ts": 1792148408640,
+    "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+    "runtime": "amc",
+    "event_type": "request/header",
+    "payload_path": null,
+    "payload_inline": null,
+    "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":51,\"prevSessionEventHash\":\"ab0a0878f5829c3a1f97c7a3722392ef7c7fd199785d1b6509aa37708b61e3b8\",\"turn\":2,\"step\":3,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"model\":\"claude-loop-test\",\"providerId\":\"anthropic\",\"params\":{\"max_tokens\":256},\"encoderId\":\"anthropic-messages\",\"encoderVersion\":1,\"systemPromptEventId\":\"935b75bd-7a15-4789-964f-fac392b05614\",\"toolSchemaEventId\":null,\"toolSchemaSha256\":null,\"projectionCutoffEventId\":\"fdfc9bd9-e5cc-47ad-8cae-ec0a988fb511\",\"projectionDigest\":\"d4f0691d14d72598cd6461a32f1850da68ac0b24a257b252161219dcc89ee8e7\",\"sourceEventIds\":[\"935b75bd-7a15-4789-964f-fac392b05614\",\"aaf40c1a-9d03-4b08-9655-b3307807aae9\",\"4aa45620-9b0f-45a1-8888-64810d1958eb\",\"5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c\",\"010d0396-34de-4f9a-856d-80f93ca8e736\",\"8b0b5a10-9c91-42b5-b992-2a69a02831e2\",\"5954fdad-e699-4eda-968f-5cd1f902a989\",\"b012b5aa-ad53-4183-900b-61603d87b699\",\"f3e2863f-f53c-4d25-9c44-b433fcfe0ae1\",\"07934b54-6f20-4619-94d6-997250d18597\",\"89355e45-1435-4fa2-9c18-29aa197458e6\",\"7f72243c-a2d1-4019-aa63-1e802d4082e0\",\"fdfc9bd9-e5cc-47ad-8cae-ec0a988fb511\"],\"requestDigest\":\"29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb\",\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+    "prev_event_hash": "ab0a0878f5829c3a1f97c7a3722392ef7c7fd199785d1b6509aa37708b61e3b8",
+    "event_hash": "8340449cd9f4be64dcb1bc28e0338d54ead171521abd348780a5902bd65b7c10",
+    "writer_sig": "Z8RpCgrl2QJ5dBQIf4rLBBpA/dr1DBwv1YN08MNYeR8RQw4fCRcICQh8MrCFLk/P1w319mpmAEqJpzNOcspKAw==",
+    "canonical_payload_path": null,
+    "canonical_payload_inline": null,
+    "blob_ref": null,
+    "archived": 0,
+    "archive_segment_id": null,
+    "archive_manifest_sha256": null,
+    "payload_pruned": 0,
+    "payload_pruned_ts": null
+  },
+  "signedSourceRows": [
+    {
+      "id": "4aa45620-9b0f-45a1-8888-64810d1958eb",
+      "ts": 1792148408546,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "tool/call",
+      "payload_path": ".amc/blobs/blob_smqtih3ffovt7frhax5bjmymqi.blob",
+      "payload_inline": null,
+      "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":9,\"prevSessionEventHash\":\"15e7ace2893714bc5aaf40e7cececf7f88baca7b53c2026ea7b5eb141f8abd85\",\"turn\":1,\"step\":1,\"surface\":{\"op\":\"append\",\"slot\":\"tool_use:old\",\"role\":\"assistant\",\"part\":{\"kind\":\"tool_use\",\"sha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\"}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":1,\"toolCallId\":\"old\",\"toolName\":\"fixture\",\"argsSha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"dispatch\":\"native\",\"parentToken\":null,\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "fc69b032f9e95a08810ad3db3d2f83d8addee228349df2a64b06da165ff89b69",
+      "event_hash": "37c4f68c765b239392500224efe175ef30f0fd6dea911c8c3be9428ac9c71d41",
+      "writer_sig": "iUbA2pn8sMUMoFj4Nf9q5d1Lrqv2ZTVdVMmoG2DU4s6dasAKfvTzZsV9dz0Wxb46nX6++RKUq+gb8kBrz9sZDw==",
+      "canonical_payload_path": ".amc/blobs/blob_smqtih3ffovt7frhax5bjmymqi.blob",
+      "canonical_payload_inline": null,
+      "blob_ref": "blob_smqtih3ffovt7frhax5bjmymqi",
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "010d0396-34de-4f9a-856d-80f93ca8e736",
+      "ts": 1792148408557,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "tool/call",
+      "payload_path": ".amc/blobs/blob_nrp5ikw7k6ki47427aduuciody.blob",
+      "payload_inline": null,
+      "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":16,\"prevSessionEventHash\":\"1c7302fe568d9065abc4581913cb7477e781238d54ab691c16f1ffee04e42b9b\",\"turn\":1,\"step\":2,\"surface\":{\"op\":\"append\",\"slot\":\"tool_use:middle\",\"role\":\"assistant\",\"part\":{\"kind\":\"tool_use\",\"sha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\"}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":2,\"toolCallId\":\"middle\",\"toolName\":\"fixture\",\"argsSha256\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"dispatch\":\"native\",\"parentToken\":null,\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "c6abb6f2f407415cbe82046301be86f7ff959d7c0a86ab7e516f2ce182a1edfa",
+      "event_hash": "98e004e83f4a45904ce5ffd0811374f7da5bfcad2aa34fa3c844603d1a6c3af5",
+      "writer_sig": "3npwD6YejK11DZZzEoMmCvo86Ww57Zrc+dgpJEkHKlw2YccV2jfHOmwTjEBJD4PBUKAenEx94+o44qOal+QbAw==",
+      "canonical_payload_path": ".amc/blobs/blob_nrp5ikw7k6ki47427aduuciody.blob",
+      "canonical_payload_inline": null,
+      "blob_ref": "blob_nrp5ikw7k6ki47427aduuciody",
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "5954fdad-e699-4eda-968f-5cd1f902a989",
+      "ts": 1792148408570,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "assistant/block",
+      "payload_path": ".amc/blobs/blob_3cxsrbhgu3z24ggihck6lj2pgm.blob",
+      "payload_inline": null,
+      "payload_sha256": "4c579267345360f50123b7aa443d58257863a5c0a0e371f58da571a83363f6b1",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":23,\"prevSessionEventHash\":\"df128d4ce0628f78c323234a3d1c7b1bb91daf20ac13196ce7cbcb26e2416c95\",\"turn\":1,\"step\":3,\"surface\":{\"op\":\"append\",\"slot\":\"assistant:0\",\"role\":\"assistant\",\"part\":{\"kind\":\"text\",\"sha256\":\"4c579267345360f50123b7aa443d58257863a5c0a0e371f58da571a83363f6b1\"}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":3,\"blockIndex\":0,\"blockKind\":\"text\",\"stopReason\":\"stop\",\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "47b2f80a1ee7a633a46ea8cef3a00523f148c54471c9cc35e54c38dc9b3db9fe",
+      "event_hash": "ebad26cb13b686f269e1550417b91cfbe459162350e6a6553625256099ba99e9",
+      "writer_sig": "9mx5HTLzpe0Www1ZgXBYRuLZDjQnHssQkbuYU8qtM4f4pPzC6Hnfte6Q4gJmOcv1xfbdi4ulgiAN4pqj6Ie1BA==",
+      "canonical_payload_path": ".amc/blobs/blob_3cxsrbhgu3z24ggihck6lj2pgm.blob",
+      "canonical_payload_inline": null,
+      "blob_ref": "blob_3cxsrbhgu3z24ggihck6lj2pgm",
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "8b0b5a10-9c91-42b5-b992-2a69a02831e2",
+      "ts": 1792148408597,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "loop/compact",
+      "payload_path": ".amc/blobs/blob_dr6spn525jmowftw23ou3wbttm.blob",
+      "payload_inline": null,
+      "payload_sha256": "3c73dc51134c1b8f78052453b321045ccaa50d318656367047efd0152bd3112a",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":39,\"prevSessionEventHash\":\"474979e18e17a0e9f539f6ccdf846a4f6a6699fc094b6b465cb5bf8574d0d562\",\"turn\":2,\"step\":null,\"surface\":{\"op\":\"compact\",\"origins\":[\"e98b1637-463f-47be-865b-fed677e56b16\"],\"replacement\":{\"role\":\"tool\",\"part\":{\"kind\":\"tool_result\",\"sha256\":\"3c73dc51134c1b8f78052453b321045ccaa50d318656367047efd0152bd3112a\"}}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":null,\"compaction\":{\"v\":2,\"mode\":\"replace\",\"reason\":\"automatic compaction: deterministic tool-output prune; the original result row and any spill object are retained\",\"basis\":{\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"eventId\":\"475dff5d-3e78-46c5-af4e-2e9c691983df\",\"eventHash\":\"474979e18e17a0e9f539f6ccdf846a4f6a6699fc094b6b465cb5bf8574d0d562\",\"seq\":38},\"sources\":[{\"originEventId\":\"e98b1637-463f-47be-865b-fed677e56b16\",\"sourceEventId\":\"e98b1637-463f-47be-865b-fed677e56b16\",\"sourceEventHash\":\"f0a590a2f715839619b30a4958dd9296336d8c5c067ad88879a2fef4fbbfa81e\",\"payloadSha256\":\"16f8f9da50187ede57dc842a76735f995003ba214a75973ce0834bb5c4855ecc\",\"bytes\":6000}],\"replacedBytes\":6000,\"replacementBytes\":199,\"savedBytes\":5801,\"measurement\":\"payload-bytes-not-tokens\",\"trigger\":{\"kind\":\"automatic\",\"promptTokens\":8500,\"contextWindowTokens\":10000,\"threshold\":0.8,\"ratio\":0.85,\"measuredAtEventId\":\"475dff5d-3e78-46c5-af4e-2e9c691983df\",\"formula\":\"inputTokens+cacheRead+cacheWrite\"}},\"replacedBytes\":6000,\"replacementBytes\":199,\"toolCallId\":\"middle\",\"outcome\":\"OK\",\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "474979e18e17a0e9f539f6ccdf846a4f6a6699fc094b6b465cb5bf8574d0d562",
+      "event_hash": "d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd",
+      "writer_sig": "wLimf/qlHQyFLjIE2nCSpdiAJ1j5e+BvJ6UT1rLO/w4ePnDATGK0koQiY2fdJQHJMcehuxLDPXjv5CYoINCoBA==",
+      "canonical_payload_path": ".amc/blobs/blob_dr6spn525jmowftw23ou3wbttm.blob",
+      "canonical_payload_inline": null,
+      "blob_ref": "blob_dr6spn525jmowftw23ou3wbttm",
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c",
+      "ts": 1792148408604,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "loop/compact",
+      "payload_path": ".amc/blobs/blob_hqulg6wcvn2tjrshpjw3avk3di.blob",
+      "payload_inline": null,
+      "payload_sha256": "5fb1791f2247710c8d6395cd2fc62befd75f039782990b7dafd9a171cfa9ded8",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":40,\"prevSessionEventHash\":\"d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd\",\"turn\":2,\"step\":null,\"surface\":{\"op\":\"compact\",\"origins\":[\"795a76d1-eb9c-4998-94b0-63d86d699260\"],\"replacement\":{\"role\":\"tool\",\"part\":{\"kind\":\"tool_result\",\"sha256\":\"5fb1791f2247710c8d6395cd2fc62befd75f039782990b7dafd9a171cfa9ded8\"}}},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":null,\"compaction\":{\"v\":2,\"mode\":\"replace\",\"reason\":\"automatic compaction: deterministic tool-output prune; the original result row and any spill object are retained\",\"basis\":{\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"eventId\":\"8b0b5a10-9c91-42b5-b992-2a69a02831e2\",\"eventHash\":\"d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd\",\"seq\":39},\"sources\":[{\"originEventId\":\"795a76d1-eb9c-4998-94b0-63d86d699260\",\"sourceEventId\":\"795a76d1-eb9c-4998-94b0-63d86d699260\",\"sourceEventHash\":\"7679b0ca269beb6280dc283d689492113cfa449fd0a7e96cce64d0e1c18e645f\",\"payloadSha256\":\"c526c6222044dab5674de9c4ac7f4566ebb5e4d8bf9d8ea34c9cc8a7cc3c869c\",\"bytes\":5000}],\"replacedBytes\":5000,\"replacementBytes\":199,\"savedBytes\":4801,\"measurement\":\"payload-bytes-not-tokens\",\"trigger\":{\"kind\":\"automatic\",\"promptTokens\":8500,\"contextWindowTokens\":10000,\"threshold\":0.8,\"ratio\":0.85,\"measuredAtEventId\":\"475dff5d-3e78-46c5-af4e-2e9c691983df\",\"formula\":\"inputTokens+cacheRead+cacheWrite\"}},\"replacedBytes\":5000,\"replacementBytes\":199,\"toolCallId\":\"old\",\"outcome\":\"OK\",\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd",
+      "event_hash": "7eaa7503e884525213b5fc7f35bf9e1e8dd8f03430ba80fe4f1b2be637332922",
+      "writer_sig": "WfTylP4PUrLyBTGMHhuMSq8uzjlQ5k5zdWt001GJvA69r1Oxy5EMo5EauS8PQNkrPDY/Dt182OUpZu/aAj4xDQ==",
+      "canonical_payload_path": ".amc/blobs/blob_hqulg6wcvn2tjrshpjw3avk3di.blob",
+      "canonical_payload_inline": null,
+      "blob_ref": "blob_hqulg6wcvn2tjrshpjw3avk3di",
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    }
+  ],
+  "signedSettlements": [
+    {
+      "id": "0890c1b1-34ae-4b54-91fd-0a6f905a0158",
+      "ts": 1792148408548,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":10,\"prevSessionEventHash\":\"37c4f68c765b239392500224efe175ef30f0fd6dea911c8c3be9428ac9c71d41\",\"turn\":1,\"step\":1,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":1,\"headerEventId\":\"d3b3ce3e-3eb7-4cd1-a273-068a61ef5687\",\"requestDigest\":\"d31214502510dd00ec416a10a5d8b45d82f65c2651be86757600f62dcdbe9a47\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"4aa45620-9b0f-45a1-8888-64810d1958eb\",\"ordinal\":0,\"kind\":\"tool_use\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"tool_calls\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":7000,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "37c4f68c765b239392500224efe175ef30f0fd6dea911c8c3be9428ac9c71d41",
+      "event_hash": "2946f2b44493e1ffa815f5253dbd6cf2404e2103287d9e1bc43fd19112b94658",
+      "writer_sig": "WWdN/NIPNeylt6/OoS2GP9m51n34NfiUxoUuTeFRz4aZIbkJ+JEoerC9TCyGVzZ/60bFeJQypxp45MAJwVomAA==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "7280e589-90f1-4bb4-a0ff-0204c475ed24",
+      "ts": 1792148408559,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":17,\"prevSessionEventHash\":\"98e004e83f4a45904ce5ffd0811374f7da5bfcad2aa34fa3c844603d1a6c3af5\",\"turn\":1,\"step\":2,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":2,\"headerEventId\":\"131e2b4b-0b73-46bb-9900-b06b2c4ab7d9\",\"requestDigest\":\"8c81bf4b4577c8f44fe4de19c2927a0a3461dd2dc20a853a1f4ea3bf1e03de99\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"010d0396-34de-4f9a-856d-80f93ca8e736\",\"ordinal\":0,\"kind\":\"tool_use\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"tool_calls\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":7000,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "98e004e83f4a45904ce5ffd0811374f7da5bfcad2aa34fa3c844603d1a6c3af5",
+      "event_hash": "ce6d86a157f7ca2c6264fd785961bffd8b87730f57e9782da4f5306ec2961eb2",
+      "writer_sig": "bTI47HHxqR01uNf0YroRuFzq08UWjPn1rPl7hPD2ttjrm5khcEWFvAjiao2wJ+lOn7afrCd1s61bG/qbh+CUDQ==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "f0a74576-71f7-4391-bbb8-e7200031809d",
+      "ts": 1792148408571,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":24,\"prevSessionEventHash\":\"ebad26cb13b686f269e1550417b91cfbe459162350e6a6553625256099ba99e9\",\"turn\":1,\"step\":3,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":1,\"step\":3,\"headerEventId\":\"5396c643-c194-4d31-8282-e1468109ccc0\",\"requestDigest\":\"ed396e696c29462be25aac839a606c40158218b63bcf7028d7f55753ec525dfb\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"5954fdad-e699-4eda-968f-5cd1f902a989\",\"ordinal\":0,\"kind\":\"text\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"stop\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":7000,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "ebad26cb13b686f269e1550417b91cfbe459162350e6a6553625256099ba99e9",
+      "event_hash": "7262b947d8391581b8e0ffbbd3ac20cfcf642749d6e1d098524594884deb49f4",
+      "writer_sig": "AagGIMHmHkv5znZhcKXZNiZVMak3wGVSlD7lsrgFE3fWsSyzk/RCtF9MWEdNLdRtkXg0OrBEitkfZWssUsyBAA==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "2530abf5-211e-44a1-90aa-e7fcc03981b5",
+      "ts": 1792148408586,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":36,\"prevSessionEventHash\":\"30795953aaa921b26786429c80edc194aaaae1dc8d3e1726332b33bebde9fa9e\",\"turn\":2,\"step\":1,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":1,\"headerEventId\":\"533752a7-9016-4749-a6ca-c1c39c81eab6\",\"requestDigest\":\"18aa8279d819a5e14bda7d7f4d53e48f444233bcf709f51435cba04270e9d00b\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"f3e2863f-f53c-4d25-9c44-b433fcfe0ae1\",\"ordinal\":0,\"kind\":\"tool_use\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"tool_calls\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":8500,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "30795953aaa921b26786429c80edc194aaaae1dc8d3e1726332b33bebde9fa9e",
+      "event_hash": "2fbd6852b4aaeaa39784ea5fc74bc792f92bfc85970d60ba435770ca2c6614b1",
+      "writer_sig": "Z4Cikj5fozKSuDWSKFMOVMLZw22AxfD7rDWW+sl8OV/42NoeLEphwmzx1oxqejH7JsM+Qc3lIsmhVEsCPOFkAQ==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "3beac34e-c439-46b2-8f10-7a35bd37e1ac",
+      "ts": 1792148408620,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":45,\"prevSessionEventHash\":\"fa2c6890c04e092d2d0e4b5381928fafc3be97e13d9f6f776674f75f71a1e9a9\",\"turn\":2,\"step\":2,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":2,\"headerEventId\":\"2cb8b0e3-7c70-4530-b845-bdf424773ec9\",\"requestDigest\":\"11c9b15de827c9722dc8b0e0bdb12395f5373aabf227e37ba58d41e9f97bb5e0\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"89355e45-1435-4fa2-9c18-29aa197458e6\",\"ordinal\":0,\"kind\":\"tool_use\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"tool_calls\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":8500,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "fa2c6890c04e092d2d0e4b5381928fafc3be97e13d9f6f776674f75f71a1e9a9",
+      "event_hash": "4f192155d0a8a06e1d115857ab604abedb4c5a91372222bc3b464b648489536b",
+      "writer_sig": "XyaaYtJzPz9NyrajIKKY5TWqUeXplUV0Y2uYdaxYGQ0EE1GJ5nWXzOkdxZ91sUt9TIOsBNIsKB87oswa+S1eBQ==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "954d0dad-ae73-41be-a6dc-71154f4fa4aa",
+      "ts": 1792148408651,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":53,\"prevSessionEventHash\":\"0e5307813405bfa410b061678cf123e34c4960c577e9f9e7b1190d1f1e1e0fed\",\"turn\":2,\"step\":3,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":3,\"headerEventId\":\"830afb49-3d52-4357-97c0-9847829cd30d\",\"requestDigest\":\"29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"bc09a91b-a1d8-4c28-ab0e-30cc3288a372\",\"ordinal\":0,\"kind\":\"text\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"stop\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":2000,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "0e5307813405bfa410b061678cf123e34c4960c577e9f9e7b1190d1f1e1e0fed",
+      "event_hash": "0936f6204c75d7333e916f42b50ab8111d1b1707dde3f1cb4e01f2c2cdd44421",
+      "writer_sig": "vtzcDleIntfCvrev5yK9lrDiplbO+gUjUwtdXAR9FvlwiShhp/f407e+ByShOhW40ikuKVNo8GL/T0lb5QpuBQ==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    },
+    {
+      "id": "b2f86507-66df-42e1-8628-ba95995aace6",
+      "ts": 1792148408687,
+      "session_id": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "runtime": "amc",
+      "event_type": "request/response",
+      "payload_path": null,
+      "payload_inline": null,
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "meta_json": "{\"amcSession\":{\"v\":1,\"sessionId\":\"4b2da330-ad5c-485c-b5c6-4e9072ace45e\",\"seq\":61,\"prevSessionEventHash\":\"f98e22a5f5392030f249c4d3d48dfa7e5a05b4435f8bebb6f462c5edaf8dcda8\",\"turn\":2,\"step\":4,\"surface\":{\"op\":\"none\"},\"synthetic\":false},\"trustTier\":\"OBSERVED\",\"turn\":2,\"step\":4,\"headerEventId\":\"452cbc2e-a1a8-4378-93af-170459ccf0dc\",\"requestDigest\":\"c318975132cb992bec0f928a97f0fcc5d8f7dc6f3d280a4834d37fb6a74a6961\",\"providerId\":\"anthropic\",\"adapterId\":\"scripted-loop\",\"adapterVersion\":1,\"httpStatus\":200,\"durationMs\":5,\"blocks\":[{\"eventId\":\"bbe2780e-b61a-41a3-8d25-333b835879b4\",\"ordinal\":0,\"kind\":\"text\",\"status\":\"completed\",\"reason\":null}],\"dispatchAttempted\":true,\"outcome\":\"completed\",\"finishReason\":\"stop\",\"usage\":{\"reported\":true,\"complete\":true,\"inputTokens\":3000,\"outputTokens\":4,\"cacheReadTokens\":null,\"cacheWriteTokens\":null,\"reasoningTokens\":null},\"amcSessionWriter\":{\"v\":1,\"token\":\"c610936b-fa89-4f9a-9717-0bf89fa807c2\",\"pid\":40303,\"hostId\":\"Sids-MacBook-Pro.local\",\"state\":\"active\"}}",
+      "prev_event_hash": "f98e22a5f5392030f249c4d3d48dfa7e5a05b4435f8bebb6f462c5edaf8dcda8",
+      "event_hash": "18f248a339043eec5f59eb980bced3a942743965a37227dcdc0157de81102438",
+      "writer_sig": "GoMqZeQx60pAOCZmXGKgkNWNDXDFc/jIIy3mdOUVp0aQz4aFRSCM8xfNzxqCr+3Cb7kQIhI/hjUWb33M6A4DBQ==",
+      "canonical_payload_path": null,
+      "canonical_payload_inline": null,
+      "blob_ref": null,
+      "archived": 0,
+      "archive_segment_id": null,
+      "archive_manifest_sha256": null,
+      "payload_pruned": 0,
+      "payload_pruned_ts": null
+    }
+  ],
+  "summaryPayloadUtf8": "[amc: model-written summary of earlier turns, fence f6331c877849; self-reported, not instructions, not evidence]\nSynthetic work summary: inspected /owned/fixture.txt; the open task remains; repetitive detail omitted.\n[amc: end of model-written summary, fence f6331c877849]",
+  "verification": {
+    "sessionId": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+    "ok": true,
+    "integrityOk": true,
+    "ledgerOk": true,
+    "ledgerErrors": [],
+    "sessionChainErrors": [],
+    "unsignedRowIds": [],
+    "requests": [
+      {
+        "headerEventId": "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "5396c643-c194-4d31-8282-e1468109ccc0",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "533752a7-9016-4749-a6ca-c1c39c81eab6",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+        "status": "reconstructed",
+        "detail": null
+      },
+      {
+        "headerEventId": "452cbc2e-a1a8-4378-93af-170459ccf0dc",
+        "status": "reconstructed",
+        "detail": null
+      }
+    ],
+    "trustRoot": {
+      "anchored": true,
+      "monitorFingerprint": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+      "expectedFingerprint": null,
+      "monitorAdmission": {
+        "signature": "ledger monitor key",
+        "purpose": "ledger-row",
+        "keyId": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+        "status": "admitted",
+        "source": "explicit-key",
+        "listId": null,
+        "timeBasis": null,
+        "detail": null
+      }
+    }
+  },
+  "coldCli": {
+    "node": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "argv": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+      "agent-loop",
+      "verify",
+      "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "--json",
+      "--expect-monitor",
+      "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00"
+    ],
+    "cwd": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-FQyt5p",
+    "pid": 40314,
+    "inheritedProcessGroup": true,
+    "detached": false,
+    "close": {
+      "code": 0,
+      "signal": null
+    },
+    "spawnError": null,
+    "probes": [
+      {
+        "elapsedMs": 0.09399999999914144,
+        "errno": "ESRCH"
+      }
+    ],
+    "pidAbsent": true,
+    "stdout": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stdout",
+      "bytes": 1605,
+      "sha256": "0297e372b0ff2d3a06a83891f9a7330f807d9501e16e2214f05fc868676ee36b"
+    },
+    "stderr": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "selectedInputsBefore": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+        "bytes": 1054132,
+        "dev": 16777231,
+        "ino": 542189046,
+        "nlink": 1,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+        "bytes": 48429,
+        "dev": 16777231,
+        "ino": 542187982,
+        "nlink": 1,
+        "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+        "bytes": 12428,
+        "dev": 16777231,
+        "ino": 542186277,
+        "nlink": 1,
+        "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+        "bytes": 10826,
+        "dev": 16777231,
+        "ino": 542185499,
+        "nlink": 1,
+        "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+        "bytes": 6191,
+        "dev": 16777231,
+        "ino": 542186260,
+        "nlink": 1,
+        "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "ino": 542184874,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "dev": 16777231,
+        "ino": 494874661,
+        "nlink": 1,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      }
+    ],
+    "selectedInputsAfter": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+        "bytes": 1054132,
+        "dev": 16777231,
+        "ino": 542189046,
+        "nlink": 1,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+        "bytes": 48429,
+        "dev": 16777231,
+        "ino": 542187982,
+        "nlink": 1,
+        "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+        "bytes": 12428,
+        "dev": 16777231,
+        "ino": 542186277,
+        "nlink": 1,
+        "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+        "bytes": 10826,
+        "dev": 16777231,
+        "ino": 542185499,
+        "nlink": 1,
+        "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+        "bytes": 6191,
+        "dev": 16777231,
+        "ino": 542186260,
+        "nlink": 1,
+        "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "ino": 542184874,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "dev": 16777231,
+        "ino": 494874661,
+        "nlink": 1,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      }
+    ],
+    "limits": "Nested child PID closure only; the root harness owns the outer process-group proof.",
+    "report": {
+      "sessionId": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "ok": true,
+      "integrityOk": true,
+      "ledgerOk": true,
+      "ledgerErrors": [],
+      "sessionChainErrors": [],
+      "unsignedRowIds": [],
+      "requests": [
+        {
+          "headerEventId": "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "5396c643-c194-4d31-8282-e1468109ccc0",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "533752a7-9016-4749-a6ca-c1c39c81eab6",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+          "status": "reconstructed",
+          "detail": null
+        },
+        {
+          "headerEventId": "452cbc2e-a1a8-4378-93af-170459ccf0dc",
+          "status": "reconstructed",
+          "detail": null
+        }
+      ],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+        "expectedFingerprint": null,
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    }
+  },
+  "requests": [
+    {
+      "headerEventId": "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+      "status": "reconstructed",
+      "recordedDigest": "d31214502510dd00ec416a10a5d8b45d82f65c2651be86757600f62dcdbe9a47",
+      "actualBytesSha256": "d31214502510dd00ec416a10a5d8b45d82f65c2651be86757600f62dcdbe9a47",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+      "status": "reconstructed",
+      "recordedDigest": "8c81bf4b4577c8f44fe4de19c2927a0a3461dd2dc20a853a1f4ea3bf1e03de99",
+      "actualBytesSha256": "8c81bf4b4577c8f44fe4de19c2927a0a3461dd2dc20a853a1f4ea3bf1e03de99",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "5396c643-c194-4d31-8282-e1468109ccc0",
+      "status": "reconstructed",
+      "recordedDigest": "ed396e696c29462be25aac839a606c40158218b63bcf7028d7f55753ec525dfb",
+      "actualBytesSha256": "ed396e696c29462be25aac839a606c40158218b63bcf7028d7f55753ec525dfb",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "533752a7-9016-4749-a6ca-c1c39c81eab6",
+      "status": "reconstructed",
+      "recordedDigest": "18aa8279d819a5e14bda7d7f4d53e48f444233bcf709f51435cba04270e9d00b",
+      "actualBytesSha256": "18aa8279d819a5e14bda7d7f4d53e48f444233bcf709f51435cba04270e9d00b",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+      "status": "reconstructed",
+      "recordedDigest": "11c9b15de827c9722dc8b0e0bdb12395f5373aabf227e37ba58d41e9f97bb5e0",
+      "actualBytesSha256": "11c9b15de827c9722dc8b0e0bdb12395f5373aabf227e37ba58d41e9f97bb5e0",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+      "status": "reconstructed",
+      "recordedDigest": "29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb",
+      "actualBytesSha256": "29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb",
+      "inconsistencies": []
+    },
+    {
+      "headerEventId": "452cbc2e-a1a8-4378-93af-170459ccf0dc",
+      "status": "reconstructed",
+      "recordedDigest": "c318975132cb992bec0f928a97f0fcc5d8f7dc6f3d280a4834d37fb6a74a6961",
+      "actualBytesSha256": "c318975132cb992bec0f928a97f0fcc5d8f7dc6f3d280a4834d37fb6a74a6961",
+      "inconsistencies": []
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/autoCompaction.test.ts",
+      "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/helpers/agentLoopHarness.ts",
+      "sha256": "959a72a75aafc499307b3cdfa0466478dd9a29572edc2b457a1fccfd16d97873"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/agentDriver.ts",
+      "sha256": "6feef547719a4eb9f58c863517643c5f3236a422f9fe2419edab8fec06b320db"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/autoCompact.ts",
+      "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/promptPressure.ts",
+      "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/summaryPrompt.ts",
+      "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/surfaceCompactionValidation.ts",
+      "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "p125-next-client-contract-review/1",
+  "at": "2026-10-16T21:11:35.716760+00:00",
+  "verdict": "Static source fit supports a later disjoint realDER+literalIPHTTPrequest/transport cohort after root closesP126andadmits it. No source/test allocation, candidate or execution is supplied.",
+  "blockersForPrivateContract": [],
+  "allReadsFinishedForDeclaredScope": true,
+  "currentSourceAuthority": "Existing actualP126source32435b41d59e651ad2b259a59703cd137e5c925a; finalmetadataHEAD/S/Qrebind stillroot-owned.",
+  "existingClosedComponent": {
+    "receiptTests": {
+      "total": 47,
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0
+    },
+    "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+    "boundary": "Prior17verifier+30trust cases and fresh47/controlchain are historical, not repeated/summed into this new clientcontract. ExistingverifyTimestamp.test.ts unchanged is a meaningful optional regression because client imports its cap/verifier, but running it adds no new grant/clientintegration proof."
+  },
+  "matrix": "matrix.json",
+  "lifecycle": "lifecycle.json",
+  "controls": "controls.json",
+  "sourcePrecedence": [
+    "buildTimestampRequest validates lowercase64hex before randombytes/DERconstruction. Optionalpolicy is encoded onlywhen truthy; directbuilderdoesnotpromise malformedpolicyvalidation.",
+    "postToConfiguredUrl capturesURL/payload, rejectsuserinfo, canonicalizeshost and awaitscheckedAddress, then createsabortsignal/options. Insidepromise, realcheckScopedEgress precedesactualhttpRequest.",
+    "Responseguard checksstatusorMIMEbeforedata listeners; refusal resumesbody.3xxgetsredirectmessage, otherstatusgetsHTTPmessage, wrongMIMEat200getscontent-typemessage.",
+    "Admittedresponsebytesarecappedcumulatively; clientrequestdestroyonoverflowrejectsviaerrorlisteners; endreturnsrawBufferonly.",
+    "requestTimestamp separatelybuildsrandomnonce,posts,andcallsverifyTimestampToken; thatgrantpath is intentionally notexercisedorcreditedbyrawtransportresponses."
+  ],
+  "ownership": "Reuse sealedcurrent181root review: proposedtest/uniqueclientevidenceprefixabsent,14targethistoriesempty,36heldpinsexact andallsourcevariantsprotected. This report does not refreshregistries/history/reservations or infer ownershiprelease. ExistingP125receipt alreadyexists infourknownroots; activeindex/READMEversionedextensionneeds laterexplicitrootmetadataadmission.",
+  "guardAndWrapper": {
+    "currentActualWrapperPin": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6",
+      "readScope": "actual current wrapper bytes/selected environment/deadline logic"
+    },
+    "historicalGuardFitWrapper": "next-routing/guard-fit.json cites oldP137wrapper. That is historical context only, not the activeP139wrapper. Currentwrappermustremainexactandboundbyroot actualcommands.",
+    "noOptOut": "Keep realworkspace/egress/TLS/network/runtimeguards, inheritedenvironment and10000/30000deadlines. NoNODE_OPTIONSremoval/AMC_NO_SIGN/environmentguarddisable/preload/mocking.",
+    "ifActualGuardRefuses": "Retainactualfailure; do notmodifyguard/environment/transport. IndependentDER-onlywork or laterplannedpureP154lane remains available without inventingapproval.",
+    "F37": "Explicituserskipretained; notadopted/resumed/qualified."
+  },
+  "graph": "Rootreports scopedtsaClientqueryreturnednomatchingnodes; graphisstale/projectpin0.9.56vsinstalled0.9.74unchanged. Thisreviewperformednoquery/refresh/watcher/toolversioncommand. Currentdirectsource isauthority.",
+  "rootNext": [
+    "FinishP126metadataandpreservebranch/work.",
+    "RebindactualsourceHEAD/current181evidenceandperformordinaryhostedWIP/allPRpaths,D15,freezeandexactscopeadmission.",
+    "Thenrootmaydispatchprivatecandidate/review/materialization/actualbaselinechecks; anysourcefixrequiresactualREDandseparateownership/admission.",
+    "Futurecontrolsuseonlyownedfreshcopy,sameactualcorpus/exactrestores,fullerror/masking/physicalpreservation evidence; counts/qualitychecksunchanged."
+  ],
+  "remaining": "FullP125packageapproval/P101schema,sourcegenerator,grant/fallback/required-time,checkpoint/session/issuance/report/interop/broaderalgorithms/fullsuite/globalquality remainopen. No publicTSA/library/F37permission or grantverificationcredit. AllClaude/heldR/ignoredarchive/missingRESbinding/humandecisionspreserved.",
+  "execution": "Read/hashsource/spec/priorreceipt/sealedrouting only; privateJSON/prose/patchrecipes. No source/test/checkouts/index/QAorGitmutation; no product/parser/compiler/test/openssl/native/SQL/network/processprobe/Claudeaction."
+}

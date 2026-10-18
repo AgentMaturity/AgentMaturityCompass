@@ -1,0 +1,13 @@
+# Independent audit of the corrected oracle runs
+
+The focused positive passed with nine cases deliberately filtered (exit 0, 3,369 ms, PGID 4196 absent by ESRCH). The full suite passed all ten cases (exit 0, 26,394 ms, PGID 4240 absent). Raw and observer identities and statuses agree. Both afterAll hooks passed, with no unhandled, separate file/suite, unexpected pending/todo or known late error.
+
+Four positive invocations in the full suite and the focused positive passed all sixteen checks. The full run produced thirteen oracle verdicts: four positives and nine intended refusals. Exact duplicate, amount-corruption, provider-only, forged-stdout, weaker-policy and unsupported-expectation checks behave as required. The weaker-policy case retains its required provider, cold-ledger and action-chain prerequisites while refusing the external default-policy mismatch.
+
+All three mutations were reached after an all-sixteen-check positive. The log copy loses exactly its final newline and fails txlog-chain. The preimage changes only arguments.amountMinor from 12000 to 12001, keeps its authorization record identical, changes the generic argument digest, and fails authorization plus payload-bound. A decision signature changes one base64 character while parsed metadata stays exact, then fails authorization. All published before/after byte hashes were independently checked.
+
+Eleven provider histories contain 116 canonical linked rows, twelve payment POSTs and twelve commits. Every row hash and checkpoint was recomputed. Reconstructed log/checkpoint bytes match published original/cold-copy hashes, sizes and separate identities. The duplicate helper's second POST has a different wire key order; its reconstructed raw hash and separate normalized hash both validate.
+
+Thirteen reached cold-verifier and snapshot checks pass. Ten preparation records show absent-to-empty WAL creation; three later reads show unchanged WAL. Active intervals record matching composite hashes and exact WAL identity, size and digest. DB/key bytes were not reopened. Published natural closure covers 36 initializer/producer/oracle children, eleven providers and thirteen internal verifiers, each exit 0, closed streams and PID ESRCH; outer group absence is separate.
+
+Successful roots are cleanup-published and are not claimed retained. Current oracle/test files match reviewed v4 pins. This audit ran no product code, SQL, import, parser or network operation and changed no R files. Earlier failures remain preserved. Full P1-19 tools, runner, normative corpus, global quality and formal completion remain separate work.

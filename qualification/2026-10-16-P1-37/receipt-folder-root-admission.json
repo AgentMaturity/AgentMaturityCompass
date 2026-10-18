@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-16T11:04:05.820921+00:00",
+  "admittedNewFolder": "qualification/2026-10-16-P1-37",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "independentInventory": {
+    "path": "/private/tmp/amc-next-after-p137-20261016/p207-readonly-preflight/p137-extra-registry-observation.json",
+    "bytes": 29773,
+    "sha256": "637d06c90f7c2f0066db80f2d31edff6148eb830e843806cbc620ea3c681f02e"
+  },
+  "exactFolderAbsences": 169,
+  "priorNewTestInventory": 163,
+  "additionalHistoricalXirpNewTestAbsences": 6,
+  "D15": "p137-receipt-scope-d15 exit0 none",
+  "hostedAll13All30PathsRead": true,
+  "touchConflictsIncludingDependabot": [],
+  "countedWipExcludingOnlyVerifiedDependabot": 0,
+  "scope": "Only bounded qualification artifacts; no source/helper/CLI/guard/baseline/held-decision edits. Formal acceptance stays open.",
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "ordinaryValidatorRequired": true
+}

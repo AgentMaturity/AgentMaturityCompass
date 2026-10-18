@@ -1,0 +1,84 @@
+{
+  "schema": "amc-p139-legacy/2",
+  "label": "legacy-pin-mismatch",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-2FSyXj",
+  "configuredProtocolVersion": "2025-11-25",
+  "requests": [
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "initialize",
+      "id": 0,
+      "hasId": true,
+      "requestedVersion": "2025-11-25",
+      "responseVersion": "2025-06-18",
+      "protocolHeader": null,
+      "originMatches": true,
+      "requestSessionPresent": false,
+      "requestSessionMatches": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseErrorCode": null,
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "DELETE",
+      "path": "/mcp",
+      "rpc": null,
+      "id": null,
+      "hasId": false,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": null,
+      "originMatches": true,
+      "requestSessionPresent": true,
+      "requestSessionMatches": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 204,
+      "responseErrorCode": null,
+      "responseSessionPresent": false,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "outcome": {
+    "refusal": {
+      "scope": "expected-refusal",
+      "name": "NativeMcpProtocolRefused",
+      "message": "MCP server negotiated a protocol version that is unsupported or differs from the pinned one.",
+      "stack": "NativeMcpProtocolRefused: MCP server negotiated a protocol version that is unsupported or differs from the pinned one.\n    at negotiate (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:177:11)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:245:22)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:257:36\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:141:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:254:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    }
+  },
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "exactEnvironmentRestored": true,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

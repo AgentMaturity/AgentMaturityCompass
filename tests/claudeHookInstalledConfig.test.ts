@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { createServer, type RequestListener } from "node:http";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
 import { getHookIntegrationStatus, installHookIntegration } from "../src/adapters/hookIntegration.js";
 import { claudeHookSettingsFindings, probeInstalledClaudeHook, verifyClaudeControl } from "../src/adapters/claudeHookProbe.js";
@@ -13,7 +14,7 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { initWorkspace } from "../src/workspace.js";
 
-const cliPath = resolve(process.cwd(), "dist/cli.js");
+const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const PASSPHRASE = "claude-hook-installed-config-passphrase";
 const roots: string[] = [];
 const closers: Array<() => Promise<void>> = [];

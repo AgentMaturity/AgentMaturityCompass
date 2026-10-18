@@ -1,0 +1,980 @@
+{
+  "issue": "P0-52",
+  "kind": "Bounded actual follow-ups3/4/5 qualification with signed producers and destination byte/link snapshots",
+  "recordedUtc": "2026-10-14T19:13:47.124089+00:00",
+  "repo": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+  "base": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "headAtReceipt": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "authoredScope": "ONLY NEW tests/federationFollowupQualification.test.ts. No production, existing test, helper, package/lock, archive, D-15, freeze, floor or budget edit.",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/tests/federationFollowupQualification.test.ts",
+    "bytes": 16931,
+    "sha256": "405ae7dbe2d10929f15b8b6dd2c9aa4a24250ef0ca9b58bfdc81608f621eb57e"
+  },
+  "run": {
+    "name": "federation-followup-first",
+    "cmd": "pnpm exec vitest run tests/federationFollowupQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-52-federation-followup-first-20261015.json",
+    "exit": 0,
+    "durationMs": 5170,
+    "startedUtc": "2026-10-14T19:10:51.430846+00:00",
+    "log": "/private/tmp/p0-52-federation-followup-first-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  "counts": {
+    "success": true,
+    "numTotalTests": 53,
+    "numPassedTests": 53,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "rawReport": {
+    "path": "/private/tmp/p0-52-federation-followup-first-20261015.json",
+    "bytes": 25296,
+    "sha256": "7386ea20bf991782efc7ede2fdca6be3cffaa7612375ca1befcb89b796821ffd"
+  },
+  "rawLog": {
+    "path": "/private/tmp/p0-52-federation-followup-first-20261015.log",
+    "bytes": 82,
+    "sha256": "e75f96d7dbc5be22bb701d8ba01adfe0397e4af16265253b7c88771d5fc9f6cf"
+  },
+  "rawEffects": {
+    "path": "/private/tmp/p0-52-federation-followup-first-20261015/followup-effects.json",
+    "bytes": 477090,
+    "sha256": "8362ea66bd3dd7220d2c19adb9f128f58c8b27a5f484d4e2674c37ba6c006a11"
+  },
+  "sourceInputs": [
+    {
+      "path": "src/federation/federationStore.ts",
+      "bytes": 6841,
+      "sha256": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+      "equalBase": true
+    },
+    {
+      "path": "src/federation/federationSchema.ts",
+      "bytes": 2564,
+      "sha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+      "equalBase": true
+    },
+    {
+      "path": "src/federation/federationSync.ts",
+      "bytes": 23252,
+      "sha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+      "equalBase": true
+    },
+    {
+      "path": "src/federation/federationIdentity.ts",
+      "bytes": 1806,
+      "sha256": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3",
+      "equalBase": true
+    },
+    {
+      "path": "src/benchmarks/benchImport.ts",
+      "bytes": 4255,
+      "sha256": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+      "equalBase": true
+    },
+    {
+      "path": "src/benchmarks/benchExport.ts",
+      "bytes": 5499,
+      "sha256": "2288a40271501d4d9838abddf55610ff2e4cd2220a5c4ec29c782d258200824d",
+      "equalBase": true
+    },
+    {
+      "path": "src/benchmarks/benchVerify.ts",
+      "bytes": 3818,
+      "sha256": "9a09401485306b90eb2855b903508c01cad61214d29ef7ce49fb33df8ac9ec78",
+      "equalBase": true
+    },
+    {
+      "path": "src/benchmarks/benchSchema.ts",
+      "bytes": 1961,
+      "sha256": "f024723dbe928d63741a221026d0b4cf04305a9479856a47db42eca6b485c23d",
+      "equalBase": true
+    },
+    {
+      "path": "src/benchmarks/benchStore.ts",
+      "bytes": 1865,
+      "sha256": "7a182a9b9bc93183f9691de0265f9e8b58715bc798d2fdef0ee4522bb1726957",
+      "equalBase": true
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "equalBase": true
+    },
+    {
+      "path": "src/utils/pathSafety.ts",
+      "bytes": 1573,
+      "sha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "equalBase": true
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "equalBase": true
+    },
+    {
+      "path": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "equalBase": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "equalBase": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "equalBase": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "bytes": 2713,
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "equalBase": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "equalBase": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "equalBase": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "equalBase": true
+    }
+  ],
+  "cases": [
+    {
+      "name": "federation follow-up 3: pre-admit the real inner benchmark an admitted outer signature with an unadmitted inner issuer leaves inbox and benchmark snapshots unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 3: pre-admit the real inner benchmark independently admitting both captured keys imports the package and exact inner benchmark bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"..\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"../escape\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"sub/../existing-peer\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"a/b\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"a\\\\b\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"/absolute\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"C:/escape\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \".hidden\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"-flag\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"_leading\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"my org\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"a\\u0000b\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"a\\nb\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes refuses peerId \"abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\" without creating a peer directory or replacing existing signed peers",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes still writes and signs valid peerId \"5d534705-b970-4903-88fd-70b7056dd4a6\"",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes still writes and signs valid peerId \"Acme.Corp_2-eu\"",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes still writes and signs valid peerId \"0\"",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes still writes and signs valid peerId \"abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 4: peer IDs are refused before paths or writes still writes and signs valid peerId \"a..b\"",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load a normal generated UUID config writes, loads and verifies its real auditor signature",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"..\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"../escape\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"sub/../existing-peer\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"a/b\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"a\\\\b\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"/absolute\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"C:/escape\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \".hidden\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"-flag\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"_leading\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"my org\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"a\\u0000b\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"a\\nb\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses writing orgId \"abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\" without replacing existing config or signature bytes",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"..\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"../escape\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"sub/../existing-peer\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"a/b\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"a\\\\b\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"/absolute\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"C:/escape\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \".hidden\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"-flag\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"_leading\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"my org\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"a\\u0000b\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"a\\nb\" without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "federation follow-up 5: config orgId is constrained on write and load refuses loading a genuinely signed config with orgId \"abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\" without rewriting it",
+      "status": "passed"
+    }
+  ],
+  "operatorsBeforeExport": {
+    "phase": "operator-pins-before-export",
+    "publisherKeyId": "a1386c232d0e9ac40d352e5024da6738b446d3f8ebe9c0e811b6cb748edadccc",
+    "auditorKeyId": "fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76"
+  },
+  "snapshotRecordCounts": {
+    "operator-pins-before-export": 1,
+    "genuine-export": 1,
+    "unadmitted-inner-refusal": 1,
+    "independent-inner-admission": 1,
+    "unsafe-peer-refusal": 15,
+    "unsafe-config-write": 15,
+    "unsafe-config-load": 15
+  },
+  "followup3": {
+    "producer": "Actual runDiagnostic\u2192exportBenchmarkArtifact and exportFederationPackage; no mocked verifier, archive extractor, producer or storage. Outer publisher and inner auditor keys are independently captured before export and are distinct.",
+    "refusal": "Genuine admitted outer package and integrity-valid unadmitted inner benchmark produce the actual Invalid benchmark/not-pinned error. Full inbox and imported-benchmark snapshots remain exactly unchanged, including names, bytes, mode, inode/device, link counts, symlink targets and mtime.",
+    "existingStores": "Both destinations contain genuine prior imports with owned plain/hardlinked/symlink sentinel files. These prevent a library count-only result from concealing overwritten or linked target bytes.",
+    "positive": "A newly operator-signed trust list independently admits both captured keys. Actual import reports benchmarkCount1, expected inbox/<peer>/<manifest> path, exact bench.json/bench.sig/auditor.pub bytes, trusted integrity/admission and no overrides; existing seed package and benchmark snapshots remain unchanged.",
+    "outerReport": {
+      "type": "amc.verifier-report",
+      "version": 1,
+      "artifact": {
+        "kind": "federation-package",
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-federation-followup-artifacts-GpdxtY/inner.amcfed",
+        "sha256": "75cf67f8d9d87135a3ec4f79bb225aa60845242ae8ff6e0e19129c7327f5aa08"
+      },
+      "verifier": {
+        "name": "agent-maturity-compass",
+        "version": "1.2.0"
+      },
+      "verifiedAt": "2026-10-14T19:10:56.223Z",
+      "asOf": "2026-10-14T19:10:56.209Z",
+      "integrity": {
+        "status": "pass",
+        "errors": []
+      },
+      "issuerAdmission": {
+        "status": "pass",
+        "signatures": [
+          {
+            "signature": "manifest.sig",
+            "purpose": "artifact-seal",
+            "keyId": "a1386c232d0e9ac40d352e5024da6738b446d3f8ebe9c0e811b6cb748edadccc",
+            "status": "admitted",
+            "source": "trust-list",
+            "listId": "test-operator",
+            "timeBasis": "claimed",
+            "detail": null
+          }
+        ]
+      },
+      "anchoring": {
+        "status": "not-applicable",
+        "detail": null
+      },
+      "scope": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "freshness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "completeness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "satisfaction": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "trusted": true,
+      "overrides": [],
+      "warnings": []
+    },
+    "innerRefusedReport": {
+      "type": "amc.verifier-report",
+      "version": 1,
+      "artifact": {
+        "kind": "benchmark",
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-federation-followup-tNczLH/.amc/benchmarks/inner.amcbench",
+        "sha256": "2367ffa788beeb31986a32b0b363cca75e9b4623a90b88ce065f4c5f6e6ecdc3"
+      },
+      "verifier": {
+        "name": "agent-maturity-compass",
+        "version": "1.2.0"
+      },
+      "verifiedAt": "2026-10-14T19:10:56.235Z",
+      "asOf": "2026-10-14T19:10:56.209Z",
+      "integrity": {
+        "status": "pass",
+        "errors": []
+      },
+      "issuerAdmission": {
+        "status": "fail",
+        "signatures": [
+          {
+            "signature": "bench.sig",
+            "purpose": "artifact-seal",
+            "keyId": "fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76",
+            "status": "not-pinned",
+            "source": null,
+            "listId": null,
+            "timeBasis": null,
+            "detail": "key fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76 is not pinned for artifact-seal by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list"
+          }
+        ]
+      },
+      "anchoring": {
+        "status": "not-applicable",
+        "detail": null
+      },
+      "scope": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "freshness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "completeness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "satisfaction": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "trusted": false,
+      "overrides": [],
+      "warnings": []
+    },
+    "actualRefusal": {
+      "message": "Invalid benchmark '/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-fed-import-YNZEU4/artifacts/benchmarks/.amc__benchmarks__inner.amcbench': bench.sig (artifact-seal): not-pinned \u2014 key fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76 is not pinned for artifact-seal by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list",
+      "issues": []
+    },
+    "positiveReport": {
+      "type": "amc.verifier-report",
+      "version": 1,
+      "artifact": {
+        "kind": "benchmark",
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-federation-followup-tNczLH/.amc/benchmarks/inner.amcbench",
+        "sha256": "2367ffa788beeb31986a32b0b363cca75e9b4623a90b88ce065f4c5f6e6ecdc3"
+      },
+      "verifier": {
+        "name": "agent-maturity-compass",
+        "version": "1.2.0"
+      },
+      "verifiedAt": "2026-10-14T19:10:56.294Z",
+      "asOf": "2026-10-14T19:10:56.281Z",
+      "integrity": {
+        "status": "pass",
+        "errors": []
+      },
+      "issuerAdmission": {
+        "status": "pass",
+        "signatures": [
+          {
+            "signature": "bench.sig",
+            "purpose": "artifact-seal",
+            "keyId": "fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76",
+            "status": "admitted",
+            "source": "trust-list",
+            "listId": "test-operator",
+            "timeBasis": "claimed",
+            "detail": null
+          }
+        ]
+      },
+      "anchoring": {
+        "status": "not-applicable",
+        "detail": null
+      },
+      "scope": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "freshness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "completeness": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "satisfaction": {
+        "status": "not-evaluated",
+        "reasons": []
+      },
+      "trusted": true,
+      "overrides": [],
+      "warnings": []
+    },
+    "scope": "One real unadmitted inner benchmark package and one admitted retry. This does not prove cross-store atomicity under later I/O failures, concurrent archive replacement, races or arbitrary multiple-issuer batches."
+  },
+  "followup4": {
+    "negativeCases": 15,
+    "actualOperationsPerCase": 2,
+    "existingSignedPeerPreserved": true,
+    "virginPeerDirectoryNotCreated": true,
+    "overwriteAttempt": "sub/../existing-peer targets the existing signed record if validation is bypassed. Actual guard refusal preserves its bytes, signed validity and all current federation state.",
+    "validControls": [
+      "Generated UUID",
+      "Acme.Corp_2-eu",
+      "0",
+      "128-character ID",
+      "a..b"
+    ],
+    "limit": "Observed refusal and persistent destination snapshots, together with current source guard before ensureDir/path formation. No filesystem mock or claim to reject historically stored legacy unsafe peer records."
+  },
+  "followup5": {
+    "invalidWriteCases": 15,
+    "signedInvalidLoadCases": 15,
+    "generatedUuidControlPassed": true,
+    "writeProof": "Real initFederationStore rejects invalid orgId on initialized signed config without replacing YAML/signature or changing current federation state.",
+    "loadProof": "Fixture auditor genuinely signs each malformed default config. Independent signature verification passes, real loadFederationConfig rejects the orgId schema path, and invalid input YAML/signature/state remain unchanged by the load call. Only test-owned original bytes are restored in finally.",
+    "limit": "Config loader performs shape validation, not auditor signature authentication. Invalid init on a virgin store can create directories before schema parsing; no zero-directory-effects claim is made."
+  },
+  "retainedPublicArtifacts": [
+    {
+      "path": "/private/tmp/p0-52-federation-followup-first-20261015/inner.amcfed",
+      "bytes": 7049,
+      "sha256": "75cf67f8d9d87135a3ec4f79bb225aa60845242ae8ff6e0e19129c7327f5aa08"
+    },
+    {
+      "path": "/private/tmp/p0-52-federation-followup-first-20261015/inner.amcbench",
+      "bytes": 2241,
+      "sha256": "2367ffa788beeb31986a32b0b363cca75e9b4623a90b88ce065f4c5f6e6ecdc3"
+    },
+    {
+      "path": "/private/tmp/p0-52-federation-followup-first-20261015/seed.amcfed",
+      "bytes": 2432,
+      "sha256": "af4b4cd2063545b0f18b62f3569e71782ba7bed2fb2dfb3d80c487301e4c456e"
+    },
+    {
+      "path": "/private/tmp/p0-52-federation-followup-first-20261015/seed.amcbench",
+      "bytes": 2237,
+      "sha256": "492d7aa1f169091a90010214caf0d656913a5ec29bffe178f62564ff860c31f0"
+    }
+  ],
+  "retainedArchiveMemberHashes": [
+    {
+      "archive": "inner.amcfed",
+      "path": "._.",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./._artifacts",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./._transparency",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./._manifest.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./manifest.sig",
+      "bytes": 249,
+      "sha256": "eefb46a0d60377dd06f4cce36fe7a0891c580e36c140a3a9545358dd3c784e1f"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./._manifest.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./manifest.json",
+      "bytes": 1202,
+      "sha256": "1ecd165088b989821f2fe97c1f69154279e0fe44be5330120291e9a43e7147ac"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./._public-keys",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./public-keys/._publisher.pub",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./public-keys/publisher.pub",
+      "bytes": 113,
+      "sha256": "a1386c232d0e9ac40d352e5024da6738b446d3f8ebe9c0e811b6cb748edadccc"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/._proofs",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/._current.root.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/current.root.sig",
+      "bytes": 781,
+      "sha256": "58b33a0685224105134222bed2a5440ba0841313eb266f988fc740b8dfcc8287"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/._current.root.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/current.root.json",
+      "bytes": 251,
+      "sha256": "d09c47d165d97b9ab8662d8995fa653b233d77c0858cd259d48d99172bb245e7"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/proofs/._402a37f460f2ce61d30e04498b60d604cbefcde9b2c377c152098244d40d5772.amcproof",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./transparency/proofs/402a37f460f2ce61d30e04498b60d604cbefcde9b2c377c152098244d40d5772.amcproof",
+      "bytes": 10240,
+      "sha256": "4c3a344fc9ca36073e7b8d14288a796ff80892a89a9873b6c0e17a6df2140275"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/._bom",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/._plugins",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/._certs",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/._benchmarks",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/benchmarks/._.amc__benchmarks__inner.amcbench",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcfed",
+      "path": "./artifacts/benchmarks/.amc__benchmarks__inner.amcbench",
+      "bytes": 2241,
+      "sha256": "2367ffa788beeb31986a32b0b363cca75e9b4623a90b88ce065f4c5f6e6ecdc3"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "._.",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./._bench.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./bench.sig",
+      "bytes": 247,
+      "sha256": "252a37435cef93cf5b24e36757758d0fff8131e4799e0e28bbb6dcc5c59e2168"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./._bench.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./bench.json",
+      "bytes": 6220,
+      "sha256": "b5be9ce86e759714790c53be497105eff4e55684db19677e360fad0aab578831"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./._public-keys",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./public-keys/._auditor.pub",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "inner.amcbench",
+      "path": "./public-keys/auditor.pub",
+      "bytes": 113,
+      "sha256": "fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "._.",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./._artifacts",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./._transparency",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./._manifest.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./manifest.sig",
+      "bytes": 249,
+      "sha256": "d19222bb8aecd35158bd8c8daf0127e8208355efeac86b293c9493d629a43e1e"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./._manifest.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./manifest.json",
+      "bytes": 787,
+      "sha256": "552194d4a9dc0ca4a8953cbda4ed3e5257dbcf6b7e5e8ab1c9f5c91e30495d53"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./._public-keys",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./public-keys/._publisher.pub",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./public-keys/publisher.pub",
+      "bytes": 113,
+      "sha256": "a1386c232d0e9ac40d352e5024da6738b446d3f8ebe9c0e811b6cb748edadccc"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./transparency/._proofs",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./transparency/._current.root.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./transparency/current.root.sig",
+      "bytes": 781,
+      "sha256": "5e3b1afb79ee6eaf5055280c8678c8827f425ce374fe99481a1fd3e047ae583d"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./transparency/._current.root.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./transparency/current.root.json",
+      "bytes": 251,
+      "sha256": "31b3d542d10331fb561006457c27f09c9ca0f76056d2c8ae6ce2d27cace1b2f6"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./artifacts/._bom",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./artifacts/._plugins",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./artifacts/._certs",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcfed",
+      "path": "./artifacts/._benchmarks",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "._.",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./._bench.sig",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./bench.sig",
+      "bytes": 247,
+      "sha256": "4df05ff2da313226626022757eb3d036ba628010c8cc162e545b816352e7f869"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./._bench.json",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./bench.json",
+      "bytes": 6220,
+      "sha256": "c6e01118e0b31a02f3a3dd36fc4fd99109de5a0f4477d2da191f44e7b67325bb"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./._public-keys",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./public-keys/._auditor.pub",
+      "bytes": 163,
+      "sha256": "7accd299c21bd7a1736712e34367e5ae62ca1f1f85064425db1295b8d40067ca"
+    },
+    {
+      "archive": "seed.amcbench",
+      "path": "./public-keys/auditor.pub",
+      "bytes": 113,
+      "sha256": "fb122c007ced09db92b6042016d5b74d748a051d9239020e65635a22075ecb76"
+    }
+  ],
+  "noPrivateKeysRetained": true,
+  "observedFailures": {
+    "unexpectedTestOrObserverFailures": 0,
+    "productionRepairsRequiredByThisRun": false,
+    "notes": "First registered53-case run is green. Expected real refusal exceptions are asserted behavior, not invented RED-before source evidence."
+  },
+  "limitations": [
+    "Actual Node22.23.3/macOS component evidence only. No Node24, whole-suite, global/per-file coverage, hosted CI, release, publication, network/provider/model invocation or Done claim.",
+    "Original P0-52 containment/double-extraction/replay/destination concerns and follow-up6 are separately qualified by parent/other assigned source slices. This component receipt does not substitute for them.",
+    "No all-or-nothing inbox+benchmark I/O transaction, OS confinement/race guarantee, complete safe-ID space or arbitrary batch behavior is inferred from unchanged refusal snapshots.",
+    "Prior P0-51 pin/formal failures, P0-22 empty arrays, P0-23 held failures, skipped P0-29 successor debt and paused/reserved scopes remain unchanged.",
+    "Owned fixture roots are removed after public artifact copies and exact effect records are retained. No pre-existing or foreign artifact cleanup occurred. Initial run Git HEAD alone omits the new uncommitted test; its exact SHA binds the executed source."
+  ]
+}

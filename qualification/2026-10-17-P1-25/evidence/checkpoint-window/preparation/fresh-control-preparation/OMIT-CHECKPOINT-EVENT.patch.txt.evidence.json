@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/checkpoint-window/preparation/fresh-control-preparation/OMIT-CHECKPOINT-EVENT.patch.txt",
+    "bytes": 692,
+    "sha256": "306cdbc514e272f0840850d28f82f2f9dff5c5c48311e596613292bbfbfea222"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvY2hlY2twb2ludC50cworKysgYi9zcmMvdGltZS9jaGVja3BvaW50LnRzCkBAIC0xMTUsNyArMTE1LDcgQEAKICAgaWYgKCFncmFudCkgcmV0dXJuIHsgc2VxdWVuY2UsIHN0YXR1czogInBlbmRpbmciLCBmYWlsdXJlcyB9OwogICAvLyBFdmVudCBmaXJzdDogaWYgdGhlIHRva2VuIGZpbGUgdGhlbiBmYWlscyB0byBsYW5kLCB0aGUgY2hlY2twb2ludCBzdGF5cyBwZW5kaW5nIGFuZCBhIGxhdGVyIHRpY2sgcmV0cmllczsgYW4KICAgLy8gZXZlbnQgbmFtaW5nIGEgdG9rZW4gbm9ib2R5IHN0b3JlZCBvbmx5IGJvdW5kcyBub3RoaW5nLgotICBhcHBlbmRDaGVja3BvaW50RXZlbnQod29ya3NwYWNlLCB7IGNoZWNrcG9pbnRTZXF1ZW5jZTogc2VxdWVuY2UsIGNoZWNrcG9pbnRTaGEyNTY6IGVudHJ5LnNoYTI1NiwgdG9rZW5TaGEyNTY6IHNoYTI1NkhleChncmFudC50b2tlbkRlcikgfSk7CisgIC8vIFNvdXJjZS1vbmx5IGNvbnRyb2w6IGRlbGliZXJhdGVseSBvbWl0IHRoZSBjaGVja3BvaW50IGxlZGdlciBldmVudC4KICAgd3JpdGVGaWxlU3luYyh0b2tlblBhdGgod29ya3NwYWNlLCBzZXF1ZW5jZSksIGdyYW50LnRva2VuRGVyLCB7IGZsYWc6ICJ3eCIsIG1vZGU6IDBvNjQ0IH0pOwogICByZXR1cm4geyBzZXF1ZW5jZSwgc3RhdHVzOiAidGltZXN0YW1wZWQiLCBmYWlsdXJlcyB9OwogfQo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

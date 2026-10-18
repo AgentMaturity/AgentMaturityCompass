@@ -16,6 +16,7 @@ import { getAdapterDefinition } from "./catalog.js";
 import { detectAdapter } from "./adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { assembleAdapterEnv, redactSecretsInText } from "./envAssembler.js";
+import { processOutputRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
@@ -201,17 +202,16 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   if (mode === "SANDBOX") {
-    const exports = Object.entries(env)
-      .filter((row): row is [string, string] => typeof row[1] === "string")
-      .map(([key, value]) => `export ${key}=${shellQuote(value)}`)
-      .join(";");
+    // The environment (the lease, the vault passphrase, operator secrets) reaches the container by name (`docker run -e
+    // NAME`), never in argv, which the sandbox attestation and the process_start row record.
     const cmd = [shellQuote(executable), ...args.map((arg) => shellQuote(arg))].join(" ");
-    const script = `${exports}; exec ${cmd}`;
       const sandbox = await runSandboxCommand({
         workspace,
         agentId,
         command: "sh",
-        args: ["-lc", script],
+        args: ["-lc", `exec ${cmd}`],
+        env: Object.fromEntries(Object.entries(env).filter((row): row is [string, string] => typeof row[1] === "string")),
+        scrubValues: [lease.token],
         gatewayRoute: routeUrl,
         gatewayProxyUrl: activeProxyBase
       });
@@ -231,6 +231,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   const ledger = openLedger(workspace);
+  // Where the workspace opted in (P2-02), the stored stdout and stderr rows get what `amc wrap`'s telemetry gets; elsewhere
+  // they hold what the terminal shows, the lease- and denylist-redacted text (`processOutputRedactor`).
+  const evidence = processOutputRedactor(workspace);
   const sessionId = randomUUID();
   let exitCode = 1;
   let dshLaunch: ReturnType<typeof prepareDeepseekHarnessLaunch> | undefined;
@@ -259,8 +262,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       eventType: "agent_process_started",
       payload: JSON.stringify({
         adapterId: adapter.id,
-        command: executable,
-        args: isDsh ? ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] : args,
+        // Stored like the run's output (P2-02); DSH's task is omitted outright.
+        ...(isDsh ? { command: executable, args: ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] }
+          : recordedArgv(workspace, executable, args, [lease.token])),
         ...(isDsh ? {
           taskSha256: createHash("sha256").update(userCommand[0]!).digest("hex"),
           approvedLaunch: profile!.deepseekHarnessLaunch,
@@ -339,7 +343,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stdout",
-          payload: text,
+          payload: evidence(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -357,7 +361,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stderr",
-          payload: text,
+          payload: evidence(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -379,7 +383,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           const text = stdoutOmitted ? "<DSH stdout omitted: exceeded 1 MiB>" : redactWithGatewayRules(redactSecretsInText(Buffer.concat(stdoutChunks).toString("utf8"), dshSecrets), lease.token, gatewayConfig.redaction.textRegexDenylist);
           process.stdout.write(text);
           for (const [eventType, payload] of [
-            ["agent_stdout", text],
+            ["agent_stdout", evidence(text)],
             ["agent_stderr", JSON.stringify({ bytes: stderrBytes, content: "omitted: may contain private reasoning or credentials" })]
           ] as const) ledger.appendEvidence({ sessionId, runtime: "any", eventType, payload, payloadExt: "txt", inline: true, meta: { adapterId: adapter.id, agentId, trustTier: "OBSERVED", evidenceBoundary: "process_only", signal, requestedSignal, spawnObserved } });
         }

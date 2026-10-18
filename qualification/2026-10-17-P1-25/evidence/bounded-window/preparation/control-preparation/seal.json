@@ -1,0 +1,102 @@
+{
+  "schema": "p125w-controls-private-preparation-seal/1",
+  "at": "2026-10-17T00:09:26.610713+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+      "bytes": 418,
+      "sha256": "3fb680e293fb0011ca12bd6b689f40163d585812b4cd66ce5d1fb0d114957e71",
+      "dev": 16777231,
+      "inode": 543742987,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+      "bytes": 756,
+      "sha256": "ac8aae830ca233586d291e0bd3b0f636e8a0000ebdf8126a0f19070f1d5e94da",
+      "dev": 16777231,
+      "inode": 543742988,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "bytes": 7070,
+      "sha256": "90c500e6f66d789cb502feb3a535e9100332769da7037a9d705c6f0236ed43af",
+      "dev": 16777231,
+      "inode": 543748058,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "bytes": 5499,
+      "sha256": "20328ea86febed06507f121d56d4dc28b4389acbb494298367d73e828f53ff78",
+      "dev": 16777231,
+      "inode": 543742989,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+      "bytes": 5543,
+      "sha256": "7f676063bf84714159ed542c467ccd6c575a88f51358f11b21a08bf9773523ed",
+      "dev": 16777231,
+      "inode": 543748059,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control-v2-adaptation.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control-v2-adaptation.patch.txt",
+      "bytes": 22127,
+      "sha256": "d1354afcd7e227cc9f6b93892d9d156010819df785ae30dd63b778971e6824f1",
+      "dev": 16777231,
+      "inode": 543743091,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "bytes": 21957,
+      "sha256": "2a7181aca9d9f3c76889b460495c426d3969f1e05279c400ab1c9414da775137",
+      "dev": 16777231,
+      "inode": 543743090,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "bytes": 6867,
+      "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606",
+      "dev": 16777231,
+      "inode": 543742990,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/static-review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/static-review.json",
+      "bytes": 3493,
+      "sha256": "f486b5e9c0ddd2aecc7b926507d3ad9c14c5c54661a8d9c4da7021f0359c59ec",
+      "dev": 16777231,
+      "inode": 543748060,
+      "nlink": 1
+    }
+  ],
+  "inputPinset": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+    "bytes": 5543,
+    "sha256": "7f676063bf84714159ed542c467ccd6c575a88f51358f11b21a08bf9773523ed",
+    "dev": 16777231,
+    "inode": 543748059,
+    "nlink": 1
+  },
+  "preferredHelper": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+  "preparedOnly": true,
+  "helperOrProductExecuted": false,
+  "sourceWrites": false,
+  "rootBindingCreated": false,
+  "blockers": []
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "p125ec-independent-inert-receipt-helper-static-review/1",
+  "at": "2026-10-17T01:16:34.916520+00:00",
+  "blockers": [],
+  "helper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+    "bytes": 36597,
+    "sha256": "ff8100686d0c3c73e6c1955e1fbf9116005a11e2fb4e4b1f6904fecc984c7d12",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+    "dev": 16777231,
+    "inode": 543906142,
+    "nlink": 1
+  },
+  "fullDelta": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/b38-to-b39.patch.txt",
+    "bytes": 30298,
+    "sha256": "7fec97409945b1af9472ea1be8917d15c4e7cfdf1b3abccac867c0f0da5f8afd",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/b38-to-b39.patch.txt",
+    "dev": 16777231,
+    "inode": 543906143,
+    "nlink": 1
+  },
+  "checks": {
+    "preferred9OutputsAnd18DeclaredInputsBytePhysicalExact": true,
+    "allOriginalSealOutputsPreserved": true,
+    "preferredReadmeOnlyExactRedControlWordingCorrection": true,
+    "fullB38UnifiedDeltaReconstructedExactly": true,
+    "all1917CurrentBaseFiles1916Hashes1914Payloads214Commands2916PinsExact": true,
+    "actualSource802SchemaAndOne161RowSuccessorContractFit": true,
+    "actual98Path21Compiled12NativeBindingContractFit": true,
+    "sixActualOutcomeSchemasAndRedGreenRolesFit": true,
+    "manualMessageFrameMaskAndNaturalActionChronologyRestoreGatesPreserved": true,
+    "actualRuntimePeerAndFinalPreservationSchemaFit": true,
+    "activeControlA30fa847AndActiveAssemblerHashOnlyRequired": true,
+    "historicalDiagnosticRetainedInBaseNoNewDiagnosticInvented": true,
+    "allOldNonDiagnosticPrivacyCommandBindingAndPreservationGuardsRetainedOrStrengthened": true,
+    "explicitPublicRolesAndCompleteCommandLogRawRoleBinding": true,
+    "markerCheckedBeforeEncodingAndAllOutputsWithinOneMiB": true,
+    "inertCodeBytecodeNativeKeysStreamsRawPemLargeObservationsExcluded": true,
+    "onlyThreeOwnMetadataSuccessorsPlusNewPrefixFutureAdmission": true,
+    "templateAllRootFlagsFalseRuntimePinsNullSelectionsEmpty": true
+  },
+  "baseCounts": {
+    "files": 1917,
+    "artifacts": 1916,
+    "payloads": 1914,
+    "commands": 214,
+    "orderedAssemblyPins": 2916
+  },
+  "actualKnownSchemaBindings": {
+    "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+    "sourceCheckpoint": "p125ec-source-checkpoint/1",
+    "runtimeProtected": "p125ec-runtime-protected-inputs-after-one-own-test-successor/1",
+    "freshBinding": "p125ec-actual-fresh-source-binding/1",
+    "peer": "p125ec-independent-completed-fresh-control-runtime-chain-review/1",
+    "finalPreservation": "p125ec-preservation-after-controls/1"
+  },
+  "safeguardAssessment": [
+    "All old base paths, metadata hashes and counts are checked before cumulative preservation. The old manifest and ordered input/command sequences are extended, never replaced.",
+    "The only removed runtime rules are B38-specific launch-order diagnostic requirements and its obsolete old-root-binding exception. Those historical bytes remain in the complete base; no current diagnostic is fabricated.",
+    "Current direct-action closure, prior restore action, source selection, all161 physical inputs and196 distinct selected files are checked more strictly. Both controls must be actual RED; source/fresh/restorations remain zero-skip GREEN.",
+    "The completed independent peer, exact manual errors/frames/masks and current preservation are hash-bound prerequisites. The helper does not itself reexecute crypto or infer later masked positives.",
+    "Literal guard-bearing assembler/delta inputs remain hash-only. Marker rejection precedes encoding. Command outcomes and original log/patch bytes remain unchanged inside lossless envelopes.",
+    "The prospective prefix has no allocation credit. Private output creation is exclusive; only later explicit root admission can materialize three metadata successors and the new prefix."
+  ],
+  "unreadyBoundary": "No filled current manifest was reviewed. Every runtime/template pin is null, selections are empty and root flags remain false. No helper import, syntax parse, compilation or execution occurred; executable success/private assembly/validation/publication/commit/export are unestablished here.",
+  "heldBoundary": "Freeze and quality checks are unchanged. RED1268/2712, Claude work, missing-reservation limitation, human holds, F37 skip, full P1-25 and whole plan remain open.",
+  "noProductSourceIndexQaReservationNetworkKeyOrStreamOperations": true
+}

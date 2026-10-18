@@ -1,7 +1,13 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { initWorkspace } from "../src/workspace.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 import { getPackById } from "../src/domains/industryPacks.js";
 import {
   buildIndustryPackAudit,
+  signIndustryPackAudit,
   verifyIndustryPackAuditChecksum,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
@@ -13,6 +19,11 @@ import {
 } from "../src/domains/industryPackAudit.js";
 
 const NOW = 1_700_000_000_000;
+const roots: string[] = [];
+afterEach(() => {
+  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  vi.unstubAllEnvs();
+});
 
 function pack() {
   const p = getPackById("clinical-trials");
@@ -105,12 +116,36 @@ describe("industry pack audit", () => {
   });
 
   test("renders an auditor-ready markdown report", () => {
-    const md = renderIndustryPackAuditMarkdown(buildIndustryPackAudit({ pack: pack(), responses: responsesAll(1), now: NOW }));
+    const audit = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(1), now: NOW });
+    const md = renderIndustryPackAuditMarkdown(audit);
     expect(md).toContain("# Industry Pack Audit — ");
     expect(md).toContain("## Framework coverage");
     expect(md).toContain("## Controls");
     expect(md).toContain("Checksum only — not signed (`sha256:");
     expect(md).toContain("```yaml");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    for (const control of audit.controls) {
+      const section = md.split(`### ${control.id} —`)[1]!.split("\n\n")[0];
+      expect(section, control.id).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    }
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**"))).toHaveLength(audit.controls.length + 1);
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+  });
+
+  test("a real auditor signature never promotes self-assessment report claims", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-pack-report-claims-"));
+    roots.push(workspace);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "industry-report-claims-test");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    const signed = signIndustryPackAudit(workspace, buildIndustryPackAudit({ pack: pack(), responses: responsesAll(5), now: NOW }));
+    expect(signed.signature).not.toBeNull();
+    const md = renderIndustryPackAuditMarkdown(signed);
+    expect(md).toContain("Signature: auditor key");
+    const claims = md.split("\n").filter((line) => line.startsWith("**Claim:**"));
+    expect(claims).toHaveLength(signed.controls.length + 1);
+    for (const line of claims) expect(line).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(claims).toMatchSnapshot();
+    expect(md).toContain(renderClaimLegend("markdown"));
   });
 });
 

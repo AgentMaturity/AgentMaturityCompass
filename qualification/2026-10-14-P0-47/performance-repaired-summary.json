@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "71ed73e5886bc957130f9712985281d1b1149fca",
+  "rawReport": "/private/tmp/p0-47-performance-repaired-20261014.json",
+  "rawSha256": "f2cf72c41a3e10e34625e2b2df87eaf8a87f6e6e525f987d411546d92c78922c",
+  "result": {
+    "success": true,
+    "numTotalTests": 5,
+    "numPassedTests": 5,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  }
+}

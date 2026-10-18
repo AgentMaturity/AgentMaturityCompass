@@ -1,0 +1,404 @@
+{
+  "kind": "read-only bounded test fixture reuse proposal; not qualification",
+  "baselineRef": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "preservedP033Ref": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+  "actualFullReport": {
+    "path": "/private/tmp/p0-47-full-correctness-20261014.json",
+    "sha256": "3d659821bae47f08a2fe5a09c281d04e79eeb45ce8eb36afaba13d028a64c30a",
+    "success": false,
+    "total": 23111,
+    "passed": 23060,
+    "failed": 51,
+    "pending": 0,
+    "todo": 0
+  },
+  "inspectedFailedCases": 30,
+  "claims": [
+    {
+      "family": "jsonlWriterResume",
+      "failedCases": 19,
+      "causeStatus": "source-and-raw-log confirmed; proposed change unexecuted here",
+      "cause": "beforeEach puts AMC_CONTROL_CHECKPOINT_DIR inside governed workspace; loadActiveCompiledPolicy calls readSignedControlJournal, whose pending/checkpoint path calls controlCheckpointDir and throws for this layout. assertStorageAdmission wraps this as registry_unverifiable active_policy_unverifiable. First three worker stderr traces show identical admission exception. Missing residency registry is not established as cause.",
+      "minimalChange": "Change only checkpoint root to owned sibling ${workspace}-control-checkpoints; retained workspaces/checkpoints, service disposal and child SIGKILL cleanup preserved.",
+      "contractsPreserved": "Every recovery, prefix, lock, cancellation, tamper, budget, new-turn and closed-session assertion remains byte-identical."
+    },
+    {
+      "family": "nativeManagedRecovery/nativeValidationOutcomeSurfaces",
+      "failedCases": 8,
+      "causeStatus": "strong source-backed fixture diagnosis; controlled before/after still required",
+      "cause": "The shared signed operator fixture has no nativeSandbox.writableDirectories and writes validation-effect at workspace root. Current nativeSandboxBinding selects Seatbelt on Darwin; nativeShellSandboxPolicy defaults writableRoots to []; Seatbelt denies file-write except signed grants and privateTmp. Success and nonzero cases consequently leave effect() null. The home and checkpoint fixture layout is already outside workspace.",
+      "minimalChange": "Use exact signed writableDirectories [validation-out], write/read the same effect within it, and probe a separate outside-grant write. Add escaped()==false assertions to both consumers.",
+      "contractsPreserved": "Existing success/nonzero/denied/budget, approval quorum, ledger, accounting, output-event, cold-inspection and current verifier verdict assertions are preserved. No copied NativeTaskService or verifier-schema production."
+    },
+    {
+      "family": "nativeSandboxPolicyBinding",
+      "failedCases": 2,
+      "causeStatus": "source-backed earlier-authority denial; proposed change unexecuted here",
+      "cause": "Current default ToolPipeline binds authorization before guards. The test guard changes policy; authorizationDenial/recheckAuthorization then returns policy_revision_changed before the shell body, with empty output. Test expects the later shell-body error.",
+      "minimalChange": "Assert default authorization denial and retained backend-not-called; add a separate authorizeClasses empty composition to exercise the shell body admission check, retaining both original output regexes.",
+      "contractsPreserved": "Both signed and unsigned mutations remain rejected by default composition and by body defense; no production policy bypass. P0-33 pipeline differs only recording/latch behavior outside this tested authorization ordering."
+    },
+    {
+      "family": "dataResidencyPersistence",
+      "failedCases": 1,
+      "causeStatus": "current source confirms stale persisted-format assertion; proposed change unexecuted here",
+      "cause": "Current issueLegalHold(workspace) delegates to issueScopedLegalHold; legalHoldRegistryRoot is .amc/residency/legal-holds. Existing test asks for old .amc/compliance/residency/legal-holds and record_hash/prev_record_hash, failing file existence. Current records are amc.legal-hold/v1 with detached signatures, signed HEAD and journal.",
+      "minimalChange": "Use existing legalHoldRegistryRoot/readLegalHoldRegistry APIs to assert modern signed files, registryDigest and journalRevision; retain all other tests and add actual record/signature/deletion tamper refusal checks and deletion-gate integration.",
+      "contractsPreserved": "Durable cross-process holds/releases and tenant/policy assertions remain. Integrity coverage increases; typed checkpoint refusal difference in preserved P0-33 is not imported."
+    }
+  ],
+  "testProposals": [
+    {
+      "path": "tests/jsonlWriterResume.test.ts",
+      "baselineSha256": "515f697c54eba34ab93783b7cc3a54745b31e95ebb343a4773849a145136966e",
+      "proposalSha256": "c317e6b3b3f65ae96a07b7906e5dc90ed61404e29a33f4b05f030bed8777205a",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/jsonlWriterResume.test.ts\n+++ b/tests/jsonlWriterResume.test.ts\n@@ -65,7 +65,8 @@\n   workspace = mkdtempSync(join(root, \"amc-jsonl-resume-\"));\n   const environment: Record<string, string | undefined> = { AMC_SESSION_STORE: undefined, AMC_NO_SIGN: undefined,\n     AMC_EXPECTED_MONITOR_FINGERPRINT: undefined, AMC_HOME: join(workspace, \"operator-home\"),\n-    AMC_CONTROL_CHECKPOINT_DIR: join(workspace, \"control-checkpoints\"), AMC_VAULT_REMEMBER: \"0\" };\n+    // Outside the workspace: a checkpoint root inside it is refused by name (P0-57, CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE).\n+    AMC_CONTROL_CHECKPOINT_DIR: `${workspace}-control-checkpoints`, AMC_VAULT_REMEMBER: \"0\" };\n   originalEnvironment = Object.fromEntries(Object.keys(environment).map(key => [key, process.env[key]]));\n   for (const [key, value] of Object.entries(environment)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }\n   initWorkspace({ workspacePath: workspace, agentId: \"default\", trustBoundaryMode: \"isolated\" });\n"
+    },
+    {
+      "path": "tests/helpers/nativeValidationOperator.ts",
+      "baselineSha256": "5d164a8cc5ba305bc39ac36fdcb31f626de32cd4fc96269691d44ec6e60e895e",
+      "proposalSha256": "c66ef0a6bc6b125597a744a5bf6ab5eb3fcc0c3bb321a95bf5b3afb735b3eab0",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/helpers/nativeValidationOperator.ts\n+++ b/tests/helpers/nativeValidationOperator.ts\n@@ -12,22 +12,27 @@\n import { loadNativeValidationConfiguration } from \"../../src/setup/nativeValidationConfig.js\";\n \n export type OutcomeCase = \"success\" | \"nonzero\" | \"denied\" | \"budget\";\n+/** The one directory the signed shell policy lets the fixture command write. */\n+const EFFECT_DIR = \"validation-out\";\n /** Disposable signed operator policy. No production credential or external model. */\n export function validationOperatorFixture(workspace: string, mode: OutcomeCase) {\n   mkdirSync(workspace, { recursive: true });\n   initWorkspace({ workspacePath: workspace, agentId: \"default\", trustBoundaryMode: \"isolated\" });\n-  // The checks run through the native shell. On macOS it is offered only by an\n-  // explicit operator opt-in (P0-06), which no workspace file can grant: each\n-  // caller passes --unsafe-unconfined-shell, allowUnconfinedShell, or starts\n-  // Studio with AMC_UNSAFE_UNCONFINED_SHELL=1. Linux still requires Bubblewrap.\n+  // The checks run through the native shell. Since P1-05 it is confined with\n+  // Seatbelt on macOS whenever Seatbelt is available (Bubblewrap on Linux); the\n+  // operator opt-in (P0-06) callers pass applies only without it. The confined\n+  // shell writes only to signed writableDirectories, so the effect goes there.\n   const budget = defaultBudgets(\"default\");\n   if (mode === \"budget\") budget.budgets.perAgent.default!.daily.maxToolExecutes.WRITE_HIGH = 0;\n   writeFileSync(budgetsPath(workspace), YAML.stringify(budget)); signBudgetsConfig(workspace);\n   initApprovalPolicy(workspace);\n   writeRuntimeFirewallPolicy({ workspace, mode: \"block\" });\n-  const command = `printf validation-outcome > validation-effect; printf validation-outcome; exit ${mode === \"nonzero\" ? 7 : 0}`;\n+  mkdirSync(join(workspace, EFFECT_DIR));\n+  // The second write probes confinement: outside the grant it must not land, opt-in or not (P1-05).\n+  const command = `printf validation-outcome > ${EFFECT_DIR}/validation-effect; (printf escaped > validation-escape) 2>/dev/null; printf validation-outcome; exit ${mode === \"nonzero\" ? 7 : 0}`;\n   const tools = defaultToolsConfig();\n   tools.tools.allowedTools = tools.tools.allowedTools.filter(tool => tool.name === \"bash\");\n+  tools.tools.allowedTools[0]!.nativeSandbox = { kind: \"os-native\", writableDirectories: [EFFECT_DIR] };\n   // Narrow the shipped shell declaration to this exact fixture command. Keep\n   // all shipped denials; do not disable policy, budget, approvals or signatures.\n   tools.tools.allowedTools[0]!.deny!.argvRegexDenylist!.push(`^(?!${command.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\")}$)[\\\\s\\\\S]*$`);\n@@ -36,7 +41,8 @@\n   writeFileSync(checks, JSON.stringify({ schemaVersion: 1, checks: [{ id: \"public\", title: \"Exact operator fixture\", command, timeoutMs: 15000 }] }));\n   const loaded = loadNativeValidationConfiguration(checks);\n   return { checks, sha256: loaded.sha256, toolsDigest: loadVerifiedToolsConfigSnapshot(workspace).digestSha256!,\n-    effect: () => existsSync(join(workspace, \"validation-effect\")) ? readFileSync(join(workspace, \"validation-effect\"), \"utf8\") : null };\n+    effect: () => existsSync(join(workspace, EFFECT_DIR, \"validation-effect\")) ? readFileSync(join(workspace, EFFECT_DIR, \"validation-effect\"), \"utf8\") : null,\n+    escaped: () => existsSync(join(workspace, \"validation-escape\")) };\n }\n \n /** Automated fixture approvers, not human evidence. Existing signed quorum is unchanged. */\n"
+    },
+    {
+      "path": "tests/nativeManagedRecovery.test.ts",
+      "baselineSha256": "7c25a87715ef92e03cf106443d649ddd16c6321ba116be28969fc0c8c5aaeb69",
+      "proposalSha256": "33c868fe6e7e0fc61b8d5dddf47539649f3e9f4669d89efb0d66d92752a7fc1b",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/nativeManagedRecovery.test.ts\n+++ b/tests/nativeManagedRecovery.test.ts\n@@ -115,7 +115,7 @@\n   expect(second.validationSelection).toEqual(first.validationSelection);\n   const newDecisions = f.observations.filter(row => String(row.path).includes(\"/approve\") && !firstApprovals.has(row.path));\n   expect(newDecisions.length).toBeGreaterThanOrEqual(2); expect(new Set(newDecisions.map(row => row.identity))).toEqual(new Set([\"ada\", \"grace\"]));\n-  expect(f.operator.effect()).toBe(\"validation-outcome\");\n+  expect(f.operator.effect()).toBe(\"validation-outcome\"); expect(f.operator.escaped()).toBe(false);\n   await f.control(first.taskId, \"verify\", 2);\n   writeFileSync(join(f.root, \"native-controller-recovery.json\"), JSON.stringify({ backend, sessionId: id, sameStudio: true,\n     originalApprovalRemovalRefused: true, changedValidationPinRefused: true, newApproverIdentities: [...new Set(newDecisions.map(row => row.identity))],\n"
+    },
+    {
+      "path": "tests/nativeValidationOutcomeSurfaces.test.ts",
+      "baselineSha256": "786a09a6bc84d78593cacd25443e6ae77efe77b3a320b7e318bce9c45adb340c",
+      "proposalSha256": "739fe9f2c92961ca242490df36c2d3610f329bfd3b3cba71cb4429cb34b63551",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/nativeValidationOutcomeSurfaces.test.ts\n+++ b/tests/nativeValidationOutcomeSurfaces.test.ts\n@@ -92,6 +92,7 @@\n     exitCode: mode === \"success\" ? 0 : mode === \"nonzero\" ? 7 : null, reason: mode === \"success\" ? null : mode === \"nonzero\" ? \"nonzero-exit\" : \"execution-denied\" }] });\n   expect(summary.toolCalls).toBe(1);\n   expect(f.effect()).toBe(mode === \"success\" || mode === \"nonzero\" ? \"validation-outcome\" : null);\n+  expect(f.escaped()).toBe(false);\n   const history = loadSessionEventHistory({ workspace, sessionId: summary.sessionId, agentId: \"default\", requireSealed: true });\n   const outputId = summary.validation.checks[0]!.outputEventId;\n   const checkCallId = summary.validation.checks[0]!.callId;\n"
+    },
+    {
+      "path": "tests/nativeSandboxPolicyBinding.test.ts",
+      "baselineSha256": "77f9287750a6b0db4a199d2fd9999f9e4d5fc9296f9ea3b058f57db26212e694",
+      "proposalSha256": "5626272eeafc4f9a1fe2ed13f5dd719e7e5a15f47da57470007dfd04ef0cd725",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/nativeSandboxPolicyBinding.test.ts\n+++ b/tests/nativeSandboxPolicyBinding.test.ts\n@@ -156,15 +156,21 @@\n   });\n \n   it.each([\"signed\", \"unsigned\"] as const)(\"refuses a %s policy change between admission and dispatch\", async mode => {\n-    const root = setup(); sign(root); const { registry, pipeline } = compose(root);\n+    const root = setup(); sign(root); const { registry } = compose(root);\n     registry.guard(\"operator-policy-change\", () => {\n       if (mode === \"signed\") sign(root, { nativeSandbox: { kind: \"linux-bwrap\", writableDirectories: [] } });\n       else writeFileSync(join(root, \".amc\", \"tools.yaml\"), \"tools: broken\\n\");\n       return undefined;\n     });\n-    const result = await pipeline.execute(call());\n+    // P1-02: the authorization record's recheck, the last stage before the body, refuses the changed policy first.\n+    const result = await new ToolPipeline({ registry, workspace: root }).execute(call());\n     expect(result.ok).toBe(false);\n-    expect(result.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);\n+    expect(result.denied).toMatchObject({ stage: \"authorization\", reason: expect.stringContaining(\"policy_revision_changed\") });\n+    // A composition that binds no authorization record still reaches the shell body's own admission check.\n+    sign(root);\n+    const unrecorded = await new ToolPipeline({ registry, workspace: root, authorizeClasses: new Set() }).execute(call());\n+    expect(unrecorded.ok).toBe(false);\n+    expect(unrecorded.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);\n     expect(backend.run).not.toHaveBeenCalled();\n   });\n \n"
+    },
+    {
+      "path": "tests/compliance/dataResidencyPersistence.test.ts",
+      "baselineSha256": "a433f31221368e3a8eeef6c05053c6e0769034325d52d49f00ca3e79394dfabe",
+      "proposalSha256": "d3c440d4097a256466072af5c82d15d3aad214388cedc8cf61d9d6fc66714e09",
+      "proposalSourceRef": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+      "diff": "--- a/tests/compliance/dataResidencyPersistence.test.ts\n+++ b/tests/compliance/dataResidencyPersistence.test.ts\n@@ -1,5 +1,5 @@\n import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n-import { mkdtempSync, rmSync, readFileSync, existsSync } from \"node:fs\";\n+import { mkdtempSync, rmSync, readFileSync, existsSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import {\n@@ -16,6 +16,15 @@\n   generateResidencyReport,\n   resetDataResidencyState\n } from \"../../src/compliance/dataResidency.js\";\n+import {\n+  holdVerdict,\n+  legalHoldRegistryRoot,\n+  LegalHoldRegistryError,\n+  readLegalHoldRegistry\n+} from \"../../src/residency/legalHoldRegistry.js\";\n+import { assertDeletionAllowed, DeletionDenied } from \"../../src/residency/deletionGate.js\";\n+\n+const logsDeletion = (workspace: string) => ({ workspace, executor: \"residency-test\", target: { kind: \"logs\" as const } });\n \n /**\n  * Residency policies, tenants and legal holds lived only in module-level\n@@ -69,6 +78,8 @@\n     const active = getActiveLegalHolds(\"acme\", workspace);\n     expect(active.map((h) => h.holdId)).toContain(hold.holdId);\n     expect(isTenantUnderLegalHold(\"acme\", workspace)).toBe(true);\n+    // Deletion admission reads the same registry, so a later process is refused.\n+    expect(() => assertDeletionAllowed(logsDeletion(workspace))).toThrow(DeletionDenied);\n   });\n \n   it(\"records a release so a later process sees it\", () => {\n@@ -81,6 +92,7 @@\n     resetDataResidencyState();\n     expect(getActiveLegalHolds(\"acme\", workspace)).toHaveLength(0);\n     expect(isTenantUnderLegalHold(\"acme\", workspace)).toBe(false);\n+    expect(assertDeletionAllowed(logsDeletion(workspace)).verdict).toBe(\"clear\");\n   });\n \n   it(\"sees every registered tenant when checking isolation\", () => {\n@@ -98,17 +110,52 @@\n     expect(getPolicyForRegion(\"eu-west-1\", workspace)?.policyId).toBe(policy.policyId);\n   });\n \n-  it(\"chains and signs stored records so tampering is detectable\", () => {\n+  it(\"signs each stored hold and anchors the set in HEAD and the journal (P2-01)\", () => {\n     const hold = issueLegalHold(\n       { tenantId: \"acme\", reason: \"litigation\", issuedBy: \"legal\" },\n       workspace\n     );\n-    const path = join(workspace, \".amc\", \"compliance\", \"residency\", \"legal-holds\", `${hold.holdId}.json`);\n-    expect(existsSync(path)).toBe(true);\n-    const stored = JSON.parse(readFileSync(path, \"utf8\"));\n-    expect(stored.record_hash).toMatch(/^[0-9a-f]{64}$/);\n-    expect(stored.prev_record_hash).toBeTruthy();\n+    const root = legalHoldRegistryRoot(workspace);\n+    const path = join(root, `${hold.holdId}.json`);\n+    for (const file of [path, `${path}.sig`, join(root, \"HEAD.json\"), join(root, \"HEAD.json.sig\"), join(root, \"journal\")]) {\n+      expect(existsSync(file), file).toBe(true);\n+    }\n+    expect(JSON.parse(readFileSync(path, \"utf8\"))).toMatchObject({\n+      schemaVersion: \"amc.legal-hold/v1\", holdId: hold.holdId, active: true, scope: { tenantId: \"acme\" }\n+    });\n+    const snapshot = readLegalHoldRegistry(workspace);\n+    expect(snapshot.holdsChecked).toBe(1);\n+    expect(snapshot.registryDigest).toMatch(/^[0-9a-f]{64}$/);\n+    expect(snapshot.journalRevision).toBeGreaterThan(0);\n   });\n+\n+  // Each tamper must surface as an integrity failure, never as \"no active holds\".\n+  const tampers: Array<[string, (path: string) => void, string]> = [\n+    [\"a forged release in the record\", (path) => {\n+      const record = JSON.parse(readFileSync(path, \"utf8\"));\n+      writeFileSync(path, JSON.stringify({ ...record, active: false, releasedTs: record.issuedTs }) + \"\\n\");\n+    }, \"signature_invalid\"],\n+    [\"a broken record signature\", (path) => {\n+      const sig = JSON.parse(readFileSync(`${path}.sig`, \"utf8\"));\n+      writeFileSync(`${path}.sig`, JSON.stringify({ ...sig, signature: Buffer.alloc(64).toString(\"base64\") }));\n+    }, \"signature_invalid\"],\n+    [\"a deleted record and signature\", (path) => {\n+      rmSync(path); rmSync(`${path}.sig`);\n+    }, \"record_corrupt\"]\n+  ];\n+  for (const [name, tamper, reason] of tampers) {\n+    it(`refuses ${name} instead of reporting the tenant unheld`, () => {\n+      const hold = issueLegalHold(\n+        { tenantId: \"acme\", reason: \"litigation\", issuedBy: \"legal\" },\n+        workspace\n+      );\n+      tamper(join(legalHoldRegistryRoot(workspace), `${hold.holdId}.json`));\n+      resetDataResidencyState();\n+      expect(() => readLegalHoldRegistry(workspace)).toThrow(LegalHoldRegistryError);\n+      expect(() => getActiveLegalHolds(\"acme\", workspace)).toThrow(LegalHoldRegistryError);\n+      expect(holdVerdict({ workspace })).toEqual({ verdict: \"unknown\", reason });\n+    });\n+  }\n \n   it(\"still works without a workspace, for library callers\", () => {\n     const hold = issueLegalHold({ tenantId: \"acme\", reason: \"x\", issuedBy: \"y\" });\n"
+    }
+  ],
+  "dependencyHashes": [
+    {
+      "path": "src/session/sessionService.ts",
+      "baselineSha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "preservedP033Sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "byteEqual": true
+    },
+    {
+      "path": "src/catalog/compiler/activate.ts",
+      "baselineSha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+      "preservedP033Sha256": "8c46f840430da2b8d80cbe873a57db4cfffac41bea3755ddea02c28a05a0088e",
+      "byteEqual": false
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "baselineSha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "preservedP033Sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "byteEqual": true
+    },
+    {
+      "path": "src/residency/checkEgress.ts",
+      "baselineSha256": "5ac226f5479a8b441738221c247b094ceb51a975af1252b82c9ded782b00d9af",
+      "preservedP033Sha256": "b90921ed218753fb1fc8d0ae24e982d40f3bd3b41ba49bba0868969aa727124d",
+      "byteEqual": false
+    },
+    {
+      "path": "src/residency/destinationRegistry.ts",
+      "baselineSha256": "9cc37a4acb4eea64a0e93280d0a6727fba3d5574ccbc1414e223bd71a71ff21d",
+      "preservedP033Sha256": "fd6a136e90377a96ce20873c751dd8edaeb620f9af867cb0f5c8ac04bd0de640",
+      "byteEqual": false
+    },
+    {
+      "path": "src/sandbox/nativeSandboxBinding.ts",
+      "baselineSha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d",
+      "preservedP033Sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d",
+      "byteEqual": true
+    },
+    {
+      "path": "src/sandbox/nativeSandboxPolicy.ts",
+      "baselineSha256": "57ee432a15576f8d62c795acfd06776e49b7f3b019fed7f8bf35cca69573559e",
+      "preservedP033Sha256": "57ee432a15576f8d62c795acfd06776e49b7f3b019fed7f8bf35cca69573559e",
+      "byteEqual": true
+    },
+    {
+      "path": "src/sandbox/seatbeltNativeShell.ts",
+      "baselineSha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f",
+      "preservedP033Sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f",
+      "byteEqual": true
+    },
+    {
+      "path": "src/tools/toolPipeline.ts",
+      "baselineSha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "preservedP033Sha256": "09411a95276c455b23a454430eb556ff6631914cd9bbcf218df3f63c3c7b2d00",
+      "byteEqual": false
+    },
+    {
+      "path": "src/actions/authorize.ts",
+      "baselineSha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90",
+      "preservedP033Sha256": "dc7f3151bf4868ce0d8d7ecfc27af909a6c03dee02f71943ea62b901f901899b",
+      "byteEqual": false
+    },
+    {
+      "path": "src/compliance/dataResidency.ts",
+      "baselineSha256": "d07f1cb766034fe4f82765148988fbfc0a516c075a7480c2364112b7226c3c17",
+      "preservedP033Sha256": "d07f1cb766034fe4f82765148988fbfc0a516c075a7480c2364112b7226c3c17",
+      "byteEqual": true
+    },
+    {
+      "path": "src/residency/legalHoldRegistry.ts",
+      "baselineSha256": "51bd8e494515a6a3f7825d9e72a621702acd3fd12b1a212e55bd2c6e437cd315",
+      "preservedP033Sha256": "42b0fb6b062d192dc3088728be97f1face38458a3690908877c6041708504f2c",
+      "byteEqual": false
+    },
+    {
+      "path": "src/residency/deletionGate.ts",
+      "baselineSha256": "e6158c7b2e2aa699d54e5b6147cb2cadbf8471003b46112be4a0fbd59716c9e5",
+      "preservedP033Sha256": "dcf23eeb2f30c616c9b7c4b3ff940e24372b963fd36037ac1eb94ec402a7a2ad",
+      "byteEqual": false
+    },
+    {
+      "path": "tests/fixtures/jsonlWriterResumeWorker.ts",
+      "baselineSha256": "88c43a588e545e21f31b9296cfe61ae784e3710678809d74efbc50c7efdd1c62",
+      "preservedP033Sha256": "88c43a588e545e21f31b9296cfe61ae784e3710678809d74efbc50c7efdd1c62",
+      "byteEqual": true
+    },
+    {
+      "path": "tests/helpers/publicTaskHttpFixture.ts",
+      "baselineSha256": "b5a390f5053bf22eef4dba58354e20cd2f2a1f21ad316de495c513179f35b70c",
+      "preservedP033Sha256": "b5a390f5053bf22eef4dba58354e20cd2f2a1f21ad316de495c513179f35b70c",
+      "byteEqual": true
+    }
+  ],
+  "actualFailures": [
+    {
+      "path": "tests/jsonlWriterResume.test.ts",
+      "failures": [
+        {
+          "fullName": "authenticated native JSONL writer recovery real killed writer: original prefix, acknowledged effects and pending usage survive genuine resume",
+          "failureMessages": [
+            "Error: fixture exited before receipt: 1\n    at ChildProcess.exit (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:31:57)\n    at Object.onceWrapper (node:events:634:26)\n    at ChildProcess.emit (node:events:519:28)\n    at Process.ChildProcess._handle.onexit (node:internal/child_process:293:12)"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery two real resumers cannot acquire the same abandoned writer",
+          "failureMessages": [
+            "Error: fixture exited before receipt: 1\n    at ChildProcess.exit (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:31:57)\n    at Object.onceWrapper (node:events:634:26)\n    at ChildProcess.emit (node:events:519:28)\n    at Process.ChildProcess._handle.onexit (node:internal/child_process:293:12)"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery an empty replacement operations journal cannot authorize uncertain dispatch recovery",
+          "failureMessages": [
+            "Error: fixture exited before receipt: 1\n    at ChildProcess.exit (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:31:57)\n    at Object.onceWrapper (node:events:634:26)\n    at ChildProcess.emit (node:events:519:28)\n    at Process.ChildProcess._handle.onexit (node:internal/child_process:293:12)"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery a released complete turn resumes only as a new explicit turn",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:154:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery a released cancelled turn resumes only as a new explicit turn",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:154:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery a parent cancellation cannot be promoted to a standalone resumed agent",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:162:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery changed agent refuses before new writer rights or append",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:168:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery changed composition refuses before new writer rights or append",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:168:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery changed policy refuses before new writer rights or append",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:168:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery changed head refuses before new writer rights or append",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:168:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery changed trust refuses before new writer rights or append",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:168:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery torn history refuses without rewriting its bytes",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:176:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery unterminated history refuses without rewriting its bytes",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:176:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery signature history refuses without rewriting its bytes",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:176:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery future history refuses without rewriting its bytes",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:176:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery unreadable workspace owner is not stolen",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:190:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery foreign workspace owner is not stolen",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:190:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery live workspace owner is not stolen",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at released (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:54:11)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:190:16\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "fullName": "authenticated native JSONL writer recovery direct recovery cannot steal a handle dropped by a live process",
+          "failureMessages": [
+            "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none\n    at block (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)\n    at context (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)\n    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)\n    at SessionService.open (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts:199:13\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/nativeManagedRecovery.test.ts",
+      "failures": [
+        {
+          "fullName": "reattached sqlite native controller retains approval quorum, accounting and validation pins",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeManagedRecovery.test.ts:89:113\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "reattached jsonl native controller retains approval quorum, accounting and validation pins",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeManagedRecovery.test.ts:89:113\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/nativeSandboxPolicyBinding.test.ts",
+      "failures": [
+        {
+          "fullName": "the requirement follows the actual confined body refuses a signed policy change between admission and dispatch",
+          "failureMessages": [
+            "AssertionError: expected '' to match /changed after shell admission/\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeSandboxPolicyBinding.test.ts:167:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "the requirement follows the actual confined body refuses a unsigned policy change between admission and dispatch",
+          "failureMessages": [
+            "AssertionError: expected '' to match /verifiable signed tools policy/\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeSandboxPolicyBinding.test.ts:167:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/nativeValidationOutcomeSurfaces.test.ts",
+      "failures": [
+        {
+          "fullName": "Darwin 'CLI' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "Darwin 'CLI' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "Darwin 'SDK' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "Darwin 'SDK' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "Darwin 'Studio' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "fullName": "Darwin 'Studio' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+          "failureMessages": [
+            "AssertionError: expected null to be 'validation-outcome' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts:94:22\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/compliance/dataResidencyPersistence.test.ts",
+      "failures": [
+        {
+          "fullName": "data residency survives the process chains and signs stored records so tampering is detectable",
+          "failureMessages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compliance/dataResidencyPersistence.test.ts:107:30\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    }
+  ],
+  "proposalPatch": {
+    "path": "/private/tmp/p0-47-additional-fixture-reuse-proposal-20261014.patch",
+    "sha256": "8b7195983c3fbdcaae0b0a59e1a5ab045e2a4a663c595060ade80ebe07d10b5a"
+  },
+  "execution": "No tests, builds, production edits, candidate edits, commits, pushes or process mutations performed by this read-only follow-on. Proposals require current-candidate controlled verification; preserved P0-33 receipts are compatibility leads, not fresh proof.",
+  "independentReadOnlyReview": {
+    "status": "two-file source compatibility confirmed without execution",
+    "nativeSandbox": "Current actionFacts and policy recheck are unchanged in inspected P0-33 actions/authorize diff; newer changes concern lease-principal and CLI-initiator paths unused by this test. Both signed and unsigned mutations change the tools digest. Original body check and backend non-launch remain.",
+    "legalHold": "Current signed artifacts are checked before journal anchored count/digest. Forged release and broken signature produce signature_invalid; deletion of record+signature breaks count/digest and produces record_corrupt.",
+    "limitation": "Added active-hold deletion assertion proves refusal, possibly unknown/tenant_unmapped; it is not evidence for a mapped held verdict."
+  }
+}

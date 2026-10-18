@@ -1,0 +1,834 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "fixture": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015",
+  "files": [
+    {
+      "relativePath": "fixture.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/fixture.json",
+      "bytes": 152130,
+      "sha256": "e202678e5c5bea49a42f27edea926c9a1a032bd86adb64b847f32f3b348f7cab"
+    },
+    {
+      "relativePath": "homes/expired/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/expired/trust/amc-trust-list.json",
+      "bytes": 925,
+      "sha256": "5d9f70ee36d76504afef4d8c709b120efec9808eb78a0a0eca6d335b4c5aa8d8"
+    },
+    {
+      "relativePath": "homes/expired/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/expired/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/foreign-root/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/foreign-root/trust/amc-trust-list.json",
+      "bytes": 903,
+      "sha256": "569f5ad96029835d5d10a685887fda91e97d4bacef08fa636881193b41e3afac"
+    },
+    {
+      "relativePath": "homes/foreign-root/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/foreign-root/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/missing-root/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/missing-root/trust/amc-trust-list.json",
+      "bytes": 903,
+      "sha256": "70392f059c4c9d3607e70c2660bb355e73fda68950ed2d6173883b3f7234ecbe"
+    },
+    {
+      "relativePath": "homes/own/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/own/trust/amc-trust-list.json",
+      "bytes": 1293,
+      "sha256": "4a9d9b466fe94b00d17f002d21030b4b909c6f91733885a47238a6a5aad52e85"
+    },
+    {
+      "relativePath": "homes/own/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/own/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/revoked/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/revoked/trust/amc-trust-list.json",
+      "bytes": 978,
+      "sha256": "e577d410439201b0f8c895cf6456897411929937178cd7536b34e3c85a966bf4"
+    },
+    {
+      "relativePath": "homes/revoked/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/revoked/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/tamper/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/tamper/trust/amc-trust-list.json",
+      "bytes": 893,
+      "sha256": "d75c70c557e40a20453a37174bece0c56b7511a555553fc8c43eb4c04fceb8d7"
+    },
+    {
+      "relativePath": "homes/tamper/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/tamper/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/unpinned/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/unpinned/trust/amc-trust-list.json",
+      "bytes": 514,
+      "sha256": "c36303ef81f036993eeb3ab8c6c83f3b3b87166fce2ce32486389269349d9d7e"
+    },
+    {
+      "relativePath": "homes/unpinned/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/unpinned/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/valid/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/valid/trust/amc-trust-list.json",
+      "bytes": 903,
+      "sha256": "70392f059c4c9d3607e70c2660bb355e73fda68950ed2d6173883b3f7234ecbe"
+    },
+    {
+      "relativePath": "homes/valid/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/valid/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "homes/wrong-purpose/trust/amc-trust-list.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/wrong-purpose/trust/amc-trust-list.json",
+      "bytes": 893,
+      "sha256": "2e7ed00496ebce8599974ae50626bcce74e60be5d6a44165152327da64e21aa6"
+    },
+    {
+      "relativePath": "homes/wrong-purpose/trust/trust-roots.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/homes/wrong-purpose/trust/trust-roots.json",
+      "bytes": 115,
+      "sha256": "f6e278fa9081020cccbc517b2809d62c9498c17dec1ced7c0934988fdb618ea8"
+    },
+    {
+      "relativePath": "input.txt",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/input.txt",
+      "bytes": 47,
+      "sha256": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57"
+    },
+    {
+      "relativePath": "own-public-pins-before-attestation.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/own-public-pins-before-attestation.json",
+      "bytes": 506,
+      "sha256": "39d34d861e70d6cf9c4904a654949d3ad5e9a452120fdcec6b3a11040bcef97e"
+    },
+    {
+      "relativePath": "phases/final-nine/00-initialize.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/00-initialize.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/00-initialize.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/00-initialize.stdout",
+      "bytes": 464,
+      "sha256": "e4a70a200624f9c22a208f1c60ff5a5d3d7087841833bc51f109ffa2a491e603"
+    },
+    {
+      "relativePath": "phases/final-nine/02-positive.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/02-positive.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/02-positive.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/02-positive.stdout",
+      "bytes": 59421,
+      "sha256": "4582e9b75d79894faaaa1461ff760e942183387919ba752e5d558c42acf028e9"
+    },
+    {
+      "relativePath": "phases/final-nine/04-missing-root.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/04-missing-root.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/04-missing-root.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/04-missing-root.stdout",
+      "bytes": 59626,
+      "sha256": "93c5f25a552d33fe267f1ea8d4548b18447aac9c24c0cdf2b03f1a76027d9cb9"
+    },
+    {
+      "relativePath": "phases/final-nine/06-foreign-root.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/06-foreign-root.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/06-foreign-root.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/06-foreign-root.stdout",
+      "bytes": 59454,
+      "sha256": "a2cde599a91aafab7a72e94b6447e9e616766ab30106d46a18ef5a2baca723d5"
+    },
+    {
+      "relativePath": "phases/final-nine/08-tamper.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/08-tamper.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/08-tamper.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/08-tamper.stdout",
+      "bytes": 59454,
+      "sha256": "340bc0a132ff0822a493d4888c08d3a1ae0ea02afb6e37f9740c44064f174c2f"
+    },
+    {
+      "relativePath": "phases/final-nine/10-own.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/10-own.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/10-own.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/10-own.stdout",
+      "bytes": 59737,
+      "sha256": "0a28c7f003441785be79c7b7ad7602ed06600732db8e872429747c6a72456a82"
+    },
+    {
+      "relativePath": "phases/final-nine/12-wrong-purpose.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/12-wrong-purpose.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/12-wrong-purpose.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/12-wrong-purpose.stdout",
+      "bytes": 59413,
+      "sha256": "e50b9f6dbbf7eb6eb55969423ac72627a1ee4e90a690dfeff0d68e4494246417"
+    },
+    {
+      "relativePath": "phases/final-nine/14-revoked.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/14-revoked.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/14-revoked.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/14-revoked.stdout",
+      "bytes": 59408,
+      "sha256": "fe7b34da0e7c698fe25691377fc2775b713afdaa41d3fdc8a594c2bb5bb4c135"
+    },
+    {
+      "relativePath": "phases/final-nine/16-expired.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/16-expired.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/16-expired.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/16-expired.stdout",
+      "bytes": 59395,
+      "sha256": "ea6dbc6bcd754c9185e5c1e1d7c8baa55d041d4c38976dc3de9ed1315dd81104"
+    },
+    {
+      "relativePath": "phases/final-nine/18-unpinned.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/18-unpinned.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/18-unpinned.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/18-unpinned.stdout",
+      "bytes": 59423,
+      "sha256": "e65d7d24f26190169e1e4524652453019ee08dccfb6104a666e28c15728d4ad3"
+    },
+    {
+      "relativePath": "phases/final-nine/20-forged.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/20-forged.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/20-forged.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/20-forged.stdout",
+      "bytes": 59479,
+      "sha256": "6aa662cec3887a9708adc091687813be19c7a5e66e097152dde4ba7b946747e3"
+    },
+    {
+      "relativePath": "phases/final-nine/22-binding.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/22-binding.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/22-binding.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/22-binding.stdout",
+      "bytes": 59498,
+      "sha256": "9912858a505666d09ffb65eaebb52539681a2afc9a43c4bb0a33f7103aef522d"
+    },
+    {
+      "relativePath": "phases/final-nine/24-dedup.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/24-dedup.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/24-dedup.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/24-dedup.stdout",
+      "bytes": 59723,
+      "sha256": "1e5fde4ef0f4a2fc5995207bb1256128fb0cfadfcffd0ae7350d1bc2f412a0a2"
+    },
+    {
+      "relativePath": "phases/final-nine/26-guard.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/26-guard.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/26-guard.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/26-guard.stdout",
+      "bytes": 146234,
+      "sha256": "ec2ad10825e57dba926dd4c39ac7711c89023f53d930b3c537e79cd24e813701"
+    },
+    {
+      "relativePath": "phases/final-nine/28-legacy.stderr",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/28-legacy.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "phases/final-nine/28-legacy.stdout",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/28-legacy.stdout",
+      "bytes": 59380,
+      "sha256": "fde0c121f7e16b0bae183e3db4ec9e5c0e85296f88e5eb5d384580ec36d2820b"
+    },
+    {
+      "relativePath": "phases/final-nine/effects.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/phases/final-nine/effects.json",
+      "bytes": 2188225,
+      "sha256": "d34baf7b273d124b92a01812568ea801de777dafc14df9decda42688b6774739"
+    },
+    {
+      "relativePath": "public-pins-before-signatures.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/public-pins-before-signatures.json",
+      "bytes": 962,
+      "sha256": "a3af9d62d1b84d05424677defd76bc08ba82a1986900193f8c57b5c073a0a62e"
+    },
+    {
+      "relativePath": "workspace/.amc/action-policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/action-policy.yaml",
+      "bytes": 3680,
+      "sha256": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104"
+    },
+    {
+      "relativePath": "workspace/.amc/action-policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/action-policy.yaml.sig",
+      "bytes": 247,
+      "sha256": "ba61dbbee1f8da656f802cd7227a00d0fc49516abcd27baba7f5b754845dffde"
+    },
+    {
+      "relativePath": "workspace/.amc/adapters.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/adapters.yaml",
+      "bytes": 180,
+      "sha256": "c16d702191b9cc839eb217acd070ddf348891419b60da6e4469b2ff490ee640d"
+    },
+    {
+      "relativePath": "workspace/.amc/adapters.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/adapters.yaml.sig",
+      "bytes": 781,
+      "sha256": "c922c0128f594fe44feb6eb5db09088c7e5acdf93e8fd7b09e0931780fc8d4ea"
+    },
+    {
+      "relativePath": "workspace/.amc/agent.config.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/agent.config.yaml",
+      "bytes": 405,
+      "sha256": "20b9fdd11b6341e3d2503ef55a0e0b25d82e7b8e5212a4200c16ea99c19882f6"
+    },
+    {
+      "relativePath": "workspace/.amc/agent.config.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/agent.config.yaml.sig",
+      "bytes": 247,
+      "sha256": "af2c12da29d5530d8152f64ddbc5800a2a106b7d07e87b6c1a2776d3bbc3868a"
+    },
+    {
+      "relativePath": "workspace/.amc/amc.config.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/amc.config.yaml",
+      "bytes": 447,
+      "sha256": "2d9b480fe7694b76156b1dc7633167c6dfe290b33f02c458e84ca2887d3de935"
+    },
+    {
+      "relativePath": "workspace/.amc/amc.config.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/amc.config.yaml.sig",
+      "bytes": 247,
+      "sha256": "f0013d2af7b41a7f357310c4768f83c7cf9e31664ae9e0624aae059ad3762c50"
+    },
+    {
+      "relativePath": "workspace/.amc/assurance/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/assurance/policy.yaml",
+      "bytes": 873,
+      "sha256": "bbd681c5807233f7590e499f835c5717dc656439e524ae910413e4e8469b8623"
+    },
+    {
+      "relativePath": "workspace/.amc/assurance/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/assurance/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "22c4de4785ebf3305f5209caf319c304a982e22adafe3d81cb2fd47f5507388c"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/maps/active.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/maps/active.yaml",
+      "bytes": 19631,
+      "sha256": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/maps/active.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/maps/active.yaml.sig",
+      "bytes": 781,
+      "sha256": "5899d2aad76a946083be6f7d85e98815302a8faa874fee58aa02313e17b5629c"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/maps/builtin.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/maps/builtin.yaml",
+      "bytes": 19631,
+      "sha256": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/maps/builtin.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/maps/builtin.yaml.sig",
+      "bytes": 781,
+      "sha256": "3a8a5389fa6993fb5271e9dc544cc3d6a855cf95a4dd177c4398b29f6daeebb7"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/policy.yaml",
+      "bytes": 990,
+      "sha256": "854ec597fa4f5d4c9a59e08e989cd7b7e41bfca8adbe51f34750e269179fff59"
+    },
+    {
+      "relativePath": "workspace/.amc/audit/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/audit/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "86eef199ea10bb22eeb42c4ec372c7021564a85714f1abc09869d7b534136dc9"
+    },
+    {
+      "relativePath": "workspace/.amc/bench/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/bench/policy.yaml",
+      "bytes": 1456,
+      "sha256": "a3bcb8e7a502bc6e396c9516950fbe58283069953fa8f1c5a749206772111c36"
+    },
+    {
+      "relativePath": "workspace/.amc/bench/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/bench/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "af866973c23289e794c3c3227cae23964e5f16fea2ca1388d04ce9b544fe7fc2"
+    },
+    {
+      "relativePath": "workspace/.amc/blob-keys/current.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "4555d457588c640bdb256232a83a6854c13de36240ba7251201ffff5352a7fe0"
+    },
+    {
+      "relativePath": "workspace/.amc/blob-keys/current.json.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "1faef05b1d07c309f5c02dd974f8c3724c63441ed356bbc0b587aa5db9c20f7f"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/blob_53aextmax5jhpduoqkiqxehneq.blob",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/blob_53aextmax5jhpduoqkiqxehneq.blob",
+      "bytes": 158,
+      "sha256": "d2bc906f0a0c3045bc98eeaf37610b196af9edef257eea8ec0c7bce8b0f19e7d"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/blob_5mrroc6nlgnr4kez7q6svc5foy.blob",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/blob_5mrroc6nlgnr4kez7q6svc5foy.blob",
+      "bytes": 158,
+      "sha256": "c34a01fef565b2e44899fbda3515c162a276d9a460c9e9c3f94961cacc5a9d92"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/blob_bemcojuuinhl2ry75z2kbginiu.blob",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/blob_bemcojuuinhl2ry75z2kbginiu.blob",
+      "bytes": 158,
+      "sha256": "5ace0a7ae2c27051d88e464e0d0056815f463f5123e6df835eff280f1af2775e"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/blob_hwemrllgpbsnfftihhwauyngmm.blob",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/blob_hwemrllgpbsnfftihhwauyngmm.blob",
+      "bytes": 158,
+      "sha256": "91f703f3319c32416ab49c7bf7cc8a31f23a77e77478fda5343e90ccccdf8dd2"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/index.jsonl",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/index.jsonl",
+      "bytes": 1512,
+      "sha256": "e250b6702de349b1337223cd459d77b20cbf7b87f928c7804c5dd52905e99c01"
+    },
+    {
+      "relativePath": "workspace/.amc/blobs/index.jsonl.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/blobs/index.jsonl.sig",
+      "bytes": 247,
+      "sha256": "787428db705954fc05e4664101888e8bace376dae550fc3b77ffc8f316ce317d"
+    },
+    {
+      "relativePath": "workspace/.amc/bridge.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/bridge.yaml",
+      "bytes": 827,
+      "sha256": "9fac7907041631982f77b57b692cbbf61cd46f94bd3bc4be2026d62ed8fa4350"
+    },
+    {
+      "relativePath": "workspace/.amc/bridge.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/bridge.yaml.sig",
+      "bytes": 781,
+      "sha256": "49629013b6864e87a4cc518cf220911e519cb9d607f5790299934f2eacb6da1a"
+    },
+    {
+      "relativePath": "workspace/.amc/budgets.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/budgets.yaml",
+      "bytes": 704,
+      "sha256": "eadcd79d9ac72fa608dcbeb5b9ffa2f77430dcd687d0ec96d2f45e87d1cbea52"
+    },
+    {
+      "relativePath": "workspace/.amc/budgets.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "e957dbc180ae8878e14088e934de875fcb8df8d2678880eb34b1d021e2fb2655"
+    },
+    {
+      "relativePath": "workspace/.amc/canon/canon.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/canon/canon.yaml",
+      "bytes": 65764,
+      "sha256": "4156c99d6dff2ae65279c28ffe9c978a04de60d115f5dac47488e29fa5ac18fe"
+    },
+    {
+      "relativePath": "workspace/.amc/canon/canon.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/canon/canon.yaml.sig",
+      "bytes": 781,
+      "sha256": "45c88f4dd3cdf36496b202494da1b76e8c9bc4f1762c108977b02c882815c30d"
+    },
+    {
+      "relativePath": "workspace/.amc/cgx/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/cgx/policy.yaml",
+      "bytes": 444,
+      "sha256": "db84a129a529c04c167176020149521ac23d9ab553b538026c6b7b54cb98e8c5"
+    },
+    {
+      "relativePath": "workspace/.amc/cgx/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/cgx/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "1553f31a4328fbe933e61186f95a0103a410087e6737f4983f7a16820c2b8795"
+    },
+    {
+      "relativePath": "workspace/.amc/context-graph.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/context-graph.json",
+      "bytes": 1958,
+      "sha256": "a3c48fd3e92f41db74a978a59e410979fd66842b598aa68674aab515ec42e534"
+    },
+    {
+      "relativePath": "workspace/.amc/current-agent",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/current-agent",
+      "bytes": 8,
+      "sha256": "01666ec060466c14b9fa06c613fbac449163f2a2017558fe16526209ab78c6b0"
+    },
+    {
+      "relativePath": "workspace/.amc/diagnostic/bank/bank.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/diagnostic/bank/bank.yaml",
+      "bytes": 1894080,
+      "sha256": "609ba843a068df9410042bab698531ad55a64dfeac9a882bbd5f36d4edfd1fee"
+    },
+    {
+      "relativePath": "workspace/.amc/diagnostic/bank/bank.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/diagnostic/bank/bank.yaml.sig",
+      "bytes": 781,
+      "sha256": "f2a80cd8098e2e3908071475e0fa04b7a588a5de76579da9e15a3ae6a5375cc9"
+    },
+    {
+      "relativePath": "workspace/.amc/eval-harness.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/eval-harness.yaml",
+      "bytes": 253,
+      "sha256": "693988ae6ef5d1aa908e7d91c6c5470536ad16e00d47616d82ced1b81e44228e"
+    },
+    {
+      "relativePath": "workspace/.amc/evidence.sqlite",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/evidence.sqlite",
+      "bytes": 565248,
+      "sha256": "ddfac4e3a2422a02a6b71810de8f6751e7cc465571384aa1da6c5f8965bbbe75"
+    },
+    {
+      "relativePath": "workspace/.amc/evidence.sqlite-shm",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/evidence.sqlite-shm",
+      "bytes": 32768,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+    },
+    {
+      "relativePath": "workspace/.amc/evidence.sqlite-wal",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/evidence.sqlite-wal",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relativePath": "workspace/.amc/fleet.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/fleet.yaml",
+      "bytes": 315,
+      "sha256": "c65de7d214e64993cb38fcc9c854ef31b4218c05bfa04e3ee853ecf404ce2e0a"
+    },
+    {
+      "relativePath": "workspace/.amc/fleet.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/fleet.yaml.sig",
+      "bytes": 247,
+      "sha256": "2604ec4f86c01350762227c94c066671e83b5bba77aa7544a5903edf04c6c5b4"
+    },
+    {
+      "relativePath": "workspace/.amc/forecast/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/forecast/policy.yaml",
+      "bytes": 850,
+      "sha256": "fe083f2f1602a057827e73cc7ecc90b18cbdef69d97b3771705b8609c7cf704a"
+    },
+    {
+      "relativePath": "workspace/.amc/forecast/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/forecast/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "d6f33d26931b8ed9fddd7afd08edae36376d0a5c95e778781ac94975020e7ba4"
+    },
+    {
+      "relativePath": "workspace/.amc/gateway.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/gateway.yaml",
+      "bytes": 2018,
+      "sha256": "fe6ad26df7c2a48b6eb53529092116473f9d3e57d4b206b30205c73908a36c4c"
+    },
+    {
+      "relativePath": "workspace/.amc/gateway.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/gateway.yaml.sig",
+      "bytes": 247,
+      "sha256": "37d3e857d0a129eadf986c90da45d7079e3e23e0944da96ccb4120ed9362de42"
+    },
+    {
+      "relativePath": "workspace/.amc/guardrails.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/guardrails.yaml",
+      "bytes": 233,
+      "sha256": "4783669f0a6e3ca50a4debb581c8eadddf70e213d00d67fa3b2f044f56176709"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/auditor_ed25519.pub",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "9311e45fe1789b152f111ecf1c2d6c4500b497fec22a2c405db7221ad8d9b9cc"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/auditor_history.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/auditor_history.json",
+      "bytes": 717,
+      "sha256": "3fd1247db860b7dbdc46dc35a6a5a43286d8f36692dff5167b25f96fc9f65c38"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/lease_ed25519.pub",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/lease_ed25519.pub",
+      "bytes": 113,
+      "sha256": "8f22bf85c0760acf15795b87835419e3bd75f412f4cfba1fcd236fab029800e9"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/lease_history.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/lease_history.json",
+      "bytes": 715,
+      "sha256": "ef67a77505d0356f5b54d0264b7618315d0a9e196e888b5e24a91d433bd5689f"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/monitor_ed25519.pub",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "153064dbb077acc20d37943968ff0d21634947cbff8c660ef8d7b5673952b1fe"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/monitor_history.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/monitor_history.json",
+      "bytes": 717,
+      "sha256": "75ad8d85202d52eba7eb6a02257d4f3b03e05bcfd72ed7f31025e229ffbb0283"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/session_ed25519.pub",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/session_ed25519.pub",
+      "bytes": 113,
+      "sha256": "aec8b0682295aafb2b232b9b4cfbb81c202c622c3f03ed3102113a892c84c8fd"
+    },
+    {
+      "relativePath": "workspace/.amc/keys/session_history.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/keys/session_history.json",
+      "bytes": 717,
+      "sha256": "be6f26d85b31a92da505b73233cd0912db171b917e9c131e99dd1509f5d64ea6"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/profiles.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/profiles.yaml",
+      "bytes": 39039,
+      "sha256": "fdea1cd1d9005fe22e66b16849fa0319813421e803251c2cefb4f27e6d314b50"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/profiles.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/profiles.yaml.sig",
+      "bytes": 781,
+      "sha256": "3f460b51dfe0662cb848857abe155e799eb26bef2b0943763a9de14d83a46256"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/targets.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/targets.yaml",
+      "bytes": 4275,
+      "sha256": "af9ef3b8bd65653bcb363b3bd92641bc6a675f7058ad40bfe111b72d1804792d"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/targets.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/targets.yaml.sig",
+      "bytes": 781,
+      "sha256": "f43626801fa3d5ec8dfed29d16a7143f7b94520d330d9a3a7a4946788082c42e"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/tuning.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/tuning.yaml",
+      "bytes": 977,
+      "sha256": "4fd00ba5ff8f5a08b96de873da2924fc3907a002dfdee2bb1d64df0528ac0e6b"
+    },
+    {
+      "relativePath": "workspace/.amc/mechanic/tuning.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/mechanic/tuning.yaml.sig",
+      "bytes": 781,
+      "sha256": "5bd6121f049f37769ae315fabe1746d389a1f96ccc568b2f17263eb1c4f7e070"
+    },
+    {
+      "relativePath": "workspace/.amc/model-taxonomy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/model-taxonomy.yaml",
+      "bytes": 1200,
+      "sha256": "1b0de0272af89cc648ad6e3a0c53c0672f6bb6e3748e72784e2f3a1762d70c44"
+    },
+    {
+      "relativePath": "workspace/.amc/model-taxonomy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/model-taxonomy.yaml.sig",
+      "bytes": 781,
+      "sha256": "3835e83f57dca0f68f3fe122655c058d1f1c92d3a05903ceed7c34a086a42f83"
+    },
+    {
+      "relativePath": "workspace/.amc/ops-policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/ops-policy.yaml",
+      "bytes": 831,
+      "sha256": "b3554faece681eae3fec9e8bc19bb62a5dfe2e9979fa6f9e05e3fb32ba877a06"
+    },
+    {
+      "relativePath": "workspace/.amc/ops-policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/ops-policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "7c0923677ce5a25f4ff50acd3dde554c15816e3aea04e6e151704996cc93be6e"
+    },
+    {
+      "relativePath": "workspace/.amc/prompt/policy.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/prompt/policy.yaml",
+      "bytes": 1782,
+      "sha256": "2237af4bf3691bc3147a93b16039ced81f4270a905ba4a032a1afcc22fe874f2"
+    },
+    {
+      "relativePath": "workspace/.amc/prompt/policy.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/prompt/policy.yaml.sig",
+      "bytes": 781,
+      "sha256": "449a46a6a93386fa995bf56f6a0781f17be8dad5de84540e688ba4c22872958e"
+    },
+    {
+      "relativePath": "workspace/.amc/prompt-addendum.md",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/prompt-addendum.md",
+      "bytes": 181,
+      "sha256": "52d9b04cb2b962af0698973e48f0e37b1a49e66905caf0bf99f185682cf25d70"
+    },
+    {
+      "relativePath": "workspace/.amc/targets/default.target.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/targets/default.target.json",
+      "bytes": 5030,
+      "sha256": "f4449c01421c44191e4cbd0dd81cb1921bb4e96c6f1227785757ae03c0955836"
+    },
+    {
+      "relativePath": "workspace/.amc/tools.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/tools.yaml",
+      "bytes": 2054,
+      "sha256": "5c905e75193056ed990b41424c28c79ae10920f70682141e58d9dad1b7d83549"
+    },
+    {
+      "relativePath": "workspace/.amc/tools.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "63824bab49d267da3450c190e3f7654c4bd83b5817ba0099b9c599d4755b00e5"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/log.jsonl",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/log.jsonl",
+      "bytes": 291,
+      "sha256": "3964777db9c3542a23ce503dc0dfc2efcff8966807315326c6797ae7d9b89fef"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/log.seal.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/log.seal.json",
+      "bytes": 247,
+      "sha256": "7fbd614c388e038a9a25ada259576375f2d65dbce8b91a771ad5ba768a127638"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/log.seal.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/log.seal.sig",
+      "bytes": 781,
+      "sha256": "eae96cbb6fd1313031433270930485c2cc3ea96dd0de23e6433269e7324fe11b"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/merkle/current.root.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/merkle/current.root.json",
+      "bytes": 251,
+      "sha256": "716efa0a3023ce334d4eabed092db61e5f757894a8f32eede801ad66733e5ed0"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/merkle/current.root.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/merkle/current.root.sig",
+      "bytes": 781,
+      "sha256": "354b8d03ea88a5fafc59976294f9e75d1622a7997045dcc4f0464fedda03c6e4"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/merkle/frontier.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/merkle/frontier.json",
+      "bytes": 372,
+      "sha256": "7b61cf48c117d855d17018e72574a2510766be2b9b6637f8eca59fcd3eb5355a"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/merkle/leaves.jsonl",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/merkle/leaves.jsonl",
+      "bytes": 175,
+      "sha256": "01d87c9ec7b56d8b025441b83375479591df462a03384ac6f4e4fd8aafd2ebf4"
+    },
+    {
+      "relativePath": "workspace/.amc/transparency/merkle/roots.jsonl",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/transparency/merkle/roots.jsonl",
+      "bytes": 227,
+      "sha256": "c394c23c71e9ca8bafd57ed6fc0de75a97f5b17b7c9f6cf3ab71ba3b827fcaea"
+    },
+    {
+      "relativePath": "workspace/.amc/trust.yaml",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/trust.yaml",
+      "bytes": 977,
+      "sha256": "028a43dedf8605e6c2b619b39d0c483dd5f4c1b04df68ff65387bee35885a7cc"
+    },
+    {
+      "relativePath": "workspace/.amc/trust.yaml.sig",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/trust.yaml.sig",
+      "bytes": 781,
+      "sha256": "8983972945c52497ba61034be1381d37c2ca2cc05409c8ebd64f535aaf7e2096"
+    },
+    {
+      "relativePath": "workspace/.amc/vault.amcvault",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/vault.amcvault",
+      "bytes": 1264,
+      "sha256": "72be3574293c344131fbe6d4d0dfa29de6a16af40de8ff3ae9273a22af0f6be1"
+    },
+    {
+      "relativePath": "workspace/.amc/vault.amcvault.meta.json",
+      "path": "/private/tmp/p0-18-final-cold-crypto-fixture-20261015/workspace/.amc/vault.amcvault.meta.json",
+      "bytes": 411,
+      "sha256": "355fb462617f70e290c676cbead73dceb0ed6ed094b2177322e851ead86b9817"
+    }
+  ],
+  "count": 137,
+  "limits": [
+    "Fresh actual final-corpus crypto fixture is distinct from the fixed fixture used for private matrices.",
+    "File hashes retain exact owned fixture and public-pins/stream/effect proof. Private workspace, vault and key bodies stay private and are not copied into the canonical packet.",
+    "The final test input and 14 registered assertions are unchanged from the authored SHAce2e8353fd3925d41b38b1790887d921c25aa922e7795aaadfee6335b1f4c494."
+  ]
+}

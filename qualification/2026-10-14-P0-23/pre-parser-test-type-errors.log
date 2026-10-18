@@ -1,0 +1,23 @@
+
+> agent-maturity-compass@1.2.0 typecheck:tests
+> tsc -p tsconfig.tests.json --noEmit
+
+tests/mcpClaimLabels.test.ts(173,17): error TS18046: 'result.content' is of type 'unknown'.
+tests/mcpClaimLabels.test.ts(174,17): error TS18046: 'result.content' is of type 'unknown'.
+tests/mcpClaimLabels.test.ts(178,49): error TS2339: Property 'claimKind' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(179,62): error TS2339: Property 'statusDimensions' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(180,28): error TS2339: Property 'claimLabel' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(181,41): error TS2339: Property 'claimLabel' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(233,19): error TS18046: 'result.content' is of type 'unknown'.
+tests/mcpClaimLabels.test.ts(234,19): error TS18046: 'result.content' is of type 'unknown'.
+tests/mcpClaimLabels.test.ts(243,38): error TS2339: Property 'claimKind' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(244,45): error TS2339: Property 'statusDimensions' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(245,43): error TS2339: Property 'claimLabel' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(276,33): error TS2339: Property 'agents' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(283,25): error TS2339: Property 'events' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(305,23): error TS2339: Property 'claimLabel' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(335,25): error TS2339: Property 'events' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(361,23): error TS2339: Property 'incidentId' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(362,23): error TS2339: Property 'station' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(363,37): error TS2339: Property 'clocks' does not exist on type '{}'.
+tests/mcpClaimLabels.test.ts(364,23): error TS2339: Property 'events' does not exist on type '{}'.

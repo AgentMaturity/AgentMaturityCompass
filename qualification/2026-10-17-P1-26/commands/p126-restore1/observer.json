@@ -1,0 +1,800 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 34903,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/sessionAnchorOfflineProof.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparencyMerkleFailLoud.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparencyMerkleIncremental.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/legacyAmbiguity.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts"
+  ],
+  "testCount": 54,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "93927083",
+      "name": "tests/sessionAnchorOfflineProof.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/sessionAnchorOfflineProof.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "93927083_0",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session root anchoring",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_0_0",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session root anchoring anchors a closed session as a session-root transparency artifact",
+      "fullName": "session root anchoring anchors a closed session as a session-root transparency artifact",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_0_1",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session root anchoring re-anchoring an unchanged session reuses the existing entry",
+      "fullName": "session root anchoring re-anchoring an unchanged session reuses the existing entry",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_0_2",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session root anchoring the exporter refuses to issue a proof against an unsigned root",
+      "fullName": "session root anchoring the exporter refuses to issue a proof against an unsigned root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "93927083_1",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_0",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification verifies from a directory with no .amc, after the workspace is deleted",
+      "fullName": "session anchor proof — offline verification verifies from a directory with no .amc, after the workspace is deleted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_1",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a truncated seal list breaks the session root it claims",
+      "fullName": "session anchor proof — offline verification a truncated seal list breaks the session root it claims",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_2",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification an edited descriptor no longer matches the digest the log anchored",
+      "fullName": "session anchor proof — offline verification an edited descriptor no longer matches the digest the log anchored",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_3",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification an edited transparency entry fails its own hash recomputation",
+      "fullName": "session anchor proof — offline verification an edited transparency entry fails its own hash recomputation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_4",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a tampered proof path no longer resolves to the anchored root",
+      "fullName": "session anchor proof — offline verification a tampered proof path no longer resolves to the anchored root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_5",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a root that was never signed is rejected even when the path is consistent",
+      "fullName": "session anchor proof — offline verification a root that was never signed is rejected even when the path is consistent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_6",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a leaf index outside the signed tree is rejected",
+      "fullName": "session anchor proof — offline verification a leaf index outside the signed tree is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_7",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification verification fails against a fingerprint the holder did not expect",
+      "fullName": "session anchor proof — offline verification verification fails against a fingerprint the holder did not expect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_8",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification an empty pin is refused rather than treated as no pin",
+      "fullName": "session anchor proof — offline verification an empty pin is refused rather than treated as no pin",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_9",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a bundle re-signed with an attacker's auditor key fails the pin",
+      "fullName": "session anchor proof — offline verification a bundle re-signed with an attacker's auditor key fails the pin",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_10",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a descriptor carrying an unrecognised field is rejected, not silently ignored",
+      "fullName": "session anchor proof — offline verification a descriptor carrying an unrecognised field is rejected, not silently ignored",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_11",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification a fingerprint that disagrees with the bundle's own key is reported",
+      "fullName": "session anchor proof — offline verification a fingerprint that disagrees with the bundle's own key is reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_12",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification anchoring and offline verification work on the JSONL backend",
+      "fullName": "session anchor proof — offline verification anchoring and offline verification work on the JSONL backend",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_13",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification refuses a proof when the LEDGER does not verify, not just the log",
+      "fullName": "session anchor proof — offline verification refuses a proof when the LEDGER does not verify, not just the log",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_1_14",
+      "name": "tests/sessionAnchorOfflineProof.test.ts session anchor proof — offline verification auditorKeyFingerprint is the sha256 of the exported PEM",
+      "fullName": "session anchor proof — offline verification auditorKeyFingerprint is the sha256 of the exported PEM",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "93927083_2",
+      "name": "tests/sessionAnchorOfflineProof.test.ts the cryptographic checks fire in the failing direction",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_2_0",
+      "name": "tests/sessionAnchorOfflineProof.test.ts the cryptographic checks fire in the failing direction a forged root signature is rejected — the one check that makes this cryptography",
+      "fullName": "the cryptographic checks fire in the failing direction a forged root signature is rejected — the one check that makes this cryptography",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_2_1",
+      "name": "tests/sessionAnchorOfflineProof.test.ts the cryptographic checks fire in the failing direction a truncated seal list is rejected by the sealCount cross-check",
+      "fullName": "the cryptographic checks fire in the failing direction a truncated seal list is rejected by the sealCount cross-check",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_2_2",
+      "name": "tests/sessionAnchorOfflineProof.test.ts the cryptographic checks fire in the failing direction a descriptor whose sealCount disagrees with its seal list is rejected",
+      "fullName": "the cryptographic checks fire in the failing direction a descriptor whose sealCount disagrees with its seal list is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "93927083_2_3",
+      "name": "tests/sessionAnchorOfflineProof.test.ts the cryptographic checks fire in the failing direction a descriptor whose turnCount is inflated is rejected",
+      "fullName": "the cryptographic checks fire in the failing direction a descriptor whose turnCount is inflated is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "234609741",
+      "name": "tests/transparencyMerkleFailLoud.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparencyMerkleFailLoud.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "234609741_0",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_0",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed appendTransparencyEntry throws when the root cannot be advanced",
+      "fullName": "a failed merkle update is surfaced, not swallowed appendTransparencyEntry throws when the root cannot be advanced",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_1",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed the entry is still in the log, and the log itself still verifies",
+      "fullName": "a failed merkle update is surfaced, not swallowed the entry is still in the log, and the log itself still verifies",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_2",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed the lag outlives the process that hit it and names the entry",
+      "fullName": "a failed merkle update is surfaced, not swallowed the lag outlives the process that hit it and names the entry",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_3",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed the explicit repair path clears the lag",
+      "fullName": "a failed merkle update is surfaced, not swallowed the explicit repair path clears the lag",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_4",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed a recorded lag fails verification on its own, and a healthy append clears it",
+      "fullName": "a failed merkle update is surfaced, not swallowed a recorded lag fails verification on its own, and a healthy append clears it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_0_5",
+      "name": "tests/transparencyMerkleFailLoud.test.ts a failed merkle update is surfaced, not swallowed a corrupt pending marker still reports a lag rather than being ignored",
+      "fullName": "a failed merkle update is surfaced, not swallowed a corrupt pending marker still reports a lag rather than being ignored",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "234609741_1",
+      "name": "tests/transparencyMerkleFailLoud.test.ts merkle verification reports instead of throwing",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "234609741_1_0",
+      "name": "tests/transparencyMerkleFailLoud.test.ts merkle verification reports instead of throwing an unparseable log line is a verification error, not an exception",
+      "fullName": "merkle verification reports instead of throwing an unparseable log line is a verification error, not an exception",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-2103169545",
+      "name": "tests/transparencyMerkleIncremental.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparencyMerkleIncremental.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-2103169545_0",
+      "name": "tests/transparencyMerkleIncremental.test.ts transparency merkle frontier equivalence",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_0_0",
+      "name": "tests/transparencyMerkleIncremental.test.ts transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (amc-legacy-v1)",
+      "fullName": "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (amc-legacy-v1)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_0_1",
+      "name": "tests/transparencyMerkleIncremental.test.ts transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (rfc9162-sha256)",
+      "fullName": "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (rfc9162-sha256)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_0_2",
+      "name": "tests/transparencyMerkleIncremental.test.ts transparency merkle frontier equivalence a wrong odd-node rule diverges from the rebuild — the equivalence oracle discriminates",
+      "fullName": "transparency merkle frontier equivalence a wrong odd-node rule diverges from the rebuild — the equivalence oracle discriminates",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_0_3",
+      "name": "tests/transparencyMerkleIncremental.test.ts transparency merkle frontier equivalence frontier shape check rejects a leaf count the nodes cannot have produced",
+      "fullName": "transparency merkle frontier equivalence frontier shape check rejects a leaf count the nodes cannot have produced",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-2103169545_1",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental transparency merkle updates",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_1_0",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental transparency merkle updates appends produce the root and the leaves file a full rebuild would produce",
+      "fullName": "incremental transparency merkle updates appends produce the root and the leaves file a full rebuild would produce",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_1_1",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental transparency merkle updates history is appended, not rewritten",
+      "fullName": "incremental transparency merkle updates history is appended, not rewritten",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_1_2",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental transparency merkle updates the resume state tracks the log and points at the published root",
+      "fullName": "incremental transparency merkle updates the resume state tracks the log and points at the published root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-2103169545_2",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_2_0",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back a resumable append takes the incremental path",
+      "fullName": "incremental resume is used, and untrusted resume state falls back a resumable append takes the incremental path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_2_1",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back a workspace written before the frontier existed migrates itself on the next append",
+      "fullName": "incremental resume is used, and untrusted resume state falls back a workspace written before the frontier existed migrates itself on the next append",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_2_2",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back a tampered frontier is rebuilt from the log instead of steering the root",
+      "fullName": "incremental resume is used, and untrusted resume state falls back a tampered frontier is rebuilt from the log instead of steering the root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_2_3",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back a frontier that does not cover this append's parent is not resumed",
+      "fullName": "incremental resume is used, and untrusted resume state falls back a frontier that does not cover this append's parent is not resumed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2103169545_2_4",
+      "name": "tests/transparencyMerkleIncremental.test.ts incremental resume is used, and untrusted resume state falls back a truncated leaves file is detected and repaired rather than appended to",
+      "fullName": "incremental resume is used, and untrusted resume state falls back a truncated leaves file is detected and repaired rather than appended to",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "139936904",
+      "name": "tests/transparency/legacyAmbiguity.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/legacyAmbiguity.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "139936904_0",
+      "name": "tests/transparency/legacyAmbiguity.test.ts algorithm-aware legacy ambiguity",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "139936904_0_0",
+      "name": "tests/transparency/legacyAmbiguity.test.ts algorithm-aware legacy ambiguity legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+      "fullName": "algorithm-aware legacy ambiguity legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "139936904_0_1",
+      "name": "tests/transparency/legacyAmbiguity.test.ts algorithm-aware legacy ambiguity RFC entry verification needs index and size and derives sides rather than trusting flags",
+      "fullName": "algorithm-aware legacy ambiguity RFC entry verification needs index and size and derives sides rather than trusting flags",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-551157785",
+      "name": "tests/transparency/rfc9162.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-551157785_0",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_0",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+      "fullName": "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_1",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+      "fullName": "RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_2",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+      "fullName": "RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_3",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+      "fullName": "RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_4",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+      "fullName": "RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_5",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+      "fullName": "RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_6",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+      "fullName": "RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_7",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "fullName": "RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_8",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "fullName": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_9",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "fullName": "RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-551157785_0_10",
+      "name": "tests/transparency/rfc9162.test.ts RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+      "fullName": "RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

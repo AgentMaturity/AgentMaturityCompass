@@ -1,0 +1,12 @@
+diff --git a/src/mcp/nativeMcpHttpTransport.ts b/src/mcp/nativeMcpHttpTransport.ts
+--- a/src/mcp/nativeMcpHttpTransport.ts
++++ b/src/mcp/nativeMcpHttpTransport.ts
+@@ -572,7 +572,7 @@
+         } catch (error) {
+           if (!(error instanceof NativeMcpReconnectTransient)) throw error;
+           // §Sending Messages: a broken stream loses the request. Re-issue only idempotent reads, once, with a new id.
+-          if (reissuable && attempt === 0) continue;
++          if ((reissuable || rpc.method === "tools/call") && attempt === 0) continue;
+           if (this.probing) { scope.cleanup(); return new Response(JSON.stringify(legacyProbeResponse(rpc.id)), { status: 200, headers: { "content-type": "application/json" } }); }
+           if (error.timedOut) this.timeoutFailure = true;
+           if (rpc.method === "tools/call") {

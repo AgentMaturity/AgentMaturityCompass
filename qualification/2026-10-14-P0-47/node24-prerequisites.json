@@ -1,0 +1,76 @@
+{
+  "task": "P0-47 Node24 prerequisites only",
+  "createdAt": "2026-10-14T13:14:55.031698+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceHead": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "statusBefore": "",
+  "node": {
+    "version": "v24.21.0",
+    "execPath": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+    "modules": "137"
+  },
+  "pnpm": "10.33.0",
+  "scopedPath": "/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+  "versionsVerified": true,
+  "sourceFiles": {
+    "package.json": {
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432
+    },
+    "pnpm-workspace.yaml": {
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "bytes": 1521
+    }
+  },
+  "phases": [
+    {
+      "name": "frozen-install",
+      "argv": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "startedAt": "2026-10-14T13:14:55.033155+00:00",
+      "finishedAt": "2026-10-14T13:14:58.377697+00:00",
+      "elapsedSeconds": 3.345,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/install.log",
+      "logSha256": "c1367d14d315c6d3242d646d0f3616d9d4f9fe1a72110b7266e624ae1e22a171",
+      "logBytes": 2374,
+      "headAfter": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "statusAfter": ""
+    },
+    {
+      "name": "build",
+      "argv": [
+        "pnpm",
+        "run",
+        "build"
+      ],
+      "startedAt": "2026-10-14T13:15:15.602378+00:00",
+      "finishedAt": "2026-10-14T13:15:51.704925+00:00",
+      "elapsedSeconds": 36.102,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/build.log",
+      "logSha256": "70e91952119c2abb576fe7a4c9300b1e6a208f1559b7b954570ea814c7fea442",
+      "logBytes": 3314,
+      "headAfter": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "statusAfter": ""
+    }
+  ],
+  "parityTests": "not run; waiting for root source commit",
+  "limits": [
+    "no source, helper, test, manifest edits",
+    "no full suite or mutations",
+    "no commits, cleanup, push",
+    "Node22 fixture and Claude work untouched"
+  ],
+  "statusAfter": "",
+  "prerequisitesPassed": true,
+  "qualificationClaim": "Prerequisites only; no parity tests or full-suite qualification"
+}

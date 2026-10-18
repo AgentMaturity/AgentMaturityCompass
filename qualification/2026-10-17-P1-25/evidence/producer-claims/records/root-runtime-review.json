@@ -1,0 +1,721 @@
+{
+  "schema": "p125pc-root-completed-runtime-review/1",
+  "at": "2026-10-17T02:05:37.432645+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "canonicalCasesNotSummed": 24,
+  "sixActualPhases": [
+    {
+      "phase": "p125pc-source-combined",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-source-combined.raw.json",
+        "exit": 0,
+        "durationMs": 4578
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+        "bytes": 7969,
+        "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045",
+        "dev": 16777231,
+        "inode": 543926549,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-source-combined/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-source-combined/command.json",
+        "bytes": 2872,
+        "sha256": "072561d385879a59e49615e475f9048d8ef09552b142de1ff548d78ccc66efe4",
+        "dev": 16777231,
+        "inode": 543921482,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+        "bytes": 235594,
+        "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b",
+        "dev": 16777231,
+        "inode": 543926557,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "acceptance": true,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "independentGrantCount": 2,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792201480999,
+            "actualRow": {
+              "id": "6f9ed2d3-85e3-4fd6-a891-b0b4dd4e5974",
+              "ts": 1792201480999,
+              "sessionId": "af80d57b-6649-4f31-ae39-bc6e94a9a867",
+              "eventType": "audit",
+              "eventHash": "58261a25b03605264821a68194a5277f4fd7638e212ed87371c027cc891b0942",
+              "previousHash": "d0bff733f6f9a367ff3d5563d44045f6472fca9b4717d85b32557965c3de8f4c",
+              "index": 2
+            },
+            "storedTsMatchesRequested": true
+          },
+          {
+            "kind": "postdated",
+            "requestedTs": 1792288181000,
+            "actualRow": {
+              "id": "e5eca238-693c-45da-89ac-d2aceb6dd42b",
+              "ts": 1792288181000,
+              "sessionId": "b9a3d2e6-3483-47df-a6ee-b78b9b9946c7",
+              "eventType": "audit",
+              "eventHash": "fec557ff8173825b888d6705b99c1673952ad65a7654dfb5d8ec06b099cfdc5c",
+              "previousHash": "58261a25b03605264821a68194a5277f4fd7638e212ed87371c027cc891b0942",
+              "index": 3
+            },
+            "storedTsMatchesRequested": true
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": false
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-fresh-canonical.raw.json",
+        "exit": 0,
+        "durationMs": 5237
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+        "bytes": 8001,
+        "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac",
+        "dev": 16777231,
+        "inode": 543992114,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-fresh-canonical/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-fresh-canonical/command.json",
+        "bytes": 2904,
+        "sha256": "fa26ce9771ddcdf42d4b16a8e097307c91282ac6138dfeef57a359f25ba25159",
+        "dev": 16777231,
+        "inode": 543991983,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+        "bytes": 235614,
+        "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b",
+        "dev": 16777231,
+        "inode": 543992141,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "acceptance": true,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "independentGrantCount": 2,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792201992999,
+            "actualRow": {
+              "id": "607c868d-020d-45d7-ad38-d12dcc71b167",
+              "ts": 1792201992999,
+              "sessionId": "7ce63168-e560-4e39-8d8a-67c9bc2bf1e4",
+              "eventType": "audit",
+              "eventHash": "803c8137dee9cee728ccb26982f3f78324195391ac8f6c51cabfd00f9d63d1a2",
+              "previousHash": "92e67083f8138d0743ff6bd1c678efb82b63f7682b308f7620509a38e1109dc2",
+              "index": 2
+            },
+            "storedTsMatchesRequested": true
+          },
+          {
+            "kind": "postdated",
+            "requestedTs": 1792288693000,
+            "actualRow": {
+              "id": "b9cd33c6-6336-4afb-98f9-2fdca8ce38ad",
+              "ts": 1792288693000,
+              "sessionId": "cd4da729-9c48-4d27-b2d6-7dbbdae718ec",
+              "eventType": "audit",
+              "eventHash": "517e15624bc6cf2b1eab934ccad1569a1bb1039d07e41d0302c47c670cefd57e",
+              "previousHash": "803c8137dee9cee728ccb26982f3f78324195391ac8f6c51cabfd00f9d63d1a2",
+              "index": 3
+            },
+            "storedTsMatchesRequested": true
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": false
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    },
+    {
+      "phase": "p125pc-m1",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-m1.raw.json",
+        "exit": 1,
+        "durationMs": 4481
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+        "bytes": 11364,
+        "sha256": "246ee26d463193f1b2a3b10d8fc3c5cef9fa6b0faf93787f2167ee6c64121fd0",
+        "dev": 16777231,
+        "inode": 543993836,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-m1/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-m1/command.json",
+        "bytes": 2813,
+        "sha256": "c50742de719f803b4e0199e1f2756c4fc644679f5cba717e22b857cb5aaeb3bb",
+        "dev": 16777231,
+        "inode": 543993812,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+        "bytes": 188394,
+        "sha256": "ea20094c661260d2d57eeb1aab66daf2bca964619b54ca6aa70e2b8bdf8aaa9b",
+        "dev": 16777231,
+        "inode": 543993849,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 34
+      },
+      "producer": {
+        "acceptance": false,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended"
+        ],
+        "independentGrantCount": 1,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792202233999,
+            "actualRow": {
+              "id": "8a598c6b-60c2-4841-b5b2-988ccaf97547",
+              "ts": 1792202534624,
+              "sessionId": "b6e28bd2-055f-45dd-9ea4-75cd7f5b6b33",
+              "eventType": "audit",
+              "eventHash": "8218887f68c92ba9439367658d2c3632328cb339eedc1729624f1c25d16f3602",
+              "previousHash": "c07ea2303d0dc3f5d4a1378861e81cb9ef1ab5f9ce40d54f98c07d4ac8a774aa",
+              "index": 2
+            },
+            "storedTsMatchesRequested": false
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": true
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    },
+    {
+      "phase": "p125pc-restore1",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-restore1.raw.json",
+        "exit": 0,
+        "durationMs": 4559
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+        "bytes": 7987,
+        "sha256": "08b8776018332147b54e73aee8f1ee667aa4ed5d4f1673b67c139c8eec3f327d",
+        "dev": 16777231,
+        "inode": 543995494,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-restore1/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-restore1/command.json",
+        "bytes": 2855,
+        "sha256": "c506320c6dd2ef206bdeb23580268902e67257b4f5d662c068e55a805e10eae1",
+        "dev": 16777231,
+        "inode": 543995480,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+        "bytes": 235595,
+        "sha256": "67bb7af19f978ff00c9a17ce07857a7e2da6f71ffcd3d9b3ebbc5b6e6ac6ced7",
+        "dev": 16777231,
+        "inode": 543995511,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "acceptance": true,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "independentGrantCount": 2,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792202281999,
+            "actualRow": {
+              "id": "a2238492-873b-43d2-be90-44c2748a48d7",
+              "ts": 1792202281999,
+              "sessionId": "1a531a60-f776-4e65-93bc-c53155c3d4de",
+              "eventType": "audit",
+              "eventHash": "1495312b43c2f9ca71441225ee408b94ea761f371275185ce5c9d25742bee622",
+              "previousHash": "12f9fd20a5c2f62e41723f4968816adcc5a120abff8e3dadb5da13d82c52a934",
+              "index": 2
+            },
+            "storedTsMatchesRequested": true
+          },
+          {
+            "kind": "postdated",
+            "requestedTs": 1792288982000,
+            "actualRow": {
+              "id": "1853e444-d88d-43b0-9c4e-835c00f39d44",
+              "ts": 1792288982000,
+              "sessionId": "582e0a72-15e3-4beb-9baa-a77e2c1db391",
+              "eventType": "audit",
+              "eventHash": "5ac4cd3346928bb9f7e2a8ead52fc11948c07221e4a53d002be36b3e17de2769",
+              "previousHash": "1495312b43c2f9ca71441225ee408b94ea761f371275185ce5c9d25742bee622",
+              "index": 3
+            },
+            "storedTsMatchesRequested": true
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": false
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    },
+    {
+      "phase": "p125pc-m2",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-m2.raw.json",
+        "exit": 1,
+        "durationMs": 4409
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+        "bytes": 11364,
+        "sha256": "58c6ad9a9284c73896311c95ce3bc90c583eb5e647c338bbbf989bf66ee50bda",
+        "dev": 16777231,
+        "inode": 543997160,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-m2/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-m2/command.json",
+        "bytes": 2813,
+        "sha256": "4267c3edbbf9c3f489da71c97a2d8fa61a376d1d3d5ce6164ee03eb60033dae1",
+        "dev": 16777231,
+        "inode": 543997134,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+        "bytes": 190169,
+        "sha256": "f4f3060d261bf8d48d19f73700e29aff31594d05d7c132812124e45e4920c890",
+        "dev": 16777231,
+        "inode": 543997170,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 36
+      },
+      "producer": {
+        "acceptance": false,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended"
+        ],
+        "independentGrantCount": 1,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792202318999,
+            "actualRow": {
+              "id": "5d58e6bf-b25e-4e71-9ad0-fc80464fdeb2",
+              "ts": 1792202318999,
+              "sessionId": "16f01673-091f-46da-8bbb-61b579989c53",
+              "eventType": "audit",
+              "eventHash": "18772abf76be560675d763657fb41bc2b6841096c72f819ffd2206af820fd4fe",
+              "previousHash": "a8218a176404e9935530d361ea1e81a5070cafbd4f2eab2d9dcc80f4ff51eb38",
+              "index": 2
+            },
+            "storedTsMatchesRequested": true
+          },
+          {
+            "kind": "postdated",
+            "requestedTs": 1792289019000,
+            "actualRow": {
+              "id": "065ab691-9a14-40b2-9683-141e2dc876cd",
+              "ts": 1792202619879,
+              "sessionId": "21e7a9d6-2294-43fa-8b90-58d81d60a7bc",
+              "eventType": "audit",
+              "eventHash": "4234d734af0674af449bd3e2eba8e8062f3c99a1073a090e6a61b0ac0068e968",
+              "previousHash": "18772abf76be560675d763657fb41bc2b6841096c72f819ffd2206af820fd4fe",
+              "index": 3
+            },
+            "storedTsMatchesRequested": false
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": true
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    },
+    {
+      "phase": "p125pc-restore2",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-restore2.raw.json",
+        "exit": 0,
+        "durationMs": 4639
+      },
+      "outcomePin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+        "bytes": 7987,
+        "sha256": "5c3192efccab323d6db4e958d86222ab982445be8740ba87f86d3c4b70de4a3c",
+        "dev": 16777231,
+        "inode": 543998813,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-restore2/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-restore2/command.json",
+        "bytes": 2855,
+        "sha256": "50ae4f04653a3da51bfe143aa49a843bc6f66eb582fd33e5c8ac6588fbbe971c",
+        "dev": 16777231,
+        "inode": 543998794,
+        "nlink": 1
+      },
+      "publicAuditPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+        "bytes": 235600,
+        "sha256": "57f4637cdd9ec37504e18d66be2c906776f693c050c619974cdff0653263aab3",
+        "dev": 16777231,
+        "inode": 543998823,
+        "nlink": 1
+      },
+      "rawObserverOrderedJoin": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "noUnhandledLateOrHookErrors": true,
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "acceptance": true,
+        "stagePrefix": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "independentGrantCount": 2,
+        "capturedUnverifiedRequests": 0,
+        "actualStoredRows": [
+          {
+            "kind": "backdated",
+            "requestedTs": 1792202375999,
+            "actualRow": {
+              "id": "693884f1-a85d-4b43-94f1-1fdf0262fbf4",
+              "ts": 1792202375999,
+              "sessionId": "21e70485-4337-4db0-ba3b-627a17e76534",
+              "eventType": "audit",
+              "eventHash": "feb7bdf02b9f21af1dd706237649ade1be49d150009dd29b5beef19a9a9713b6",
+              "previousHash": "4bbdfac0a04c9c55cd28ea0cedd2f06f719691bfe7940f496541dc6e291fe150",
+              "index": 2
+            },
+            "storedTsMatchesRequested": true
+          },
+          {
+            "kind": "postdated",
+            "requestedTs": 1792289076000,
+            "actualRow": {
+              "id": "1c3d7e2f-a353-4ad3-a44c-400929c72b97",
+              "ts": 1792289076000,
+              "sessionId": "c7ddaf45-b754-4f8f-a4d0-167ba2c52775",
+              "eventType": "audit",
+              "eventHash": "4c8ad0eded53bcae64d39cfaffa498317987b0061cbf3cb6a055d57b54464719",
+              "previousHash": "feb7bdf02b9f21af1dd706237649ade1be49d150009dd29b5beef19a9a9713b6",
+              "index": 3
+            },
+            "storedTsMatchesRequested": true
+          }
+        ],
+        "laterCoveredReaderAndFinalFactsAbsentOnRed": false
+      },
+      "naturalWrapperClosureAndNoSignals": true
+    }
+  ],
+  "sameOrdered24IdentitiesAcrossSixPhases": true,
+  "sameHooks3And4AcrossSixPhases": true,
+  "allActualErrorsFramesMasksAndCleanupRead": true,
+  "manualClassificationPins": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/m1-classification.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/m1-classification.json",
+      "bytes": 2385,
+      "sha256": "24cdea4862bd408492df74a6e8bb5be1739e1cd48343618452ea61a0b5d6dd53",
+      "dev": 16777231,
+      "inode": 543993868,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/m2-classification.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/m2-classification.json",
+      "bytes": 2410,
+      "sha256": "eaebe920ab33812ea839ae9f449942fa26ddfb70ecac2c90eef60c85c30bd93d",
+      "dev": 16777231,
+      "inode": 543997188,
+      "nlink": 1
+    }
+  ],
+  "directActionNaturalClosures": [
+    {
+      "actionPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply1.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply1.json",
+        "bytes": 3851,
+        "sha256": "93b81a8340a2fe10428494477a2d45c6ccd4f9df1b3869b1f8b24823060eb0ec",
+        "dev": 16777231,
+        "inode": 543992223,
+        "nlink": 1
+      },
+      "mode": "apply",
+      "number": 1,
+      "naturalDirectReturnObserved": true,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/p1-25-producer-qualification-20261017/source-control.py",
+        "apply",
+        "1"
+      ],
+      "startedUtc": "2026-10-17T02:02:05.503120+00:00",
+      "endedUtc": "2026-10-17T02:02:06.087344+00:00",
+      "exit": 0,
+      "dependentPhase": "p125pc-m1",
+      "dependentStartedAfterActualReturn": true,
+      "observationBasis": "Root subprocess.run returned; actual outer exec_command reported natural exit0 before the dependent harness call. The immutable six-field action record has no naturalDirectReturnObserved member."
+    },
+    {
+      "actionPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+        "bytes": 5835,
+        "sha256": "acb452e7a46b8b3d38f05e0878242718318d80058df739ce8a3cf10df7162e73",
+        "dev": 16777231,
+        "inode": 543993884,
+        "nlink": 1
+      },
+      "mode": "restore",
+      "number": 1,
+      "naturalDirectReturnObserved": true,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/p1-25-producer-qualification-20261017/source-control.py",
+        "restore",
+        "1"
+      ],
+      "startedUtc": "2026-10-17T02:02:51.859876+00:00",
+      "endedUtc": "2026-10-17T02:02:52.498621+00:00",
+      "exit": 0,
+      "dependentPhase": "p125pc-restore1",
+      "dependentStartedAfterActualReturn": true,
+      "observationBasis": "Root subprocess.run returned; actual outer exec_command reported natural exit0 before the dependent harness call. The immutable six-field action record has no naturalDirectReturnObserved member."
+    },
+    {
+      "actionPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply2.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply2.json",
+        "bytes": 4243,
+        "sha256": "e3ecf474031cd0e25aa1f02a24abe493af2f79fd408931cf2e2b236ad71f6b3b",
+        "dev": 16777231,
+        "inode": 543995540,
+        "nlink": 1
+      },
+      "mode": "apply",
+      "number": 2,
+      "naturalDirectReturnObserved": true,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/p1-25-producer-qualification-20261017/source-control.py",
+        "apply",
+        "2"
+      ],
+      "startedUtc": "2026-10-17T02:03:28.908223+00:00",
+      "endedUtc": "2026-10-17T02:03:29.442199+00:00",
+      "exit": 0,
+      "dependentPhase": "p125pc-m2",
+      "dependentStartedAfterActualReturn": true,
+      "observationBasis": "Root subprocess.run returned; actual outer exec_command reported natural exit0 before the dependent harness call. The immutable six-field action record has no naturalDirectReturnObserved member."
+    },
+    {
+      "actionPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore2.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore2.json",
+        "bytes": 5843,
+        "sha256": "62e7e01be57b4558e629607603c423b84d6b22a8f1f98fc3a826229b675fee3c",
+        "dev": 16777231,
+        "inode": 543997199,
+        "nlink": 1
+      },
+      "mode": "restore",
+      "number": 2,
+      "naturalDirectReturnObserved": true,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/p1-25-producer-qualification-20261017/source-control.py",
+        "restore",
+        "2"
+      ],
+      "startedUtc": "2026-10-17T02:04:25.827345+00:00",
+      "endedUtc": "2026-10-17T02:04:26.444932+00:00",
+      "exit": 0,
+      "dependentPhase": "p125pc-restore2",
+      "dependentStartedAfterActualReturn": true,
+      "observationBasis": "Root subprocess.run returned; actual outer exec_command reported natural exit0 before the dependent harness call. The immutable six-field action record has no naturalDirectReturnObserved member."
+    }
+  ],
+  "noCurrentDiagnosticRunOrRetry": true,
+  "exactSameInodeRestoreBeforeEachGreen": true,
+  "sourceOnlyControlNoCompiledMutationCredit": true,
+  "twelveNormalSourceChecksAll0": true,
+  "qualityRed2712DeadCode1268DuplicatesExactUnwaived": true,
+  "finalPreservationPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+    "bytes": 1794,
+    "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41",
+    "dev": 16777231,
+    "inode": 543998885,
+    "nlink": 1
+  },
+  "allHoldsRetained": true,
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "metadataCopyCommitExportOrQaCreditAtThisRecord": false,
+  "preparationReadError": "One guessed receipt delta filename was absent; actual rg inventory resolved c39-to-producer.patch.txt and root read it completely. No source/product/evidence mutation or rerun resulted."
+}

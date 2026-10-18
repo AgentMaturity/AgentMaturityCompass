@@ -1,0 +1,1776 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:00:08.550842+00:00",
+  "state": "BOUNDED_SIX_CONSUMER_SOURCE_GUARD_CONTROLS_COMPLETE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015",
+  "construction": "Fresh independent source 58 filesystem copy, not a Git clone.",
+  "sourceFixture": {
+    "path": "tests/leaseRevocationConsumerQualification.test.ts",
+    "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c",
+    "bytes": 31014,
+    "distinctRegisteredCases": 7,
+    "deadlineMs": 90000,
+    "normalConfigAndSetupGuards": "Unchanged; original 35 still use 30000ms and are not rerun in this packet."
+  },
+  "recipeProposal": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-proposal-20261015.json",
+    "bytes": 6847,
+    "sha256": "78b77be735524fa739c26f478d030574a6ad2c5e2296ef6958c35a6164b819e9"
+  },
+  "independentStaticReview": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-static-review-20261015.json",
+    "bytes": 22562,
+    "sha256": "6e799b6f6efa9108899dde99fe918278dc1424ca14e1406a479c47d1d3b72f98"
+  },
+  "controls": [
+    {
+      "id": "P30-1542-current-empty-set-seven-consumer-supplement",
+      "basis": "Same current semantic reanchor already qualified by the separate original35 core; this is a distinct supplementary seven-case corpus.",
+      "sourceTarget": "src/leases/leaseStore.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 5,
+          "numFailedTests": 2,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "managedHookLease",
+        "agentCredentialAuth"
+      ],
+      "actualAffectedObservationConsumers": [
+        "managedHookLease",
+        "agentCredentialAuth"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "managedHookLease",
+          "agentCredentialAuth"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers managedHookLease",
+          "firstMessage": "AssertionError: managedHookLease: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        },
+        {
+          "name": "private AMC-1542 current public revocation consumers agentCredentialAuth",
+          "firstMessage": "AssertionError: agentCredentialAuth: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "managedHookLease",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "managedHookLease",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "managedHookLease",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "managedHookLease",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "agentCredentialAuth",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "agentCredentialAuth",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "agentCredentialAuth",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "agentCredentialAuth",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1542-current-consumer-bridge",
+      "basis": "New current-source semantic guard deletion, reconstructed from actual current verify-then-reload flow; not the absent held readRevokedLeaseIds literal recipe.",
+      "sourceTarget": "src/bridge/bridgeAuth.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 6,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "bridgeAuth"
+      ],
+      "actualAffectedObservationConsumers": [
+        "bridgeAuth"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "bridgeAuth"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers bridgeAuth",
+          "firstMessage": "AssertionError: bridgeAuth: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "bridgeAuth",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "bridgeAuth",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "bridgeAuth",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "bridgeAuth",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1542-current-consumer-gateway",
+      "basis": "New current-source semantic guard deletion, reconstructed from actual current verify-then-reload flow; not the absent held readRevokedLeaseIds literal recipe.",
+      "sourceTarget": "src/gateway/server.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 6,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "gateway"
+      ],
+      "actualAffectedObservationConsumers": [
+        "gateway"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "gateway"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers gateway",
+          "firstMessage": "AssertionError: gateway: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(12) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "gateway",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            }
+          },
+          "operation": "upstream",
+          "before": {
+            "count": 1,
+            "ids": []
+          },
+          "after": {
+            "count": 2,
+            "ids": []
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "gateway",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            }
+          },
+          "operation": "upstream",
+          "before": {
+            "count": 2,
+            "ids": []
+          },
+          "after": {
+            "count": 3,
+            "ids": []
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "gateway",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            }
+          },
+          "operation": "upstream",
+          "before": {
+            "count": 3,
+            "ids": []
+          },
+          "after": {
+            "count": 4,
+            "ids": []
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "gateway",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            }
+          },
+          "operation": "upstream",
+          "before": {
+            "count": 4,
+            "ids": []
+          },
+          "after": {
+            "count": 5,
+            "ids": []
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1542-current-consumer-router",
+      "basis": "New current-source semantic guard deletion, reconstructed from actual current verify-then-reload flow; not the absent held readRevokedLeaseIds literal recipe.",
+      "sourceTarget": "src/workspaces/workspaceRouter.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 6,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "workspaceRouter"
+      ],
+      "actualAffectedObservationConsumers": [
+        "workspaceRouter"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "workspaceRouter"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers workspaceRouter",
+          "firstMessage": "AssertionError: workspaceRouter: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "workspaceRouter",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "workspaceRouter",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "workspaceRouter",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "workspaceRouter",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            }
+          },
+          "operation": "none",
+          "before": {
+            "count": null,
+            "ids": []
+          },
+          "after": {
+            "count": null,
+            "ids": []
+          },
+          "actualOperationDelta": null,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1542-current-consumer-studio",
+      "basis": "New current-source semantic guard deletion, reconstructed from actual current verify-then-reload flow; not the absent held readRevokedLeaseIds literal recipe.",
+      "sourceTarget": "src/studio/studioServer.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 6,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "studioServer"
+      ],
+      "actualAffectedObservationConsumers": [
+        "studioServer"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "studioServer"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers studioServer",
+          "firstMessage": "AssertionError: studioServer: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(16) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "studioServer",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "effectiveMode": "SIMULATE"
+            }
+          },
+          "operation": "intent",
+          "before": {
+            "count": 1,
+            "ids": [
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "after": {
+            "count": 2,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "studioServer",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_7fabd999143d4052b3931ca2ba376580",
+              "effectiveMode": "SIMULATE"
+            }
+          },
+          "operation": "intent",
+          "before": {
+            "count": 2,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "after": {
+            "count": 3,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_7fabd999143d4052b3931ca2ba376580",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "studioServer",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_583ece6e63184fd69287ab9aa1a9bae8",
+              "effectiveMode": "SIMULATE"
+            }
+          },
+          "operation": "intent",
+          "before": {
+            "count": 3,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_7fabd999143d4052b3931ca2ba376580",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "after": {
+            "count": 4,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_583ece6e63184fd69287ab9aa1a9bae8",
+              "intent_7fabd999143d4052b3931ca2ba376580",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "studioServer",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_a80785863d974b319962c9e3c580b5e7",
+              "effectiveMode": "SIMULATE"
+            }
+          },
+          "operation": "intent",
+          "before": {
+            "count": 4,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_583ece6e63184fd69287ab9aa1a9bae8",
+              "intent_7fabd999143d4052b3931ca2ba376580",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a"
+            ]
+          },
+          "after": {
+            "count": 5,
+            "ids": [
+              "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+              "intent_583ece6e63184fd69287ab9aa1a9bae8",
+              "intent_7fabd999143d4052b3931ca2ba376580",
+              "intent_91c04f594a2145b5b17f2f977a41aa3a",
+              "intent_a80785863d974b319962c9e3c580b5e7"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1542-current-consumer-wire",
+      "basis": "New current-source semantic guard deletion, reconstructed from actual current verify-then-reload flow; not the absent held readRevokedLeaseIds literal recipe.",
+      "sourceTarget": "src/wire/wireDispatcher.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 7,
+          "numPassedTests": 6,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailedCases": [
+        "wireDispatcher"
+      ],
+      "actualAffectedObservationConsumers": [
+        "wireDispatcher"
+      ],
+      "predictionComparison": {
+        "predictedCases": [
+          "wireDispatcher"
+        ],
+        "actualMatches": true
+      },
+      "failedAssertions": [
+        {
+          "name": "private AMC-1542 current public revocation consumers wireDispatcher",
+          "firstMessage": "AssertionError: wireDispatcher: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(16) ] to deeply equal []",
+          "isAssertionError": true,
+          "locations": [
+            "leaseRevocationConsumerQualification.test.ts:396:88"
+          ]
+        }
+      ],
+      "observedErrors": [],
+      "damagedStateAdmissions": [
+        {
+          "consumer": "wireDispatcher",
+          "state": "removed-row-old-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "460aad5f1909360da3c4fc756de95f33de627cdd46dd056353d4ebfce7b76414",
+              "workSessionId": "f67daf7c-c61e-4e91-b161-b3ead8ad58f2",
+              "agentId": "default"
+            }
+          },
+          "operation": "wire",
+          "before": {
+            "count": 1,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898"
+            ]
+          },
+          "after": {
+            "count": 2,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "wireDispatcher",
+          "state": "removed-row-old-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "2b5cd3746d69373c82da836ef59e1d10b91031c123bab363fa32e9eb58cafcdd",
+              "workSessionId": "fe5eddff-a366-4189-a0ec-afdf4e9d89a4",
+              "agentId": "default"
+            }
+          },
+          "operation": "wire",
+          "before": {
+            "count": 2,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89"
+            ]
+          },
+          "after": {
+            "count": 3,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89",
+              "9a0a23e9-5636-44cd-944d-ce7ba5b965aa"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "wireDispatcher",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "live",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "87d4c406ea20ccaef3ad18245e5b733e01568f0607d32bdad9654609905f1fed",
+              "workSessionId": "be8b2708-98e1-41e1-b474-fc822ec29a37",
+              "agentId": "default"
+            }
+          },
+          "operation": "wire",
+          "before": {
+            "count": 3,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89",
+              "9a0a23e9-5636-44cd-944d-ce7ba5b965aa"
+            ]
+          },
+          "after": {
+            "count": 4,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89",
+              "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+              "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        },
+        {
+          "consumer": "wireDispatcher",
+          "state": "missing-list-kept-signature",
+          "tokenKind": "revoked",
+          "outcome": {
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "2e3665f18b42c39235a50baf36c8d2a5d9c43c7948f8fb2401b5448cbf5d8144",
+              "workSessionId": "0da243c9-83a3-4b84-8888-84a0dd2a8877",
+              "agentId": "default"
+            }
+          },
+          "operation": "wire",
+          "before": {
+            "count": 4,
+            "ids": [
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89",
+              "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+              "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+            ]
+          },
+          "after": {
+            "count": 5,
+            "ids": [
+              "02e61ecb-c067-4f5b-9888-3623e596971a",
+              "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+              "4ad8ae20-87c6-431e-89da-c6a02122da89",
+              "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+              "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+            ]
+          },
+          "actualOperationDelta": 1,
+          "withinLifetime": true,
+          "namedInputsAndPairUnchanged": true
+        }
+      ],
+      "classification": "meaningful-source-guard-sensitivity",
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    }
+  ],
+  "phaseEvidence": [
+    {
+      "phase": "P30-1542-current-empty-set-seven-consumer-supplement-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/summary.json",
+        "bytes": 4011,
+        "sha256": "3e94a207042d7cc7d2908d4093d5e49689cf32adb16318ee2f0332911b5f908d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/raw-tests.json",
+        "bytes": 2601,
+        "sha256": "04532d4847ec4de97f7cf8f2a41216e2f8bc58b1c5b34e962e2f098eeb0862fb"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/observations.json",
+        "bytes": 429609,
+        "sha256": "2609dbecb02eede7aa4692f9b6b08b049a8f2be1808ab60677158dd36b3a0741"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/semantic-validation.json",
+        "bytes": 45887,
+        "sha256": "6ead81b6ea5338ece7b70b96eb09e78ea2a8e3645985806eb0a5e387f70450f2"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/command.json",
+        "bytes": 1992,
+        "sha256": "f36841f0e72c8717dc23d3e142722f26f4d1c1d4a1f375e5566257cdc3c63af0"
+      }
+    },
+    {
+      "phase": "P30-1542-current-empty-set-seven-consumer-supplement-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/summary.json",
+        "bytes": 6308,
+        "sha256": "b796a4585dd9597d82878365c1772b3da9a6ed495ddea6e9371c19c3edc6f606"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/raw-tests.json",
+        "bytes": 3562,
+        "sha256": "8f1dde62b97d4d898d9507b9b73b66d7214e7de3e3c3cde7a4ca7ea8bcc32c32"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/observations.json",
+        "bytes": 430893,
+        "sha256": "ef5f101288454f7f69c3f39b8e190c3a466acce729289d935a46e9359f0b6186"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/semantic-validation.json",
+        "bytes": 47281,
+        "sha256": "0435dada5b65645a959d9ae0a30c535e62d276e7706413c887ce909fc27683a2"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/command.json",
+        "bytes": 1981,
+        "sha256": "0c2e19782011cceecc352c0ae0f03543d01a9c34eb3d41ec3d90dfc96aef8591"
+      }
+    },
+    {
+      "phase": "P30-1542-current-empty-set-seven-consumer-supplement-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/summary.json",
+        "bytes": 4019,
+        "sha256": "6d2d311f6e734991e89b2dbd2efdf4e1e825f2726e070d0edd07e701ce52454a"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/raw-tests.json",
+        "bytes": 2609,
+        "sha256": "7fdccc024a1a7b9d2212c397b2bda481ba1f8f2db25e599eebb40accbb0a9376"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/observations.json",
+        "bytes": 429609,
+        "sha256": "afb8fa989dfad9d4f0e1a046860c78f3bde543118e9ce6bb22df4452c7a6f4d9"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/semantic-validation.json",
+        "bytes": 45887,
+        "sha256": "bba727c366381a0e4e5d14cd9727bdcc4df9b0fdd1d5a65d030e60a2e33dbb7d"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/command.json",
+        "bytes": 1992,
+        "sha256": "43ce42a9d12b3813e58f5e208a9c3960a02fd5a343f555012ad5f7535c58fb67"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-bridge-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/summary.json",
+        "bytes": 3940,
+        "sha256": "8897d037650d5cce0a8dd64aa7247b79674c25684a284919aecfb4b88eae0f5b"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/raw-tests.json",
+        "bytes": 2610,
+        "sha256": "311d9b7932a4af010199caa038e4bf7e8aa293d5f81aaff3c6814891c38950fa"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/observations.json",
+        "bytes": 429329,
+        "sha256": "0d478b729cb868982aa2b9eeac87d478d384d17af577486582c729823151295d"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "0483130a3d1175f76d143e249886d859defee141ceb883e57c82e35a68ff4be9"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/command.json",
+        "bytes": 1852,
+        "sha256": "34368772591fede76e869d4552904daba5b3909a5eb9d891276507b0c0fadce6"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-bridge-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/summary.json",
+        "bytes": 5046,
+        "sha256": "12978c6afc08412be4d5d66639dbed25daa8dcd645ae4a9ad575c743f09c2234"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/raw-tests.json",
+        "bytes": 3079,
+        "sha256": "113614e7519f4843399b0bc55a950e5462d39d9066064b5c64f223c940d45092"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/observations.json",
+        "bytes": 429621,
+        "sha256": "e6692729a532273546b21732482e71441212ee3abd84af1c0d4ad1d6fc160d24"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/semantic-validation.json",
+        "bytes": 46203,
+        "sha256": "8609daa0aa442032dd1e5d9b42153976fc02863fa8ba2be2037a81b00e6d6002"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/command.json",
+        "bytes": 1841,
+        "sha256": "170bb90cdc9ed0e10e9c3ac6c7767fd9817b385bef52b80211f43b9a1c07b6de"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-bridge-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/summary.json",
+        "bytes": 3937,
+        "sha256": "56781799685cb3d812d8157c68161cd2513e623466a6acf65abea2c44a6c8d6d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/raw-tests.json",
+        "bytes": 2606,
+        "sha256": "99de651df7c3e6e5a20c334f2bfb5e008553afc8a483f586c7617af95dd0cade"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/observations.json",
+        "bytes": 429329,
+        "sha256": "2c3b746bb5a195d42770ee43d667c5ed8eae9d558d1cab727969316a5873582e"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "be285f35fd678e77644ef5843ef1ed2cc457213246f1491f67d65801c66994ac"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/command.json",
+        "bytes": 1852,
+        "sha256": "cf57dfb7bf5e6b81d5067d03df3b5d8a7fa0522ce605502a3712c4a69c36462a"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-gateway-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/summary.json",
+        "bytes": 3944,
+        "sha256": "8ceefcc3b41b29ffc8a7ceb815d13ee10bf4d132611df8d0f5fff16872ec74ef"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/raw-tests.json",
+        "bytes": 2609,
+        "sha256": "827f95abd81dbdcccd99a1d13e075d90972a1e894a608eee4902424ff24b2793"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/observations.json",
+        "bytes": 429343,
+        "sha256": "89a5eaa864c5b1aad5294b66a0ab510caa571446b6f50890a29f88fcfef21378"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/semantic-validation.json",
+        "bytes": 45868,
+        "sha256": "8568198378a749153094e574f73b6f6e3d6c194a1f4e6a2d673b52345d162982"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/command.json",
+        "bytes": 1859,
+        "sha256": "b13930d2db7931d3e4613a5afa2b6c5d33360c44f8dab0dc0bb719c022a4d1f1"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-gateway-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/summary.json",
+        "bytes": 5356,
+        "sha256": "2c34ab7b50f0130a4c5e1483aa40be437fef91b31d4110b3aa2b41c11e3b7fd2"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/raw-tests.json",
+        "bytes": 3058,
+        "sha256": "3eb26fa5a68746895dc7b28f1964a220542a02aa02fa50c478b9140cde35f5fd"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/observations.json",
+        "bytes": 430189,
+        "sha256": "cdf99ace5d5f84a4087470431ab5b29523b345a38ed38a3ca490bb8306973e59"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/semantic-validation.json",
+        "bytes": 46782,
+        "sha256": "3ae48ec2ff09a4a69387c41d45dcd3cdd99e868c617c21a40044d805d1e7832f"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/command.json",
+        "bytes": 1848,
+        "sha256": "9a5ce658d81c9fe8beeae393891202ab20907a4f542c5525675a39319fbc975a"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-gateway-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/summary.json",
+        "bytes": 3943,
+        "sha256": "9579da658dec61a3ccc15cf1c278cf030aaf796a49cf615e6fcb5b79b656c2a7"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/raw-tests.json",
+        "bytes": 2609,
+        "sha256": "bbbc8bc02f61bff830d740c4ddaec9d2c75cdb92ca77a3486b7cff0591a42694"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/observations.json",
+        "bytes": 429343,
+        "sha256": "9d51a65ea5e7f25bfe358159b507a96d65a8402c0bc7d03c266ab2d1c1b0a4f2"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/semantic-validation.json",
+        "bytes": 45868,
+        "sha256": "0aa1027b8b59f443b9eea455d3737bb760abe45f70f276ca9ca2e227fcd06aff"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/command.json",
+        "bytes": 1859,
+        "sha256": "81b6cd5a8e8399a418c0833c0e0aaf81d0a9271be4f04c93440a5d8b632e7b3e"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-router-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/summary.json",
+        "bytes": 3932,
+        "sha256": "221183a3dab4319a43e72129944426ea8f54ad0e6c2ba43e7d3b5cf7a16dbac0"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/raw-tests.json",
+        "bytes": 2601,
+        "sha256": "ae445ede2ae2a0f860cd883afcc372de061a99cc97253f849010ad1bee18fb53"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/observations.json",
+        "bytes": 429329,
+        "sha256": "dd5fc06b323c62177766d349b3d16995ddb986858ac3c7a9418b96159e372a95"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "8eea4bcabf8d8f90a6dd2e4b0aa9fdbe706b494286108f272ac7d653fac9e8d2"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/command.json",
+        "bytes": 1852,
+        "sha256": "28e6c72bd691063840b1cc4611e7d1cae32136a2813748857f72a1f8030d0ee5"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-router-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/summary.json",
+        "bytes": 5057,
+        "sha256": "581690fc4979f674b27ed39a798daa6c4f449ce0aafc58bb455f6c07e2c8ad33"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/raw-tests.json",
+        "bytes": 3085,
+        "sha256": "e7361c1384931de0d4a0a527202220b33a6674fadda1a018853b2645ca2b51c6"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/observations.json",
+        "bytes": 429577,
+        "sha256": "893293078516869e7662607c2a6668e555c4b82dc8b89de117d7ffac72331efa"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/semantic-validation.json",
+        "bytes": 46159,
+        "sha256": "4bd937807c0b2521a89668ec815b15616f6aa863f250b93600af12716d3801b7"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/command.json",
+        "bytes": 1841,
+        "sha256": "5e345b95e5e584f1c4c15c66d39e3e5bf6d1e853c0436c6f6ffe6d3de13b2660"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-router-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/summary.json",
+        "bytes": 3937,
+        "sha256": "050974f383d4b01131d2549cc9f82b31a7e4671c60e111187c23abcda9d64419"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/raw-tests.json",
+        "bytes": 2606,
+        "sha256": "8212fa81916612ab92c13050baf0e0f8cdc1ebe8300b63c4834677a51c32259a"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/observations.json",
+        "bytes": 429329,
+        "sha256": "83cb048f88794d3f4e7090883b0aede42e5050752b12aca78a8606ea4ea48dd9"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "f1fe9387774b21234aac9c01f2114e42c6734b49e59a4abacc8cb06e5e51d967"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/command.json",
+        "bytes": 1852,
+        "sha256": "19b4e83307174e5b12d108044667d88ee787d676ba7051c9ca11262d9b7523b2"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-studio-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/summary.json",
+        "bytes": 3939,
+        "sha256": "8aa0e5bbaf0dcca9eb046a89843745bceb0b804f923cdea0973c961994a76c99"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/raw-tests.json",
+        "bytes": 2609,
+        "sha256": "d9e1f73e789f67e3d1c7615f9a5afe4b12227f6d362941ac040927b57ec036e2"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/observations.json",
+        "bytes": 429329,
+        "sha256": "fc12051fe29914c5e0f27ab18843dc451402013c204b9a43485cd3d352c71e7a"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "4c643bb2f7f495942ba55f0070dbae32b3741115ee5eb766e08b1bfb3d7b464b"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/command.json",
+        "bytes": 1852,
+        "sha256": "a80234b3362f2d5cd9ed7b5a633b3f9dbac88326f884986ff140224b1ac74b36"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-studio-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/summary.json",
+        "bytes": 5735,
+        "sha256": "a7a240e2e72205ea48a7884796b03942e3a4bd362493c9b813b579c6eb2eb3fb"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/raw-tests.json",
+        "bytes": 3082,
+        "sha256": "c0a83ff98e19a805fcba932f082080fbf9c01e019d186dba9a59d7b892d78831"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/observations.json",
+        "bytes": 432481,
+        "sha256": "5ea460121b11c6a756dece8dbfdae2b40cdc27124a3fedab1445c5a076426aaf"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/semantic-validation.json",
+        "bytes": 49167,
+        "sha256": "bc000800ff4a5513d44de062ebcedd36571eccf308a9bb201145acd4a85b9789"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/command.json",
+        "bytes": 1841,
+        "sha256": "c42bec0c98e458d6dfb110aff21635c4e451ea205a8e79fbe66233ba12fca032"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-studio-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/summary.json",
+        "bytes": 3938,
+        "sha256": "65684ddd96be105708e6c2abde1513344b98646e193c317b7c3025562baf2ae8"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/raw-tests.json",
+        "bytes": 2608,
+        "sha256": "419b1212f8fbffa8bddc03d315deabe1029a390dc1cae3beb90bbd8a2a55ab0c"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/observations.json",
+        "bytes": 429329,
+        "sha256": "6423aad0ff080ad6bfd0fbd71ff4be7e89c35b4bc05d167671b5b0234f496a77"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/semantic-validation.json",
+        "bytes": 45867,
+        "sha256": "b12ba5a21d5f0f3704dfa900d5ce1b27fd92ecaee38144c29a0a41de0e279604"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/command.json",
+        "bytes": 1852,
+        "sha256": "7b942cd25df9f8b2428dae75218f4b448f94b49e0f9c2d24c4189e41d4346093"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-wire-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/summary.json",
+        "bytes": 3931,
+        "sha256": "325e1c3a35c04d3236cc90d61cda38f5d43a0fb6fb4c2be3483018183669bcd9"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/raw-tests.json",
+        "bytes": 2609,
+        "sha256": "21569c1d39610791859246ff2126ebdb1f68d662619e1a28f874694705642633"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/observations.json",
+        "bytes": 429301,
+        "sha256": "2c3304f7149bd7e0a1fe1e0b75a26a3c5dbcf8e742bea757dcc764243fa20e4f"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/semantic-validation.json",
+        "bytes": 45865,
+        "sha256": "5669f7d6987637d42a9bd8e834de2259e911b90d793890b368e8b38be96f4925"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/command.json",
+        "bytes": 1838,
+        "sha256": "ba0aa1888c3e276ade5642473bba2c712d9325526da28435d1e0d0737db47ab1"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-wire-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/summary.json",
+        "bytes": 5705,
+        "sha256": "cf71938a9008cf6c90f00f98ff30a10e8599fa6b34eb1ec16d44bc70c6a624d1"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/raw-tests.json",
+        "bytes": 3086,
+        "sha256": "4c66bb14179cbdd106c533fe2e220686355e47f24de7d9d2ac66851b426a64de"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/observations.json",
+        "bytes": 432189,
+        "sha256": "cf3d4b3676b97ef1260902d56156b56b78666b5be14b8de707b66f853080b430"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/semantic-validation.json",
+        "bytes": 48877,
+        "sha256": "bf453a4c206252a46a04e77235cc7c103c7289d90a7c753fbf88f3784de2af73"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/command.json",
+        "bytes": 1827,
+        "sha256": "705c58048e8e33c99d60d905ac0334cbe9deb35ff13ef85c8cd9ff3220208881"
+      }
+    },
+    {
+      "phase": "P30-1542-current-consumer-wire-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/summary.json",
+        "bytes": 3932,
+        "sha256": "cadf121706caa331495f065a66f8a79a75d6f6a1ca846a648312e0265b57df13"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/raw-tests.json",
+        "bytes": 2610,
+        "sha256": "3f4d9ad070af37fe636c2169170ef2d26f04cdc073a19469ab6e8e50e728875c"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/observations.json",
+        "bytes": 429301,
+        "sha256": "c4e4348f6f673f4eadfa07363ab9f2de7f73786d912f1cc57ea82031919ada22"
+      },
+      "semanticValidation": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/semantic-validation.json",
+        "bytes": 45865,
+        "sha256": "07a4872a7d10d938d911fe427af17b22c3b7a7ded6391afb029eef46613ff2f3"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/command.json",
+        "bytes": 1838,
+        "sha256": "fdae79d7dfc74d2ebe2c2b15d3a026119afa265230d182c285b7e9b0107d3da9"
+      }
+    }
+  ],
+  "counting": "Six controls, five newly reconstructed current consumer signature guards plus the already measured shared empty-set guard in a distinct seven-case corpus. The shared guard is not another unique guard. Eighteen measured test processes reuse seven case definitions and fresh generator-created keys/UUIDs; they are not 126 distinct tests or physically identical fixtures.",
+  "retention": {
+    "testPhases": 18,
+    "perPhaseFinalObservations": 7,
+    "perPhaseStateTokenCalls": 56,
+    "totalFinalObservations": 126,
+    "totalStateTokenCalls": 1008,
+    "rawStreamsAndReports": "Dual default+JSON reporters used from the start in every phase. No reporter-only repeat or dropped first result."
+  },
+  "preservation": {
+    "originalSourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newPrivateCaseFiles": 1,
+    "completePrivateClosureFiles": 12269,
+    "onlyPerMutantDelta": "The exact one TS sourceTarget, as full phase manifests and frozen target bodies show.",
+    "allRootAndPrivateSourceRestored": true,
+    "allCompiledBytesNeverChanged": true,
+    "nativeBytesDeviceInodeNlinkExact": true,
+    "readinessPins": 92,
+    "rootProtectedPins": 31,
+    "additionalProposalPins": 5,
+    "coreOriginalIndexReferences": 103,
+    "coreClosureFiles": 12268,
+    "baselineIndexReferences": 149,
+    "baselineClosureFiles": 12269,
+    "baselineCorePriorPacketsAndReviewsUnchanged": true,
+    "rootGitStatus": "clean"
+  },
+  "runtime": "Every actual final observation directly records Node v22.23.3, the Cellar Node22 executable and ABI 127. Allowlisted credential-free 0700 private HOME/AMC_HOME and actual loopback fixture HTTP; no broad process/network isolation claim.",
+  "cryptoAndEffectsLimits": "Genuine role keys and signatures are independently checked during fixture execution. Cleanup removes raw public keys, tokens and pair bytes, so hashes/runtime booleans do not enable later offline crypto re-verification. Named counters prove gateway upstream requests, wire acceptance rows and Studio pending intents; helper counters are null. This is not universal no-audit/no-filesystem effects, factual truth, external authority, independent receipt verification or tool/model execution.",
+  "limits": [
+    "Exact source-mode sensitivity, not a production fix or current baseline product failure.",
+    "Five current semantic guard recipes are newly reconstructed, not the absent held literal consumer recipes or a P1-08 transfer.",
+    "No compiler, build, import adapter, compiled mutation, installed CLI, permanent test, live source/counter/docs/owner change, fixture relaxation or extra repeat.",
+    "Port-claim/setup/transport errors would remain fixture failures, never kills; actual raw outcomes and errors are retained.",
+    "Static state controls do not resolve verify/reload races, pair publication/crash, deletion of both files, anti-rollback, P1-08, all authentication paths or whole P0-30/old held batch/Node24/full suite/coverage/hosted CI/G0/release/Done."
+  ],
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 33754,
+    "sha256": "0689c27dfe93552a9fd9aa3afb51b03708e33ceb53a3f07ffaadc86a203c1e8b"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/artifact-index.json",
+    "bytes": 103100,
+    "sha256": "a89f1cbc8bf2df408fc15ec6e4994162340d156bf0d299d25d65c11a3d90bed4"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

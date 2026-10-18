@@ -1,0 +1,55 @@
+{
+  "schema": "p111-source-run-review-seal/1",
+  "at": "2026-10-16T19:29:05.585745+00:00",
+  "blockers": [],
+  "inputCount": 136,
+  "inputsPin": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/pins.json",
+    "bytes": 56249,
+    "sha256": "e825fd4529739938467bbbaa8f8f364739373c000d7cb1dad14ae38cfc139e2d",
+    "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/pins.json",
+    "dev": 16777231,
+    "inode": 543144370,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/review.json",
+      "bytes": 4435,
+      "sha256": "d19408b5a1fcca47cdad2c1a2f42320b0fce1f9531f940525ef1c966546b80b6",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/review.json",
+      "dev": 16777231,
+      "inode": 543144368,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/README.md",
+      "bytes": 1520,
+      "sha256": "75ef29be612411e9165342c0730e1f719ac1481769eed40d6db9256acecce2da",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/README.md",
+      "dev": 16777231,
+      "inode": 543144369,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/current-pin-observations.json",
+      "bytes": 97414,
+      "sha256": "2a7dc4d17727d1c9547c5a8525f52a35a84333f908d956a6d8cf6e9c649b53ba",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/current-pin-observations.json",
+      "dev": 16777231,
+      "inode": 543144367,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/pins.json",
+      "bytes": 56249,
+      "sha256": "e825fd4529739938467bbbaa8f8f364739373c000d7cb1dad14ae38cfc139e2d",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/pins.json",
+      "dev": 16777231,
+      "inode": 543144370,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputBytePinsRechecked": true,
+  "execution": "Read/hash/stat/JSON data join and private packet only; no product/helper/compiler/test/native/SQL/network/probe or checkout/index writes."
+}

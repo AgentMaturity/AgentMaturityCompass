@@ -1,0 +1,133 @@
+{
+  "kind": "Independent bounded final review of P0-22 lab restart/durable-reader repairs",
+  "atUtc": "2026-10-14T16:43:38.060516+00:00",
+  "scope": [
+    "src/lab/cognitionLab.ts",
+    "tests/cognitionLab.test.ts"
+  ],
+  "findings": [],
+  "sourceHashes": {
+    "src/lab/cognitionLab.ts": "bac7c0f67bb68790c17de866252ac4089e173f5e59fb67fe2397530cd6d9e984",
+    "tests/cognitionLab.test.ts": "a1ec43219d2175d0bbbdd58cacf17a75d448ff758f16a2039ec0761138be7a54"
+  },
+  "patch": "/private/tmp/p0-22-cognition-lab-final-own-key-validation-20261014.patch",
+  "phases": [
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-probe-validation-red-node22-20261014.json",
+      "sha256": "09cfd0599188c1ddee2338734ecce37e6272c6ca01c5853fde916c51bc9d8314",
+      "success": false,
+      "tests": 45,
+      "passed": 1,
+      "failed": 6,
+      "pending": 38,
+      "todo": 0,
+      "durationMs": 409.796875
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-probe-validation-green-node22-20261014.json",
+      "sha256": "8e1b6979836b17010dd4b7d0b9148f4b459c2c6d4142382b7cf15bc2a2f017e5",
+      "success": true,
+      "tests": 46,
+      "passed": 8,
+      "failed": 0,
+      "pending": 38,
+      "todo": 0,
+      "durationMs": 252.17578125
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-shape-whole-file-node22-20261014.json",
+      "sha256": "338c46be86ca54fa730c9530d8e8234e2cc5de481d2402b16e6b8940c08b2791",
+      "success": true,
+      "tests": 46,
+      "passed": 46,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 280.1591796875
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-metadata-preservation-red-node22-20261014.json",
+      "sha256": "8e9f5710659d3db8f47e422615371d2559d2aeeb6b4368b73c886e50014b1e70",
+      "success": false,
+      "tests": 47,
+      "passed": 0,
+      "failed": 1,
+      "pending": 46,
+      "todo": 0,
+      "durationMs": 250.839599609375
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-metadata-preservation-green-node22-20261014.json",
+      "sha256": "fc4ad76bda137186e89b96793001967badde484df4b97b4a1db424cce5e7b8d6",
+      "success": true,
+      "tests": 47,
+      "passed": 1,
+      "failed": 0,
+      "pending": 46,
+      "todo": 0,
+      "durationMs": 245.982421875
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-metadata-whole-file-node22-20261014.json",
+      "sha256": "5147675f983574be21d6191586d45cdd5211292c200319823806c1ebe941c614",
+      "success": true,
+      "tests": 47,
+      "passed": 47,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 301.158447265625
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-score-own-key-red-quality-node22-20261014.json",
+      "sha256": "d7b0aedd73c5f9a4499c1d98cfc19ab6986d8d0ef236015b2525f1dcedd99e37",
+      "success": false,
+      "tests": 49,
+      "passed": 0,
+      "failed": 2,
+      "pending": 47,
+      "todo": 0,
+      "durationMs": 254.56640625
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-score-own-key-green-node22-20261014.json",
+      "sha256": "8e2ddc2a505ccbacc4ce850a161ffb47ade2fc17089b0fe82a2a82cfab46e295",
+      "success": true,
+      "tests": 49,
+      "passed": 2,
+      "failed": 0,
+      "pending": 47,
+      "todo": 0,
+      "durationMs": 252.47314453125
+    },
+    {
+      "report": "/private/tmp/p0-22-cognition-lab-final-own-keys-whole-file-node22-20261014.json",
+      "sha256": "fef1354b368e9372e136790429af6e5998e837e4303e43a604b0334ae3beda7e",
+      "success": true,
+      "tests": 49,
+      "passed": 49,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 289.232666015625
+    }
+  ],
+  "review": [
+    "Cold workspace is resolved once and propagated to lookup/start/probe-record/complete/report; cached no-workspace calls remain memory-only.",
+    "Returned parseable matching durable rows require typed shape and every raw own normalized score value finite0..1; null/unidentifiable rows fail clearly, identified different experiment scope remains separate.",
+    "Schema validation does not coerce retained raw metadata or wrapper values; own JSON keys survive.",
+    "Object.fromEntries creates own aggregate data properties, preserves Object.prototype, and retains identical ordinary-key mean math.",
+    "Deterministic score generation, synthetic tags/envelopes and no-model-call behavior remain unchanged."
+  ],
+  "limits": [
+    "Generic record helper still skips unreadable/unparsable JSON; this guard validates returned parseable records only.",
+    "No signature authentication or trust upgrade is introduced.",
+    "Final compiled CLI qualification needs root build; no build or full E2E rerun occurred in this guard task.",
+    "User-directed passport/leaderboard empty-array interfaces remain unresolved and their literal RED tests unchanged."
+  ],
+  "patchSha256": "c2a0008d578ae86bb1f84307975f3585db4c5ea2b79263d15ac289cb0a1dece4",
+  "actualInstalledZodEdgeProbe": {
+    "report": "/private/tmp/p0-22-zod-own-score-key-probe-20261014.json",
+    "sha256": "8c10c18ae17b0b3cb786afd075b938bce2f7cb4454146072ebcfb1c167deb65a"
+  }
+}

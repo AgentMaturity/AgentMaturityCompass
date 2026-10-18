@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T10:58:39.415938+00:00",
+  "initialOrdinaryGitAddExit": 1,
+  "message": "The following paths are ignored by one of your .gitignore files: docs/internal",
+  "exactSubsequentObservation": "All11 requested files were staged despite the ignored-parent diagnostic. Both docs/internal files were already tracked; all staged blobs equal owned current R bytes; no unstaged/untracked changes remain.",
+  "stagedPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "tests/autoCompaction.test.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "forceAddUsed": false,
+  "safeguardsBypassed": false,
+  "additionalStagingPerformed": false
+}

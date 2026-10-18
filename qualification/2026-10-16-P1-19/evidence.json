@@ -1,0 +1,3835 @@
+{
+  "schemaVersion": 1,
+  "kind": "P1-19 bounded provider-component checkpoint",
+  "date": "2026-10-16",
+  "state": "ACTIVE; full P1-19 continues",
+  "formalAcceptanceClosed": false,
+  "sourceCandidate": {
+    "commit": "b9ba9a092f491d821c154679473b6f38c75b935d",
+    "parent": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+    "branch": "codex/p1-19-qualification",
+    "manifest": [
+      {
+        "path": "README.md",
+        "bytes": 59828,
+        "sha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe"
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841"
+      },
+      {
+        "path": "website/index.html",
+        "bytes": 43520,
+        "sha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138"
+      },
+      {
+        "path": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67"
+      },
+      {
+        "path": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181"
+      },
+      {
+        "path": "examples/lighthouse-finance/service/server.mjs",
+        "bytes": 27740,
+        "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+      },
+      {
+        "path": "docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+        "bytes": 8551,
+        "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+      },
+      {
+        "path": "examples/lighthouse-finance/README.md",
+        "bytes": 1409,
+        "sha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181"
+      },
+      {
+        "path": ".changeset/finance-payee-version-exhaustion.md",
+        "bytes": 253,
+        "sha256": "28bbdea260029fd92fdfa129b935ccc4dca57cea7e249428dff022e516ec9fa6"
+      },
+      {
+        "path": "tests/helpers/financeQualification.ts",
+        "bytes": 17131,
+        "sha256": "3b4d755e03fa86035661557c2b60136e4ec5d21e0fb2352f6f08675c21ff835c"
+      },
+      {
+        "path": "tests/lighthouse/financeFixtureService.test.ts",
+        "bytes": 23208,
+        "sha256": "a8fa0dc2d2aba614f2007c204b2758c84e0b39ae87109a4f0c5600b9a97c7a53"
+      },
+      {
+        "path": "tests/lighthouse/financeClientAdapter.test.ts",
+        "bytes": 33348,
+        "sha256": "52ae6e44d441f90e793379052045c7d7139051293f6765361dea7b5522c071e8"
+      }
+    ],
+    "commitMetadata": {
+      "head": "b9ba9a092f491d821c154679473b6f38c75b935d",
+      "branch": "codex/p1-19-qualification",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 59828,
+          "sha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841"
+        },
+        {
+          "path": "website/index.html",
+          "bytes": 43520,
+          "sha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138"
+        },
+        {
+          "path": "website/lite.html",
+          "bytes": 11197,
+          "sha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67"
+        },
+        {
+          "path": "website/i18n.js",
+          "bytes": 44169,
+          "sha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced"
+        },
+        {
+          "path": "docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65"
+        },
+        {
+          "path": "docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd"
+        },
+        {
+          "path": "docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b"
+        },
+        {
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e"
+        },
+        {
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181"
+        },
+        {
+          "path": "examples/lighthouse-finance/service/server.mjs",
+          "bytes": 27740,
+          "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+        },
+        {
+          "path": "docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+          "bytes": 8551,
+          "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+        },
+        {
+          "path": "examples/lighthouse-finance/README.md",
+          "bytes": 1409,
+          "sha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181"
+        },
+        {
+          "path": ".changeset/finance-payee-version-exhaustion.md",
+          "bytes": 253,
+          "sha256": "28bbdea260029fd92fdfa129b935ccc4dca57cea7e249428dff022e516ec9fa6"
+        },
+        {
+          "path": "tests/helpers/financeQualification.ts",
+          "bytes": 17131,
+          "sha256": "3b4d755e03fa86035661557c2b60136e4ec5d21e0fb2352f6f08675c21ff835c"
+        },
+        {
+          "path": "tests/lighthouse/financeFixtureService.test.ts",
+          "bytes": 23208,
+          "sha256": "a8fa0dc2d2aba614f2007c204b2758c84e0b39ae87109a4f0c5600b9a97c7a53"
+        },
+        {
+          "path": "tests/lighthouse/financeClientAdapter.test.ts",
+          "bytes": 33348,
+          "sha256": "52ae6e44d441f90e793379052045c7d7139051293f6765361dea7b5522c071e8"
+        }
+      ],
+      "cleanAfterCommit": true,
+      "pushed": false,
+      "formalP119Complete": false,
+      "stagingWarningPreserved": "/private/tmp/p1-19-finance-qualification-20261016/staging-return-1.json"
+    },
+    "stagingWarning": {
+      "action": "git add explicit17paths",
+      "exit": 1,
+      "diagnostic": "The following paths are ignored by one of your .gitignore files: docs/internal",
+      "trackedFilesAffected": [
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md"
+      ],
+      "observedIndex": "All17intendedfileswereactuallystageddespiteignorewarning; everyindexblobverifiedagainstmanifest",
+      "forcedAdd": false,
+      "retriedAdd": false,
+      "ignoreRule": ".gitignore144 internal/",
+      "continuation": "Ordinarycommitofalreadytracked/generatedandadmittednewfilesonly"
+    }
+  },
+  "canonicalTests": {
+    "scope": "Only fresh-clone component run; earlier overlapping runs are not added",
+    "total": 120,
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0,
+    "service": 31,
+    "clientAdapter": 89,
+    "phase": "p119-fresh-clone-components",
+    "rawCopy": "fresh-components.raw.json",
+    "observerCopy": "fresh-components.observer.json"
+  },
+  "history": {
+    "original": {
+      "total": 110,
+      "passed": 109,
+      "failed": 1,
+      "rawCopy": "original-components.raw.json",
+      "failedRows": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeFixtureService.test.ts",
+          "fullName": "synthetic finance provider: actual independent service CLI refuses payee-version overflow from a valid maximum-safe seed without changing destination or effects",
+          "failureMessages": [
+            "AssertionError: expected 200 to be greater than or equal to 400\n    at seed.seed (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeFixtureService.test.ts:207:63)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:213:9)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeFixtureService.test.ts:202:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "masking": "Later no-mutation assertions did not run after the first hard failure; original retained provider bytes were separately audited."
+    },
+    "followup": {
+      "total": 110,
+      "passed": 110,
+      "failed": 0,
+      "helperVersion": "v2/4ac8c5ee168762881a1cbb3cc66efe07fd0f6f00377b675cc44119a9be031ae3; no retroactive v3 Vitest result"
+    },
+    "helperV3": {
+      "removedOnlyUnusedExportPrefixes": [
+        "financeSourceRoot",
+        "FinanceLogRecord",
+        "FinanceReply",
+        "createFinanceFixture"
+      ],
+      "bodyBytesUnchangedAfterExactTextReconstruction": true,
+      "sha256": "8d7e3d39647523a989e7877cebd5d0511efa5cd6e2d9ccdbaab15b1b6dda0ea9"
+    },
+    "extendedService": {
+      "total": 31,
+      "passed": 31,
+      "helperVersion": "v4 optionalfaultsPath only",
+      "phase": "p119-extended-service"
+    },
+    "extendedClient": {
+      "total": 89,
+      "passed": 89,
+      "phase": "p119-extended-client",
+      "extension": "one eventual settlement witness plus six HTTP peer response controls"
+    },
+    "fresh": {
+      "total": 120,
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "sourceRepair": {
+    "exactPatch": {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-repair-proposal/payee-version-overflow.patch",
+      "bytes": 884,
+      "sha256": "ccaece2929b1b74c6710bdf05d31d65355aba687f38c4f99184ca8c4a20637f2"
+    },
+    "line": "if (before.version >= Number.MAX_SAFE_INTEGER) fail('payee_version_exhausted', 409);",
+    "effect": "409 before payee construction, payee_update append or Map mutation; request/reject/response audit writes remain. Below-bound versions retain original increment/publication. Restart/log formats unchanged, no repair of legacy unsafe history.",
+    "beforeSha256": "79194f88991eeda469057c7b13f3e6a1260eba8256cc901ae83debeffadf8ac1",
+    "afterSha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0",
+    "protectedP102P104MachineryEdited": false
+  },
+  "host": {
+    "node": "22.23.3",
+    "nodeAbi": "127",
+    "nodeExec": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "pnpm": "10.33.0",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "kernel": "Darwin 25.6.0",
+    "arch": "arm64",
+    "capturedUtc": "2026-10-15T22:13:25.717Z"
+  },
+  "commands": [
+    {
+      "phase": "p119-original-provider-client",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-original-provider-client.producer.json",
+      "exit": 1,
+      "durationMs": 20930,
+      "startedUtc": "2026-10-15T22:05:55.276152+00:00",
+      "endedUtc": "2026-10-15T22:06:16.221450+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 96920,
+        "ownedPgid": 96920,
+        "observedPgidAfterLaunch": 96920,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeFixtureService.test.ts",
+          "tests/lighthouse/financeClientAdapter.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-original-provider-client.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:05:55.276152+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-original-provider-client.producer.json",
+          "bytes": 42304,
+          "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/raw.json",
+          "bytes": 42304,
+          "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/observer.json",
+          "bytes": 56282,
+          "sha256": "367b03c5046cb25e96632b0a56f945f6851af439ac24df7ed1f9148bb9ceee9c"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-test-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40770,
+      "startedUtc": "2026-10-15T22:06:51.658764+00:00",
+      "endedUtc": "2026-10-15T22:07:32.448904+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-test-typecheck/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97182,
+        "ownedPgid": 97182,
+        "observedPgidAfterLaunch": 97182,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T22:06:51.658764+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-followup-provider-client",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-followup-provider-client.producer.json",
+      "exit": 0,
+      "durationMs": 19359,
+      "startedUtc": "2026-10-15T22:07:47.564695+00:00",
+      "endedUtc": "2026-10-15T22:08:06.936746+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97280,
+        "ownedPgid": 97280,
+        "observedPgidAfterLaunch": 97280,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeFixtureService.test.ts",
+          "tests/lighthouse/financeClientAdapter.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-followup-provider-client.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:07:47.564695+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-followup-provider-client.producer.json",
+          "bytes": 41597,
+          "sha256": "a32853b6b550f081a63ef743d2f526c69e7ea2fc0e31018070174d39e9242398"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/raw.json",
+          "bytes": 41597,
+          "sha256": "a32853b6b550f081a63ef743d2f526c69e7ea2fc0e31018070174d39e9242398"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/observer.json",
+          "bytes": 54488,
+          "sha256": "7405a6d99492a9b2c6fb8161a264709bc5a0498c65f4e5a446e01115cc9976ab"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-counts-before",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 360,
+      "startedUtc": "2026-10-15T22:08:17.381459+00:00",
+      "endedUtc": "2026-10-15T22:08:17.752820+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-before/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97393,
+        "ownedPgid": 97393,
+        "observedPgidAfterLaunch": 97393,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T22:08:17.381459+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-gen-counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 228,
+      "startedUtc": "2026-10-15T22:08:43.298355+00:00",
+      "endedUtc": "2026-10-15T22:08:43.537730+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-gen-counts/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97439,
+        "ownedPgid": 97439,
+        "observedPgidAfterLaunch": 97439,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--write"
+        ],
+        "startedUtc": "2026-10-15T22:08:43.298355+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-source-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 28561,
+      "startedUtc": "2026-10-15T22:08:50.027508+00:00",
+      "endedUtc": "2026-10-15T22:09:18.600261+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-source-typecheck/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97461,
+        "ownedPgid": 97461,
+        "observedPgidAfterLaunch": 97461,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T22:08:50.027508+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3075,
+      "startedUtc": "2026-10-15T22:09:24.328441+00:00",
+      "endedUtc": "2026-10-15T22:09:27.414462+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-lint/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97521,
+        "ownedPgid": 97521,
+        "observedPgidAfterLaunch": 97521,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-15T22:09:24.328441+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1472,
+      "startedUtc": "2026-10-15T22:09:27.465478+00:00",
+      "endedUtc": "2026-10-15T22:09:28.948614+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-freeze/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97552,
+        "ownedPgid": 97552,
+        "observedPgidAfterLaunch": 97552,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-freeze.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:09:27.465478+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-counts-after",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 222,
+      "startedUtc": "2026-10-15T22:09:28.996638+00:00",
+      "endedUtc": "2026-10-15T22:09:29.229670+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-after/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97574,
+        "ownedPgid": 97574,
+        "observedPgidAfterLaunch": 97574,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T22:09:28.996638+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-docs-drift",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 157,
+      "startedUtc": "2026-10-15T22:09:29.278493+00:00",
+      "endedUtc": "2026-10-15T22:09:29.446951+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-docs-drift/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97578,
+        "ownedPgid": 97578,
+        "observedPgidAfterLaunch": 97578,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:09:29.278493+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1564,
+      "startedUtc": "2026-10-15T22:09:29.495237+00:00",
+      "endedUtc": "2026-10-15T22:09:31.071927+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-architecture/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97582,
+        "ownedPgid": 97582,
+        "observedPgidAfterLaunch": 97582,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:09:29.495237+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 464,
+      "startedUtc": "2026-10-15T22:09:31.123857+00:00",
+      "endedUtc": "2026-10-15T22:09:31.599767+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-duplicates/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97587,
+        "ownedPgid": 97587,
+        "observedPgidAfterLaunch": 97587,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "duplicates"
+        ],
+        "startedUtc": "2026-10-15T22:09:31.123857+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2901,
+      "startedUtc": "2026-10-15T22:09:31.652375+00:00",
+      "endedUtc": "2026-10-15T22:09:34.565558+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97593,
+        "ownedPgid": 97593,
+        "observedPgidAfterLaunch": 97593,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T22:09:31.652375+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-dead-code-delta",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-19-finance-qualification-20261016/detailed-quality-comparison.mjs",
+      "exit": 1,
+      "durationMs": 6093,
+      "startedUtc": "2026-10-15T22:10:19.561073+00:00",
+      "endedUtc": "2026-10-15T22:10:25.667010+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code-delta/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97688,
+        "ownedPgid": 97688,
+        "observedPgidAfterLaunch": 97688,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-19-finance-qualification-20261016/detailed-quality-comparison.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:10:19.561073+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-helper-v3-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40178,
+      "startedUtc": "2026-10-15T22:10:47.946936+00:00",
+      "endedUtc": "2026-10-15T22:11:28.138797+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-typecheck/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 97791,
+        "ownedPgid": 97791,
+        "observedPgidAfterLaunch": 97791,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T22:10:47.946936+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-helper-v3-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 3402,
+      "startedUtc": "2026-10-15T22:12:31.069941+00:00",
+      "endedUtc": "2026-10-15T22:12:34.483720+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-dead-code/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 98097,
+        "ownedPgid": 98097,
+        "observedPgidAfterLaunch": 98097,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T22:12:31.069941+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-host-fingerprint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs",
+      "exit": 0,
+      "durationMs": 266,
+      "startedUtc": "2026-10-15T22:13:25.454574+00:00",
+      "endedUtc": "2026-10-15T22:13:25.731864+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-host-fingerprint/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 98263,
+        "ownedPgid": 98263,
+        "observedPgidAfterLaunch": 98263,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:13:25.454574+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-extended-service",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-service.producer.json",
+      "exit": 0,
+      "durationMs": 23394,
+      "startedUtc": "2026-10-15T22:15:31.095294+00:00",
+      "endedUtc": "2026-10-15T22:15:54.502008+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 98531,
+        "ownedPgid": 98531,
+        "observedPgidAfterLaunch": 98531,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeFixtureService.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-service.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:15:31.095294+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-extended-service.producer.json",
+          "bytes": 12935,
+          "sha256": "f884c9c37c656e1456008a32d6df5c464f1992663268b869a9c0d026063abcc6"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/raw.json",
+          "bytes": 12935,
+          "sha256": "f884c9c37c656e1456008a32d6df5c464f1992663268b869a9c0d026063abcc6"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/observer.json",
+          "bytes": 16633,
+          "sha256": "88cdaf3e2018a9496b3197da9b2987c589c6a2f60da880747dde76f2403fbbdf"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-extended-client",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-client.producer.json",
+      "exit": 0,
+      "durationMs": 7626,
+      "startedUtc": "2026-10-15T22:19:00.278745+00:00",
+      "endedUtc": "2026-10-15T22:19:07.917194+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99060,
+        "ownedPgid": 99060,
+        "observedPgidAfterLaunch": 99060,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeClientAdapter.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-client.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:19:00.278745+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-extended-client.producer.json",
+          "bytes": 33163,
+          "sha256": "66b81170fbf60fbcb9d0f46b8c5fad795a76564cb3fab0c7b88f840e59044025"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/raw.json",
+          "bytes": 33163,
+          "sha256": "66b81170fbf60fbcb9d0f46b8c5fad795a76564cb3fab0c7b88f840e59044025"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/observer.json",
+          "bytes": 43562,
+          "sha256": "143427578deaabdaecb1c7a5d69dbbb71372387725dadd22a8303e3d5ccb421b"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-final-component-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40033,
+      "startedUtc": "2026-10-15T22:19:21.550865+00:00",
+      "endedUtc": "2026-10-15T22:20:01.599934+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-final-component-typecheck/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99176,
+        "ownedPgid": 99176,
+        "observedPgidAfterLaunch": 99176,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T22:19:21.550865+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-component-final-counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 350,
+      "startedUtc": "2026-10-15T22:20:23.022617+00:00",
+      "endedUtc": "2026-10-15T22:20:23.383391+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-counts/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99288,
+        "ownedPgid": 99288,
+        "observedPgidAfterLaunch": 99288,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T22:20:23.022617+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-component-final-docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 157,
+      "startedUtc": "2026-10-15T22:20:23.432313+00:00",
+      "endedUtc": "2026-10-15T22:20:23.601076+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-docs/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99294,
+        "ownedPgid": 99294,
+        "observedPgidAfterLaunch": 99294,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:20:23.432313+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-component-final-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1912,
+      "startedUtc": "2026-10-15T22:20:23.650063+00:00",
+      "endedUtc": "2026-10-15T22:20:25.573957+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-architecture/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99298,
+        "ownedPgid": 99298,
+        "observedPgidAfterLaunch": 99298,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:20:23.650063+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-component-final-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2983,
+      "startedUtc": "2026-10-15T22:20:25.623239+00:00",
+      "endedUtc": "2026-10-15T22:20:28.617904+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-dead-code/stdout-stderr.log",
+      "head": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "headAfter": "3a15c654d24b33f2bd93967d7dbfbf2b60f5f4b8",
+      "ownedProcess": {
+        "pid": 99311,
+        "ownedPgid": 99311,
+        "observedPgidAfterLaunch": 99311,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T22:20:25.623239+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 52846,
+      "startedUtc": "2026-10-15T22:21:07.787391+00:00",
+      "endedUtc": "2026-10-15T22:22:00.645309+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-clean-source/stdout-stderr.log",
+      "head": "b9ba9a092f491d821c154679473b6f38c75b935d",
+      "headAfter": "b9ba9a092f491d821c154679473b6f38c75b935d",
+      "ownedProcess": {
+        "pid": 99499,
+        "ownedPgid": 99499,
+        "observedPgidAfterLaunch": 99499,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-15T22:21:07.787391+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-fresh-clone-components",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/vitest.config.ts tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-fresh-clone-components.producer.json",
+      "exit": 0,
+      "durationMs": 25898,
+      "startedUtc": "2026-10-15T22:22:17.226649+00:00",
+      "endedUtc": "2026-10-15T22:22:43.137244+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/stdout-stderr.log",
+      "head": "b9ba9a092f491d821c154679473b6f38c75b935d",
+      "headAfter": "b9ba9a092f491d821c154679473b6f38c75b935d",
+      "ownedProcess": {
+        "pid": 104,
+        "ownedPgid": 104,
+        "observedPgidAfterLaunch": 104,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout",
+          "--config",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/vitest.config.ts",
+          "tests/lighthouse/financeFixtureService.test.ts",
+          "tests/lighthouse/financeClientAdapter.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-fresh-clone-components.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:22:17.226649+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-fresh-clone-components.producer.json",
+          "bytes": 45656,
+          "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/raw.json",
+          "bytes": 45656,
+          "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/observer.json",
+          "bytes": 59827,
+          "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    }
+  ],
+  "commandsExactJournalMatch": {
+    "count": 26,
+    "selectedRecordsEqualEachClosedCommandJson": true,
+    "journalPath": "/private/tmp/p1-03-post-typecheck-commands-20261016.jsonl",
+    "journalSha256AtCapture": "64c217a78dcba3826f613ef75e247a6536ef103db87648e30adfed3bab3581a8",
+    "journalIsAppendOnlyHistoricalInput": "Later root commands may append; these26 selected command snapshots are pinned separately."
+  },
+  "nonzeroCommands": [
+    {
+      "phase": "p119-original-provider-client",
+      "exit": 1,
+      "durationMs": 20930,
+      "reason": "One real service overflow body AssertionError at207:63: actual200 vs expected4xx; later unchanged-state assertions masked. Retained bytes independently show destination/version mutation, no payment effect. One source guard fixes the measured invariant."
+    },
+    {
+      "phase": "p119-counts-before",
+      "exit": 1,
+      "durationMs": 360,
+      "reason": "Published test-file count1664 is stale after two new files; admitted exact ten-surface generation1664->1666 precedes passing checks."
+    },
+    {
+      "phase": "p119-duplicates",
+      "exit": 1,
+      "durationMs": 464,
+      "reason": "1268 clone findings remain red/unwaived; newClones0 is not a waiver."
+    },
+    {
+      "phase": "p119-dead-code",
+      "exit": 1,
+      "durationMs": 2901,
+      "reason": "Initial2736 findings remain red; exact delta vs prior2731 is8added/3removed, not a generic repair claim."
+    },
+    {
+      "phase": "p119-dead-code-delta",
+      "exit": 1,
+      "durationMs": 6093,
+      "reason": "Detailed qualified scanner comparison intentionally retains red status1 and exact8added/3removed."
+    },
+    {
+      "phase": "p119-helper-v3-dead-code",
+      "exit": 1,
+      "durationMs": 3402,
+      "reason": "2732 findings after four unused new test-helper export prefixes are removed; still red/unwaived."
+    },
+    {
+      "phase": "p119-component-final-dead-code",
+      "exit": 1,
+      "durationMs": 2983,
+      "reason": "Latest2732 findings remain red/unwaived; no product/public API deletion or fabricated debt reduction."
+    }
+  ],
+  "quality": {
+    "duplicates": {
+      "latestFindings": 1268,
+      "exit": 1,
+      "newClones": 0,
+      "waived": false
+    },
+    "deadCode": {
+      "priorP104": 2731,
+      "initial": 2736,
+      "initialAdded": [
+        "[\"src/lighthouse/finance/paymentServiceClient.ts\",\"types\",{\"name\":\"PaymentAccount\"}]",
+        "[\"src/lighthouse/finance/paymentServiceClient.ts\",\"types\",{\"name\":\"PaymentBankTransaction\"}]",
+        "[\"src/lighthouse/finance/paymentServiceClient.ts\",\"types\",{\"name\":\"PaymentBookEntry\"}]",
+        "[\"src/lighthouse/finance/paymentServiceClient.ts\",\"types\",{\"name\":\"PaymentPayee\"}]",
+        "[\"tests/helpers/financeQualification.ts\",\"exports\",{\"name\":\"createFinanceFixture\"}]",
+        "[\"tests/helpers/financeQualification.ts\",\"exports\",{\"name\":\"financeSourceRoot\"}]",
+        "[\"tests/helpers/financeQualification.ts\",\"types\",{\"name\":\"FinanceLogRecord\"}]",
+        "[\"tests/helpers/financeQualification.ts\",\"types\",{\"name\":\"FinanceReply\"}]"
+      ],
+      "initialRemoved": [
+        "[\"src/lighthouse/finance/paymentAdapter.ts\",\"files\",{\"name\":\"src/lighthouse/finance/paymentAdapter.ts\"}]",
+        "[\"src/lighthouse/finance/paymentArgs.ts\",\"files\",{\"name\":\"src/lighthouse/finance/paymentArgs.ts\"}]",
+        "[\"src/lighthouse/finance/paymentServiceClient.ts\",\"files\",{\"name\":\"src/lighthouse/finance/paymentServiceClient.ts\"}]"
+      ],
+      "helperV3": 2732,
+      "latest": 2732,
+      "exit": 1,
+      "waived": false,
+      "interpretation": "Four scoped unused helper export prefixes removed. No fabricated legacy debt repairs, no product public-field deletion, no baseline adoption."
+    }
+  },
+  "sourceAndTestsChecks": {
+    "freeze": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632,
+      "baselineChanged": false
+    },
+    "counts": {
+      "before": 1664,
+      "after": 1666,
+      "generatedFiles": 10,
+      "exactOtherBytesRetained": true
+    },
+    "sourceTypecheck": 0,
+    "completeTestTypechecks": [
+      {
+        "phase": "p119-test-typecheck",
+        "durationMs": 40770,
+        "exit": 0
+      },
+      {
+        "phase": "p119-source-typecheck",
+        "durationMs": 28561,
+        "exit": 0
+      },
+      {
+        "phase": "p119-helper-v3-typecheck",
+        "durationMs": 40178,
+        "exit": 0
+      },
+      {
+        "phase": "p119-final-component-typecheck",
+        "durationMs": 40033,
+        "exit": 0
+      }
+    ],
+    "lintExit": 0,
+    "finalCountsDocsArchitecture": {
+      "p119-component-final-counts": 0,
+      "p119-component-final-docs": 0,
+      "p119-component-final-architecture": 0
+    }
+  },
+  "freshClone": {
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout",
+    "audit": {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/audit.json",
+      "bytes": 57061,
+      "sha256": "2d67bcf66a9fc9b632ad869371a4a41a2dd9d805c6d2855644121902af2fec0d"
+    },
+    "observed": {
+      "publicSuccessMarkers": 44,
+      "childClosures": 49,
+      "childExitCodes": {
+        "0": 45,
+        "70": 1,
+        "1": 3
+      },
+      "allSourceArgvPhysicalClone": true,
+      "allStreamsClosedSignalsNullPidESRCH": true,
+      "snapshotsIndependentlyRehashed": 98,
+      "rowInstancesChecked": 1013,
+      "uniqueRootSequenceRows": 534,
+      "uniqueCommitRows": 28,
+      "retainedInvalidRoots": 3,
+      "cleanedSuccessfulRoots": 41
+    },
+    "overlap": [
+      {
+        "root": "/private/tmp/lhf-uqA1a3",
+        "barrier": {
+          "changed": false,
+          "posts": 2,
+          "commits": 0,
+          "requestIds": [
+            "b64231eb-22bd-4361-b958-fcc982daac71",
+            "33cb73d4-e46a-43b7-bd5c-47c635b978d2"
+          ],
+          "logSha256": "6a9cef0b94f9fc30ac006079fbc50d1b9df9c1db1d77f0ea3c185734b486279a",
+          "checkpoint": {
+            "hash": "2a6300c37f3cb70a2069593478d48437935b16521fa0643f02111f9ea5a6d82b",
+            "seq": 11
+          }
+        },
+        "barrierSnapshot": {
+          "records": [
+            {
+              "action": "initialize",
+              "faultPlan": {
+                "faults": [],
+                "schemaVersion": "lighthouse-finance-faults/1"
+              },
+              "hash": "a655cca836f7b0c8a642446169598513024be68c126f830f934c001477817635",
+              "kind": "admin",
+              "prevHash": "GENESIS",
+              "seedSha256": "72b31e638892996c3cf8484b91fce098920e472f3b03d45bd0d8302bece38cbc",
+              "seq": 1,
+              "ts": "2026-10-15T22:22:37.033Z"
+            },
+            {
+              "bodyBytesRead": 177,
+              "bodyFields": [
+                "schemaVersion",
+                "faults"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "de85af08c9e3d860dff26bdc483fc9e96530800870f4cc5554fd37808ee112b7",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "be3d92589819b1dd521867d79607a22b321f11a1dc6a732b96045a871ee3194b",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/admin/faults",
+              "prevHash": "a655cca836f7b0c8a642446169598513024be68c126f830f934c001477817635",
+              "rawBodySha256": "de85af08c9e3d860dff26bdc483fc9e96530800870f4cc5554fd37808ee112b7",
+              "requestId": "4707fda7-f73d-41c5-8470-b85801c4538c",
+              "seq": 2,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:37.064Z"
+            },
+            {
+              "action": "replace_faults",
+              "faultPlan": {
+                "faults": [
+                  {
+                    "delayMs": 2500,
+                    "id": "component-first-delay",
+                    "method": "POST",
+                    "mode": "delay_then_commit",
+                    "nth": 1,
+                    "path": "/v1/payments"
+                  }
+                ],
+                "schemaVersion": "lighthouse-finance-faults/1"
+              },
+              "hash": "ab94016094d57e6ccb62e0b60eb6ed37b1c1cd749a4c0d1d7279b094b019e788",
+              "kind": "admin",
+              "prevHash": "be3d92589819b1dd521867d79607a22b321f11a1dc6a732b96045a871ee3194b",
+              "requestId": "4707fda7-f73d-41c5-8470-b85801c4538c",
+              "seq": 3,
+              "ts": "2026-10-15T22:22:37.078Z"
+            },
+            {
+              "hash": "152e9917ed247d5128e7c7b1a071b61bd92e213b32d4477f178b0f3de4056bae",
+              "kind": "response",
+              "prevHash": "ab94016094d57e6ccb62e0b60eb6ed37b1c1cd749a4c0d1d7279b094b019e788",
+              "requestId": "4707fda7-f73d-41c5-8470-b85801c4538c",
+              "seq": 4,
+              "status": 200,
+              "ts": "2026-10-15T22:22:37.092Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 1
+              },
+              "faultPlanSeq": 3,
+              "hash": "8372ba8ac0c9d40fe5e61962ea0ccef0b10303aba734aa2035af36adf07db921",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": "component-first-delay",
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "152e9917ed247d5128e7c7b1a071b61bd92e213b32d4477f178b0f3de4056bae",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "b64231eb-22bd-4361-b958-fcc982daac71",
+              "seq": 5,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:37.108Z"
+            },
+            {
+              "faultPlanSeq": 3,
+              "hash": "0bed21ba94f168bbab5d3671979f064cefcaeac15ce3e142dcc7a06393e50dab",
+              "id": "component-first-delay",
+              "kind": "fault",
+              "mode": "delay_then_commit",
+              "prevHash": "8372ba8ac0c9d40fe5e61962ea0ccef0b10303aba734aa2035af36adf07db921",
+              "requestId": "b64231eb-22bd-4361-b958-fcc982daac71",
+              "seq": 6,
+              "ts": "2026-10-15T22:22:37.122Z"
+            },
+            {
+              "bodyBytesRead": 0,
+              "bodyReadComplete": true,
+              "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "4ab1ad4f60502962e8ccadc529227d4f3dca3934ee98514fa268567e61e99293",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "GET",
+              "path": "/admin/log",
+              "prevHash": "0bed21ba94f168bbab5d3671979f064cefcaeac15ce3e142dcc7a06393e50dab",
+              "rawBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "requestId": "764805c2-b070-4cf3-96ed-dae025e06648",
+              "seq": 7,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:37.137Z"
+            },
+            {
+              "hash": "df7e3aa490c0bbd99d4c65bbb4d149a370945235502c0c73565816b5f58171b2",
+              "kind": "response",
+              "prevHash": "4ab1ad4f60502962e8ccadc529227d4f3dca3934ee98514fa268567e61e99293",
+              "requestId": "764805c2-b070-4cf3-96ed-dae025e06648",
+              "seq": 8,
+              "status": 200,
+              "ts": "2026-10-15T22:22:37.151Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 2
+              },
+              "faultPlanSeq": 3,
+              "hash": "6c475e7fc1b5123762ca509005a54f46ba1360d1670a6239a736519a4553f982",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "df7e3aa490c0bbd99d4c65bbb4d149a370945235502c0c73565816b5f58171b2",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "33cb73d4-e46a-43b7-bd5c-47c635b978d2",
+              "seq": 9,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:37.167Z"
+            },
+            {
+              "bodyBytesRead": 0,
+              "bodyReadComplete": true,
+              "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "0801ccd347709e07f5ed2f1bd5c6e9efab1eb6e5ec0968a4e49e1464509d5f25",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "GET",
+              "path": "/admin/log",
+              "prevHash": "6c475e7fc1b5123762ca509005a54f46ba1360d1670a6239a736519a4553f982",
+              "rawBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "requestId": "db932f90-c569-4b71-922a-97ed2c31701f",
+              "seq": 10,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:37.182Z"
+            },
+            {
+              "hash": "2a6300c37f3cb70a2069593478d48437935b16521fa0643f02111f9ea5a6d82b",
+              "kind": "response",
+              "prevHash": "0801ccd347709e07f5ed2f1bd5c6e9efab1eb6e5ec0968a4e49e1464509d5f25",
+              "requestId": "db932f90-c569-4b71-922a-97ed2c31701f",
+              "seq": 11,
+              "status": 200,
+              "ts": "2026-10-15T22:22:37.196Z"
+            }
+          ],
+          "commits": [],
+          "posts": [
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 1
+              },
+              "faultPlanSeq": 3,
+              "hash": "8372ba8ac0c9d40fe5e61962ea0ccef0b10303aba734aa2035af36adf07db921",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": "component-first-delay",
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "152e9917ed247d5128e7c7b1a071b61bd92e213b32d4477f178b0f3de4056bae",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "b64231eb-22bd-4361-b958-fcc982daac71",
+              "seq": 5,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:37.108Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 2
+              },
+              "faultPlanSeq": 3,
+              "hash": "6c475e7fc1b5123762ca509005a54f46ba1360d1670a6239a736519a4553f982",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "df7e3aa490c0bbd99d4c65bbb4d149a370945235502c0c73565816b5f58171b2",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "33cb73d4-e46a-43b7-bd5c-47c635b978d2",
+              "seq": 9,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:37.167Z"
+            }
+          ],
+          "checkpoint": {
+            "hash": "2a6300c37f3cb70a2069593478d48437935b16521fa0643f02111f9ea5a6d82b",
+            "seq": 11
+          },
+          "logSha256": "6a9cef0b94f9fc30ac006079fbc50d1b9df9c1db1d77f0ea3c185734b486279a"
+        },
+        "finalStatuses": [
+          [
+            201
+          ],
+          [
+            200
+          ]
+        ],
+        "finalCommitSeq": 12,
+        "finalHash": "d2afa506af4679701583d9fdcae5c510c0d49fa1485aee589f454c486c20730c"
+      },
+      {
+        "root": "/private/tmp/lhf-wNHYde",
+        "barrier": {
+          "changed": true,
+          "posts": 2,
+          "commits": 0,
+          "requestIds": [
+            "87b726c8-2325-461d-b872-1920eca53c6d",
+            "1ee6dccd-adfa-483d-8c6f-c9a1a1744077"
+          ],
+          "logSha256": "6bb4832c2d15282aa84b73002ebbffa557d60bac26cf70e43ef2e2d496eb66da",
+          "checkpoint": {
+            "hash": "0ede488838cfbc9a759abf5e40bb01a6e1656ed47c8016de7e43f6d313b1c743",
+            "seq": 11
+          }
+        },
+        "barrierSnapshot": {
+          "records": [
+            {
+              "action": "initialize",
+              "faultPlan": {
+                "faults": [],
+                "schemaVersion": "lighthouse-finance-faults/1"
+              },
+              "hash": "485799378ae7f2ae87eedb77f031f70735daa8a551cd8014e55f642cb0c97850",
+              "kind": "admin",
+              "prevHash": "GENESIS",
+              "seedSha256": "72b31e638892996c3cf8484b91fce098920e472f3b03d45bd0d8302bece38cbc",
+              "seq": 1,
+              "ts": "2026-10-15T22:22:39.876Z"
+            },
+            {
+              "bodyBytesRead": 177,
+              "bodyFields": [
+                "schemaVersion",
+                "faults"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "de85af08c9e3d860dff26bdc483fc9e96530800870f4cc5554fd37808ee112b7",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "a1d328ff3d7465b224108afa285eae559d0d11c5fc6ccc02e425027fe3a6f0a8",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/admin/faults",
+              "prevHash": "485799378ae7f2ae87eedb77f031f70735daa8a551cd8014e55f642cb0c97850",
+              "rawBodySha256": "de85af08c9e3d860dff26bdc483fc9e96530800870f4cc5554fd37808ee112b7",
+              "requestId": "010befbc-d63b-4ec2-9399-26be5795e5ad",
+              "seq": 2,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:39.909Z"
+            },
+            {
+              "action": "replace_faults",
+              "faultPlan": {
+                "faults": [
+                  {
+                    "delayMs": 2500,
+                    "id": "component-first-delay",
+                    "method": "POST",
+                    "mode": "delay_then_commit",
+                    "nth": 1,
+                    "path": "/v1/payments"
+                  }
+                ],
+                "schemaVersion": "lighthouse-finance-faults/1"
+              },
+              "hash": "9216c76d2674557cc52b9ebd004b5b571efe2a7c05b144aa318076f265c85a42",
+              "kind": "admin",
+              "prevHash": "a1d328ff3d7465b224108afa285eae559d0d11c5fc6ccc02e425027fe3a6f0a8",
+              "requestId": "010befbc-d63b-4ec2-9399-26be5795e5ad",
+              "seq": 3,
+              "ts": "2026-10-15T22:22:39.924Z"
+            },
+            {
+              "hash": "8cbb884acf79e720ce85a153bd742fc076e95aec67cc9019e5b3c949afc660d6",
+              "kind": "response",
+              "prevHash": "9216c76d2674557cc52b9ebd004b5b571efe2a7c05b144aa318076f265c85a42",
+              "requestId": "010befbc-d63b-4ec2-9399-26be5795e5ad",
+              "seq": 4,
+              "status": 200,
+              "ts": "2026-10-15T22:22:39.938Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 1
+              },
+              "faultPlanSeq": 3,
+              "hash": "adf16b6258cced1b90e7668560d536d4c8306e914328ea5a1495d9559020aff8",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": "component-first-delay",
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "8cbb884acf79e720ce85a153bd742fc076e95aec67cc9019e5b3c949afc660d6",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "87b726c8-2325-461d-b872-1920eca53c6d",
+              "seq": 5,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:39.955Z"
+            },
+            {
+              "faultPlanSeq": 3,
+              "hash": "d34a8566b658697c00118b6096651f08452ea9772b5c4b96c3803092663e6588",
+              "id": "component-first-delay",
+              "kind": "fault",
+              "mode": "delay_then_commit",
+              "prevHash": "adf16b6258cced1b90e7668560d536d4c8306e914328ea5a1495d9559020aff8",
+              "requestId": "87b726c8-2325-461d-b872-1920eca53c6d",
+              "seq": 6,
+              "ts": "2026-10-15T22:22:39.972Z"
+            },
+            {
+              "bodyBytesRead": 0,
+              "bodyReadComplete": true,
+              "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "4df7411cb9215420f55e14c5dcd21bfdbf95bc3785cf94d3f3e8caa23dd1aa4a",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "GET",
+              "path": "/admin/log",
+              "prevHash": "d34a8566b658697c00118b6096651f08452ea9772b5c4b96c3803092663e6588",
+              "rawBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "requestId": "3a943132-ba15-492e-b108-61631aaab4f3",
+              "seq": 7,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:39.989Z"
+            },
+            {
+              "hash": "9e9023a915a2861c9854c42a54e00bb33024b7d32120739b23dd7d84fcb64d1b",
+              "kind": "response",
+              "prevHash": "4df7411cb9215420f55e14c5dcd21bfdbf95bc3785cf94d3f3e8caa23dd1aa4a",
+              "requestId": "3a943132-ba15-492e-b108-61631aaab4f3",
+              "seq": 8,
+              "status": 200,
+              "ts": "2026-10-15T22:22:40.003Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12001,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "0544bf59d827786f6d4d2a10687e5b2ed218e3a7f62834cd046e3be33fb08728",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 2
+              },
+              "faultPlanSeq": 3,
+              "hash": "6d50d0927c3bda58294b514e39e475e3454d2eef2d4f135c4707def96ad18110",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "9e9023a915a2861c9854c42a54e00bb33024b7d32120739b23dd7d84fcb64d1b",
+              "rawBodySha256": "4600e8e0eed94f47b3477f549c4d8a18100aa089ad31629e6b69a71017088965",
+              "requestId": "1ee6dccd-adfa-483d-8c6f-c9a1a1744077",
+              "seq": 9,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:40.021Z"
+            },
+            {
+              "bodyBytesRead": 0,
+              "bodyReadComplete": true,
+              "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "channel": "admin",
+              "clientId": null,
+              "faultCounts": null,
+              "faultPlanSeq": null,
+              "hash": "a0caba98aebe6a3479b94d2ff396278858f51e813af7ba866d25888bef667160",
+              "idempotencyKey": null,
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "GET",
+              "path": "/admin/log",
+              "prevHash": "6d50d0927c3bda58294b514e39e475e3454d2eef2d4f135c4707def96ad18110",
+              "rawBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "requestId": "94cdf6cb-9dff-4a3c-aa52-248973721b1d",
+              "seq": 10,
+              "tenantId": null,
+              "ts": "2026-10-15T22:22:40.036Z"
+            },
+            {
+              "hash": "0ede488838cfbc9a759abf5e40bb01a6e1656ed47c8016de7e43f6d313b1c743",
+              "kind": "response",
+              "prevHash": "a0caba98aebe6a3479b94d2ff396278858f51e813af7ba866d25888bef667160",
+              "requestId": "94cdf6cb-9dff-4a3c-aa52-248973721b1d",
+              "seq": 11,
+              "status": 200,
+              "ts": "2026-10-15T22:22:40.051Z"
+            }
+          ],
+          "commits": [],
+          "posts": [
+            {
+              "body": {
+                "amountMinor": 12000,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 1
+              },
+              "faultPlanSeq": 3,
+              "hash": "adf16b6258cced1b90e7668560d536d4c8306e914328ea5a1495d9559020aff8",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": "component-first-delay",
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "8cbb884acf79e720ce85a153bd742fc076e95aec67cc9019e5b3c949afc660d6",
+              "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+              "requestId": "87b726c8-2325-461d-b872-1920eca53c6d",
+              "seq": 5,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:39.955Z"
+            },
+            {
+              "body": {
+                "amountMinor": 12001,
+                "currency": "USD",
+                "kind": "refund",
+                "originalTxnId": "txn-a-1002",
+                "payeeId": "payee-a-002",
+                "reference": "RF-1002",
+                "sourceAccountId": "acct-a-op"
+              },
+              "bodyBytesRead": 159,
+              "bodyFields": [
+                "kind",
+                "sourceAccountId",
+                "payeeId",
+                "amountMinor",
+                "currency",
+                "reference",
+                "originalTxnId"
+              ],
+              "bodyReadComplete": true,
+              "bodySha256": "0544bf59d827786f6d4d2a10687e5b2ed218e3a7f62834cd046e3be33fb08728",
+              "channel": "api",
+              "clientId": "executor-a",
+              "faultCounts": {
+                "component-first-delay": 2
+              },
+              "faultPlanSeq": 3,
+              "hash": "6d50d0927c3bda58294b514e39e475e3454d2eef2d4f135c4707def96ad18110",
+              "idempotencyKey": "fixture_key_1002",
+              "kind": "request",
+              "matchedFaultId": null,
+              "method": "POST",
+              "path": "/v1/payments",
+              "prevHash": "9e9023a915a2861c9854c42a54e00bb33024b7d32120739b23dd7d84fcb64d1b",
+              "rawBodySha256": "4600e8e0eed94f47b3477f549c4d8a18100aa089ad31629e6b69a71017088965",
+              "requestId": "1ee6dccd-adfa-483d-8c6f-c9a1a1744077",
+              "seq": 9,
+              "tenantId": "tenant-a",
+              "ts": "2026-10-15T22:22:40.021Z"
+            }
+          ],
+          "checkpoint": {
+            "hash": "0ede488838cfbc9a759abf5e40bb01a6e1656ed47c8016de7e43f6d313b1c743",
+            "seq": 11
+          },
+          "logSha256": "6bb4832c2d15282aa84b73002ebbffa557d60bac26cf70e43ef2e2d496eb66da"
+        },
+        "finalStatuses": [
+          [
+            201
+          ],
+          [
+            409
+          ]
+        ],
+        "finalCommitSeq": 12,
+        "finalHash": "2303dc3c357a6dbbeedfa1690957d0cf0965c499f29149abd6fcd2ca2fec4653"
+      }
+    ],
+    "eventual": [
+      {
+        "root": "/private/tmp/lhf-v1eVEO",
+        "observation": {
+          "kind": "eventual-provider-settlement-before-shutdown",
+          "providerOnly": true,
+          "posts": 1,
+          "commits": 1,
+          "readCalls": [
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key",
+            "reference",
+            "key"
+          ],
+          "paymentId": "pay_821a304c2eda428192087b3f73da1030",
+          "checkpoint": {
+            "hash": "5b65daa0a1468bf540ec98a8cd597b21210ef5a223feae2f80607c804923e5fd",
+            "seq": 54
+          },
+          "fixedElapsedClaim": false
+        },
+        "firstPostSeq": 5,
+        "commitSeq": 51,
+        "successfulGetCheckpoint": {
+          "hash": "5b65daa0a1468bf540ec98a8cd597b21210ef5a223feae2f80607c804923e5fd",
+          "seq": 54
+        },
+        "shutdownSeq": 56,
+        "undeliveredPostResponse": {
+          "delivered": false,
+          "hash": "b690a35d0125c0f67b57475e024410a0b9ec4368fd9b6b3368ee6198ab2fc2b4",
+          "kind": "response",
+          "prevHash": "a0bdb57ba4b3b7e0bf335605ca5d7dd76b1d90edbccbe7701adff378e7cc85f4",
+          "requestId": "f0c5dcc1-ba96-40b7-b4b1-369ed05ab41f",
+          "seq": 52,
+          "status": 201,
+          "ts": "2026-10-15T22:22:27.135Z"
+        },
+        "actualGetCount": 23,
+        "normalizedPayment": {
+          "amountMinor": 12000,
+          "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+          "committedAt": "2026-10-15T22:22:27.121Z",
+          "currency": "USD",
+          "destinationTokenSha256": "3dcbe928e26c6d6e96aa0728827bfaac68b80bd90476ac6fedc9f64d3d5f2a2a",
+          "idempotencyKey": "p119-key-000001",
+          "kind": "refund",
+          "logSeq": 51,
+          "originalTxnId": "txn-a-1002",
+          "payeeId": "payee-a-002",
+          "payeeVersion": 1,
+          "paymentId": "pay_821a304c2eda428192087b3f73da1030",
+          "reference": "RF-1002",
+          "sourceAccountId": "acct-a-op",
+          "tenantId": "tenant-a"
+        }
+      }
+    ],
+    "cli": [
+      {
+        "root": "/private/tmp/lhf-L4xdny",
+        "observation": {
+          "planId": "first-post-error-before-commit",
+          "firstStatus": 503,
+          "secondStatus": 201,
+          "posts": 2,
+          "commits": 1,
+          "faultCount": 1,
+          "restoredMatchedRequestCount": 2
+        },
+        "actualChildArgv": [
+          [
+            "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/examples/lighthouse-finance/service/server.mjs",
+            "--dir",
+            "/private/tmp/lhf-L4xdny/run",
+            "--seed",
+            "/private/tmp/lhf-L4xdny/seed.json",
+            "--faults",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/spec/fixtures/v1/lighthouse-finance/faults/error_before_commit.json"
+          ],
+          [
+            "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/examples/lighthouse-finance/service/server.mjs",
+            "--dir",
+            "/private/tmp/lhf-L4xdny/run",
+            "--seed",
+            "/private/tmp/lhf-L4xdny/seed.json",
+            "--faults",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/spec/fixtures/v1/lighthouse-finance/faults/error_before_commit.json"
+          ]
+        ],
+        "postRows": [
+          {
+            "body": {
+              "amountMinor": 12000,
+              "currency": "USD",
+              "kind": "refund",
+              "originalTxnId": "txn-a-1002",
+              "payeeId": "payee-a-002",
+              "reference": "RF-1002",
+              "sourceAccountId": "acct-a-op"
+            },
+            "bodyBytesRead": 159,
+            "bodyFields": [
+              "kind",
+              "sourceAccountId",
+              "payeeId",
+              "amountMinor",
+              "currency",
+              "reference",
+              "originalTxnId"
+            ],
+            "bodyReadComplete": true,
+            "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "channel": "api",
+            "clientId": "executor-a",
+            "faultCounts": {
+              "first-post-error-before-commit": 1
+            },
+            "faultPlanSeq": 1,
+            "hash": "16317ddfa651836b33cf8cd1bf8643e5029b2b9552d3c45cefe1585d55b70b0a",
+            "idempotencyKey": "fixture_key_1002",
+            "kind": "request",
+            "matchedFaultId": "first-post-error-before-commit",
+            "method": "POST",
+            "path": "/v1/payments",
+            "prevHash": "3b1e9d28836638d49e015712285621479f6927df1923174a1505ef0421dd4107",
+            "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+            "requestId": "1a7a8084-6a8e-4723-9cf5-965e83e1d026",
+            "seq": 2,
+            "tenantId": "tenant-a",
+            "ts": "2026-10-15T22:22:42.762Z"
+          },
+          {
+            "body": {
+              "amountMinor": 12000,
+              "currency": "USD",
+              "kind": "refund",
+              "originalTxnId": "txn-a-1002",
+              "payeeId": "payee-a-002",
+              "reference": "RF-1002",
+              "sourceAccountId": "acct-a-op"
+            },
+            "bodyBytesRead": 159,
+            "bodyFields": [
+              "kind",
+              "sourceAccountId",
+              "payeeId",
+              "amountMinor",
+              "currency",
+              "reference",
+              "originalTxnId"
+            ],
+            "bodyReadComplete": true,
+            "bodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "channel": "api",
+            "clientId": "executor-a",
+            "faultCounts": {
+              "first-post-error-before-commit": 2
+            },
+            "faultPlanSeq": 1,
+            "hash": "f6e362c21cc87916f34eb13a5a5568961d62bf9922e35b2e58c8c0a5b154b868",
+            "idempotencyKey": "fixture_key_1002",
+            "kind": "request",
+            "matchedFaultId": null,
+            "method": "POST",
+            "path": "/v1/payments",
+            "prevHash": "0e432f28cce851f53d7ecb3b182a6ef351a94c00b1ca7e8cc089620e54fdcdc0",
+            "rawBodySha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+            "requestId": "c53b8141-ae1e-4b99-91fa-9ba4e7f3536f",
+            "seq": 9,
+            "tenantId": "tenant-a",
+            "ts": "2026-10-15T22:22:42.975Z"
+          }
+        ],
+        "priorStoppedPrefixExact": true
+      }
+    ],
+    "sixOwnedHttpPeers": [
+      {
+        "mode": "malformed-json",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      },
+      {
+        "mode": "invalid-schema",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      },
+      {
+        "mode": "redirect",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      },
+      {
+        "mode": "oversized",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      },
+      {
+        "mode": "unrecognized-4xx",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      },
+      {
+        "mode": "server-5xx",
+        "requestCount": 1,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/v1/accounts",
+            "authorized": true
+          }
+        ],
+        "listening": false,
+        "socketCount": 0,
+        "bodyFailed": false,
+        "closureFailed": false
+      }
+    ],
+    "clonePreservation": {
+      "all17ManifestFilesExactInRAndClone": [
+        {
+          "path": "README.md",
+          "bytes": 59828,
+          "sha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841"
+        },
+        {
+          "path": "website/index.html",
+          "bytes": 43520,
+          "sha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138"
+        },
+        {
+          "path": "website/lite.html",
+          "bytes": 11197,
+          "sha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67"
+        },
+        {
+          "path": "website/i18n.js",
+          "bytes": 44169,
+          "sha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced"
+        },
+        {
+          "path": "docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65"
+        },
+        {
+          "path": "docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd"
+        },
+        {
+          "path": "docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b"
+        },
+        {
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e"
+        },
+        {
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181"
+        },
+        {
+          "path": "examples/lighthouse-finance/service/server.mjs",
+          "bytes": 27740,
+          "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+        },
+        {
+          "path": "docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+          "bytes": 8551,
+          "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+        },
+        {
+          "path": "examples/lighthouse-finance/README.md",
+          "bytes": 1409,
+          "sha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181"
+        },
+        {
+          "path": ".changeset/finance-payee-version-exhaustion.md",
+          "bytes": 253,
+          "sha256": "28bbdea260029fd92fdfa129b935ccc4dca57cea7e249428dff022e516ec9fa6"
+        },
+        {
+          "path": "tests/helpers/financeQualification.ts",
+          "bytes": 17131,
+          "sha256": "3b4d755e03fa86035661557c2b60136e4ec5d21e0fb2352f6f08675c21ff835c"
+        },
+        {
+          "path": "tests/lighthouse/financeFixtureService.test.ts",
+          "bytes": 23208,
+          "sha256": "a8fa0dc2d2aba614f2007c204b2758c84e0b39ae87109a4f0c5600b9a97c7a53"
+        },
+        {
+          "path": "tests/lighthouse/financeClientAdapter.test.ts",
+          "bytes": 33348,
+          "sha256": "52ae6e44d441f90e793379052045c7d7139051293f6765361dea7b5522c071e8"
+        }
+      ],
+      "cloneTrackedStatusClean": true,
+      "native": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "inode": 541759398,
+        "nlink": 1
+      },
+      "runner": "Actual command borrows pinned R Vitest entry and reporter. --root/--config/test modules and every provider child source/fault path are physical clone. This is not an independent clone-runner execution."
+    },
+    "cleanSourceLimits": "Successful helper log and source show committed clone, frozen install, build, doctor/init, stub+echo native turn and actual two-process same-session resume/seal plus request reconstruction. Successful inner full stdout JSON is not retained in the outer log; this is no full CI/kernel/model/provider proof."
+  },
+  "preservation": {
+    "initialAdmissionUnchangedInputsCurrent": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/txlog.mjs",
+        "bytes": 6696,
+        "sha256": "45b8bf0624ebfb3fb1a7cfb8291cc3835205763ffd865a7d32fb6e469d360140"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/faults.mjs",
+        "bytes": 2864,
+        "sha256": "7aad83275985054c5c1fd6173f02a7dd5a86b8a1d5a470adde73dd7390d5290b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentArgs.ts",
+        "bytes": 1865,
+        "sha256": "73f37d1a65ff5100aa66e7e9c729b84bc6f977fc59fff18490b9e0ee63dc15fa"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentServiceClient.ts",
+        "bytes": 11998,
+        "sha256": "6c95c1d07fc6a6965733180c53a964c7a11c4e1d840e0670c1bc31d9a8b1ccd7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentAdapter.ts",
+        "bytes": 7838,
+        "sha256": "f6bf640a995cfcfb7f2aa3edb5cb16460ba129621caa3e4a4d44f4a26be4ee4e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/seed.json",
+        "bytes": 4718,
+        "sha256": "1b52e98459eeb6cfa4dcc0501c6409cc4fa6c38a070df2558b6b9c43a443d50e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/cases.json",
+        "bytes": 52804,
+        "sha256": "f955827ca996c2adaad3b4c31faf895375a13644b4c616d7cdeb302d6ef55999"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/reconcile.ts",
+        "bytes": 20018,
+        "sha256": "5f5b44479db7311b44db502515bfd25fe0d8097f431c06351f6f25074036ad7e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+        "bytes": 20450,
+        "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+        "bytes": 33320,
+        "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 32498,
+        "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+        "bytes": 636550,
+        "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/crash_after_commit.json",
+        "bytes": 234,
+        "sha256": "e9b6222b306754a62a6df47182270d7b3bff5aefc48113e9f2addb75bc20f933"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/delay_then_commit.json",
+        "bytes": 255,
+        "sha256": "135e253207b6d694599e6da0b738b59272d104f585223f445198746b17dfadf0"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/drop_response_after_commit.json",
+        "bytes": 250,
+        "sha256": "c7888f62a1e91b0362f7804cd4d80522315de12fcdda8411cbaceac3db582be3"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/error_after_commit.json",
+        "bytes": 255,
+        "sha256": "175bf3b3a1c9834f86ea3a1b48a1627b3171c6a19638025d5ff5ebb58e434168"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/error_before_commit.json",
+        "bytes": 257,
+        "sha256": "74d0902e2aff88a8dc51d595d7ec404e8b581028e01b66072eccbc4dde9ee8c6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/faults/reset_before_body.json",
+        "bytes": 232,
+        "sha256": "801fa073ae1a0b78705eb5bb7617d92626a10ecc49386f3c256b17e9ee90a024"
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-19.md",
+        "bytes": 28238,
+        "sha256": "25846731b701a4d0b44c1a22d9be0957005b463b15203db629cfb7e5fc00d0b9"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "bytes": 275376,
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+      },
+      {
+        "path": "/private/tmp/p1-04-next-item-routing-20261016/routing.json",
+        "bytes": 12851,
+        "sha256": "05c06195752fd642688ab4ced543c613dc374e479b80d4e166914cb528800ed2"
+      },
+      {
+        "path": "/private/tmp/p1-04-next-item-routing-20261016/README.md",
+        "bytes": 2828,
+        "sha256": "8aa353bfb1f11c0dbf8715e8ef052ab3e9ebd655bc1adbed0142c4a7a4f1a8af"
+      },
+      {
+        "path": "/private/tmp/p1-04-next-item-routing-20261016/input-pins.json",
+        "bytes": 9892,
+        "sha256": "a38dd4d213075be4e5562fc1429ecb05df7180fae9736000ef2e58a4c2928536"
+      },
+      {
+        "path": "/private/tmp/p1-19-qualification-preflight-20261016/live-wip.json",
+        "bytes": 5857,
+        "sha256": "79800a51a564d528252339bf9a06e8e8d0c366d93c1ba361dc24cf64d67f2fe9"
+      },
+      {
+        "path": "/private/tmp/p1-04-idempotency-qualification-20261016/final-p1-04-checkpoint.json",
+        "bytes": 4725,
+        "sha256": "83a3dfa43e6e18cda23cbd4672a89428aaeb0d86de5892690dc569472e36d8cb"
+      }
+    ],
+    "onlyThreeAuthorizedInitialSourceInputsChanged": [
+      {
+        "original": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+          "bytes": 27643,
+          "sha256": "79194f88991eeda469057c7b13f3e6a1260eba8256cc901ae83debeffadf8ac1"
+        },
+        "candidate": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+          "bytes": 27740,
+          "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+        }
+      },
+      {
+        "original": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/README.md",
+          "bytes": 719,
+          "sha256": "ad598ce4ef42ac1cf504dcf6c883c2a123809be99fbc8f268585e86667795756"
+        },
+        "candidate": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/README.md",
+          "bytes": 1409,
+          "sha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181"
+        }
+      },
+      {
+        "original": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+          "bytes": 6077,
+          "sha256": "1452421d1aa16a3343a0b36d94722092401466e3b25e8645f123950b532b17ca"
+        },
+        "candidate": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+          "bytes": 8551,
+          "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+        }
+      }
+    ],
+    "sourceManifestPins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+        "bytes": 27740,
+        "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+        "bytes": 8551,
+        "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/README.md",
+        "bytes": 1409,
+        "sha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/finance-payee-version-exhaustion.md",
+        "bytes": 253,
+        "sha256": "28bbdea260029fd92fdfa129b935ccc4dca57cea7e249428dff022e516ec9fa6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+        "bytes": 17131,
+        "sha256": "3b4d755e03fa86035661557c2b60136e4ec5d21e0fb2352f6f08675c21ff835c"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeFixtureService.test.ts",
+        "bytes": 23208,
+        "sha256": "a8fa0dc2d2aba614f2007c204b2758c84e0b39ae87109a4f0c5600b9a97c7a53"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeClientAdapter.test.ts",
+        "bytes": 33348,
+        "sha256": "52ae6e44d441f90e793379052045c7d7139051293f6765361dea7b5522c071e8"
+      }
+    ],
+    "historicalProtectedRefsNotRefreshedByThisPacket": [
+      {
+        "root": "/Users/sid/AgentMaturityCompass",
+        "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+      }
+    ],
+    "heldRefHistorical": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+  },
+  "provenanceIndex": [
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/admission.json",
+      "bytes": 15927,
+      "sha256": "4c7e12e05d2661f9247d66b4103b55efaca12b5e378a98eafacaa92f8cc882a7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-repair-admission.json",
+      "bytes": 1676,
+      "sha256": "6adf198ef4a22f5957737ab4187737490d7645534ddfe11fe97a4275e192c469"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-repair-application.json",
+      "bytes": 325,
+      "sha256": "71cade6eae3982ce6468a95b61c816b6f7ad2ee343856178ce194fc2a2bf23e4"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/test-application.json",
+      "bytes": 9504,
+      "sha256": "a440ed0554c5f5661f4147a79e065f19fb54a80bb78c71bbdac6ec9e58403624"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/component-extension-application.json",
+      "bytes": 782,
+      "sha256": "a84675937acaa4c448d66b3af0870c0b0cf7fe84b23827713eff51e20f775518"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/client-extension-application.json",
+      "bytes": 625,
+      "sha256": "02b93275cfa3c40798e129b0a2183022c7d489c9fdddac5c48f558d0c2218474"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/documentation-application.json",
+      "bytes": 939,
+      "sha256": "35e30889e0600dc316e361fa76da43c4d25b52e0c427db03e6c6b40eb5b22fe5"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/docs-component-extension-application.json",
+      "bytes": 1389,
+      "sha256": "3c92c4b1ec7063782490a8a1b266ea4602cd92a69e9c51bd77e0571a946cb278"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/count-generation-admission.json",
+      "bytes": 3768,
+      "sha256": "0653c382f61f116b8c1b6fc97e34df7fee918fda5b9072d9e6b19468a6bcc4fb"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/count-generation-delta.json",
+      "bytes": 2699,
+      "sha256": "2c53a177094e68c60c44f2dee3d97450f15807d7b6360864282dda9c06543b7e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-candidate-manifest.json",
+      "bytes": 3061,
+      "sha256": "253d28ddc70b2ccdafed25b0079d1941fcc68abdc88d95bc24f8731a910848da"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-candidate-commit.json",
+      "bytes": 3145,
+      "sha256": "d1ef7ef409376f089dd281df63e3f1044f0219b487d59a0b1221c1915e605f82"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-admission.json",
+      "bytes": 3521,
+      "sha256": "8a802ad1b72a5942acc98e9c5a40d4df668e33f58d3d727f97ca111322b00992"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-root-audit.json",
+      "bytes": 494,
+      "sha256": "32a3805bab77886282bca738879267478a0bfa2e9fb6992a93ac00df4c4bdc61"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/staging-return-1.json",
+      "bytes": 574,
+      "sha256": "c625e6dd2d91f37721378c8ad5961fdc457025e309fb2dfc347ae225f5e5bad7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/intermediate-preservation.json",
+      "bytes": 18427,
+      "sha256": "6bde4545ddbbb912c2ec84cacb76ba89a5b4dd6f1b2260c5f009aee6934e79fc"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/component-checkpoint-command-index.json",
+      "bytes": 53576,
+      "sha256": "c93f6def49c3e12f90bff6460af0b0361371cd4fd2e3dc6c06f7e321855a0c35"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/detailed-quality-comparison.json",
+      "bytes": 510238,
+      "sha256": "8b7f6dff286b519ab31a39ea33734746b6adc28d041b8e1373dd7aeda9318362"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/source-repair-proposal/payee-version-overflow.patch",
+      "bytes": 884,
+      "sha256": "ccaece2929b1b74c6710bdf05d31d65355aba687f38c4f99184ca8c4a20637f2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/service-helper-v3-quality-proposal/helper-v2-to-v3.patch",
+      "bytes": 2525,
+      "sha256": "c2283c55a32e79b8663cc6844a2f0c97aaaf00bdf6126d0cbebd1b064bc147b7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/component-extension-proposal/pins.json",
+      "bytes": 1789,
+      "sha256": "db44e9f0337aacbff1a25a420a2ef047bf5730f454d737a338516d0dbe653785"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/client-extension-v2-proposal/pins.json",
+      "bytes": 6521,
+      "sha256": "e812d71bc07385f4bb9766643ac0deed7d9ff5dd8eefefcf877d086f4feda356"
+    }
+  ],
+  "closedAuditIndex": [
+    {
+      "name": "original-service-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/README.md",
+          "bytes": 2418,
+          "sha256": "8ddf3027763e8d740fbff4705ff8b3b31f1a6e44f3873b4a98d95df745b5363b"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/audit.json",
+          "bytes": 6965,
+          "sha256": "8bbef814aba6bc0957f7e692a979ec948a39583b77e6f678d443790544618652"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/case-identities.json",
+          "bytes": 60670,
+          "sha256": "01fc1a059b576f675306c017941e18b5e9149df3b8a392a5c5453ada59eafa55"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/fixture-observations-summary.json",
+          "bytes": 40589,
+          "sha256": "954205b9b435492bbdfe5931c3935503d06f082919d20a64dc73bf1bac90934d"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/input-pins.json",
+          "bytes": 2798,
+          "sha256": "e151e58cfba64ac32cbb57bc81840213f91eaa58bbbc0aacd90f586d0341ca2a"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/retained-member-index.json",
+          "bytes": 10382,
+          "sha256": "6ed2866f9f6a4f64664ed638b118388d6cf8abbf8d923bf60893c04220b131c0"
+        }
+      ]
+    },
+    {
+      "name": "original-client-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-client-audit/README.md",
+          "bytes": 2815,
+          "sha256": "68bb29b9c768573191023900fe11f792b7b3857d870967b3f98e07ab77df7231"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-client-audit/audit.json",
+          "bytes": 12586,
+          "sha256": "2ea4056fa4ceda19c241b5f7c19e64f64ba7a0a936780aa61fba46316bf1acb0"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/original-client-audit/input-pins.json",
+          "bytes": 4396,
+          "sha256": "6f16b2a838a27d04cb333582c3fd26cb9a3cede313d2be47db272562e3e9b459"
+        }
+      ]
+    },
+    {
+      "name": "followup-service-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/README.md",
+          "bytes": 1667,
+          "sha256": "0bb65d29a39d5d109aaeaf7e1ca6d91291a6eea3e421fc2d1351ac1c4f307439"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/audit.json",
+          "bytes": 6868,
+          "sha256": "74b64e674945860bb5df30e7a5f265853f199a88c83283cd6b33ece91947717a"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/case-identities.json",
+          "bytes": 53120,
+          "sha256": "5363d00abcd5611a1771731a7c69d5fc9c10a87da6191b0811a8b4b6a02d2667"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/fixture-observations-summary.json",
+          "bytes": 33474,
+          "sha256": "0fe6aa1ff7d21143b1e5aa0085f1b5204de2333511dbbcf6eac50c633f268873"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/input-pins.json",
+          "bytes": 3086,
+          "sha256": "bfa32bda06e8f4724fc76f76b3eb3e97a3351dae385c77c1da63a82b2d20e12b"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/retained-member-index.json",
+          "bytes": 7701,
+          "sha256": "d6a966c8611e10df46f460d34130597156747d40b5c00ae404ca73cc663c9382"
+        }
+      ]
+    },
+    {
+      "name": "followup-client-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-client-audit/README.md",
+          "bytes": 2313,
+          "sha256": "e78b0d9408d6060ebbbc65ddeb65512052e8c3dc1b336b37066de546055f107e"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-client-audit/audit.json",
+          "bytes": 8505,
+          "sha256": "f1d75458bfa0ea1b594a9af62f64aae4a124071f2be0e2cf5358ad11d8eea9bf"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-client-audit/input-pins.json",
+          "bytes": 4422,
+          "sha256": "bf3b1cc6210cbe72652419824aca2af8b6847549c9ec995bb1a4c38b1f1577a0"
+        }
+      ]
+    },
+    {
+      "name": "extended-service-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-service-audit/README.md",
+          "bytes": 1895,
+          "sha256": "aa30f152e4ab65c0b15bb1af7588d1c7b56d6465e0cc045b9d7268b1a2b6d571"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-service-audit/audit.json",
+          "bytes": 40767,
+          "sha256": "7c615d8250424a2b92504be1b2c1e8d53fe2a5c7200e4e8514cdec77cd29284f"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-service-audit/case-identities.json",
+          "bytes": 7328,
+          "sha256": "491b50c10dbc537bfb000cc7f02657c8a4c5620733b86a47808ada70f9f21076"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-service-audit/fixture-summary.json",
+          "bytes": 37014,
+          "sha256": "cd69f80d6c94b8dc379b649920e31529f4c165308e3c07fe46de3df9382254d5"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-service-audit/pins.json",
+          "bytes": 5526,
+          "sha256": "c1d92efdaed7bd5157809387349061c43de15d329cf77c35a77067f64e8bba53"
+        }
+      ]
+    },
+    {
+      "name": "extended-client-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-client-audit/README.md",
+          "bytes": 3229,
+          "sha256": "87d832c244ce1879b9ec672ff665f169bd6f4d2a12b5eb2d978633d227de147c"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-client-audit/audit.json",
+          "bytes": 8081,
+          "sha256": "58ce5df001449ee2eb5252e0fba6a6856191e0f2c07a4c70dd239bb9938498df"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/extended-client-audit/input-pins.json",
+          "bytes": 4210,
+          "sha256": "86405fddf12e000c9a50fdd9fc7cc0712fd7f49a668ad7f6707d9b57471bad81"
+        }
+      ]
+    },
+    {
+      "name": "fresh-clone-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/README.md",
+          "bytes": 2670,
+          "sha256": "a3bd7c4560b0f413ec6478312a00ebb3f0b05f27e5382660f3b5cff6eee82622"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/audit.json",
+          "bytes": 57061,
+          "sha256": "2d67bcf66a9fc9b632ad869371a4a41a2dd9d805c6d2855644121902af2fec0d"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/case-identities.json",
+          "bytes": 23119,
+          "sha256": "342ec7bc745fd48933ee61bc8e6c135551eeb6672319ba314c57492d3a55edce"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/fixture-index.json",
+          "bytes": 49128,
+          "sha256": "429bacb905a5d8f85a15934b038314133c4bd7071a3947d88c867f04d83b83cc"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/fresh-clone-audit/pins.json",
+          "bytes": 10273,
+          "sha256": "9a942801760a17bd9b4ebe885bb9c0006f47276eb596cafdf00cd92fffd1493f"
+        }
+      ]
+    },
+    {
+      "name": "final-source-review",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/final-source-review/README.md",
+          "bytes": 1778,
+          "sha256": "0f779157d17589ea1678568653116deaa9b95e72dde52fe5be8b463b3274c5ba"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/final-source-review/pins.json",
+          "bytes": 4005,
+          "sha256": "2899707c6b6dab7f9ffa005f932251507875832da3d568f6dd7e870a167c85cc"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/final-source-review/review.json",
+          "bytes": 10330,
+          "sha256": "f90a426f6bbba38b1a553ed8cd140474eef6e10e7afd084fd4e6a7b17e5a5c9f"
+        }
+      ]
+    },
+    {
+      "name": "static-audit",
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/static-audit/README.md",
+          "bytes": 2227,
+          "sha256": "48dbab0bdefd4c2f176c6ba6ce98efdb68d781a3da5c09ad817de7b2b0d419b9"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/static-audit/audit.json",
+          "bytes": 19797,
+          "sha256": "c5a2c691af2e6c4f1144871fee2ab43be0a67f276297f77276a7173e8fd24703"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/static-audit/pins.json",
+          "bytes": 9005,
+          "sha256": "ca73ddea22baea34153e3162cfacf9e8e8d99767c8f967fda97f35a48e42c6b3"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/static-audit/root-expectation-addendum-pins.json",
+          "bytes": 206,
+          "sha256": "c7ae5163451727a6132e1e209a41776ce9e59b35618aac47e45104aab8ec6d60"
+        },
+        {
+          "path": "/private/tmp/p1-19-finance-qualification-20261016/static-audit/root-expectation-addendum.json",
+          "bytes": 981,
+          "sha256": "b0dca166a8c08b57825977bf064b7bbb0cc7b664bf171854ced85c06e2cb278d"
+        }
+      ]
+    }
+  ],
+  "runtimeArtifactIndex": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/command.json",
+      "bytes": 2746,
+      "sha256": "8ae9bd3d4d7b658741be8daa3905d9ad5c6428b0dc0e5dfa17f32ed62eba11cb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/observer.json",
+      "bytes": 56282,
+      "sha256": "367b03c5046cb25e96632b0a56f945f6851af439ac24df7ed1f9148bb9ceee9c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "8a12443b3d90860099389d8bce9532e54f6ef60833421385881b539e64fb2d06"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/owned-process.json",
+      "bytes": 808,
+      "sha256": "2aea22522322015e9c6b86f94a34fdd9825cf4e795e3b508cc8d7aafa61ceeb5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/raw.json",
+      "bytes": 42304,
+      "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-original-provider-client/stdout-stderr.log",
+      "bytes": 652305,
+      "sha256": "eb2c9ff731260c4c42c25e8b1b862e7b270904542bbd0b450b7af9c8521549b7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-test-typecheck/command.json",
+      "bytes": 1318,
+      "sha256": "39892cf3722e1ce8c619ad895a19385bd3cb69d47933753093e5a0d1b2b2195b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-test-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "0c86c7d7e49c5b763026c7a9a51beac9aef44ce8907d944683002b6408e696d4"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-test-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "1eb056be75399afb3743a54db5e7fc70d7d2f27b041ceb2371cf95db1d2bb0e8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-test-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/command.json",
+      "bytes": 2746,
+      "sha256": "e17553cd2ecf3956d82bde1d52b3b5463c3e5ff149b2f423827634aad8efbd02"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/observer.json",
+      "bytes": 54488,
+      "sha256": "7405a6d99492a9b2c6fb8161a264709bc5a0498c65f4e5a446e01115cc9976ab"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "67f1d559afa83d17f6f74c2b928a08b67f1abd3822de6dbf80125ca8c7de0819"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/owned-process.json",
+      "bytes": 808,
+      "sha256": "4c231e4763c919c81d62abe938af8087cde3647da258b068d738db6f3b60efba"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/raw.json",
+      "bytes": 41597,
+      "sha256": "a32853b6b550f081a63ef743d2f526c69e7ea2fc0e31018070174d39e9242398"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-followup-provider-client/stdout-stderr.log",
+      "bytes": 648864,
+      "sha256": "a224e11ca5cdb29ab3e2b974eb6498949ee59d1f82035ffc80abc22cbb75cda8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-before/command.json",
+      "bytes": 1242,
+      "sha256": "125a9271856660617dfe3230badb73d1b952191687612a8632ec5f773192f685"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "42b4788ef3cb0299a606fde2251824669782704980c7441c2f0b9a7b6b4f699e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-before/owned-process.json",
+      "bytes": 449,
+      "sha256": "fb2c5cd0341a19e847f541d040dc4aab803671e16ae593947128c24ce12ac4a0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-before/stdout-stderr.log",
+      "bytes": 1228,
+      "sha256": "4e0ac8c2bd4571c91a56a437f76a16cd56f09f1b96ae36711dacdfcd3e4c74b2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-gen-counts/command.json",
+      "bytes": 1236,
+      "sha256": "a928c6698c3923e81cc1e3541db562554409694bd17b75e2a22f2f0613eff0b4"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-gen-counts/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "d1563835b56b2b9374ee35ffbad39855de59df6170e97bc96ee45467dc1c08a2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-gen-counts/owned-process.json",
+      "bytes": 449,
+      "sha256": "143b9ec544dea1a4c1a65ad63296993c44da484ac6f441c2826b55afe0f68063"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-gen-counts/stdout-stderr.log",
+      "bytes": 20,
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-source-typecheck/command.json",
+      "bytes": 1310,
+      "sha256": "d3b2a167d1a72136d02bad46f63622786206349776325d84aa8254a1717cf0f0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-source-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "dbbd0b33129eb4e321d2849aa719f71833bd3fbe36eb03c8a6eef4fbf53b4ac8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-source-typecheck/owned-process.json",
+      "bytes": 482,
+      "sha256": "3c9eca4e51a25af2b93974b184497f3da2f5470b7af7803aa89aa5a7eb6b8eee"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-source-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-lint/command.json",
+      "bytes": 1121,
+      "sha256": "25a369752e89a3f570c4d0f1799d8cad0117025ce8881471f5f0a83bd852f522"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-lint/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "6d29755524ac2ad19cd5ed00b1abb3702bfffe90ec1372dbe4cf1f38541ef06b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-lint/owned-process.json",
+      "bytes": 397,
+      "sha256": "62073981ccebc9dde3baf20ee5b1930bdaf28a0f5761409e055bc14ce0a68ed2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-lint/stdout-stderr.log",
+      "bytes": 443,
+      "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-freeze/command.json",
+      "bytes": 1214,
+      "sha256": "8b43d39443494d227cf3aa34adf95699556206cb84b62f9bfe34a118c31a70a0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-freeze/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "7c4a430fd998d28b0e290a061c3985f941a8f7599522767774d6a45fcb64f4d4"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-freeze/owned-process.json",
+      "bytes": 440,
+      "sha256": "c592d85493fb0ca178e0874d400d5fc8ed8e5da413c19bb4cd7b0701b0a606c3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-freeze/stdout-stderr.log",
+      "bytes": 116,
+      "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-after/command.json",
+      "bytes": 1240,
+      "sha256": "58b6c52388c752589d6c441cadb3e032cb4ee7c64eff96925382861d321fa40d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-after/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "4acfee0a41a09903731abc5c5334825ba8a1fb2ddd25c50c03745068ad855c48"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-after/owned-process.json",
+      "bytes": 449,
+      "sha256": "34ab9c581f0013edf9b92f0da9c35390d07f3c9156c344aa07ed3ee312ab3b18"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-counts-after/stdout-stderr.log",
+      "bytes": 81,
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-docs-drift/command.json",
+      "bytes": 1229,
+      "sha256": "e6c45573218edc55ccf3a13d52fd6037d21bf8f95758cf428938af05cd26af9e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-docs-drift/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "751eb63f734220b59bda3b4bec73c288b5eaa2a7390fb01c90725d9744a7f7a9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-docs-drift/owned-process.json",
+      "bytes": 444,
+      "sha256": "12641bb955cb63c8a488481b16fa327462a3ae89a7c1e93b07b491babcd13181"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-docs-drift/stdout-stderr.log",
+      "bytes": 45,
+      "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-architecture/command.json",
+      "bytes": 1260,
+      "sha256": "fc02956aa63e2bca8ad06a2cb3353b8996f6622b744123dc0e581003132293a7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-architecture/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "12dc43f1a5eb0292ff4fb69a04999b9b95f9910107afad3bb4da33baffdfba6b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-architecture/owned-process.json",
+      "bytes": 457,
+      "sha256": "65d5898ad2489d9173316d0664c5b1b26204ceda9854abb24b2f90d359469060"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-architecture/stdout-stderr.log",
+      "bytes": 95563,
+      "sha256": "c2d57b00d67df0fba869ba197d74f690ff00c1e2720d4ecc27300a4276cb3c51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-duplicates/command.json",
+      "bytes": 1250,
+      "sha256": "84c1786f71b2f3a9cd5c0b47c20fbe371c45aea657fe5441a4a62889e23372de"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-duplicates/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "b89a7dc05b0210366caeb3ea6e7ccea111f2807f4642f6a39efbf2037e2a3388"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-duplicates/owned-process.json",
+      "bytes": 456,
+      "sha256": "b465cff5dc1f5540444cca14a751f4608a4c4b1fff20444a1e2b3b1451852c9d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-duplicates/stdout-stderr.log",
+      "bytes": 1844,
+      "sha256": "1e533c61c0976a56b4ba6363da60d2a930e9d92b0706673d2566a83e81f7b385"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code/command.json",
+      "bytes": 1247,
+      "sha256": "8a138b4a1034c3a6608681e15a46f83458075bf80bc970a83ff7dccd038839f1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "c72b5f24a8e0758b01a8bba64d3671677d231195e1afcb450482b6c4754b15f7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code/owned-process.json",
+      "bytes": 455,
+      "sha256": "5bb9286fc5a472cc88fec910a9e57a70606bbd5a4244ae3e4fdc464686b7a90c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "534dc58e451d6c902f2e75042f27b1eb26487dee0a0e07808cee9bdb00cab483"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code-delta/command.json",
+      "bytes": 1346,
+      "sha256": "d79fba1e30762c96c15db7e2c59caaa965e942e49e9551db7c79228752759df2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code-delta/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "21d253737abb08721e8f31612d0f28e964b9d61dd0eef28ed095f86ce9be79b3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code-delta/owned-process.json",
+      "bytes": 497,
+      "sha256": "962629a606500d55e5deba4c7f9717ba76418a6298a0eb51ced0fd097feeded7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-dead-code-delta/stdout-stderr.log",
+      "bytes": 1151,
+      "sha256": "328dc4d8aac28012aaa58092ab466d3ea1998d18989f71ee5abffeaba83d0b73"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-typecheck/command.json",
+      "bytes": 1328,
+      "sha256": "7fd5a54fd5f5a722e17330546be94f0cf9fafb2c9a842ea61c18729687c5c8d8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "ba6f8ecc40f11fdc7b365eddc45d4ae878748b4d9a0d3e50f2ec001e5722cb25"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "e4971a61282c6b8a806f1899d628b9183465db3ebcb178d44022ce92e32f78bf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-dead-code/command.json",
+      "bytes": 1267,
+      "sha256": "5060a85e53e79a441c9be95a403c5f9e8b3d18c01de8fe60cc15b7b6cd058fca"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-dead-code/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "e615ae572c179d41ddbd5c17d4618be091231229cdf6af604d48f1c626bd8f96"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-dead-code/owned-process.json",
+      "bytes": 455,
+      "sha256": "302bf9fc3b73d2d9dbdef50f161f3fa219744a497ad9a3830a4141f4eaa1274e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-helper-v3-dead-code/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "eb41cf1ed90c5360e529fa3ca4f20d8d197967be6dcd653bdd5401099d17b3dc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-host-fingerprint/command.json",
+      "bytes": 1333,
+      "sha256": "23d212a188592616fc1da382f8a0a393c0129670e3f4625c008723eff2703016"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-host-fingerprint/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3911add9e984d7fb156d00beb34357e921583619c10d830bb0915ea636c4b70d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-host-fingerprint/owned-process.json",
+      "bytes": 490,
+      "sha256": "a711a25f86ada76bd1154b00c4c620792a75c150c8327d0d5471eb8f96efab08"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-host-fingerprint/stdout-stderr.log",
+      "bytes": 307,
+      "sha256": "871a520e120eb0f4aa3467851fa3d539edfb81a516b7c17dcb7dc8e876509c51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/command.json",
+      "bytes": 2595,
+      "sha256": "962946cf1d2f46aee738eda0f35bbb81c4d31c3719d394302456047cef059804"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/observer.json",
+      "bytes": 16633,
+      "sha256": "88cdaf3e2018a9496b3197da9b2987c589c6a2f60da880747dde76f2403fbbdf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "c88cdaf83f3fba0deaa2946427c51d1af7cb36e78099712d284652df75a81d38"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/owned-process.json",
+      "bytes": 751,
+      "sha256": "390e496b6c6db8575b7db7d5a44723fb4322690816466e9e8328c5b8a7fb3a0a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/raw.json",
+      "bytes": 12935,
+      "sha256": "f884c9c37c656e1456008a32d6df5c464f1992663268b869a9c0d026063abcc6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-service/stdout-stderr.log",
+      "bytes": 578405,
+      "sha256": "ae0d8a9ebc4ca49c9f1e9c96b05e1de6191d86767ca17e48fd447520b2fa0f66"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/command.json",
+      "bytes": 2585,
+      "sha256": "918f8a288a86bd3bda755a8c0eaacd5f0cb237815c2af44e6121832d1dc6ec68"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/observer.json",
+      "bytes": 43562,
+      "sha256": "143427578deaabdaecb1c7a5d69dbbb71372387725dadd22a8303e3d5ccb421b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "acc444c4ee491433a969d25114c9fd27b52e2aefb597f2c1ded8a31df22339bb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/owned-process.json",
+      "bytes": 749,
+      "sha256": "eb11f99dd92f06231cd2d1a4579f6ebfb5cc5a4f4d7373e1475ca094c7511c3b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/raw.json",
+      "bytes": 33163,
+      "sha256": "66b81170fbf60fbcb9d0f46b8c5fad795a76564cb3fab0c7b88f840e59044025"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-extended-client/stdout-stderr.log",
+      "bytes": 266997,
+      "sha256": "3f49ae84819d9b1b0f4c1df1e5ad30bf77e169e391daa20df72b6c994ec92a99"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-final-component-typecheck/command.json",
+      "bytes": 1340,
+      "sha256": "b2aa87d0981e672613619b2cb1bebdbcce7370a9895ad1f65c706f6127f79fdc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-final-component-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "cc8dc57ed27b1869e0becdddbef113e65b0cf928d59e3358c8f418559ba5a679"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-final-component-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "cffa4378d3d60f6e6c912d827d59a7703ebf29552cd095f61a8c76fbd761a736"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-final-component-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-counts/command.json",
+      "bytes": 1260,
+      "sha256": "c025d8704c04f6604a933eb7085140bf249d3f009f9f36013af03313bbb50943"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-counts/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "8c249179e8c4a9f180bb5cf35e26ced6f2b1928f9a6be34a9e73899018b6a36b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-counts/owned-process.json",
+      "bytes": 449,
+      "sha256": "f136b2c4c2178c8a0d9cbafbe20296d52100272bb4e413bd8121725f92d8a41c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-counts/stdout-stderr.log",
+      "bytes": 81,
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-docs/command.json",
+      "bytes": 1249,
+      "sha256": "f2587265696d1bf969ae160f3e51468b5f473b369f4202197cb6f24b09680a70"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-docs/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "40859701321fafa348751a3823220352f0884f050197ebfc8c86784217b91333"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-docs/owned-process.json",
+      "bytes": 444,
+      "sha256": "35e12437044e0ebe734cb98f00eea854fbd6a726963176479a26bb11153886a0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-docs/stdout-stderr.log",
+      "bytes": 45,
+      "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-architecture/command.json",
+      "bytes": 1292,
+      "sha256": "2d61dd3cd6ca89dad7700b53b09777feb81a18b7ce99ac12adcdbeb2ee737d94"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-architecture/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "7e116da64f50ea4cbe1748ee3303ef3328645a44715e3aea2a2969c10ef67d8c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-architecture/owned-process.json",
+      "bytes": 457,
+      "sha256": "2c833420c75e0245b1809cf93457199a93dfc4da6e63e4df66d8d0bc66279fab"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-architecture/stdout-stderr.log",
+      "bytes": 95563,
+      "sha256": "c2d57b00d67df0fba869ba197d74f690ff00c1e2720d4ecc27300a4276cb3c51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-dead-code/command.json",
+      "bytes": 1279,
+      "sha256": "56545fbd602f72f58341c61424a0d9b12b58c00e35507be61541ae65c5bf88ac"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-dead-code/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "3756f982153be8d049d186ffbf56486bb5a1e4bf771541e481c7de44edc25f37"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-dead-code/owned-process.json",
+      "bytes": 455,
+      "sha256": "f7228dbb4592eb2f9d10ee91ca1ebbe3e4a3b92f1b9a82596e10e3d0a1f705bf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-component-final-dead-code/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "eb41cf1ed90c5360e529fa3ca4f20d8d197967be6dcd653bdd5401099d17b3dc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-clean-source/command.json",
+      "bytes": 1256,
+      "sha256": "838002a08a5e2c81e30d56e33973a38a6d911bce63ea81e68b391350155e5033"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-clean-source/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "827376baf96f9fec1346bb0316a0a3e1a0fb72cc2a23aac8b3191fcd32a816f9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-clean-source/owned-process.json",
+      "bytes": 456,
+      "sha256": "d3e773da29eea23eb4a5a7ab51b8fbeae1a89e8d1c1984b0b5bb4e5d765bf796"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "0a73f4563caa0450148bd20a037fcb885aac2f1c177bc87e515215142e984d32"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/command.json",
+      "bytes": 3304,
+      "sha256": "0aa1fdcf438644d4225423f6c4183a6bb786cf5cc8a637a343c6289fa73bea18"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/observer.json",
+      "bytes": 59827,
+      "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3d347758d92e3303d4420d6e1277bcee77f2a4d075d29233f6a597fc365fb2b3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/owned-process.json",
+      "bytes": 1095,
+      "sha256": "01e6a199cea9b947e3dc1f9caf7c747abd21748b53bfd4eee802070f440e0dab"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/raw.json",
+      "bytes": 45656,
+      "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-fresh-clone-components/stdout-stderr.log",
+      "bytes": 846634,
+      "sha256": "c4768c19593e35b0abe5209e6212ea5e4804ad22b4eece7dbeec515cd38eb5fb"
+    }
+  ],
+  "statusAndContinuation": {
+    "P119": "ACTIVE; remain in this item for oracle/tools/runner/control continuation",
+    "P107": "Not advanced to by this component checkpoint",
+    "actualPublicAsyncSeam": "ToolPipelineInit.approve is awaited when approvalRequiredFor includes FINANCIAL. It can perform an owned asynchronous payee GET, cache per-execution trusted facts, then syncguard compares frozen envelope/record before final recheck/start. Genuine signed authority IDs and boundApprovalRequiredFor remain required. This source-supported route is not implemented/qualified by this packet; no blanket protected API blocker is asserted.",
+    "remaining": [
+      "Independent oracle and negative fixtures; runner; full finance tool composition; durable exact envelope/provider-body mapping; credential separation; C1-C3 loader/evaluator and actual P111 evidence binding",
+      "Full F01-F38 remain planned/not_run; no false-pass, false-block, unauthorized-effect, duplicate-effect or100percent coverage metric measured",
+      "F1/maturity/clinical/legal/financial real-world approval, expert review and release are outside this component packet"
+    ]
+  },
+  "limits": [
+    "Canonical receipt tests count only fresh120/120; earlier runs overlap and are not summed.",
+    "Provider logs are unsigned local fixture SHA integrity, not AMC authority, authenticated-person or external trust proof. Hand-shaped mapping controls are explicitly synthetic.",
+    "Root executed all commands; reviewers inspected closed outputs. Service extension reviewer also authored those3 tests; client auditor authored client tests. No independent test-design claim.",
+    "Successful fixture roots are cleaned after sanitized publication;3 fresh corrupt-history roots remain for direct byte checks. No token file or private key is copied into this packet.",
+    "Actual command borrows R Vitest entry/reporter; physical clone root/config/test imports/provider argv and own single-link native are separately proven. No independent clone runner claim.",
+    "Clean-source build/doctor/init/stub native/real2processresume logs are actual; successful inner stdout JSON is not fully retained outside helper. No full CI or live model/provider proof.",
+    "No full suite/global coverage, Linux/Node24/hosted qualification, arbitrary race/power-loss guarantee, native30s deadline qualification, PR/push/merge/deploy/release/formalDone claim.",
+    "P106 Claude ownership, P202 pause, held P102-P104/approval/pipeline/enforce/native/CLI work and prior unresolved decisions remain preserved. Historical held failures are not rerun or waived here."
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "capturedUtc": "2026-10-14T21:41:45.067627+00:00",
+  "root": "/private/tmp/p0-27-session-evidence-petbBm",
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "major": "22",
+  "caseFiles": [
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/actual-session-helper.mjs",
+      "bytes": 11933,
+      "sha256": "a497a40b3403deb2a3ddb2e7ab2aed97261788a2c20dcb2f9e6ada3b5e7ae670"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/deny-transport.mjs",
+      "bytes": 428,
+      "sha256": "4aa113629cf1cb068a83257ec103037e670f393c1ba519d92bdda424afaacff1"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/request.json",
+      "bytes": 231,
+      "sha256": "3020d73b756718b24c4064ea84e97ec3796be4ed312491aebf28ef5127d58e08"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/result.json",
+      "bytes": 9030,
+      "sha256": "a29a635dbd5f19adb33351f16578e264d919bdf1cd5082fbb6a6306f0759c130"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "6c2a6ca24b7a5890eadb478804a1c2953b40259c5813da7e5f656b80accd00d3"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/stdout.log",
+      "bytes": 64,
+      "sha256": "0d3813ccec6d2815a68baa4bd4219ebe9dae80eba188ed8e5beb03861a5c15ec"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/request.json",
+      "bytes": 213,
+      "sha256": "14815617affbe61e755f4bf2bf570dbe1da4121cca1af7855acd5b6a4ed73a64"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/result.json",
+      "bytes": 2954,
+      "sha256": "736ff3d1fcf19e8400926cf6a77318ef36282fe43c4d890aa26af2301d7e1caa"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "e967e234a0b15d6bb4dd52e79b1c7ab2930b2b62173062cbb4984b21fa171811"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/stdout.log",
+      "bytes": 55,
+      "sha256": "c412dc3cf8aace1e13bd0c7426335aa3ea3f8551f53133ca1d27310ea3a47804"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/request.json",
+      "bytes": 217,
+      "sha256": "e554c0dd8800704196edf6b1648b26adca84c45a8e1f5e277096d1e0292aab69"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/result.json",
+      "bytes": 18122,
+      "sha256": "f149298a2dadbf36cfad53bbceeb26f4e1fd2f295d7c893cd2b56edb3cb163d4"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "d620a03074789a4ff7f1094e82fac7326e7307312fb9f3c01bc9c0b870545210"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/stdout.log",
+      "bytes": 58,
+      "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/request.json",
+      "bytes": 219,
+      "sha256": "c2939655cb12658247bf98873aabe9f8ea9467b36d6043b691d977a875284d41"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/result.json",
+      "bytes": 18128,
+      "sha256": "4d42f816fb80493baaa578c92f72dcc541b5dc413fe98f7dd781a54eedee268d"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "d5c8afbd74ab3ff1c9c45625c344a0c269ecab81c82d041aad5acc5f79e9efeb"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/stdout.log",
+      "bytes": 58,
+      "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/request.json",
+      "bytes": 219,
+      "sha256": "a576394005f67f8973968412a35ba9128076c8d1d13f3c2bc78d8c9fcc3acd34"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/result.json",
+      "bytes": 12764,
+      "sha256": "9255887c60cec80a1c2c7663f5651b788a5813c8f78c17f9bd35fee50045fcc5"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "2c1955d06509d0be6dec7cd6ade005c040ccc5be540e960c1c9d63ba7b17373a"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/stdout.log",
+      "bytes": 56,
+      "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/request.json",
+      "bytes": 211,
+      "sha256": "7e643dca2fd84bc65680232a3b14bb74cec300f71cfd49ebaba54a9805f900a2"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/result.json",
+      "bytes": 9200,
+      "sha256": "f363e5ab3cbd17352e93af08227180ff496e633974a1585c802acdab2d6a1264"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "c0ab2d57b5cd5bf1f58c75601fd1c732b4ecc34d0b700595f7c8108eea6e9525"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/stdout.log",
+      "bytes": 54,
+      "sha256": "c3214993a2391974b683800295ca617ee189cfd3814278f1cca5b115f7e377f8"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/request.json",
+      "bytes": 221,
+      "sha256": "d6db01517f21573156ac094ea5b011247871151386779fd363a78f0f789fb695"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/result.json",
+      "bytes": 2960,
+      "sha256": "5696a75cce86696e5758fe2e3c7c6830ff2019f5440ecf568a867e97512a6907"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "73baff5dea2ce6440b81ac607ecbfbda105834aafe675053e3203efdc73539d5"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/stdout.log",
+      "bytes": 59,
+      "sha256": "54cc0088872d8894c68f3a92cfd9e92cac9b64725819484234b92fd854d0b324"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/request.json",
+      "bytes": 215,
+      "sha256": "5d0284c1c945b6f577bc6679565463b9530d7492d5e758d6fcd407cf6da15ee1"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/result.json",
+      "bytes": 19997,
+      "sha256": "552632f698acc0c286347011e8323d24ea6a57be56f3477a6766156b7dd34efc"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/monitor-before-artifacts.json",
+      "bytes": 694,
+      "sha256": "5d66469d65424eaacdd3c6067d2d70ba603903c263501d0c2811d0ad73cdc39f"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/stdout.log",
+      "bytes": 56,
+      "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+    }
+  ]
+}

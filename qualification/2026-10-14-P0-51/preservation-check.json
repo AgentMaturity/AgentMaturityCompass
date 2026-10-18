@@ -1,0 +1,64 @@
+{
+  "source": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "atUtc": "2026-10-14T18:30:54.281634+00:00",
+  "checkouts": {
+    "primary": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "trackedStatus": ""
+    },
+    "Claude": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "trackedStatus": ""
+    }
+  },
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "heldSourceRef": {
+    "repository": "/Users/sid/AgentMaturityCompass",
+    "ref": "refs/heads/pending-main-442cd919",
+    "sha": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+  },
+  "protectedEqualAcceptedMain": {
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/api/accessPolicy.ts": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+    "src/api/resultRouteRegistry.ts": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/studio/openapi.ts": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+    "website/openapi.yaml": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+    "src/console/assets/app.js": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+    "src/console/assets/components/claimBadge.js": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+    "src/mcp/amcMcpServer.ts": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+    "src/mcp/a4Tools.ts": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff"
+  },
+  "additionalProtectedEqualBase": {
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "immutableArchivesEqualBase": true,
+  "policy": "No foreign source edits, historical archive/snapshot rewrite, freeze/floor/baseline/dependency change, held overlay, paused A4/P2-02 work, tracker closure, external message, push or publication."
+}

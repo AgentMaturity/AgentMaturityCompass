@@ -1,0 +1,123 @@
+{
+  "sourceCommit": "aa198eaf060a656628d4f78a2822ca17ce4df3ab",
+  "localOnly": true,
+  "canonical": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "skipped": 0,
+    "files": 9,
+    "hooks": 60,
+    "publicRecords": 32,
+    "newCases": 30
+  },
+  "phases": [
+    {
+      "label": "canonical",
+      "phase": "p139-fresh-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 12884,
+      "hooks": 60,
+      "publicRecords": 32
+    },
+    {
+      "label": "M1",
+      "phase": "p139-issuer-control-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 80,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 11417,
+      "hooks": 60,
+      "publicRecords": 32
+    },
+    {
+      "label": "restored-M1",
+      "phase": "p139-issuer-restored-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 11395,
+      "hooks": 60,
+      "publicRecords": 32
+    },
+    {
+      "label": "M2",
+      "phase": "p139-replay-control-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 79,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 11519,
+      "hooks": 60,
+      "publicRecords": 32
+    },
+    {
+      "label": "restored-M2",
+      "phase": "p139-replay-restored-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 11523,
+      "hooks": 60,
+      "publicRecords": 32
+    }
+  ],
+  "countsNotAddedAcrossReruns": true,
+  "sameActual81IdentitiesAllFivePhases": true,
+  "realPKCEToSameGrantToGovernedCall": true,
+  "allNineCommittedPayloadsInspectedForKnownTokenRedaction": true,
+  "rootReadOriginalFirstFailuresAndMasking": true,
+  "sourceOnlyControlNoCompiledChildSensitivity": true,
+  "qualityGreen": false,
+  "fullP139Done": false,
+  "fullPlanDone": false,
+  "notNewlyRun": [
+    "full npm test",
+    "global coverage",
+    "OS matrix",
+    "live vendor TLS",
+    "CLI/Studio/ACP OAuth integration"
+  ],
+  "ADRExceptions": [
+    "per-call reread instead of subscriptions/listen or TTL/cache",
+    "no MRTR or enabled elicitation approval routing",
+    "no automatic stdio restart",
+    "documented protected-resource path-prefix relaxation"
+  ],
+  "limits": [
+    "Finite synthetic token secrecy; no universal secrecy claim",
+    "Signed-field presence is not independent crypto verification",
+    "Product OAuth callback closeAllConnections/nonawaited close unobserved internally",
+    "Public setup caller inherits environment/user dotenv",
+    "Source and fixture lifecycle observations do not prove universal detached descendants"
+  ],
+  "heldWorkUnchanged": [
+    "F37 skipped",
+    "P1-01 gaps",
+    "P1-02 three failures",
+    "provider D15 archive staging",
+    "all earlier user-held decisions"
+  ],
+  "next": "P1-35 bounded legacy migration qualification after current admission; no tracker Done/PR/push/merge/release claim"
+}

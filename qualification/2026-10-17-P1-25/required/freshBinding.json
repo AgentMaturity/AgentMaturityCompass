@@ -1,0 +1,249 @@
+{
+  "schema": "p125-fresh-source-binding/1",
+  "at": "2026-10-16T18:56:36.032656+00:00",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "freshParent": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "sourceCompiledConfigAndNewFilesExact": [
+    {
+      "relativePath": "src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+    },
+    {
+      "relativePath": "dist/time/verifyTimestamp.js",
+      "bytes": 14777,
+      "sha256": "914d44693865680b1e3123255dfe4f393930ccbf2f418b3b8302b9c3cc942afa"
+    },
+    {
+      "relativePath": "src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+    },
+    {
+      "relativePath": "dist/time/der.js",
+      "bytes": 5518,
+      "sha256": "1ed3e62994bc5d7aad45e721ca73234c5c1e4069a81fa271adb3e7f894c2a89e"
+    },
+    {
+      "relativePath": "src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+    },
+    {
+      "relativePath": "dist/time/timeEvidence.js",
+      "bytes": 2973,
+      "sha256": "4157ecf0aa60813bea6335f4a26fb13f7cb5b4ed4c3b86c6515b90b8295c1829"
+    },
+    {
+      "relativePath": "src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "relativePath": "dist/trust/trustList.js",
+      "bytes": 10052,
+      "sha256": "4500847b46e4575d84d347fc8afacd1d35896019024590e80515bbd922783819"
+    },
+    {
+      "relativePath": "src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+    },
+    {
+      "relativePath": "dist/trust/verifierReport.js",
+      "bytes": 6231,
+      "sha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae"
+    },
+    {
+      "relativePath": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relativePath": "scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "relativePath": "scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "relativePath": "scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b"
+    },
+    {
+      "relativePath": "scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "relativePath": "knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "7212099e06483ab3bec0ac04f9b09f37ef33ecbcf0790796be755c1ff5adb108"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "652c1b3ee065964d510a66d2896b46d7c2cd77e2cedb47955b0f2d20c0adc725"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "845db24b2d318b1c7c5d13d5c0ea94f655473fb0cf254998dc2143b0cdde2760"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "de9bbf7cf182b9869f0f2a777b2f12d8d288a3ee77e275417fc1a3807a9f1f5b"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "c7cb66f62796fb3b44e91cfad3a4611676334015042232056c6581179d4946fe"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "83922c34f27d2da16a1439cf6cc66d9f1995cb4ca821607f2bcb48a1c2a81f5d"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "66c9bb1c5c2860167b63188e93bf34a14d8642a42fb944c12cdec2d31f5c1de7"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "e36e56a45d431f0fdbab2e91f107cdd62392cc099072fe8e1ae09eb10f197072"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "a658a9fe358da3fc3988d4ff2922afc92bdd67c1458397b941c79048c6709a82"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "f5cec7aa990b88f2c5b953bfd32d4fc969f6c6a111e69e2d912d8c9c01f0e060"
+    },
+    {
+      "relativePath": "tests/time/verifyTimestamp.test.ts",
+      "bytes": 11425,
+      "sha256": "47f9aa1984cf61ae0d1192d2c04d4f3138c0fa42d32145124552bd648eddeb31"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/public-certificates.json",
+      "bytes": 10021,
+      "sha256": "430746b4e4e721616a57bbec9d8b8a950cdd3b2631d51dc4925d263cb1642b52"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/valid.token.der",
+      "bytes": 2356,
+      "sha256": "d45216b462f9286af58ab5a3694c82b3b1675959a45011ec9c35eef1e4973912"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/valid.response.der",
+      "bytes": 2365,
+      "sha256": "cf14b113569a5be83fd3491938f5cb650724fffef7c0a946edb09fb62c1fdc31"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/missing-eku.token.der",
+      "bytes": 2332,
+      "sha256": "264ca611164421a268c868d0631660cbfc3423873cd9231514e7b9fd64280ec8"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/noncritical-eku.token.der",
+      "bytes": 2353,
+      "sha256": "84e186ce834f2a9f30a87a1b8ba722c95517c9e110a922ce72c72c67677d6896"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/expired.token.der",
+      "bytes": 2356,
+      "sha256": "1baf6dd1c9d9601c98bf47506563b0226bfb132a884f674dad9eb641e3420d3a"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/tampered-attribute.token.der",
+      "bytes": 2356,
+      "sha256": "fc6ac617be35765b6038bd928ec00d09de02cffbee88c6e99341d697517cfd1d"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/query.der",
+      "bytes": 76,
+      "sha256": "6c039cf80c0e99b576a1802d7916835d5c11f85998c60ea866dc02a1403051c7"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/tstinfo.der",
+      "bytes": 93,
+      "sha256": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/provenance.json",
+      "bytes": 80160,
+      "sha256": "3c38fe129eecdd32d9f8cd2d89028dbe73e17ad5634ffd7b0667e0eef0c32366"
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/README.md",
+      "bytes": 784,
+      "sha256": "1ac37a60cabc739bfa0a0f8489f20346e3d4ba23789e918d54d85b667783eef8"
+    }
+  ],
+  "freshNative": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543125595,
+    "nlink": 1
+  },
+  "RStatusExact18Rows": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+  "helperPhase": "p125-fresh-helper",
+  "helperExit": 0,
+  "helperDurationMs": 46224,
+  "helperOwnPgid": 11803,
+  "groupAbsentByESRCH": true,
+  "helperExecutedVitest": false,
+  "freshSourceStatusClean": true,
+  "retainedForAudit": true,
+  "boundary": "Actual frozen install/build/doctor/keyless one-turn and cross-process two-turn signed checks only. Source/compiled byte parity is binding evidence; canonical Vitest/controls follow separately."
+}

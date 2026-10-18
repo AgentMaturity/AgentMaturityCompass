@@ -1,0 +1,101 @@
+{
+  "schema": "p126-preservation-and-receipt-helpers-static-review/1",
+  "at": "2026-10-16T20:49:44.460488+00:00",
+  "blockers": [],
+  "verdict": "No concrete static blocker in the exact finite adaptations. Actual binding, preservation snapshots and assembled packet remain later root-owned evidence.",
+  "helpers": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/check-preservation.py",
+      "bytes": 2912,
+      "sha256": "063007f0ad68259cc240ffe7a41632c25f2ed310583bbae3c1ba420968cb92eb",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/check-preservation.py",
+      "dev": 16777231,
+      "inode": 543401343,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+      "bytes": 4099,
+      "sha256": "9266e852cb73180b3ddb6b98a2dbc6966f56bfdc600cff968604e54c47ca2914",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+      "dev": 16777231,
+      "inode": 543401344,
+      "nlink": 1
+    }
+  ],
+  "bothCurrentAndPriorHelpersFullyRead": true,
+  "exactAdaptations": {
+    "check-preservation.py": {
+      "replacements": [
+        [
+          "/private/tmp/p1-12-compiled-guard-qualification-20261017",
+          "/private/tmp/p1-26-tree-qualification-20261017"
+        ],
+        [
+          "label in ('after-m2', 'final')",
+          "label in ('before-controls', 'after-m1', 'final')"
+        ],
+        [
+          "B / 'protected-inputs.json'",
+          "B / 'protected-inputs-after-metadata-repair.json'"
+        ],
+        [
+          "src/tools/guards/compiledPolicyGuard.ts",
+          "src/transparency/rfc9162.ts"
+        ]
+      ],
+      "addition": "Exact sourceCommit HEAD equality for both S and Q before clean/index snapshot claims."
+    },
+    "assemble-receipt.py": {
+      "replacements": [
+        [
+          "/private/tmp/p1-12-compiled-guard-qualification-20261017",
+          "/private/tmp/p1-26-tree-qualification-20261017"
+        ],
+        [
+          "P1-12",
+          "P1-26"
+        ],
+        [
+          "codex/p1-12-compiled-guard-qualification",
+          "codex/p1-26-tree-qualification"
+        ]
+      ],
+      "date": "2026-10-17 is unchanged."
+    }
+  },
+  "allOtherHelperBytesUnchanged": true,
+  "preservation": {
+    "purpose": "An explicitly invoked read-only snapshot with one exclusive private result file; it does not restore source or run product checks.",
+    "labels": [
+      "before-controls",
+      "after-m1",
+      "final"
+    ],
+    "protectedInputSelection": "The preferred post-repair file has 113 byte/hash pins. Its historical sourceHead is not used as current HEAD; the future binding sourceCommit is checked for both S and Q.",
+    "boundSource": "Every boundPaths relative source is read under both S and Q and compared by exact length/SHA. The actual future row count and commit are not validated by this static review.",
+    "native": "The path-deduplicated union of protected native pins, existing binding natives and fresh native is checked against resolved physical path, dev/inode, link count1, bytes and SHA. Root’s future binding review must ensure duplicate path rows agree and the actual six native identities remain distinct; this helper does not itself assert pairwise distinctness.",
+    "state": "Both S/Q HEAD values must match binding sourceCommit, both statuses and indexes must be empty. Held R status/head and empty index must match the retained exact snapshot.",
+    "target": "The fresh RFC target uses lstat regular/single-link/canonical-path checks and an inode different from S. Those are finite path-based observations, not an atomic descriptor or continuous-isolation proof.",
+    "claimBoundary": "Result flags are emitted only after the preceding assertions. No unrecorded earlier physical check, runtime native-load identity, descendant isolation or whole-history claim is added."
+  },
+  "assembler": {
+    "purpose": "Assembles only a root-supplied finite manifest into a new exclusive private dated directory. It is not the semantic source/runtime/receipt validator.",
+    "adaptation": "Private base, P1-26 dated directory/key and tree-qualification branch only; the date and all other assembly logic are unchanged.",
+    "closedCommands": "Requires unique nonempty phase selection, matching phase, endedUtc, recorded ESRCH/no nonzero signals and exact borrowed-R cwd/head. Actual cmd/exit/duration triples are preserved, including closed failures; no exit normalization or synthetic future command is added.",
+    "sourceAdoption": "Sources must be files and not final-component symlinks; supplied expected bytes/SHA are checked before adoption. Destinations reject absolute paths/traversal and use exclusive writes. Output artifacts have exact SHA entries.",
+    "lossless": "Logs and explicitly selected artifacts use base64 JSON envelopes with original path/bytes/SHA and an immediate strict decode equality check. No original bytes or command result are edited.",
+    "rules": "Each emitted artifact is capped at1,048,576 bytes. The forbidden private-key marker is checked both before optional encoding and on emitted bytes. These finite rules are not generic secret detection or full schema/filename validation.",
+    "inertTestEvidence": "No helper-level inert-suffix assertion is present. The future root-owned manifest must target candidate test copies only under inert filenames or the established lossless JSON envelope. The actual packet must be reviewed/validated before source adoption. This is the already required caller boundary, not approval for executable qualification copies.",
+    "helperSource": "The assembler contains its own literal forbidden-marker guard. Keep it pinned by path/bytes/SHA; do not adopt its source or encode it as an artifact to evade the guard.",
+    "trustedManifest": "Root still owns exact semantic review of source commit, environment, tests, notes, artifact inventory, target names and actual runtime/control masks. The helper does not derive those claims or independently verify all outcome semantics.",
+    "futureValidation": "No assembler invocation, packet creation, manifest adoption, schema-validator result, freeze/staging/commit or final receipt success is claimed here."
+  },
+  "rootSourceCheckpoint": {
+    "record": "/private/tmp/p1-26-tree-qualification-20261017/source-commit.json",
+    "providedHead": "32435b41d59e651ad2b259a59703cd137e5c925a",
+    "boundary": "The checkpoint record is pinned as input; no new Git/source command or broad quality verification ran in this review."
+  },
+  "holds": "All Claude work, held R rows/index/archive, missing reservation binding, F37 skip, public-entry approval and remaining whole-issue/library/P1-25 decisions are preserved.",
+  "execution": "Text/JSON/hash/diff metadata reads and private review writes only. Neither helper, product, compiler, test, native addon, SQL, network or process probe was executed; no source/index/Git/QA writes occurred."
+}

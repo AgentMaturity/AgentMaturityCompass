@@ -1,0 +1,6 @@
+{
+  "originalSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+  "proposedSha256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+  "patch": "/private/tmp/p0-27-node-runtime-guard-proposal-20261015.patch",
+  "status": "Unapplied until separate bounded followup afterP019; only two new qualification runtime assertions, all eight behavioral cases unchanged. All Claude/production/legacy/freeze files stay preserved."
+}

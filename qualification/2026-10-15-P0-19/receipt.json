@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-19",
+  "date": "2026-10-15",
+  "commit": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "branch": "codex/p0-19-current-qualification",
+  "node": "v22.23.3; Node24 unqualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 2046
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 31662
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/assuranceLab.test.ts tests/assuranceAgentResponder.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts tests/compliance/complianceFailClosed.test.ts tests/redteam.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-19-original-baselines-node22-20261015.json",
+      "exit": 0,
+      "durationMs": 30485
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4699
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1972
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 4770
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 28408
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-first-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-first-20261015.json",
+      "exit": 1,
+      "durationMs": 4364
+    },
+    {
+      "cmd": "env AMC_P019_GRADING_PHASE=first pnpm exec vitest run tests/assuranceGradingQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-grading-first-20261015.json",
+      "exit": 0,
+      "durationMs": 1070
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-payload-corrected-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-payload-corrected-20261015.json",
+      "exit": 1,
+      "durationMs": 4370
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-19-grading-private-guards-20261015.py",
+      "exit": 0,
+      "durationMs": 5629
+    },
+    {
+      "cmd": "env AMC_P019_GRADING_PHASE=final pnpm exec vitest run tests/assuranceGradingQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-grading-final-20261015.json",
+      "exit": 0,
+      "durationMs": 1078
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-19-grading-final-private-guards-20261015.py",
+      "exit": 0,
+      "durationMs": 5664
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-final-current-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-final-current-20261015.json",
+      "exit": 1,
+      "durationMs": 4479
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 2,
+      "durationMs": 38661
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-19-grading-keyword-private-guards-20261015.py",
+      "exit": 0,
+      "durationMs": 3022
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-typed-current-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-typed-current-20261015.json",
+      "exit": 1,
+      "durationMs": 4234
+    },
+    {
+      "cmd": "pnpm run gen-counts",
+      "exit": 0,
+      "durationMs": 547
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/baseline-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/baseline.json",
+      "exit": 1,
+      "durationMs": 6227
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36832
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed.json",
+      "exit": 1,
+      "durationMs": 5970
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored.json",
+      "exit": 1,
+      "durationMs": 6378
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed.json",
+      "exit": 1,
+      "durationMs": 5984
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored.json",
+      "exit": 1,
+      "durationMs": 6051
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+      "exit": 0,
+      "durationMs": 6129
+    },
+    {
+      "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+      "exit": 1,
+      "durationMs": 5911
+    },
+    {
+      "cmd": "git diff --cached --check",
+      "exit": 0,
+      "durationMs": 17
+    },
+    {
+      "cmd": "git commit -m 'test: qualify current P0-19 grading and preserve strict validity failure'",
+      "exit": 0,
+      "durationMs": 78
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 30949
+    },
+    {
+      "cmd": "pnpm run check:api-ref",
+      "exit": 0,
+      "durationMs": 451
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 567
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 807
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1621
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2146
+    },
+    {
+      "cmd": "env AMC_P019_GRADING_PHASE=final-bounded AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-final-bounded-runner-effects-20261015 P0_19_COMPLIANCE_EVIDENCE_ROOT=/private/tmp/p0-19-final-bounded-compliance-evidence-20261015 P0_19_COMPLIANCE_PHASE=final-bounded pnpm exec vitest run tests/assuranceLab.test.ts tests/assuranceAgentResponder.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts tests/compliance/complianceFailClosed.test.ts tests/redteam.test.ts tests/assuranceGradingQualification.test.ts tests/assuranceRunnerInconclusiveQualification.test.ts tests/compliance/assuranceGradingEligibilityQualification.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-19-final-bounded-node22-20261015.json",
+      "exit": 1,
+      "durationMs": 40701
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 51793
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3175
+    }
+  ],
+  "tests": {
+    "total": 516,
+    "passed": 515,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b192cff3fc56ef66cae642670119362c6e2bb238857596b49611d5e58f8c5004"
+    },
+    {
+      "path": "candidate-lint.log",
+      "sha256": "14759bf2a30c64d215b1bbe3c80ec9165bbccd24d6e4071e9e5c6c442edc6c7a"
+    },
+    {
+      "path": "candidate-production-types.log",
+      "sha256": "b56201ec869aa587bc54206497672f6eeffa464200c8c0db9a2b91d4256fbc0e"
+    },
+    {
+      "path": "candidate-test-types.log",
+      "sha256": "bb7fb69894740baeef116c903c74aef0ee00661d7f30b4a3569d0f0857a744ad"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "1d06226e496d082800014e9df9d703710ec21878687803fb03159c5abdd64e99"
+    },
+    {
+      "path": "compliance-first.json",
+      "sha256": "d8322512f489d07250247cc8a9c48fcd0473290c3d42c9eece2cbfde166eeca7"
+    },
+    {
+      "path": "compliance-independent-review.json",
+      "sha256": "bde409236dee59c5751ea02f0dc7ba52a60ecfd74c82167f062b24dfe550a9a4"
+    },
+    {
+      "path": "compliance-independent-review.md",
+      "sha256": "4ef179c1bda4f0d1e15923bc218acd98ad7914eb2afe61ded3deb8e87420b380"
+    },
+    {
+      "path": "compliance-qualification.json",
+      "sha256": "6855988baa096399fe5d205ed3c841f955ed5591b07ca911c6100e97f7c181bb"
+    },
+    {
+      "path": "compliance-qualification.md",
+      "sha256": "70b3a75e037fbd23ae02bf5298d06d4ee6e73997e8ee7a2105ddde589aedadcc"
+    },
+    {
+      "path": "corrected-test-types.log",
+      "sha256": "1380f0da347680b74e2fab69da6893f29a635f83420dfc54d80cacf1904eba1e"
+    },
+    {
+      "path": "current-build.log",
+      "sha256": "762afe09f36993320cec483949236532d3ab43dca4283a385424d4d7a74305b5"
+    },
+    {
+      "path": "final-api-reference.log",
+      "sha256": "62d4824667b4c74036105ae465502a3257dfea5d26052a2648c7144798211e95"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "417e9e9ab341cfac05409bb2ca04e9bf5922d84930a56244bd4a15e4e7293039"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "5ac60533406e8cd76ccaa442f599abbd423e1379087623e1c50313bd334084b3"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "d922c9051878b35e28c78ceffc2846ca8021247952acf72769edbd9e20ef5f74"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "b3c046b6539d79a5e4c7cb709d6c2b5c2c5285724f65d8826fa6cd43cb66ad1f"
+    },
+    {
+      "path": "final-build.log",
+      "sha256": "762afe09f36993320cec483949236532d3ab43dca4283a385424d4d7a74305b5"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "55cb21c79220924147cdb7a6e063e5b1a827e60b9ef4561871a48424171979dd"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "b3760690aacd611457500f5c21563fdf9bdd24f4e7a4adeda7ca0afc9c87e2bb"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "88d85eae1f2aac57aeb35bf81db3174356263635b3170626dbbf46ca0f128971"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "19e1866f5b5edc46e41ed9404ee63732c1f1dabe32f24d57bf7fe5e151f90e7a"
+    },
+    {
+      "path": "final-normal-input-check.json",
+      "sha256": "6b54d822c87617526bfc6807ca4b91262ad9a2481ff1d5619e65a355ddf47341"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "28a39c05e1c491908fffb20539cabe04ded8644d619871f812e3dca48ba4b54e"
+    },
+    {
+      "path": "final-test-inputs-before-types.json",
+      "sha256": "35b3af6226fc722136d34fd204f544c31b2915f0036295185dfca7183305e935"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "afb94478739961f446b9d1d559a61973a7870345a4c3b0679a9f0c0a78870df2"
+    },
+    {
+      "path": "grading-artifact-index.json",
+      "sha256": "00e67050d11a6445b24856b8e32bcce56896aaf3c572f2dcea2ce37549638e9a"
+    },
+    {
+      "path": "grading-final-private-guards.log",
+      "sha256": "ea1e1f5e70c3cc51645e0f39ea12363e60d988076ca7fceec01a69a2becd35aa"
+    },
+    {
+      "path": "grading-final.json",
+      "sha256": "2cd0cd1f73d58d020a7da9587ae1c5b2b056476d5524bf5e3015c3fc55c2ceb9"
+    },
+    {
+      "path": "grading-final.log",
+      "sha256": "d946394f27047f383d37de8e999efd788bdfc464d2ffafecb7fe3abf507cf481"
+    },
+    {
+      "path": "grading-first.json",
+      "sha256": "38929cbf17ecc5d326b1053aa3247a91c32d9d96ab35df2140004b0342c1f441"
+    },
+    {
+      "path": "grading-first.log",
+      "sha256": "17cc37d8253b4b4ab4fe27cafe1252e48d98df449dcec42fb95060cad32a45d3"
+    },
+    {
+      "path": "grading-independent-review.json",
+      "sha256": "436399a9eef7efbab663a0aaf0012505cf9056ec42d2e7164c500cad9a7cadda"
+    },
+    {
+      "path": "grading-independent-review.md",
+      "sha256": "2806ed67741f36925851cada3e37d8948eb701aa11683eda89965d898c69ccb7"
+    },
+    {
+      "path": "grading-keyword-private-guards.log",
+      "sha256": "e1cfcf7c778a4008010c32e3c6e1102b8416dc79882ff5a9481b6de4056d3101"
+    },
+    {
+      "path": "grading-private-guards.log",
+      "sha256": "0eafdeae683e2d59d1cfc4545d3e98d72742bcb57ad6f8759c464688cf0402d9"
+    },
+    {
+      "path": "grading-qualification.json",
+      "sha256": "948ef7ef3247a90c37995f66850d684be4faaf2910d1e2d51efe3eb33d5183f4"
+    },
+    {
+      "path": "grading-qualification.md",
+      "sha256": "09dd62bf96f1878be205ca976d1169b9120e099bb1b28de26a449a757c5f1a71"
+    },
+    {
+      "path": "measured-inventory-update.log",
+      "sha256": "bec4f87935c668c2eacaafcc9f9ca9b1e9f1e56681aa8206d106ed206a524edc"
+    },
+    {
+      "path": "next-test-runtime-preflight.json",
+      "sha256": "b087cd66b4ed96a0d149f53932cd4e846fdd2f3d673b81ffb7481b834d8aad49"
+    },
+    {
+      "path": "next-test-runtime-preflight.md",
+      "sha256": "c7a5cff0aa05760347079523608ffcbed64790c237aabcdb17c26bd99a637cec"
+    },
+    {
+      "path": "next-test-runtime-proposal.json",
+      "sha256": "3137bfc86699f0d13a203916a0efb22fa23b106b16802e768b0e94bce32dde9f"
+    },
+    {
+      "path": "next-test-runtime-proposal.patch",
+      "sha256": "4622cd6eb87c0c60bdcda1f53a4e37593adfcb2793d613aa78068ebaea62d205"
+    },
+    {
+      "path": "original-baselines-node22.json",
+      "sha256": "ed73dd6f9bb47a4daaf0b495e0af5618730d75c83c307eabe83450584c7450b4"
+    },
+    {
+      "path": "original-baselines-node22.log",
+      "sha256": "b7b6f1b6afe41c90b12d8aa845f6d11b0e6e82def2d9f8798edbfbe0aabb2933"
+    },
+    {
+      "path": "original-baselines-summary.json",
+      "sha256": "8ff8fd8b40a143148b55648506f81e8fccc098351b50ced524a167375d878903"
+    },
+    {
+      "path": "original-runtime-contracts.json",
+      "sha256": "6f3dc3decc7d7f568905540d5e5b6fe1296fcc3d668381335b20dd0b84217b22"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "dedfcfe928c8ff543b9c1ad090d80ad204d429af72d74db696b6a9a1ed3b45f3"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "b17237dbbb0c158ab02e952e40c2e8561cd671ff1af497eade344b8ae8e97f01"
+    },
+    {
+      "path": "private-response-digest-changed.log",
+      "sha256": "d40aef340a1c257103a553831f87aa52a39352c176118a8d2b2bd4053d8cac42"
+    },
+    {
+      "path": "private-response-digest-restored.log",
+      "sha256": "bc503ffc3725e4af01b2cfb8530bf7d19f3c7376a7aaf630f7a3aac41c9445af"
+    },
+    {
+      "path": "private-runner-baseline.log",
+      "sha256": "f2238089d325ba56054abf8d24ea8f371413e9fe6e9168ef9c1fed96908d23bd"
+    },
+    {
+      "path": "private-seal-order-proposal-changed.log",
+      "sha256": "a4cf3e1a74cd99d467037e44c82be3bd06d6c6fcb3554f6449d66c7cbeab62aa"
+    },
+    {
+      "path": "private-seal-order-proposal-restored.log",
+      "sha256": "9c9937d6a353b083ac87235ea07ab6ce8fcac7c17132f6f7b4b9c3129b52dd18"
+    },
+    {
+      "path": "private-v1-findings-changed.log",
+      "sha256": "a51b6fe5ef50d41affef00e610255e0d8c94e54f02f58c455e7b2bfeadea29ab"
+    },
+    {
+      "path": "private-v1-findings-restored.log",
+      "sha256": "dff9fa28c1190345e048c198b5f5f77b5ca9d8f5961bd21113c7a4951ec58186"
+    },
+    {
+      "path": "proposed-seal-order-repair.patch",
+      "sha256": "c837b6e8c3a5a84588f10da907818ae4a2ed50db3b2da1fc329761918b2fa6d5"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "97e1a54be7cd2ce8835d3307376b59d9f109bb4f494deac99179456926b742c8"
+    },
+    {
+      "path": "routing-preflight.json",
+      "sha256": "aef1d2aa863c787cfa4ee8665995ead6bb4efe27e9f2315d686c365bb22b22a5"
+    },
+    {
+      "path": "routing-preflight.md",
+      "sha256": "a7b20ada3407277cf22d46a6c76ba73570ba667ec4b6e021249e1e5cf8f5e83e"
+    },
+    {
+      "path": "runner-artifact-index.json",
+      "sha256": "1d526ec971ab7dbeb76705798ec47e25d91823863c13d0dccc0ecd73d2061aa4"
+    },
+    {
+      "path": "runner-final-current.log",
+      "sha256": "31410d5ec1ad5e43a3d65ddf1a6e76e12269bbe61de8795c668a4cc86939ab36"
+    },
+    {
+      "path": "runner-first.json",
+      "sha256": "0a1dae6956efc1cc6950ffb5619e47bdb18e23525c9dea45ac9685fd438fa8c7"
+    },
+    {
+      "path": "runner-first.log",
+      "sha256": "17adc20e9ee943207a14cef9ecf8d78fe9226082d90b27a1017f1a2d042f78c9"
+    },
+    {
+      "path": "runner-independent-review.json",
+      "sha256": "07c78e47942f79a4092e09bdf303fb4a576e006f3e7198411e79958288666ac7"
+    },
+    {
+      "path": "runner-independent-review.md",
+      "sha256": "12d8ebbe7b39b92d5025b31cfe18be4c6275bcb58c5d96530feb840246bd89f8"
+    },
+    {
+      "path": "runner-payload-corrected.json",
+      "sha256": "5e9fcadfbd23315058656777b3a6ddaf29202fce9449229ef1d496d1106a5a74"
+    },
+    {
+      "path": "runner-payload-corrected.log",
+      "sha256": "eaf176510935f25c3b528b879d614f87645191e4b20e124775ede2476ed0172a"
+    },
+    {
+      "path": "runner-proposal-independent-review.json",
+      "sha256": "42e4bf1023cb987c678ae8271282b11cf7c609b4010cc0dbb4dd1d37baf597b2"
+    },
+    {
+      "path": "runner-qualification.json",
+      "sha256": "31b84dcbc8af5522fb422f0183d351a3164047599e3e62ead572528c49121b7d"
+    },
+    {
+      "path": "runner-qualification.md",
+      "sha256": "1a22c5f8046cf3a4c4f5984383983284426d53bd88b540fa6564b6ae3dc4e9a1"
+    },
+    {
+      "path": "runner-typed-current.json",
+      "sha256": "65e19d23b66bad600d24c70f0b8c5b31191c4508c048aa802b9e30d5b5304398"
+    },
+    {
+      "path": "runner-typed-current.log",
+      "sha256": "59a6cdb042e0d75b2c60669513f10f34da50fdb78626fb071118dfc4f694fd1f"
+    },
+    {
+      "path": "scope-freeze-preflight.json",
+      "sha256": "12487f61f1edfd2b7bed56cd5b6ffc44e27a3abf424b00cce95a66bf77c93e14"
+    },
+    {
+      "path": "scope-freeze-preflight.md",
+      "sha256": "d5227de6b8c1aa966a8479a76d05cd403b4111a41adfaaa7c5af9545bea799ef"
+    },
+    {
+      "path": "seal-order-normal-line-budget.json",
+      "sha256": "35e195c23b7338593569525952ab8b487fa89964311ac3987b9f729b3568cdb4"
+    },
+    {
+      "path": "seal-order-proposal-metadata.json",
+      "sha256": "63e905f27db0f3abbbe0b6851e81b8f09ece48ad2ca3ae011bb398da072a44fd"
+    },
+    {
+      "path": "source-checkpoint.log",
+      "sha256": "edfeb84b2776bcc8e6c7c9101665fb1a2b7c40c1811d5c5de4f94551a4f8e445"
+    },
+    {
+      "path": "source-dead-code.log",
+      "sha256": "a5d589c30bcb8a7ab8ca90792bd180ed8a258f2af0ffb86c9d44c4432babd9d3"
+    },
+    {
+      "path": "source-duplicates.log",
+      "sha256": "a69939bff656d1aa4716b354762d85754db5a15a53823b2ec1a3b8f6f3635419"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "e561fe0cc9aff52c1b0ddc127aac414f04e155cd7ba357f1326b71e24898e282"
+    },
+    {
+      "path": "source-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "quality-context-followup.json",
+      "sha256": "abe477c0c9e2c3fb5ecb35838af0429627409789f4ba4192306b7e4c8e56730d"
+    },
+    {
+      "path": "exact-source-dead-code-followup.log",
+      "sha256": "cde42fc6d4b32973aa3c08da583323f2400cc3fb9374665aff3437f2cbdc5094"
+    }
+  ],
+  "notes": "Bounded515/516,0pending/todo; genuine measuredreportINVALID beforecurrentseal staysstrictRED. Privateunappliedseal-orderproposal identical19cases18\u219219\u219218, all8abort/isolationpass,4529copiedfilesrestored; noownershipapprovalorproductionfix. Pure59pass andfivecausalguards; compliance14pass,samefixtures4mutationfails,correctedactualrestore14,4547hashesexact. Initialencryptedpayload/nullablepath/Nodeguardobserver andmisnamedcompliancerestore failuresretainedunqualified. Frozeninstall/build/types/correctedtesttypes/lint/normalfreeze/architecture/counts/docs/APIref/cleanpass; sourcequality1269duplicates2779deadfail. ThreeNEWtests+teninventoryonly; allprod/original/shared/held/archives/guards/floors/budgets/deps preserved. 47echo/P227,fullsuite/coverage/Node24/hosted/release/G0 andearlierunresolvedskips/questionsopen. No bypass, trackerclosure, externalmessage orpublication. NextourP027two-testguardruntimecompatibility thenP024preflight. Exact-source quality follow-up: original2779 is initial-phase8c execution; later ordinary gate atartifactf28/sourcef10 reports2774 and fails. Complete current finding sets atf10 andcompat75cb are identical2774. Initial raw and original artifactf28 preserved; no productioncleanup/waiver/cause claim."
+}

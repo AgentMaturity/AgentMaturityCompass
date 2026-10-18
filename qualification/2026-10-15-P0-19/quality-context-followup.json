@@ -1,0 +1,36 @@
+{
+  "capturedUtc": "2026-10-14T21:49:49.017767+00:00",
+  "source": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "originalArtifact": "f28ccd983060d863c1b24fcf592b3e289cc759aa",
+  "initialRecordedDeadCodeCount": 2779,
+  "initialPhaseHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "laterExactSourceDeadCodeCount": 2774,
+  "actualNormalFollowup": {
+    "name": "exact-source-dead-code-followup",
+    "cmd": "pnpm run check:dead-code",
+    "exit": 1,
+    "durationMs": 3175,
+    "startedUtc": "2026-10-14T21:49:07.384284+00:00",
+    "log": "/private/tmp/p0-19-exact-source-dead-code-followup-20261015.log",
+    "sourceHead": "f28ccd983060d863c1b24fcf592b3e289cc759aa"
+  },
+  "normalFollowupLogSha256": "cde42fc6d4b32973aa3c08da583323f2400cc3fb9374665aff3437f2cbdc5094",
+  "currentFullFindingSets": {
+    "prior": {
+      "root": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+      "count": 2774,
+      "path": "/private/tmp/p0-27-runtime-compatibility-prior-full-dead-code-20261015.json",
+      "sha256": "13202fb70fc45b820e9468d9d3f6d709802627af75f43946f4b58cf08913c46d"
+    },
+    "candidate": {
+      "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+      "count": 2774,
+      "path": "/private/tmp/p0-27-runtime-compatibility-candidate-full-dead-code-20261015.json",
+      "sha256": "0a33d09f2f323f643e7d99c517a5d397ea72f1053d1c20395408328ca3449b0a"
+    },
+    "onlyPrior": [],
+    "onlyCandidate": [],
+    "summaryOnlyFirstAttempt": "The first comparison used missing findings fields in gate summaries; its empty arrays are not a full-set comparison. This diagnostic uses the unchanged exported actual collector and complete findings in two owned contexts. Normal gates stillfail, no waiver orsource-improvementclaim."
+  },
+  "interpretation": "The original2779 raw result remains an initial-phase observation. The later exact measured source with completed qualification tests has2774 actual findings; the current compatibility candidate has the identical complete normalized finding set. There is no production code cleanup or waiver; both normal gates fail. Historical full2779 findings were not retained, so no claim identifies which five changed or proves a particular cause."
+}

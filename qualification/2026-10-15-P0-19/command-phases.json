@@ -1,0 +1,326 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 2046,
+    "startedUtc": "2026-10-14T21:02:05.899634+00:00",
+    "log": "/private/tmp/p0-19-frozen-install-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "current-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 31662,
+    "startedUtc": "2026-10-14T21:06:39.830122+00:00",
+    "log": "/private/tmp/p0-19-current-build-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "original-baselines-node22",
+    "cmd": "pnpm exec vitest run tests/assuranceLab.test.ts tests/assuranceAgentResponder.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts tests/compliance/complianceFailClosed.test.ts tests/redteam.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-19-original-baselines-node22-20261015.json",
+    "exit": 0,
+    "durationMs": 30485,
+    "startedUtc": "2026-10-14T21:07:45.977817+00:00",
+    "log": "/private/tmp/p0-19-original-baselines-node22-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "candidate-lint",
+    "cmd": "pnpm run lint",
+    "exit": 0,
+    "durationMs": 4699,
+    "startedUtc": "2026-10-14T21:08:36.601792+00:00",
+    "log": "/private/tmp/p0-19-candidate-lint-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "source-duplicates",
+    "cmd": "pnpm run check:duplicates",
+    "exit": 1,
+    "durationMs": 1972,
+    "startedUtc": "2026-10-14T21:08:54.889618+00:00",
+    "log": "/private/tmp/p0-19-source-duplicates-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "source-dead-code",
+    "cmd": "pnpm run check:dead-code",
+    "exit": 1,
+    "durationMs": 4770,
+    "startedUtc": "2026-10-14T21:08:54.889613+00:00",
+    "log": "/private/tmp/p0-19-source-dead-code-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "candidate-production-types",
+    "cmd": "pnpm run typecheck",
+    "exit": 0,
+    "durationMs": 28408,
+    "startedUtc": "2026-10-14T21:08:36.601826+00:00",
+    "log": "/private/tmp/p0-19-candidate-production-types-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "runner-first",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-first-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-first-20261015.json",
+    "exit": 1,
+    "durationMs": 4364,
+    "startedUtc": "2026-10-14T21:09:54.657875+00:00",
+    "log": "/private/tmp/p0-19-runner-first-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "grading-first",
+    "cmd": "env AMC_P019_GRADING_PHASE=first pnpm exec vitest run tests/assuranceGradingQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-grading-first-20261015.json",
+    "exit": 0,
+    "durationMs": 1070,
+    "startedUtc": "2026-10-14T21:10:08.026619+00:00",
+    "log": "/private/tmp/p0-19-grading-first-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "runner-payload-corrected",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-payload-corrected-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-payload-corrected-20261015.json",
+    "exit": 1,
+    "durationMs": 4370,
+    "startedUtc": "2026-10-14T21:11:43.530200+00:00",
+    "log": "/private/tmp/p0-19-runner-payload-corrected-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "grading-private-guards",
+    "cmd": "python3 /private/tmp/p0-19-grading-private-guards-20261015.py",
+    "exit": 0,
+    "durationMs": 5629,
+    "startedUtc": "2026-10-14T21:11:46.120103+00:00",
+    "log": "/private/tmp/p0-19-grading-private-guards-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "grading-final",
+    "cmd": "env AMC_P019_GRADING_PHASE=final pnpm exec vitest run tests/assuranceGradingQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-grading-final-20261015.json",
+    "exit": 0,
+    "durationMs": 1078,
+    "startedUtc": "2026-10-14T21:12:34.723554+00:00",
+    "log": "/private/tmp/p0-19-grading-final-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "grading-final-private-guards",
+    "cmd": "python3 /private/tmp/p0-19-grading-final-private-guards-20261015.py",
+    "exit": 0,
+    "durationMs": 5664,
+    "startedUtc": "2026-10-14T21:12:40.113750+00:00",
+    "log": "/private/tmp/p0-19-grading-final-private-guards-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "runner-final-current",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-final-current-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-final-current-20261015.json",
+    "exit": 1,
+    "durationMs": 4479,
+    "startedUtc": "2026-10-14T21:13:15.216238+00:00",
+    "log": "/private/tmp/p0-19-runner-final-current-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "candidate-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 2,
+    "durationMs": 38661,
+    "startedUtc": "2026-10-14T21:13:00.695504+00:00",
+    "log": "/private/tmp/p0-19-candidate-test-types-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "grading-keyword-private-guards",
+    "cmd": "python3 /private/tmp/p0-19-grading-keyword-private-guards-20261015.py",
+    "exit": 0,
+    "durationMs": 3022,
+    "startedUtc": "2026-10-14T21:14:22.760638+00:00",
+    "log": "/private/tmp/p0-19-grading-keyword-private-guards-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "runner-typed-current",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-runner-typed-current-20261015 pnpm exec vitest run tests/assuranceRunnerInconclusiveQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-runner-typed-current-20261015.json",
+    "exit": 1,
+    "durationMs": 4234,
+    "startedUtc": "2026-10-14T21:15:20.397596+00:00",
+    "log": "/private/tmp/p0-19-runner-typed-current-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "measured-inventory-update",
+    "cmd": "pnpm run gen-counts",
+    "exit": 0,
+    "durationMs": 547,
+    "startedUtc": "2026-10-14T21:15:24.923280+00:00",
+    "log": "/private/tmp/p0-19-measured-inventory-update-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-runner-baseline",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/baseline-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/baseline.json",
+    "exit": 1,
+    "durationMs": 6227,
+    "startedUtc": "2026-10-14T21:15:44.062751+00:00",
+    "log": "/private/tmp/p0-19-private-runner-baseline-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "corrected-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 36832,
+    "startedUtc": "2026-10-14T21:16:10.347753+00:00",
+    "log": "/private/tmp/p0-19-corrected-test-types-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-response-digest-changed",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed.json",
+    "exit": 1,
+    "durationMs": 5970,
+    "startedUtc": "2026-10-14T21:17:04.676695+00:00",
+    "log": "/private/tmp/p0-19-private-response-digest-changed-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-response-digest-restored",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored.json",
+    "exit": 1,
+    "durationMs": 6378,
+    "startedUtc": "2026-10-14T21:17:10.861502+00:00",
+    "log": "/private/tmp/p0-19-private-response-digest-restored-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-v1-findings-changed",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed.json",
+    "exit": 1,
+    "durationMs": 5984,
+    "startedUtc": "2026-10-14T21:17:17.446629+00:00",
+    "log": "/private/tmp/p0-19-private-v1-findings-changed-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-v1-findings-restored",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored.json",
+    "exit": 1,
+    "durationMs": 6051,
+    "startedUtc": "2026-10-14T21:17:23.637059+00:00",
+    "log": "/private/tmp/p0-19-private-v1-findings-restored-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-seal-order-proposal-changed",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+    "exit": 0,
+    "durationMs": 6129,
+    "startedUtc": "2026-10-14T21:17:29.892259+00:00",
+    "log": "/private/tmp/p0-19-private-seal-order-proposal-changed-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "private-seal-order-proposal-restored",
+    "cmd": "env AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored-effects pnpm exec vitest run --root /private/tmp/p0-19-private-runner-3yl41gpg tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+    "exit": 1,
+    "durationMs": 5911,
+    "startedUtc": "2026-10-14T21:17:36.235015+00:00",
+    "log": "/private/tmp/p0-19-private-seal-order-proposal-restored-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "source-whitespace",
+    "cmd": "git diff --cached --check",
+    "exit": 0,
+    "durationMs": 17,
+    "startedUtc": "2026-10-14T21:19:47.363016+00:00",
+    "log": "/private/tmp/p0-19-source-whitespace-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "source-checkpoint",
+    "cmd": "git commit -m 'test: qualify current P0-19 grading and preserve strict validity failure'",
+    "exit": 0,
+    "durationMs": 78,
+    "startedUtc": "2026-10-14T21:19:47.552449+00:00",
+    "log": "/private/tmp/p0-19-source-checkpoint-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 30949,
+    "startedUtc": "2026-10-14T21:19:58.496531+00:00",
+    "log": "/private/tmp/p0-19-final-build-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-api-reference",
+    "cmd": "pnpm run check:api-ref",
+    "exit": 0,
+    "durationMs": 451,
+    "startedUtc": "2026-10-14T21:21:51.018301+00:00",
+    "log": "/private/tmp/p0-19-final-api-reference-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-docs",
+    "cmd": "pnpm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 567,
+    "startedUtc": "2026-10-14T21:21:51.018436+00:00",
+    "log": "/private/tmp/p0-19-final-docs-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "pnpm run check:counts",
+    "exit": 0,
+    "durationMs": 807,
+    "startedUtc": "2026-10-14T21:21:51.018412+00:00",
+    "log": "/private/tmp/p0-19-final-counts-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "pnpm run check:freeze",
+    "exit": 0,
+    "durationMs": 1621,
+    "startedUtc": "2026-10-14T21:21:51.018841+00:00",
+    "log": "/private/tmp/p0-19-final-freeze-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "pnpm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 2146,
+    "startedUtc": "2026-10-14T21:21:51.027815+00:00",
+    "log": "/private/tmp/p0-19-final-architecture-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "env AMC_P019_GRADING_PHASE=final-bounded AMC_P0_19_RUNNER_EFFECTS_DIR=/private/tmp/p0-19-final-bounded-runner-effects-20261015 P0_19_COMPLIANCE_EVIDENCE_ROOT=/private/tmp/p0-19-final-bounded-compliance-evidence-20261015 P0_19_COMPLIANCE_PHASE=final-bounded pnpm exec vitest run tests/assuranceLab.test.ts tests/assuranceAgentResponder.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts tests/compliance/complianceFailClosed.test.ts tests/redteam.test.ts tests/assuranceGradingQualification.test.ts tests/assuranceRunnerInconclusiveQualification.test.ts tests/compliance/assuranceGradingEligibilityQualification.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-19-final-bounded-node22-20261015.json",
+    "exit": 1,
+    "durationMs": 40701,
+    "startedUtc": "2026-10-14T21:21:49.820492+00:00",
+    "log": "/private/tmp/p0-19-final-bounded-node22-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "pnpm run check:clean-source",
+    "exit": 0,
+    "durationMs": 51793,
+    "startedUtc": "2026-10-14T21:23:00.249261+00:00",
+    "log": "/private/tmp/p0-19-final-clean-source-20261015.log",
+    "sourceHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+  }
+]

@@ -1,0 +1,129 @@
+{
+  "schema": "p125f-future-fresh-binding-and-control-plan/1",
+  "at": "2026-10-16T22:11:03.111243+00:00",
+  "status": "private unexecuted preparation",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "preChangeSourceHead": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "sourceBranch": "codex/p1-25-fallback-qualification",
+  "sourceCommit": null,
+  "freshRoot": null,
+  "bindingRequiredAt": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+  "bindingSchema": "p125f-actual-fresh-source-binding/1",
+  "bindingStructure": "Keep B34 actual fields sourceRoot/freshRoot/sourceCommit/boundPaths/compiledPairs/existingNativePins/freshNative/helper/vitestCreditFromHelper/prospectiveCountOrCompiledHashesAdopted. Each bound row keeps relativePath/bytes/sha256 plus actual source/fresh path/physicalPath/bytes/sha256/dev/inode/nlink pins. Root supplies actual post-build/checkpoint/fresh values.",
+  "selectedNames": {
+    "pathsEachRoot": 72,
+    "compiledPairs": 8,
+    "preservedCurrentClientTestSelectedButNotRunInCohort": true,
+    "futureFallbackPath": "tests/time/tsaFallback.test.ts",
+    "noProspectiveCountCompiledNativeHashes": true
+  },
+  "requiredProtection": {
+    "protectedInputs": 128,
+    "priorNativePhysicalPins": 7,
+    "newDistinctFreshNativeRequired": true,
+    "totalNativePinsAfterActualFreshBinding": 8,
+    "heldRHead18StatusRowsEmptyIndexExact": true,
+    "allSelectedRegularSingleLinkAndPhysicallyDistinct": true
+  },
+  "prospectiveCohort": {
+    "files": [
+      "tests/time/tsaFallback.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "newFixedBodies": 4,
+    "unchangedBodies": 17,
+    "total": 21,
+    "executed": false,
+    "hookTaskEntries": null,
+    "individualHookValues": null,
+    "hookPolicy": "Compare actual source and fresh canonical hookTaskEntries/individualHookValues, then every actual control/restore to that actual baseline. Never predict counts."
+  },
+  "phases": [
+    "p125f-source-combined",
+    "p125f-fresh-canonical",
+    "p125f-m1",
+    "p125f-restore1",
+    "p125f-m2",
+    "p125f-restore2",
+    "p125f-m3",
+    "p125f-restore3"
+  ],
+  "operators": [
+    {
+      "number": 1,
+      "id": "F1-order",
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "proposedWholeFile": {
+        "bytes": 10942,
+        "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9"
+      },
+      "actualFailures": null,
+      "actualApplied": false
+    },
+    {
+      "number": 2,
+      "id": "F2-no-continue",
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "proposedWholeFile": {
+        "bytes": 10940,
+        "sha256": "c8b94cc2b7ba905d380e64989bce9e4f3734e6dfc4aeb4a588f4612a86e1dc31"
+      },
+      "actualFailures": null,
+      "actualApplied": false
+    },
+    {
+      "number": 3,
+      "id": "F3-unpinned-dispatch",
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "proposedWholeFile": {
+        "bytes": 10911,
+        "sha256": "ecae1ba1428281a8ba8fe7e1e065d4cffa0e62504a113dfd70d43c745de16938"
+      },
+      "actualFailures": null,
+      "actualApplied": false
+    }
+  ],
+  "auditAdapter": {
+    "sealedSource": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/audit-observed.py",
+    "rootOwnedDestination": "/private/tmp/p1-25-fallback-qualification-20261017/audit-observed.py",
+    "bytes": 1570,
+    "sha256": "7b3aeb694dff1f326bdd6d015d1400d56ed306519c1d091108e9a44396238330",
+    "rootMustCopyExactBeforeUse": true,
+    "adapterExecutedByThisAuthor": false
+  },
+  "explicitOperationProtocol": [
+    "Root first admits source/test scope, captures actual same21 source evidence, makes the ordinary source checkpoint and binds an owned actual fresh copy after unchanged helper closure.",
+    "Require same source/fresh HEAD, clean S/empty Q index and actual p125f binding. Reject ACTIVE/HALTED markers with or without .json. Root helper argv/closure, exact adapter/recipe/protection/pinset hashes and all selected source/compiled/protected/native bytes/physical identities must match.",
+    "Apply exactly one requested operator only with Q pristine, fixed original hash/size, one before match and computed exact proposed hash/size. Retain exclusive original and prepared metadata; check target regular/single-link/physically distinct S via guarded O_NOFOLLOW descriptor without O_TRUNC before the sole write. Capture the actual live Git patch and source-only apply record.",
+    "No root test is run by a helper. Root independently runs the unchanged same21 corpus and read-only audit. Actual failed count is not predetermined.",
+    "Before explicit restore require actual normal RED, full ordered unique21/raw-observer join, actual unchanged passing hooks, no unhandled/late/non-test errors, natural ESRCH/no nonzero signal and the separate source/operator/outcome-hash-bound manual classification of every failure/first-sensitive assertion/mask.",
+    "Verify only target is changed, exact applied mutant and original backup, and preservation before explicit guarded exact restore. Recheck pristine Q and every original selected/protected/native pin afterward.",
+    "Before F2 require F1 exact restore and actual same-corpus green restore1. Before F3 require F2 exact restore and actual same-corpus green restore2. Each actual predecessor hook count is compared to the actual canonical. Root separately qualifies restore3 and final snapshot.",
+    "Any collision/check/write failure stops in place. Preserve partial private metadata or mutant state for root classification; no retry/automatic restore/deletion/cleanup."
+  ],
+  "manualClassificationRequired": [
+    "phase",
+    "sourceCommit",
+    "operator",
+    "outcomeSha256",
+    "rootAllFailuresRead",
+    "allFailuresClassified",
+    "firstSensitiveAssertionRead",
+    "noHookOrEnvironmentFailure",
+    "firstSensitiveAssertion",
+    "masking"
+  ],
+  "preservationLabels": [
+    "before-controls",
+    "after-m1",
+    "after-m2",
+    "final"
+  ],
+  "publication": "Keep preparation private. Root may adopt finite metadata/recipe/patch summaries only as explicitly admitted. Any copied source/test/helper is inert .source.txt or an established lossless representation, never executable .test.ts evidence. No receipt is authored here.",
+  "boundaries": [
+    "No code/helper/parser/compiler/product/test/native/SQL/network/process-probe execution, checkout/index/Git mutation, RES probe or QA write by this author.",
+    "No source/test allocation from this proposal; root fresh ownership/hosted/D15/freeze admission remains required.",
+    "No timeout/egress/config/baseline/frozen-wrapper/observer/package/compiled/native edits.",
+    "No predicted RED counts, fresh outcomes, green restores, grant/crypto/typed-error/public TSA/F37/full-issue/full-suite/global-quality/plan completion credit."
+  ]
+}

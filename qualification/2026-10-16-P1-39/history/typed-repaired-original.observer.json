@@ -1,0 +1,66 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 77357,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts"
+  ],
+  "testCount": 3,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1152513869",
+      "name": "tests/mcp/mcp20260728.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1152513869_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "fullName": "P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_1",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "fullName": "P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_2",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "fullName": "P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "amc-private-p1-01-source-control-static-review/1",
+  "createdAt": "2026-10-15T08:32:45.085335+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "reviewedDriver": {
+    "path": "/private/tmp/p1-01-source-control-prepared-20261015.py",
+    "bytes": 9918,
+    "sha256": "4369a2058ecf174edd74036ec322180257aefbd62a0d4ec1df8340df70b8a0c0"
+  },
+  "scope": "Complete source-only read of final announced 4369a205 driver; pinned manifests, compiler config, installed Zod method and final probe read. No parser/import/compiler/product execution or source writes. Future copy not created.",
+  "blockingFindings": [
+    {
+      "id": "F1",
+      "severity": "blocking-preparation",
+      "lines": [
+        96,
+        100,
+        104,
+        107,
+        206,
+        211
+      ],
+      "finding": "Outer exception handler tests BASE.exists(), not ownership. Rejection of a pre-existing BASE enters that handler and can create HALTED.json in an unowned or completed frozen namespace. This contradicts the no retry/overwrite boundary.",
+      "requiredFix": "Record successful exclusive BASE.mkdir ownership for this invocation and permit HALTED writes only after that ownership is established. Preserve v1 bytes and independently bind any revision before execution."
+    }
+  ],
+  "observations": [
+    {
+      "id": "O1",
+      "finding": "8751 tracked and 4529 compiled rows are manifest-pinned. Each future copy2 is physically separate from its corresponding source and nlink1; node_modules is borrowed, not independently installed. No .git copy is introduced."
+    },
+    {
+      "id": "O2",
+      "finding": "Exact one-anchor mutation appends .passthrough() to the existing strict first state branch. Installed Zod method replaces catchall with unknown while preserving the discriminator shape. It affects requested, authorized, started and outcome_unknown only."
+    },
+    {
+      "id": "O3",
+      "finding": "Real tsc child runs before mutant checks. Manifest differences allow only receipt.ts, receipt.js and existing compiled .d.ts paths. Actual changed inputs are retained and rehashed after checks. Schema generation --write is never invoked."
+    },
+    {
+      "id": "O4",
+      "finding": "Every child starts a new session, records PID/observed group/argv and real exit, then probes its group with signal zero for positive ESRCH before returning. Unexpected result stops later phases and restoration. Only actual 0/1 expected exits may proceed. observedPgid=None is explicitly accepted by code; do not report it as an observed positive PGID."
+    },
+    {
+      "id": "O5",
+      "finding": "Restoration follows both completed mutant children and preservation checks. All listed bytes/modes and parent rows are rechecked; native SHA/inode/nlink are compared at completion. This does not cover all dependency files or new unlisted files, and does not establish whole-process-family isolation."
+    },
+    {
+      "id": "O6",
+      "finding": "Child wait is deliberately unbounded; the five-second deadline bounds post-exit group absence polling only. No timeout, signal, automatic retry or restoration-on-exception exists. Metadata must not describe this as an outer runtime deadline."
+    },
+    {
+      "id": "O7",
+      "finding": "Marker checks identify expected mutant assertions/staleness, but full raw stderr/source attribution and unexpected-error audit remain necessary after actual execution; no causal result follows from static review."
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-01-source-control-prepared-20261015.py",
+      "bytes": 9918,
+      "sha256": "4369a2058ecf174edd74036ec322180257aefbd62a0d4ec1df8340df70b8a0c0"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/original-tracked-files.json",
+      "bytes": 1432354,
+      "sha256": "4e9cb8099bb2faab68082a7ee231970f6c2741319dfa36f0f902b238f2b1176a"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/original-dist-files.json",
+      "bytes": 656697,
+      "sha256": "2af55d06288b5b6046e7acb8c819dc8b271e3a035190e14e61460c50f59ee1d2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules/zod/v4/classic/schemas.js",
+      "bytes": 51378,
+      "sha256": "eb4af7946a092aff8678b9251728ea58dab40154920cd65ec4a2ca1d4df68393"
+    },
+    {
+      "path": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+      "bytes": 8360,
+      "sha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab"
+    },
+    {
+      "path": "/private/tmp/p1-01-supplemental-coverage-readonly-review-20261015.json",
+      "bytes": 21265,
+      "sha256": "569d8bbe12d4b660d4e55b39be17705a651ca13d776957c0bfeb50b220e88978"
+    }
+  ],
+  "runtimeAuthorizedByThisReview": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

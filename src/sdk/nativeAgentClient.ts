@@ -13,6 +13,7 @@ import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
+import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
 export * as llm from "../llm/index.js";
 /** Native in-process and capability-negotiated subprocess image input. */
 export { openAgentSession, resumeAgentSession, type AgentSession, type OrderedAgentSession, type AgentSessionInit } from "../agent/agentSession.js";
@@ -438,8 +439,7 @@ export class AMCNativeClient {
     this.child.stdout.once("end", () => {
       if (!this.closing && !this.closed) this.fail(new AMCNativeProtocolError("native agent output closed before client shutdown"));
     });
-    // Drain diagnostics without copying potentially sensitive provider output into errors or receipts.
-    this.child.stderr.resume();
+    forwardNativeShellWarnings(this.child.stderr, () => Boolean(this.fatal || this.closed), error => this.fail(error));
     this.child.stderr.on("error", () => { /* Diagnostics are not execution or evidence authority. */ });
     this.child.on("error", () => this.fail(new AMCNativeProtocolError("could not start the installed AMC runtime")));
     this.child.stdin.on("error", () => this.fail(new AMCNativeProtocolError("native agent input closed")));

@@ -1,0 +1,67 @@
+{
+  "schema": "p126-extra-license-path-scope-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/seal.json",
+      "bytes": 1227,
+      "sha256": "2d9e21c2280ffb39a3c44627b47353392da7ecaafe4d45c4589ebf47178c2d13"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/review.json",
+      "bytes": 6265,
+      "sha256": "b4906bfb3ad054f35abe48cfa21bdedc34be5b3b3eac420d3fa0f72465600214"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/observations.json",
+      "bytes": 1418515,
+      "sha256": "15f4241395764f37cf624e6ada468eb3581aebc8e865015580f626c6999822a7"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/inventory.json",
+      "bytes": 1233,
+      "sha256": "e02d2416eb96b2812e2751e9f4565e01e2adacaf1cf1c659bebc87f021d7ecd8"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/commit.json",
+      "bytes": 15099,
+      "sha256": "57fa263d1e4f3998ff2b148b23728b7e856de827a7e4e349837917c53c30ffb7"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/license-response.json",
+      "bytes": 16620,
+      "sha256": "b5c465ab9c886e8c0e85c11ac604655cb147ae143e63f5c63fa4b56b1c6571bd"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/LICENSE",
+      "bytes": 1079,
+      "sha256": "0c8b5b095c5c1af4ca5e8596d2aa8592fedcce5ccf05bdbe9047c69579b0fe81"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/observations.json",
+      "bytes": 195077,
+      "sha256": "1a550eddab6bf4417019f091bef549bc18b5a50c6600cf03bb035e6976be2140"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/review.json",
+      "bytes": 4365,
+      "sha256": "c05d04a188efb0a329c01df6a446a9eba45dd00eb7d51de4ad7d49f06f779a04"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/README.md",
+      "bytes": 2232,
+      "sha256": "da6204af120ec9682bfbc8bbe90c2b4e1b8ec4e338e5af9d186469b35ca11a37"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/pending-reservation-addendum.md",
+      "bytes": 832,
+      "sha256": "68b13bf0c55895a63fc4d92bcfa8ebd833923aaa7da27e53a3392d8455613e05"
+    }
+  ]
+}

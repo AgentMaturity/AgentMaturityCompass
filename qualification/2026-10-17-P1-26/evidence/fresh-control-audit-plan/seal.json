@@ -1,0 +1,80 @@
+{
+  "schema": "p126-five-phase-plan-seal/1",
+  "at": "2026-10-16T20:41:38.379396+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/README.md",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/README.md",
+      "bytes": 2335,
+      "sha256": "b558ef4dfec25f4639956e8086102478583aff266cc6204601addd984dcf3fd0",
+      "dev": 16777231,
+      "inode": 543338970,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/expected-inventory.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/expected-inventory.json",
+      "bytes": 8528,
+      "sha256": "79e158bde788f8b1ea3971449f68c37e550a0ee072180af1375c21c7001dd327",
+      "dev": 16777231,
+      "inode": 543338871,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/input-pins.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/input-pins.json",
+      "bytes": 6951,
+      "sha256": "bfa738d1070e994a475ce095e9030d912e738544af1d93e07243669a7055c7e0",
+      "dev": 16777231,
+      "inode": 543338969,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/plan.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/plan.json",
+      "bytes": 6322,
+      "sha256": "5b4b753391664726d3d6b73fdefa05688f992dfafe0dac10de5751f943f7f97e",
+      "dev": 16777231,
+      "inode": 543338968,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/preparation-note.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/preparation-note.json",
+      "bytes": 687,
+      "sha256": "05e6f890aa82b0c55f065a4292e7b8b6cbf9f76d016bd6fbb7bca7414744c063",
+      "dev": 16777231,
+      "inode": 543338965,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/source-pinset.json",
+      "bytes": 42209,
+      "sha256": "1adb4e152c3bd35368edb7ba2903c4396d08e29c4b8e29f902a5f06b74f5ad45",
+      "dev": 16777231,
+      "inode": 543338967,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/verified-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/verified-protected-inputs.json",
+      "bytes": 27244,
+      "sha256": "753a6fffc1d20e7ab45b836e0eb7ab6ff0f95490b3dc0acec0ee65bb68375064",
+      "dev": 16777231,
+      "inode": 543338966,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    }
+  ],
+  "blockers": [],
+  "prospectiveOnly": true,
+  "futureResultsClaimed": false,
+  "executionOrSourceWrites": false
+}

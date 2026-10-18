@@ -1,0 +1,354 @@
+diff --git a/src/lab/cognitionLab.ts b/src/lab/cognitionLab.ts
+index ab9bed242..7bdd32b2d 100644
+--- a/src/lab/cognitionLab.ts
++++ b/src/lab/cognitionLab.ts
+@@ -13,6 +13,8 @@
+  */
+ 
+ import { randomUUID } from "node:crypto";
++import { resolve } from "node:path";
++import { z } from "zod";
+ import { envelopeForSyntheticExample } from "../claims/eligibility/adapters.js";
+ import { sha256Hex } from "../utils/hash.js";
+ import {
+@@ -23,6 +25,7 @@ import {
+ 
+ /** Where lab experiments live under .amc/. */
+ const EXPERIMENTS_AT = { area: ["lab"], kind: "experiments" };
++const PROBE_RESULTS_AT = { area: ["lab"], kind: "probe-results" };
+ 
+ // ---------------------------------------------------------------------------
+ // Types
+@@ -97,6 +100,18 @@ export interface LabProbeResult {
+   ts: number;
+ }
+ 
++const labProbeIdentitySchema = z.object({ experimentId: z.string().refine((id) => id.trim().length > 0, "experiment identity must be nonempty") });
++const labProbeResultSchema = z.object({
++  ...labProbeIdentitySchema.shape,
++  probeId: z.string().refine((id) => id.trim().length > 0, "probe identity must be nonempty"),
++  responseText: z.string(),
++  scores: z.record(z.string(), z.number().finite().min(0).max(1)),
++  latencyMs: z.number().finite().nonnegative(),
++  tokenCount: z.number().int().nonnegative(),
++  metadata: z.record(z.string(), z.unknown()),
++  ts: z.number().finite().nonnegative()
++}).passthrough();
++
+ export interface LabComparisonPair {
+   pairId: string;
+   baselineExperimentId: string;
+@@ -347,6 +362,12 @@ export function listLabExperiments(kind?: LabExperimentKind, workspace?: string)
+   return kind ? all.filter((e) => e.kind === kind) : all;
+ }
+ 
++/** Old cached callers remain memory-only; a cold CLI invocation reads its workspace's durable experiment. */
++function experimentWorkspace(experimentId: string, workspace?: string): string | undefined {
++  if (workspace) return resolve(workspace);
++  return experiments.some((experiment) => experiment.experimentId === experimentId) ? undefined : process.cwd();
++}
++
+ /** Applies a status transition in memory and in the store. */
+ function transitionExperiment(
+   experimentId: string,
+@@ -378,8 +399,11 @@ export function startLabExperiment(experimentId: string, workspace?: string): La
+ /**
+  * Record a probe result for an experiment.
+  */
+-export function recordLabProbeResult(result: Omit<LabProbeResult, "ts">): LabProbeResult {
++export function recordLabProbeResult(result: Omit<LabProbeResult, "ts">, workspace?: string): LabProbeResult {
+   const full: LabProbeResult = { ...result, ts: Date.now() };
++  if (workspace) {
++    saveWorkspaceRecord(workspace, PROBE_RESULTS_AT, randomUUID(), { ...full }, full.ts);
++  }
+   probeResults.push(full);
+   return full;
+ }
+@@ -419,12 +443,13 @@ export function cancelLabExperiment(experimentId: string, workspace?: string): L
+  * Use this to exercise the lab workflow (wiring, reporting, storage), not to
+  * evaluate a model.
+  */
+-export function simulateExperiment(experimentId: string): LabProbeResult[] {
+-  const experiment = getLabExperiment(experimentId);
++export function simulateExperiment(experimentId: string, workspace?: string): LabProbeResult[] {
++  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
++  const experiment = getLabExperiment(experimentId, resolvedWorkspace);
+   if (!experiment) return [];
+ 
+   if (experiment.status === "draft") {
+-    startLabExperiment(experimentId);
++    startLabExperiment(experimentId, resolvedWorkspace);
+   }
+ 
+   const results: LabProbeResult[] = [];
+@@ -448,11 +473,11 @@ export function simulateExperiment(experimentId: string): LabProbeResult[] {
+       latencyMs: Math.floor(100 + seed * 900),
+       tokenCount: Math.floor(50 + seed * 450),
+       metadata: { simulated: true, modelId: experiment.modelId, envelope: envelopeForSyntheticExample({ producer: "lab:simulate", now: Date.now() }) },
+-    });
++    }, resolvedWorkspace);
+     results.push(result);
+   }
+ 
+-  completeLabExperiment(experimentId);
++  completeLabExperiment(experimentId, resolvedWorkspace);
+   return results;
+ }
+ 
+@@ -547,14 +572,42 @@ export function getSignalImports(experimentId?: string): ModelSignalImport[] {
+ // Report generation
+ // ---------------------------------------------------------------------------
+ 
++/** Validate only the requested experiment's payload; a record without an identity cannot be safely scoped away. */
++function storedProbeResults(workspace: string, experimentId: string): LabProbeResult[] {
++  const invalid = (error: z.ZodError): Error => {
++    const issue = error.issues[0];
++    return new Error(`Invalid persisted lab probe result at ${issue?.path.join(".") || "record"}: ${issue?.message || "invalid record shape"}`);
++  };
++  const results: LabProbeResult[] = [];
++  for (const record of loadWorkspaceRecords<unknown>(workspace, PROBE_RESULTS_AT)) {
++    const identity = labProbeIdentitySchema.safeParse(record);
++    if (!identity.success) throw invalid(identity.error);
++    if (identity.data.experimentId !== experimentId) continue;
++    const parsed = labProbeResultSchema.safeParse(record);
++    if (!parsed.success) throw invalid(parsed.error);
++    const result = record as LabProbeResult;
++    // Record validators can skip reserved own keys; validate every raw dimension before retaining its value.
++    for (const [dimension, score] of Object.entries(result.scores)) {
++      if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) {
++        throw new Error(`Invalid persisted lab probe result at scores.${dimension}: expected a finite number between 0 and 1`);
++      }
++    }
++    // The schema validates without coercion; retain raw own keys that the validator's clone can omit.
++    results.push(result);
++  }
++  return results;
++}
++
+ /**
+  * Generate a lab experiment report.
+  */
+-export function generateLabReport(experimentId: string): LabExperimentReport | null {
+-  const experiment = getLabExperiment(experimentId);
++export function generateLabReport(experimentId: string, workspace?: string): LabExperimentReport | null {
++  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
++  const experiment = getLabExperiment(experimentId, resolvedWorkspace);
+   if (!experiment) return null;
+ 
+-  const results = probeResults.filter((r) => r.experimentId === experimentId);
++  const results = resolvedWorkspace ? storedProbeResults(resolvedWorkspace, experimentId)
++    : probeResults.filter((r) => r.experimentId === experimentId);
+ 
+   // Aggregate scores by dimension
+   const dimensionSums = new Map<string, number[]>();
+@@ -566,10 +619,8 @@ export function generateLabReport(experimentId: string): LabExperimentReport | n
+     }
+   }
+ 
+-  const aggregateScores: Record<string, number> = {};
+-  for (const [dim, scores] of dimensionSums) {
+-    aggregateScores[dim] = parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(3));
+-  }
++  const aggregateScores: Record<string, number> = Object.fromEntries([...dimensionSums].map(([dim, scores]) =>
++    [dim, parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(3))]));
+ 
+   // Find comparisons involving this experiment
+   const comparisons = probeResults.length > 0 ? [] : []; // comparisons must be computed separately
+diff --git a/tests/cognitionLab.test.ts b/tests/cognitionLab.test.ts
+index 56a2db623..f460819fa 100644
+--- a/tests/cognitionLab.test.ts
++++ b/tests/cognitionLab.test.ts
+@@ -1,4 +1,7 @@
+-import { afterEach, describe, expect, test } from "vitest";
++import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { afterEach, describe, expect, test, vi } from "vitest";
+ import {
+   getLabTemplates,
+   getLabTemplate,
+@@ -18,8 +21,12 @@ import {
+   resetLabState,
+ } from "../src/lab/cognitionLab.js";
+ 
++const workspaces: string[] = [];
++
+ afterEach(() => {
+   resetLabState();
++  vi.restoreAllMocks();
++  for (const workspace of workspaces.splice(0)) rmSync(workspace, { recursive: true, force: true });
+ });
+ 
+ // ---------------------------------------------------------------------------
+@@ -180,6 +187,59 @@ describe("probe results", () => {
+ // Simulation
+ // ---------------------------------------------------------------------------
+ describe("experiment simulation", () => {
++  test("simulates a persisted experiment after a cold restart and retains its synthetic results", () => {
++    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-restart-"));
++    workspaces.push(workspace);
++    const experiment = createLabExperiment({
++      kind: "typed_attention", name: "Cold restart", description: "Durable lab fixture", modelId: "fixture-model"
++    }, workspace);
++    resetLabState();
++    vi.spyOn(process, "cwd").mockReturnValue(workspace);
++    const fetch = vi.spyOn(globalThis, "fetch");
++
++    const results = simulateExperiment(experiment.experimentId);
++    expect(results).toHaveLength(experiment.probes.length);
++    expect(results.length).toBeGreaterThan(0);
++    expect(fetch).not.toHaveBeenCalled();
++    for (const result of results) {
++      expect(result.metadata).toMatchObject({
++        simulated: true,
++        modelId: "fixture-model",
++        envelope: {
++          claimKind: "synthetic_example",
++          eligibleLevel: null,
++          statusDimensions: { result: "not_evaluated", evidence: "incomplete" }
++        }
++      });
++    }
++    const stored = JSON.parse(readFileSync(join(workspace, ".amc", "lab", "experiments", `${experiment.experimentId}.json`), "utf8"));
++    expect(stored.status).toBe("completed");
++    expect(stored.startedTs).toEqual(expect.any(Number));
++    expect(stored.completedTs).toEqual(expect.any(Number));
++    expect(stored.completedTs).toBeGreaterThanOrEqual(stored.startedTs);
++
++    resetLabState();
++    expect(getLabExperiment(experiment.experimentId, workspace)?.status).toBe("completed");
++    const report = generateLabReport(experiment.experimentId);
++    expect(report?.probeResults).toHaveLength(results.length);
++    for (const result of results) {
++      expect(report?.probeResults.find((storedResult) => storedResult.probeId === result.probeId)).toMatchObject(result);
++    }
++    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
++    expect(fetch).not.toHaveBeenCalled();
++  });
++
++  test("keeps cached library simulations memory-only when no workspace is supplied", () => {
++    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-memory-"));
++    workspaces.push(workspace);
++    vi.spyOn(process, "cwd").mockReturnValue(workspace);
++    const experiment = createLabExperiment({ kind: "trace_memory", name: "Memory only", description: "Library compatibility", modelId: "fixture-model" });
++    expect(simulateExperiment(experiment.experimentId)).toHaveLength(experiment.probes.length);
++    expect(getLabExperiment(experiment.experimentId)?.status).toBe("completed");
++    expect(generateLabReport(experiment.experimentId)?.probeResults).toHaveLength(experiment.probes.length);
++    expect(existsSync(join(workspace, ".amc"))).toBe(false);
++  });
++
+   test("simulates all probes for experiment", () => {
+     const exp = createLabExperiment({ kind: "typed_attention", name: "Test", description: "D", modelId: "qwen-2.5" });
+     const results = simulateExperiment(exp.experimentId);
+@@ -337,6 +397,111 @@ describe("lab report generation", () => {
+   });
+ });
+ 
++describe("durable probe record validation", () => {
++  function fixture() {
++    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-record-"));
++    workspaces.push(workspace);
++    const experiment = createLabExperiment({
++      kind: "typed_attention", name: "Stored probes", description: "Malformed record boundary", modelId: "fixture-model"
++    }, workspace);
++    const results = simulateExperiment(experiment.experimentId, workspace);
++    const records = join(workspace, ".amc", "lab", "probe-results");
++    const path = join(records, readdirSync(records).find((name) => name.endsWith(".json"))!);
++    const record = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
++    resetLabState();
++    return { workspace, experiment, results, records, path, record };
++  }
++
++  const malformed: Array<[string, (record: Record<string, unknown>) => string, string]> = [
++    ["null without an identifiable experiment", () => "null", "record"],
++    ["matching scores null", (record) => JSON.stringify({ ...record, scores: null }), "scores"],
++    ["matching numeric-string score", (record) => JSON.stringify({ ...record, scores: { fixture: "0.75" } }), "scores.fixture"],
++    ["matching nonfinite score", (record) => JSON.stringify({ ...record, scores: { fixture: "__infinite_probe_score__" } })
++      .replace('"__infinite_probe_score__"', "1e309"), "scores.fixture"],
++    ["matching missing probe identity", (record) => {
++      const { probeId: _probeId, ...rest } = record;
++      return JSON.stringify(rest);
++    }, "probeId"],
++    ["matching metadata null", (record) => JSON.stringify({ ...record, metadata: null }), "metadata"]
++  ];
++
++  test.each(malformed)("refuses a malformed persisted probe record: %s", (_name, tamper, field) => {
++    const { workspace, experiment, path, record } = fixture();
++    writeFileSync(path, `${tamper(record)}\n`);
++    expect(() => generateLabReport(experiment.experimentId, workspace)).toThrow(`Invalid persisted lab probe result at ${field}:`);
++  });
++
++  test("allows an empty score object without changing synthetic metadata or stored wrapper fields", () => {
++    const { workspace, experiment, path, record, results } = fixture();
++    const emptyScores = { ...record, scores: {} };
++    writeFileSync(path, JSON.stringify(emptyScores));
++    const report = generateLabReport(experiment.experimentId, workspace);
++    expect(report?.probeResults).toHaveLength(results.length);
++    expect(report?.probeResults.find((result) => result.probeId === record.probeId)).toMatchObject(emptyScores);
++    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
++  });
++
++  test("preserves own __proto__ metadata without changing object prototypes", () => {
++    const { workspace, experiment, path, record, results } = fixture();
++    const ownKeys = JSON.parse('{"__proto__":{"labProbeOwnValue":"preserved"},"valid":true}');
++    const metadata = { ...record.metadata as Record<string, unknown>, ...ownKeys };
++    expect(Object.hasOwn(metadata, "__proto__")).toBe(true);
++    expect(Object.getPrototypeOf(metadata)).toBe(Object.prototype);
++    const stored = { ...record, metadata };
++    writeFileSync(path, JSON.stringify(stored));
++
++    const report = generateLabReport(experiment.experimentId, workspace);
++    expect(report?.probeResults).toHaveLength(results.length);
++    const restored = report?.probeResults.find((result) => result.probeId === record.probeId);
++    expect(restored).toBeDefined();
++    expect(Object.hasOwn(restored!.metadata, "__proto__")).toBe(true);
++    expect(Object.keys(restored!.metadata).sort()).toEqual(Object.keys(metadata).sort());
++    expect(restored).toEqual(stored);
++    expect(Object.getPrototypeOf(restored)).toBe(Object.prototype);
++    expect(Object.getPrototypeOf(restored!.metadata)).toBe(Object.prototype);
++    expect(Object.hasOwn(Object.prototype, "labProbeOwnValue")).toBe(false);
++    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
++  });
++
++  test("preserves a numeric own __proto__ score in the stored result and aggregate", () => {
++    const { workspace, experiment, records, record, results } = fixture();
++    const scores = JSON.parse('{"__proto__":0.7,"quality":0.6}');
++    for (const name of readdirSync(records)) {
++      const path = join(records, name);
++      const stored = JSON.parse(readFileSync(path, "utf8"));
++      writeFileSync(path, JSON.stringify({ ...stored, scores }));
++    }
++    const report = generateLabReport(experiment.experimentId, workspace);
++    expect(report?.probeResults).toHaveLength(results.length);
++    const restored = report?.probeResults.find((result) => result.probeId === record.probeId);
++    expect(Object.hasOwn(restored!.scores, "__proto__")).toBe(true);
++    expect(restored!.scores).toEqual(scores);
++    expect(Object.getPrototypeOf(restored!.scores)).toBe(Object.prototype);
++    expect(Object.hasOwn(report!.aggregateScores, "__proto__")).toBe(true);
++    expect(report!.aggregateScores).toEqual(scores);
++    expect(Object.getPrototypeOf(report!.aggregateScores)).toBe(Object.prototype);
++    expect(restored!.metadata).toEqual(record.metadata);
++    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
++  });
++
++  test("refuses a nonnumeric own __proto__ score in a stored result", () => {
++    const { workspace, experiment, path, record } = fixture();
++    writeFileSync(path, JSON.stringify({ ...record, scores: JSON.parse('{"__proto__":"bad"}') }));
++    expect(() => generateLabReport(experiment.experimentId, workspace)).toThrow("Invalid persisted lab probe result at scores.__proto__:");
++  });
++
++  test("preserves another identified experiment's scope before validating its probe payload", () => {
++    const { workspace, experiment, results, records } = fixture();
++    writeFileSync(join(records, "unrelated.json"), JSON.stringify({ experimentId: "lab_other_scope", scores: null }));
++    const report = generateLabReport(experiment.experimentId, workspace);
++    expect(report?.probeResults).toHaveLength(results.length);
++    for (const result of results) {
++      expect(report?.probeResults.find((storedResult) => storedResult.probeId === result.probeId)).toMatchObject(result);
++    }
++    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
++  });
++});
++
+ // ---------------------------------------------------------------------------
+ // Markdown rendering
+ // ---------------------------------------------------------------------------

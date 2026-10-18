@@ -1,0 +1,3543 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "kind": "independent actual six consumer-source guard receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:04:44.725729+00:00",
+  "status": "PASS_WITH_BOUNDED_LIMITS",
+  "findings": [],
+  "scope": "Frozen six-guard source-mode packet only. The shared empty-set guard is repeated in a distinct seven-case corpus; the other five are new current-source signature-check recipes. No production fix or whole acceptance is inferred.",
+  "freeze": "All reads of this guard namespace followed the explicit final frozen notice. No live/appendable journal was used, and no product runtime or code execution was repeated.",
+  "verification": {
+    "preservation": {
+      "receipt": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+        "bytes": 67992,
+        "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+      },
+      "markdown": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.md",
+        "bytes": 2930,
+        "sha256": "9d2f013eb8699153b309d061bf3b77ab68c63a5937db167476fc2a3ca4c5e748"
+      },
+      "index": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/artifact-index.json",
+        "bytes": 103100,
+        "sha256": "a89f1cbc8bf2df408fc15ec6e4994162340d156bf0d299d25d65c11a3d90bed4"
+      },
+      "indexRefsChecked": 417,
+      "source": 7739,
+      "compiled": 4529,
+      "completeClosureRegularFilesExcludingDependenciesAndSymlinks": 12269,
+      "coreClosure": 12268,
+      "baselineClosure": 12269,
+      "preservationSets": [
+        {
+          "prefix": "protected-pins-",
+          "snapshots": 14,
+          "entriesPerSnapshot": 128,
+          "uniquePaths": 120
+        },
+        {
+          "prefix": "core-reference-pins-",
+          "snapshots": 14,
+          "entriesPerSnapshot": 106,
+          "uniquePaths": 106
+        },
+        {
+          "prefix": "baseline-reference-pins-",
+          "snapshots": 14,
+          "entriesPerSnapshot": 152,
+          "uniquePaths": 152
+        }
+      ],
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "device": 16777231,
+        "inode": 537685380,
+        "nlink": 1
+      },
+      "nativeSnapshots": 14,
+      "dependencyLinks": 307,
+      "testFixture": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+        "bytes": 31014,
+        "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+      },
+      "sourcePhysicallyIndependent": true,
+      "noGitMetadata": true,
+      "mutations": [
+        {
+          "id": "P30-1542-current-empty-set-seven-consumer-supplement",
+          "sourceTarget": "src/leases/leaseStore.ts",
+          "sourceLine": 173,
+          "sourceMatches": 1,
+          "oldSha256": "9a5bb71d2295610d8686d87d5b87681f575743cdea1d36a82a8038c581818378",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-mutant-source.ts",
+            "bytes": 6962,
+            "sha256": "98b9d58aae1b5ad8649190fd149f524293904ae0077d46236381c0ea1ccff3e1"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement.patch",
+            "bytes": 454,
+            "sha256": "6dd95be19abfc7808c671af8b80ca664b9774ea406f2f2beadf6569ecf319de7"
+          },
+          "mutantManifestSoleDelta": "src/leases/leaseStore.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        },
+        {
+          "id": "P30-1542-current-consumer-bridge",
+          "sourceTarget": "src/bridge/bridgeAuth.ts",
+          "sourceLine": 205,
+          "sourceMatches": 1,
+          "oldSha256": "0ad1e674fd5f40de8b2a34414d2d37050697a52720d560eee2bcdce56038d3be",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-mutant-source.ts",
+            "bytes": 8104,
+            "sha256": "1a51b0cfc60c89380b83747052d2cdb45d3cdb8ffea79f92152f0ed70ec54b0e"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge.patch",
+            "bytes": 276,
+            "sha256": "aa6baec712406ca57d4583b8be7d2d1bcb0fbd740cb9ebf8680706b2eadab575"
+          },
+          "mutantManifestSoleDelta": "src/bridge/bridgeAuth.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        },
+        {
+          "id": "P30-1542-current-consumer-gateway",
+          "sourceTarget": "src/gateway/server.ts",
+          "sourceLine": 464,
+          "sourceMatches": 1,
+          "oldSha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-mutant-source.ts",
+            "bytes": 68386,
+            "sha256": "2e4b59367c3326d4bc08137657dd09e6b2f560c6a3f6ed0d5fa8954b9c4c95c8"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway.patch",
+            "bytes": 273,
+            "sha256": "aa1c5d76116e7aaaeceaf94fc0e29bfcad77d3473e1eb61c51adada57e425586"
+          },
+          "mutantManifestSoleDelta": "src/gateway/server.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        },
+        {
+          "id": "P30-1542-current-consumer-router",
+          "sourceTarget": "src/workspaces/workspaceRouter.ts",
+          "sourceLine": 663,
+          "sourceMatches": 1,
+          "oldSha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-mutant-source.ts",
+            "bytes": 65247,
+            "sha256": "aa2fb044594cb9cf3a94b3ff5fc7e26216508077c08e9c0f8e15bca138658f50"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router.patch",
+            "bytes": 456,
+            "sha256": "4eceb7f435c049fb564f9baeb0363f333e248b8594d091a8ec39f8fbd3361826"
+          },
+          "mutantManifestSoleDelta": "src/workspaces/workspaceRouter.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        },
+        {
+          "id": "P30-1542-current-consumer-studio",
+          "sourceTarget": "src/studio/studioServer.ts",
+          "sourceLine": 1150,
+          "sourceMatches": 1,
+          "oldSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-mutant-source.ts",
+            "bytes": 323506,
+            "sha256": "ec8aeea76a031f521aa7d50e1ba8887d0c57e926ebecc9ce5ca2f3f89acafd86"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio.patch",
+            "bytes": 288,
+            "sha256": "09dfe4a2bfa4cbe0bd75d2b4058cfd67ae5750836bcbbbb7a343cd2087d9b330"
+          },
+          "mutantManifestSoleDelta": "src/studio/studioServer.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        },
+        {
+          "id": "P30-1542-current-consumer-wire",
+          "sourceTarget": "src/wire/wireDispatcher.ts",
+          "sourceLine": 204,
+          "sourceMatches": 1,
+          "oldSha256": "e1842e5eda8d563f6aaf288491e1f23cb57f0d65f18135375ed6b9791103cc3b",
+          "frozenMutant": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-mutant-source.ts",
+            "bytes": 8008,
+            "sha256": "5deb291831187af68ed70a114cda5635924eecc5cef8270fa981007cfac037f4"
+          },
+          "patch": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire.patch",
+            "bytes": 414,
+            "sha256": "31e3ab53ee06129707f1b4d144231c3cb6b7d55fad6aa2e777ec61ff3fced00f"
+          },
+          "mutantManifestSoleDelta": "src/wire/wireDispatcher.ts",
+          "fullRestoration": 12269,
+          "unchangedCompiledCount": 4529
+        }
+      ]
+    },
+    "actual": {
+      "rawCommandRecords": 20,
+      "testPhases": 18,
+      "distinctCases": 7,
+      "totals": {
+        "admissions": 280,
+        "calls": 1008,
+        "refusals": 728,
+        "failureLabels": 76,
+        "observations": 126,
+        "gatewayOperations": 40,
+        "wireDispatcherOperations": 40,
+        "studioServerOperations": 40
+      },
+      "distinctPhysicalFixtureRoots": 126,
+      "distinctRecordedSPKIFingerprints": 504,
+      "distinctRecordedTokens": 252,
+      "phases": [
+        {
+          "phase": "P30-1542-current-empty-set-seven-consumer-supplement-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/raw-tests.json",
+            "bytes": 2601,
+            "sha256": "04532d4847ec4de97f7cf8f2a41216e2f8bc58b1c5b34e962e2f098eeb0862fb"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/observations.json",
+            "bytes": 429609,
+            "sha256": "2609dbecb02eede7aa4692f9b6b08b049a8f2be1808ab60677158dd36b3a0741"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5995,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-empty-set-seven-consumer-supplement-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/raw-tests.json",
+            "bytes": 3562,
+            "sha256": "8f1dde62b97d4d898d9507b9b73b66d7214e7de3e3c3cde7a4ca7ea8bcc32c32"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/observations.json",
+            "bytes": 430893,
+            "sha256": "ef5f101288454f7f69c3f39b8e190c3a466acce729289d935a46e9359f0b6186"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 5,
+            "numFailedTests": 2,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5819,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 22,
+          "actualRefusals": 34,
+          "failedCases": [
+            "managedHookLease",
+            "agentCredentialAuth"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 8,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 8,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-empty-set-seven-consumer-supplement-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/raw-tests.json",
+            "bytes": 2609,
+            "sha256": "7fdccc024a1a7b9d2212c397b2bda481ba1f8f2db25e599eebb40accbb0a9376"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/observations.json",
+            "bytes": 429609,
+            "sha256": "afb8fa989dfad9d4f0e1a046860c78f3bde543118e9ce6bb22df4452c7a6f4d9"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5959,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-bridge-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/raw-tests.json",
+            "bytes": 2610,
+            "sha256": "311d9b7932a4af010199caa038e4bf7e8aa293d5f81aaff3c6814891c38950fa"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/observations.json",
+            "bytes": 429329,
+            "sha256": "0d478b729cb868982aa2b9eeac87d478d384d17af577486582c729823151295d"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5679,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-bridge-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/raw-tests.json",
+            "bytes": 3079,
+            "sha256": "113614e7519f4843399b0bc55a950e5462d39d9066064b5c64f223c940d45092"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/observations.json",
+            "bytes": 429621,
+            "sha256": "e6692729a532273546b21732482e71441212ee3abd84af1c0d4ad1d6fc160d24"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 6,
+            "numFailedTests": 1,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 6011,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 18,
+          "actualRefusals": 38,
+          "failedCases": [
+            "bridgeAuth"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 8,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-bridge-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/raw-tests.json",
+            "bytes": 2606,
+            "sha256": "99de651df7c3e6e5a20c334f2bfb5e008553afc8a483f586c7617af95dd0cade"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/observations.json",
+            "bytes": 429329,
+            "sha256": "2c3b746bb5a195d42770ee43d667c5ed8eae9d558d1cab727969316a5873582e"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5675,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-gateway-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/raw-tests.json",
+            "bytes": 2609,
+            "sha256": "827f95abd81dbdcccd99a1d13e075d90972a1e894a608eee4902424ff24b2793"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/observations.json",
+            "bytes": 429343,
+            "sha256": "89a5eaa864c5b1aad5294b66a0ab510caa571446b6f50890a29f88fcfef21378"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5906,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-gateway-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/raw-tests.json",
+            "bytes": 3058,
+            "sha256": "3eb26fa5a68746895dc7b28f1964a220542a02aa02fa50c478b9140cde35f5fd"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/observations.json",
+            "bytes": 430189,
+            "sha256": "cdf99ace5d5f84a4087470431ab5b29523b345a38ed38a3ca490bb8306973e59"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 6,
+            "numFailedTests": 1,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5805,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 18,
+          "actualRefusals": 38,
+          "failedCases": [
+            "gateway"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 12,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 6
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-gateway-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/raw-tests.json",
+            "bytes": 2609,
+            "sha256": "bbbc8bc02f61bff830d740c4ddaec9d2c75cdb92ca77a3486b7cff0591a42694"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/observations.json",
+            "bytes": 429343,
+            "sha256": "9d51a65ea5e7f25bfe358159b507a96d65a8402c0bc7d03c266ab2d1c1b0a4f2"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5762,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-router-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/raw-tests.json",
+            "bytes": 2601,
+            "sha256": "ae445ede2ae2a0f860cd883afcc372de061a99cc97253f849010ad1bee18fb53"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/observations.json",
+            "bytes": 429329,
+            "sha256": "dd5fc06b323c62177766d349b3d16995ddb986858ac3c7a9418b96159e372a95"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5913,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-router-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/raw-tests.json",
+            "bytes": 3085,
+            "sha256": "e7361c1384931de0d4a0a527202220b33a6674fadda1a018853b2645ca2b51c6"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/observations.json",
+            "bytes": 429577,
+            "sha256": "893293078516869e7662607c2a6668e555c4b82dc8b89de117d7ffac72331efa"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 6,
+            "numFailedTests": 1,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5842,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 18,
+          "actualRefusals": 38,
+          "failedCases": [
+            "workspaceRouter"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 8,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-router-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/raw-tests.json",
+            "bytes": 2606,
+            "sha256": "8212fa81916612ab92c13050baf0e0f8cdc1ebe8300b63c4834677a51c32259a"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/observations.json",
+            "bytes": 429329,
+            "sha256": "83cb048f88794d3f4e7090883b0aede42e5050752b12aca78a8606ea4ea48dd9"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5748,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-studio-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/raw-tests.json",
+            "bytes": 2609,
+            "sha256": "d9e1f73e789f67e3d1c7615f9a5afe4b12227f6d362941ac040927b57ec036e2"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/observations.json",
+            "bytes": 429329,
+            "sha256": "fc12051fe29914c5e0f27ab18843dc451402013c204b9a43485cd3d352c71e7a"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5904,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-studio-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/raw-tests.json",
+            "bytes": 3082,
+            "sha256": "c0a83ff98e19a805fcba932f082080fbf9c01e019d186dba9a59d7b892d78831"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/observations.json",
+            "bytes": 432481,
+            "sha256": "5ea460121b11c6a756dece8dbfdae2b40cdc27124a3fedab1445c5a076426aaf"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 6,
+            "numFailedTests": 1,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5872,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 18,
+          "actualRefusals": 38,
+          "failedCases": [
+            "studioServer"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 16,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 6
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-studio-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/raw-tests.json",
+            "bytes": 2608,
+            "sha256": "419b1212f8fbffa8bddc03d315deabe1029a390dc1cae3beb90bbd8a2a55ab0c"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/observations.json",
+            "bytes": 429329,
+            "sha256": "6423aad0ff080ad6bfd0fbd71ff4be7e89c35b4bc05d167671b5b0234f496a77"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5884,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-wire-baseline",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/raw-tests.json",
+            "bytes": 2609,
+            "sha256": "21569c1d39610791859246ff2126ebdb1f68d662619e1a28f874694705642633"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/observations.json",
+            "bytes": 429301,
+            "sha256": "2c3304f7149bd7e0a1fe1e0b75a26a3c5dbcf8e742bea757dcc764243fa20e4f"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 6079,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-wire-mutant",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/raw-tests.json",
+            "bytes": 3086,
+            "sha256": "4c66bb14179cbdd106c533fe2e220686355e47f24de7d9d2ac66851b426a64de"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/observations.json",
+            "bytes": 432189,
+            "sha256": "cf3d4b3676b97ef1260902d56156b56b78666b5be14b8de707b66f853080b430"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 6,
+            "numFailedTests": 1,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5999,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 18,
+          "actualRefusals": 38,
+          "failedCases": [
+            "wireDispatcher"
+          ],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 6,
+              "refusals": 2,
+              "calls": 8,
+              "failureLabels": 16,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 6
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        },
+        {
+          "phase": "P30-1542-current-consumer-wire-restored",
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/raw-tests.json",
+            "bytes": 2610,
+            "sha256": "3f4d9ad070af37fe636c2169170ef2d26f04cdc073a19469ab6e8e50e728875c"
+          },
+          "observations": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/observations.json",
+            "bytes": 429301,
+            "sha256": "c4e4348f6f673f4eadfa07363ab9f2de7f73786d912f1cc57ea82031919ada22"
+          },
+          "counts": {
+            "numTotalTests": 7,
+            "numPassedTests": 7,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0
+          },
+          "durationMs": 5887,
+          "markers": 7,
+          "calls": 56,
+          "errors": 0,
+          "actualAdmissions": 14,
+          "actualRefusals": 42,
+          "failedCases": [],
+          "consumers": [
+            {
+              "consumer": "managedHookLease",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "bridgeAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "gateway",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "workspaceRouter",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "wireDispatcher",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": null
+            },
+            {
+              "consumer": "studioServer",
+              "admissions": 2,
+              "refusals": 6,
+              "calls": 8,
+              "failureLabels": 0,
+              "runtimeExact": true,
+              "protectedAndPairComparisons": 8,
+              "lifetimeTrue": 8,
+              "cleanupErrors": 0,
+              "fixtureRemoved": true,
+              "finalNamedOperationCount": 2
+            }
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "P30-1542-current-empty-set-seven-consumer-supplement",
+          "sourceTarget": "src/leases/leaseStore.ts",
+          "passedCounts": [
+            7,
+            5,
+            7
+          ],
+          "actualAffectedCases": [
+            "managedHookLease",
+            "agentCredentialAuth"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers managedHookLease",
+              "firstMessage": "AssertionError: managedHookLease: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            },
+            {
+              "name": "private AMC-1542 current public revocation consumers agentCredentialAuth",
+              "firstMessage": "AssertionError: agentCredentialAuth: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "managedHookLease",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default",
+                  "expired": false
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "managedHookLease",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default",
+                  "expired": false
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "managedHookLease",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default",
+                  "expired": false
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "managedHookLease",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default",
+                  "expired": false
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "username": "agent-lease",
+                  "scopes": [
+                    "toolhub:intent"
+                  ]
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "username": "agent-lease",
+                  "scopes": [
+                    "toolhub:intent"
+                  ]
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "username": "agent-lease",
+                  "scopes": [
+                    "toolhub:intent"
+                  ]
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "agentCredentialAuth",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "username": "agent-lease",
+                  "scopes": [
+                    "toolhub:intent"
+                  ]
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        },
+        {
+          "id": "P30-1542-current-consumer-bridge",
+          "sourceTarget": "src/bridge/bridgeAuth.ts",
+          "passedCounts": [
+            7,
+            6,
+            7
+          ],
+          "actualAffectedCases": [
+            "bridgeAuth"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers bridgeAuth",
+              "firstMessage": "AssertionError: bridgeAuth: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "bridgeAuth",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "bridgeAuth",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "bridgeAuth",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "bridgeAuth",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "agentId": "default",
+                  "workspaceId": "default"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        },
+        {
+          "id": "P30-1542-current-consumer-gateway",
+          "sourceTarget": "src/gateway/server.ts",
+          "passedCounts": [
+            7,
+            6,
+            7
+          ],
+          "actualAffectedCases": [
+            "gateway"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers gateway",
+              "firstMessage": "AssertionError: gateway: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(12) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "gateway",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "upstreamResponseId": "owned-local-upstream"
+                }
+              },
+              "operation": "upstream",
+              "before": {
+                "count": 1,
+                "ids": []
+              },
+              "after": {
+                "count": 2,
+                "ids": []
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "gateway",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "upstreamResponseId": "owned-local-upstream"
+                }
+              },
+              "operation": "upstream",
+              "before": {
+                "count": 2,
+                "ids": []
+              },
+              "after": {
+                "count": 3,
+                "ids": []
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "gateway",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "upstreamResponseId": "owned-local-upstream"
+                }
+              },
+              "operation": "upstream",
+              "before": {
+                "count": 3,
+                "ids": []
+              },
+              "after": {
+                "count": 4,
+                "ids": []
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "gateway",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "upstreamResponseId": "owned-local-upstream"
+                }
+              },
+              "operation": "upstream",
+              "before": {
+                "count": 4,
+                "ids": []
+              },
+              "after": {
+                "count": 5,
+                "ids": []
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        },
+        {
+          "id": "P30-1542-current-consumer-router",
+          "sourceTarget": "src/workspaces/workspaceRouter.ts",
+          "passedCounts": [
+            7,
+            6,
+            7
+          ],
+          "actualAffectedCases": [
+            "workspaceRouter"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers workspaceRouter",
+              "firstMessage": "AssertionError: workspaceRouter: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(8) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "workspaceRouter",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "knownToolListed": true,
+                  "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "workspaceRouter",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "knownToolListed": true,
+                  "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "workspaceRouter",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "knownToolListed": true,
+                  "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "workspaceRouter",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "knownToolListed": true,
+                  "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+                }
+              },
+              "operation": "none",
+              "before": {
+                "count": null,
+                "ids": []
+              },
+              "after": {
+                "count": null,
+                "ids": []
+              },
+              "actualOperationDelta": null,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        },
+        {
+          "id": "P30-1542-current-consumer-studio",
+          "sourceTarget": "src/studio/studioServer.ts",
+          "passedCounts": [
+            7,
+            6,
+            7
+          ],
+          "actualAffectedCases": [
+            "studioServer"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers studioServer",
+              "firstMessage": "AssertionError: studioServer: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(16) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "studioServer",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "intentId": "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "effectiveMode": "SIMULATE"
+                }
+              },
+              "operation": "intent",
+              "before": {
+                "count": 1,
+                "ids": [
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "after": {
+                "count": 2,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "studioServer",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "intentId": "intent_7fabd999143d4052b3931ca2ba376580",
+                  "effectiveMode": "SIMULATE"
+                }
+              },
+              "operation": "intent",
+              "before": {
+                "count": 2,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "after": {
+                "count": 3,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_7fabd999143d4052b3931ca2ba376580",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "studioServer",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "intentId": "intent_583ece6e63184fd69287ab9aa1a9bae8",
+                  "effectiveMode": "SIMULATE"
+                }
+              },
+              "operation": "intent",
+              "before": {
+                "count": 3,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_7fabd999143d4052b3931ca2ba376580",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "after": {
+                "count": 4,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_583ece6e63184fd69287ab9aa1a9bae8",
+                  "intent_7fabd999143d4052b3931ca2ba376580",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "studioServer",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": 200,
+                "reason": null,
+                "witness": {
+                  "intentId": "intent_a80785863d974b319962c9e3c580b5e7",
+                  "effectiveMode": "SIMULATE"
+                }
+              },
+              "operation": "intent",
+              "before": {
+                "count": 4,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_583ece6e63184fd69287ab9aa1a9bae8",
+                  "intent_7fabd999143d4052b3931ca2ba376580",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a"
+                ]
+              },
+              "after": {
+                "count": 5,
+                "ids": [
+                  "intent_040338ffe1be4df58e9ad62ed9d8e13f",
+                  "intent_583ece6e63184fd69287ab9aa1a9bae8",
+                  "intent_7fabd999143d4052b3931ca2ba376580",
+                  "intent_91c04f594a2145b5b17f2f977a41aa3a",
+                  "intent_a80785863d974b319962c9e3c580b5e7"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        },
+        {
+          "id": "P30-1542-current-consumer-wire",
+          "sourceTarget": "src/wire/wireDispatcher.ts",
+          "passedCounts": [
+            7,
+            6,
+            7
+          ],
+          "actualAffectedCases": [
+            "wireDispatcher"
+          ],
+          "failedAssertions": [
+            {
+              "name": "private AMC-1542 current public revocation consumers wireDispatcher",
+              "firstMessage": "AssertionError: wireDispatcher: see retained AMC1542_CONSUMER_OBSERVATION: expected [ \u2026(16) ] to deeply equal []",
+              "isAssertionError": true,
+              "locations": [
+                "leaseRevocationConsumerQualification.test.ts:396:88"
+              ]
+            }
+          ],
+          "allDamagedStateAdmissions": [
+            {
+              "consumer": "wireDispatcher",
+              "state": "removed-row-old-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "receiptSha256": "460aad5f1909360da3c4fc756de95f33de627cdd46dd056353d4ebfce7b76414",
+                  "workSessionId": "f67daf7c-c61e-4e91-b161-b3ead8ad58f2",
+                  "agentId": "default"
+                }
+              },
+              "operation": "wire",
+              "before": {
+                "count": 1,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898"
+                ]
+              },
+              "after": {
+                "count": 2,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "wireDispatcher",
+              "state": "removed-row-old-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "receiptSha256": "2b5cd3746d69373c82da836ef59e1d10b91031c123bab363fa32e9eb58cafcdd",
+                  "workSessionId": "fe5eddff-a366-4189-a0ec-afdf4e9d89a4",
+                  "agentId": "default"
+                }
+              },
+              "operation": "wire",
+              "before": {
+                "count": 2,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89"
+                ]
+              },
+              "after": {
+                "count": 3,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89",
+                  "9a0a23e9-5636-44cd-944d-ce7ba5b965aa"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "wireDispatcher",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "live",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "receiptSha256": "87d4c406ea20ccaef3ad18245e5b733e01568f0607d32bdad9654609905f1fed",
+                  "workSessionId": "be8b2708-98e1-41e1-b474-fc822ec29a37",
+                  "agentId": "default"
+                }
+              },
+              "operation": "wire",
+              "before": {
+                "count": 3,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89",
+                  "9a0a23e9-5636-44cd-944d-ce7ba5b965aa"
+                ]
+              },
+              "after": {
+                "count": 4,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89",
+                  "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+                  "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            },
+            {
+              "consumer": "wireDispatcher",
+              "state": "missing-list-kept-signature",
+              "tokenKind": "revoked",
+              "outcome": {
+                "admitted": true,
+                "status": null,
+                "reason": null,
+                "witness": {
+                  "receiptSha256": "2e3665f18b42c39235a50baf36c8d2a5d9c43c7948f8fb2401b5448cbf5d8144",
+                  "workSessionId": "0da243c9-83a3-4b84-8888-84a0dd2a8877",
+                  "agentId": "default"
+                }
+              },
+              "operation": "wire",
+              "before": {
+                "count": 4,
+                "ids": [
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89",
+                  "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+                  "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+                ]
+              },
+              "after": {
+                "count": 5,
+                "ids": [
+                  "02e61ecb-c067-4f5b-9888-3623e596971a",
+                  "32ad7edb-bd74-4cf5-b725-c67732ad0898",
+                  "4ad8ae20-87c6-431e-89da-c6a02122da89",
+                  "9a0a23e9-5636-44cd-944d-ce7ba5b965aa",
+                  "f7667d6c-493f-43a4-a4ba-58b6d7ae8922"
+                ]
+              },
+              "actualOperationDelta": 1,
+              "withinLifetime": true,
+              "namedInputsAndPairUnchanged": true
+            }
+          ],
+          "maskedCalls": 0,
+          "allStateAndTokenCallsRetained": true
+        }
+      ],
+      "cryptoReplayPerformed": false,
+      "allMutantFailuresAreFinalOriginalAssertionErrors": 7,
+      "all1008WithinCallNamedInputsAndPairsExact": true,
+      "all1008WithinLifetime": true,
+      "setupCallCleanupErrors": 0,
+      "freshPhysicalGeneratorsNotAcrossPhaseEquality": true
+    }
+  },
+  "controllerAndSourcePins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/controller.py",
+      "bytes": 17513,
+      "sha256": "9710c6879b89ce6090e3d27213011da3ee2fb5822559ef7936daaef0c5c4bf1c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/finalize.py",
+      "bytes": 18563,
+      "sha256": "c832b103c96759deb819f51783399ed6f6db7dccbf1f10ad2a4389d433483d52"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    }
+  ],
+  "separatePriorReviewsUnchanged": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.json",
+      "bytes": 66381,
+      "sha256": "58bf7220d3e6139c0f96c8b4a5987413c74b687fbd09db89f4259a3178975ad2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.md",
+      "bytes": 3195,
+      "sha256": "079b375babce876d38423b9496c747a91ce3319a4992a07e4f81b2f6925d80b9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-static-review-20261015.json",
+      "bytes": 22562,
+      "sha256": "6e799b6f6efa9108899dde99fe918278dc1424ca14e1406a479c47d1d3b72f98"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-static-review-20261015.md",
+      "bytes": 3329,
+      "sha256": "8e6e3de4837813a0b2f2212d2dd12915da7dc32bf5792e89b9592ab47734a388"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+      "bytes": 69989,
+      "sha256": "694f13036a023f239565f9e9c6b9309c07b1821d9016152c065ff5c458ccb45f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.md",
+      "bytes": 3115,
+      "sha256": "bf2ab7ab5124d46decaabec59c13547150b76a62c166716384a29273c803be92"
+    }
+  ],
+  "independentCausalConclusion": [
+    {
+      "control": "shared current-empty-set",
+      "target": "src/leases/leaseStore.ts:173",
+      "actualTransition": [
+        7,
+        5,
+        7
+      ],
+      "affected": [
+        "managedHookLease",
+        "agentCredentialAuth"
+      ],
+      "meaning": "For each of the two affected cases, all four calls across removed-row/missing-list and live/revoked tokens actually admit. The helper result and agent principal retain the expected identity/scope fields. The other five consumers still refuse damaged pairs through their own signature checks. The shared source guard was already measured by the original core and is not another unique guard."
+    },
+    {
+      "control": "Bridge signature check",
+      "target": "src/bridge/bridgeAuth.ts:205",
+      "actualTransition": [
+        7,
+        6,
+        7
+      ],
+      "affected": [
+        "bridgeAuth"
+      ],
+      "meaning": "All four damaged-state calls return actual admitted expected actor/workspace payloads. This is a direct public API outcome, not an HTTP or forwarding operation. All other cases retain their criteria."
+    },
+    {
+      "control": "Gateway signature check",
+      "target": "src/gateway/server.ts:464",
+      "actualTransition": [
+        7,
+        6,
+        7
+      ],
+      "affected": [
+        "gateway"
+      ],
+      "meaning": "All four damaged-state calls return HTTP 200 with the real local upstream marker, and each increments the actual upstream counter by one. This mutant ends with six upstream requests rather than the two intact/restored positive controls. Other cases retain expected behavior."
+    },
+    {
+      "control": "Router signature check",
+      "target": "src/workspaces/workspaceRouter.ts:663",
+      "actualTransition": [
+        7,
+        6,
+        7
+      ],
+      "affected": [
+        "workspaceRouter"
+      ],
+      "meaning": "All four damaged-state calls return protected HTTP 200 with trusted signed tool context. A real tracked OWNER cookie reaches Studio session authentication while every supplied ws-a lease still reaches the outer router guard. This is not a health, 404 or generic authentication witness."
+    },
+    {
+      "control": "Studio route signature check",
+      "target": "src/studio/studioServer.ts:1150",
+      "actualTransition": [
+        7,
+        6,
+        7
+      ],
+      "affected": [
+        "studioServer"
+      ],
+      "meaning": "Configured bootstrap-admin resolves before agentCredentialAuth while the supplied lease is still checked at verifyLeaseForScope. Each of the four damaged-state calls returns a new intent ID present in the public pending-intent list and adds exactly one named intent. The mutant ends with six intents, below the 25-entry limit. This is SIMULATE intent admission, not tool execution or policy permission."
+    },
+    {
+      "control": "Wire signature check",
+      "target": "src/wire/wireDispatcher.ts:204",
+      "actualTransition": [
+        7,
+        6,
+        7
+      ],
+      "affected": [
+        "wireDispatcher"
+      ],
+      "meaning": "All four damaged-state calls return actual workSessionId/receipt hashes with default-agent attribution and add exactly one new work/accepted row each. The mutant ends with six acceptance rows rather than two. The ledger witness is not independent receipt crypto verification or provider/model execution."
+    }
+  ],
+  "assertionsAndMasking": {
+    "raw": "All seven failed mutant case instances are original final AssertionErrors at leaseRevocationConsumerQualification.test.ts:396:88. Each follows its full eight-call sequence, exact pair restoration and cleanup. There are zero setup, call, parse, observer, port, transport, timeout or cleanup errors in the retained observations.",
+    "checks": "All 18 phases retain seven markers and 56 state/token calls. All 1,008 before/after named protected-input and pair comparisons and recorded lifetime checks match. Intact healthy/restored controls admit only live credentials and refuse revoked ones in every phase; unaffected consumers continue to refuse every damaged pair.",
+    "labels": "The independent raw derivation reproduces all 76 intentional behavioral failure labels from the actual 28 unexpected damaged-state admissions. These labels do not replace the actual admitted outcomes or measured operations. No later state/token call is hidden by an early behavioral assertion in this corpus.",
+    "effects": "Gateway, wire and Studio each add four actual operations in their affected mutant. Across all repeated phases they each have 40 measured operations, including 36 positive control operations plus four unsafe damaged-state admissions. All refused calls preserve each named count and ID set. Helper/read-only counts remain null."
+  },
+  "countingAndRuntime": {
+    "tests": "There are seven distinct case definitions, six controls, 18 test processes, 126 repeated observations and 1,008 repeated calls. These are not 126 distinct tests, 126 users, a combined suite or physically equal cross-phase inputs.",
+    "freshInputs": "The raw data contains 126 distinct removed fixture roots, 504 distinct recorded pre-artifact role SPKI fingerprints and 252 distinct recorded token hashes. These are synthetic physical fixture identities, not external people or independent authorities.",
+    "runtime": "Every retained observation records Node v22.23.3, the actual Cellar22 executable and ABI127. The controller uses the explicit Node22 Vitest source route, unchanged normal config/setup/guards and fixed fixture bytes. Dual default+JSON reporters are used from the start; no dropped first phase or reporter-only repeat exists in this packet.",
+    "deadlines": "These seven private cases use explicit 90-second deadlines and 5-second request timeouts. The separate original 35 retain their normal 30-second config and are not rerun here."
+  },
+  "preservationMeaning": {
+    "source": "Each frozen mutant body and patch independently reproduces exactly one prescribed TS replacement, matching its static predicted hash. Full 12,269-entry mutant manifests differ only at that sourceTarget; each restored manifest equals the complete accepted baseline. All 4,529 compiled entries are unchanged in every retained mutant manifest and at current direct review. No compiler, adapter or compiled mutation path exists in the reviewed controller.",
+    "scope": "The current root/private source 7,739 and compiled 4,529 bytes match. Complete regular-file closures for guard 12,269, prior baseline 12,269 and prior core 12,268 match directly. The new case remains byte-exact 11c5. No .git metadata is in the private copy; it is a filesystem copy, not literal-clone evidence.",
+    "protected": "All 417 index refs and 14 equal snapshots each of 128 protected entries (120 unique paths), 106 core refs (including original 103) and 152 baseline refs (including original 149) match. Six prior independent-review JSON/MD files were checked separately and remain unchanged. Native bytes/device/inode/nlink and 307 resolver links match.",
+    "limits": "Regular-file closure manifests exclude dependencies/symlinks; resolver links/native identity are separately checked. Before/after/current hashes and controller checkpoints do not constitute an OS-wide write audit or an assertion that every untracked dependency file was observed continuously."
+  },
+  "cryptoAndEffectLimits": [
+    "The byte-exact fixture records public PEM/SPKI hashes before public createVault and signed histories, compares persisted keys before initialization and artifacts, then performs actual Node-crypto token and decoded-digest signature checks. All recorded signature/lifetime booleans and pair-state validity fields agree with this procedure. This independent review read those booleans and source; it did not replay crypto.",
+    "Normal cleanup removes all raw public keys, tokens and list/signature inputs. Hash-only logs cannot support later offline independent signature re-verification, external trust, real people, signed-list delegation, regulated review or factual truth.",
+    "Named protected-path snapshots and operation counters cover actual inputs/upstream requests/work rows/public intents. They do not assert zero audit, sessions, SQLite/pool/WAL/SHM, broad process/network isolation or universal filesystem effects.",
+    "The five current consumers still verify then separately reload; static damaged/restored states do not qualify TOCTOU, pair publication/crash, deleting both files, anchored rollback, prepared-signature/bootstrap concerns or P1-08 migration.",
+    "Public router probe/reuse and inner listener port races remain. No such failure occurred in these raw phases; any future setup/transport/port timeout must be retained as fixture failure, not a guard kill.",
+    "No production source repair, held source/test/helper/runner transfer, counter/archive/tracker change, source ownership clearance, freeze bypass, installed or compiled-route acceptance, full-suite, coverage, Node24, hosted CI, G0, release or Done conclusion follows. D-15/P1-67, held P1-08 and generic 1496/1497/CLI1588 holds remain untouched."
+  ],
+  "operations": {
+    "productImports": 0,
+    "testsOrReruns": 0,
+    "cryptoReplay": 0,
+    "TypeScriptParserTypeChecks": 0,
+    "compilerBuildInstall": 0,
+    "networkRequests": 0,
+    "GitCommands": 0,
+    "sourceInputPriorPacketEdits": 0,
+    "writesOnly": [
+      "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+      "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.md"
+    ]
+  },
+  "allReadsFinished": true
+}

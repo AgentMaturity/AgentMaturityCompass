@@ -1,0 +1,30 @@
+{
+  "schema": "amc-p207-pending/1",
+  "label": "public-ttl-boundary",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+  "compiledChildModules": [
+    "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/workspaces/workspaceRouter.js",
+    "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/hostVault.js"
+  ],
+  "observations": [
+    {
+      "milestone": "public-ttl-minus-one-passed",
+      "elapsedMs": 599999
+    },
+    {
+      "milestone": "public-exact-ttl-refused",
+      "elapsedMs": 600000
+    },
+    {
+      "milestone": "public-expired-state-burned"
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-PnoaoS"
+}

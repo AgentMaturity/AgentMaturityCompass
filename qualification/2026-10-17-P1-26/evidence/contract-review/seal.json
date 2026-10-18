@@ -1,0 +1,46 @@
+{
+  "schema": "p126-static-contract-seal/1",
+  "at": "2026-10-16T20:28:34.027034+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/M1-prefix-swap.patch",
+      "bytes": 641,
+      "sha256": "6755b8c5ef22f3983da97385c9576f6bd182bec6ffd1c926a5f1369c33d5e9a9",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/M2-inclusion-terminal-size.patch",
+      "bytes": 317,
+      "sha256": "4721a212fb6847cb82b39a5b42a255b04445be6119172e833702a4d8d1edd61e",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/README.md",
+      "bytes": 2907,
+      "sha256": "9f71cc3f8bf694e88aeb5973f970c1c5541c4a970229c6fe890e8e32c48800ec",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+      "bytes": 5628,
+      "sha256": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/input-pins.json",
+      "bytes": 15104,
+      "sha256": "5e7c42a4c6ff067bb8cb371be5d15afea3476e820c61ac544c49aedbb53c7c29",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/review.json",
+      "bytes": 11835,
+      "sha256": "c99fe5d6a78aa0146f0e7d34739478c52101ba4b43f3ca38ecee07b23ace94db",
+      "readScope": "sealed private output"
+    }
+  ],
+  "inputCount": 47,
+  "blockers": [],
+  "runtimeExecuted": false,
+  "sourceOrIndexWritten": false
+}

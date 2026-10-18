@@ -1,0 +1,71 @@
+{
+  "status": "unresolved; bounded qualification only",
+  "activeFailures": [
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) saved OpenAPI has every registered result operation and its ClaimResult JSON schema",
+      "failureMessages": [
+        "AssertionError: expected [ \u2026(57) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:212:73\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) generated OpenAPI has every registered result operation and its ClaimResult JSON schema",
+      "failureMessages": [
+        "AssertionError: expected [ \u2026(106) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:218:77\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response",
+      "failureMessages": [
+        "AssertionError: expected { ok: true, data: { \u2026(28) }, \u2026(3) } to match object { claimKind: 'self_reported', \u2026(2) }\n(30 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:238:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a sealed legacy run retains the canonical legacy claim after Studio report decoration",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'self_reported', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:176:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a legacy version cannot become observed even when its stored readiness also verifies",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'self_reported', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:199:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) adding display readiness does not invalidate a current report's valid stored seal",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'observed', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:210:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a missing stored run returns 404 without a fabricated result claim",
+      "failureMessages": [
+        "AssertionError: {\"error\":\"internal server error\"}: expected 500 to be 404 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:249:44\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "ownership": {
+    "source": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "lines": "25-32,1114-1121,1326,1582-1588",
+    "quote": "src/api/{index,accessPolicy,resultRouteRegistry}.ts; src/studio/{openapi,a4Openapi}.ts and website/openapi.yaml; src/console/assets/components/claimBadge.js",
+    "action": "Keep reserved source unchanged; no owner clearance inferred from an idle session or absent P0-23-specific row."
+  },
+  "P0-22": "Both literal successful-empty-array failures remain unresolved by direct user decision. They are not fixed or waived by this slice.",
+  "otherOpen": [
+    "full suite and measured global/per-file coverage on this source",
+    "Node24 and hosted CI",
+    "every API/Studio route and reasoned keyword/exclusion inventory",
+    "list shape/required per-item schema contracts",
+    "actual browser/strip reset/reload behavior",
+    "actual independently-reviewed/synthetic tool transcripts beyond helper projections"
+  ],
+  "nextKey": "P0-51",
+  "tieDecision": "Dependency-priority judgment: P0-51 feeds Urgent P0-55; P0-46 is also eligible at equal High priority/date and stays open."
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "p125-private-client-fixed-candidate-matrix/1",
+  "candidate": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/tsaClient.test.ts",
+    "bytes": 15569,
+    "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8"
+  },
+  "target": "tests/time/tsaClient.test.ts",
+  "fixedBodies": 11,
+  "families": [
+    {
+      "id": "DER-01",
+      "name": "encodes the full SHA-256 request, captured positive nonce and literal certReq true",
+      "line": 187,
+      "limit": "Captured nonce relation and literal wire representation only; no entropy/collision claim."
+    },
+    {
+      "id": "DER-02",
+      "name": "inserts the independent literal policy OID without changing the required fields",
+      "line": 197,
+      "limit": "Only valid literal policy; no malformed-policy contract invented."
+    },
+    {
+      "id": "DER-03",
+      "name": "rejects invalid digest strings beside a real valid request",
+      "line": 204,
+      "limit": "Five invalid string rows remain one body."
+    },
+    {
+      "id": "HTTP-01",
+      "name": "POSTs the real request with exact headers/path/body and returns only raw reply bytes",
+      "line": 211,
+      "limit": "Raw public bytes, without CMS/PKI/grant/AttestedTime meaning."
+    },
+    {
+      "id": "HTTP-02",
+      "name": "normalizes response MIME case and parameters",
+      "line": 228,
+      "limit": "Only MIME normalization, not signature/content verification."
+    },
+    {
+      "id": "HTTP-03",
+      "name": "refuses configured URL credentials before a second request reaches the listener",
+      "line": 236,
+      "limit": "Synthetic userinfo only, exact refusal and no second wire request."
+    },
+    {
+      "id": "HTTP-04",
+      "name": "refuses finite non-200 statuses before MIME admission",
+      "line": 249,
+      "limit": "201 and 500 rows remain one body; wrong MIME intentionally confirms status precedence."
+    },
+    {
+      "id": "HTTP-05",
+      "name": "refuses a same-listener redirect without requesting its target",
+      "line": 263,
+      "limit": "Same owned listener only; no external destination."
+    },
+    {
+      "id": "HTTP-06",
+      "name": "refuses wrong response MIME after the adjacent real positive",
+      "line": 275,
+      "limit": "Promise-refusal witness precedes request-count and cleanup assertions."
+    },
+    {
+      "id": "HTTP-07",
+      "name": "returns exactly 65536 bytes and refuses a finite 65537-byte reply",
+      "line": 286,
+      "limit": "Finite accurate-length bodies; no general memory/streaming-security claim."
+    },
+    {
+      "id": "HTTP-08",
+      "name": "uses the unchanged 10000 ms client default against an owned stalled response",
+      "line": 300,
+      "limit": "Real default retained; actual AbortError/code and measured elapsed time. No exact scheduler or DNS/fallback time bound is asserted."
+    }
+  ],
+  "controls": [
+    {
+      "id": "C1-certReq-false",
+      "recipe": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C1-certReq-false.patch",
+        "bytes": 412,
+        "sha256": "1bb9fbacc7dda0e6bcf46dc55991334aef50f813205005c599a79b108a48499b"
+      },
+      "witnessLine": 193,
+      "priorPositiveLine": 191,
+      "firstWitness": "Direct literal 0101ff bit assertion after full non-bit request prefix; full expected hex and the policy case are later independent assertions.",
+      "masking": "Earlier nonce or prefix failures mask the bit witness; no result or sensitivity is predicted."
+    },
+    {
+      "id": "C2-ignore-response-MIME",
+      "recipe": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C2-ignore-response-MIME.patch",
+        "bytes": 648,
+        "sha256": "cda51cf7e9242a0acbdea9506e07096c43e3f65df545cec3b63f261384c8ed15"
+      },
+      "witnessLine": 280,
+      "messageLine": 281,
+      "firstWitness": "Actual Promise rejection after the adjacent real positive; count and finally assertions follow.",
+      "masking": "If cleanup is clean, the same primary AssertionError object is rethrown unchanged. Real cleanup failures produce AggregateError with primary first; no invented cleanup failure or sensitivity credit."
+    }
+  ],
+  "actualResults": null,
+  "allocation": false
+}

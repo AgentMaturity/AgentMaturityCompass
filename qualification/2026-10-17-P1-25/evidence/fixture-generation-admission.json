@@ -1,0 +1,20 @@
+{
+  "schema": "p125-root-private-generation-admission/1",
+  "at": "2026-10-16T18:43:48.596564+00:00",
+  "script": {
+    "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-design/generate-offline-fixtures.py",
+    "bytes": 21387,
+    "sha256": "0a71c1a205a000cbf0effff899ec807300bc43a43da8d5078ea207b79c742320"
+  },
+  "fullCodeRead": true,
+  "syntaxCompiledWithoutExecution": true,
+  "actualCapabilityReviewed": true,
+  "output": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01",
+  "opensslCommandsExpectedByStaticCount": 41,
+  "protectedCheckoutsReadOnly": true,
+  "sourceAllocation": false,
+  "fixtureAdmission": false,
+  "allowed": "One actual private generation attempt using unchanged frozen process harness and installed OpenSSL. Explicit fixed dates before signing; genuine RSA/CMS/ESS/X509; CMS negative-policy oracles signature-only; positive TS oracle required. Retain all partial failures/keys privately; do not retry, signal, delete, mutate source or add dependency.",
+  "remainingReview": "Inspect actual41commands/statuses/streams/publichashes/certificateextensions/ESS/signedattributeoffset before any source use.",
+  "currentReservationLimitation": "Live RES missing, last-known binding remains. This private generation allocates no checkout path."
+}

@@ -1,0 +1,14 @@
+{
+  "operator": "operator-tier-consumption",
+  "sourceBefore": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+  "mutant": "3df8eae90e0a1a10100bb1d4ac8c148d9486c6a4b000201e3964554a95397443",
+  "patchSha256": "17fc2f58283f834d330b21761d8ae65a3c5f3f0f876a42a37fecb26fdda6412d",
+  "patchCapturedFromLiveMutant": true,
+  "at": "2026-10-16T19:36:59.555908+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/src/catalog/evidence/admission.ts",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "mode": "apply",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false
+}

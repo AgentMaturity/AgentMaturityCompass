@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-14T21:55:15.890279+00:00",
+  "scope": "Read-only independent review of the P0-19 append-only quality chronology supplement. No tests, builds, validator reruns, source edits, canonical edits, or next-issue work.",
+  "status": "no actionable findings within the reviewed metadata scope",
+  "findings": [],
+  "artifactCommit": "6e50f76734fcf10001f843c87f685a044824bfd8",
+  "directParentArtifactCommit": "f28ccd983060d863c1b24fcf592b3e289cc759aa",
+  "measuredSourceCommit": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "canonicalFolder": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-19",
+  "verified": {
+    "canonicalFiles": 85,
+    "distinctManifestEntries": 84,
+    "allManifestHashesMatch": true,
+    "manifestCoversEveryFileExceptReceipt": true,
+    "symlinks": 0,
+    "largestFileBytes": 224720,
+    "allCanonicalFilesBelow1MiB": true,
+    "originalPacketFiles": 83,
+    "originalUntouchedFilesByteEqualToParent": 81,
+    "originalReadmeIsCompleteBytePrefix": true,
+    "historical2779RawLogBytePreserved": true,
+    "receiptFixedFieldsUnchanged": true,
+    "originalCommandEntriesUnchanged": true,
+    "originalNotesAreCompletePrefix": true,
+    "originalManifestEntriesOrderAndHashesPreservedExceptUpdatedReadmeHash": true,
+    "newManifestEntriesOnly": [
+      "quality-context-followup.json",
+      "exact-source-dead-code-followup.log"
+    ],
+    "changedPathsOnly": [
+      "qualification/2026-10-15-P0-19/README.md",
+      "qualification/2026-10-15-P0-19/receipt.json",
+      "qualification/2026-10-15-P0-19/quality-context-followup.json",
+      "qualification/2026-10-15-P0-19/exact-source-dead-code-followup.log"
+    ],
+    "productionTestsPackagesScriptsPackageAndLockUnchanged": true,
+    "collectorBytesIdenticalAtSourceParentAndSupplement": true,
+    "sourceQualityCollector": "scripts/source-quality.mjs",
+    "currentPriorAndCandidateCompleteFindingArraysExactlyEqual": true,
+    "currentPriorFindingCount": 2774,
+    "currentCandidateFindingCount": 2774,
+    "currentUniqueFindingCount": 2774,
+    "currentCollector": "knip 6.39.0",
+    "actualNode": "v22.23.3",
+    "normalFollowupLogByteEqualToRetainedPrivateRawLog": true,
+    "cleanGitStatusObserved": true
+  },
+  "appendedFailedNormalCommand": {
+    "cmd": "pnpm run check:dead-code",
+    "exit": 1,
+    "durationMs": 3175
+  },
+  "chronology": [
+    {
+      "phase": "initial recorded gate",
+      "head": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+      "deadCodeCount": 2779,
+      "rawPreserved": true,
+      "completeFindingSetRetained": false
+    },
+    {
+      "phase": "later exact-source normal gate",
+      "artifactHead": "f28ccd983060d863c1b24fcf592b3e289cc759aa",
+      "source": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+      "deadCodeCount": 2774,
+      "exit": 1
+    },
+    {
+      "phase": "current full collector comparisons",
+      "heads": [
+        "f28ccd983060d863c1b24fcf592b3e289cc759aa",
+        "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+      ],
+      "countEach": 2774,
+      "exactArrayEquality": true
+    }
+  ],
+  "observerCorrection": "The initial comparison of missing findings fields in summaries produced empty arrays and was not full-set proof. The supplement retains this correction and compares actual complete arrays emitted by the unchanged exported collector.",
+  "priorReviewChronologyCorrection": "The earlier compatibility review field priorF10ContextDeadCode=2779 attributed the historical count too broadly. Verified chronology places 2779 at initial 8c16a904 and the later f28/source-f10 gate at 2774. This new review records the correction; the prior review and evidence are preserved byte-for-byte.",
+  "preservedPreviousCanonicalReview": {
+    "path": "/private/tmp/p0-19-canonical-review-20261015.json",
+    "sha256": "56534efd338163a54b966b7b94b5933395be062c9c6ebda0d6bd65de64716ff3",
+    "bytes": 34579
+  },
+  "canonicalPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-19/README.md",
+      "sha256": "b192cff3fc56ef66cae642670119362c6e2bb238857596b49611d5e58f8c5004",
+      "bytes": 6783
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-19/receipt.json",
+      "sha256": "eb5e5272b4c4cb4a8efe562f8d44c11679a9ab56402bb9c484b99faa5c21c706",
+      "bytes": 21831
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-19/quality-context-followup.json",
+      "sha256": "abe477c0c9e2c3fb5ecb35838af0429627409789f4ba4192306b7e4c8e56730d",
+      "bytes": 2256
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-19/exact-source-dead-code-followup.log",
+      "sha256": "cde42fc6d4b32973aa3c08da583323f2400cc3fb9374665aff3437f2cbdc5094",
+      "bytes": 1174
+    }
+  ],
+  "fullFindingPins": [
+    {
+      "path": "/private/tmp/p0-27-runtime-compatibility-prior-full-dead-code-20261015.json",
+      "sha256": "13202fb70fc45b820e9468d9d3f6d709802627af75f43946f4b58cf08913c46d",
+      "bytes": 252779
+    },
+    {
+      "path": "/private/tmp/p0-27-runtime-compatibility-candidate-full-dead-code-20261015.json",
+      "sha256": "0a33d09f2f323f643e7d99c517a5d397ea72f1053d1c20395408328ca3449b0a",
+      "bytes": 252787
+    }
+  ],
+  "retainedValidationPins": [
+    {
+      "path": "/private/tmp/p0-19-quality-followup-receipt-validator-20261015.log",
+      "sha256": "9392bf84920fa3b5571d60c6b9fb8e778708f06222b4f00653458faf477298bb",
+      "bytes": 234
+    },
+    {
+      "path": "/private/tmp/p0-19-quality-followup-receipt-final-validator-20261015.log",
+      "sha256": "9392bf84920fa3b5571d60c6b9fb8e778708f06222b4f00653458faf477298bb",
+      "bytes": 234
+    },
+    {
+      "path": "/private/tmp/p0-19-quality-followup-whitespace-20261015.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "validationAttribution": "Both retained normal receipt-validator logs report eight valid receipts; parent recorded exit 0 twice. The retained whitespace log is empty, with parent-recorded exit 0. These commands were not rerun by this reviewer.",
+  "limits": [
+    "Initial complete 2779 finding set was not retained; the five differences and their cause cannot be identified from this packet.",
+    "2774 remains an actual failed dead-code gate. No production cleanup, waiver, guard correction cause, or source-quality acceptance is inferred.",
+    "Successful diagnostic collection is not a passing normal gate.",
+    "Original P0-19 bounded result remains 516 total, 515 passed, one strict artifact VALID failure, zero skipped; source proposal is not applied or approved.",
+    "No whole-suite, coverage, Node24 P0-19, hosted CI, release, or Done approval is provided.",
+    "This review adds no secret-material or whole-packet behavioral claims beyond the original preserved review."
+  ]
+}

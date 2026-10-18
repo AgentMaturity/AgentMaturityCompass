@@ -1,0 +1,10 @@
+{
+  "classification": "passed",
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "pending": 0,
+  "todo": 0,
+  "failures": [],
+  "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+}

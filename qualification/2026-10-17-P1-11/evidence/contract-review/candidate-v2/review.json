@@ -1,0 +1,112 @@
+{
+  "schema": "p111-independent-decisive-candidate-v2-review/1",
+  "at": "2026-10-16T19:26:53.281137+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "preferredCandidate": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+    "bytes": 18998,
+    "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018"
+  },
+  "historicalV1": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+    "bytes": 19051,
+    "sha256": "f8a19dbba9a636a3e9e0fd40063939b1ecd5130811f133307fb74a0fc6047a9b"
+  },
+  "exactTwoLineDeltaVerified": true,
+  "same25LiteralCaseBodies": true,
+  "candidateExecutedOrParsed": false,
+  "sourceWrites": false,
+  "staticFindings": [
+    "Full V1 source and exact V2 equality reviewed. V2 improves first-use replay isolation using unchanged receiptItem in overlapping Oct1-Oct31 andOct1-Nov1 windows; originalV1/seal remain exact.",
+    "Typed factories and Result discriminants/current field names match actual source. Testtsconfig noUncheckedIndexedAccessfalse permits the array accesses; current source digestOf prefix matches positive assertion. No any/cast, mock, timer, environment or deadline edit.",
+    "All15 mandatory decisive families are represented at the typed already-derived unit seam, plus adjacent presence/provenance/sampling/enforcement/digest/review boundaries. Each refusal has an actual evaluator-positive prerequisite; test identities remain literal under source controls.",
+    "No-plan test removes policyDigest constraint only in its own unit record/item, so evidence still admits and applicability is tested without an earlier missing-policy rejection. It neither changes production nor supplies a plan to public reports.",
+    "Freshness Oct1-Nov1 is31days and within-window, boundaryOct2 is30days; claimedAt cannot rescue stale recordedAt. Replay uses exact source useKey and prefixed identities, paired same-key permission and same-evaluation duplicate refusal.",
+    "Nonviolating contradiction and incomplete trusted-violation cases preserve distinct precedence. System-session positive rejection and missing-agent system violation-only exception match current P0-17 behavior.",
+    "Ignored attribute tier consumes supplied derived SELF_REPORTED provenance; producer cap, synthetic claim and observed ratio assertions match current P0-08 composition. They do not verify raw operator meta or real imported producer signatures.",
+    "Review inputs name actual evaluator digest, are explicitly already signature-verified upstream decisions, and never produce independently_reviewed kind. Actual Date.now is untouched; past/far-future expiry avoids fake clocks.",
+    "Only synchronous typed values/hash evaluation are owned. No workspace, native/SQL, vault, child, socket, server, network or environment resource requires cleanup.",
+    "Source authority uses static module imports from the materialized test path. No process.cwd or held-R source reads were added; inherited regression census R/src remains a separate root-labelled boundary."
+  ],
+  "sourceControlWitnesses": [
+    {
+      "operator": "tenant-comparison",
+      "literalCase": "refuses another tenant and treats its evidence as untrusted",
+      "caseLine": 122,
+      "firstSensitiveAssertionLine": 67,
+      "callLine": 124,
+      "primaryObservation": "exact rejected id/reason cross_tenant",
+      "laterAssertionsMayBeMasked": [
+        "admitted empty",
+        "evidence untrusted",
+        "result not_evaluated",
+        "claim self_reported"
+      ]
+    },
+    {
+      "operator": "freshness",
+      "literalCase": "uses recorded time for freshness even when claimed time looks fresh",
+      "caseLine": 145,
+      "firstSensitiveAssertionLine": 67,
+      "callLine": 147,
+      "primaryObservation": "exact rejected id/reason stale while Oct1 lies in Oct1-Nov1 window and is31days old",
+      "laterAssertionsMayBeMasked": [
+        "admitted empty",
+        "evidence stale",
+        "result not_evaluated",
+        "claim self_reported"
+      ]
+    },
+    {
+      "operator": "operator-tier-consumption",
+      "literalCase": "consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "caseLine": 259,
+      "firstSensitiveAssertionLine": 266,
+      "primaryObservation": "actual admitted derived tier stays SELF_REPORTED despite attributes label",
+      "laterAssertionsMayBeMasked": [
+        "result not_evaluated",
+        "claim self_reported"
+      ],
+      "boundary": "typed unit provenance-consumption control only; no actual meta_json or loader derivation proof"
+    },
+    {
+      "operator": "replay",
+      "literalCase": "refuses prefixed ref and receipt identities previously used in another window",
+      "caseLine": 161,
+      "firstSensitiveAssertionLine": 67,
+      "callLine": 168,
+      "primaryObservation": "same immutable receiptItem admits in both overlapping windows; distinct actual useKey/prefixed priorUses causes replay refusal",
+      "laterAssertionsMayBeMasked": [
+        "second prefixed id iteration",
+        "admitted empty",
+        "evidence incomplete",
+        "result not_evaluated",
+        "claim self_reported"
+      ],
+      "additionalPotentialSensitiveCases": [
+        "admits a receipt identity once per evaluation",
+        "refuses the loader's derived foreign-receipt decision"
+      ],
+      "predictedOutcomeCount": null
+    }
+  ],
+  "controlDesign": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/controls.json",
+    "bytes": 5322,
+    "sha256": "059651d3ccf2e21f9142d968a164c48bd9736259f006acb23e4613972a499ca0"
+  },
+  "pinsVerified": {
+    "v1Inputs": 31,
+    "v1Outputs": 5,
+    "v2Inputs": 35,
+    "v2Outputs": 5,
+    "originalContractSourcePinsExact": true
+  },
+  "limits": [
+    "No actual runtime/compiler result predicted. Root alone admits/materializes/runs and later mutates/restores freshQ.",
+    "No real ledger/receipt/external trust/approval signature, loader/meta tier, compiled-plan or public-report positive is qualified by these supplied unit inputs.",
+    "Current public plan:null, score-null versus spec0, status spelling, real origin/main comparison, fullspec mutations, surface/fullsuite/globalquality gaps remain recorded in original contract review.",
+    "All Claude source ownership, reservations limitation, held decisions and F37 skip preserved."
+  ]
+}

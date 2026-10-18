@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-16T20:12:42.329919+00:00",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "boundedCheckpointOnly": true,
+  "wholeIssueDone": false,
+  "goalActive": true,
+  "quality": {
+    "duplicatesBefore": 1268,
+    "duplicatesAfter": 1268,
+    "deadCodeBefore": 2724,
+    "deadCodeAfter": 2723,
+    "bothGatesExit1": true,
+    "soleRemoval": "The compiledPolicyDenial unused export is now reached by the new test. No finding was added and no production reachability is claimed.",
+    "diagnosticExit0IsNotQualityPass": true,
+    "waived": false,
+    "baselineAdopted": false
+  },
+  "freshControlChain": "control-chain-summary.json",
+  "finalPreservation": "preservation-final.json",
+  "freezeCounts": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "fullSuiteCoverageOrAcceptanceClaim": false,
+  "heldArchive": "held-archive-current-check.json",
+  "allHoldsRetained": true,
+  "nextPlanItem": "P1-26 offline tree qualification, after bounded receipt closure",
+  "noPrPushMergeReleaseTrackerDone": true,
+  "missingReservation": "The last known binding remains in effect. The absent file is not release. No replacement or broad scan was performed. The private pending entry remains retained."
+}

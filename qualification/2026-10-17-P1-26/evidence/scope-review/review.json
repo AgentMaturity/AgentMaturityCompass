@@ -1,0 +1,89 @@
+{
+  "schema": "p126-new-scope180-review/1",
+  "at": "2026-10-16T20:22:24.155493+00:00",
+  "recommendation": "Current finite ownership evidence supports root admission of only the two new offline tests and actual-date qualification packet. This review does not allocate, materialize or execute that scope.",
+  "blockersForProposedScope": [],
+  "sourceBinding": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "commit": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+    "branch": "codex/p1-26-tree-qualification",
+    "headStableDuringObservation": true,
+    "selectedStatusEmpty": true,
+    "indexEmpty": true,
+    "wholeTreeCleanIndependentlyClaimed": false,
+    "previousP112Source": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+    "previousP112Metadata": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+    "priorSelected11SourcePresenceHashesUnchanged": true
+  },
+  "scope": {
+    "newPaths": [
+      "tests/transparency/rfc9162.test.ts",
+      "tests/transparency/legacyAmbiguity.test.ts",
+      "qualification/2026-10-17-P1-26"
+    ],
+    "permittedFutureContent": "New fixed-inventory offline tree and legacy-ambiguity tests plus qualification metadata only, after root admission. Self-authored deterministic fixtures and an independent reference tree do not substitute for vendor vector/licence evidence.",
+    "protected": "All product source, existing test fixtures/tests, docs, package/lock, shared Vitest/TypeScript/workspace guards, freeze/quality scripts and baselines, legacy compatibility, migration, trusted-time/public-anchor integration and all unrelated paths. The observed tests/fixtures/anchors path is not allocated."
+  },
+  "ownership": {
+    "registeredRoots": 170,
+    "retainedRoots": 10,
+    "physicalRoots": 180,
+    "targetAbsenceChecks": 540,
+    "allTargetPathsAbsent": true,
+    "allTargetAndSelectedStatusesExit0Empty": true,
+    "emptyTargetHistories": 13,
+    "allHistoriesExit0Empty": true,
+    "selectedRelativePaths": 19,
+    "actualPresentFilePins": 2233,
+    "selectedPresenceRows": 3420,
+    "allPrior1980PresenceHashRowsUnchanged": true,
+    "selectedAnchorFixtureDirectoryAbsentAcross180": true,
+    "sourceVariantCounts": {
+      "src/transparency/rfc9162.ts": 1,
+      "src/transparency/merkle.ts": 3,
+      "src/transparency/merkleFrontier.ts": 2,
+      "src/transparency/checkpointNote.ts": 1,
+      "src/transparency/anchors/anchor.ts": 2,
+      "src/transparency/anchors/rekorV2.ts": 2,
+      "tests/transparencyMerkleIncremental.test.ts": 2,
+      "tests/transparencyMerkleFailLoud.test.ts": 1,
+      "docs/TRANSPARENCY_MERKLE.md": 6,
+      "docs/PUBLIC_ANCHORING.md": 1,
+      "docs/security/dependency-reviews/anchoring.md": 1,
+      "package.json": 18,
+      "pnpm-lock.yaml": 8,
+      "vitest.config.ts": 6,
+      "tsconfig.tests.json": 1,
+      "tests/setup/repoWorkspaceGuard.global.ts": 1,
+      "tests/setup/repoWorkspaceGuard.ts": 1,
+      "scripts/check-freeze.mjs": 1,
+      "scripts/source-quality.mjs": 3
+    },
+    "all36HeldPinsMatch": true,
+    "meaning": "Finite exact-path disjointness and preservation, not ownership release. Preserve all observed byte variants, including Claude prose and clean historical work. No absent/clean/merged path releases ownership."
+  },
+  "planAndDependencies": {
+    "planAndP126SpecUnchanged": true,
+    "priority": "G1 / High / due2027-01-15",
+    "routing": "The prior accepted priority/dependency routing selected this offline lane after bounded P1-12. No earlier hold or completed bounded component is reopened.",
+    "formalDependency": "P1-26 remains formally blocked by full P1-25 acceptance; the pure node:crypto tree/legacy helpers take no time/TSA/anchor input, so this smaller lane consumes none of that unfinished integration. Full P1-25/P1-26/G1/plan completion is unclaimed."
+  },
+  "preservedHolds": {
+    "publicEntryApproval": "P1-26 step7 explicitly requires Sid, or an agent with Sid written approval in the PR, for permanent public test submissions. No such approval or submission is inferred. This does not create an offline unit-test approval hold.",
+    "vectorsLibrariesIntegration": "Exact vendor-vector commit/licence/header, C2SP vector provenance, the explicit pending Sid library decision, SCITT service/profile/backend, public fixtures and P1-25 client/checkpoint/issuance integration remain open. No library is added or adopted here.",
+    "others": "P1-01/P1-02 gaps, P0-09 precedence, P0-29 successors, P0-22 empty results, D-03 written health skip untilP2-06, F37 skip, ignored provider archive/R overlays, manual-generator/Knip/D15 and all other held source/integration decisions remain unchanged."
+  },
+  "reservations": {
+    "lastKnownPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "lastKnownBytes": 275376,
+    "lastKnownSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "currentLimitation": "Reuse the exact prior missing-live-file observation; no existence re-probe, broad search, recreation, append or Claude message. Current reservation deltas remain unavailable. Missing file does not release ownership or invent a human approval requirement.",
+    "pendingPrivateEntry": "pending-reservation-entry.md is an unappended proposal only, for root use if the original real reservation file returns."
+  },
+  "rootOwnedAdmission": [
+    "Current hosted all-path/WIP check with verified Dependabot excluded from WIP only.",
+    "Ordinary D15/freeze and exact candidate review/admission, followed by actual compiler/test/quality/source-control evidence with unchanged guards/deadlines/baselines.",
+    "Any source repair, count update, fixture expansion, docs/changeset, source commit or receipt materialization requires its own root allocation; this report authorizes none of those writes."
+  ],
+  "executionBoundary": "Read-only file/hash/Git registry/status/history/HEAD observations and private report files only. No graph query/refresh, product/helper/test/compiler/native/SQL/network, hosted/D15/freeze, source/index/branch/QA/checkout writes, package action, public entry or Claude coordination. Existing root-reported P1-12 closure is not rerun or broadened."
+}

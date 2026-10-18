@@ -1,0 +1,64 @@
+{
+  "schema": "p107-control-classification/1",
+  "number": 2,
+  "phase": "p107-m2",
+  "actualExit": 1,
+  "actualTests": {
+    "numTotalTests": 971,
+    "numPassedTests": 969,
+    "numFailedTests": 2,
+    "numPendingTests": 0
+  },
+  "same971OrderedCaseInventory": true,
+  "firstFailures": [
+    {
+      "name": "P1-07 emitter registry finite correspondence the registry excludes seeder modules and synthetic claims and caps importers at L1",
+      "message": "AssertionError: expected [ 'p107-seeder-mutation' ] to deeply equal []",
+      "firstFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:36:21"
+    },
+    {
+      "name": "P1-07 emitter registry finite correspondence every current module contains its exact quoted literal in this physical checkout",
+      "message": "AssertionError: p107-seeder-mutation: expected '/**\\n * Dogfood evidence seeding: a d\u2026' to contain '\"AMC_P107_SYNTHETIC_MUTANT\"'",
+      "firstFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:55:37"
+    }
+  ],
+  "causalWitness": "The direct seeder exclusion fails first at line36 with p107-seeder-mutation. A separate fixed body reaches source correspondence and fails at line55 because the unique quoted audit literal is absent from the actual seeder module. The added entry is synthetic_example; no seeder is executed or admitted as runtime evidence.",
+  "maskedAssertions": [
+    "same-line synthetic exclusion after seeder exclusion at36",
+    "import caps later in exclusion body",
+    "requiresMeta/event-vocabulary assertions and later registry rows after first source-literal failure at55"
+  ],
+  "actualLoggedLists": {
+    "seeders": [
+      "p107-seeder-mutation"
+    ],
+    "synthetic": [
+      "p107-seeder-mutation"
+    ]
+  },
+  "hooks": "46 observer entries all pass",
+  "nativeFixture": "Actual runtime case passes with signed rows, exact mapping, unchanged ten inputs/native and clean cleanup; earned same-day L1",
+  "unhandledErrors": [],
+  "readBoundary": "Full failure identities/raw messages read; combined stdout display truncated within the verbose source diff, whose complete bytes remain retained. No full-log root read claimed.",
+  "compiledSensitivityClaim": false,
+  "fullIssueDone": false,
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "originalClassification": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-classification.json",
+    "bytes": 2413,
+    "sha256": "7d7a42826750430e61cd57a751b8ab9bf3e469cc75813f8dcf6372b336bf7f3c"
+  },
+  "actualSourceBinding": {
+    "apply": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-apply.json",
+      "bytes": 850,
+      "sha256": "34b2a59b50e29fffd9148b90aa1c23aeab332b742b8149c86eca9e73a7e2951a"
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+    },
+    "method": "Root verified the actual fresh root/commit and exact original\u2192mutant target before the run; preferred record adds source binding to preserved original classification without changing its outcomes."
+  }
+}

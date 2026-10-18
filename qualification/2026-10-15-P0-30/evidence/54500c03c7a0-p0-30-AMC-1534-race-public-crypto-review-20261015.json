@@ -1,0 +1,2066 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T02:51:47.773Z",
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "state": "PUBLIC_INPUT_OFFLINE_REVIEW_COMPLETE_NO_FAILURES",
+  "allReadsFinished": true,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+      "bytes": 12191,
+      "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+      "bytes": 709120,
+      "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "0125b20a748d097c19f1920896935c7445af376d9da4f4bbb1b877d1975ac74c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/result.json",
+      "bytes": 4502,
+      "sha256": "3b3c9ee231904f25c4ce0dae896b903209118a627b45c47aae7a3c6ab548b47d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/ready.json",
+      "bytes": 1742,
+      "sha256": "751cc52e8a788dbe8b504d7e1ac383df5fa475198e6f2ee6ff80ada5c0ac434f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/result.json",
+      "bytes": 500,
+      "sha256": "1dc03159b6b6bcf9b890d4496264a095c4b8678470deaec0629815c68ee459b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/ready.json",
+      "bytes": 1750,
+      "sha256": "50eff0c4ac8a9c84b307e353ec254e0627293a4515a501882603f84b7e747816"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/result.json",
+      "bytes": 1442,
+      "sha256": "78e6a7fcced829752a9cf0b9c07fae5e3dc966223ede488dbf1bddbd4455a2d3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/read-control/result.json",
+      "bytes": 15444,
+      "sha256": "59ce1b02b163618ccad577b49456feb3904827af730559febc0e7f424bcddc0d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/read-race/result.json",
+      "bytes": 22410,
+      "sha256": "760bee0ee762988e2e365ef0c1267a933cd7715addf46f099fa882bcf0fd2c39"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/right/ready.json",
+      "bytes": 1744,
+      "sha256": "8471e00a30b7e88ced2da8a94d8cc8c3e800ba67a76dc5158ad8535eef5b88bc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/right/result.json",
+      "bytes": 1440,
+      "sha256": "334b93aa52dd82d4ba123244b8716b5bbbe34da9def4447ab644187e38038672"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/observations.json",
+      "bytes": 4702462,
+      "sha256": "82be02a414d1182b7f145f7514c1ec382eb370d6465ce8504da05f543d971226"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "43159420eac55896847e3c59a36548f8a1ca16dc2ea817493931f3e1748d89fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "eed7200e3f4b6b7709bd9e590f28637ad238d886f803b3810d219ab9e289bb7e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "8e35860937f119efcb8cf36777644fa073fdaaf95f63997d0589609c10ee5671"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "6202908969787729227ec8dffd05a8ca614c720cad1844f650224be0c3ddf323"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "6887440da98e11b455efff89a6940be3b8a8ed5c9d9fadd768c1541693f5eaea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "badb64f664f94e118e233f40dd49e13f25b5c9fff97e973daa7e09312f7666bb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "756b97829b4e6e5c664d3c6a06775cc77cb819a6b6c17dc2bba298909a134edc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "70f08317fce82c3fbc0311867f57fc051a67e840dbd531548a751cfaae223d69"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "cddab48a0591bf13f100e1222338fe028300627693c50bca803940e29a22cb38"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "a66593b336d00f6ae985359c0d1fb2db834c6945fa75e354bf162beeae377991"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "8a7a5d2a8a034ffd55bd6bb3dfb5877748a31547de45358a32b50edb76fee154"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "b4816808a53d88c4548a14671ec362e999f69bd6f3283488de82efefeb3c6b99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "e8763c3c89517bbb2a5c4474b26b80f30c646dd8165ec29b6fcdbb7ee48d0dff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/result.json",
+      "bytes": 4490,
+      "sha256": "a8cfa3b34fee91366c4b45834fa20556f0851036319bd126e4b60d019f0af77e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/ready.json",
+      "bytes": 1738,
+      "sha256": "546e93c09f06e4b0f28f65dff8ada9a49ae9cbfee35d28c39ce13613e5dcbc7e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/result.json",
+      "bytes": 500,
+      "sha256": "5b074cd80ebc9e8f6e085d55200baa8739bed1c0e029b360eca4011f892789cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/ready.json",
+      "bytes": 1746,
+      "sha256": "6bf44dfc211977a8d2eee60e21fdf6d0d8b29d3b1babae7e13f96ef46ea40e48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/result.json",
+      "bytes": 1442,
+      "sha256": "0fa48c4aaeb4f4c3a0c612e1daae21e37cd91c3feffd88a0a288996b801a905f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-control/result.json",
+      "bytes": 15440,
+      "sha256": "97b4fb0f492f59d949322f262a99bb12b78a1ffc254ed25f1f581524c1bc838a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-race/result.json",
+      "bytes": 22406,
+      "sha256": "1302e5e129243ffaa452fa22f90e1b266a96c0925c4db10318e9d6030e2ad6c9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/ready.json",
+      "bytes": 1740,
+      "sha256": "dd8821249ea599fc37960c1dc81c42132b52332c3e135bddd647c9605f7eec4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/result.json",
+      "bytes": 1442,
+      "sha256": "301e7b75763b19e52637cbc2576fd162b8c42b09b121e1e16aeb5ecb09d1e53e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/observations.json",
+      "bytes": 4702384,
+      "sha256": "6d1d430e59e44cb1f07429fd22222a70c6f33466668fa590b58497882a37fcde"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "2f488a2f09ff4aa6550a6bbd39448f364b4ca045b01913a966e5a192b76ca3c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "fd493bca1d47b1d65280d5a08097f1cba9f94af684bc4736f9784dfd39708c2a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "de45f6fc31160e1172cef7b68a4207a0e0234a98b12a3e4a4b0175fac5694a22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "c41b66bbd4da43e8bcec735e7171177b502ced3fed475e4dca25d478a93574f8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "fcdb346607fc910feadf7a41953055c8bc5bfa537dcf795c054826f2d082d5a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "03a4be772d15dbc40692d17c9048d710dfd83824a079d7d7b85c7ce3d58c4861"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "57120df674a26e7ea62e796bb0849fb01ae18a2178f563f95c0072ae6dba6c74"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "a90c17b06ff3a3588e380613fb6ad840667e433d31f7c0b3cfbfc3e7cd1da48d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "0be20b16c800cd7be44cd804a867c82f1c30abf191a7e7e3b3511c481891be1e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "d061f1c40e9672567ac0a245136bb2dc07e9519908830b94f2e41caf9d26b284"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "d818ff89de91312e2656220fbbe7fd5e2cb21aecf46efa2aac6c8a80d52cf226"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "a87967c6ac470b68527765afd30056fe667786b3192674f58587b6b7844bc431"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "a67c93919f2587cae9b8a56606148bd95497210b34f581811d6a96862bc391cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/result.json",
+      "bytes": 4478,
+      "sha256": "901e0366e0beb5da4e424dad8fde7ff7fa0f33c7ec5bc5c62041afb5d62d3484"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/ready.json",
+      "bytes": 1734,
+      "sha256": "d0c0ce56fe4f59409943fd81918e0a638f07266806466e06d9460466a0b0134f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/result.json",
+      "bytes": 1444,
+      "sha256": "90c7b5a9e210b852a447d60ff91a92bd23a3dd8eb71df330c022b102a9fd07a1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/ready.json",
+      "bytes": 1742,
+      "sha256": "e40f3ff8635533d23dc499b1309691e374fe1535998c787db84f02fd80d594fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/result.json",
+      "bytes": 1443,
+      "sha256": "633030ff0697408291dcc8698b563aa50170c3d639b3490381d1c713f65ed78c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-control/result.json",
+      "bytes": 15436,
+      "sha256": "09376ef96f721fcb4843d762cbcad93331633d66618ec1457514f375a05a2f16"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-race/result.json",
+      "bytes": 27142,
+      "sha256": "d6f1a6597983145cd947dec7f82840a9d1b315afa709d0c519e78bd2bf8ebd6c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/ready.json",
+      "bytes": 1736,
+      "sha256": "8e84d911c552674aa4f60dbf4499442153afa88eb26ab9bdc0b12658760c713c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/result.json",
+      "bytes": 1441,
+      "sha256": "cf6d7045d7ff745b813c96a09d022884958f21002746fc057a87f7ecd82f0494"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/observations.json",
+      "bytes": 4716185,
+      "sha256": "d62580199c6e52db1d7429f6db71a4093d0a72a31599fe4a4aff9af368aa37aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "9e9bc88384ff8aa85fea1ca3c47ac0a64d95210bba06ba12823cc22b6d577707"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "7007a185a4490e6c12ccb94db8134df4e8d6e8203b777176c95ec62de6ef3a0a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "bd0478fa03b3641c9ea1049a70758532e98bf6ce8dd810708141bb6b8048f8b4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "1f670fd5b6192f517b421f0079ded1a7f6a76dd8f4f714c04f2c763711d72cc6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "505db193dbd1cd85319e313f84bd82b757e1f3a6e625dae3c6aad8d966c313fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "44ccf6fcf343fedf41fd52007ecaf2f61da721cdc098df7bdb9f3ee72686a9eb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "1a8678626734aa1e63351ec0d41fdaa1a4f51739cbacfe8f7de74172a58eb97b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "9d0fcfe072b3523a836e2b0693b244ab194bed1e17703a91a50cb25ab51bf543"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "4a1f59be4a3240bdf73162974130000e9cff3901dc0b87111369601844722041"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "2c39545b03a06c2d1858556ab86e9e8366220cd05070456aa386733e294d08b1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "77da6ad3ebf19720632ac4b1010ea2468e93eb2f92471464b678bf99c85a9ea1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "fccdf39dfa5c34d5d745381495a734ac69d15afb917edb633e3d6389cd259fe2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "6011432418cde37d87e052a22473da97d6e3d2a6183cf95f48d3651440c889e1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/result.json",
+      "bytes": 4490,
+      "sha256": "db27cf8bb632056abdea13dac2abbd01f0cb2e31c1899f9ec7499ad8b467125f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/ready.json",
+      "bytes": 1738,
+      "sha256": "8fd5c9c219879d76dba4430da53c3fa5547f936698c2a42525b351224f67611f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/result.json",
+      "bytes": 1443,
+      "sha256": "7697c4429ee8e7cc9c44122c81adfc8fe40790a26ac2ba1ad100951056b3e357"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/ready.json",
+      "bytes": 1746,
+      "sha256": "b43fbe0cf6bba80deda9d10222bee26a6f8adb064c8c51e460e52823de38fc3e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/result.json",
+      "bytes": 1442,
+      "sha256": "f5a3bc7a709eea582d94305e6fb6eb023bee696673bf79a95866e772d703bae4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-control/result.json",
+      "bytes": 15440,
+      "sha256": "40ced8dea87f6f0a953abc4fe44a108648ea9503b750dd016e259be864ff9f82"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-race/result.json",
+      "bytes": 22406,
+      "sha256": "628d03192e08cc269651c979a717864d7faa9d330488cb05d08e668337cc2f00"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/ready.json",
+      "bytes": 1740,
+      "sha256": "f6291e8de404af69bef8b21eb6b4d03b3bef0cc7160f8659425c211e16bce2b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/result.json",
+      "bytes": 500,
+      "sha256": "e9222011fcadf893edb053792089ee8e6ca926e2cb5f21eef8956b25e2ffa947"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/observations.json",
+      "bytes": 4702378,
+      "sha256": "18c16fc9b64487eab246b97ef7f3f9e517b361eb9f901a8e8a2137edf89f85b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "8c68031926c9ea20c10d11667968bf54d1572cbb9b1961b9bd445745761bbdb9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "cc684d1ac01dbce3b0acf167ad15588c76a2f0b648f9709eeb1f0d60cc67c204"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "bfdaea015b1f69a98319b5eda3b6ec90b24bc031531f280608df5ae846d5e7e5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "97588e444efafe94e149718c188d985fd7cdc82e61a498055fccdf0df0f19af1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "df9532f20b5e61bf347532396e45d7c9f0754dd3c4de4b2ba7477b314f911099"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "38b8bc42cb6284f636d647e74f706a55337750e0ef696d83dfbec06198fc9c4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "713ddafce35a1c561f1f475655e05719675bda9662a730cabe231b349423d878"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "5a8395dc52a7f7a96ec8777b134935f6cc17bc9c770d3819bf723d68cabbe75f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "8a05acac4b5957208afbf68735729fd1b86f5db9acb9e1dad77a4cb55f8bac57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "aae54df20570ce718fd21fb4d4ae2105cebce58ed3f4f6e95d3d263331a84a68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "2928e97e8a99a14c2daecba202e282f7ed057a16d78ec36fdcea58e9fe9d185b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "8becf6693f3197f83d531c47bfa80594aebf63ba588f9fd317a1ec6cf3aa6df1"
+    }
+  ],
+  "calculationMethod": {
+    "imports": [
+      "node:fs",
+      "node:path",
+      "node:crypto",
+      "node:util"
+    ],
+    "operations": "Read frozen JSON/PEM/YAML bytes; SHA-256 raw PEM and exported public SPKI DER; Ed25519 verify(null, decoded32-byte hex digest, public key, canonical64-byte base64 signature); structural JSON matching and scoped pending/execute counting only.",
+    "signatureBoundaries": "Budget signatures cover independently recomputed SHA256(exact retained YAML bytes). Row and seal checks verify signatures over retained event/final digest bytes; they do not independently recompute the canonical row preimage, authenticate key-history envelopes or rerun chain verification.",
+    "exactBudgetSchemaProfile": "All8 complete YAML byte sequences must equal the fully enumerated unambiguous positive-integer/nonnegative cap-one literal below. This is exact-profile equality consistent with the reviewed budget schema, not a general YAML or product Zod parser. No partial regex-only cap extraction.",
+    "capOneYaml": "budgets:\n  version: 1\n  perAgent:\n    default:\n      daily:\n        maxLlmRequests: 500\n        maxLlmTokens: 5000000\n        maxCostUsd: 50\n        maxToolExecutes:\n          READ_ONLY: 1\n          WRITE_LOW: 50\n          WRITE_HIGH: 5\n          DEPLOY: 3\n          SECURITY: 0\n          FINANCIAL: 0\n          NETWORK_EXTERNAL: 20\n          DATA_EXPORT: 2\n          IDENTITY: 2\n      perMinute:\n        maxLlmRequests: 60\n        maxLlmTokens: 200000\n      consequences:\n        onExceed:\n          - action: DOWNGRADE_TO_SIMULATE\n          - action: FREEZE_EXECUTE\n            actionClasses:\n              - DEPLOY\n              - WRITE_HIGH\n              - SECURITY\n          - action: ALERT_OWNER\n",
+    "capOneProfile": {
+      "budgets": {
+        "version": 1,
+        "perAgent": {
+          "default": {
+            "daily": {
+              "maxLlmRequests": 500,
+              "maxLlmTokens": 5000000,
+              "maxCostUsd": 50,
+              "maxToolExecutes": {
+                "READ_ONLY": 1,
+                "WRITE_LOW": 50,
+                "WRITE_HIGH": 5,
+                "DEPLOY": 3,
+                "SECURITY": 0,
+                "FINANCIAL": 0,
+                "NETWORK_EXTERNAL": 20,
+                "DATA_EXPORT": 2,
+                "IDENTITY": 2
+              }
+            },
+            "perMinute": {
+              "maxLlmRequests": 60,
+              "maxLlmTokens": 200000
+            },
+            "consequences": {
+              "onExceed": [
+                {
+                  "action": "DOWNGRADE_TO_SIMULATE"
+                },
+                {
+                  "action": "FREEZE_EXECUTE",
+                  "actionClasses": [
+                    "DEPLOY",
+                    "WRITE_HIGH",
+                    "SECURITY"
+                  ]
+                },
+                {
+                  "action": "ALERT_OWNER"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "expectedBudgetSha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+    "orderingBoundary": "Six children per phase total: four initializer/worker writers and two prior actual readers. Checks compare all four writer close records before both reader launches, first reader close before second reader launch, and all six closes before removal. These are recorded producer timestamps/PIDs, not an independent current process census or externally authenticated clock.",
+    "programSource": "import {readFileSync} from \"node:fs\";\nimport {join} from \"node:path\";\nimport {createHash,createPublicKey,verify} from \"node:crypto\";\nimport {isDeepStrictEqual} from \"node:util\";\nconst receiptPath=\"/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json\";\nconst expectedReceipt=\"388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c\";\nconst hash=b=>createHash(\"sha256\").update(b).digest(\"hex\");\nconst reads=new Map(), failures=[];\nconst check=(name,ok,details={})=>{if(!ok)failures.push({name,...details});return !!ok;};\nconst bytes=p=>{const b=readFileSync(p);const v={path:p,bytes:b.length,sha256:hash(b)};if(reads.has(p))check(\"repeated input bytes unchanged\",isDeepStrictEqual(reads.get(p),v),{path:p});reads.set(p,v);return b;};\nconst json=p=>JSON.parse(bytes(p).toString(\"utf8\"));\nconst receipt=json(receiptPath);\ncheck(\"root receipt exact pin\",reads.get(receiptPath).sha256===expectedReceipt);\nconst index=json(receipt.artifactIndex.path);\ncheck(\"artifact index exact pin\",isDeepStrictEqual(reads.get(receipt.artifactIndex.path),receipt.artifactIndex));\nconst indexed=new Map(index.artifacts.map(v=>[v.path,v]));\nconst roleNames=[\"monitor\",\"auditor\",\"lease\",\"session\"];\nconst actionClasses=[\"READ_ONLY\",\"WRITE_LOW\",\"WRITE_HIGH\",\"DEPLOY\",\"SECURITY\",\"FINANCIAL\",\"NETWORK_EXTERNAL\",\"DATA_EXPORT\",\"IDENTITY\"];\nconst expectedCapOneYaml=\"budgets:\\n  version: 1\\n  perAgent:\\n    default:\\n      daily:\\n        maxLlmRequests: 500\\n        maxLlmTokens: 5000000\\n        maxCostUsd: 50\\n        maxToolExecutes:\\n          READ_ONLY: 1\\n          WRITE_LOW: 50\\n          WRITE_HIGH: 5\\n          DEPLOY: 3\\n          SECURITY: 0\\n          FINANCIAL: 0\\n          NETWORK_EXTERNAL: 20\\n          DATA_EXPORT: 2\\n          IDENTITY: 2\\n      perMinute:\\n        maxLlmRequests: 60\\n        maxLlmTokens: 200000\\n      consequences:\\n        onExceed:\\n          - action: DOWNGRADE_TO_SIMULATE\\n          - action: FREEZE_EXECUTE\\n            actionClasses:\\n              - DEPLOY\\n              - WRITE_HIGH\\n              - SECURITY\\n          - action: ALERT_OWNER\\n\";\nconst profile={budgets:{version:1,perAgent:{default:{daily:{maxLlmRequests:500,maxLlmTokens:5000000,maxCostUsd:50,maxToolExecutes:{READ_ONLY:1,WRITE_LOW:50,WRITE_HIGH:5,DEPLOY:3,SECURITY:0,FINANCIAL:0,NETWORK_EXTERNAL:20,DATA_EXPORT:2,IDENTITY:2}},perMinute:{maxLlmRequests:60,maxLlmTokens:200000},consequences:{onExceed:[{action:\"DOWNGRADE_TO_SIMULATE\"},{action:\"FREEZE_EXECUTE\",actionClasses:[\"DEPLOY\",\"WRITE_HIGH\",\"SECURITY\"]},{action:\"ALERT_OWNER\"}]}}}}};\nconst def=profile.budgets.perAgent.default;\ncheck(\"literal profile positive integer request/token limits\",[def.daily.maxLlmRequests,def.daily.maxLlmTokens,def.perMinute.maxLlmRequests,def.perMinute.maxLlmTokens].every(v=>Number.isInteger(v)&&v>0));\ncheck(\"literal profile positive cost and nonnegative tool counts\",Number.isFinite(def.daily.maxCostUsd)&&def.daily.maxCostUsd>0&&actionClasses.every(k=>Number.isInteger(def.daily.maxToolExecutes[k])&&def.daily.maxToolExecutes[k]>=0)&&def.daily.maxToolExecutes.READ_ONLY===1);\nfunction digestSignature(h,s,key,kind,extra) {\n let ok=false,detail=null;\n try {\n  if(!/^[0-9a-f]{64}$/.test(h)) throw new Error(\"not an exact32-byte hexadecimal digest\");\n  const sig=Buffer.from(s,\"base64\");\n  if(sig.length!==64||sig.toString(\"base64\")!==s) throw new Error(\"not canonical64-byte Ed25519 base64\");\n  ok=verify(null,Buffer.from(h,\"hex\"),key,sig);\n }catch(e){detail=String(e);}\n check(kind,ok,{...extra,detail});\n return ok;\n}\nconst outputs=[],allSpki=[], allReservationIds=[], counts={phaseViews:0,publicKeys:0,budgetSignatures:0,reservationRows:0,reservationEventSignatures:0,reservationSealSignatures:0,allRetainedRowDigestSignatures:0,allRetainedSessionSealSignatures:0,publicAdmissions:0,exactCapRefusals:0,priorWriters:0,recordedReaders:0};\nfor (const phase of receipt.initialAndMatrixPhases) {\n const ev=join(receipt.privateRoot,\"evidence\",phase.phase);\n const obs=json(phase.observations.path);\n check(\"frozen observations exact pin\",isDeepStrictEqual(reads.get(phase.observations.path),phase.observations),{phase:phase.phase});\n const pinsMarker=json(join(ev,\"events\",\"init\",\"pins-before-artifacts.json\"));\n const initResult=json(join(ev,\"events\",\"init\",\"result.json\"));\n const childMap=new Map(obs.children.map(v=>[v.label,v]));\n const expectedLabels=[\"init\",\"positive\",\"left\",\"right\",\"read-control\",\"read-race\"];\n check(\"exact six recorded child labels\",obs.children.length===6&&isDeepStrictEqual([...childMap.keys()].sort(),[...expectedLabels].sort()),{phase:phase.phase});\n const normalChildren=obs.children.every(v=>v.code===0&&v.signal===null&&v.spawnError===null&&v.streamRetentionError===null&&Number.isInteger(v.pid)&&v.closedAt>=v.launchedAt);\n check(\"six actual child records closed normally\",normalChildren,{phase:phase.phase});\n check(\"within-phase child PIDs distinct\",new Set(obs.children.map(v=>v.pid)).size===6,{phase:phase.phase});\n const writers=obs.children.filter(v=>v.script!==\"reader.ts\"), readers=obs.children.filter(v=>v.script===\"reader.ts\");\n counts.priorWriters+=writers.length;counts.recordedReaders+=readers.length;\n check(\"four prior writers and two readers\",writers.length===4&&readers.length===2,{phase:phase.phase});\n const lastWriterClose=Math.max(...writers.map(v=>v.closedAt));\n const ordering=readers.map(v=>({label:v.label,pid:v.pid,launchedAt:v.launchedAt,closedAt:v.closedAt,lastWriterClose,writersClosedBeforeLaunch:lastWriterClose<=v.launchedAt,gapMs:v.launchedAt-lastWriterClose}));\n check(\"all four writers closed before both reader launches\",ordering.every(v=>v.writersClosedBeforeLaunch),{phase:phase.phase});\n check(\"initializer fully exited before positive and race workers\",[\"positive\",\"left\",\"right\"].every(k=>childMap.get(\"init\").closedAt<=childMap.get(k).launchedAt),{phase:phase.phase});\n check(\"first reader closed before second reader launch\",childMap.get(\"read-control\").closedAt<=childMap.get(\"read-race\").launchedAt,{phase:phase.phase});\n check(\"all six children closed before removal\",obs.removal?.removed===true&&obs.children.every(v=>v.closedAt<=obs.removal.at),{phase:phase.phase});\n const workers={};\n for(const label of [\"positive\",\"left\",\"right\"]){\n  const r=json(join(ev,\"events\",label,\"result.json\")),ready=json(join(ev,\"events\",label,\"ready.json\"));\n  check(\"worker raw output matches frozen observation\",isDeepStrictEqual(r,obs.results[label].result)&&isDeepStrictEqual(ready,obs.results[label].ready),{phase:phase.phase,label});\n  check(\"worker measured PID matches child record\",ready.runtime.pid===childMap.get(label).pid,{phase:phase.phase,label});\n  check(\"worker result/ready identity stable\",[\"sessionId\",\"agentId\",\"token\",\"callId\",\"rootCallId\"].every(k=>r[k]===ready[k]),{phase:phase.phase,label});\n  check(\"public outcome is admission or exact cap refusal\",(r.resultWasUndefined===true&&r.refusal===null)||(r.resultWasUndefined===false&&r.refusal===\"daily tool budget exhausted for READ_ONLY\"),{phase:phase.phase,label});\n  workers[label]=r;\n }\n const phaseOutput={phase:phase.phase,recordedProcessOrder:{normalChildren,children:obs.children.map(({label,pid,launchedAt,closedAt,code,signal})=>({label,pid,launchedAt,closedAt,code,signal})),ordering,removedAt:obs.removal?.at},views:[]};\n const release=obs.scheduling.find(v=>v.stage===\"release-both\");\n phaseOutput.recordedRelease={at:release.at,leftGateEnteredAt:release.leftGate?.enteredAt??null,rightGateEnteredAt:release.rightGate?.enteredAt??null,leftInTransaction:release.leftGate?.inTransaction??null,rightInTransaction:release.rightGate?.inTransaction??null,twoGatesBeforeRelease:!!release.leftGate&&!!release.rightGate&&release.leftGate.enteredAt<=release.at&&release.rightGate.enteredAt<=release.at};\n for(const workspace of [\"control\",\"race\"]) {\n  const pub=join(ev,\"public\",workspace),before=json(join(pub,\"before-artifacts.json\"));\n  check(\"preartifact workspace identity\",before.workspaceName===workspace,{phase:phase.phase,workspace});\n  const marker=pinsMarker.workspaces.find(v=>v.name===workspace);\n  check(\"before-artifacts matches initializer pins marker\",!!marker&&isDeepStrictEqual(before.pins,marker.pins)&&before.capturedAt<=pinsMarker.capturedAt,{phase:phase.phase,workspace});\n  const keys={},keyChecks=[];\n  for(const role of roleNames){\n   const pem=bytes(join(pub,role+\".pub.pem\")),key=createPublicKey(pem);\n   const spki=key.export({format:\"der\",type:\"spki\"}),pemSha=hash(pem),spkiSha=hash(spki);\n   const publicOnly=/^-----BEGIN PUBLIC KEY-----\\r?\\n/.test(pem.toString())&&!pem.toString().includes(\"PRIVATE KEY\");\n   const match=key.asymmetricKeyType===\"ed25519\"&&publicOnly&&pemSha===before.pins[role].pemSha256&&spkiSha===before.pins[role].spkiSha256;\n   check(\"role public PEM and SPKI pin\",match,{phase:phase.phase,workspace,role});\n   keys[role]=key;allSpki.push(spkiSha);counts.publicKeys++;\n   keyChecks.push({role,type:key.asymmetricKeyType,publicOnly,pemSha256:pemSha,spkiSha256:spkiSha,matches:match});\n  }\n  const budgetBytes=bytes(join(pub,\"budgets.yaml\")),budgetSig=json(join(pub,\"budgets.yaml.sig\"));\n  const yamlExact=budgetBytes.equals(Buffer.from(expectedCapOneYaml));\n  check(\"exact fully enumerated cap-one YAML profile\",yamlExact,{phase:phase.phase,workspace});\n  const budgetSha=hash(budgetBytes),budgetDigestMatches=budgetSig.digestSha256===budgetSha&&budgetSig.signer===\"auditor\";\n  check(\"budget exact bytes digest and signer role\",budgetDigestMatches,{phase:phase.phase,workspace});\n  const budgetSignature=digestSignature(budgetSha,budgetSig.signature,keys.auditor,\"budget decoded-digest Ed25519 signature\",{phase:phase.phase,workspace});\n  counts.budgetSignatures++;\n  const pinOrder=Number.isFinite(budgetSig.signedTs)&&before.capturedAt<=budgetSig.signedTs&&pinsMarker.capturedAt<=budgetSig.signedTs;\n  check(\"recorded public pin markers precede budget signature timestamp\",pinOrder,{phase:phase.phase,workspace});\n  const initialized=initResult.initialized.find(v=>v.workspaceName===workspace);\n  check(\"initializer retained profile metadata consistency\",initialized?.cap===1&&initialized.budgetSha256===budgetSha&&isDeepStrictEqual(initialized.pins,before.pins),{phase:phase.phase,workspace});\n  const reader=json(join(ev,\"events\",\"read-\"+workspace,\"result.json\"));\n  check(\"raw reader result matches frozen observation\",isDeepStrictEqual(reader,obs.results[\"read-\"+workspace].result),{phase:phase.phase,workspace});\n  check(\"reader measured PID matches recorded process\",reader.runtime.pid===childMap.get(\"read-\"+workspace).pid,{phase:phase.phase,workspace});\n  check(\"reader monitor pin consistency\",reader.expectedMonitorFingerprint===before.pins.monitor.pemSha256&&reader.integrity.trustRoot.expectedFingerprint===before.pins.monitor.pemSha256&&reader.integrity.trustRoot.monitorFingerprint===before.pins.monitor.pemSha256&&reader.integrity.trustRoot.anchored===true,{phase:phase.phase,workspace});\n  check(\"product prior canonical integrity verdict retained\",reader.integrity.ok===true&&reader.integrity.chain.ok===true&&reader.integrity.errors.length===0,{phase:phase.phase,workspace});\n  const rows=reader.rows, sessions=reader.sessions;\n  const metas=rows.map(row=>({row,meta:JSON.parse(row.meta_json)}));\n  const reservations=metas.filter(v=>v.row.event_type===\"audit\"&&v.meta.auditType===\"NATIVE_BUDGET_RESERVATION\");\n  const toolOutcomes=metas.filter(v=>v.row.event_type===\"audit\"&&[\"TOOL_CALL_ALLOWED\",\"TOOL_CALL_FAILED\",\"TOOL_CALL_DENIED\"].includes(v.meta.auditType));\n  const candidates=(workspace===\"control\"?[\"positive\"]:[\"left\",\"right\"]).map(label=>({label,...workers[label]}));\n  const admitted=candidates.filter(v=>v.resultWasUndefined&&v.refusal===null),refused=candidates.filter(v=>!v.resultWasUndefined);\n  counts.publicAdmissions+=admitted.length;counts.exactCapRefusals+=refused.length;\n  const matches=[];\n  for(const {row,meta} of reservations){\n   const rowSig=digestSignature(row.event_hash,row.writer_sig,keys.monitor,\"reservation digest Ed25519 signature\",{phase:phase.phase,workspace,rowId:row.id});\n   counts.reservationEventSignatures++;\n   const sameSession=sessions.filter(v=>v.session_id===row.session_id);\n   check(\"one actual journal session per reservation\",sameSession.length===1,{phase:phase.phase,workspace,rowId:row.id});\n   const session=sameSession[0];\n   const finalSame=session?.session_final_event_hash===row.event_hash;\n   check(\"journal final hash names actual reservation and is sealed\",finalSame&&Number.isFinite(session.ended_ts)&&session.started_ts<=row.ts&&row.ts<=session.ended_ts&&session.binary_path===\"amc-native-budget-admission\",{phase:phase.phase,workspace,rowId:row.id});\n   const sealSig=digestSignature(session.session_final_event_hash,session.session_seal_sig,keys.monitor,\"reservation seal digest Ed25519 signature\",{phase:phase.phase,workspace,rowId:row.id});\n   counts.reservationSealSignatures++;\n   const retained=reader.reservations.filter(v=>v.row.id===row.id);\n   check(\"reader reservation wrapper matches actual row/session/meta\",retained.length===1&&isDeepStrictEqual(retained[0].row,row)&&isDeepStrictEqual(retained[0].session,session)&&isDeepStrictEqual(retained[0].meta,meta),{phase:phase.phase,workspace,rowId:row.id});\n   const admittedMatches=admitted.filter(v=>v.sessionId===meta.nativeSessionId&&v.token===meta.toolToken&&v.callId===meta.callId&&meta.reservationKey===\"tool:\"+v.sessionId+\":\"+v.token);\n   const noRefusedMatch=refused.every(v=>v.sessionId!==meta.nativeSessionId&&v.token!==meta.toolToken);\n   check(\"reservation bijective admitted identity\",admittedMatches.length===1&&noRefusedMatch&&meta.agentId===\"default\"&&meta.kind===\"tool\"&&meta.actionClass===\"READ_ONLY\"&&meta.trustTier===\"OBSERVED\",{phase:phase.phase,workspace,rowId:row.id});\n   const settled=toolOutcomes.filter(v=>v.row.session_id===meta.nativeSessionId&&v.meta.toolToken===meta.toolToken);\n   check(\"reservation remains pending with no recorded outcome\",settled.length===0,{phase:phase.phase,workspace,rowId:row.id});\n   check(\"recorded public pins precede reservation timestamp\",before.capturedAt<=row.ts&&pinsMarker.capturedAt<=row.ts,{phase:phase.phase,workspace,rowId:row.id});\n   matches.push({reservationId:row.id,journalSessionId:row.session_id,eventHash:row.event_hash,reservationKey:meta.reservationKey,nativeSessionId:meta.nativeSessionId,toolToken:meta.toolToken,callId:meta.callId,admittedLabel:admittedMatches[0]?.label??null,admittedMatches:admittedMatches.length,noRefusedMatch,eventSignatureVerified:rowSig,sealSignatureVerified:sealSig,finalHashNamesActualEvent:finalSame,eventAndSealSignatureBytesIdentical:row.writer_sig===session.session_seal_sig,pending:true});\n   allReservationIds.push(row.id);counts.reservationRows++;\n  }\n  const bijective=reservations.length===admitted.length&&admitted.every(v=>matches.filter(m=>m.nativeSessionId===v.sessionId&&m.toolToken===v.token&&m.callId===v.callId).length===1)&&new Set(matches.map(m=>m.reservationKey)).size===matches.length;\n  check(\"complete admission-to-reservation bijection\",bijective,{phase:phase.phase,workspace});\n  const independentlyCountedPending=reservations.filter(v=>!toolOutcomes.some(o=>o.row.session_id===v.meta.nativeSessionId&&o.meta.toolToken===v.meta.toolToken)).length;\n  const independentlyCountedExecuted=toolOutcomes.filter(v=>v.meta.effectiveMode===\"EXECUTE\"&&v.meta.agentId===\"default\"&&v.meta.actionClass===\"READ_ONLY\"&&v.meta.auditType!==\"TOOL_CALL_DENIED\").length;\n  check(\"simple scoped raw-row counts match saved projection\",independentlyCountedPending===reader.usage.daily.toolPending.READ_ONLY&&independentlyCountedExecuted===reader.usage.daily.toolExecutes.READ_ONLY&&toolOutcomes.length===0,{phase:phase.phase,workspace});\n  check(\"wrapper count includes every reservation\",reader.reservations.length===reservations.length,{phase:phase.phase,workspace});\n  const rowSignatureChecks=rows.map(row=>({rowId:row.id,type:row.event_type,verified:digestSignature(row.event_hash,row.writer_sig,keys.monitor,\"all retained row digest signature\",{phase:phase.phase,workspace,rowId:row.id})}));\n  counts.allRetainedRowDigestSignatures+=rowSignatureChecks.length;\n  const sessionSealChecks=sessions.map(session=>({sessionId:session.session_id,verified:digestSignature(session.session_final_event_hash,session.session_seal_sig,keys.monitor,\"all retained session seal digest signature\",{phase:phase.phase,workspace,sessionId:session.session_id})}));\n  counts.allRetainedSessionSealSignatures+=sessionSealChecks.length;\n  const opens=metas.filter(v=>v.row.event_type===\"session/open\"), closes=metas.filter(v=>v.row.event_type===\"session/close\");\n  check(\"native owner openings/closings match candidates\",opens.length===candidates.length&&closes.length===candidates.length&&candidates.every(v=>opens.filter(o=>o.row.session_id===v.sessionId&&o.meta.agentId===\"default\").length===1&&closes.filter(o=>o.row.session_id===v.sessionId).length===1),{phase:phase.phase,workspace});\n  counts.phaseViews++;\n  phaseOutput.views.push({workspace,keyChecks,budget:{sha256:budgetSha,exactProfileMatches:yamlExact,signer:budgetSig.signer,signedTs:budgetSig.signedTs,signatureVerified:budgetSignature,bothPinMarkersPrecedeSignedTs:pinOrder},beforeArtifactsCapturedAt:before.capturedAt,pinsMarkerCapturedAt:pinsMarker.capturedAt,readerRecordedProductVerdict:{ok:reader.integrity.ok,chainOk:reader.integrity.chain.ok,trustRoot:reader.integrity.trustRoot},admissions:admitted.map(v=>({label:v.label,sessionId:v.sessionId,token:v.token,callId:v.callId})),refusals:refused.map(v=>({label:v.label,refusal:v.refusal})),matches,counts:{rawRows:rows.length,sessions:sessions.length,reservations:reservations.length,admissions:admitted.length,capRefusals:refused.length,pendingFromScopedRows:independentlyCountedPending,executedFromScopedRows:independentlyCountedExecuted,savedPending:reader.usage.daily.toolPending.READ_ONLY,savedExecuted:reader.usage.daily.toolExecutes.READ_ONLY},completeAdmissionReservationBijection:bijective,rowSignatureChecks,sessionSealChecks});\n }\n outputs.push(phaseOutput);\n}\ncheck(\"all role keys distinct across phase/workspace/role\",new Set(allSpki).size===allSpki.length);\ncheck(\"all reservation IDs distinct\",new Set(allReservationIds).size===allReservationIds.length);\ncheck(\"derived total nine reservation rows across eight views\",counts.reservationRows===9&&counts.phaseViews===8);\ncheck(\"derived 32 role public keys and eight signed budgets\",counts.publicKeys===32&&counts.budgetSignatures===8);\ncheck(\"derived nine admissions and three exact cap refusals\",counts.publicAdmissions===9&&counts.exactCapRefusals===3);\nfor(const input of reads.values()){\n if(input.path.startsWith(join(receipt.privateRoot,\"evidence\")+ \"/\")){\n  const expected=indexed.get(input.path);\n  check(\"retained public evidence included in frozen artifact index\",!!expected&&isDeepStrictEqual(input,expected),{path:input.path});\n }\n}\nconst inputPins=[...reads.values()].sort((a,b)=>a.path.localeCompare(b.path));\nfor(const input of inputPins){\n const b=readFileSync(input.path);\n check(\"all read inputs unchanged after calculation\",b.length===input.bytes&&hash(b)===input.sha256,{path:input.path});\n}\nconst payload={counts,allRoleSpkiUnique:new Set(allSpki).size===allSpki.length,allReservationIdsUnique:new Set(allReservationIds).size===allReservationIds.length,phases:outputs};\nconst report={schemaVersion:1,capturedUtc:new Date().toISOString(),key:\"P0-30\",oldIssue:\"AMC-1534\",source:\"58e91dcef111bf02f773dcbfd1921d428cf75e34\",state:failures.length?\"PUBLIC_INPUT_OFFLINE_REVIEW_HAS_FAILURES\":\"PUBLIC_INPUT_OFFLINE_REVIEW_COMPLETE_NO_FAILURES\",allReadsFinished:true,inputPins,calculationMethod:{imports:[\"node:fs\",\"node:path\",\"node:crypto\",\"node:util\"],operations:\"Read frozen JSON/PEM/YAML bytes; SHA-256 raw PEM and exported public SPKI DER; Ed25519 verify(null, decoded32-byte hex digest, public key, canonical64-byte base64 signature); structural JSON matching and scoped pending/execute counting only.\",signatureBoundaries:\"Budget signatures cover independently recomputed SHA256(exact retained YAML bytes). Row and seal checks verify signatures over retained event/final digest bytes; they do not independently recompute the canonical row preimage, authenticate key-history envelopes or rerun chain verification.\",exactBudgetSchemaProfile:\"All8 complete YAML byte sequences must equal the fully enumerated unambiguous positive-integer/nonnegative cap-one literal below. This is exact-profile equality consistent with the reviewed budget schema, not a general YAML or product Zod parser. No partial regex-only cap extraction.\",capOneYaml:expectedCapOneYaml,capOneProfile:profile,expectedBudgetSha256:hash(Buffer.from(expectedCapOneYaml)),orderingBoundary:\"Six children per phase total: four initializer/worker writers and two prior actual readers. Checks compare all four writer close records before both reader launches, first reader close before second reader launch, and all six closes before removal. These are recorded producer timestamps/PIDs, not an independent current process census or externally authenticated clock.\"},verificationResults:payload,verificationResultsSha256:hash(Buffer.from(JSON.stringify(payload))),failures,limitations:[\"No test rerun, product module/fixture import, SQLite/native loading, new cold read, mutation, signing, agent retry or network access occurred. Only builtin public-key verification calculations ran.\",\"Product reader canonical hashes, row/global/session chains, seals and trust-root verdicts are preserved prior runtime inputs. This review independently verifies public-key identity and digest signatures, then matches raw structural metadata; it does not replace the product canonicalization/history-admission checks.\",\"Pre-artifact ordering is consistency of the recorded public pin markers, signature timestamps and event timestamps plus the previously reviewed producer sequence, not external timestamp attestation.\",\"Event and final seal signatures for a one-event reservation journal are often identical bytes because they sign the same digest under the same Ed25519 key. Separate event/seal role checks are not independent signing authorities.\",\"Simple scoped pending counts here use actual retained reservation and matching outcome rows; this is not a full reimplementation of all native model/tool budget projection semantics.\",\"Nine reservation rows across eight phase/workspace views are retained facts from one new scenario executed four times, not nine new tests. Initial/baseline/restored races each have one reservation; deliberate private no-transaction mutation has two. The control has one in every phase.\",\"Local fixture public keys do not establish external people/deployment authority. Private credentials/vault inputs were cleaned and were neither read nor recreated; full offline fixture replay is not possible from these public inputs alone.\",\"No P0-27 corruption-cause repair, original25/held27/historical26 substitution, source/ownership/freeze closure, Node24/full-suite/release/hosted/whole P0-30 or formal Done is implied.\"]};\nprocess.stdout.write(JSON.stringify(report));\n",
+    "invocation": "/usr/bin/env -i PATH=/usr/bin:/bin /opt/homebrew/opt/node@22/bin/node --input-type=module; program supplied through stdin. This is an offline builtin-crypto calculation, not a runtime qualification fingerprint."
+  },
+  "verificationResults": {
+    "counts": {
+      "phaseViews": 8,
+      "publicKeys": 32,
+      "budgetSignatures": 8,
+      "reservationRows": 9,
+      "reservationEventSignatures": 9,
+      "reservationSealSignatures": 9,
+      "allRetainedRowDigestSignatures": 33,
+      "allRetainedSessionSealSignatures": 21,
+      "publicAdmissions": 9,
+      "exactCapRefusals": 3,
+      "priorWriters": 16,
+      "recordedReaders": 8
+    },
+    "allRoleSpkiUnique": true,
+    "allReservationIdsUnique": true,
+    "phases": [
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "recordedProcessOrder": {
+          "normalChildren": true,
+          "children": [
+            {
+              "label": "init",
+              "pid": 95118,
+              "launchedAt": 1792032019513,
+              "closedAt": 1792032021416,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "positive",
+              "pid": 95126,
+              "launchedAt": 1792032021447,
+              "closedAt": 1792032022287,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "left",
+              "pid": 95128,
+              "launchedAt": 1792032022289,
+              "closedAt": 1792032024249,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "right",
+              "pid": 95132,
+              "launchedAt": 1792032023049,
+              "closedAt": 1792032024181,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-control",
+              "pid": 95136,
+              "launchedAt": 1792032024356,
+              "closedAt": 1792032025091,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-race",
+              "pid": 95138,
+              "launchedAt": 1792032025203,
+              "closedAt": 1792032025935,
+              "code": 0,
+              "signal": null
+            }
+          ],
+          "ordering": [
+            {
+              "label": "read-control",
+              "pid": 95136,
+              "launchedAt": 1792032024356,
+              "closedAt": 1792032025091,
+              "lastWriterClose": 1792032024249,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 107
+            },
+            {
+              "label": "read-race",
+              "pid": 95138,
+              "launchedAt": 1792032025203,
+              "closedAt": 1792032025935,
+              "lastWriterClose": 1792032024249,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 954
+            }
+          ],
+          "removedAt": 1792032026175
+        },
+        "views": [
+          {
+            "workspace": "control",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "6887440da98e11b455efff89a6940be3b8a8ed5c9d9fadd768c1541693f5eaea",
+                "spkiSha256": "2c1b164e6dfb05b7a7c0090eff6bcdbcae7b2b25afb143f8df9cf54210283dd1",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "43159420eac55896847e3c59a36548f8a1ca16dc2ea817493931f3e1748d89fb",
+                "spkiSha256": "f636e9d4d399a0b2e5f84c7bd4988a8073694a1a818677244922ab63ff4b8d97",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "6202908969787729227ec8dffd05a8ca614c720cad1844f650224be0c3ddf323",
+                "spkiSha256": "c3b54ddacd69c1f5a425176219ab6b81d19c54d664ebd207e37cdcaaaceda5fe",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "badb64f664f94e118e233f40dd49e13f25b5c9fff97e973daa7e09312f7666bb",
+                "spkiSha256": "fa9c9d7e20c5d857a7cc0586dc721c0c11384b3968276748cf40b4ff55d1438d",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032021380,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032021007,
+            "pinsMarkerCapturedAt": 1792032021007,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "6887440da98e11b455efff89a6940be3b8a8ed5c9d9fadd768c1541693f5eaea",
+                "expectedFingerprint": "6887440da98e11b455efff89a6940be3b8a8ed5c9d9fadd768c1541693f5eaea"
+              }
+            },
+            "admissions": [
+              {
+                "label": "positive",
+                "sessionId": "a46cee5d-2a21-454d-862f-aeeaec477547",
+                "token": "0c8e4ba0-f2dc-4978-954d-9495243577fb",
+                "callId": "f01ae492-5af2-4a5d-88a9-a02e5c130faf"
+              }
+            ],
+            "refusals": [],
+            "matches": [
+              {
+                "reservationId": "97b36be8-445d-4d4a-9ae1-9c6724eaacde",
+                "journalSessionId": "native-budget-da22f724-414f-4102-83ee-9161b1fce5fc",
+                "eventHash": "121b5f43573a1a609353286129fbc30e352d7a8d4e1954f98c9b61e75c819b65",
+                "reservationKey": "tool:a46cee5d-2a21-454d-862f-aeeaec477547:0c8e4ba0-f2dc-4978-954d-9495243577fb",
+                "nativeSessionId": "a46cee5d-2a21-454d-862f-aeeaec477547",
+                "toolToken": "0c8e4ba0-f2dc-4978-954d-9495243577fb",
+                "callId": "f01ae492-5af2-4a5d-88a9-a02e5c130faf",
+                "admittedLabel": "positive",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 3,
+              "sessions": 2,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 0,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "ed392028-faa9-414a-bfff-1fb78b62b22e",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "97b36be8-445d-4d4a-9ae1-9c6724eaacde",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "ae0e5bd3-78a8-41c2-9b2a-074298ce9c64",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "a46cee5d-2a21-454d-862f-aeeaec477547",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-da22f724-414f-4102-83ee-9161b1fce5fc",
+                "verified": true
+              }
+            ]
+          },
+          {
+            "workspace": "race",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "8a7a5d2a8a034ffd55bd6bb3dfb5877748a31547de45358a32b50edb76fee154",
+                "spkiSha256": "1c89cbd32cf948a81540ea79e3ad4760bbf021533d84213d2b5a3b79caf580ff",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "756b97829b4e6e5c664d3c6a06775cc77cb819a6b6c17dc2bba298909a134edc",
+                "spkiSha256": "19815a55eaeb3815f422abd7d90c6964a2866a8fe162fc6131abb73b59ddacbb",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "a66593b336d00f6ae985359c0d1fb2db834c6945fa75e354bf162beeae377991",
+                "spkiSha256": "4e5ec1f209631c65d5daa12730f7ead118599f030fde899939f49f8e01b6142d",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "b4816808a53d88c4548a14671ec362e999f69bd6f3283488de82efefeb3c6b99",
+                "spkiSha256": "c9c072e8788cfc8ee6f5ec75c149583afec6b505609b63dd0c10a419560cd65f",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032021218,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032021006,
+            "pinsMarkerCapturedAt": 1792032021007,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "8a7a5d2a8a034ffd55bd6bb3dfb5877748a31547de45358a32b50edb76fee154",
+                "expectedFingerprint": "8a7a5d2a8a034ffd55bd6bb3dfb5877748a31547de45358a32b50edb76fee154"
+              }
+            },
+            "admissions": [
+              {
+                "label": "right",
+                "sessionId": "7c4d4fa8-9d44-4827-9be9-bcc1445fdee6",
+                "token": "a8699a02-fbec-46c6-a6fc-726812227242",
+                "callId": "81d0dc28-726b-4768-b310-8fb586ff0215"
+              }
+            ],
+            "refusals": [
+              {
+                "label": "left",
+                "refusal": "daily tool budget exhausted for READ_ONLY"
+              }
+            ],
+            "matches": [
+              {
+                "reservationId": "9fe3c3b5-fe5f-41cb-8576-d77bd54b18f6",
+                "journalSessionId": "native-budget-0c864a3a-ea8e-4fe1-ab34-7b86bbf5b2be",
+                "eventHash": "8eab7a83f3724849d0aa506a54e6b5ed8df9bccd9062ea737776b332e354063a",
+                "reservationKey": "tool:7c4d4fa8-9d44-4827-9be9-bcc1445fdee6:a8699a02-fbec-46c6-a6fc-726812227242",
+                "nativeSessionId": "7c4d4fa8-9d44-4827-9be9-bcc1445fdee6",
+                "toolToken": "a8699a02-fbec-46c6-a6fc-726812227242",
+                "callId": "81d0dc28-726b-4768-b310-8fb586ff0215",
+                "admittedLabel": "right",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 5,
+              "sessions": 3,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 1,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "5ffd0233-c78f-4dc8-81df-d097e5072e90",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "ed8cf7d5-a6b6-41f8-9ffa-e7188f41ffcb",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "9fe3c3b5-fe5f-41cb-8576-d77bd54b18f6",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "5d3b42fd-d90f-474f-b895-6ffb0891095a",
+                "type": "session/close",
+                "verified": true
+              },
+              {
+                "rowId": "95199842-2808-48ad-b65a-f4a4b2fd7947",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "74e74464-b70f-4352-b6dd-0a35d631f3a7",
+                "verified": true
+              },
+              {
+                "sessionId": "7c4d4fa8-9d44-4827-9be9-bcc1445fdee6",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-0c864a3a-ea8e-4fe1-ab34-7b86bbf5b2be",
+                "verified": true
+              }
+            ]
+          }
+        ],
+        "recordedRelease": {
+          "at": 1792032024072,
+          "leftGateEnteredAt": null,
+          "rightGateEnteredAt": 1792032023819,
+          "leftInTransaction": null,
+          "rightInTransaction": true,
+          "twoGatesBeforeRelease": false
+        }
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "recordedProcessOrder": {
+          "normalChildren": true,
+          "children": [
+            {
+              "label": "init",
+              "pid": 95221,
+              "launchedAt": 1792032092824,
+              "closedAt": 1792032094639,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "positive",
+              "pid": 95223,
+              "launchedAt": 1792032094672,
+              "closedAt": 1792032095515,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "left",
+              "pid": 95225,
+              "launchedAt": 1792032095515,
+              "closedAt": 1792032097499,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "right",
+              "pid": 95231,
+              "launchedAt": 1792032096284,
+              "closedAt": 1792032097440,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-control",
+              "pid": 95233,
+              "launchedAt": 1792032097608,
+              "closedAt": 1792032098350,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-race",
+              "pid": 95235,
+              "launchedAt": 1792032098457,
+              "closedAt": 1792032099190,
+              "code": 0,
+              "signal": null
+            }
+          ],
+          "ordering": [
+            {
+              "label": "read-control",
+              "pid": 95233,
+              "launchedAt": 1792032097608,
+              "closedAt": 1792032098350,
+              "lastWriterClose": 1792032097499,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 109
+            },
+            {
+              "label": "read-race",
+              "pid": 95235,
+              "launchedAt": 1792032098457,
+              "closedAt": 1792032099190,
+              "lastWriterClose": 1792032097499,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 958
+            }
+          ],
+          "removedAt": 1792032099426
+        },
+        "views": [
+          {
+            "workspace": "control",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "fcdb346607fc910feadf7a41953055c8bc5bfa537dcf795c054826f2d082d5a8",
+                "spkiSha256": "d65f47936b6d3254c6694ff5c598aa1ee56ca55597675e5b0f347988d83ee99b",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "2f488a2f09ff4aa6550a6bbd39448f364b4ca045b01913a966e5a192b76ca3c3",
+                "spkiSha256": "9c59e316386b87b57986f31fb62811d0e4f476ff331f0a512eb005483dfd02be",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "c41b66bbd4da43e8bcec735e7171177b502ced3fed475e4dca25d478a93574f8",
+                "spkiSha256": "663ef82d94d1c7486b6d31d24f91d77821ba2dd484d32576af4d3c890be634f4",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "03a4be772d15dbc40692d17c9048d710dfd83824a079d7d7b85c7ce3d58c4861",
+                "spkiSha256": "7fd8e369e2aff2030f1969702a32b41c7f565c33e77dfb9c6e834731fcf5e192",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032094607,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032094244,
+            "pinsMarkerCapturedAt": 1792032094244,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "fcdb346607fc910feadf7a41953055c8bc5bfa537dcf795c054826f2d082d5a8",
+                "expectedFingerprint": "fcdb346607fc910feadf7a41953055c8bc5bfa537dcf795c054826f2d082d5a8"
+              }
+            },
+            "admissions": [
+              {
+                "label": "positive",
+                "sessionId": "773afa45-caef-4c8c-9334-fc9c78b0908f",
+                "token": "13c0a986-46bb-4f08-85fe-9ac19c2c5f28",
+                "callId": "0447d5e7-80e0-42fa-9755-1069c7ac52a0"
+              }
+            ],
+            "refusals": [],
+            "matches": [
+              {
+                "reservationId": "2cc32433-ff0b-4e95-b981-029c1a57cce1",
+                "journalSessionId": "native-budget-32e69ea6-7ef8-4261-95f3-11a99633174e",
+                "eventHash": "ca66396dfe29f6d11413c978ecd093a70e989ceddf27fb05acb362d55f06c28f",
+                "reservationKey": "tool:773afa45-caef-4c8c-9334-fc9c78b0908f:13c0a986-46bb-4f08-85fe-9ac19c2c5f28",
+                "nativeSessionId": "773afa45-caef-4c8c-9334-fc9c78b0908f",
+                "toolToken": "13c0a986-46bb-4f08-85fe-9ac19c2c5f28",
+                "callId": "0447d5e7-80e0-42fa-9755-1069c7ac52a0",
+                "admittedLabel": "positive",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 3,
+              "sessions": 2,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 0,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "44e400e9-c1c5-4c34-853b-aaae7ab1c98a",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "2cc32433-ff0b-4e95-b981-029c1a57cce1",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "6ed52640-ae6c-4c51-b729-2b49c5a2b06e",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "773afa45-caef-4c8c-9334-fc9c78b0908f",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-32e69ea6-7ef8-4261-95f3-11a99633174e",
+                "verified": true
+              }
+            ]
+          },
+          {
+            "workspace": "race",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "d818ff89de91312e2656220fbbe7fd5e2cb21aecf46efa2aac6c8a80d52cf226",
+                "spkiSha256": "b6cb1e8bac347178f2aa392c648bb1dd49ef9ef59131e52cdea28a47e8e49c52",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "57120df674a26e7ea62e796bb0849fb01ae18a2178f563f95c0072ae6dba6c74",
+                "spkiSha256": "ad9081ca2c945c80d3405929fbbf9415cd3ad3c4b8ca38da7c7556ad87199008",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "d061f1c40e9672567ac0a245136bb2dc07e9519908830b94f2e41caf9d26b284",
+                "spkiSha256": "5c280387c88a005926240f7aa5a4781eaeae77a40f3f4597e34641c2088cf3c1",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "a87967c6ac470b68527765afd30056fe667786b3192674f58587b6b7844bc431",
+                "spkiSha256": "3c501f7f678119f9255cdb0fadf8b156f0bfd66d868979cfc007e8b44826237a",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032094448,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032094243,
+            "pinsMarkerCapturedAt": 1792032094244,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "d818ff89de91312e2656220fbbe7fd5e2cb21aecf46efa2aac6c8a80d52cf226",
+                "expectedFingerprint": "d818ff89de91312e2656220fbbe7fd5e2cb21aecf46efa2aac6c8a80d52cf226"
+              }
+            },
+            "admissions": [
+              {
+                "label": "right",
+                "sessionId": "c2a1a9ce-4614-48db-884a-e750b25fb234",
+                "token": "4a497f11-8e62-470d-802b-ef49b0b84e8f",
+                "callId": "d5e5e692-00d5-41e1-baf4-689641df2b06"
+              }
+            ],
+            "refusals": [
+              {
+                "label": "left",
+                "refusal": "daily tool budget exhausted for READ_ONLY"
+              }
+            ],
+            "matches": [
+              {
+                "reservationId": "36da3b87-f34a-4ae0-8a94-20338cb06bca",
+                "journalSessionId": "native-budget-c36ff556-1b7f-4f97-9587-5b716c303169",
+                "eventHash": "1f4c68b00043c79afa69411497908e36492276305c0175b6390fa08ae572ea1d",
+                "reservationKey": "tool:c2a1a9ce-4614-48db-884a-e750b25fb234:4a497f11-8e62-470d-802b-ef49b0b84e8f",
+                "nativeSessionId": "c2a1a9ce-4614-48db-884a-e750b25fb234",
+                "toolToken": "4a497f11-8e62-470d-802b-ef49b0b84e8f",
+                "callId": "d5e5e692-00d5-41e1-baf4-689641df2b06",
+                "admittedLabel": "right",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 5,
+              "sessions": 3,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 1,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "e7b891aa-18bf-41e9-a00c-1bff6cf91509",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "920507e8-1259-443d-8593-fb6968a12ecd",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "36da3b87-f34a-4ae0-8a94-20338cb06bca",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "d5a9709f-f09e-43e7-b9a7-fe54a670b5d6",
+                "type": "session/close",
+                "verified": true
+              },
+              {
+                "rowId": "bd2ae6fe-5857-4389-8ce5-c4e25a3c53b6",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "cc4ff5be-a3fe-42b7-a6a9-924589f61afe",
+                "verified": true
+              },
+              {
+                "sessionId": "c2a1a9ce-4614-48db-884a-e750b25fb234",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-c36ff556-1b7f-4f97-9587-5b716c303169",
+                "verified": true
+              }
+            ]
+          }
+        ],
+        "recordedRelease": {
+          "at": 1792032097324,
+          "leftGateEnteredAt": null,
+          "rightGateEnteredAt": 1792032097063,
+          "leftInTransaction": null,
+          "rightInTransaction": true,
+          "twoGatesBeforeRelease": false
+        }
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "recordedProcessOrder": {
+          "normalChildren": true,
+          "children": [
+            {
+              "label": "init",
+              "pid": 95247,
+              "launchedAt": 1792032100791,
+              "closedAt": 1792032102453,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "positive",
+              "pid": 95257,
+              "launchedAt": 1792032102488,
+              "closedAt": 1792032103338,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "left",
+              "pid": 95259,
+              "launchedAt": 1792032103341,
+              "closedAt": 1792032104965,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "right",
+              "pid": 95261,
+              "launchedAt": 1792032104098,
+              "closedAt": 1792032104937,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-control",
+              "pid": 95263,
+              "launchedAt": 1792032105064,
+              "closedAt": 1792032105808,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-race",
+              "pid": 95265,
+              "launchedAt": 1792032105916,
+              "closedAt": 1792032106658,
+              "code": 0,
+              "signal": null
+            }
+          ],
+          "ordering": [
+            {
+              "label": "read-control",
+              "pid": 95263,
+              "launchedAt": 1792032105064,
+              "closedAt": 1792032105808,
+              "lastWriterClose": 1792032104965,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 99
+            },
+            {
+              "label": "read-race",
+              "pid": 95265,
+              "launchedAt": 1792032105916,
+              "closedAt": 1792032106658,
+              "lastWriterClose": 1792032104965,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 951
+            }
+          ],
+          "removedAt": 1792032106894
+        },
+        "views": [
+          {
+            "workspace": "control",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "505db193dbd1cd85319e313f84bd82b757e1f3a6e625dae3c6aad8d966c313fe",
+                "spkiSha256": "4ecce5dd03e0ed34d52766d4e5b347f8847f4409f5fa95ab1fddf950feffc54c",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "9e9bc88384ff8aa85fea1ca3c47ac0a64d95210bba06ba12823cc22b6d577707",
+                "spkiSha256": "4e7952dc1e6982ce8cfae98133966d9826314cf49782a2f64fc2d1af8f83079e",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "1f670fd5b6192f517b421f0079ded1a7f6a76dd8f4f714c04f2c763711d72cc6",
+                "spkiSha256": "028a3cbda3990cc2b7b2cb4114d18c6f246cf62f7fe174262baf17406def46b2",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "44ccf6fcf343fedf41fd52007ecaf2f61da721cdc098df7bdb9f3ee72686a9eb",
+                "spkiSha256": "fcec05dcdd6d4ce7aa515a1c56116c710d09ece30218b9f0785c954a69ebfb9b",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032102420,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032102047,
+            "pinsMarkerCapturedAt": 1792032102048,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "505db193dbd1cd85319e313f84bd82b757e1f3a6e625dae3c6aad8d966c313fe",
+                "expectedFingerprint": "505db193dbd1cd85319e313f84bd82b757e1f3a6e625dae3c6aad8d966c313fe"
+              }
+            },
+            "admissions": [
+              {
+                "label": "positive",
+                "sessionId": "5b72d098-f264-4afa-b4aa-64c50fa65b0b",
+                "token": "7ae4aec5-77b5-44f8-bf0f-4da1758818ee",
+                "callId": "44ead910-58fe-48f2-adcc-8af82ee3a94d"
+              }
+            ],
+            "refusals": [],
+            "matches": [
+              {
+                "reservationId": "d7e436bd-4283-413a-9c1a-a80f0153ce02",
+                "journalSessionId": "native-budget-744401e8-cb46-4913-beb6-376d11541c68",
+                "eventHash": "b0f0b9710d6f881b4a74213616d3e97d8488ae9537d279168442e513662a6305",
+                "reservationKey": "tool:5b72d098-f264-4afa-b4aa-64c50fa65b0b:7ae4aec5-77b5-44f8-bf0f-4da1758818ee",
+                "nativeSessionId": "5b72d098-f264-4afa-b4aa-64c50fa65b0b",
+                "toolToken": "7ae4aec5-77b5-44f8-bf0f-4da1758818ee",
+                "callId": "44ead910-58fe-48f2-adcc-8af82ee3a94d",
+                "admittedLabel": "positive",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 3,
+              "sessions": 2,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 0,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "ffef4a4a-d06b-4286-9612-7c28a38df467",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "d7e436bd-4283-413a-9c1a-a80f0153ce02",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "a5d9826b-c1b8-4624-a595-48922f89cb7e",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "5b72d098-f264-4afa-b4aa-64c50fa65b0b",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-744401e8-cb46-4913-beb6-376d11541c68",
+                "verified": true
+              }
+            ]
+          },
+          {
+            "workspace": "race",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "77da6ad3ebf19720632ac4b1010ea2468e93eb2f92471464b678bf99c85a9ea1",
+                "spkiSha256": "afcba74759ef99c47011d60dabee53702baf976f05359fa5a860c756d36924a2",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "1a8678626734aa1e63351ec0d41fdaa1a4f51739cbacfe8f7de74172a58eb97b",
+                "spkiSha256": "99328f4434ed01e9449c6f85092cfe14e26b4732c597cbec880a9168c580bb78",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "2c39545b03a06c2d1858556ab86e9e8366220cd05070456aa386733e294d08b1",
+                "spkiSha256": "41bbda1d3e5ee40856c254089c4c8c96911a313915a453955a9a8032b66aa6ed",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "fccdf39dfa5c34d5d745381495a734ac69d15afb917edb633e3d6389cd259fe2",
+                "spkiSha256": "627fe7e3ad81939029d4eb0bba230dc0598673c805b10ddfa704242a4ac7737f",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032102261,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032102047,
+            "pinsMarkerCapturedAt": 1792032102048,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "77da6ad3ebf19720632ac4b1010ea2468e93eb2f92471464b678bf99c85a9ea1",
+                "expectedFingerprint": "77da6ad3ebf19720632ac4b1010ea2468e93eb2f92471464b678bf99c85a9ea1"
+              }
+            },
+            "admissions": [
+              {
+                "label": "left",
+                "sessionId": "ab6b4dd7-b7fd-4879-ac20-ebccc7471e7e",
+                "token": "fc647d56-03a8-40d7-980b-44d411c9e124",
+                "callId": "79962dc2-3e70-461e-9d5b-1e54239f5620"
+              },
+              {
+                "label": "right",
+                "sessionId": "61b66cff-3916-42e1-b1cc-165957a252c8",
+                "token": "4346c201-6b16-4170-8464-ca0a6fdb577c",
+                "callId": "f22bc4e2-c27f-4cd0-8c57-f12f18d0b306"
+              }
+            ],
+            "refusals": [],
+            "matches": [
+              {
+                "reservationId": "91221867-5337-4e34-bdfa-96173acf3536",
+                "journalSessionId": "native-budget-c211fd97-c988-4493-9dbb-3343484aa00e",
+                "eventHash": "fc4a0b347c693fbe0601862f13b86ce0822a7141d5f1b6a2da0916fba70dd780",
+                "reservationKey": "tool:61b66cff-3916-42e1-b1cc-165957a252c8:4346c201-6b16-4170-8464-ca0a6fdb577c",
+                "nativeSessionId": "61b66cff-3916-42e1-b1cc-165957a252c8",
+                "toolToken": "4346c201-6b16-4170-8464-ca0a6fdb577c",
+                "callId": "f22bc4e2-c27f-4cd0-8c57-f12f18d0b306",
+                "admittedLabel": "right",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              },
+              {
+                "reservationId": "80346306-397f-436c-a76b-657ad81e883b",
+                "journalSessionId": "native-budget-898062c9-29b1-41d9-837d-ce1103969df4",
+                "eventHash": "a8b0af571bb51cafc2ab94c89cc465ff7a2c5da5cba5e7c2792ec7b5367414ce",
+                "reservationKey": "tool:ab6b4dd7-b7fd-4879-ac20-ebccc7471e7e:fc647d56-03a8-40d7-980b-44d411c9e124",
+                "nativeSessionId": "ab6b4dd7-b7fd-4879-ac20-ebccc7471e7e",
+                "toolToken": "fc647d56-03a8-40d7-980b-44d411c9e124",
+                "callId": "79962dc2-3e70-461e-9d5b-1e54239f5620",
+                "admittedLabel": "left",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 6,
+              "sessions": 4,
+              "reservations": 2,
+              "admissions": 2,
+              "capRefusals": 0,
+              "pendingFromScopedRows": 2,
+              "executedFromScopedRows": 0,
+              "savedPending": 2,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "d9841ca8-ec76-4fc6-a29d-c8c45bdeed32",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "60d158db-6d15-498f-8997-1ae2b3535d27",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "91221867-5337-4e34-bdfa-96173acf3536",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "82d015a7-11a9-4927-b455-d8441ff5acb1",
+                "type": "session/close",
+                "verified": true
+              },
+              {
+                "rowId": "80346306-397f-436c-a76b-657ad81e883b",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "7e6cbcca-2f2a-4641-81b9-3e6254cdd935",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "ab6b4dd7-b7fd-4879-ac20-ebccc7471e7e",
+                "verified": true
+              },
+              {
+                "sessionId": "61b66cff-3916-42e1-b1cc-165957a252c8",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-898062c9-29b1-41d9-837d-ce1103969df4",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-c211fd97-c988-4493-9dbb-3343484aa00e",
+                "verified": true
+              }
+            ]
+          }
+        ],
+        "recordedRelease": {
+          "at": 1792032104864,
+          "leftGateEnteredAt": 1792032104858,
+          "rightGateEnteredAt": 1792032104861,
+          "leftInTransaction": false,
+          "rightInTransaction": false,
+          "twoGatesBeforeRelease": true
+        }
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "recordedProcessOrder": {
+          "normalChildren": true,
+          "children": [
+            {
+              "label": "init",
+              "pid": 95274,
+              "launchedAt": 1792032108285,
+              "closedAt": 1792032109922,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "positive",
+              "pid": 95277,
+              "launchedAt": 1792032109956,
+              "closedAt": 1792032110842,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "left",
+              "pid": 95279,
+              "launchedAt": 1792032110845,
+              "closedAt": 1792032112751,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "right",
+              "pid": 95285,
+              "launchedAt": 1792032111613,
+              "closedAt": 1792032112817,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-control",
+              "pid": 95287,
+              "launchedAt": 1792032112926,
+              "closedAt": 1792032113668,
+              "code": 0,
+              "signal": null
+            },
+            {
+              "label": "read-race",
+              "pid": 95289,
+              "launchedAt": 1792032113780,
+              "closedAt": 1792032114518,
+              "code": 0,
+              "signal": null
+            }
+          ],
+          "ordering": [
+            {
+              "label": "read-control",
+              "pid": 95287,
+              "launchedAt": 1792032112926,
+              "closedAt": 1792032113668,
+              "lastWriterClose": 1792032112817,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 109
+            },
+            {
+              "label": "read-race",
+              "pid": 95289,
+              "launchedAt": 1792032113780,
+              "closedAt": 1792032114518,
+              "lastWriterClose": 1792032112817,
+              "writersClosedBeforeLaunch": true,
+              "gapMs": 963
+            }
+          ],
+          "removedAt": 1792032114753
+        },
+        "views": [
+          {
+            "workspace": "control",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "df9532f20b5e61bf347532396e45d7c9f0754dd3c4de4b2ba7477b314f911099",
+                "spkiSha256": "1f74f95c9e60f61ff604dac853e733a03092d7f2c1a92f871e4200ed70bb824f",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "8c68031926c9ea20c10d11667968bf54d1572cbb9b1961b9bd445745761bbdb9",
+                "spkiSha256": "8bb1c8f3fac03240d62b0e67fe0b3cd653fb4eabfb589fabe0481a44dfd08933",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "97588e444efafe94e149718c188d985fd7cdc82e61a498055fccdf0df0f19af1",
+                "spkiSha256": "c3b18cdd546085496eb862c5c6d84bf911fd23c7b0866a087b312bb95118622f",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "38b8bc42cb6284f636d647e74f706a55337750e0ef696d83dfbec06198fc9c4d",
+                "spkiSha256": "325e5ca7f88ab4aae301fbba2005eacb044e14bd72c65b59449c99611a820ecb",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032109896,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032109526,
+            "pinsMarkerCapturedAt": 1792032109526,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "df9532f20b5e61bf347532396e45d7c9f0754dd3c4de4b2ba7477b314f911099",
+                "expectedFingerprint": "df9532f20b5e61bf347532396e45d7c9f0754dd3c4de4b2ba7477b314f911099"
+              }
+            },
+            "admissions": [
+              {
+                "label": "positive",
+                "sessionId": "e86329d7-8f93-4a82-a4a2-c7486e0dd630",
+                "token": "ee1e3e5c-8eb0-4665-a74e-738515d90fc9",
+                "callId": "e39f7216-fac2-49e1-82b1-c5da25f039ae"
+              }
+            ],
+            "refusals": [],
+            "matches": [
+              {
+                "reservationId": "9e59937a-70aa-4897-95f3-e07f11a918fa",
+                "journalSessionId": "native-budget-f9ff0039-e2d1-4248-9060-f08c8ebaf46f",
+                "eventHash": "2aa343b820894436880710d990d782e733047ed6e98aa38d2f0c0f97ed24d1d7",
+                "reservationKey": "tool:e86329d7-8f93-4a82-a4a2-c7486e0dd630:ee1e3e5c-8eb0-4665-a74e-738515d90fc9",
+                "nativeSessionId": "e86329d7-8f93-4a82-a4a2-c7486e0dd630",
+                "toolToken": "ee1e3e5c-8eb0-4665-a74e-738515d90fc9",
+                "callId": "e39f7216-fac2-49e1-82b1-c5da25f039ae",
+                "admittedLabel": "positive",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 3,
+              "sessions": 2,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 0,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "de943635-61a9-4995-8ae3-cb8841997c8d",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "9e59937a-70aa-4897-95f3-e07f11a918fa",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "0f0334ee-5724-46b3-949a-a9969022437d",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "e86329d7-8f93-4a82-a4a2-c7486e0dd630",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-f9ff0039-e2d1-4248-9060-f08c8ebaf46f",
+                "verified": true
+              }
+            ]
+          },
+          {
+            "workspace": "race",
+            "keyChecks": [
+              {
+                "role": "monitor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "2928e97e8a99a14c2daecba202e282f7ed057a16d78ec36fdcea58e9fe9d185b",
+                "spkiSha256": "7df9c1d0dbc5e18f72786d67c0946102dad826c4f257c3f870c91bc6990b7f68",
+                "matches": true
+              },
+              {
+                "role": "auditor",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "713ddafce35a1c561f1f475655e05719675bda9662a730cabe231b349423d878",
+                "spkiSha256": "296fd7bb9b21fc3b2e8604eb9267c4be5351d247368d433209e982956e1b3938",
+                "matches": true
+              },
+              {
+                "role": "lease",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "aae54df20570ce718fd21fb4d4ae2105cebce58ed3f4f6e95d3d263331a84a68",
+                "spkiSha256": "175238741635f9a97685ff697efd98dd7950f9f35e4ec4db1d48a77fdae6a539",
+                "matches": true
+              },
+              {
+                "role": "session",
+                "type": "ed25519",
+                "publicOnly": true,
+                "pemSha256": "8becf6693f3197f83d531c47bfa80594aebf63ba588f9fd317a1ec6cf3aa6df1",
+                "spkiSha256": "7795f775a7d58838fee93890101988ea2e10f0637ec473591b7de14ee2da0c1c",
+                "matches": true
+              }
+            ],
+            "budget": {
+              "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644",
+              "exactProfileMatches": true,
+              "signer": "auditor",
+              "signedTs": 1792032109739,
+              "signatureVerified": true,
+              "bothPinMarkersPrecedeSignedTs": true
+            },
+            "beforeArtifactsCapturedAt": 1792032109525,
+            "pinsMarkerCapturedAt": 1792032109526,
+            "readerRecordedProductVerdict": {
+              "ok": true,
+              "chainOk": true,
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "2928e97e8a99a14c2daecba202e282f7ed057a16d78ec36fdcea58e9fe9d185b",
+                "expectedFingerprint": "2928e97e8a99a14c2daecba202e282f7ed057a16d78ec36fdcea58e9fe9d185b"
+              }
+            },
+            "admissions": [
+              {
+                "label": "left",
+                "sessionId": "7e9a157f-57b8-446b-ab78-a4964b479c37",
+                "token": "399ecf04-b9de-4ada-8543-5024b5a2eae6",
+                "callId": "efa9c8b7-96ee-42c3-957f-b52ab1043b3d"
+              }
+            ],
+            "refusals": [
+              {
+                "label": "right",
+                "refusal": "daily tool budget exhausted for READ_ONLY"
+              }
+            ],
+            "matches": [
+              {
+                "reservationId": "29694bb6-7275-47bb-be8d-cea008e576b1",
+                "journalSessionId": "native-budget-06ae3e9e-5c2d-4693-bb0b-68cfbd5c293f",
+                "eventHash": "738d5d8b9a93095fc23eb5b75a38a210a90b6b0d180cf36acf197b02a94f69fa",
+                "reservationKey": "tool:7e9a157f-57b8-446b-ab78-a4964b479c37:399ecf04-b9de-4ada-8543-5024b5a2eae6",
+                "nativeSessionId": "7e9a157f-57b8-446b-ab78-a4964b479c37",
+                "toolToken": "399ecf04-b9de-4ada-8543-5024b5a2eae6",
+                "callId": "efa9c8b7-96ee-42c3-957f-b52ab1043b3d",
+                "admittedLabel": "left",
+                "admittedMatches": 1,
+                "noRefusedMatch": true,
+                "eventSignatureVerified": true,
+                "sealSignatureVerified": true,
+                "finalHashNamesActualEvent": true,
+                "eventAndSealSignatureBytesIdentical": true,
+                "pending": true
+              }
+            ],
+            "counts": {
+              "rawRows": 5,
+              "sessions": 3,
+              "reservations": 1,
+              "admissions": 1,
+              "capRefusals": 1,
+              "pendingFromScopedRows": 1,
+              "executedFromScopedRows": 0,
+              "savedPending": 1,
+              "savedExecuted": 0
+            },
+            "completeAdmissionReservationBijection": true,
+            "rowSignatureChecks": [
+              {
+                "rowId": "557a2656-6a7a-486a-9da4-e47bbb7cd302",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "f47e369c-1263-4c01-ab58-d21fa5a9ffc1",
+                "type": "session/open",
+                "verified": true
+              },
+              {
+                "rowId": "29694bb6-7275-47bb-be8d-cea008e576b1",
+                "type": "audit",
+                "verified": true
+              },
+              {
+                "rowId": "8d871b2b-58a4-49eb-b5b7-6c9361438882",
+                "type": "session/close",
+                "verified": true
+              },
+              {
+                "rowId": "33ff02a4-d210-4a9e-9a44-96a9ed07c59c",
+                "type": "session/close",
+                "verified": true
+              }
+            ],
+            "sessionSealChecks": [
+              {
+                "sessionId": "7e9a157f-57b8-446b-ab78-a4964b479c37",
+                "verified": true
+              },
+              {
+                "sessionId": "5c0979c0-3e1a-447f-8d0b-0ac3f1e2d69e",
+                "verified": true
+              },
+              {
+                "sessionId": "native-budget-06ae3e9e-5c2d-4693-bb0b-68cfbd5c293f",
+                "verified": true
+              }
+            ]
+          }
+        ],
+        "recordedRelease": {
+          "at": 1792032112640,
+          "leftGateEnteredAt": 1792032112378,
+          "rightGateEnteredAt": null,
+          "leftInTransaction": true,
+          "rightInTransaction": null,
+          "twoGatesBeforeRelease": false
+        }
+      }
+    ]
+  },
+  "verificationResultsSha256": "1f48f5fc3913cdbc2bcb10e500a1d41a456c1c8c165445cd9bd828d5b2c4f85c",
+  "failures": [],
+  "limitations": [
+    "No test rerun, product module/fixture import, SQLite/native loading, new cold read, mutation, signing, agent retry or network access occurred. Only builtin public-key verification calculations ran.",
+    "Product reader canonical hashes, row/global/session chains, seals and trust-root verdicts are preserved prior runtime inputs. This review independently verifies public-key identity and digest signatures, then matches raw structural metadata; it does not replace the product canonicalization/history-admission checks.",
+    "Pre-artifact ordering is consistency of the recorded public pin markers, signature timestamps and event timestamps plus the previously reviewed producer sequence, not external timestamp attestation.",
+    "Event and final seal signatures for a one-event reservation journal are often identical bytes because they sign the same digest under the same Ed25519 key. Separate event/seal role checks are not independent signing authorities.",
+    "Simple scoped pending counts here use actual retained reservation and matching outcome rows; this is not a full reimplementation of all native model/tool budget projection semantics.",
+    "Nine reservation rows across eight phase/workspace views are retained facts from one new scenario executed four times, not nine new tests. Initial/baseline/restored races each have one reservation; deliberate private no-transaction mutation has two. The control has one in every phase.",
+    "Local fixture public keys do not establish external people/deployment authority. Private credentials/vault inputs were cleaned and were neither read nor recreated; full offline fixture replay is not possible from these public inputs alone.",
+    "No P0-27 corruption-cause repair, original25/held27/historical26 substitution, source/ownership/freeze closure, Node24/full-suite/release/hosted/whole P0-30 or formal Done is implied."
+  ],
+  "outputPinMethod": "verificationResultsSha256 pins UTF-8 JSON.stringify(verificationResults). Final report-file byte/SHA pins are returned separately, avoiding a self-referential report hash.",
+  "operations": {
+    "retainedInputFilesRead": 102,
+    "publicCryptoCalculation": true,
+    "productImports": 0,
+    "fixtureImports": 0,
+    "sqliteOrNativeLoads": 0,
+    "testReruns": 0,
+    "newColdReaders": 0,
+    "mutationOrSigning": 0,
+    "network": 0,
+    "agentRetry": 0,
+    "writes": "This write-once JSON/Markdown review pair only"
+  }
+}
+

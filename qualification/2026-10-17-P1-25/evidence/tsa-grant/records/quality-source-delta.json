@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-16T22:51:37.568468+00:00",
+  "before": 2719,
+  "after": 2719,
+  "added": [],
+  "removed": [],
+  "duplicates": 1268,
+  "globalStatus": "RED",
+  "waiverOrBaselineChange": false,
+  "diagnosticZeroIsNotGatePass": true
+}

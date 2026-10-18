@@ -1,0 +1,29 @@
+{
+  "schema": "p125w-independent-helper-static-review-seal/1",
+  "at": "2026-10-17T00:32:10.003120+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 8661,
+      "sha256": "38d36ed245c5d99dab686ae8d8e77ac15e3c2514ccdfd31d820a3b07cba3fdc7",
+      "dev": 16777231,
+      "inode": 543820595,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "bytes": 21796,
+      "sha256": "49a183b2b7580656352eb72ae5e35f80b9fea6e65a4e2d08ab3b89605ebd361a",
+      "dev": 16777231,
+      "inode": 543820596,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 54,
+  "blockers": [],
+  "staticOnly": true,
+  "filledActualManifestReviewed": false,
+  "helperExecuted": false
+}

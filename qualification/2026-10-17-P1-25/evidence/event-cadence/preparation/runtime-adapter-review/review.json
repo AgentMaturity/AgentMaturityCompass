@@ -1,0 +1,36 @@
+{
+  "schema": "p125ec-independent-runtime-adapter-rebind-review/1",
+  "at": "2026-10-17T00:58:42.078457+00:00",
+  "blockers": [],
+  "sourceMetadataHead": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "sourceScope": "One admitted own checkpointWindow.test.ts successor. Helper and grant files are exact.",
+  "checks": {
+    "bothAdaptersAndBothDeltasExactAgainstDeclaredPins": true,
+    "bothPatchesReproducedByExactUnifiedDiff": true,
+    "activeBytesEqualOnlyDeclaredNamespacePhaseSchemaAndLocationReplacements": true,
+    "noCorpusOrSemanticOrGuardResourcePrivacyChange": true,
+    "v2ConditionalSignerEqualityRetained": true,
+    "all161CurrentInputsByteAndPhysicalExact": true,
+    "all11NativesBytePhysicalExactAndDistinct": true,
+    "onlyOneInitialToRuntimeInputSuccessorOther160Exact": true,
+    "materializedCandidateEqualsAdmittedPrivateCandidate": true,
+    "oldThreeCaseBlockContiguousAndByteExact": true,
+    "oldBlockLineShiftExactly29": true,
+    "windowAndCadenceAssertionLocationsActual": true,
+    "priorV2StaticReviewSealedAndPinned": true
+  },
+  "preservedBoundaries": [
+    "The observed adapter retains its pinned old raw/observer import and unchanged three-file corpus; the phase prefix alone changes to p125ec. No helper import or execution occurred in this review.",
+    "The public adapter retains old GREEN-only window semantics, actual partial-RED cadence observations, manual mask-classification requirement, query-specific proof association, last-reply boundary, physical/public trust file guards and derived resource counts.",
+    "The V2 signer equality remains conditional on exactly two independent grants; zero/one-grant failures gain no later proof.",
+    "First-head public seed-hash limitation and source assertion/GREEN boundary remain explicit. Signature and source assertions are not independently cryptographically verified here.",
+    "Current 161 protected inputs and 11 native identities are finite read/hash/stat observations. Root admission records preserve missing-reservation binding, heldR18 and all holds; no reservation probe or universal isolation claim.",
+    "No runtime success/count/source-commit/fresh/control/metadata/export/whole-P1-25/plan acceptance is inferred. Freeze and quality policy are unchanged."
+  ],
+  "readOnlyDiagnostic": {
+    "toolChunk": "37615f",
+    "exit": 1,
+    "cause": "After listing the three exact prior-review files, a combined read guessed README.md, which is absent. The actual review.json and seal.json were then fully read. No source/product effect."
+  },
+  "noProductParserCompilerHelperImportExecutionNetworkSourceIndexQaOrReservationProbe": true
+}

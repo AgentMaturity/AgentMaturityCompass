@@ -1,0 +1,31 @@
+{
+  "schema": "p125pc-inert-fresh-binder-author-review/1",
+  "at": "2026-10-17T01:55:34.501939+00:00",
+  "blockers": [],
+  "fullParentAdaptedCodeAndCompleteDeltaRead": true,
+  "exactDeltaReproducedWithoutCodeParsingOrExecution": true,
+  "actualRuntimeAndSelectionAndSourceCheckpointSchemasRead": true,
+  "actualSourceCheckpointPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+    "bytes": 453,
+    "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+  },
+  "actualSourceCheckpointUsesIntegerSource24AndTwelveChecksAndNoInventedSourceRoot": true,
+  "sourceRootAuthorityRetainedByExactSelectionBranchAndSuccessorPathThenFutureGitHeads": true,
+  "initial175AndAllOther174SuccessorMappingPreserved": true,
+  "all175PhysicalAndTwelveOldNativeGuardsRemainFutureExecutionRequirements": true,
+  "current102And23SelectionDerivedFromPrior98And21AndTwoNamedPairs": true,
+  "priorSimplePinsVerifiedThroughPhysicalRegularSingleLinkStablePinFunction": true,
+  "actualFutureSAndQHeadCleanIndexAndHeldR18GuardsPreserved": true,
+  "futureNativeDistinctFromAllTwelveOldIdentitiesAndAll204SelectedFiles": true,
+  "noProspectiveFreshHashRootCommandOutcomeOrBindingAdopted": true,
+  "noVitestCreditFromHelper": true,
+  "sourceCommitKeyBugNotReintroduced": true,
+  "noImportParserCompileHelperProductOpenSslNativeSqlNetworkProbeSourceIndexQaOrPriorArtifactWrites": true,
+  "requiredBeforeExecution": [
+    "root full exact code/delta read",
+    "independent static review",
+    "actual closed clean-source command/log and no active/halted markers",
+    "separate root adoption and input verification"
+  ]
+}

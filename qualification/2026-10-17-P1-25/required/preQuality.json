@@ -1,0 +1,85 @@
+{
+  "schema": "p125-pre-change-quality/1",
+  "at": "2026-10-16T18:42:57.287935+00:00",
+  "sourceHead": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+  "quality": "RED",
+  "waiver": false,
+  "baselineAdopted": false,
+  "rows": [
+    {
+      "phase": "p125-pre-duplicates",
+      "tool": "jscpd",
+      "version": "5.4.0",
+      "findingCount": 1268,
+      "actualExit": 1,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-pre-duplicates/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      },
+      "result": {
+        "status": "failed",
+        "tool": "jscpd",
+        "version": "5.4.0",
+        "findingCount": 1268,
+        "statistics": {
+          "clones": 1268,
+          "duplicatedLines": 14771,
+          "duplicatedTokens": 95635,
+          "lines": 527385,
+          "newClones": 0,
+          "newDuplicatedLines": 0,
+          "percentage": 2.8008001744456137,
+          "percentageTokens": 2.9093467803857673,
+          "sources": 2146,
+          "tokens": 3287164
+        },
+        "representativeFindings": [
+          "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+          "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+          "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+          "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+          "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+          "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+          "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+          "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+          "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+          "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+        ]
+      }
+    },
+    {
+      "phase": "p125-pre-dead-code",
+      "tool": "knip",
+      "version": "6.39.0",
+      "findingCount": 2724,
+      "actualExit": 1,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-pre-dead-code/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "ac0b3f8267fa0fa6ae81a88f85239c55077fbc6ba9e9664393058d2567b4bd8f"
+      },
+      "result": {
+        "status": "failed",
+        "tool": "knip",
+        "version": "6.39.0",
+        "findingCount": 2724,
+        "representativeFindings": [
+          "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+          "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+          "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+          "[\"scripts/make-legacy-fixtures.mjs\",\"files\",{\"name\":\"scripts/make-legacy-fixtures.mjs\"}]",
+          "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+          "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+          "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+          "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+          "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+          "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]"
+        ]
+      }
+    }
+  ],
+  "scope": "Observed before any test/fixture materialization; failed checks retained as failures. No cleanup or guard change."
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 17480,
+  "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts"
+  ],
+  "testCount": 4,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1388770115",
+      "name": "tests/ledgerVerifySeparation.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1388770115_0",
+      "name": "tests/ledgerVerifySeparation.test.ts evidence-chain verification is separate from config governance",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1388770115_0_0",
+      "name": "tests/ledgerVerifySeparation.test.ts evidence-chain verification is separate from config governance a clean workspace passes both halves",
+      "fullName": "evidence-chain verification is separate from config governance a clean workspace passes both halves",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1388770115_0_1",
+      "name": "tests/ledgerVerifySeparation.test.ts evidence-chain verification is separate from config governance a broken gateway config does not report the evidence chain as failed",
+      "fullName": "evidence-chain verification is separate from config governance a broken gateway config does not report the evidence chain as failed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1388770115_0_2",
+      "name": "tests/ledgerVerifySeparation.test.ts evidence-chain verification is separate from config governance a rewritten evidence event does fail the chain half",
+      "fullName": "evidence-chain verification is separate from config governance a rewritten evidence event does fail the chain half",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1388770115_0_3",
+      "name": "tests/ledgerVerifySeparation.test.ts evidence-chain verification is separate from config governance still reports the whole set of errors in one list",
+      "fullName": "evidence-chain verification is separate from config governance still reports the whole set of errors in one list",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

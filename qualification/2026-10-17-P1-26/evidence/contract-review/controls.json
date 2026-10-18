@@ -1,0 +1,93 @@
+{
+  "schema": "p126-pure-tree-source-control-design/1",
+  "sourceHead": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "operators": [
+    {
+      "id": "M1-prefix-swap",
+      "target": "src/transparency/rfc9162.ts",
+      "originalFile": {
+        "bytes": 6476,
+        "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35"
+      },
+      "before": "export function leafHash(data: Uint8Array): string {\n  return sha256(Uint8Array.of(0), data);\n}\n\n/** SHA-256(0x01 || left || right), over the raw 32-byte hashes. */\nexport function nodeHash(left: string, right: string): string {\n  return sha256(Uint8Array.of(1), Buffer.from(left, \"hex\"), Buffer.from(right, \"hex\"));\n}\n",
+      "after": "export function leafHash(data: Uint8Array): string {\n  return sha256(Uint8Array.of(1), data);\n}\n\n/** SHA-256(0x01 || left || right), over the raw 32-byte hashes. */\nexport function nodeHash(left: string, right: string): string {\n  return sha256(Uint8Array.of(0), Buffer.from(left, \"hex\"), Buffer.from(right, \"hex\"));\n}\n",
+      "matchCountRequired": 1,
+      "beforeLine": 22,
+      "beforeBytes": 319,
+      "beforeSha256": "e902ed770984832e84837217aee9ede0a106c8b090238d7f12868b705dc00e3b",
+      "afterBytes": 319,
+      "afterSha256": "6557a54ffd35d24ae5b27aa826fc9b149abb51f1594ffdd4b1f0d6772331d26f",
+      "proposedWholeFile": {
+        "bytes": 6476,
+        "sha256": "4526ad7242fdd7846e6bc0e837dc8a023a18d71ea226cf0d74187279e7d5942c"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/M1-prefix-swap.patch",
+        "bytes": 641,
+        "sha256": "6755b8c5ef22f3983da97385c9576f6bd182bec6ffd1c926a5f1369c33d5e9a9",
+        "readScope": "exact proposal, not applied"
+      },
+      "witness": {
+        "requiredPositiveFirst": "The unchanged empty root equals its pinned SHA-256 literal.",
+        "primary": "The next literal empty-input leaf hash assertion differs when the leaf prefix becomes 0x01. The candidate must retain this as a direct literal assertion; expected hashes must not come from AMC functions.",
+        "laterSensitive": "Other leaf/node/root literal vectors, independent roots, adapter/frontier and proof checks may also fail; classify actual first assertions rather than predicting a total."
+      },
+      "maskingExclusions": [
+        "A generated expected leaf/root using the mutated AMC hash functions would mask domain separation.",
+        "Do not stop at empty-root success: that calculation is unchanged."
+      ],
+      "actualFailureIdentities": null,
+      "predictedFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "M2-inclusion-terminal-size",
+      "target": "src/transparency/rfc9162.ts",
+      "originalFile": {
+        "bytes": 6476,
+        "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35"
+      },
+      "before": "  return sn === 0 ? sides : null;\n",
+      "after": "  return sides;\n",
+      "matchCountRequired": 1,
+      "beforeLine": 88,
+      "beforeBytes": 34,
+      "beforeSha256": "fde30b9bc5fe6fe696c7a9f6705b36598933b1acb2402bad5e7686df3f5b5fa7",
+      "afterBytes": 16,
+      "afterSha256": "91ba6e436c73d88670e0c3bbf762f2aeaf172e6cbdc1a8896ba4547cb0ecee91",
+      "proposedWholeFile": {
+        "bytes": 6458,
+        "sha256": "5df810447a4da0eefc1e8fa59cf1c75567fb619d01883cc0f683d60249777e45"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/M2-inclusion-terminal-size.patch",
+        "bytes": 317,
+        "sha256": "4721a212fb6847cb82b39a5b42a255b04445be6119172e833702a4d8d1edd61e",
+        "readScope": "exact proposal, not applied"
+      },
+      "witness": {
+        "requiredPositiveFirst": "With independently computed L0/L1 and H(0x01||L0||L1), verifyInclusion(index=0,size=2,proof=[L1]) is true.",
+        "primary": "In the same standalone test, reuse exactly that leaf, proof and root with size=3 and require false. The source walk ends with sn=1, so its terminal completeness refusal is decisive.",
+        "laterSensitive": "Missing-path cases and direct inclusionSides checks may also be sensitive; inspect actual reached assertions and masked later statements."
+      },
+      "maskingExclusions": [
+        "Do not put direct inclusionSides(...).toBeNull before the standalone verifyInclusion wrong-size assertion.",
+        "Do not claim every alternate size must fail: some different declared sizes yield the same path shape, which proof hashes alone cannot distinguish."
+      ],
+      "actualFailureIdentities": null,
+      "predictedFailureCount": null,
+      "applied": false
+    }
+  ],
+  "futureProtocol": [
+    "Root admits one operator at a time only in its owned, bound clean fresh copy; source TS only, without rebuilding compiled output.",
+    "Pin complete originals, exact target regular-file identity, selected source/config/native/compiled inputs and borrowed runner before any write.",
+    "Run unchanged canonical argv and literal test inventory; retain raw observer/log/process closure and actual failures.",
+    "Root reads all reached first frames and distinguishes masked later assertions, setup/hook/cleanup/unhandled failures before manual restore.",
+    "Restore exact original bytes once, verify all protected pins, rerun the same corpus, and retain actual closure. No automatic retry, signal, timeout extension or forced recovery."
+  ],
+  "runtimeCredit": false,
+  "sourceFilesWritten": false,
+  "mutantFilesCreated": false
+}

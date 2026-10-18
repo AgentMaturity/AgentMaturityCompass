@@ -1,0 +1,110 @@
+{
+  "schema": "p125ec-future-source-control-recipes/1",
+  "at": "2026-10-17T01:02:03.550267+00:00",
+  "operators": [
+    {
+      "id": "COUNT-CHECKPOINT-ROWS",
+      "target": "src/time/checkpoint.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "dev": 16777231,
+        "inode": 542461050,
+        "nlink": 1
+      },
+      "before": "event_type != 'time/checkpoint'\n      AND ",
+      "after": "",
+      "matchCountRequired": 1,
+      "beforeLine": 171,
+      "beforeSha256": "509bb347c425b68e1f9bc668b92d07b18be395604077301c821d465bc37b1914",
+      "afterSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "proposedWholeFile": {
+        "bytes": 20963,
+        "sha256": "3e9c61019cf7b2b92fe2f24acaa2bc553e372c21cef6e171b8bda335f27b11ce"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/COUNT-CHECKPOINT-ROWS.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/COUNT-CHECKPOINT-ROWS.patch.txt",
+        "bytes": 947,
+        "sha256": "01619042ef9f231af40042d70cca48c6397a97f6b91f99adfd5c1b77d04cab92",
+        "dev": 16777231,
+        "inode": 543893268,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          582
+        ],
+        "candidatePin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "bytes": 48568,
+          "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+          "dev": 16777231,
+          "inode": 543658576,
+          "nlink": 1
+        },
+        "masking": "Initial genuine checkpoint, independent first captured-query grant, exact token/event/head/ledger positives and checkpoint-only negative precede one-audit false. An early mutant second checkpoint/reply can be captured before582 but has not reached independent second verifyReply; later equality/two-audit/reset/final assertions are masked. No failure or resource total is predicted.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "STRICT-THRESHOLD",
+      "target": "src/time/checkpoint.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "dev": 16777231,
+        "inode": 542461050,
+        "nlink": 1
+      },
+      "before": "n >= config.checkpoint.everyEvents",
+      "after": "n > config.checkpoint.everyEvents",
+      "matchCountRequired": 1,
+      "beforeLine": 173,
+      "beforeSha256": "a13f24c637ff8a01fb42a9575b8671e691e8f02d468e54437891a13814d3778a",
+      "afterSha256": "af9edc0b4eaac92b3333789e60830dbe0f1ac589fd71a564d8e73bd2986f019f",
+      "proposedWholeFile": {
+        "bytes": 21004,
+        "sha256": "7d8ae689e30c026896d3c2fa35f3dc202449ab0453e845f5b88332c530ce540b"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/STRICT-THRESHOLD.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/STRICT-THRESHOLD.patch.txt",
+        "bytes": 688,
+        "sha256": "7e74cb2d9e141df6b3613471964e4b3a3516439f808bfb9eb810e9494a64b227",
+        "dev": 16777231,
+        "inode": 543893269,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          597
+        ],
+        "candidatePin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "bytes": 48568,
+          "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+          "dev": 16777231,
+          "inode": 543658576,
+          "nlink": 1
+        },
+        "masking": "Initial !last checkpoint and checkpoint-only/one-audit negatives must pass. At exact-two below15minutes, false stops at597; second independent grant, later chain/token/event/reset/final assertions remain masked. Every actual failure must be read/classified before explicit restoration; no total is predicted.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "noSourceMutantStored": true,
+  "futureQualificationHashesNotPredicted": true,
+  "sourceProjectionHashesAreExactStaticRecipeBytesOnly": true,
+  "noPredictedFailuresHooksOrQualificationCredit": true
+}

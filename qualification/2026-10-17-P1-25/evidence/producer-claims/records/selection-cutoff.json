@@ -1,0 +1,30 @@
+{
+  "schema": "p125pc-actual-command-selection-cutoff/1",
+  "at": "2026-10-17T02:20:13.664806+00:00",
+  "noFutureCommandOrArtifactResultCredit": true,
+  "versionCommands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "--version"
+      ],
+      "startedUtc": "2026-10-17T02:20:13.404063+00:00",
+      "endedUtc": "2026-10-17T02:20:13.467441+00:00",
+      "exit": 0,
+      "stdout": "v22.23.3\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--version"
+      ],
+      "startedUtc": "2026-10-17T02:20:13.467473+00:00",
+      "endedUtc": "2026-10-17T02:20:13.664765+00:00",
+      "exit": 0,
+      "stdout": "10.33.0\n",
+      "stderr": ""
+    }
+  ],
+  "allReviewsClosedBeforeSelection": true
+}

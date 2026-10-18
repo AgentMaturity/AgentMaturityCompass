@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-15T06:42:32.498318+00:00",
+  "issue": "Root release-author derivation used an overly broad numeric text replacement ==12 to ==7 before replacing12734; it changed the parent/private manifest count to7734. The author-helper assertion stopped before any release file or controller invocation.",
+  "originalAuthor": {
+    "path": "/private/tmp/p0-11-author-causal-release-20261015.py",
+    "bytes": 5152,
+    "sha256": "23eebeb4e9decca89cc5b6452ab2144a7d69d71b0374338cf4fbac4186c70475"
+  },
+  "newAuthor": {
+    "path": "/private/tmp/p0-11-author-causal-release-v2-20261015.py",
+    "bytes": 5153,
+    "sha256": "fbd1c829fd98444d69f913d45ecddd65e31581395c344ef7e661398ca13b817c"
+  },
+  "onlyChange": "assert len(expected)==7734 to assert len(expected)==12891",
+  "releaseWritten": false,
+  "controllerExecuted": false,
+  "mutantWritten": false,
+  "uncertainProcessCreated": false,
+  "noGuardOrProductChange": true,
+  "originalHelperPreserved": true
+}

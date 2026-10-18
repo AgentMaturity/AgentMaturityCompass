@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "preparedUtc": "2026-10-15T06:55:58.861115+00:00",
+  "state": "Unexecuted canonical builder. EXPECTED/RUNTIME/CURATED_COMPACT_INPUTS/ADDITIONAL_PRIVATE_REFERENCES remain unresolved. Root must author and statically review a NEW bound version.",
+  "builder": {
+    "path": "/private/tmp/p0-11-build-canonical-packet-prepared-20261015.py",
+    "bytes": 28675,
+    "sha256": "2d2e5dd9c63e14c3cf45d3fee975b339e0283c3ca5ab916877947b738dcdf6dd"
+  },
+  "derivedFrom": {
+    "path": "/private/tmp/p0-45-build-canonical-packet-v2-20261015.py",
+    "bytes": 28314,
+    "sha256": "03be352c669512c2be775e2a803c7481ee781d5ae096899cc2a37c4a526dd9c3"
+  },
+  "preparedFreezer": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-prepared-20261015.py",
+    "bytes": 44252,
+    "sha256": "3c87f034df3b79a10adce0a4f2f767d471c00dad2f86eef49ec8e87ea3f9236a"
+  },
+  "boundFreezerV2": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 52709,
+    "sha256": "00c8fd2ef5d934aef19af621e45c07d6266a6bd6609a64a53b50f6ea5086e0fe"
+  },
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "parent": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "production": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "tracked": 8362,
+    "compiled": 4529,
+    "physical": 12891,
+    "nativeInode": 538824643,
+    "futureQ": "qualification/2026-10-15-P0-11"
+  },
+  "actualSchema": "Uses prepared/bound freezer fields originalCorpora/primaryOriginalTestsAcrossTwoRuns/rootJournalContract/priorReviewContracts/latePreparationHistory/privateOnlyManifests/controls/failureKinds. No stale P045 field or broad old numeric replacement.",
+  "counting": "Four separate original runs7/2/5/7 contain21 distinct registrations across4 files. Receipt9 aggregates two primary runs, never one9-case process. Three controls9phases repeat14 existing registrations over63 executions. Pass/fail/kinds/survivors/distinct failed pairs derive dynamically; C1/L1 can fail the same map case, not3 unique failures.",
+  "bindingsToFillInNewVersion": {
+    "EXPECTED": "Exact packet/Markdown, causal/Markdown, index, final actual independent review/Markdown, root outcome, freezer review and nextP041 readiness/routing pairs. They remainNone here; no final input was read to populate them.",
+    "RUNTIME": "Actual node/pnpm/os/arch linked to original launcher/native metadata; no per-child ABI invented.",
+    "CURATED_COMPACT_INPUTS": "Explicit nonempty exact pin list for current wrapper, runtime attribution, freezer-v2 note/history and authoring issue/helper/correction metadata not already selected. Root fills from finished immutable evidence; no directory sweep.",
+    "ADDITIONAL_PRIVATE_REFERENCES": "Explicit exact private refs for historical preparations/large manifests; verify bytes/hash without copying bodies."
+  },
+  "curation": "Copies compact packet/index/final review/outcome, four prior original/recipe/code/sealed review pairs and companions, readiness/plan pairs, controller/preparation, freezer prepared/v2/note, late helper versions/issues, actual20 root logs, four raw/producers/observers/commands/groups/streams, nine phase10files and3 result/release sets, setup/proposal/reporter/preservation metadata. Final root supplies remaining compact helpers/notes as exact pins.",
+  "manifestExclusion": "IndexprivateOnlyManifests must name all3 source/compiled/physical manifests. Every body stays private unsplit regardless of cap, also parent tracked-source-before.json/compiled-after-build.json. All managed-root input bodies and private closure/home/store/tmp are excluded; no source/native/dependency/store/key bodies copied.",
+  "safetyAndMeaning": "Exclusive Q creation only after all selected regular compact bodies pass1MiB/scanner/hash checks; content-address collisions allow only byte identity. Nontransactional failures retained without trimming/retry. Explicit empty blockingFindings/blockingPacketFindings gates final review; informational findings retained. Outcome binds packet/review and cannot pin future builder. C2 genuine Error distinct from Assertions; L1 ENOENT does not prove invalid admission/close literal criterion. Only4 exact negative checker exits1; allguards0. Quality/Sid/ASI/stamp/followups/all prior holds persist. NextP041 conditional only.",
+  "authoringIssue": "Initial metadata-writing wrapper had nested-quote SyntaxError before any file write. No parser/product/runtime/builder or Q action occurred. Final inert body was authored in separate sections without execution or syntax validation; this preparation note preserves that author-only error.",
+  "parentFinishedMetadataNotice": "Root later announced frozen packet b6aa7d..., causal86a94..., indexcbb4...359refs and final reviewa7f2..., outcome de2b6...; no such final file was read by this authoring lane. Root will fill exact final pins in a NEW version.",
+  "performed": "Read immutable P045v2 builder and static prepared/bound freezer source metadata. No final packet/causal/index/review/outcome or active artifacts read. No import/parser/syntax execution, product/test/build/install, Git mutation, source/canonical writes, Q creation or evidence copying. Only new prepared script and note authored.",
+  "allPreparationReadsFinished": true
+}

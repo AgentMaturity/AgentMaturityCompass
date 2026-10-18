@@ -1,0 +1,201 @@
+{
+  "source": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "scope": "Bounded Node22 candidate; seven held failures remain active",
+  "counts": {
+    "numTotalTests": 229,
+    "numPassedTests": 222,
+    "numFailedTests": 7,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numFailedTestSuites": 4,
+    "numPendingTestSuites": 0,
+    "success": false
+  },
+  "files": 13,
+  "failures": [
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) saved OpenAPI has every registered result operation and its ClaimResult JSON schema",
+      "failureMessages": [
+        "AssertionError: expected [ \u2026(57) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:212:73\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) generated OpenAPI has every registered result operation and its ClaimResult JSON schema",
+      "failureMessages": [
+        "AssertionError: expected [ \u2026(106) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:218:77\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "apiClaimLabels.test.ts",
+      "case": "API result claim contracts (P0-23) a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response",
+      "failureMessages": [
+        "AssertionError: expected { ok: true, data: { \u2026(28) }, \u2026(3) } to match object { claimKind: 'self_reported', \u2026(2) }\n(30 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts:238:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a sealed legacy run retains the canonical legacy claim after Studio report decoration",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'self_reported', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:176:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a legacy version cannot become observed even when its stored readiness also verifies",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'self_reported', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:199:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) adding display readiness does not invalidate a current report's valid stored seal",
+      "failureMessages": [
+        "AssertionError: expected { agentId: 'default', \u2026(31) } to match object { claimKind: 'observed', \u2026(2) }\n(67 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:210:27\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "studioClaimLabels.test.ts",
+      "case": "Studio claims over actual authenticated loopback HTTP (P0-23) a missing stored run returns 404 without a fabricated result claim",
+      "failureMessages": [
+        "AssertionError: {\"error\":\"internal server error\"}: expected 500 to be 404 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts:249:44\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "componentCases": {
+    "actualSdkMcp": 23,
+    "actualCliPackGuards": 5,
+    "actualApiDispatcherAndSchema": 8,
+    "actualAuthenticatedStudioHttp": 15,
+    "badgeRendererProjections": 9
+  },
+  "componentFailures": {
+    "MCP": 0,
+    "CLI": 0,
+    "API": 3,
+    "Studio": 4,
+    "badge": 0
+  },
+  "finalCommands": [
+    {
+      "name": "committed-source-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 29199,
+      "startedUtc": "2026-10-14T17:29:58.844687+00:00",
+      "log": "/private/tmp/p0-23-committed-source-build-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "mcp-final-labels-removed-mutant",
+      "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.json",
+      "exit": 1,
+      "durationMs": 7747,
+      "startedUtc": "2026-10-14T17:31:56.234547+00:00",
+      "log": "/private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-bounded-node22",
+      "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts tests/apiClaimLabels.test.ts tests/studioClaimLabels.test.ts tests/industryPackCli.test.ts tests/claimBadge.test.ts tests/mcpServer.test.ts tests/mcpServerTools.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/industryPackSchema.test.ts tests/industryPackEntitlement.test.ts tests/openapiContracts.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-23-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 10815,
+      "startedUtc": "2026-10-14T17:32:35.039332+00:00",
+      "log": "/private/tmp/p0-23-final-bounded-node22-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-source-types",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 28417,
+      "startedUtc": "2026-10-14T17:32:35.110988+00:00",
+      "log": "/private/tmp/p0-23-final-source-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-test-types",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 34737,
+      "startedUtc": "2026-10-14T17:33:03.576934+00:00",
+      "log": "/private/tmp/p0-23-final-test-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3908,
+      "startedUtc": "2026-10-14T17:33:38.366121+00:00",
+      "log": "/private/tmp/p0-23-final-lint-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-freeze",
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1446,
+      "startedUtc": "2026-10-14T17:33:42.313977+00:00",
+      "log": "/private/tmp/p0-23-final-freeze-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-architecture",
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1488,
+      "startedUtc": "2026-10-14T17:33:43.797997+00:00",
+      "log": "/private/tmp/p0-23-final-architecture-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-counts",
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 316,
+      "startedUtc": "2026-10-14T17:33:45.326086+00:00",
+      "log": "/private/tmp/p0-23-final-counts-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-docs-drift",
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 268,
+      "startedUtc": "2026-10-14T17:33:45.681568+00:00",
+      "log": "/private/tmp/p0-23-final-docs-drift-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-source-duplicates",
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1363,
+      "startedUtc": "2026-10-14T17:33:45.989911+00:00",
+      "log": "/private/tmp/p0-23-final-source-duplicates-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-source-dead-code",
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3163,
+      "startedUtc": "2026-10-14T17:33:47.395745+00:00",
+      "log": "/private/tmp/p0-23-final-source-dead-code-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "final-clean-source",
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 49913,
+      "startedUtc": "2026-10-14T17:33:50.599629+00:00",
+      "log": "/private/tmp/p0-23-final-clean-source-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    }
+  ],
+  "rawReportSha256": "603446f0fcab2751d8fe9ad13423f6321474537e94666a9d4545b377d98e42f5",
+  "fullAcceptance": "Not Done. Full suite/coverage/Node24/hosted CI, all API/Studio routes, reasoned keyword inventory, browser/strip behavior and actual four-kind tool transcripts remain open. Older P0-50/P0-22 reports are contextual only."
+}

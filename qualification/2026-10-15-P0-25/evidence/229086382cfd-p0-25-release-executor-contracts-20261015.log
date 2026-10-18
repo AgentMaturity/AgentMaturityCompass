@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass
+
+ ✓ tests/releaseGateExecution.test.ts (22 tests) 45ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  10:05:43
+   Duration  193ms (transform 24ms, setup 19ms, import 23ms, tests 45ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-25-release-executor-contracts-20261015.json

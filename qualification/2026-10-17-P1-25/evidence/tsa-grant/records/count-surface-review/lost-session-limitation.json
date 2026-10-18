@@ -1,0 +1,26 @@
+{
+  "schema": "p125g-count-scan-lost-session-limitation/1",
+  "at": "2026-10-16T22:52:16.278165+00:00",
+  "operation": "Initial183-root count status/full-history scan in a standard-library Python command",
+  "toolObservation": "Initial exec_command yielded after10000ms. The outer functions call printed only its empty output and discarded the returned session identifier.",
+  "exactSessionIdKnown": false,
+  "coordinatorExit": null,
+  "naturalCoordinatorClosureEstablished": false,
+  "laterOutputFilesExist": true,
+  "outputExistenceIsNotClosureProof": true,
+  "excludedFromAllAdmissionAndQualificationCredit": [
+    "ownership-observations.json",
+    "review.json",
+    "review-v2.json",
+    "seal.json",
+    "seal-v2.json",
+    "proposed-admission.json",
+    "pins.json",
+    "README.md",
+    "README-v2.md",
+    "private-originals initial copies"
+  ],
+  "preservedUnchanged": true,
+  "untrackedProcessRetriedSignalledOrSearched": false,
+  "replacementBoundary": "A distinct minimal independent read-only pass uses current file hashes, targeted statuses and16 distinct known history authorities, captured by a tool call allowing30000ms with its full return metadata retained. No product/helper/native/SQL/network or generator execution."
+}

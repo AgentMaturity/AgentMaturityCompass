@@ -1,0 +1,28 @@
+{
+  "schema": "p125-root-exact-path-allocation/1",
+  "at": "2026-10-16T18:46:22.454118+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "branch": "codex/p1-25-timestamp-qualification",
+  "base": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+  "paths": [
+    "tests/time/verifyTimestamp.test.ts",
+    "tests/fixtures/rfc3161/",
+    "qualification/2026-10-17-P1-25/"
+  ],
+  "allocated": true,
+  "materialized": false,
+  "lastKnownReservationsBinding": true,
+  "currentReservationDeltaUnavailable": true,
+  "sharedAppendPendingNotPerformed": true,
+  "interpretation": "Finite new-path absence/history and current ordinary admission permit this disjoint allocation; no source ownership release is inferred. Independent reservation-scope review found no concrete conflict or live-file prerequisite.",
+  "conditionsBeforeMaterialization": [
+    "exact public fixture peer review",
+    "independent17-case test peer review",
+    "root fullcode/actualfixture review and candidate pins"
+  ],
+  "existingProductionTestsDocsPackagesGuardsReadOnly": true,
+  "generatorSourceExcluded": true,
+  "quality": "RED1268/2724; unwaived",
+  "heldArchiveStillHeld": true,
+  "F37StillSkipped": true
+}

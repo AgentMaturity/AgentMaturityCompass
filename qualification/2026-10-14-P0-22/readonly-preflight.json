@@ -1,0 +1,328 @@
+{
+  "kind": "read-only P0-22 preflight; no tests or edits executed",
+  "sourceRoot": "/Users/sid/AgentMaturityCompass",
+  "sourceRef": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceGitStatus": "",
+  "acceptance": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-22.md",
+    "sha256": "32592de8c33bbc377ad3d5f6638698fa39345226978d0abefeba76ba19c511f6",
+    "sections": {
+      "Touch scope": "### Touch scope\n\nNew `src/cli/claimOutput.ts`, `src/cli/resultCommandRegistry.ts`, `src/cli/claimLabelHooks.ts`, `src/cli/reportRenderers.ts`; additive adapters in `src/claims/eligibility/adapters/`; small edits to each registered command's action; the report builders listed; `src/repl/replRenderer.ts`, `src/repl/replContext.ts`, `src/dashboard/templates/index.html`; tests; `docs/CLAIM_KINDS.md`; a changeset. Not `src/mcp`, `src/api`, `src/studio` or `src/console` (P0-23).\n\n",
+      "Tests to add": "### Tests to add\n\n- `tests/cliResultCommandRegistry.test.ts` (static): every `RESULT_COMMANDS` and `NON_RESULT_COMMANDS` path exists in `buildCommandInventory(program)`; no path is in both; every inventory path whose description matches score, level, verdict, complian, certif, passport, attest, assurance, bundle, readiness, benchmark, badge or leaderboard (case-insensitive) is in one of the lists.\n- `tests/cliClaimLabels.e2e.test.ts`: build one seeded temp workspace (`amc init` plus a signed diagnostic run, using the helpers existing e2e tests use); run every registry path with `node dist/cli.js` and `AMC_CLAIM_LABELS_STRICT=1`, preferring `--json`; assert exit code is never 70; when it is 0, text contains \"Claim: \" and JSON has `claimKind` in `CLAIM_KINDS` and a `statusDimensions` that parses. Commands that need fixtures the workspace lacks must refuse cleanly (exit not 0 and not 70); list them by name in the test. Use `describe.concurrent` with a bounded concurrency.\n- Exact cases: `amc domain assess --example` \u2192 synthetic_example; `amc domain pack run --baseline --json` \u2192 self_reported with `eligibleLevel` at most 1; `amc quickscore --auto` on the seeded workspace \u2192 never independently_reviewed; a 1.1.1 run fixture \u2192 \"Legacy (1.x), self-reported\".\n- Report snapshots: each listed builder renders the legend and a claim kind per result.\n- Hook: a dummy registered command that prints without a label exits 70 in strict mode and prints the fallback line otherwise.\n\nMutation checks: skip `installClaimLabelHooks` \u2192 the dummy strict case fails; drop one registry entry \u2192 the static coverage test fails.\n\n",
+      "Acceptance criteria": "### Acceptance criteria\n\n- The registry covers every inventory command the keyword test matches; each exclusion has a reason.\n- Strict e2e: no registered command exits 70; every successful one prints \"Claim: \" and its JSON carries `claimKind` and `statusDimensions`.\n- Each listed report builder renders a legend and per-result claim kinds (snapshots).\n- Legacy fixtures read \"Legacy (1.x), self-reported\".\n- No \"Certified\" level name in REPL or dashboard; P0-16 `pending` entries for P0-22 removed.\n- `src/cli.ts` and the files with 1 line of headroom stay within budget; mutation checks recorded; full suite and checks pass; docs and changeset added.\n\n",
+      "Dependencies": "### Dependencies\n\n- **Blocked by:** P0-08 (renderer and adapters); P0-15 (the outputs being labelled must already be truthful); P0-21 (certification fields renamed).\n- **Blocks:** P0-28 (docs show labelled output); P0-34 (release notes and surface); P2-29 (deprecates and consolidates CLI commands once they are labelled); GATE-G0 (CLI and reports are two of the five surfaces).\n- **Related:** P0-23 (same envelopes and strings on MCP, API, Studio); AMC-1523 and AMC-1538, whose remaining CLI gaps survey-1505 links to claim-kind labels.\n\n",
+      "Risks and gotchas": "### Risks and gotchas\n\n- Scripts that parse CLI text will see new lines; JSON changes are additive. Release notes (P0-34) must say so.\n- `postAction` does not run after `process.exit(\u2026)`. Registered commands that call `process.exit(0)` after printing bypass the hook; switch them to `process.exitCode`.\n- The e2e file spawns about 160 commands; keep it separate so the focused suite stays fast.\n- Never label a verification as `independently_reviewed` because a signature checked out.\n"
+    }
+  },
+  "authority": {
+    "route": "Agent-Doable",
+    "priority": "Urgent",
+    "due": "2026-10-24",
+    "dependencies": [
+      "P0-08",
+      "P0-15",
+      "P0-21"
+    ],
+    "acceptedP021Merge": "42e0e3a7d5846472f0c4c385ea4f65cd645416fc",
+    "mode": "Qualify existingaccepted-main CLIclaim implementation in root-owned slice; no broadClaude overlay."
+  },
+  "sourceHashes": [
+    {
+      "path": "src/cli/claimLabelHooks.ts",
+      "sha256": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+      "gitBlob": "cf219f2baf3dddee17f7f594acc78114b8d3925a"
+    },
+    {
+      "path": "src/cli/claimOutput.ts",
+      "sha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+      "gitBlob": "97d95e78ea4edd9a93c8a98ca106074d43c492c9"
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "gitBlob": "73cc44cc4d96bd903a8f22d9f7b4a09304d22dcf"
+    },
+    {
+      "path": "src/cli/reportRenderers.ts",
+      "sha256": "50538537441bb77d118f7f33d486462630ff3a5a067a1b4a4438b16928257bb1",
+      "gitBlob": "4c886ddc9d63c0c7563ff0357312624e01120cf6"
+    },
+    {
+      "path": "src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "gitBlob": "f9993b2dd4980debcc721da495fb4a3b502c8b50"
+    },
+    {
+      "path": "src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "gitBlob": "359560c9aa5d63bddc8e9d03a66ca4aec6ff7edb"
+    },
+    {
+      "path": "src/claims/eligibility/types.ts",
+      "sha256": "4cfc64f7c7ad43b13f16ebae4c68c0ced2e652aa3cf2d9942e826067351c4eb6",
+      "gitBlob": "1f325c38fd0a45d77950abd56f59e4ed31442eff"
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "gitBlob": "7edfcc8814faa8e0490ef92bad5ce38953b058eb"
+    },
+    {
+      "path": "src/repl/replRenderer.ts",
+      "sha256": "a3c8f908c5635456b2b4398f2f7be8fc0d482910643c9e99878e0eaa7be6058e",
+      "gitBlob": "dccb499ccb5b4e04815c50caae9b4bfc53fd1c3d"
+    },
+    {
+      "path": "src/repl/replContext.ts",
+      "sha256": "365a55e30f4c58d35bcf8fd1fa216980dac5ffc5c14d916707c5e6b9f0c950fc",
+      "gitBlob": "a640404fa02fdf7fa266532da4a185897a5d7ef7"
+    },
+    {
+      "path": "src/dashboard/templates/index.html",
+      "sha256": "60cb126d6c78ea6a10ead21bdc8a484a18ea08fc1487b427b58e23ffefc18e88",
+      "gitBlob": "ec0561f36277da0d7eb37eb9b97cf2a74f00e859"
+    },
+    {
+      "path": "docs/CLAIM_KINDS.md",
+      "sha256": "772d98f777801dfce807bcd399c7424f7c7447c89f223ad8b8ab8043fe4b0a04",
+      "gitBlob": "7c37a797d7856a4374b0a71768446320e10f6ac9"
+    },
+    {
+      "path": "scripts/no-fabrication-allowlist.json",
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937",
+      "gitBlob": "f01053159f6a444b0e8cb4a47ed0e21140ab12e4"
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "gitBlob": "81f3207a793b1034be9ac66dd25616c21c751244"
+    },
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "gitBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "gitBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a"
+    },
+    {
+      "path": "tests/claims/claimEligibility.test.ts",
+      "sha256": "d5afe1a4c02b488108bba0964b332ab1adab335ea66ddfd2acbaa8d3092807c4",
+      "gitBlob": "a0b2a43f3530b92610c83619c46f3806e54fc08d"
+    },
+    {
+      "path": "tests/claims/claimAdapters.test.ts",
+      "sha256": "cd9326a2c9b216274de68c3c2a8ad2c8f8bc59559b90fd47d75acd1fd95db562",
+      "gitBlob": "da5652ad2cf2167f14891a611e30d75858abfe6f"
+    },
+    {
+      "path": "tests/claims/claimLabels.test.ts",
+      "sha256": "0864308cdb341524b1dfdbe17216ae62ebcc612f1c9501797caf720b1b59997a",
+      "gitBlob": "3c8250735d65e5df9d682f8d8e4cd2a88ce5f768"
+    },
+    {
+      "path": "tests/domainExampleMode.test.ts",
+      "sha256": "07f547ab711ac8500e1ba190d1cfdf43b27d645c2eaefb84df1c3d5ee69472ea",
+      "gitBlob": "41ff7c656e72cd448a03ed6622dd126234916a0a"
+    },
+    {
+      "path": "tests/selfReportedLevelCap.test.ts",
+      "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365",
+      "gitBlob": "29010e06e1e64984e4aeb62c69c30e2fe9b208ce"
+    },
+    {
+      "path": "tests/noCertificationFromSelfAssessment.test.ts",
+      "sha256": "aee68e82516aa990e5712a4e518846bd7b845c9e0aae336cc7dd677c09733bb8",
+      "gitBlob": "0d034785021e5a3ac7112f392494b7228801f705"
+    },
+    {
+      "path": "tests/complianceReportReadability.test.ts",
+      "sha256": "fa206bdef4b1d82870fe5fc30eafbf60cc3cef2d98abcce2899ffa47cc9ba243",
+      "gitBlob": "c885f4368d118963df00c6cb23cd75816e02b7ef"
+    },
+    {
+      "path": "tests/complyReportFrameworkSelection.test.ts",
+      "sha256": "2bd5a9f02d2d4a1236f021f23493812240468288a225dcfa9c3d7d56f1570cdc",
+      "gitBlob": "f71d10340d7cc7c9d7786fed9ee7b1d4459b61ce"
+    }
+  ],
+  "missingAcceptanceFiles": [
+    "tests/cliResultCommandRegistry.test.ts",
+    "tests/cliClaimLabels.e2e.test.ts"
+  ],
+  "existingCLIHelperStringTestMatches": [
+    "tests/claims/claimLabels.test.ts"
+  ],
+  "focusedFiles": [
+    "tests/claims/claimEligibility.test.ts",
+    "tests/claims/claimAdapters.test.ts",
+    "tests/claims/claimLabels.test.ts",
+    "tests/domainExampleMode.test.ts",
+    "tests/selfReportedLevelCap.test.ts",
+    "tests/noCertificationFromSelfAssessment.test.ts",
+    "tests/complianceReportReadability.test.ts",
+    "tests/complyReportFrameworkSelection.test.ts"
+  ],
+  "recommendedCommands": [
+    {
+      "phase": "prepare-owned-source",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "note": "Run only after root creates its owned P0-22 worktree; this preflight does not build."
+    },
+    {
+      "phase": "current-focused-baseline",
+      "argv": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/claims/claimEligibility.test.ts",
+        "tests/claims/claimAdapters.test.ts",
+        "tests/claims/claimLabels.test.ts",
+        "tests/domainExampleMode.test.ts",
+        "tests/selfReportedLevelCap.test.ts",
+        "tests/noCertificationFromSelfAssessment.test.ts",
+        "tests/complianceReportReadability.test.ts",
+        "tests/complyReportFrameworkSelection.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=tmp/p0-22/current-focused.json"
+      ],
+      "environment": {
+        "Node": "22.23.3 or qualified24.21.0",
+        "GIT_NO_LAZY_FETCH": "1"
+      },
+      "note": "Existing actual tests, no fixed assumed count; require success and0failed/pending/todo. Labels test covers shared renderer/schema and includes a P0-23console badge assertion; this does not authorize editing P0-23source."
+    },
+    {
+      "phase": "current-live-inventory",
+      "argv": [
+        "node",
+        "dist/cli.js",
+        "commands",
+        "--json"
+      ],
+      "redirectStdout": "tmp/p0-22/current-command-inventory.json",
+      "note": "Read inventory generated by owned current build; compare paths and options against both registries with explicit reasons, not old1228count."
+    },
+    {
+      "phase": "missing-acceptance-contracts-after-authorized-test-first-work",
+      "argv": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cliResultCommandRegistry.test.ts",
+        "tests/cliClaimLabels.e2e.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=tmp/p0-22/acceptance.json"
+      ],
+      "note": "Both files are absent today. Do not issue this command now and treat a silently ignored filename as acceptance. Tests must exist first and actualregistry/executedcase membership must be checked."
+    },
+    {
+      "phase": "isolated-CLI-empty-result-confirmation",
+      "argv": [
+        "node",
+        "dist/cli.js",
+        "passport",
+        "search",
+        "--capability",
+        "p0-22-fixture-absent"
+      ],
+      "environment": {
+        "AMC_CLAIM_LABELS_STRICT": "1"
+      },
+      "cwd": "newownedseededfixture",
+      "note": "Source-backed empty-array discrepancy to confirm, not a reproduced failure. No live endpoints/credentials. Preserve current array contract until root adjudicates fullacceptance semantics."
+    }
+  ],
+  "requiredAfterRepairChecks": [
+    "npm run typecheck",
+    "npm run typecheck:tests",
+    "npm run lint",
+    "npm run check:counts",
+    "npm run check:docs-drift",
+    "npm run check:architecture-boundaries",
+    "npm run check:clean-source",
+    "npm run check:freeze -- --base-ref 5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "npm test",
+    "npm run test:coverage",
+    "npm run check:duplicates",
+    "npm run check:dead-code"
+  ],
+  "phaseOrder": [
+    "Pin fresh owned HEAD, source hashes, Node/Pnpm/ABI and reservations; preserve all oldcandidates.",
+    "Build own dist and run existingfocusedclaims/domain/report prerequisite corpus with exactactualfile/case inventory.",
+    "Capture currentCLI commandinventory/options; create per-registry argument/fixture manifest with real supportedmodes and explicit legitimate refusal reasons. Do not pass every command merely by supplying invalidargs.",
+    "Add missing specification contracts test-first in owned scope; include directhook strict70/fallback, trueinventory coverage and all listed report snapshots. No source edits are authorized by this preflight.",
+    "Confirm source-backed empty-array output and any actualcurrent strict/legacy/report failures before repair. Protect later P1-35legacy synthetic classifications; no signature-only claimkind upgrades.",
+    "Preserve actualreport fixtures and strict tests for every registered command; deterministic signed localworkspace, isolatedHOME/checkpoints, boundedconcurrency, no live models/accounts.",
+    "Run actualhook omission and one registry-entry-removal negatives in ownedsourcefixture with byte restoration and correctfailingassertion. ReservedCLI/registry path coordination must be resolved before changing those sharedfiles; never mutate primary or Claude author tree.",
+    "After fixes, run source/testtypechecks, lint/linebudgets, freeze, generatedcount/docs/architecture, clean-source and requiredbroadsuite/coverage/sourcequality. Record unavoidablecurrentglobaldebt honestly; no baseline/floor/exclusion waivers and no issueDoneclaim from focusedtests."
+  ],
+  "findings": [
+    {
+      "type": "confirmed acceptance-test debt",
+      "path": "tests/cliResultCommandRegistry.test.ts; tests/cliClaimLabels.e2e.test.ts",
+      "evidence": "Both specification-named files are absent at accepted5ea. The only existingtestmatching CLI helper/hook/registry/strict strings is tests/claims/claimLabels.test.ts, which actually imports shared eligibility/rendering schemas and a P0-23console badge, not CLI hook/registry.",
+      "implication": "Currentrenderer tests cannot establish inventory-wide strict command output, registeredhook enforcement, actualcoverage exclusions, or hook/registry mutation acceptance."
+    },
+    {
+      "type": "source-backed contract discrepancy; runtime unconfirmed",
+      "path": "src/cli/claimOutput.ts:69-76; src/cli/resultCommandRegistry.ts:190; src/cli.ts:19774-19785",
+      "evidence": "Registered passport search prints JSON.stringify(withClaimFieldsEach(results,...)); withClaimFieldsEach marks labelled even when rows is empty and returns[]. Currentimplementation intentionally gives empty lists no claim fields, while literalacceptance says every successful registered JSON result carries claimKind/statusDimensions.",
+      "implication": "Confirm on an ownedfixture, then document/narrowlyresolve acceptance semantics; do not silently omit the case or pretend strictmode catches it."
+    },
+    {
+      "type": "guard limitation; no existing misbehaving caller established",
+      "path": "src/cli/claimOutput.ts:45-49; src/cli/claimLabelHooks.ts:35-41",
+      "evidence": "Strict hook relies on a module boolean recorded when constructing claim fields or printing a label. It does not inspect emitted JSON/per-row output itself.",
+      "implication": "Positiveall-command e2e and actualnegativemutations are necessary; a helper call or on-disksource marker is not proof of emitted labels."
+    },
+    {
+      "type": "confirmed fulfilled source prerequisite, not behavior proof",
+      "path": "src/cli.ts:2170; scripts/no-fabrication-allowlist.json:30",
+      "evidence": "Claim hooks are installed in currentCLI and pendingallowlist is empty. Report builders import/render claim legends; that presence does not establish every emittedreport or per-result label.",
+      "implication": "Reuse current implementation; do not add duplicatehooks or reimplement oldfeature. Retain meaningful current runtime/snapshot validation."
+    }
+  ],
+  "ownership": {
+    "reservationFile": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "noIssueReservationFound": "P0-22 andP0-23 are not listed in retainedissue-reservation set.",
+    "sharedReservedEditCoordination": {
+      "line": 1588,
+      "paths": [
+        "src/cli.ts",
+        "src/cli/resultCommandRegistry.ts",
+        "src/repl/replParser.ts"
+      ],
+      "instruction": "Codex and7fccbbfa: tellClaude before editing these dueP1-65overlap.",
+      "limit": "Qualification/read-onlywork is eligible; no idle inference, source mutation permission or messaging authorization granted by this report."
+    },
+    "heldSourcePreserve": [
+      "src/a4/**",
+      "src/console/assets/a4*.js",
+      "privateP2-02slice2 atamc-a4-2",
+      "P1-65candidateCLI/freeze exception"
+    ],
+    "excludedProductScopes": [
+      "src/mcp",
+      "src/api",
+      "src/studio",
+      "src/console"
+    ]
+  },
+  "decisionLimits": [
+    "No new deployment/Sid decision is needed for the unreservedP0-22qualification slice.",
+    "Legacy/spec/mode mismatches must be documented with actualsource evidence and proposedacceptancecorrection; do not invent waivers or force cachedoldbehaviors.",
+    "No hostedCI, release, trackerclosure or A4/P202resume."
+  ],
+  "status": "READY_FOR_OWNED_BASELINE_AND_TEST_FIRST_QUALIFICATION",
+  "execution": "Source/plan/reservation/file inventory reads only; no currentbug was reproduced by productexecution in this preflight."
+}

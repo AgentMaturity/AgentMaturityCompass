@@ -1,0 +1,21 @@
+{
+  "prepared": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-prepared-20261015.py",
+    "bytes": 44252,
+    "sha256": "3c87f034df3b79a10adce0a4f2f767d471c00dad2f86eef49ec8e87ea3f9236a"
+  },
+  "bound": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 52709,
+    "sha256": "00c8fd2ef5d934aef19af621e45c07d6266a6bd6609a64a53b50f6ea5086e0fe"
+  },
+  "changes": [
+    "Supply exact actual priorreview/context/rootproof/journal/runtime/history bindings; no future own-output actualreview.",
+    "Correct actual phase spelling pre-causal-normal-freeze, preserving the closed original journal.",
+    "Allow the actual explicitly pinned /opt/homebrew/opt/node@22/bin/node argv spelling for direct checker fixtures alongside the resolved Cellar executable. Actualargv exactbound and fingerprint unchanged."
+  ],
+  "sourceGuardsWaived": false,
+  "productOrControllerRerun": false,
+  "freezerExecuted": false,
+  "originalPreparedBodyPreserved": true
+}

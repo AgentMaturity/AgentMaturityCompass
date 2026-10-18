@@ -1,0 +1,148 @@
+{
+  "schema": "p125k-fresh-launcher-path-diagnosis/1",
+  "at": "2026-10-16T23:41:10.305042+00:00",
+  "failedPhase": "p125k-fresh-canonical",
+  "tests": {
+    "total": 21,
+    "passed": 17,
+    "failed": 4,
+    "skipped": 0
+  },
+  "allFourFirstFrames": "tests/time/tsaTestFixture.ts:283 versionMatch null",
+  "failedOuterLauncherWorkdir": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "sourceOuterLauncherWorkdir": "/Users/sid/AgentMaturityCompass",
+  "actualCorrectionLauncherPATH": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/opt/homebrew/bin:/Users/sid/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/sid/.codex/tmp/arg0-macos/codex-arg0xyEelE:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/sid/.local/bin:/Users/sid/.lmstudio/bin:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/sid/.lmstudio/bin",
+  "threeDirectoryReadProbe": "Primary launcher prefers /opt/homebrew/bin before /usr/bin; S and R launchers prefer /usr/bin. Harness itself unchanged: actual product cwd R with inherited PATH plus Node22.",
+  "correctedPhase": "p125k-fresh-canonical-corrected-path",
+  "rows": [
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n7gADJ/public-evidence.json",
+        "bytes": 2380,
+        "sha256": "02c11876cfacf508d14ce412ea9fad90d013b48ecebfdb5ca1b940c305b293a2"
+      },
+      "caseId": "FIRST-GRANT",
+      "selectedTool": {
+        "invoked": "/usr/bin/openssl",
+        "physical": "/usr/bin/openssl",
+        "sha256": "f81b4fcec5048ea1eceb40fc08f4e06f1668181f0b5bacfa8be27d0da181dcb7",
+        "version": null
+      },
+      "onlyVersionChildNatural0": true,
+      "streams": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n7gADJ/child-1.stdout",
+          "bytes": 15,
+          "sha256": "281a9d202102bf647f4daed64b98f57dfc22dcbf8f9b1bde9e39ed8836daa023"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n7gADJ/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "listenersStarted": false,
+      "sockets": 0,
+      "cleanupErrorCount": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hRaY84/public-evidence.json",
+        "bytes": 2384,
+        "sha256": "09a8e5a6ee0b4433faf2a5013d3d78bd313f3ffa4ff1828de0608ccd9e9684e4"
+      },
+      "caseId": "HTTP500-THEN-GRANT",
+      "selectedTool": {
+        "invoked": "/usr/bin/openssl",
+        "physical": "/usr/bin/openssl",
+        "sha256": "f81b4fcec5048ea1eceb40fc08f4e06f1668181f0b5bacfa8be27d0da181dcb7",
+        "version": null
+      },
+      "onlyVersionChildNatural0": true,
+      "streams": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hRaY84/child-1.stdout",
+          "bytes": 15,
+          "sha256": "281a9d202102bf647f4daed64b98f57dfc22dcbf8f9b1bde9e39ed8836daa023"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hRaY84/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "listenersStarted": false,
+      "sockets": 0,
+      "cleanupErrorCount": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-F9Vmr5/public-evidence.json",
+        "bytes": 2392,
+        "sha256": "f723c49687895ae51f9dda6d532109bbf60ed9ebe2b7bd1a0bdbcd0c547f5ca1"
+      },
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "selectedTool": {
+        "invoked": "/usr/bin/openssl",
+        "physical": "/usr/bin/openssl",
+        "sha256": "f81b4fcec5048ea1eceb40fc08f4e06f1668181f0b5bacfa8be27d0da181dcb7",
+        "version": null
+      },
+      "onlyVersionChildNatural0": true,
+      "streams": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-F9Vmr5/child-1.stdout",
+          "bytes": 15,
+          "sha256": "281a9d202102bf647f4daed64b98f57dfc22dcbf8f9b1bde9e39ed8836daa023"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-F9Vmr5/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "listenersStarted": false,
+      "sockets": 0,
+      "cleanupErrorCount": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SYKlN6/public-evidence.json",
+        "bytes": 2396,
+        "sha256": "4defa0973db0e4c586830006abc5add58cb7769554119a260da371e738066c9e"
+      },
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "selectedTool": {
+        "invoked": "/usr/bin/openssl",
+        "physical": "/usr/bin/openssl",
+        "sha256": "f81b4fcec5048ea1eceb40fc08f4e06f1668181f0b5bacfa8be27d0da181dcb7",
+        "version": null
+      },
+      "onlyVersionChildNatural0": true,
+      "streams": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SYKlN6/child-1.stdout",
+          "bytes": 15,
+          "sha256": "281a9d202102bf647f4daed64b98f57dfc22dcbf8f9b1bde9e39ed8836daa023"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SYKlN6/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "listenersStarted": false,
+      "sockets": 0,
+      "cleanupErrorCount": 0
+    }
+  ],
+  "beforeControlsSnapshotOnly": "preservation-before-controls.json is byte/physical clean-tree evidence, no GREEN runtime assertion",
+  "greenPublicAuditorRefusedWithoutOutput": true,
+  "noControlApplied": true,
+  "noSourceGuardDeadlineBaselineOrPackageChanges": true,
+  "noAutomaticRetry": true,
+  "actualRepeatRequiresSameSourceTool": {
+    "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+    "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+  }
+}
