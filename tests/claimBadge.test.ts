@@ -3,6 +3,7 @@ import {
   claimFields, envelopeForLegacyResult, envelopeForSelfAssessment, evaluateClaimEligibility,
   renderClaimLegend, type ClaimEligibilityInput
 } from "../src/claims/eligibility/index.js";
+import { REASON_TEXT } from "../src/claims/eligibility/render.js";
 import { claimBadge, claimLegend, claimLegendHtml, LEGEND_PAGES } from "../src/console/assets/components/claimBadge.js";
 
 const now = Date.UTC(2026, 9, 14, 12);
@@ -38,7 +39,8 @@ describe("Studio badge contracts using the actual console renderer", () => {
 
   test("keeps the not-evaluated reason visible with neutral styling rather than inventing a score", () => {
     const html = claimBadge(claimFields(fixtures[1][1]));
-    expect(html).toContain("not evaluated (self-reported answers cannot pass a regulated control)");
+    // Built from the renderer's own reason text, so a wording change cannot drift from this pin.
+    expect(html).toContain(`not evaluated (${REASON_TEXT.SELF_REPORTED_NO_POSITIVE_STATUS})`);
     expect(html).toContain('class="claim-badge pill"');
     expect(html).not.toMatch(/class="claim-badge pill (?:ok|bad)"|>0<|>5</);
   });

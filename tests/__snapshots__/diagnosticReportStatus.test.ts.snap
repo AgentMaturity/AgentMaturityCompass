@@ -2,6 +2,6 @@
 
 exports[`diagnostic report status explanation > a current stored run needs a checked seal before its claim is observed 1`] = `"**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
 
-exports[`diagnostic report status explanation > keeps version 1.1.1 legacy in the rendered report 1`] = `"**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
+exports[`diagnostic report status explanation > keeps version 1.1.1 legacy in the rendered report 1`] = `"**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
 
-exports[`diagnostic report status explanation > keeps version undefined legacy in the rendered report 1`] = `"**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
+exports[`diagnostic report status explanation > keeps version undefined legacy in the rendered report 1`] = `"**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
