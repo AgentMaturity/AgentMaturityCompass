@@ -4,8 +4,8 @@ import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { PACK_QUESTION_FLOOR, resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema.js";
 
 /**
- * Health station, round-2 content (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/
- * round2/content/health/questions.json + review.json, applied 2026-10-04).
+ * Health station, round-2 content (the candidate's round2/content/health/questions.json + review.json
+ * at 37c1466b, cited in qualification/2026-10-18-P1-42/; applied 2026-10-04).
  */
 const packs = getIndustryPacksByStation("health");
 const questions = packs.flatMap((pack) => pack.questions);

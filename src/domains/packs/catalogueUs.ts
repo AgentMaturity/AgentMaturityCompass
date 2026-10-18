@@ -152,7 +152,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
 
   // Health station round 2 (2026-10-04): each url was read on 2026-10-04 (receipt:
-  // AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/result.json).
+  // qualification/2026-10-18-P1-42/, which cites the candidate's apply/health/result.json at 37c1466b).
   verified("us-information-blocking", "Information blocking (42 U.S.C. 300jj-52, added by 21st Century Cures Act §4004)", "US", "law", "in-force",
     "https://www.govinfo.gov/link/uscode/42/300jj-52?link-type=html", ["42 U.S.C. 300jj-52", "42 U.S.C. §300jj-52"],
     { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04" }),

@@ -4,7 +4,7 @@ import { resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema
 
 /**
  * Education station content rules from the round-2 review
- * (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/content/education/review.json):
+ * (the candidate's round2/content/education/review.json at 37c1466b, cited in qualification/2026-10-18-P1-42/):
  * a question that cites two instruments cannot be scored when only one is met,
  * so each question cites exactly one instrument (one or more provisions of it).
  */

@@ -5,7 +5,7 @@ import { PACK_QUESTION_FLOOR, resolveRegulatoryRefParts } from "../src/domains/p
 
 /**
  * Round-2 content rules for the environment station
- * (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/).
+ * (the candidate's apply/environment/ record at 37c1466b, cited in qualification/2026-10-18-P1-42/).
  */
 const packs = Object.values(environment) as IndustryPack[];
 

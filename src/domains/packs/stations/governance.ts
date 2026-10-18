@@ -1,6 +1,6 @@
 /** Governance station industry packs. Registered in ../../industryPacks.ts (PACK_CONTENT). */
-/* Round-2 content applied 2026-10-04 from AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/content/governance
-   with the refuter's fixes (review.json); dispositions in apply/governance/result.json. */
+/* Round-2 content applied 2026-10-04 from the candidate's round2/content/governance record with the refuter's fixes
+   (review.json); dispositions in apply/governance/result.json. Both are cited at 37c1466b in qualification/2026-10-18-P1-42/. */
 import type { IndustryPack } from "../../industryPacks.js";
 import { q } from "./shared.js";
 

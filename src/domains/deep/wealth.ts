@@ -41,7 +41,7 @@ export const FINANCE_CONTROLS = [
  * Round-2 review (2026-10-04): ids continue that numbering from 51. finance-deep-51 replaces
  * finance-sox-control-01 (ICFR is SOX §404; §302 is officer certification); finance-basel-risk-01 is retired
  * (RWA calculation is a bank capital computation, not an agent control). Receipt:
- * AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/.
+ * qualification/2026-10-18-P1-42/ (it cites the candidate's apply/wealth/ record at 37c1466b).
  */
 const read = (title: string, url: string, retrievedAt: string, note: string): RegulationSource => ({ title, url, retrievedAt, verified: true, note });
 
