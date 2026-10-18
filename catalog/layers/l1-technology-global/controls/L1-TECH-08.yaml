@@ -65,7 +65,8 @@
         - "US"
     "legalReview": null
     "note": "The S5 register has no FTC Act entry. The proposed AI accuracy policy is separate and is not used as
-      a substitute legal basis."
+      a substitute legal basis. Re-verification required (reverify: true in instrument metadata); this homepage
+      is a discovery locator, not a Section 5 primary-text source or a legal review."
 "binding":
   "kind": "manual"
   "points": []

@@ -46,28 +46,34 @@
       "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
         treated as an exclusion or a pass."
 "citations":
-  - "key": "us-ccpa-admt"
+  - "key": "us-ca-ccpa-admt-notice"
     "registerId": "us-ca-cppa-admt"
-    "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits"
-    "clause": "ADMT notice, opt-out and qualifying human appeal; paragraph pins unverified here"
-    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity
+      audits (11 CCR; CPPA)"
+    "clause": "11 CCR §7220 pre-use notice, and Article 11 opt-out and access rights, for ADMT used for
+      significant decisions"
+    "edition": "CPPA approved regulations text (OAL-approved 2025-09-22)"
     "jurisdiction": "US-CA"
-    "statusType": "binding-now"
+    "statusType": "binding-future"
     "superseded": null
-    "effectiveDate": null
-    "complianceDueDate": null
-    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
-    "url": "https://cppa.ca.gov/regulations/ccpa_updates.html"
+    "effectiveDate": "2026-01-01"
+    "complianceDueDate": "2027-01-01"
+    "dateNote": "Regulations effective 2026-01-01; a business using ADMT for significant decisions before
+      2027-01-01 complies by that date (§7200(b), per S5)."
+    "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf"
     "retrieval":
       "state": "unverified"
-      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
-        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+      "reason": "Inherited P1-18 law-as-data row us-ca-ccpa-admt-notice and S5 us-ca-cppa-admt record a source read
+        on 2026-10-03 without a content hash. No source was fetched, hashed or re-read for P2-30; legal review
+        and re-verification remain pending."
     "appliesWhen":
       "fact": "jurisdictions"
       "includesAny":
         - "US-CA"
     "legalReview": null
-    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+    "note": "Re-verification required: The CCPA ADMT and risk-assessment compliance dates and scope, at the
+      2027-01-01 status review. Existing register metadata is inherited, not a fresh P2-30 source read or an
+      applicability decision."
 "binding":
   "kind": "manual"
   "points": []

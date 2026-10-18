@@ -1152,37 +1152,6 @@
         "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
       },
       "s5RegisterId": "us-coppa"
-    },
-    {
-      "id": "us-ccpa-admt",
-      "row": "P2-30 Technology: CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits",
-      "stations": [
-        "technology"
-      ],
-      "meaning": "Experimental draft mapping: Questionnaire and document review of ADMT notice and opt-out or qualifying human appeal within the applicable business scope.",
-      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
-      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
-      "citation": {
-        "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits",
-        "clause": "ADMT notice, opt-out and qualifying human appeal; paragraph pins unverified here",
-        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
-        "jurisdiction": "US-CA",
-        "statusType": "binding-now",
-        "effectiveDate": null,
-        "complianceDueDate": null,
-        "url": "https://cppa.ca.gov/regulations/ccpa_updates.html",
-        "contentHash": null,
-        "retrievedAt": null,
-        "legalReviewer": null
-      },
-      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
-      "sourceKind": "official",
-      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
-      "flags": {
-        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text.",
-        "litigationExposed": true
-      },
-      "s5RegisterId": "us-ca-cppa-admt"
     }
   ]
 }

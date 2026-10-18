@@ -10,12 +10,14 @@ integrator on 2026-10-18:
 
 - Pack and controls: `catalog/layers/l1-technology-global/` (`overlay.technology`, version `0.1.0`).
 - Fixtures: `catalog/fixtures/<CONTROL-ID>/{positive,negative}/*.json`.
-- Law-as-data entries: the appended Technology block of `catalog/registers/us.json` and Technology entries in
-  `catalog/registers/eu.json`. No source is promoted by reusing its identifier.
+- Law-as-data entries: three appended Technology entries and the inherited CCPA ADMT notice in
+  `catalog/registers/us.json`, plus Technology entries in `catalog/registers/eu.json`. No source is promoted by
+  reusing its identifier.
 - Instrument order and unresolved instrument records: [instruments.json](instruments.json), ordered US, EU, rest of
-  world and voluntary standards. Metadata for unread sources remains unverified with `reverify: true` and no URL or dates.
-  Law-as-data records retain candidate official URLs required by the existing grammar; their content hashes and
-  retrieval dates remain null. A locator does not prove the text was read.
+  world and voluntary standards. Metadata remains unverified with `reverify: true`; URLs identify candidate
+  sources or explicitly labelled discovery locators. New draft law-as-data records have null hashes and retrieval
+  dates. The reused CCPA record retains its inherited dates and source provenance. A locator does not prove a
+  fresh source reading.
 - Question mapping: [dispositions.json](dispositions.json), covering all 97 pack questions and 16 deep questions
   exactly once on integration `577aa79700479634fa4f16cf44c48192fe57a994`. Its source hashes include both split
   Technology data files and their registry wrappers. No absent question is invented.
@@ -26,6 +28,18 @@ integrator on 2026-10-18:
 The FTC Act Section 5 candidate, India IT Rules and DoT candidate rules, IEC 62443 and SOC 2 still need S5 integration
 before they can become catalog clause references. They remain unverified metadata. The separately labelled draft FTC
 AI-accuracy proposal does not substitute for FTC Act Section 5. The overlay does not extend official-source hosts.
+
+`L1-TECH-05` reuses P1-18’s `us-ca-ccpa-admt-notice` without modifying that register entry. It records
+`binding-future`, effective date `2026-01-01` and compliance date `2027-01-01`, inherited from S5
+`us-ca-cppa-admt`. Its recorded `2026-10-03` retrieval has no content hash; this item fetched, hashed and re-read
+no primary text. The control remains unverified and unreviewed, with re-verification and legal scope pending.
+The FTC Act homepage is only an unverified publisher discovery locator requiring re-verification; no Section 5
+primary-text URL, source reading or legal review is claimed.
+
+P2-11 must reuse these exact existing law-as-data IDs rather than create duplicate entries:
+`eu-ai-act-art50`, `eu-ai-act-gpai`, `technology-eu-ai-omnibus`, `technology-eu-dsa`,
+`technology-eu-data-act`, `eu-cra-art14` and `eu-nis2-art23`. Their present Technology mappings remain
+experimental and unreviewed; reuse establishes neither broader station scope nor legal review.
 
 ## Controls and decisive fixtures
 
