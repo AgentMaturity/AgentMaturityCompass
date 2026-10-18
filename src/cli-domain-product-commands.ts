@@ -1,14 +1,16 @@
 import chalk from "chalk";
-import type { Command } from "commander";
+import { Option, type Command } from "commander";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
-import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
+import { printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import type { Station } from "./domains/stations.js";
 import type { ConformanceStationProfile, PackResponseEvidence } from "./domains/conformance/index.js";
+
+const EXPIRES_AT_REFUSED = "--expires-at is not accepted: a licence's expiry is the one its issuer signed into it, and activation enforces that expiry.";
 
 type DomainProductCliDeps = {
   product: Command;
@@ -23,10 +25,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
   sectorPack
     .command("access")
     .alias("subscribe")
-    .description("Show Industry Packs entitlement and public-checkout readiness")
+    .description("Show Industry Packs access, licence verification and checkout availability")
     .option("--json", "Output as JSON")
     .action(async (opts: { json?: boolean }) => {
-      const { getIndustryPackEntitlement, formatIndustryPackPaywallMessage } = await import("./domains/industryPackEntitlement.js");
+      const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
       const entitlement = getIndustryPackEntitlement(process.cwd());
       if (opts.json) {
         console.log(JSON.stringify(entitlement, null, 2));
@@ -34,20 +36,19 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Access"));
       console.log(chalk.gray("Plan:"), entitlement.planId);
-      console.log(chalk.gray("Planned price:"), `$${entitlement.priceUsdMonthly}/month`);
+      console.log(chalk.gray("Price:"), `US$${entitlement.priceUsdMonthly}/month`);
       console.log(chalk.gray("Status:"), entitlement.active ? chalk.green("active") : chalk.yellow("locked"));
-      console.log(chalk.gray("Public checkout:"), entitlement.checkoutAvailable ? chalk.green("available") : chalk.yellow("not live"));
+      console.log(chalk.gray("Licence verification:"), entitlement.licenseVerificationConfigured ? chalk.green("configured") : chalk.yellow("not configured"));
+      console.log(chalk.gray("Checkout:"), entitlement.checkoutAvailable ? chalk.green("available") : chalk.yellow("not available in this deployment"));
       console.log(chalk.gray("Source:"), entitlement.source);
-      if (!entitlement.active) {
-        console.log("");
-        console.log(formatIndustryPackPaywallMessage(entitlement));
-      }
+      console.log("");
+      console.log(entitlement.message);
       console.log("");
     });
 
   sectorPack
     .command("checkout")
-    .description("Create a checkout link only when a verified provider is configured")
+    .description("Print the checkout link when this deployment has a checkout and licence verification configured")
     .option("--success-url <url>", "Return URL after successful payment")
     .option("--cancel-url <url>", "Return URL if checkout is cancelled")
     .option("--email <email>", "Customer email to prefill at checkout")
@@ -56,55 +57,61 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .action(async (opts: { successUrl?: string; cancelUrl?: string; email?: string; reference?: string; json?: boolean }) => {
       const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
       const entitlement = getIndustryPackEntitlement(process.cwd());
-      const checkoutUrl = buildIndustryPackCheckoutUrl({
-        successUrl: opts.successUrl,
-        cancelUrl: opts.cancelUrl,
-        customerEmail: opts.email,
-        clientReferenceId: opts.reference
-      });
-      const payload = { checkoutUrl, entitlement };
-      if (opts.json) {
-        console.log(JSON.stringify(payload, null, 2));
-        return;
+      if (!entitlement.checkoutAvailable) {
+        if (opts.json) console.log(JSON.stringify({ error: "checkout_not_available", message: entitlement.message, entitlement }, null, 2));
+        else console.error(chalk.yellow(entitlement.message));
+        process.exit(1); return;
       }
-      console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Checkout"));
-      console.log(chalk.gray("Price:"), `$${entitlement.priceUsdMonthly}/month for all 41 packs`);
-      console.log(checkoutUrl);
-      console.log(chalk.gray("\nAfter payment, activate the license: amc domain pack activate --key <license-key>"));
+      try {
+        const checkoutUrl = buildIndustryPackCheckoutUrl({
+          successUrl: opts.successUrl,
+          cancelUrl: opts.cancelUrl,
+          customerEmail: opts.email,
+          clientReferenceId: opts.reference
+        });
+        if (opts.json) {
+          console.log(JSON.stringify({ checkoutUrl, entitlement }, null, 2));
+          return;
+        }
+        console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Checkout"));
+        console.log(chalk.gray("Price:"), `US$${entitlement.priceUsdMonthly}/month`);
+        console.log(checkoutUrl);
+        console.log(chalk.gray("\nAfter payment, activate the licence: amc domain pack activate --key <licence-key>"));
+      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   sectorPack
     .command("activate")
-    .description("Activate Industry Packs with a valid issued license key")
+    .description("Activate Industry Packs with a licence signed by a key pinned in the AMC trust list")
     .requiredOption("--key <licenseKey>", "License key from checkout")
-    .option("--expires-at <isoDate>", "Optional entitlement expiry timestamp")
+    // Kept only to refuse it by name: the expiry is the one the issuer signed into the licence, enforced at verification.
+    .addOption(new Option("--expires-at <isoDate>").hideHelp())
     .option("--json", "Output as JSON")
     .action(async (opts: { key: string; expiresAt?: string; json?: boolean }) => {
+      if (opts.expiresAt !== undefined) {
+        console.error(chalk.red(EXPIRES_AT_REFUSED));
+        process.exit(1); return;
+      }
       try {
-        const { activateIndustryPackAccessOnline } = await import("./domains/industryPackEntitlement.js");
-        const entitlement = await activateIndustryPackAccessOnline({
-          workspace: process.cwd(),
-          licenseKey: opts.key,
-          expiresAt: opts.expiresAt ?? null
-        });
+        const { activateIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+        const entitlement = activateIndustryPackAccess({ workspace: process.cwd(), licenseKey: opts.key });
         if (opts.json) {
           console.log(JSON.stringify(entitlement, null, 2));
           return;
         }
-        console.log(chalk.green("Industry Packs activated."));
-        console.log(chalk.gray(`Access: all 41 Industry Domain Packs at $${entitlement.priceUsdMonthly}/month`));
+        console.log(chalk.green("Industry Packs activated: the licence verified against a pinned licence key."));
+        if (entitlement.expiresAt) console.log(chalk.gray(`Expires: ${entitlement.expiresAt}`));
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   withTrustFlags(sectorPack
     .command("verify")
-    .description("Verify an Industry Packs license key")
+    .description("Verify an Industry Packs license key against the licence key pinned in the AMC trust list")
     .requiredOption("--key <licenseKey>", "License key from checkout"),
-  { pubkey: "pin the Ed25519 license public key (artifact-seal)", json: true })
+  { json: true })
     .action(async (opts: { key: string } & TrustFlags) => {
       const { verifyIndustryPackLicenseReport } = await import("./domains/industryPackEntitlement.js");
-      const result = verifyIndustryPackLicenseReport(opts.key, trustFromFlags(opts, ["artifact-seal"]),
-        opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+      const result = verifyIndustryPackLicenseReport(opts.key, trustFromFlags(opts, ["artifact-seal"]));
       finishVerify("Industry Packs license", result.report, { json: opts.json, result,
         details: result.payload?.expiresAt ? [`Expires: ${result.payload.expiresAt}`] : [] });
     });
@@ -160,9 +167,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions`));
       if (!entitlement.active) {
-        console.log(chalk.yellow(`\n  Locked: $${entitlement.priceUsdMonthly}/month unlocks all 41 Industry Domain Packs.`));
-        console.log(chalk.gray(`  Subscribe: ${entitlement.checkoutUrl}`));
-        console.log(chalk.gray(`  Activate:  amc domain pack activate --key <license-key>`));
+        console.log(chalk.yellow(`\n${entitlement.message}`));
       } else {
         console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId> --agent <agentId>`));
         console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
@@ -224,11 +229,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .command("run")
     .description("Run an industry sector pack — interactive assessment or baseline score")
     .requiredOption("--pack <packId>", "Pack ID")
-    .option("--baseline", "Score with L1 defaults (no interaction needed)", false)
+    .option("--baseline", "Run with no answers: every question is not evaluated and no score is computed (no interaction needed)", false)
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
       const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
       const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
       const pack = getPackById(opts.pack);
       if (!pack) {
@@ -251,8 +257,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
       }
 
-      // Baseline and non-interactive runs answer nothing: unanswered questions count as 1 and the
-      // self-assessment reads incomplete, so a default is never reported as an answer.
+      // Baseline and non-interactive runs answer nothing: every question is not evaluated, so no
+      // score or level is computed (packSelfAssessment.ts), and the self-assessment reads incomplete.
       const responses: Record<string, number> = {};
 
       if (!opts.baseline && process.stdin.isTTY) {
@@ -274,14 +280,16 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
 
       const result = scoreIndustryPack(opts.pack as PackIdType, responses);
-      // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from (src/domains/packSelfAssessment.ts).
-      const claim = selfAnswerClaim(`industry-pack:${pack.id}`, Object.values(responses), true);
+      // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from.
+      const claim = packSelfAssessmentEnvelope(pack, responses, Date.now());
       if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); return; }
 
       console.log(chalk.bold("  Results:"));
       printClaimResult(claim, opts);
       console.log(`    Pack:       ${result.packId}`);
-      console.log(`    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
+      console.log(result.percentage === null
+        ? `    Self-reported score: not evaluated (${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered)`
+        : `    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
       const { complete, answered, total } = result.selfAssessment;
       console.log(`    Self-assessment:     ${complete ? "complete" : "incomplete"} (${answered}/${total} answered; self-reported; not a certification)`);
       console.log(`    Eligible level:      ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`);

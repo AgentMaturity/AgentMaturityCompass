@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-11",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [
+      {
+        "kind": "NOTIFIED",
+        "clock": "glba-314-4j-ftc-notice",
+        "atHours": 48
+      }
+    ]
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "future_dated"
+  }
+}

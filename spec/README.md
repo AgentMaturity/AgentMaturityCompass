@@ -23,6 +23,7 @@ true; the acceptance rules cover those checks.
 | `receipt` | One state of one execution (`requested` … `outcome_unknown`) | Contract only; P1-03 emits it |
 | `legacy-receipt` | The signed receipt payload AMC mints today (a kind, no state) | Emitted |
 | `authorization-record` | Who authorized which effect, bound at the enforcement point | Contract only; P1-02 emits it |
+| `redaction-receipt` | One redaction of protected data before a native session row was committed (P2-02) | Emitted in workspaces with a processor registry, as the payload of `PROTECTED_DATA_REDACTED` audit rows |
 | `control-result` | One control's five status dimensions, claim kind and evidence | Contract only; P1-11 emits it |
 | `claim-envelope` | What a result may claim (docs/CLAIM_KINDS.md) | Emitted |
 | `scoped-attestation` | A signed statement about one deployment, profile and window | Contract only; the registry (P3-04) issues it |
@@ -33,6 +34,7 @@ true; the acceptance rules cover those checks.
 | `control-record` | One Regulated Control Catalog control (docs/catalog/CONTROL_RECORD.md) | Read by `loadCatalog`; content under `catalog/` |
 | `pack-manifest` | One catalog pack: its controls, layer, stations and declared support | Read by `loadCatalog` |
 | `catalog-lock` | The digests that pin one catalog tree | Built by `buildCatalogLock`; P1-10 embeds it in compiled plans |
+| `register-entry` | One clause of a jurisdiction's register as law-as-data (docs/catalog/REGISTER.md) | Read by `loadCatalog` from `catalog/registers/` |
 | `a4-project`, `a4-revision`, `a4-gate`, `a4-decision`, `a4-transition`, `a4-intent`, `a4-readiness` and the other `a4-*` records | One A4 Forge project's views (docs/A4_FORGE.md) | Emitted behind `AMC_A4_PREVIEW=1` |
 | `a4-record` | One A4 project exported as stored, for a verifier without SQLite | Checked by `verifyA4Bundle`; fixtures in `tests/fixtures/contracts/a4-record/` |
 | `amcbench`, `amcprompt`, `amccert`, `amcaudit`, `amcpass`, `amcproof`, `registry.bench`, `registry.passport` | The `amc standard` artifacts | Emitted; `amc standard generate` writes these same files |

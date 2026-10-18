@@ -59,7 +59,7 @@
         { "path": "src/tools/builtin/readBeforeEdit.ts", "symbol": "ReadBeforeEditLedger" },
         { "path": "src/toolhub/toolhubValidators.ts", "symbol": "validateToolRequest" }
       ],
-      "evidence": "Tool evidence rows",
+      "evidence": "Tool evidence rows; fileChange before and after SHA-256 on fs.write and fs.edit audit rows",
       "status": "enforced",
       "bypasses": [
         "The shell and unconfined MCP servers reach the same files without these checks"

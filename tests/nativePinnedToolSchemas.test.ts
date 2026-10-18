@@ -12,6 +12,9 @@ import { SessionService } from "../src/session/sessionService.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { defaultToolsConfig, type ToolDefinition } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot, toolsConfigPath, toolsConfigSigPath } from "../src/toolhub/toolhubValidators.js";
+import { PATH_ARGUMENTS } from "../src/toolhub/toolArgumentRoles.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { initWorkspace } from "../src/workspace.js";
 
 // AUTHORED UNEXECUTED: source regressions, not installed or provider acceptance.
@@ -21,7 +24,7 @@ const refusal = /signed workspace tool policy changed or cannot be verified/;
 const read: ToolDefinition = { name: "fs.read", actionClass: "READ_ONLY", allow: { paths: ["./workspace/**"] } };
 const write: ToolDefinition = { name: "fs.write", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
 
-function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolean } = {}) {
+function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolean; grants?: ToolDefinition[] } = {}) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-pinned-tool-schemas-")));
   cleanups.push(() => rmSync(root, { recursive: true, force: true }));
   const workspace = join(root, "project"); mkdirSync(workspace);
@@ -29,7 +32,7 @@ function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolea
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(root, "control-checkpoints"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
-  const config = defaultToolsConfig(); config.tools.allowedTools = [read];
+  const config = defaultToolsConfig(); config.tools.allowedTools = [read, ...(options.grants ?? [])];
   // A signed legacy permissive default cannot override the explicit native pin.
   config.tools.denyByDefault = false;
   const extension: ToolDefinition = { name: "reviewed_extension", actionClass: "READ_ONLY" };
@@ -132,4 +135,38 @@ test("an already cancelled native step remains cancelled before schema admission
   const controller = new AbortController(); const reason = new Error("fixture caller cancellation"); controller.abort(reason);
   await expect(f.step(controller.signal)).rejects.toBe(reason);
   expect(f.prepare).not.toHaveBeenCalled();
+});
+
+// P1-36 re-review pin. The signed policy digest (`expectedToolsDigest`) covers grants (name, action class, paths), not
+// schema bytes; each request commits the bytes it offered in its own `request/tools` row, and verification rebuilds an
+// old session from those recorded bytes. Changing a native fs schema therefore changes every new request's
+// `toolSchemaSha256` without touching any policy pin, so this digest makes that change a reviewed test change.
+// P1-36: fs.read gained `offset`/`limit`; fs.edit gained `replaceAll` and `edits`, and `required` is now `["path"]`.
+const FS_TOOL_SCHEMAS_SHA256 = "7507bbeaefaf87cbf0d4c901cdcd8a9ec97cb79c9846e5bb23902fbb7765bb65";
+const edit: ToolDefinition = { name: "fs.edit", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
+
+test("the offered fs tool schemas are pinned by digest and keep one top-level path argument (P1-36)", () => {
+  const f = fixture({ grants: [write, edit] });
+  const offered = f.tools.seam.schemas()!.filter(schema => schema.name.startsWith("fs.")).sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["fs.edit", "fs.read", "fs.write"]);
+  for (const { parameters } of offered) {
+    expect(Object.keys(parameters).filter(key => ["oneOf", "anyOf", "allOf"].includes(key))).toEqual([]);
+    expect(parameters.required).toContain("path");
+    expect(Object.keys(parameters.properties as object).filter(key => (PATH_ARGUMENTS as readonly string[]).includes(key))).toEqual(["path"]);
+  }
+  expect(sha256Hex(canonicalize(offered))).toBe(FS_TOOL_SCHEMAS_SHA256);
+});
+
+test("signed path globs still deny line-range reads and multi-edits outside the grant (P1-36)", async () => {
+  const f = fixture({ grants: [edit] });
+  writeFileSync(join(f.workspace, "outside.txt"), "a\n");
+  expect(await f.call("fs.read", { path: "workspace/review.txt", limit: 1 }))
+    .toMatchObject({ outcome: "OK", content: "     1\tpinned read-only fixture\n[amc: lines 1-1 of 1]" });
+  expect(await f.call("fs.edit", { path: "workspace/review.txt", edits: [{ find: "pinned", replace: "Pinned" }] })).toMatchObject({ outcome: "OK" });
+  expect(readFileSync(join(f.workspace, "workspace", "review.txt"), "utf8")).toBe("Pinned read-only fixture");
+  const deniedRead = await f.call("fs.read", { path: "outside.txt", offset: 1 });
+  const deniedEdit = await f.call("fs.edit", { path: "outside.txt", edits: [{ find: "a", replace: "b" }] });
+  expect([deniedRead.outcome, deniedEdit.outcome]).toEqual(["DENIED", "DENIED"]);
+  expect(String(deniedEdit.content)).toContain("not in allowlist");
+  expect(readFileSync(join(f.workspace, "outside.txt"), "utf8")).toBe("a\n");
 });

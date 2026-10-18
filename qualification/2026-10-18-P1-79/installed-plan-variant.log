@@ -1,0 +1,14 @@
+commit bf92762462a21e7b9fd73fd6d6cb1a2c5d5818f5; installed from the tarball packed by packed-install.log; script: P1-79-installed-plan.mjs (session scratch, sha256 7d8310d878f2e8e986ecaf02c6a55d63da92e4a930ceb0114c24fdf2e2eb714f)
+P1-79 installed-package variant, node v22.23.3, local macOS arm64, not CI; package /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-packed-install-43oG4h/consumer/node_modules/agent-maturity-compass/dist
+info plan-os-user: unmodified quickstart exit 1; its fs.write ran under a lease naming the owner and the plan's approval rule refused it
+ok   plan-os-user: owner is the OS account; fs.read variant exit 0; 1 authorization record(s) name 491c1ab7-81be-49cd-baac-e091abe988a5 via lease lease_31e891464f914cb8b8148181706cf636; 9.4s
+     [synthetic] provider stub: no model ran; a scripted demonstration, never a real-model result (claim kind synthetic_example)
+     [synthetic] session 0244d6d9-cacf-4bf0-aa7f-866e9dd59c47
+     [synthetic] governed tool call fs.write hello.txt: completed; hello.txt written: yes
+     [synthetic] verification: verified, externally-anchored (integrity and authorship of the recorded evidence, not answer quality)
+     [synthetic] receipt sha256: d4e87bc835a588f458227a1eee70bcac23fdc768b3daff65050e76cc4ccdb457
+     [synthetic] wall time: 2.7s
+ok   plan-other-user: owner is not the OS account; quickstart exit 1; sessions in the ledger 0; 3.9s
+     AMCNativeRefusedError: PRINCIPAL_UNRESOLVED: the active plan requires a principal for every tool call, and the OS user sid is not an active user of the signed users.yaml; no lease was minted
+     data: { reason: 'PRINCIPAL_UNRESOLVED' }
+exit=0

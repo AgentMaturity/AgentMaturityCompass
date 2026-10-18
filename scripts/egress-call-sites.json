@@ -180,14 +180,6 @@
       "reason": "Doctor rules capture one bridge probe URL and check known workspace before diagnostic lease issuance; both sequential carrier POSTs pass that scope to helper. Copied headers/prepared native options and body precede a final same-URL bridge gate; null resource facts, caller-declared agent header (system if absent), no independent actor/lease proof. Typed refusal rejects before connection mapping and becomes residency FAIL, not invalid config. Source-only; a late denial can follow lease/first POST and earlier local effects; ordinary deadline/draining and DNS/HTTP/proof limitations remain."
     },
     {
-      "siteId": "src/domains/industryPackEntitlement.ts:492:1",
-      "path": "src/domains/industryPackEntitlement.ts",
-      "line": 492,
-      "call": "fetcher(",
-      "status": "gated",
-      "reason": "Online activation POST uses captured explicit-or-ALS scope, kept separate from the persistence cwd fallback, and checks network-tool residency immediately before same-endpoint injected fetch with manual redirects. Key and expiry are captured; license classes/purpose remain unknown. Local-valid shortcut and verifier are unchanged. Source-only; trusted injected fetch, DNS, response parsing/caps, environment drift and post-dispatch persistence limits remain."
-    },
-    {
       "siteId": "src/drift/alerts.ts:215:1",
       "path": "src/drift/alerts.ts",
       "line": 215,

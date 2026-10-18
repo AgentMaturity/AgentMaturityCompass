@@ -1,0 +1,107 @@
+{
+  "note": "Each guard broken once in the working tree, its test run, the failing tests named, the source restored from a copy taken before the edit. Local macOS arm64, Node 22 / Python 3.12, not CI.",
+  "mutations": [
+    {
+      "id": "M1",
+      "guard": "the shared scorer gives an unanswered question no level (replaces the first round's MCP-only check)",
+      "mutation": "src/domains/packSelfAssessment.ts packAnswers: likert(responses[q.id] ?? 1), the old L1 default",
+      "test": "tests/industryPackNotEvaluated.test.ts tests/industryPackMcpClaims.test.ts tests/logisticsIndustryPack.test.ts",
+      "failed": [
+        "no answers: nothing evaluated, no percentage, no level, no gap",
+        "one question unanswered: it is listed, the others are reported, and no overall score exists",
+        "CLI: amc domain pack run --baseline --json reports every question not evaluated and no score",
+        "MCP amc_score_sector_pack: no score or level for unanswered questions",
+        "MCP amc_score_industry_pack: returns the shared result unchanged",
+        "an unanswered control is not evaluated: no level, no gap, and the overall has no score",
+        "one question unanswered: listed as not evaluated, and no level or percentage is computed",
+        "scores concrete logistics controls and surfaces low-level compliance gaps"
+      ],
+      "result": "8 failed | 13 passed"
+    },
+    {
+      "id": "M2",
+      "guard": "pack ids are own keys only",
+      "mutation": "src/domains/industryPacks.ts getPackById: INDUSTRY_PACKS[packId] without Object.hasOwn",
+      "test": "tests/industryPackMcpClaims.test.ts",
+      "failed": [
+        "__proto__",
+        "constructor",
+        "toString"
+      ],
+      "result": "3 failed | 9 passed"
+    },
+    {
+      "id": "M3",
+      "guard": "a licence never changes the station summary (D-06 = B)",
+      "mutation": "src/mcp/industryPackTools.ts: frameworks withheld without a licence (the candidate's behaviour)",
+      "test": "tests/industryPackMcpClaims.test.ts",
+      "failed": [
+        "list and station summary return the same result with and without a licence, apart from the locked flag"
+      ],
+      "result": "1 failed | 11 passed"
+    },
+    {
+      "id": "M4",
+      "guard": "O18 scenario stations equal the S9 manifest",
+      "mutation": "tests/fixtures/industry-assurance/packs/healthcarePHI.json: one scenario's station health -> wealth",
+      "test": "tests/industryAssuranceFixtures.test.ts",
+      "failed": [
+        "gives every scenario a unique id and its pack's station"
+      ],
+      "result": "1 failed | 27 passed"
+    },
+    {
+      "id": "M5",
+      "guard": "cross-framework packs resolve to P1-13 station tags among the seven",
+      "mutation": "src/domains/domainRegistry.ts listIndustryAssurancePackStations returns []",
+      "test": "tests/industryAssuranceFixtures.test.ts",
+      "failed": [
+        "maps every scenario to stations among the seven, with P1-13's tags for cross-framework packs"
+      ],
+      "result": "1 failed | 27 passed"
+    },
+    {
+      "id": "M6",
+      "guard": "Python score results require claimKind and statusDimensions",
+      "mutation": "sdk/python/amc_sdk/industry.py: claimKind and statusDimensions removed from IndustryPackScoreResult",
+      "test": "sdk/python/tests/test_industry.py (Python 3.12)",
+      "failed": [
+        "test_contract_drift_fails_closed[score_pack_baseline-stdout8]",
+        "test_contract_drift_fails_closed[score_pack_baseline-stdout9]",
+        "test_contract_drift_fails_closed[score_pack_baseline-stdout10]",
+        "test_score_result_carries_the_claim_and_no_certified_field"
+      ],
+      "result": "4 failed, 38 passed"
+    },
+    {
+      "id": "M7",
+      "guard": "O20 verification pins the monitor key recorded after init",
+      "mutation": "examples/regulated-industries/lib/runStation.mjs: agent-loop verify without --expect-monitor",
+      "test": "tests/regulatedExamples.test.ts -t health",
+      "failed": [
+        "health: completes and every output carries provenance"
+      ],
+      "result": "1 failed | 5 skipped"
+    },
+    {
+      "id": "M8",
+      "guard": "README citations resolve to quoted text",
+      "mutation": "examples/regulated-industries/README.md: C2 quotes `HOME: homeDir,`, which the file does not contain",
+      "test": "tests/regulatedExamples.test.ts -t citations",
+      "failed": [
+        "README appendix citations resolve to the quoted text"
+      ],
+      "result": "1 failed | 5 skipped"
+    },
+    {
+      "id": "M9",
+      "guard": "the examples README passes the P0-28 truth check",
+      "mutation": "examples/regulated-industries/README.md: adds 'The health example is certified.'",
+      "test": "tests/regulatedExamples.test.ts -t docs-drift",
+      "failed": [
+        "README passes the docs-drift truth and command checks (P0-28)"
+      ],
+      "result": "1 failed | 5 skipped"
+    }
+  ]
+}

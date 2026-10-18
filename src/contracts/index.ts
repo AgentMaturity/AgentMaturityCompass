@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { catalogLockSchema } from "../catalog/lockfile.js";
+import { registerEntrySchema } from "../catalog/register.js";
 import { controlRecordSchema, packManifestSchema } from "../catalog/schema.js";
 import { claimEnvelopeSchema } from "../claims/eligibility/schemas.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
@@ -33,6 +34,7 @@ import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
+import { redactionReceiptV1Schema } from "./v1/redactionReceipt.js";
 import { scopedAttestationV1Schema } from "./v1/scopedAttestation.js";
 import { scopedAttestationV2Schema } from "./v2/scopedAttestation.js";
 
@@ -56,6 +58,7 @@ export * from "./v1/authorizationRecord.js";
 export * from "./v1/controlResult.js";
 export * from "./v1/evidenceEvent.js";
 export * from "./v1/receipt.js";
+export * from "./v1/redactionReceipt.js";
 export * from "./v1/scopedAttestation.js";
 export * from "./v2/scopedAttestation.js";
 // Re-exported, never forked: AMC already parses these records with them.
@@ -70,6 +73,8 @@ export const CONTRACTS = {
   "receipt": { title: "AMC Receipt", schema: receiptV2Schema },
   "legacy-receipt": { title: "AMC Receipt Payload (legacy v1)", schema: receiptV1Schema },
   "authorization-record": { title: "AMC Authorization Record", schema: authorizationRecordV1Schema },
+  // P2-02: one audit row per redaction before a session row is committed.
+  "redaction-receipt": { title: "AMC Redaction Receipt", schema: redactionReceiptV1Schema },
   "control-result": { title: "AMC Control Result", schema: controlResultV1Schema },
   "claim-envelope": { title: "AMC Claim Envelope", schema: claimEnvelopeSchema },
   "scoped-attestation": { title: "AMC Scoped Attestation", schema: scopedAttestationV1Schema },
@@ -80,6 +85,8 @@ export const CONTRACTS = {
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
   "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema },
+  // Law-as-data register entries (P1-18); refinements are in docs/catalog/REGISTER.md.
+  "register-entry": { title: "AMC Register Entry", schema: registerEntrySchema },
   // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md "A4 project record" (P1-63).
   "a4-project": { title: "AMC A4 Project", schema: a4ProjectV1Schema },
   "a4-revision": { title: "AMC A4 Revision", schema: a4RevisionV1Schema },

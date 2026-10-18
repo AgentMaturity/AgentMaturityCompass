@@ -2121,6 +2121,18 @@ components:
         receiptIds:
           type: array
           items: { type: string }
+        authorizationMismatch:
+          type: boolean
+          nullable: true
+          description: Claude Code control only. Whether the input the tool ran with differs from the input AMC authorized (observed, not prevented); null without a bound outcome.
+        observationConflict:
+          type: boolean
+          description: Claude Code control only. An outcome for this call was unmatched, conflicting or unverifiable.
+        observationNotRecorded:
+          type: string
+          nullable: true
+          enum: [rate-limited]
+          description: Claude Code control only. An observation of this call was refused by the intake cap and listed in a signed summary row; the call is not fully evidenced.
         rawProviderPayloadStored:
           type: boolean
           enum: [false]

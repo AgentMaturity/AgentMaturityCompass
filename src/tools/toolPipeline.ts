@@ -12,6 +12,8 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { digestField, type OutputDigest } from "../dataflow/tokenizer.js";
+import { outputDigestFor } from "../dataflow/tokenVault.js";
 import { freezeToolArguments } from "./toolArguments.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
@@ -178,11 +180,17 @@ function effectVerdict(actionClass: string, settled: { readonly result: ToolBody
     : { state: "completed", effect: null, reasonCode: "completed" };
 }
 
-/** What a receipt binds about an outcome: its facts and the output's digest, never the output. */
-function outcomeDigest(outcome: ToolOutcome): string {
+/**
+ * What a receipt binds about an outcome: its facts and the output's digest, never the output. The digest's form is part
+ * of the bound object: `outputSha256` (plain, as before) or, in a workspace that opted in to protected-data redaction
+ * (P2-02), `outputDigest: { kind: "hmac-sha256", value }`, keyed so a short output (an SSN, a card number) cannot be
+ * brute-forced from it. The call's `stdout` evidence row carries the same field, so a verifier knows which form to check.
+ */
+function outcomeDigest(outcome: DigestedOutcome): string {
   return sha256Hex(canonicalize({ ok: outcome.ok, exitCode: outcome.exitCode, timedOut: outcome.timedOut, bytes: outcome.bytes,
-    outputSha256: sha256Hex(outcome.output) }));
+    ...digestField("output", outcome.outputDigest) }));
 }
+type DigestedOutcome = ToolOutcome & { readonly outputDigest: OutputDigest };
 
 /**
  * The call once its record binds: the record, its execution id and AMC's key (P1-04) on the carrier the signed tool
@@ -313,7 +321,10 @@ export class ToolPipeline {
         selectedDefinitions.delete(execution);
       }
       try {
-        this.init.record?.(execution, outcome);
+        if (this.init.record !== undefined) {
+          outcome = this.withOutputDigest(outcome);
+          this.init.record(execution, outcome);
+        }
       } catch (error) {
         // The guarantee belongs HERE, not to each recorder. A recorder that
         // threw would turn an evidence problem into a tool failure, and the
@@ -608,8 +619,11 @@ export class ToolPipeline {
     const verdict = effectVerdict(execution.actionClass, settled);
     try {
       if (verdict.state === "completed") {
+        // A keyed digest needs the token keys; if they cannot load, the receipt is not written (it stays `started`).
+        const digested = this.withOutputDigest(outcome);
+        outcome = digested;
         const ref = "result" in settled ? settled.result.externalRef : undefined;
-        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(outcome), reasonCode: verdict.reasonCode,
+        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(digested), reasonCode: verdict.reasonCode,
           externalRef: typeof ref === "string" && ref.length > 0 && ref.length <= 512 ? ref : null });
       } else {
         journal.markUnknown(executionId, verdict.reasonCode);
@@ -620,6 +634,11 @@ export class ToolPipeline {
       // journal keeps this execution blocking the agent's journaled calls in this process.
       return { ...outcome, action: action("started", false) };
     }
+  }
+
+  /** How evidence binds this call's output, decided once and carried on the outcome, so receipt and stdout row agree. */
+  private withOutputDigest(outcome: ToolOutcome): DigestedOutcome {
+    return { ...outcome, outputDigest: outcome.outputDigest ?? outputDigestFor(this.init.workspace, sha256Hex(outcome.output)) };
   }
 
   /** Returns a denial outcome, or null to continue. */

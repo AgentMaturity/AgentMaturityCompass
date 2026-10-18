@@ -139,6 +139,22 @@ Contract only: P1-02 builds it at the enforcement point and defines its digest
 - `agentSuppliedMetadata` is what the agent said. It is untrusted and no rule may read it.
 - Freshness: the record is valid only while `asOf` < `expiresAt`.
 
+## redaction-receipt
+
+Emitted in workspaces that opted in to protected-data redaction (P2-02): the payload of one `PROTECTED_DATA_REDACTED`
+audit row in a native session, written before the row it describes. It is local enforcement bookkeeping and is never
+maturity evidence. Rules the schema cannot express:
+
+- `sessionId` equals the session of the audit row that carries the receipt.
+- `callId` is non-null exactly when `source` is `tool/result`.
+- `redactedDigest` is the SHA-256 of the redacted text: a message, queued input, a tool result, native-validation
+  output, operator compaction text, or an attachment's content or file name (each redacted separately). For a tool
+  result above the spill cap it equals the spill's `contentSha256`. It is never a digest of a raw value.
+- `gateway` and `bridge` are reserved sources: gateway and bridge redactions emit no receipt yet, and their markers are
+  not tokens.
+- `findings` are heuristic detections and declared-field matches. They do not show that nothing was missed, and a
+  token in the redacted text is a pseudonym, not de-identified or anonymized data.
+
 ## control-result
 
 Contract only: P1-11 emits it. The schema already refuses `pass` unless applicability is `applicable` and evidence is
@@ -263,6 +279,18 @@ express, all listed in docs/catalog/CONTROL_RECORD.md:
   superseded instrument is cited only as historical.
 - A lock verifies only against a rebuild from the same tree: every digest, source row and the register digest must
   match. A matching lock shows the content is unchanged, not that it is true.
+
+## register-entry
+
+One clause of a jurisdiction register (P1-18; docs/catalog/REGISTER.md). Rules the schema cannot express:
+
+- `sourceKind` is `official` exactly when the url host is on the S5 register's official hosts; a secondary entry names
+  no legal reviewer.
+- A null date has `dateNotes`; an entry without `contentHash` has a `sourceNote`; a hash has its `retrievedAt`.
+- `s5RegisterId` exists and its stations include the entry's; a register's litigation rule flags every matching
+  jurisdiction unless a legal reviewer cleared it with a rationale.
+- A control citation keyed by an entry id restates the entry, and a control citing an unreviewed entry cannot report an
+  approved review.
 
 ## A4 project record
 

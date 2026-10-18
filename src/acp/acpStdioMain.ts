@@ -16,6 +16,9 @@ import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import { prepareAcpNativeSession } from "./acpNativeSession.js";
+import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { runLease } from "../leases/runLease.js";
 import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
@@ -208,6 +211,11 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // caught: the conversation completed and the agent produced no text at all.
   const transport = route.providerId === STUB_PROVIDER_ID ? stubProviderTransport({}) : undefined;
 
+  // P1-79: each session's lease, minted at session/new, load or fork before the session opens; PRINCIPAL_UNRESOLVED is coded.
+  const sessionLease = (): ReturnType<typeof runLease> => {
+    try { return runLease({ workspace: init.workspace, agentId: init.agentId, model: route.models?.[0] ?? route.providerId, tools, ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) }); }
+    catch (error) { throw error instanceof LeasePrincipalRefused ? new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code }) : error; }
+  };
   const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }): AgentSessionInit & { sessionId: string } =>
     ({
       workspace: params.workspace,
@@ -234,7 +242,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-      ...(validation === undefined ? {} : { validation }), ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken })
+      ...(validation === undefined ? {} : { validation }), ...sessionLease()
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
@@ -246,7 +254,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
     orderedImageInput: true,
     audioInput: true,
-    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: init.forkSessionFactory }),
+    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: params => init.forkSessionFactory!({ ...params, ...sessionLease() }) }),
     write: createAcpStdioSink(stdout),
     sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),

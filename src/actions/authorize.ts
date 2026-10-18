@@ -198,7 +198,7 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
  * is AGENT is a registered service; any other user is a human. `state` is the user record's digest, which the recheck
  * compares, so a principal deactivated or demoted between bind and execution is refused.
  */
-function leasePrincipal(workspace: string, payload: LeasePayload):
+export function leasePrincipal(workspace: string, payload: Pick<LeasePayload, "principal">):
   { readonly principal: AuthorizationRecordV1["principal"]; readonly state: string } | null | Failed {
   const named = payload.principal;
   if (!named) return null;

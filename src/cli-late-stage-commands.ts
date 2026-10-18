@@ -1423,43 +1423,30 @@ export function registerLateStageCliCommands({
 
   enterprise
     .command("status")
-    .description("Show current license status, tier, and enabled features")
+    .description("Show whether enterprise licence verification is configured, and the licence it verifies")
     .action(async () => {
       const { enterpriseStatusCli } = await import("./enterprise/enterpriseCli.js");
       const result = enterpriseStatusCli({ workspace: process.cwd() });
       console.log(chalk.bold.white(`\n  Enterprise Status\n`));
-      console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
-      console.log(`  License:   ${result.licenseValid ? chalk.green("valid") : chalk.red(result.licenseStatus)}`);
-      if (result.org) {
-        console.log(`  Org:       ${chalk.white(result.org)}`);
+      console.log(`  Licence verification: ${result.verificationConfigured ? chalk.green("configured") : chalk.yellow("not configured")}`);
+      if (result.verificationConfigured) {
+        console.log(`  License:   ${result.licenseValid ? chalk.green(result.licenseStatus) : chalk.red(result.licenseStatus)}`);
       }
-      if (result.expiresAt) {
-        console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+      if (result.licenseValid) {
+        console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
+        if (result.org) console.log(`  Org:       ${chalk.white(result.org)}`);
+        if (result.expiresAt) console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+        if (result.graceDaysRemaining > 0) console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
       }
-      if (result.graceDaysRemaining > 0) {
-        console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
-      }
-      console.log(`  Features:  ${result.features.length > 0 ? result.features.join(", ") : chalk.gray("none")}`);
-      if (result.errors.length > 0) {
-        for (const err of result.errors) {
-          console.log(`  ${chalk.red("error:")} ${err}`);
-        }
-      }
-      console.log();
+      for (const err of result.errors) console.log(`  ${chalk.yellow("note:")} ${err}`);
+      console.log(chalk.gray("  An enterprise licence gates no AMC feature and never changes a result.\n"));
     });
 
   enterprise
     .command("activate <key>")
-    .description("Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX)")
+    .description("Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list")
     .action(async (key: string) => {
-      const { validateLicenseKeyFormat } = await import("./enterprise/license.js");
       const { enterpriseActivateCli } = await import("./enterprise/enterpriseCli.js");
-      const formatCheck = validateLicenseKeyFormat(key);
-      if (!formatCheck.valid) {
-        console.error(chalk.red(`\n  Invalid key format: ${formatCheck.errors.join(", ")}\n`));
-        process.exit(1);
-        return;
-      }
       const result = enterpriseActivateCli({ workspace: process.cwd(), key });
       if (result.success) {
         console.log(chalk.green(`\n  License activated — tier: ${result.tier}`));
@@ -1468,7 +1455,7 @@ export function registerLateStageCliCommands({
         }
         console.log(chalk.gray(`  Stored: ${result.path}\n`));
       } else {
-        console.error(chalk.red(`\n  Activation failed: ${result.errors.join(", ")}\n`));
+        console.error(chalk.red(`\n  Activation refused: ${result.errors.join(", ")}\n`));
         process.exit(1);
       }
     });

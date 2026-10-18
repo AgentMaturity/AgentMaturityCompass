@@ -365,7 +365,8 @@ describe("Claude control probe runs only the handler AMC would install", () => {
    * workspace's own auditor key, so the forged state stays `installed`: what a cloned or
    * shared workspace can carry when its `.amc` keys are not the user's.
    */
-  function forgeSignedHandler(workspace: string, edit: (group: ControlSettings["hooks"]["PreToolUse"][number], handler: InstalledHandler) => void): void {
+  function forgeSignedHandler(workspace: string, edit: (group: ControlSettings["hooks"]["PreToolUse"][number], handler: InstalledHandler) => void,
+    expectedState: "installed" | "drifted" = "installed"): void {
     const settingsPath = join(workspace, ".claude", "settings.local.json");
     const settings = JSON.parse(readFileSync(settingsPath, "utf8")) as ControlSettings;
     const group = settings.hooks.PreToolUse[0]!;
@@ -381,7 +382,7 @@ describe("Claude control probe runs only the handler AMC would install", () => {
     }
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
     signFileWithAuditor(workspace, manifestPath);
-    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe(expectedState);
   }
 
   function installControl(agentId: string): string {
@@ -437,7 +438,6 @@ describe("Claude control probe runs only the handler AMC would install", () => {
       args[args.indexOf("--agent") + 1] = "someone-else";
     }],
     ["a longer timeout", (_group: { matcher: string }, handler: InstalledHandler) => { handler.timeout = 600; }],
-    ["a narrowed matcher", (group: { matcher: string }) => { group.matcher = "Read"; }],
     ["a bare command name", (_group: { matcher: string }, handler: InstalledHandler) => {
       handler.command = "sh";
       handler.args = ["-c", "true"];
@@ -448,6 +448,15 @@ describe("Claude control probe runs only the handler AMC would install", () => {
     const workspace = installControl("forged-args");
     forgeSignedHandler(workspace, edit);
     await expectStaleNotRun(workspace);
+  }, 60_000);
+
+  // P1-23: AMC's hooks must match every tool, so a narrowed matcher is drift even in a re-signed manifest; never run.
+  test("reports a signed handler with a narrowed matcher as drifted and never runs it", async () => {
+    const workspace = installControl("forged-matcher");
+    forgeSignedHandler(workspace, (group) => { group.matcher = "Read"; }, "drifted");
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).issues).toContain("AMC's Claude Code hooks do not match every tool (a matcher other than *)");
+    expect(await verifyClaudeControl({ workspace, home: tempDir("amc-claude-home-") })).toMatchObject({ verified: false, probe: null,
+      summary: "Control: NOT VERIFIED (drifted)" });
   }, 60_000);
 
   test("still runs and verifies the genuine installed handler", async () => {

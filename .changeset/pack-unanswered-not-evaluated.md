@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": major
+---
+
+Breaking: an unanswered industry-pack question is not evaluated. It used to count as level 1. The shared scorer (`scoreIndustryPack`, and the pack audit through the same `selfAssessPack`) gives it no level, no question result and no compliance gap, lists it in the new `notEvaluatedQuestionIds`, and leaves `percentage`, `level` and `eligibleLevel` `null` until every question is answered. `amc domain pack run --json` (including `--baseline`, which now answers nothing and computes no score), `amc_score_sector_pack` and `amc_score_industry_pack` report this one result: the text prints "not evaluated: N of M questions unanswered" instead of a score. The pack audit marks an unanswered control `NOT_EVALUATED` with `level: null` (its remediation still says what to answer and evidence), its overall carries `notEvaluatedQuestionIds` and a `null` percentage and level until every control is answered, and its schema id is `amc.industry-pack-audit/4`. Scripts that read `percentage` or `level` from a pack result or an audit must handle `null`.

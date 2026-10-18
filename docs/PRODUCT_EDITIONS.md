@@ -5,7 +5,9 @@
 AMC has one simple split:
 
 - **Free / Open Source**: the entire trust stack
-- **Industry Packs / Enterprise (planned)**: sector-specific domain diagnostics; public checkout is not live
+- **Industry Packs / Enterprise (planned)**: sector-specific, self-reported domain questionnaires; public checkout is not live
+
+A licence unlocks access to Industry Pack questions and runs. It never changes a score, gap, report or other result: the same inputs give the same result in every edition.
 
 ## Full edition matrix
 
@@ -34,7 +36,7 @@ Most open-source projects gate core features behind paid tiers, which kills adop
 
 The trust stack itself is free. Always.
 
-Commercial availability boundary: the entitlement and license machinery exists, but public checkout and automatic issuance are not live. Do not present this matrix as a purchase-ready offer until `website/publication-status.json` marks that channel live.
+Commercial availability boundary: the licence gate exists, but public checkout and automatic issuance are not live. A deployment offers checkout only when a checkout URL and a pinned licence signing key are configured; otherwise every locked surface says checkout is not available in this deployment and to contact sales. Do not present this matrix as a purchase-ready offer until `website/publication-status.json` marks that channel live.
 
 ## Read next
 - `docs/PRICING.md`

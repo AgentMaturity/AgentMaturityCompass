@@ -99,11 +99,14 @@
     "check:vendor-rescope": "node scripts/vendor/rescope-vendor.mjs --check",
     "gen:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs",
     "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
+    "gen:capability-matrix": "node scripts/gen-capability-matrix.mjs",
+    "check:capability-matrix": "node scripts/gen-capability-matrix.mjs --check",
     "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery",
     "graph:update": "graphify update .",
     "check:clean-source": "node scripts/clean-source-check.mjs",
     "bundle:kernel": "node scripts/bundle-kernel.mjs",
     "check:packed-install": "node scripts/packed-install-check.mjs",
+    "check:sdk-api": "node scripts/check-sdk-api.mjs",
     "qualify:platform": "node scripts/qualify-platform.mjs",
     "check:package": "node scripts/package-lint.mjs",
     "check:duplicates": "node scripts/source-quality.mjs duplicates",
@@ -190,6 +193,14 @@
     "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "1.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@amc/cordis": "workspace:*",
     "@amc/cordis-plugin-loader": "workspace:*",
@@ -197,6 +208,7 @@
     "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
+    "@earendil-works/pi-ai": "1.3.0",
     "@fontsource/inter": "5.2.8",
     "@fontsource/space-mono": "5.2.9",
     "@playwright/test": "^1.56.0",

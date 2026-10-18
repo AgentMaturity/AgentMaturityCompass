@@ -1,4 +1,5 @@
 import { SessionService } from "../session/sessionService.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScope } from "./delegationScope.js";
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
@@ -98,6 +99,12 @@ export interface DriverRunnerInit {
   readonly hookControl?: LoopHookControl;
   /** The parent's resolved shell decision; children inherit it and never widen it. Absent, a child inherits no opt-in. */
   readonly parentShell?: NativeShellReadiness;
+  /**
+   * The parent run's lease (P1-79), which every child and grandchild composes its toolset with. Its agent is the root's
+   * (`toolsetAgentId`), so each call binds the parent's principal, under the narrower of the child's scope and the lease's
+   * classes, until the parent's lease expires or is revoked. Absent, children carry none. Never in a digest.
+   */
+  readonly leaseToken?: string;
   /**
    * Lets a child delegate further.
    *
@@ -228,7 +235,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     let descendantStops: readonly string[] | undefined;
     try { descendantStops = descendantStopConditions(ctx.stopConditions, grant?.stopConditions); }
     catch (error) { return { ok: false, text: "", reason: `child stop conditions: ${error instanceof Error ? error.message : String(error)}` }; }
-    const session = new SessionService(init.workspace);
+    const session = redactingSessionFor(new SessionService(init.workspace)); // P2-02: opt-in redaction before commit
     let toolset: ReturnType<typeof agentToolset> | undefined;
     let driver: AgentDriver | undefined;
     let opened = false;
@@ -282,6 +289,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
         parentShell: init.parentShell ?? null,
+        ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
         delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
           ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
         ...(grant === undefined ? {} : { subagents: {

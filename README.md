@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C780-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C816-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -270,7 +270,7 @@ In these counts, registered = packs returned by `listAssurancePacks()`; files on
 | Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are implemented behind an entitlement boundary, with a planned commercial price of `$9.99/month` for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.** `amc domain pack access` reports this state; `amc domain pack checkout` fails closed unless an operator has configured a verified checkout provider. Do not send payment based on repository copy alone.
+Industry Packs are paid, self-reported questionnaires behind a licence gate, with a planned price of `$9.99/month` for all 41 packs. A licence unlocks access to pack questions and runs only; the same answers and evidence give the same score, gap, report, assurance result and roadmap with or without one, and pack names and descriptions stay visible without one. **Public checkout is not live.** `amc domain pack access` states what your deployment offers: checkout appears only when a checkout URL and a licence signing key pinned in your AMC trust list are both configured; otherwise it says checkout is not available in this deployment and to contact sales. Do not send payment based on repository copy alone.
 
 ### Simulation & Forecast Evaluation Lane
 
@@ -533,7 +533,7 @@ amc connect hooks install --provider claude-code --mode control --agent my-agent
 
 The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; run `amc vault unlock` or set `AMC_VAULT_PASSPHRASE` for non-interactive use. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
-`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. Claude Code can receive `allow`, `deny`, or `ask`. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
+`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
 Track real first-run outcomes without creating traffic or evidence:
 
@@ -704,7 +704,7 @@ Do not treat a detected runtime as proof of event/control coverage. Issue a port
 amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-capabilities.json --json
 ```
 
-Claude Code receipts can verify allow/deny/ask and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
+Claude Code receipts can verify allow/deny and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
 
 For supported shell input, the same hook performs a compound-command blast-radius review across every bounded segment and applies the most restrictive result. Unsupported expansion or syntax fails closed before partial policy output. Signed evidence keeps only action classes, canonical tool names, outcomes, reason codes, and counts; the raw command and argument values are never retained.
 
@@ -779,12 +779,12 @@ All four targets stay documented (decision D-03). Only a qualified target may be
 
 ## Pricing
 
-The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live.
+The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live. Payment unlocks access only: it never changes a result, a trust tier or a verification outcome.
 
 | Tier | What you get |
 |---|---|
 | **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,255 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
+| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs, which are self-reported questionnaires; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
 > Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays MIT licensed. See [`website/publication-status.json`](website/publication-status.json) before making any availability claim.
@@ -917,7 +917,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,780<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,816<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

@@ -19,6 +19,7 @@ const mcpTools = vi.hoisted(() => new Map<string, ToolHandler>());
 vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
   McpServer: class {
     tool(name: string, _description: string, _schema: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
+    registerTool(name: string, _config: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
     resource() {}
     async connect() {}
     async close() {}
@@ -95,7 +96,7 @@ describe("no certification from self-assessment (P0-21)", () => {
   test("the pack audit reports a self-reported overall with no certified field", () => {
     for (const pack of listIndustryPacks()) {
       const audit = buildIndustryPackAudit({ pack, responses: allFives(pack), now: 1_700_000_000_000 });
-      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/3");
+      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/4");
       expect("certified" in audit.overall, pack.id).toBe(false);
       expect(audit.overall.claimKind).toBe("self_reported");
       expect(audit.overall.eligibleLevel!).toBeLessThanOrEqual(1);

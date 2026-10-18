@@ -142,9 +142,11 @@ async function wire(base: string, path: string, method = "GET", body = "", heade
       const chunks: Buffer[] = [];
       res.on("data", (chunk: Buffer) => chunks.push(chunk)); res.on("error", reject);
       res.on("end", () => {
-        // Node generates the Date transport header independently of application code.
-        const { date: _date, ...stableHeaders } = res.headers;
-        resolvePromise({ status: res.statusCode ?? 0, headers: stableHeaders, body: Buffer.concat(chunks).toString("utf8") });
+        // Node generates the Date transport header independently of application code. P1-55's request id is
+        // random per response, so only its presence is compared.
+        const { date: _date, "x-request-id": requestId, ...stableHeaders } = res.headers;
+        const headers = requestId === undefined ? stableHeaders : { ...stableHeaders, "x-request-id": "<request-id>" };
+        resolvePromise({ status: res.statusCode ?? 0, headers, body: Buffer.concat(chunks).toString("utf8") });
       });
     });
     req.once("error", reject); req.end(body);

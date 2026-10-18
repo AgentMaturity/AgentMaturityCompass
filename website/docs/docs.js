@@ -18,7 +18,7 @@ const CATEGORIES = [
     name: 'Native Runtime',
     icon: '02',
     docs: [
-  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
+  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'sdk/TYPESCRIPT_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
   'SESSION_RESUME', 'SESSION_EVENT_HISTORY', 'PLATFORM_QUALIFICATION', 'NATIVE_SANDBOX_UBUNTU'
 ]
   },
@@ -35,7 +35,7 @@ const CATEGORIES = [
   {
     name: 'Adapters & Integration',
     icon: '05',
-    docs: ['ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility', 'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI', 'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI', 'adapters/langchain-python', 'adapters/langchain-node', 'adapters/langgraph-python', 'adapters/crewai', 'adapters/autogen', 'adapters/openai-agents-sdk', 'adapters/llamaindex', 'adapters/semantic-kernel', 'adapters/claude-code', 'adapters/gemini', 'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/generic-cli', 'BRIDGE', 'BRIDGE_PROMPT_ENFORCEMENT', 'CONNECT', 'INTEGRATIONS', 'integrations/ci-cd', 'MCP_SERVER', 'PAIRING', 'PAIRING_LAN_PWA', 'PROVIDERS', 'SDK', 'SDK_VERSIONING']
+    docs: ['ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility', 'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI', 'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI', 'adapters/langchain-python', 'adapters/langchain-node', 'adapters/langgraph-python', 'adapters/crewai', 'adapters/autogen', 'adapters/openai-agents-sdk', 'adapters/llamaindex', 'adapters/semantic-kernel', 'adapters/claude-code', 'adapters/claude-code-hooks', 'adapters/gemini', 'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/generic-cli', 'BRIDGE', 'BRIDGE_PROMPT_ENFORCEMENT', 'CONNECT', 'INTEGRATIONS', 'integrations/ci-cd', 'MCP_SERVER', 'PAIRING', 'PAIRING_LAN_PWA', 'PROVIDERS', 'SDK', 'SDK_VERSIONING']
   },
   {
     name: 'Scoring & Dimensions',
@@ -97,7 +97,7 @@ const CATEGORIES = [
 // All known doc filenames (without .md)
 const ALL_DOCS = [
   
-  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
+  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'sdk/TYPESCRIPT_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
   'SESSION_RESUME', 'SESSION_EVENT_HISTORY', 'PLATFORM_QUALIFICATION', 'NATIVE_SANDBOX_UBUNTU'
 ,
   'A4_FORGE','ACCESSIBILITY','ACTION_EVIDENCE_LOGIC','ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
@@ -141,7 +141,7 @@ const ALL_DOCS = [
   'deep-dive/INDEX','deep-dive/runtime-control-plane','deep-dive/trust-evidence-plane',
   'deep-dive/governance-execution-plane','deep-dive/evaluation-assurance-plane',
   'deep-dive/operations-ecosystem-plane',
-  'adapters/autogen','adapters/claude-code','adapters/crewai','adapters/gemini',
+  'adapters/autogen','adapters/claude-code','adapters/claude-code-hooks','adapters/crewai','adapters/gemini',
   'adapters/generic-cli','adapters/langchain-node','adapters/langchain-python',
   'adapters/langgraph-python','adapters/llamaindex','adapters/openai-agents-sdk',
   'adapters/openclaw','adapters/openhands','adapters/python-amc-sdk','adapters/semantic-kernel',
@@ -176,7 +176,7 @@ const INTERNAL_DOCS = new Set([
 ]);
 const PUBLIC_DOC_IDS = new Set([
   
-  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
+  'NATIVE_AGENT_WORKFLOW', 'NATIVE_STUDIO_TASKS', 'NATIVE_SDK', 'sdk/TYPESCRIPT_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS', 'NATIVE_DELEGATION_LIMITS', 'STUDIO_AGENT_AUTH', 'SESSION_SPILL_LIFECYCLE', 'SESSION_SPILL_COMMANDS', 'HUMAN_FIRST_USE_STUDY', 'HUMAN_FIRST_USE_CAPTURE', 'HUMAN_FIRST_USE_OBSERVER', 'HUMAN_FIRST_USE_MODEL_REVISION', 'HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS', 'AMC_1512_HUMAN_FIRST_USE_PROTOCOL', 'AMC_1512_EVIDENCE_PROTOCOL',
   'SESSION_RESUME', 'SESSION_EVENT_HISTORY', 'PLATFORM_QUALIFICATION', 'NATIVE_SANDBOX_UBUNTU'
 ,
   // First score and adoption
@@ -195,7 +195,7 @@ const PUBLIC_DOC_IDS = new Set([
   'ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility',
   'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI',
   'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI',
-  'adapters/autogen', 'adapters/claude-code', 'adapters/crewai', 'adapters/gemini',
+  'adapters/autogen', 'adapters/claude-code', 'adapters/claude-code-hooks', 'adapters/crewai', 'adapters/gemini',
   'adapters/generic-cli', 'adapters/langchain-node', 'adapters/langchain-python',
   'adapters/langgraph-python', 'adapters/llamaindex', 'adapters/openai-agents-sdk',
   'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/semantic-kernel',

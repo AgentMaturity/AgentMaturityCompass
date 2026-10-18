@@ -1085,34 +1085,44 @@ async function wrapWithBridgeToken(params: {
   };
   process.stdin.on("data", stdinHandler);
 
-  child.stdout.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stdout.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stdout",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stderr.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stderr",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
+  // A telemetry row ends at a newline (or past 64 KiB), not at a write, so a value the agent prints over two writes reaches
+  // the bridge's evidence redaction in one row (P2-02). A partial line (a token stream, a spinner) waits at most 250 ms. The
+  // rest is flushed, and every row settled, before the exit row, or before amc exits on SIGINT or SIGTERM.
+  const telemetryLines = (eventType: "agent_stdout" | "agent_stderr", out: NodeJS.WriteStream) => {
+    let pending = "";
+    let timer: NodeJS.Timeout | undefined;
+    const post = (payload: string) => {
+      if (payload) queueTelemetry(postBridgeTelemetry(base, leaseToken, { sessionId: wrapSessionId, eventType, correlationId, runId, provider: params.provider, payload }));
+    };
+    const flush = () => { clearTimeout(timer); timer = undefined; post(pending); pending = ""; };
+    return {
+      write: (chunk: Buffer) => {
+        const text = redactBridgeText(chunk.toString("utf8"));
+        out.write(text);
+        pending += text;
+        const cut = pending.length > 65_536 ? pending.length : pending.lastIndexOf("\n") + 1;
+        post(pending.slice(0, cut));
+        pending = pending.slice(cut);
+        if (cut > 0) { clearTimeout(timer); timer = undefined; }
+        if (pending !== "") timer ??= setTimeout(flush, 250);
+      },
+      flush
+    };
+  };
+  const stdoutLines = telemetryLines("agent_stdout", process.stdout);
+  const stderrLines = telemetryLines("agent_stderr", process.stderr);
+  child.stdout.on("data", stdoutLines.write);
+  child.stderr.on("data", stderrLines.write);
+  // Ctrl+C or a supervisor's SIGTERM: post what is pending and settle it (at most 1 s), then die of the same signal.
+  const onSignal = (signal: NodeJS.Signals): void => {
+    stdoutLines.flush();
+    stderrLines.flush();
+    void Promise.race([Promise.allSettled(pendingTelemetry), new Promise((settle) => setTimeout(settle, 1_000))]).then(() => {
+      process.kill(process.pid, signal);
+    });
+  };
+  process.once("SIGINT", onSignal);
+  process.once("SIGTERM", onSignal);
 
   const exitCode = await new Promise<number>((resolvePromise, rejectPromise) => {
     child.on("error", rejectPromise);
@@ -1120,6 +1130,9 @@ async function wrapWithBridgeToken(params: {
   }).finally(() => {
     process.stdin.off("data", stdinHandler);
   });
+  stdoutLines.flush();
+  stderrLines.flush();
+  await Promise.allSettled(pendingTelemetry);
 
   await postBridgeTelemetry(base, leaseToken, {
     sessionId: wrapSessionId,
@@ -1132,6 +1145,8 @@ async function wrapWithBridgeToken(params: {
     }
   }).catch(() => {});
   await Promise.allSettled(pendingTelemetry);
+  process.off("SIGINT", onSignal);
+  process.off("SIGTERM", onSignal);
 
   console.log(chalk.hex('#4AEF79')("Unified Clarity"));
   console.log(`agent=${decoded.agentId} workspace=${decoded.workspaceId} provider=${params.provider}`);
@@ -2194,7 +2209,14 @@ program
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean }) => {
+  .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
+  .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean }) => {
+    const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
+    try {
+      const starter = starterProfileFlag(opts);
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force); return; }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");

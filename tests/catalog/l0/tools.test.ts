@@ -62,21 +62,22 @@ async function run(f: L0Fixture, ws: string, guardLabel: string, guard: ReturnTy
     record: (execution, outcome) => records.push(...toolEvidenceFor(execution, outcome)) });
   const outcome = await pipeline.execute({ name: tool.name, agentId: "default", arguments: args, requestedMode: "EXECUTE" });
   const executionId = outcome.action?.executionId;
-  expect(executionId, `${f.ref}: a journaled call has an execution id`).toBeTruthy();
-  const chain = journal!.verifyReceiptChain(executionId!);
-  const view = journal!.get(executionId!);
-  journal!.close();
+  // READ_ONLY calls are not journaled: their oracle is the TOOL_CALL_ALLOWED or TOOL_CALL_DENIED record alone (P1-18).
+  if (tool.actionClass !== "READ_ONLY") expect(executionId, `${f.ref}: a journaled call has an execution id`).toBeTruthy();
+  else expect(executionId, `${f.ref}: a read is not journaled`).toBeUndefined();
+  const chain = executionId ? journal!.verifyReceiptChain(executionId) : null;
+  const view = executionId ? journal!.get(executionId) : undefined;
+  journal?.close();
   return { outcome, bodyRuns, records, chain, view };
 }
 
 function assertOutcome(f: L0Fixture, guardLabel: string, r: Awaited<ReturnType<typeof run>>): void {
   const expected = f.envelope.expected;
-  expect(r.chain.ok, `${f.ref}: the receipt chain verifies (${r.chain.errors.join("; ")})`).toBe(true);
-  const last = r.chain.receipts.at(-1);
+  if (r.chain) expect(r.chain.ok, `${f.ref}: the receipt chain verifies (${r.chain.errors.join("; ")})`).toBe(true);
   if (expected.result === "allow") {
     expect(r.outcome.ok, JSON.stringify(r.outcome.denied)).toBe(true);
     expect(r.bodyRuns).toBe(1);
-    expect(r.view?.state).toBe("completed");
+    if (r.chain) expect(r.view?.state).toBe("completed");
     expect(r.records.some((row) => row.meta?.auditType === "TOOL_CALL_ALLOWED")).toBe(true);
     return;
   }
@@ -84,10 +85,12 @@ function assertOutcome(f: L0Fixture, guardLabel: string, r: Awaited<ReturnType<t
   expect(r.outcome.denied?.stage).toBe("guard");
   expect(r.outcome.denied?.guardLabel).toBe(guardLabel);
   expect(r.bodyRuns, "a denied call never runs its body").toBe(0);
-  expect(r.view?.state).toBe("denied");
-  expect(last?.reasonCode).toBe(expected.reasonCode);
   const denied = r.records.find((row) => row.meta?.auditType === "TOOL_CALL_DENIED");
   expect(denied?.meta?.denialGuard).toBe(guardLabel);
+  if (r.chain) {
+    expect(r.view?.state).toBe("denied");
+    expect(r.chain.receipts.at(-1)?.reasonCode).toBe(expected.reasonCode);
+  } else expect(`guard_denied:${String(denied?.meta?.denialGuard)}`).toBe(expected.reasonCode);
 }
 
 /**
@@ -108,8 +111,8 @@ async function runUnregistered(f: L0Fixture, ws: string, s: AllowlistSetup): Pro
   expect(`${String(denied?.meta?.denialStage)}_denied`).toBe(f.envelope.expected.reasonCode);
 }
 
-describe("L0-TOOL-01 signed tool allowlist (tool-allowlist guard)", () => {
-  const fixtures = fixturesFor("tool_allowlist", "L0-TOOL-01");
+describe("L0-TOOL-01 signed tool allowlist and L1-WLT-US-06 scoped customer reads (tool-allowlist guard)", () => {
+  const fixtures = fixturesFor("tool_allowlist");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, async () => {

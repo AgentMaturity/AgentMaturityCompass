@@ -47,7 +47,8 @@
  * is an operator-configuration question, not a duplicate engine.
  */
 
-export type SecretPatternSource = "bridge" | "secretBlind" | "both";
+/** `dataflow`: added with the protected-data credential class (P2-02), for key formats neither engine knew. */
+export type SecretPatternSource = "bridge" | "secretBlind" | "both" | "dataflow";
 
 export interface SecretPattern {
   /** Stable label; `secretBlind` renders it into its placeholder. */
@@ -60,12 +61,16 @@ export interface SecretPattern {
 export const SECRET_PATTERNS: readonly SecretPattern[] = [
   { type: "aws_key", source: "both", pattern: /AKIA[A-Z0-9]{16}/ },
   { type: "aws_secret", source: "secretBlind", pattern: /(?:aws_secret_access_key|AWS_SECRET)["\s:=]+[A-Za-z0-9/+=]{40}/i },
-  { type: "github_token", source: "both", pattern: /gh[ps]_[A-Za-z0-9]{36,}/ },
+  { type: "github_token", source: "both", pattern: /gh[psur]_[A-Za-z0-9]{36,}/ },
+  { type: "github_pat", source: "dataflow", pattern: /github_pat_[A-Za-z0-9_]{22,}/ },
   { type: "github_oauth", source: "both", pattern: /gho_[A-Za-z0-9]{36,}/ },
   // Anthropic before the generic `sk-` rule: `sk-ant-` has a hyphen four
   // characters in, so the generic pattern stops short and never covers it.
   { type: "anthropic_key", source: "bridge", pattern: /sk-ant-[a-zA-Z0-9-]{20,}/ },
   { type: "openai_key", source: "both", pattern: /\bsk-[A-Za-z0-9]{12,}\b/ },
+  // Project, service-account and admin keys: the generic rule stops at the hyphen after the prefix.
+  { type: "openai_project_key", source: "dataflow", pattern: /\bsk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{20,}/ },
+  { type: "stripe_key", source: "dataflow", pattern: /\b[rs]k_live_[A-Za-z0-9]{16,}/ },
   { type: "google_api_key", source: "bridge", pattern: /\bAIza[0-9A-Za-z\-_]{20,}\b/ },
   { type: "xai_key", source: "bridge", pattern: /\bxai-[A-Za-z0-9\-_]{12,}\b/ },
   { type: "slack_token", source: "secretBlind", pattern: /xox[bprs]-[A-Za-z0-9-]{10,}/ },
@@ -74,7 +79,9 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   { type: "private_key", source: "secretBlind", pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/ },
   { type: "connection_string", source: "secretBlind", pattern: /(mongodb|postgres|mysql|redis|amqp):\/\/[^\s"']+/i },
   { type: "generic_api_key", source: "secretBlind", pattern: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?[A-Za-z0-9_\-]{16,}["']?/i },
-  { type: "password_in_url", source: "secretBlind", pattern: /\/\/[^:\s]+:[^@\s]+@/ },
+  // Bounded, and never across "/" or a quote: unbounded, one URL's "//" ran on through JSON members to any later "@"
+  // (an email), and rescanning from every "//" took quadratic time on text without whitespace.
+  { type: "password_in_url", source: "secretBlind", pattern: /\/\/[^:\s/@"]{1,256}:[^@\s/"]{1,256}@/ },
   { type: "bearer_token", source: "both", pattern: /Bearer\s+[A-Za-z0-9._-]{8,}/i },
   { type: "jwt", source: "both", pattern: /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/ },
   { type: "amc_lease", source: "bridge", pattern: /\blease_[a-z0-9]{10,}\b/i },

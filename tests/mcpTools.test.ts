@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { MCP_TOOL_METADATA, resetRateLimiter } from "../src/mcp/amcMcpServer.js";
+import { a4ToolMetadata } from "../src/mcp/a4Tools.js";
 
 describe("MCP Tool Metadata", () => {
-  test("contains all 11 tools", () => {
-    expect(MCP_TOOL_METADATA.length).toBe(11);
+  test("contains the 15 core tools plus the A4 preview tools", () => {
+    expect(MCP_TOOL_METADATA.length).toBe(15 + a4ToolMetadata().length);
     expect(MCP_TOOL_METADATA.map((t) => t.name)).toContain("amc_incident_clocks");
   });
 
@@ -33,9 +34,10 @@ describe("MCP Tool Metadata", () => {
     }
   });
 
-  test("all tool descriptions include (read-only)", () => {
+  test("all tool descriptions include (read-only), except the named write tools, which say what they write", () => {
+    const writeTools = new Set(["amc_a4_comment"]); // AMC_A4_PREVIEW=1; posts a self-reported comment through Studio
     for (const tool of MCP_TOOL_METADATA) {
-      expect(tool.description).toContain("read-only");
+      expect(tool.description).toMatch(writeTools.has(tool.name) ? /\(writes [^)]+\)/ : /\(read-only\)/);
     }
   });
 

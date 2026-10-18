@@ -1,0 +1,32 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-11",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [
+      {
+        "kind": "TRIGGER",
+        "clock": "INCIDENT_DETERMINATION",
+        "atHours": 1
+      },
+      {
+        "kind": "NOTIFIED",
+        "clock": "nydfs-500-17-notice",
+        "atHours": 2
+      }
+    ],
+    "due": [
+      {
+        "clock": "nydfs-500-17-notice",
+        "hoursAfterCreated": 73
+      }
+    ]
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

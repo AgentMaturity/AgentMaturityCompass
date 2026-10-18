@@ -33,7 +33,8 @@ function readSignedPlan(planPath: string): SignedPlan {
   return { ...rest, plan: readJson(planPath) as CompiledPlan };
 }
 
-export function runCatalogCompile(workspace: string, opts: CompileFlags): number {
+/** Compile, sign and write the plan files, and activate when asked; runCatalogCompile prints what this returns. */
+export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   if (opts.activate && opts.requestReview) throw new Error("--activate needs a review that was already approved; it cannot be combined with --request-review");
   const profile = parseDeploymentProfile(readJson(resolve(workspace, opts.profile)));
   const ref = profile.operatingProfile;
@@ -72,10 +73,15 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
   for (const [name, text] of Object.entries(files)) writeFileAtomic(join(outDir, name), text, 0o644);
   const activated = opts.activate ? activateControlPlan({ workspace, signed, approvalRequestId: opts.activate,
     reviewAgentId: profile.deployment.agentIds[0] ?? "", allowWeakening: opts.allowWeakening }) : null;
+  return { plan, signed, weakenings, outDir, files: Object.keys(files), activated };
+}
+
+export function runCatalogCompile(workspace: string, opts: CompileFlags): number {
+  const { plan, signed, weakenings, outDir, files, activated } = compileCatalogPlan(workspace, opts);
   const count = (a: string) => plan.requirements.filter((r) => r.applicability === a).length;
   if (opts.json) {
     console.log(JSON.stringify({ status: plan.status, digest: plan.digest, policyDigest: plan.runtimePolicy.policyDigest, outDir,
-      files: Object.keys(files), review: signed.review, weakenings, activation: activated, claim: "experimental plan; no compliance claim" }, null, 2));
+      files, review: signed.review, weakenings, activation: activated, claim: "experimental plan; no compliance claim" }, null, 2));
   } else {
     console.log((plan.status === "ready" ? chalk.green : chalk.yellow)(`Control plan ${plan.status}: ${outDir}`));
     console.log(`  ${plan.digest}; ${count("applicable")} applicable, ${count("unresolved")} unresolved, ${count("not_applicable")} not applicable`);

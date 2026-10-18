@@ -49,6 +49,7 @@ import { projectNativeValidation } from "../agent/nativeValidationProjection.js"
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
+import type { RequestEncoderRegistry } from "../llm/request/requestEncoder.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import {
   agentPromptProfile,
@@ -66,6 +67,8 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
@@ -82,6 +85,7 @@ import type { ApprovalSeamService } from "./services/approvalServices.js";
 import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices.js";
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -201,6 +205,8 @@ export interface ComposedTurnOptions {
   readonly routes: readonly LlmRouteConfig[];
   /** Replaces the platform `fetch` — the stub provider answers in-process. */
   readonly transport?: HttpTransport;
+  /** Encoders beyond the built-ins, for a route whose encoder is loaded at selection (P1-38 pi-ai). */
+  readonly encoders?: RequestEncoderRegistry;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
@@ -214,6 +220,12 @@ export interface ComposedTurnOptions {
   readonly onReady?: (handle: ComposedTurnHandle) => void;
   /** The parent's resolved shell decision, which in-process children inherit and never widen (P0-06). */
   readonly parentShell?: NativeShellReadiness;
+  /**
+   * The run's lease (P1-79, runLease), which in-process children inherit: delegated ones and a schedule pass's. Under a
+   * plan that requires a principal, a run that may spawn them without one is refused before its session opens. Never in
+   * a digest.
+   */
+  readonly leaseToken?: string;
   /**
    * Let this run delegate to in-process children (P6.1a).
    *
@@ -413,6 +425,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
   }
+  // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
+  if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
+    && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
+    throw new LeasePrincipalRefused("the active plan requires a principal for every tool call, and this run holds no lease for its in-process children to inherit; no session was opened");
+  }
   if (options.delegation !== undefined) {
     // An in-process child opens a second session writer; a foreign runner's process opens none here.
     if (options.delegation.runner === undefined) assertSecondSessionWriter(options.workspace, "In-process delegation");
@@ -448,6 +465,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     session = new SessionService(options.workspace);
     session.open({ ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }), ...identity });
   }
+  // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+  session = redactingSessionFor(session);
   const sessionId = session.sessionId;
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];
@@ -468,7 +487,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       credentials: serviceOn<CredentialsSeamService>(ctx, CREDENTIALS_SEAM.name),
       routes: options.routes,
       ...(options.onLiveText === undefined ? {} : { onLiveText: options.onLiveText }),
-      ...(options.transport !== undefined ? { transport: options.transport } : {})
+      ...(options.transport !== undefined ? { transport: options.transport } : {}),
+      ...(options.encoders !== undefined ? { encoders: options.encoders } : {})
     });
     await llmFiber.await();
     fibers.push(llmFiber);
@@ -553,6 +573,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
           ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
+          ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),

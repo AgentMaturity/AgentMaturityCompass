@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { allFixtures, EXECUTED_HARNESSES, harnessOf, layer0 } from "./harness.js";
+import { allFixtures, controls, EXECUTED_HARNESSES, harnessOf } from "./harness.js";
 
 /**
  * Every mandatory Layer 0 control carries a positive fixture and negative fixtures of the five evidence classes, and
@@ -13,7 +13,7 @@ describe("Layer 0 fixture coverage (P1-14)", () => {
   const fixtures = allFixtures();
 
   it("gives every mandatory control a positive fixture and stale, replayed, contradictory, cross_tenant and empty negatives", () => {
-    for (const c of layer0.filter((x) => x.mandatory)) {
+    for (const c of controls.filter((x) => x.mandatory)) {
       const own = fixtures.filter((f) => f.control.id === c.id);
       expect(own.some((f) => f.envelope.polarity === "positive"), `${c.id} positive`).toBe(true);
       for (const evidenceClass of REQUIRED_NEGATIVE) {

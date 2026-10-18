@@ -1,7 +1,7 @@
 import { execFile, spawnSync } from "node:child_process";
 import { createServer } from "node:http";
 import { promisify } from "node:util";
-import { createHash, generateKeyPairSync } from "node:crypto";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { assertFileNotExample, assertNotExample, EXAMPLE_BANNER } from "../src/claims/eligibility/exampleMode.js";
 import { assessDomainForAgent, buildDomainReportForAgent, getDomainGaps, getDomainRoadmap } from "../src/domains/domainCliIntegration.js";
-import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { DEMO_AGENT_ID, noVaultDemoGatewayConfig, prepareNoVaultDemoWorkspace, runDemo } from "../src/demo/demoRun.js";
@@ -22,6 +21,7 @@ import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import { evidenceProducer, effectiveTrustTier, eventMeta, readerTrustFor } from "../src/claims/evidenceProvenance.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { withWorkspaceScope } from "../src/enforce/evidenceEmitter.js";
+import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /**
  * P0-15: illustrative domain values exist only behind `--example`, stamped
@@ -71,13 +71,10 @@ function writeExampleRun(dir: string, runId: string): void {
 }
 
 beforeAll(() => {
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const env = {
-    AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString(),
-    AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString()
-  } as NodeJS.ProcessEnv;
-  licenseEnv.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY = env.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY!;
-  licenseEnv.AMC_INDUSTRY_PACKS_LICENSE_KEY = createIndustryPackLicenseKey({ expiresAt: "2099-01-01T00:00:00.000Z", env });
+  // A licence signed by a key pinned in a temp AMC home trust list (P1-51); the CLI child reads both from its env.
+  const licence = testIndustryPackLicence();
+  roots.push(licence.amcHome);
+  Object.assign(licenseEnv, licence.env);
   workspace = tempDir("amc-p015-example-");
   process.env.AMC_VAULT_PASSPHRASE = "p015-example-mode";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });

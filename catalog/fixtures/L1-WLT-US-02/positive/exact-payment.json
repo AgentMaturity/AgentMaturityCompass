@@ -1,0 +1,40 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "bound_approval",
+    "tool": "fixture.pay",
+    "actionClass": "FINANCIAL",
+    "approved": {
+      "amount": "12000",
+      "currency": "USD",
+      "recipient": "payee-a-002"
+    },
+    "call": {
+      "amount": "12000",
+      "currency": "USD",
+      "recipient": "payee-a-002"
+    },
+    "approvers": [
+      {
+        "userId": "approver-1",
+        "roles": [
+          "OWNER"
+        ]
+      },
+      {
+        "userId": "approver-2",
+        "roles": [
+          "OWNER"
+        ]
+      }
+    ],
+    "scenario": "approved"
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

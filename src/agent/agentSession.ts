@@ -17,7 +17,9 @@ import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { resumeSession } from "../session/sessionResume.js";
+import { runLease } from "../leases/runLease.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 
 /**
@@ -67,7 +69,11 @@ export interface AgentSessionInit {
   readonly expectedToolsDigest?: string;
   /** Explicit acceptance of an unconfined macOS shell; see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: ExplicitShellOptIn;
-  /** The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Never in a digest. */
+  /**
+   * The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Absent, a workspace-tools session
+   * under a plan that requires a principal mints the run's lease for the OS account's active users.yaml user, or is
+   * refused PRINCIPAL_UNRESOLVED before any session row (P1-79, runLease). Never in a digest.
+   */
   readonly leaseToken?: string;
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
@@ -139,12 +145,16 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
+    const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
+      ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
     const sessionId = init.sessionId ?? randomUUID();
-    const session = claimant === undefined ? new SessionService(workspace) : resumeSession({
+    // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+    const session = redactingSessionFor(claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
-    }).service;
+    }).service);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no
@@ -157,7 +167,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
       ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
-      ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
+      ...lease,
       // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
       // rows at the right session id was only half of it: written through the raw
       // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to

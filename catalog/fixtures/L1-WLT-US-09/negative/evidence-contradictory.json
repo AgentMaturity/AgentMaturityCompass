@@ -1,0 +1,101 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-09",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-09-manualDuty-record-1"
+        },
+        "producerId": "amc.manualDuty.record",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.manualDuty.record",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "deploymentId": "dep-a",
+          "controlId": "L1-WLT-US-09"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-09-manualDuty-record-1-receipt",
+          "observationKey": "L1-WLT-US-09-observation-1",
+          "observation": "allow"
+        }
+      },
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-09-manualDuty-record-3"
+        },
+        "producerId": "amc.manualDuty.record",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.manualDuty.record",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "deploymentId": "dep-a",
+          "controlId": "L1-WLT-US-09"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-09-manualDuty-record-3-receipt",
+          "observationKey": "L1-WLT-US-09-observation-1",
+          "observation": "deny"
+        }
+      },
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-09-versionManifest-2"
+        },
+        "producerId": "amc.versionManifest",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.versionManifest",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "deploymentId": "dep-a",
+          "controlId": "L1-WLT-US-09"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-09-versionManifest-2-receipt",
+          "observationKey": "L1-WLT-US-09-observation-2",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_not_admitted"
+  }
+}

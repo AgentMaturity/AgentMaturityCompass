@@ -4,7 +4,9 @@
 
 AMC is open source and MIT licensed. The full trust stack is free.
 
-The planned commercial surface is **Industry Packs** — 41 sector-specific domain packs that map trust scoring to regulated and specialized verticals. The target price is **$9.99/month per user** for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.**
+The planned commercial surface is **Industry Packs** — 41 sector-specific domain packs for regulated and specialized verticals. The target price is **$9.99/month per user** for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.**
+
+Industry Packs are self-reported questionnaires. A licence unlocks access to pack questions and runs; it never changes a score, gap, report, assurance result or roadmap, nor a trust tier or verification outcome. Pack names, descriptions and regulatory basis stay visible without a licence.
 
 ## What is free
 
@@ -29,7 +31,7 @@ All of the above is MIT licensed and always will be.
 
 ## What is planned as paid
 
-**Industry Packs** — 41 domain-specific packs that add sector-tuned diagnostics, compliance mappings, and trust scoring calibrated to specific regulated verticals.
+**Industry Packs** — 41 domain-specific, self-reported questionnaires with regulatory mappings for regulated verticals. They are scored by the same published method with or without a licence.
 
 Examples:
 - Healthcare / HIPAA
@@ -45,28 +47,28 @@ Examples:
 Industry packs require deep domain expertise, regulatory research, and ongoing maintenance as regulations evolve. Keeping them as the paid tier funds the open-source core sustainably.
 
 ### Current access status
-- **Industry Packs** — implemented behind an entitlement boundary; target price $9.99/month per user; not yet publicly purchasable
+- **Industry Packs** — implemented behind a licence gate; target price $9.99/month per user; not yet publicly purchasable. Every locked surface (CLI, Studio, console, dashboard, MCP, hosted API) states what is locked, the price, and either a working checkout or "Checkout is not available in this deployment; contact sales for access."
 - **Enterprise** — contact-first planning only; no self-serve checkout claim
 
 CLI:
 
 ```bash
-amc domain pack access
-amc domain pack checkout # fails closed unless a verified checkout provider is configured
+amc domain pack access    # what is locked, the price, and whether checkout is available here
+amc domain pack checkout  # exits 1 with the reason unless checkout and licence verification are configured
 amc domain pack activate --key <license-key>
-amc domain pack verify --key <license-key> --pubkey <license-public-key.pem>
+amc domain pack verify --key <license-key>
 ```
 
-`domain pack verify` counts only an Ed25519 license signature from a key pinned by `--pubkey`, a signed trust list or `AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY`, and exits 0, 1 or 2 like every verify command. A license signed with `AMC_INDUSTRY_PACKS_LICENSE_SECRET` or a legacy allowlisted key names no signer, so `verify` refuses it; `activate` still accepts them.
+`domain pack verify`, `activate` and every locked command, route and tool accept only a licence signed by a key that the signed trust list in your AMC home (`<AMC home>/trust/amc-trust-list.json`, or `--trust-list` on `verify`; see [TRUST_LIST.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md)) pins for `artifact-seal`. A public key, shared secret or legacy allowlist in the environment is supplied by the client, so it never counts, and `verify` takes no `--pubkey`. With no such key pinned, `verify` exits 1 with "licence verification is not configured", `amc domain pack access` reports it as not configured, `activate` refuses and stores nothing, and checkout is not offered, because a licence bought there could not be activated. A licence's expiry is the one its issuer signed into it and is enforced at verification; `activate --expires-at` is refused.
 
-For a future production checkout, an operator must first verify a real payment link, then set `AMC_INDUSTRY_PACKS_CHECKOUT_URL` and configure the API with `AMC_INDUSTRY_PACKS_LICENSE_SECRET` plus `AMC_INDUSTRY_PACKS_ADMIN_TOKEN`. Payment webhooks or a checkout adapter can then call `POST /api/industry-packs/license/issue` to generate a signed activation key after a paid subscription event. None of that configuration exists on the static public website today.
+For a future production checkout, an operator must first verify a real payment link, then configure the issuing API (`api/index.ts`) with `AMC_INDUSTRY_PACKS_CHECKOUT_URL`, an Ed25519 `AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY` and `AMC_INDUSTRY_PACKS_ADMIN_TOKEN`; the API offers checkout only when all three are set, and answers `POST /api/industry-packs/checkout` with 503 and the reason otherwise. With `AMC_INDUSTRY_PACKS_WEBHOOK_SECRET` set, `POST /api/industry-packs/webhook` verifies the payment provider's `Stripe-Signature` (HMAC-SHA256 over the raw body, five-minute tolerance) and records each paid checkout once for fulfilment; it never issues a licence. An admin issues it with `POST /api/industry-packs/license/issue` (admin token, compared in constant time), and delivering it to the buyer is not wired. Buyers also need the matching public key pinned in their trust list. None of that configuration exists on the static public website today.
 
 ## Pricing tiers
 
 | Tier | What you get | Who it's for |
 |---|---|---|
 | **Free / Open Source** | Full AMC trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all adapters, all CLI commands, browser playground, CI gates | Everyone — solo devs, teams, enterprises evaluating |
-| **Industry Packs (planned)** | Everything in Free + all 41 Industry Packs; target $9.99/month per user; checkout not live | Teams in regulated industries who need sector-specific diagnostics |
+| **Industry Packs (planned)** | Everything in Free + all 41 Industry Packs (self-reported questionnaires; results never depend on payment); target $9.99/month per user; checkout not live | Teams in regulated industries who need sector-specific diagnostics |
 | **Enterprise (contact-first)** | Planned Industry Packs access + priority support + custom pack development + deployment assistance | Regulated organizations, platform teams at scale |
 
 ## FAQ

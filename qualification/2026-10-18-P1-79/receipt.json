@@ -1,0 +1,138 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-79",
+ "date": "2026-10-18",
+ "commit": "a4167d3d3c4473de52700ef13fc0e12987f3b1ba",
+ "branch": "rtd/p1-79-run-principal-lease",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local macOS arm64, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 170830
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 59198
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 90947
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 6446
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 2296
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 827
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 4669
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 4991
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 586
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1364
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 490
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 523
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 1963
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 8009
+  },
+  {
+   "cmd": "node scripts/check-sdk-api.mjs --base-ref int",
+   "exit": 0,
+   "durationMs": 1497
+  },
+  {
+   "cmd": "npx vitest run tests/runPrincipalLease.test.ts tests/catalog/l0/identity.test.ts tests/cliWorkspaceToolEvidence.test.ts tests/acpStdio.test.ts tests/acpAgentServer.test.ts tests/cosProduct08Continuity.test.ts tests/nativeShellComposition.test.ts tests/starterProfiles.test.ts --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-79/qualification/2026-10-18-P1-79/focused-tests.json",
+   "exit": 0,
+   "durationMs": 187125
+  }
+ ],
+ "tests": {
+  "total": 112,
+  "passed": 112,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "README.md",
+   "sha256": "2df1dc5f6a30dc576c3d9c925eddc28bffd387bfdba5d97edd8fe42c0944f068"
+  },
+  {
+   "path": "red.txt",
+   "sha256": "ca39c245f03528991faa872505bb4277e6e72e23218d9e688a180ace6370cd22"
+  },
+  {
+   "path": "red-fork.txt",
+   "sha256": "b212824fd080e353700872b75f1a9ffdfe837fda274603c74141d20bdca1930a"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "43556e32a73d6ab7a0501b9e8801b067afef5e085db861f039a772af976f1a3b"
+  },
+  {
+   "path": "packed-install.log",
+   "sha256": "cf60549935dc16e86e68bd22814528e0f6f7fe9a9b23d86b8335714e9e3dc130"
+  },
+  {
+   "path": "installed-plan-variant.log",
+   "sha256": "77688d86f86d1f7e25e5634cfb7bc5f1696acaf4ff86e248ee20715fe4e46387"
+  },
+  {
+   "path": "installed-plan-variant.mjs",
+   "sha256": "7d8310d878f2e8e986ecaf02c6a55d63da92e4a930ceb0114c24fdf2e2eb714f"
+  },
+  {
+   "path": "related-tests.json",
+   "sha256": "44903ff0c9b3efdfc8b11e5684853132fbf79699777f157723aec71a00d7bf80"
+  },
+  {
+   "path": "focused-tests.json",
+   "sha256": "ab389667c912490723c05fb9bba342fc97eaef1862d2cc0c980fb0661f1cff49"
+  }
+ ],
+ "notes": "Commands and tests ran at this commit (int a4167d3d3 merged); tests are the focused files: tests/runPrincipalLease.test.ts, tests/catalog/l0/identity.test.ts, tests/cliWorkspaceToolEvidence.test.ts, tests/acpStdio.test.ts, tests/acpAgentServer.test.ts, tests/cosProduct08Continuity.test.ts, tests/nativeShellComposition.test.ts, tests/starterProfiles.test.ts. Every command exited 0. packed-install.log and installed-plan-variant.log ran on bf9276246, before the session/fork change (571061197), which they do not cover; red-fork.txt and mutation M8 in mutations.json cover it. related-tests.json summarises the 1517-test related run on bf9276246 at load average about 20: 4 timing failures, all passing on rerun; details in README.md."
+}

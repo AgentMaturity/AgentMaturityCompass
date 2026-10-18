@@ -30,6 +30,14 @@ amc adapters configure \
   --model claude-sonnet-4-6
 ```
 
+## Native hooks (observe or control)
+
+`amc connect hooks install --provider claude-code` installs AMC's Claude Code hooks instead of wrapping the binary.
+In `--mode control`, AMC restricts at `PreToolUse` (a call passes AMC only for AMC's signed decision bound to the exact call, and Claude Code's own permissions still apply),
+admits each prompt at `UserPromptSubmit`, registers each session at `SessionStart` and records outcomes at `PostToolUse`,
+`PostToolUseFailure` and `Stop`. Qualified release: Claude Code 2.1.296. The claim per hook, the settings snippet,
+managed-settings delivery and the limits are in [claude-code-hooks.md](claude-code-hooks.md).
+
 ## Environment Variables Injected
 
 | Variable | Description |

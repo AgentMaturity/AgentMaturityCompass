@@ -24,7 +24,7 @@ import { ToolPipeline, type ToolApprovalAsker } from "../../../src/tools/toolPip
 import { defineTool, ToolRegistry } from "../../../src/tools/toolRegistry.js";
 import type { ActionClass } from "../../../src/types.js";
 import { catalog, fixturesFor, type L0Fixture } from "./harness.js";
-import { newWorkspace } from "./workspaces.js";
+import { newWorkspace, signPayTool } from "./workspaces.js";
 
 /**
  * L0-IDN-02 and L0-IDN-04 against the real tool pipeline (P1-14). The call carries a signed lease through the
@@ -44,7 +44,12 @@ function issue(ws: string, agentId: string, scopes: string[], ttl = "1h", worksp
     ...(workspaceId ? { workspaceId } : {}), ...(principal ? { principal } : {}) }).token;
 }
 
+/** The transfer a FINANCIAL fixture makes (L1-WLT-US-01); its signed tool entry binds these fields. */
+const TRANSFER = { amount: "12000", currency: "USD", recipient: "payee-a-002" };
+
 function compose(ws: string, actionClass: ActionClass, leaseToken: () => string, approve?: ToolApprovalAsker) {
+  if (actionClass === "FINANCIAL") signPayTool(ws, "fixture.write", actionClass);
+  const args = actionClass === "FINANCIAL" ? TRANSFER : {};
   const runs = { body: 0 };
   const registry = new ToolRegistry();
   registry.define(defineTool({ name: "fixture.write", actionClass, description: "fixture tool",
@@ -57,7 +62,7 @@ function compose(ws: string, actionClass: ActionClass, leaseToken: () => string,
     record: (execution, outcome) => records.push(...toolEvidenceFor(execution, outcome)) });
   const call = async () => {
     const before = runs.body;
-    const outcome = await pipeline.execute({ name: "fixture.write", agentId: "default", arguments: {}, requestedMode: "EXECUTE" });
+    const outcome = await pipeline.execute({ name: "fixture.write", agentId: "default", arguments: args, requestedMode: "EXECUTE" });
     const id = outcome.action?.executionId;
     expect(id, "a journaled call has an execution id").toBeTruthy();
     const chain = journal!.verifyReceiptChain(id!);
@@ -75,8 +80,8 @@ function expectRefused(f: L0Fixture, r: Awaited<ReturnType<ReturnType<typeof com
   expect(r.reasonCode).toBe(f.envelope.expected.reasonCode);
 }
 
-describe("L0-IDN-02 short-lived scoped credentials (lease check at the authorization stage)", () => {
-  const fixtures = fixturesFor("lease", "L0-IDN-02");
+describe("L0-IDN-02 short-lived scoped credentials and L1-WLT-US-01 delegation (lease check at the authorization stage)", () => {
+  const fixtures = fixturesFor("lease");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, async () => {
@@ -106,8 +111,8 @@ describe("L0-IDN-02 short-lived scoped credentials (lease check at the authoriza
   }
 });
 
-describe("L0-IDN-04 revocation takes effect (drill)", () => {
-  const fixtures = fixturesFor("lease_revocation_drill", "L0-IDN-04");
+describe("L0-IDN-04 and L1-WLT-US-01: revocation takes effect (drill)", () => {
+  const fixtures = fixturesFor("lease_revocation_drill");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, async () => {
