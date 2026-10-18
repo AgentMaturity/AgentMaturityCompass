@@ -1,11 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "source": "native",
-  "environment": {
-    "node": "22.23.3",
-    "platform": "darwin-arm64",
-    "ci": false
-  },
   "routes": [
     {
       "route": "anthropic",
@@ -183,174 +178,146 @@
       }
     }
   ],
-  "results": [
+  "claims": [
     {
       "route": "anthropic",
-      "feature": "text-input",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "anthropic",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "anthropic",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai-responses",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai-responses",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "openai-responses",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "deepseek",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "deepseek",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "deepseek",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini-audio",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini-audio",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "gemini-audio",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "ollama",
-      "feature": "text-input",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "ollama",
-      "feature": "text-output",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
-    },
-    {
-      "route": "ollama",
-      "feature": "usage",
-      "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "anthropic: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
     },
     {
       "route": "anthropic",
-      "feature": "tool-calls",
+      "features": [
+        "tool-calls"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "anthropic: a tool call decodes under the offered name"
     },
     {
       "route": "openai",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "openai: a tool call decodes under the offered name"
     },
     {
       "route": "openai-responses",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "openai-responses: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai-responses",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "openai-responses: a tool call decodes under the offered name"
     },
     {
       "route": "deepseek",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "deepseek: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "deepseek",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "deepseek: a tool call decodes under the offered name"
     },
     {
       "route": "gemini",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "gemini: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "gemini: a tool call decodes under the offered name"
     },
     {
       "route": "gemini-audio",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "gemini-audio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini-audio",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "gemini-audio: a tool call decodes under the offered name"
     },
     {
       "route": "ollama",
-      "feature": "tool-calls",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
       "support": "supported",
-      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "ollama: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "ollama",
+      "features": [
+        "tool-calls"
+      ],
+      "support": "supported",
+      "file": "tests/nativeCapabilityContract.test.ts",
+      "title": "ollama: a tool call decodes under the offered name"
     }
   ]
 }
