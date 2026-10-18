@@ -68,7 +68,7 @@ function genuine(result: unknown) {
     keyFingerprint: `sha256:${sha256Hex(publicPem)}`, fileSha256: sha256Hex(bytes), errors: [] });
   expect(actual.report).toMatchObject({ trusted: true, integrity: { status: "pass" }, issuerAdmission: { status: "pass" },
     satisfaction: { status: "not-evaluated" }, completeness: { status: "not-evaluated" } });
-  expect(actual.audit).toMatchObject({ schemaVersion: "amc.industry-pack-audit/3",
+  expect(actual.audit).toMatchObject({ schemaVersion: "amc.industry-pack-audit/4",
     overall: { claimKind: "self_reported", eligibleLevel: 1 } });
 }
 
@@ -121,7 +121,7 @@ afterAll(() => {
 });
 
 describe("P0-20 actual industry-pack audit helper containment", () => {
-  test("admits a genuine /3 signed file under an independently captured operator pin", () => {
+  test("admits a genuine /4 signed file under an independently captured operator pin", () => {
     const f = fixture(), file = put(join(f.exports, "signed.json"));
     genuine(verifyIndustryPackAuditFile({ file, trust })); genuine(observe("genuine", f, file));
   });

@@ -66,7 +66,9 @@ async function route(handler: Handler, pathname: string, body: Record<string, un
     end: (value: unknown) => { bodies.push(String(value)); } } as unknown as ServerResponse;
   expect(await handler(pathname, "POST", req as unknown as IncomingMessage, res, workspace)).toBe(true);
   expect(statuses).toHaveLength(1); expect(bodies).toHaveLength(1);
-  expect(headers).toEqual([{ "Content-Type": "application/json" }]);
+  // P1-55 adds a request id to /api/v1 error responses; no other header may appear.
+  const requestId = Object.hasOwn(Object(headers[0]), "X-Request-Id") ? { "X-Request-Id": expect.any(String) } : {};
+  expect(headers).toEqual([{ "Content-Type": "application/json", ...requestId }]);
   const result = { status: statuses[0]!, body: responseSchema.parse(JSON.parse(bodies[0]!)) };
   records.push({ kind: "actual-handler", label, pathname, ...result });
   return result;

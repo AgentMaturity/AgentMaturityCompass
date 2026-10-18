@@ -1,14 +1,14 @@
 import { execFile } from "node:child_process";
-import { generateKeyPairSync, createHash } from "node:crypto";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { RESULT_COMMANDS } from "../src/cli/resultCommandRegistry.js";
 import { CLAIM_KINDS, statusDimensionsSchema } from "../src/claims/eligibility/index.js";
-import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
+import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /** P0-22 actual stdout qualification. No recorded-label boolean substitutes for emitted claim fields.
  * Every registry path has an explicit recipe below. Named missing fixtures may refuse; parser errors,
@@ -291,6 +291,8 @@ function assertClaimFields(value: unknown, path: string): void {
   expect(row.claimLabel, `${path}: emitted canonical claimLabel`).toMatch(/^Claim: /);
 }
 
+let licence: TestIndustryPackLicence | undefined;
+
 beforeAll(async () => {
   expect(process.versions.node.split(".")[0], "qualified runtime required; importing CLI under another major may rebuild SQLite").toMatch(/^(22|24)$/);
   expect(existsSync(cli), "run the normal build before this corpus").toBe(true);
@@ -303,17 +305,13 @@ const deny = () => { throw new Error("P0_22_OFFLINE_FIXTURE: network transport i
 http.request = http.get = https.request = https.get = deny; net.connect = net.createConnection = deny;
 net.Socket.prototype.connect = deny; dns.lookup = dns.resolve = deny; globalThis.fetch = deny;
 syncBuiltinESMExports();\n`);
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const licenseEnvironment = {
-    AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString(),
-    AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString()
-  };
+  // A licence signed by a key pinned in a temp AMC home trust list (P1-51); the CLI child reads both from its env.
+  licence = testIndustryPackLicence();
   environment = {
     PATH: `${dirname(process.execPath)}:${process.env.PATH ?? ""}`, HOME: home, NO_COLOR: "1", TERM: "dumb",
     AMC_VAULT_PASSPHRASE: "p0-22-private-fixture-only", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"),
     AMC_CLAIM_LABELS_STRICT: "1", NODE_OPTIONS: `--import=${guard}`,
-    AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: licenseEnvironment.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY,
-    AMC_INDUSTRY_PACKS_LICENSE_KEY: createIndustryPackLicenseKey({ expiresAt: "2099-01-01T00:00:00.000Z", env: licenseEnvironment })
+    ...licence.env
   };
   expect(Object.keys(environment).some((key) => /OPENAI|ANTHROPIC|GEMINI|API_KEY|TOKEN|SECRET/.test(key))).toBe(false);
   const init = await invoke("seed-init", ["init", "--trust-boundary", "isolated", "--profile", "ci"]);
@@ -369,6 +367,7 @@ afterAll(() => {
     attempted: records, fixture: root, concurrency: 1, strict: true, credentialsInherited: false, transport: "denied",
     acceptance: "literal; empty successful arrays remain failures" }, null, 2));
   rmSync(root, { recursive: true, force: true });
+  licence?.cleanup();
 }, 120_000);
 
 describe.concurrent("actual strict CLI result labels in a signed, keyless private workspace", () => {

@@ -1,5 +1,5 @@
 import { execFile, spawnSync } from "node:child_process";
-import { sign } from "node:crypto";
+import { createHmac, sign } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
@@ -39,7 +39,7 @@ const records: Array<Record<string, unknown>> = [];
 const objectSchema = z.record(z.string(), z.unknown());
 let root: string, workspace: string, home: string, operatorHome: string, logs: string, guard: string;
 let environment: NodeJS.ProcessEnv;
-let tokenJson: string, certificateJson: string, license: string, licensePin: string;
+let tokenJson: string, certificateJson: string, license: string;
 let licenseIssuer: TestKey, authorityIssuer: TestKey;
 let hmacLicense: string;
 const localLicenseSecret = "p0-51-local-shared-secret-fixture";
@@ -186,12 +186,14 @@ syncBuiltinESMExports();\n`, { mode: 0o600 });
   expect(verifyTrustToken(token, "cli-demo-secret")).toMatchObject({ valid: true, reasons: [] });
   tokenJson = JSON.stringify(token);
 
-  licenseIssuer = testKey(); licensePin = pinFile("license", licenseIssuer);
+  licenseIssuer = testKey();
   license = createIndustryPackLicenseKey({ customerId: "p0-51-local-paid-fixture", expiresAt: "2099-01-01T00:00:00.000Z",
     env: { AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: licenseIssuer.privateKeyPem } });
   expect(verifyIndustryPackLicenseKey(license, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: licenseIssuer.publicKeyPem }).valid).toBe(true);
-  hmacLicense = createIndustryPackLicenseKey({ customerId: "p0-51-local-hmac-fixture", expiresAt: "2099-01-01T00:00:00.000Z",
-    env: { AMC_INDUSTRY_PACKS_LICENSE_SECRET: localLicenseSecret } });
+  // P1-51 issues only Ed25519 licences, so the HMAC-signed one is built by hand, the way an older issuer signed it.
+  const hmacPayload = Buffer.from(JSON.stringify({ v: 1, planId: "industry-packs-monthly", status: "active", issuedAt: new Date().toISOString(),
+    expiresAt: "2099-01-01T00:00:00.000Z", customerId: "p0-51-local-hmac-fixture" }), "utf8").toString("base64url");
+  hmacLicense = `AMC-INDUSTRY-PACKS.${hmacPayload}.${createHmac("sha256", localLicenseSecret).update(hmacPayload).digest("base64url")}`;
   expect(verifyIndustryPackLicenseKey(hmacLicense, { AMC_INDUSTRY_PACKS_LICENSE_SECRET: localLicenseSecret }).valid).toBe(true);
   expect(verifyIndustryPackLicenseKey(legacyLicense, { AMC_INDUSTRY_PACKS_LEGACY_KEY_SHA256_ALLOWLIST: sha256Hex(legacyLicense) }).valid).toBe(true);
 
@@ -351,16 +353,19 @@ describe.each(["formal", "passport"] as const)("Unkeyed CLI %s", (family) => {
   });
 });
 
+// P1-51: the licence verdict uses only keys an operator-signed trust list admits for artifact-seal, like the gate; the
+// command takes no --pubkey and reads no environment key.
 describe("Portable CLI Industry Packs license", () => {
-  test("a genuine Ed25519 license accepts only the independently supplied operator PEM", async () => {
-    const result = await invoke("license-pinned", ["domain", "pack", "verify", "--key", license, "--pubkey", licensePin]);
+  test("a genuine Ed25519 license is trusted through the operator's signed trust list", async () => {
+    const result = await invoke("license-listed", ["domain", "pack", "verify", "--key", license,
+      ...listFlags("license-listed", licenseIssuer, "artifact-seal", "admitted")]);
     expect(result.status, result.stderr).toBe(0); expect(result.body.valid).toBe(true); expect(result.report.trusted).toBe(true);
-    expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ keyId: licenseIssuer.keyId, purpose: "artifact-seal", status: "admitted" });
+    expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ keyId: licenseIssuer.keyId, purpose: "artifact-seal", status: "admitted", source: "trust-list" });
   });
-  test("operator environment PEM is a real pin and unused allow flags create no override", async () => {
+  test("an environment PEM is not a licence pin and unused allow flags create no override", async () => {
     const result = await invoke("license-operator-environment", ["domain", "pack", "verify", "--key", license, ...bothAllows],
       { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: licenseIssuer.publicKeyPem });
-    expect(result.status, result.stderr).toBe(0); expect(result.report).toMatchObject({ trusted: true, overrides: [] });
+    expect(result.status, result.stderr).toBe(1); expect(result.report).toMatchObject({ trusted: false, integrity: { status: "fail" }, overrides: [] });
   });
   test("no available verifying key refuses rather than manufacturing integrity-only success", async () => {
     const result = await invoke("license-no-key", ["domain", "pack", "verify", "--key", license, ...bothAllows]);
@@ -368,7 +373,8 @@ describe("Portable CLI Industry Packs license", () => {
     expect(result.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
   });
   test("a mismatched genuine operator key cannot verify the license even with overrides", async () => {
-    const result = await invoke("license-wrong-key", ["domain", "pack", "verify", "--key", license, "--pubkey", pinFile("license-wrong", testKey()), ...bothAllows]);
+    const result = await invoke("license-wrong-key", ["domain", "pack", "verify", "--key", license,
+      ...listFlags("license-wrong-key", testKey(), "artifact-seal", "admitted"), ...bothAllows]);
     expect(result.status, result.stderr).toBe(1); expect(result.report.integrity.status).toBe("fail"); expect(result.report.trusted).toBe(false);
   });
   test.each(allowCases)("a locally valid HMAC license stays portable-untrusted with flags %j", async (...flags: string[]) => {
@@ -385,11 +391,12 @@ describe("Portable CLI Industry Packs license", () => {
     expect(result.report).toMatchObject({ trusted: false, integrity: { status: "fail" }, overrides: [] });
     expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ status: "not-pinned", keyId: null });
   });
-  test("operator distrust beats the matching license PEM and both allow flags", async () => {
-    const result = await invoke("license-distrusted", ["domain", "pack", "verify", "--key", license, "--pubkey", licensePin,
+  test("operator distrust beats the matching listed license key and both allow flags", async () => {
+    const result = await invoke("license-distrusted", ["domain", "pack", "verify", "--key", license,
       ...listFlags("license-distrusted", licenseIssuer, "artifact-seal", "distrusted"), ...bothAllows]);
-    expect(result.status, result.stderr).toBe(1); expect(result.report.integrity.status).toBe("pass");
-    expect(result.report.issuerAdmission.signatures[0]?.status).toBe("distrusted"); expect(result.report.trusted).toBe(false);
+    // A distrusted key is never tried, so no signer verifies and none is named.
+    expect(result.status, result.stderr).toBe(1); expect(result.report.integrity.status).toBe("fail");
+    expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ status: "not-pinned", keyId: null }); expect(result.report.trusted).toBe(false);
   });
 });
 

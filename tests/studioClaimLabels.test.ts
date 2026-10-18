@@ -1,4 +1,3 @@
-import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
@@ -10,7 +9,7 @@ import { claimKindSchema, statusDimensionsSchema } from "../src/claims/eligibili
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../src/diagnostic/evidenceReadiness.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
-import { createIndustryPackLicenseKey, getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
@@ -22,9 +21,11 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
+import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const ADMIN = "p0-23-owned-studio-claim-admin";
 const roots: string[] = [];
+const licences: TestIndustryPackLicence[] = [];
 const servers: Array<Awaited<ReturnType<typeof startStudioApiServer>>> = [];
 
 beforeEach(() => {
@@ -53,6 +54,7 @@ afterEach(async () => {
       rmSync(workspace, { recursive: true, force: true });
     } catch (error) { errors.push(error); }
   }
+  for (const licence of licences.splice(0)) licence.cleanup();
   vi.unstubAllEnvs();
   if (errors.length > 0) throw new AggregateError(errors, "Studio claim fixture cleanup failed");
 });
@@ -155,14 +157,11 @@ function requireError(response: Response): void {
   for (const key of ["claimKind", "statusDimensions", "claimLabel", "runId", "runSealSig"]) expect(response.json).not.toHaveProperty(key);
 }
 
+/** A licence signed by a key pinned in a temp AMC home trust list (P1-51), the only key a licence gate accepts. */
 function signedEntitlement(workspace: string): void {
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const licenseKey = createIndustryPackLicenseKey({
-    customerId: "p0-23-owned-studio-fixture", expiresAt: "2099-01-01T00:00:00.000Z",
-    env: { AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString() },
-  });
-  vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKey.export({ type: "spki", format: "pem" }).toString());
-  vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
+  const licence = testIndustryPackLicence();
+  licences.push(licence);
+  for (const [key, value] of Object.entries(licence.env)) vi.stubEnv(key, value);
   expect(getIndustryPackEntitlement(workspace)).toMatchObject({ active: true, source: "env" });
 }
 

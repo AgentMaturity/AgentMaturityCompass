@@ -57,7 +57,7 @@ function rechecksum(value: IndustryPackAudit): void {
 }
 
 function selfReported(value: IndustryPackAudit): void {
-  expect(value.schemaVersion).toBe("amc.industry-pack-audit/3");
+  expect(value.schemaVersion).toBe("amc.industry-pack-audit/4"); // P1-44 bumped /3 to /4 (NOT_EVALUATED controls)
   expect(value.overall.claimKind).toBe("self_reported");
   expect(value.overall.eligibleLevel).toBe(1);
   expect(industryPackAuditClaim(value)).toMatchObject({ claimKind: "self_reported", eligibleLevel: 1,
@@ -142,7 +142,7 @@ afterAll(() => {
 }, 120_000);
 
 describe("P0-20 genuine signed audit and independent issuer admission", () => {
-  test("untouched /3 audit verifies under the independently recorded auditor pin", () => {
+  test("untouched /4 audit verifies under the independently recorded auditor pin", () => {
     admitted(check("untouched", signed), auditorId);
     expect(canonicalize(answered)).toBe(answeredBeforeSigning);
     expect(answered.signature).toBeNull();
@@ -228,11 +228,12 @@ describe("P0-20 genuine signed audit and independent issuer admission", () => {
     expect(renderIndustryPackAuditMarkdown(answered)).toContain("Checksum only — not signed");
   });
 
-  test("the unanswered L1 default is a synthetic example and cannot be signed", () => {
+  test("the unanswered baseline is a synthetic example and cannot be signed", () => {
     const baseline = audit(1, false);
     expect(baseline.overall).toMatchObject({ claimKind: "synthetic_example", eligibleLevel: null,
       selfAssessment: { complete: false, answered: 0 } });
-    expect(baseline.controls.every(control => control.level === 1)).toBe(true);
+    // P1-44: an unanswered control is not evaluated, with no level (it was an L1 default before).
+    expect(baseline.controls.every(control => control.level === null && control.status === "NOT_EVALUATED")).toBe(true);
     expect(baseline.signature).toBeNull();
     expect(verifyIndustryPackAuditChecksum(baseline)).toBe(true);
     expect(() => signIndustryPackAudit(workspace, baseline)).toThrow("synthetic_example results cannot be signed");

@@ -1,13 +1,13 @@
 import { execFile } from "node:child_process";
-import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { statusDimensionsSchema } from "../src/claims/eligibility/index.js";
-import { createIndustryPackLicenseKey, getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const records: Array<Record<string, unknown>> = [];
@@ -17,6 +17,7 @@ let fixtureHome: string;
 let logs: string;
 let guard: string;
 let licenseKey: string;
+let licence: TestIndustryPackLicence | undefined;
 let environment: NodeJS.ProcessEnv;
 let paidControl: Promise<void> | undefined;
 
@@ -41,17 +42,14 @@ for (const name of ["lookup", "resolve", "resolve4", "resolve6", "resolveAny", "
 }
 globalThis.fetch = deny; globalThis.WebSocket = class { constructor() { deny(); } };
 syncBuiltinESMExports();\n`);
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  licenseKey = createIndustryPackLicenseKey({
-    customerId: "p0-23-owned-cli-fixture", expiresAt: "2099-01-01T00:00:00.000Z",
-    env: { AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString() },
-  });
+  // A licence signed by a key pinned in a temp AMC home trust list (P1-51); the CLI child reads both from its env.
+  licence = testIndustryPackLicence();
+  licenseKey = licence.licenseKey;
   environment = {
     PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: fixtureHome,
     NO_COLOR: "1", TERM: "dumb", NODE_ENV: "test", AMC_CLAIM_LABELS_STRICT: "1",
     NODE_OPTIONS: `--import=${pathToFileURL(guard).href}`,
-    AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString(),
-    AMC_INDUSTRY_PACKS_LICENSE_KEY: licenseKey,
+    ...licence.env,
   };
   expect(getIndustryPackEntitlement(workspace, environment)).toMatchObject({ active: true, source: "env" });
   writeFileSync(join(logs, "fixture.json"), JSON.stringify({
@@ -66,6 +64,7 @@ afterAll(() => {
   // Raw child streams and their hashes remain private; only fresh fixture state is removed.
   if (workspace) rmSync(workspace, { recursive: true, force: true });
   if (fixtureHome) rmSync(fixtureHome, { recursive: true, force: true });
+  licence?.cleanup();
 });
 
 async function invoke(name: string, args: string[]) {
@@ -111,8 +110,9 @@ function validPaidControl(): Promise<void> {
     expect(body).toMatchObject({ packId: "clinical-trials", claimKind: "self_reported", selfAssessment: { complete: false, answered: 0 } });
     expect(statusDimensionsSchema.parse(body.statusDimensions).result).toBe("not_evaluated");
     expect(body.claimLabel).toContain("Claim: Self-reported");
-    expect(Array.isArray(body.questionResults)).toBe(true);
-    expect((body.questionResults as unknown[]).length).toBeGreaterThan(0);
+    // P1-44: a baseline answers nothing, so no question has a result and every question is listed as not evaluated.
+    expect(body.questionResults).toEqual([]);
+    expect((body.notEvaluatedQuestionIds as unknown[]).length).toBeGreaterThan(0);
   })();
 }
 

@@ -233,7 +233,7 @@ describe("P1-17 actual incident-clock surfaces", () => {
   test("the genuine MCP SDK client lists and invokes the read-only clock tool with conservative claims and natural transport closure", async () => {
     await fixture(async f => {
       const out = await f.run("mcp"); const tools = out.tools as Json[];
-      expect(tools).toHaveLength(11);
+      expect(tools).toHaveLength(15); // 11 plus P1-44's four industry pack tools
       expect(tools.filter(row => row.name === "amc_incident_clocks")).toHaveLength(1);
       expect(String(tools.find(row => row.name === "amc_incident_clocks")!.description)).toContain("read-only");
       const result = object(out.listing); expect(result.isError ?? false).toBe(false); const structured = object(result.structuredContent); listing(structured);

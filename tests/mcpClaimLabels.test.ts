@@ -1,7 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { CallToolResultSchema, type CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { generateKeyPairSync } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,7 +9,7 @@ import { z } from "zod";
 import { claimKindSchema, statusDimensionsSchema } from "../src/claims/eligibility/index.js";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "../src/crypto/keys.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
-import { createIndustryPackLicenseKey, getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import { getPackById } from "../src/domains/industryPacks.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { buildAgentConfig, scaffoldAgent } from "../src/fleet/registry.js";
@@ -25,12 +24,15 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
+import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const DEFAULT_TOOL_NAMES = [
   "amc_list_agents", "amc_quickscore", "amc_get_guide", "amc_check_compliance",
   "amc_transparency_report", "amc_score_sector_pack", "amc_score_agent", "amc_list_evidence",
   "amc_query_diagnostic", "amc_get_recommendations", "amc_incident_clocks",
 ];
+/** P1-44's industry pack tools, also listed by default; their claims are covered by tests/industryPackMcpClaims.test.ts. */
+const INDUSTRY_PACK_TOOL_NAMES = ["amc_list_industry_packs", "amc_get_industry_pack", "amc_score_industry_pack", "amc_industry_station_summary"];
 const AGENT_ID = "sdk-claim-agent";
 const fieldsSchema = z.object({ claimKind: claimKindSchema, statusDimensions: statusDimensionsSchema, claimLabel: z.string() });
 const LICENSE_ENV_KEYS = [
@@ -41,6 +43,7 @@ const LICENSE_ENV_KEYS = [
   "AMC_INDUSTRY_PACKS_LEGACY_KEY_SHA256_ALLOWLIST", "AMC_INDUSTRY_PACKS_ACTIVE", "AMC_DOMAIN_PACKS_ACTIVE",
 ] as const;
 const roots: string[] = [];
+const licences: TestIndustryPackLicence[] = [];
 const connections: Array<{ client: Client; server: ReturnType<typeof createAmcMcpServer> }> = [];
 
 beforeEach(() => {
@@ -65,6 +68,7 @@ afterEach(async () => {
       errors.push(error);
     }
   }
+  for (const licence of licences.splice(0)) licence.cleanup();
   vi.unstubAllEnvs();
   resetRateLimiter();
   if (errors.length > 0) throw new AggregateError(errors, "MCP claim fixture cleanup failed");
@@ -145,15 +149,11 @@ function storedRun(workspace: string, version = "1.1.1", sealed = true): Diagnos
   return stored;
 }
 
+/** A licence signed by a key pinned in a temp AMC home trust list (P1-51), the only key a licence gate accepts. */
 function signedEntitlement(workspace: string): void {
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const licenseKey = createIndustryPackLicenseKey({
-    customerId: "p0-23-owned-fixture",
-    expiresAt: "2099-01-01T00:00:00.000Z",
-    env: { AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString() },
-  });
-  vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKey.export({ type: "spki", format: "pem" }).toString());
-  vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
+  const licence = testIndustryPackLicence();
+  licences.push(licence);
+  for (const [key, value] of Object.entries(licence.env)) vi.stubEnv(key, value);
   expect(getIndustryPackEntitlement(workspace).active).toBe(true);
 }
 
@@ -219,10 +219,10 @@ function incidentFixture(workspace: string): string {
 }
 
 describe("AMC MCP claim labels through the SDK", () => {
-  test("discovers the exact 11 default tools with A4 preview disabled", async () => {
+  test("discovers the exact 15 default tools with A4 preview disabled", async () => {
     const client = await connectClient(workspaceFixture());
     const { tools } = await client.listTools();
-    expect(tools.map((tool) => tool.name).sort()).toEqual([...DEFAULT_TOOL_NAMES].sort());
+    expect(tools.map((tool) => tool.name).sort()).toEqual([...DEFAULT_TOOL_NAMES, ...INDUSTRY_PACK_TOOL_NAMES].sort());
     expect(tools.some((tool) => tool.name.startsWith("amc_a4_"))).toBe(false);
   });
 
