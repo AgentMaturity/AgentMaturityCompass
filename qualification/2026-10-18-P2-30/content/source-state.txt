@@ -1,0 +1,27 @@
+Node v22.23.3
+HEAD a3b15b6f069f650547065ef68562ebc632986d8e
+Status before source verification:
+ M catalog/registers/us.json
+ M catalog/vocabulary.yaml
+ M src/incidents/regulatoryClocksTable.ts
+?? .changeset/technology-overlay.md
+?? catalog/fixtures/L1-TECH-01/
+?? catalog/fixtures/L1-TECH-02/
+?? catalog/fixtures/L1-TECH-03/
+?? catalog/fixtures/L1-TECH-04/
+?? catalog/fixtures/L1-TECH-05/
+?? catalog/fixtures/L1-TECH-06/
+?? catalog/fixtures/L1-TECH-07/
+?? catalog/fixtures/L1-TECH-08/
+?? catalog/layers/l1-technology-global/
+?? catalog/registers/eu.json
+?? docs/catalog/technology/
+?? docs/industries/
+?? qualification/2026-10-18-P2-30/docs/
+?? qualification/2026-10-18-P2-30/generate-technology-content.mjs
+?? qualification/2026-10-18-P2-30/oracles/
+?? qualification/2026-10-18-P2-30/overlay-red.log
+?? qualification/2026-10-18-P2-30/register-scope-red.log
+?? qualification/2026-10-18-P2-30/resume-install.log
+?? qualification/2026-10-18-P2-30/technology-citations.json
+?? tests/catalog/stations/

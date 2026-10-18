@@ -1,0 +1,2 @@
+{"scan":"duplicates","baseline":1223,"current":1240,"new":0,"stale":0,"accepted":17}
+No source-quality baseline at origin/main (merge-base ebfa106dc45a): one-time bootstrap, base check skipped

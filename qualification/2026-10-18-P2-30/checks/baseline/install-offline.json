@@ -1,0 +1,20 @@
+{
+  "command": [
+    "pnpm",
+    "install",
+    "--offline",
+    "--frozen-lockfile"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+  "startedAt": "2026-10-18T09:24:52.110Z",
+  "finishedAt": "2026-10-18T09:24:59.405Z",
+  "exitCode": 0,
+  "signal": null,
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/install-offline.log",
+  "logSha256": "11fa85f1f7a242e4c90cc1230caf4f398b34a4c8cf4fc421336e2406a6ab8490",
+  "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "status": ""
+}

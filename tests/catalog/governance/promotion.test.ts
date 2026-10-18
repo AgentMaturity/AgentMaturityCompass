@@ -127,7 +127,7 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     // and fails here: route it through effectiveSupport, supportStanding or a shown* helper instead, or add it with its reason.
     const allowed: Record<string, [number, string]> = {
       "src/catalog/governance/support.ts": [11, "supportStanding, effectiveSupport and the shown* helpers"],
-      "src/catalog/governance/index.ts": [4, "the report compares the declaration with effectiveSupport's result"],
+      "src/catalog/governance/index.ts": [5, "the report compares the declaration with effectiveSupport's result; the declared support that sets GOV_CITATION_DUE_PASSED severity"],
       "src/catalog/governance/changelogGuard.ts": [2, "declared reviewed content needs review ids: stricter only"],
       "src/catalog/compiler/compile.ts": [2, "writes supportStanding's verdict into each row"],
       "src/catalog/compiler/applicability.ts": [2, "the row's initial value, replaced by compile; retired never promotes"],
