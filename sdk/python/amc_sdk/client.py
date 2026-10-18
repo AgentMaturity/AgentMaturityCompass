@@ -1191,8 +1191,8 @@ class AmcAgent:
         """verify (P2-13): after close, the same installed CLI's cold verifier (`amc agent-loop verify --json`)."""
         if not self.closed:
             raise AmcError("close the native client before cold verification")
-        if not _identity(session_id):
-            raise ValueError("choose the session to verify")
+        if not isinstance(session_id, str) or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,199}", session_id) is None:
+            raise ValueError("choose the session to verify")  # never a value the CLI could read as a flag
         return admit_verification(run_cli(self._bin, ["agent-loop", "verify", session_id, "--json"], cwd=self.workspace,
                                           env=self._env, timeout=self.timeout), session_id)
 

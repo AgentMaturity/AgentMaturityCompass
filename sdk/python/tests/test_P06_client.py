@@ -507,3 +507,13 @@ def test_approve_refuses_malformed_decisions_before_running_anything(peers, bad)
     decision = {"approval_request_id": "apr_1", "reason": "r", "username": "u", "roles": ["APPROVER"], **bad}
     with pytest.raises(ValueError):
         agent.approve(decision.pop("approval_request_id"), **decision)
+
+
+def test_verify_session_needs_a_closed_client_and_never_passes_a_flag_like_id(peers):
+    agent, _ = peers()
+    with pytest.raises(AmcError, match="close the native client"):
+        agent.verify_session("p06-1")
+    agent.close()
+    for bad in ["--json", "", "-x", "a b"]:
+        with pytest.raises(ValueError):
+            agent.verify_session(bad)
