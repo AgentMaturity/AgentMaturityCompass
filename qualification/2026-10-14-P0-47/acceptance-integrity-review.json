@@ -1,0 +1,1006 @@
+{
+  "schemaVersion": 1,
+  "audit": "P0-47 acceptance integrity read-only review",
+  "timestampUtc": "2026-10-14T13:15:31.399040+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "mergedPR38": {
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/38",
+    "mergeCommit": "a54e4ec84f6f4350909ec2294b59fec176ec9172",
+    "acceptanceFile": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-47/merged-pr-38-acceptance.json",
+    "acceptanceSha256": "c7af4b05fb2fdd119052cfe031c9ae280bc100024776f6a6deabfb77efe931f7"
+  },
+  "D15": {
+    "file": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-47/D-15-recorded-decision.md",
+    "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+    "recordedOption": "A snapshot on edit"
+  },
+  "counts": {
+    "originalRoutedTests": 19,
+    "manifestRows": 55,
+    "sourceRows": 53,
+    "compiledRows": 2,
+    "manifestProvenanceMismatchesObserved": 0
+  },
+  "findings": [
+    {
+      "id": "compiled-base-ancestry-not-enforced",
+      "priority": 2,
+      "verdict": "concrete_validation_gap_in_current_source",
+      "file": "tests/planEditsManifest.test.ts",
+      "firstLine": 50,
+      "lastLine": 53,
+      "trigger": "Change only a pinned dist row baseCommit to an unrelated or nonexistent40-hex commit in a complete clone, retaining archive bytes and SHA.",
+      "actualSourceBehavior": "validatePlanEdits admits40-hex syntax. The outer missing-base check skips only shallow clones. provenanceFailures returns on a matching compiled pin at50 before checking baseCommit ancestry at51, so the dist row passes provenance despite a false origin record.",
+      "contract": "PR38 merge note says the snapshot baseCommit must remain an ancestor of HEAD; README says baseCommit must stay an ancestor and records the commit the pinned build was taken at. D-15 records provenance by base commit. Source rows enforce this but compiled rows do not.",
+      "evidence": [
+        {
+          "path": "tests/planEditsManifest.test.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "23c590cc501d882fb307c051da4f432210c2c6f3",
+          "sha256": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+          "firstLine": 40,
+          "lastLine": 77,
+          "excerpt": "/**\n * Where each archive came from: a pinned build output must equal its compiledContracts pin; any other\n * archive must equal the blob at its baseCommit, and that commit must be an ancestor of HEAD, so a\n * base rewritten by a squash merge fails here instead of skipping.\n */\nfunction provenanceFailures(root: string, edits: readonly PlanEdit[]): string[] {\n  const pins = compiledPins(root);\n  return edits.flatMap(edit => {\n    const archive = readFileSync(join(root, edit.archivePath));\n    const pinned = pins.get(edit.path);\n    if (pinned) return pinned.every(pin => pin === sha256(archive)) ? [] : [`${edit.path}: archive is not the pinned build`];\n    if (spawnSync(\"git\", [\"merge-base\", \"--is-ancestor\", edit.baseCommit, \"HEAD\"], { cwd: root }).status !== 0) {\n      return [`${edit.path}: baseCommit ${edit.baseCommit} is not an ancestor of HEAD; re-run scripts/snapshot-plan-edit.mjs at the new base`];\n    }\n    const shown = spawnSync(\"git\", [\"cat-file\", \"blob\", `${edit.baseCommit}:${edit.path}`], { cwd: root, maxBuffer: 256 * 1024 * 1024 });\n    return shown.status === 0 && shown.stdout.equals(archive) ? [] : [`${edit.path}: archive differs from ${edit.baseCommit}:${edit.path}`];\n  });\n}\n\ndescribe(\"committed plan-edits manifest (D-15)\", () => {\n  it(\"validates: schema, sorted unique paths, archives under plan-edits/<issue>/, archive sha256, 40-hex base\", () => {\n    const edits = planEdits();\n    const raw = JSON.parse(readFileSync(resolve(MANIFEST), \"utf8\")) as { files: PlanEdit[] };\n    expect(edits).toEqual(raw.files);\n    for (const edit of edits) {\n      expect(edit.archivePath.startsWith(`unused-code/plan-edits/${edit.issue}/`)).toBe(true);\n      expect(edit.baseCommit).toMatch(/^[0-9a-f]{40}$/);\n      expect(sha256(readFileSync(resolve(edit.archivePath)))).toBe(edit.sha256);\n      expect(landedBytes(edit.path).equals(readFileSync(resolve(edit.archivePath)))).toBe(true);\n    }\n  });\n\n  it(\"archives equal the blob at an ancestor baseCommit, or the pinned build for dist/ outputs\", (ctx) => {\n    const missing = planEdits().filter(edit =>\n      spawnSync(\"git\", [\"cat-file\", \"-e\", `${edit.baseCommit}^{commit}`]).status !== 0).map(edit => edit.baseCommit);\n    const shallow = spawnSync(\"git\", [\"rev-parse\", \"--is-shallow-repository\"], { encoding: \"utf8\" }).stdout.trim() === \"true\";\n    if (missing.length && shallow) ctx.skip(`base commits not in this shallow clone: ${[...new Set(missing)].join(\", \")}`);\n    expect(provenanceFailures(resolve(\".\"), planEdits())).toEqual([]);"
+        },
+        {
+          "path": "unused-code/plan-edits/README.md",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "6c2a7b4cfc71ff249981147637ae0b95c7029cae",
+          "sha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+          "firstLine": 25,
+          "lastLine": 41,
+          "excerpt": "## Build outputs under `dist/`\n\nSome parity tests also hash build outputs, listed as `compiledContracts` in a `restoration.json`. Git does not track `dist/`, so the script archives a pinned output from disk, and only when its bytes still equal the pin. Registering `src/X.ts` also registers its pinned `dist/X.d.ts` and `dist/X.js`; pass any other pinned output, such as `dist/index.d.ts` for an edit that changes what it re-exports, explicitly. If you already rebuilt, the script refuses; rebuild at the base commit and run it again.\n\n## Rebasing onto a rewritten base\n\n`baseCommit` must stay an ancestor of `HEAD`. If a squash merge rewrites your base, remove your entries from `manifest.json`, delete their archives and run the script again with the new base. Otherwise the provenance test fails.\n\n## Manifest fields\n\n`manifest.json` holds `schemaVersion` (1), `decision` (\"D-15\") and `files`, sorted by `path` with each path at most once. Each entry has:\n\n- `path`: the repository-relative POSIX path of the edited file.\n- `issue`: the plan issue that archived it, for example `P0-06`.\n- `baseCommit`: the 40-hex commit whose bytes were archived; for a `dist/` output, the commit the pinned build was taken at.\n- `archivePath`: `unused-code/plan-edits/<issue>/<path>.landed`.\n- `sha256`: the sha256 of the archived bytes. The helper refuses an archive that no longer matches."
+        },
+        {
+          "path": "tests/helpers/landedSource.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "4af907a9228f72a997edcb919038bada64dcc226",
+          "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+          "firstLine": 24,
+          "lastLine": 36,
+          "excerpt": "  }\n  const files = manifest.files as PlanEdit[];\n  files.forEach((row, index) => {\n    const fail = (reason: string) => { throw new Error(`Invalid plan-edits entry ${index} (${String(row?.path)}): ${reason}`); };\n    if (typeof row?.path !== \"string\" || row.path.includes(\"\\\\\")\n      || row.path.split(\"/\").some(part => part === \"\" || part === \".\" || part === \"..\")) fail(\"path must be repo-relative POSIX\");\n    if (!ISSUE_KEY.test(row.issue)) fail(\"issue must match \" + ISSUE_KEY);\n    if (!/^[0-9a-f]{40}$/.test(row.baseCommit)) fail(\"baseCommit must be 40 hex\");\n    if (row.archivePath !== `unused-code/plan-edits/${row.issue}/${row.path}.landed`) fail(\"archivePath must be unused-code/plan-edits/<issue>/<path>.landed\");\n    if (!/^[0-9a-f]{64}$/.test(row.sha256)) fail(\"sha256 must be 64 lowercase hex\");\n    if (index > 0 && !(files[index - 1].path < row.path)) fail(\"files must be sorted by path with unique paths\");\n  });\n  return files;"
+        }
+      ],
+      "currentManifestAffected": "Current main has two compiled rows. Both current bases are actual ancestors and both archives match every compiled pin; no existing bad archive is observed.",
+      "recommendedQualification": "Run a dist-only unrelated/missing-base mutation, require failure without changing pins or snapshots, and extend ancestry enforcement to every row before the compiled/source-specific byte checks. Keep the documented shallow-only missing-commit behavior.",
+      "executionStatus": "Source-derived; this reviewer did not run tests or mutants. Root owns current baseline and mutations."
+    }
+  ],
+  "routedTestReview": [
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "beforeSha256": "54d4692f54f10771d8277af7a71489636324be6e8633cbe3f55078db034208ab",
+      "mergedSha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "currentSha256": "17a06cd5a85a6f82fc54c82a09a7ca1e5ef992341438f1352ca37ce7f106317c",
+      "originalRoutingDiff": "diff --git a/tests/apiRouterResponseParity.test.ts b/tests/apiRouterResponseParity.test.ts\nindex 4ef6d74a5..cfe606efc 100644\n--- a/tests/apiRouterResponseParity.test.ts\n+++ b/tests/apiRouterResponseParity.test.ts\n@@ -11,6 +11,7 @@ import ts from \"typescript\";\n import { afterAll, beforeAll, describe, expect, test, vi } from \"vitest\";\n import type { ProviderDriftCanaryRow } from \"../src/benchmarks/providerDriftBenchmark.js\";\n import * as projections from \"../src/api/routerResponseHelpers.js\";\n+import { landedBytes } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-02-native/api-router-responses\";\n const restoration = JSON.parse(readFileSync(resolve(archive, \"restoration.json\"), \"utf8\")) as {\n@@ -33,7 +34,7 @@ function modules(original: boolean) {\n     const bytes = readFileSync(resolve(original ? row!.archive! : path));\n     if (original && hash(bytes) !== row!.sha256) throw new Error(\"Complete original changed: \" + path);\n     if (!original && row?.archive && ![\"src/api/scoreRouter.ts\", \"src/api/shieldRouter.ts\", \"src/api/watchRouter.ts\"].includes(path)\n-      && hash(bytes) !== row.sha256) throw new Error(\"Read-only dependency changed: \" + path);\n+      && hash(landedBytes(path)) !== row.sha256) throw new Error(\"Read-only dependency changed: \" + path);\n     const filename = resolve(path.replace(/^src\\//, \"dist/\").replace(/\\.ts$/, \".js\"));\n     const compiled = ts.transpileModule(bytes.toString(\"utf8\"), { fileName: path, reportDiagnostics: true,\n       compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } });\n",
+      "currentChangeDiff": "diff --git a/tests/apiRouterResponseParity.test.ts b/tests/apiRouterResponseParity.test.ts\nindex cfe606efc..6a5a72035 100644\n--- a/tests/apiRouterResponseParity.test.ts\n+++ b/tests/apiRouterResponseParity.test.ts\n@@ -156,10 +156,20 @@ async function call(port: number, path: string, method: string, payload?: unknow\n     }); req.once(\"error\", reject); req.setTimeout(10_000, () => req.destroy(new Error(\"Router HTTP timeout\"))); req.end(data);\n   });\n }\n+// P0-23: the current dispatcher appends claim fields to result routes; the archived one predates them.\n+function withoutClaim(body: Buffer): string {\n+  const text = body.toString(\"utf8\");\n+  if (!text.startsWith(\"{\")) return text;\n+  const { claimKind, statusDimensions, claimLabel, ...rest } = JSON.parse(text) as Record<string, unknown>;\n+  return claimKind === undefined && statusDimensions === undefined && claimLabel === undefined ? text : JSON.stringify(rest);\n+}\n async function parity(path: string, method: string, payload?: unknown, headers?: IncomingHttpHeaders): Promise<Wire> {\n   const before = await call(ports[0], path, method, payload, headers), after = await call(ports[1], path, method, payload, headers);\n-  expect({ ...after, body: after.body.toString(\"utf8\") }).toEqual({ ...before, body: before.body.toString(\"utf8\") });\n-  expect(after.body).toEqual(before.body); return after;\n+  expect({ ...after, body: withoutClaim(after.body) }).toEqual({ ...before, body: before.body.toString(\"utf8\") });\n+  if (after.status === 200 && path.startsWith(\"/api/v1/\") && !path.endsWith(\"/status\") && !path.includes(\"/watch/\")) {\n+    expect(JSON.parse(after.body.toString(\"utf8\")).claimKind).toBe(\"self_reported\");\n+  }\n+  return after;\n }\n \n for (const lane of laneSpecs) for (const surface of [\"score\", \"shield\", \"watch\", \"benchmarks\"]) {\n",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 31,
+      "expectCountMerged": 31,
+      "expectCountCurrent": 31,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/archiveFilesParity.test.ts",
+      "beforeSha256": "355458c8261b0b1326267c8a61c9e3d2adb173bac471fdada0339179ffdcc8a7",
+      "mergedSha256": "ad554970e1f70923313ac5a05484b8988a8c0639ef542ef08203182ae710a2c9",
+      "currentSha256": "ad554970e1f70923313ac5a05484b8988a8c0639ef542ef08203182ae710a2c9",
+      "originalRoutingDiff": "diff --git a/tests/archiveFilesParity.test.ts b/tests/archiveFilesParity.test.ts\nindex af013807b..b4cdc0e4b 100644\n--- a/tests/archiveFilesParity.test.ts\n+++ b/tests/archiveFilesParity.test.ts\n@@ -20,6 +20,7 @@ import * as benchCollector from \"../src/bench/benchCollector.js\";\n import * as passportCollector from \"../src/passport/passportCollector.js\";\n import * as benchSigner from \"../src/bench/benchSigner.js\";\n import * as passportSigner from \"../src/passport/passportSigner.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-01-main/archive-files\";\n const sources = [\n@@ -231,7 +232,7 @@ for (const [path, expectedHash] of sources) {\n   const original = originalHelpers(originalSource);\n   describe(`archive file utility parity: ${path}`, () => {\n     test(\"preserves extraction bounds, all verifiers, domain errors and public APIs\", () => {\n-      expect(untouched(read(path))).toBe(untouched(originalSource));\n+      expect(untouched(landedText(path))).toBe(untouched(originalSource));\n       expect(collectFiles.length).toBe(original.collectFiles.length);\n       expect(cleanupDir.length).toBe(original.cleanupDir.length);\n     });\n@@ -297,7 +298,7 @@ for (const row of additionalRestoration.files.filter(item => item.originalPath.s\n   const original = additionalCollector(originalSource), current = additionalCollector(read(row.originalPath));\n   describe(`additional archive file utility: ${row.originalPath}`, () => {\n     test(\"retains all other declarations, cleanup, crypto, extraction guards and public APIs\", () => {\n-      expect(additionalUntouched(read(row.originalPath))).toBe(additionalUntouched(originalSource));\n+      expect(additionalUntouched(landedText(row.originalPath))).toBe(additionalUntouched(originalSource));\n       expect(current.length).toBe(original.length);\n     });\n     for (const [label, files] of [\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 42,
+      "expectCountMerged": 42,
+      "expectCountCurrent": 42,
+      "currentLandedCalls": 2,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "beforeSha256": "3490e6c21279c11a0dc05e0a945344441bbdd49dd6a164bb5244263f9cf6679d",
+      "mergedSha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da",
+      "currentSha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da",
+      "originalRoutingDiff": "diff --git a/tests/assuranceScenarioContextParity.test.ts b/tests/assuranceScenarioContextParity.test.ts\nindex ed9474053..270c207b2 100644\n--- a/tests/assuranceScenarioContextParity.test.ts\n+++ b/tests/assuranceScenarioContextParity.test.ts\n@@ -10,6 +10,7 @@ import { forecastLegitimacyPack } from \"../src/assurance/packs/forecastLegitimac\n import { factSimulationBoundaryPack } from \"../src/assurance/packs/factSimulationBoundaryPack.js\";\n import { humanOversightQualityPack } from \"../src/assurance/packs/humanOversightQualityPack.js\";\n import type { AssurancePackDefinition, AssurancePromptContext } from \"../src/assurance/validators.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const BASE_COMMIT = \"f0ab8027208f3679029fa624225fe574d27bba30\";\n const ARCHIVE = \"unused-code/2026-10-01-cos/assurance\";\n@@ -185,7 +186,7 @@ describe(\"assurance scenario context parity against preserved base implementatio\n       });\n \n       it(\"leaves validator, regex, seed, suffix and metadata source bytes unchanged\", () => {\n-        const source = readSource(`src/assurance/packs/${name}.ts`);\n+        const source = landedText(`src/assurance/packs/${name}.ts`);\n         const before = readSource(`${ARCHIVE}/originals/src/assurance/packs/${name}.ts`);\n         expect(source.split(HELPER_IMPORT)).toHaveLength(2);\n         expect(source.match(PROMPT_BLOCK)).toHaveLength(1);\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 28,
+      "expectCountMerged": 28,
+      "expectCountCurrent": 28,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/auditEvidenceAccountingParity.test.ts",
+      "beforeSha256": "8355a758cf7aac665cc0f9eb4bbbe66c0c0bfc20fb7faf454be6f70a35514d67",
+      "mergedSha256": "0bc35a31fd928f37fdcc245e50f14f5feeb17a1ca285ee45697982f374699833",
+      "currentSha256": "19e73c8492efa38f8d0cb2eca129937b2023d26051940ed531e7a9002eac3abd",
+      "originalRoutingDiff": "diff --git a/tests/auditEvidenceAccountingParity.test.ts b/tests/auditEvidenceAccountingParity.test.ts\nindex a68487562..55bf25b80 100644\n--- a/tests/auditEvidenceAccountingParity.test.ts\n+++ b/tests/auditEvidenceAccountingParity.test.ts\n@@ -14,6 +14,7 @@ import * as gate from \"../src/ci/gate.js\";\n import * as publicApi from \"../src/index.js\";\n import { canonicalize } from \"../src/utils/json.js\";\n import { sha256Hex } from \"../src/utils/hash.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-02-native/audit-evidence-accounting\";\n const generatedAt = \"2026-10-02T08:00:00.000Z\";\n@@ -103,7 +104,7 @@ for (const [name, path, currentNamespace, buildName, verifyName, renderName, row\n       expect(Object.keys(currentNamespace).sort()).toEqual(Object.keys(old()).sort());\n       for (const exported of [buildName, verifyName, renderName]) expect((publicApi as unknown as Record<string, unknown>)[exported]).toBe(current[exported]);\n       const inverses = JSON.parse(readFileSync(resolve(archive, \"inverse-text.json\"), \"utf8\")) as Record<string, Array<{ position: number; before: string; after: string }>>;\n-      let restored = readFileSync(resolve(path), \"utf8\");\n+      let restored = landedText(path);\n       for (const operation of [...inverses[path]!].reverse()) {\n         expect(restored.slice(operation.position, operation.position + operation.after.length)).toBe(operation.after);\n         restored = restored.slice(0, operation.position) + operation.before + restored.slice(operation.position + operation.after.length);\n",
+      "currentChangeDiff": "diff --git a/tests/auditEvidenceAccountingParity.test.ts b/tests/auditEvidenceAccountingParity.test.ts\nindex 55bf25b80..19b97f165 100644\n--- a/tests/auditEvidenceAccountingParity.test.ts\n+++ b/tests/auditEvidenceAccountingParity.test.ts\n@@ -249,7 +249,14 @@ test(\"unsigned CI initialization preserves real policy/workflow bytes and disclo\n     const actual = gate.initCiForAgent(options);\n     expect(actual).toEqual(expected);\n     expect(readFileSync(actual.policyPath).equals(policy)).toBe(true);\n-    expect(readFileSync(actual.workflowPath).equals(workflow)).toBe(true);\n+    // P0-09: the one intended change is the bundle verify step, which now pins keys recorded outside the checkout\n+    // (repository variables), because an unpinned `amc bundle verify` fails since PR 2. Every other byte is preserved.\n+    const pinned = (bundle: string, pubFile: string) => `amc bundle verify ${bundle} --pubkey \"${pubFile}\" --expect-monitor \"$AMC_MONITOR_FINGERPRINT\"`;\n+    const expectedWorkflow = workflow.toString(\"utf8\").replace(/( {6}- name: Verify evidence bundle\\n) {8}run: amc bundle verify (\\S+)\\n/, (_line, name: string, bundle: string) =>\n+      `${name}        env:\\n          AMC_AUDITOR_PUBKEY: \\${{ vars.AMC_AUDITOR_PUBKEY }}\\n          AMC_MONITOR_FINGERPRINT: \\${{ vars.AMC_MONITOR_FINGERPRINT }}\\n` +\n+      `        run: printf '%s\\\\n' \"$AMC_AUDITOR_PUBKEY\" > \"$RUNNER_TEMP/amc-auditor.pub\" && ${pinned(bundle, \"$RUNNER_TEMP/amc-auditor.pub\")}\\n`);\n+    expect(expectedWorkflow).not.toBe(workflow.toString(\"utf8\"));\n+    expect(readFileSync(actual.workflowPath, \"utf8\")).toBe(expectedWorkflow);\n     expect(statSync(actual.policyPath).mode & 0o777).toBe(policyMode);\n     expect(statSync(actual.workflowPath).mode & 0o777).toBe(workflowMode);\n     expect(policyMode).toBe(0o644);\n@@ -260,7 +267,8 @@ test(\"unsigned CI initialization preserves real policy/workflow bytes and disclo\n     expect(actual.workflowPath).toBe(join(workspace, \".github\", \"workflows\", \"amc.yml\"));\n     expect(workflow.toString(\"utf8\")).toContain(\"--no-sign\");\n     expect(workflow.toString(\"utf8\")).toContain(\"UNSIGNED CI mode: maturity BOM signing skipped\");\n-    expect(gate.printCiSteps(options)).toEqual(original.printCiSteps!(options));\n+    expect(gate.printCiSteps(options)).toEqual((original.printCiSteps!(options) as string[]).map(step =>\n+      step.replace(/^amc bundle verify (\\S+)$/, (_step, bundle: string) => pinned(bundle, \"$AMC_AUDITOR_PUB_FILE\"))));\n     expect(gate.printCiSteps(options).join(\"\\n\")).toContain(\"amc bundle verify .amc/\");\n   } finally {\n     rmSync(workspace, { recursive: true, force: true });\n",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 54,
+      "expectCountMerged": 54,
+      "expectCountCurrent": 55,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/controlHttpResponsesParity.test.ts",
+      "beforeSha256": "086b02a255ad1877c5fee81bf32bca2fc92c9681553e3beebefd22d99d67f066",
+      "mergedSha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6",
+      "currentSha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6",
+      "originalRoutingDiff": "diff --git a/tests/controlHttpResponsesParity.test.ts b/tests/controlHttpResponsesParity.test.ts\nindex 274beb4c4..0284d31db 100644\n--- a/tests/controlHttpResponsesParity.test.ts\n+++ b/tests/controlHttpResponsesParity.test.ts\n@@ -18,6 +18,7 @@ import { createHostUser, createWorkspaceRecord, grantMembership, initHostDb, rev\n import { issueHostSessionToken } from \"../src/workspaces/hostAuth.js\";\n import { hostWorkspaceDir } from \"../src/workspaces/workspacePaths.js\";\n import { startWorkspaceRouter } from \"../src/workspaces/workspaceRouter.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-02-native/http-controls\";\n const hash = (bytes: string | Buffer) => createHash(\"sha256\").update(bytes).digest(\"hex\");\n@@ -264,7 +265,7 @@ it(\"freezes full original modules and bounds every intentional response edit\", (\n   expect(map.base).toBe(\"b30e1c771b89e23ecedb13604cc0bf9102078136\");\n   for (const row of map.files.filter(value => value.exactBefore)) {\n     expect(readFileSync(resolve(row.archive!), \"utf8\")).toBe(row.exactBefore);\n-    const current = readFileSync(resolve(row.path), \"utf8\");\n+    const current = landedText(row.path);\n     expect(current).toBe(row.exactAfter); expect(hash(current)).toBe(row.candidateSha256);\n     // The exact candidate-to-full-original reversal leaves all route/policy\n     // declarations byte-identical, rather than deriving the baseline from copies.\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 23,
+      "expectCountMerged": 23,
+      "expectCountCurrent": 23,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/diagnosticResponseScoringParity.test.ts",
+      "beforeSha256": "264dedfd4d86ebe40c5932efa6b345d7d8881ebf3a83dd337c34d428630d1208",
+      "mergedSha256": "09c6da4e448b05ec5d972d4afff6f4e9d67a46d037a5aa50956f1325923f59a9",
+      "currentSha256": "09c6da4e448b05ec5d972d4afff6f4e9d67a46d037a5aa50956f1325923f59a9",
+      "originalRoutingDiff": "diff --git a/tests/diagnosticResponseScoringParity.test.ts b/tests/diagnosticResponseScoringParity.test.ts\nindex e5d2b547b..70524b66f 100644\n--- a/tests/diagnosticResponseScoringParity.test.ts\n+++ b/tests/diagnosticResponseScoringParity.test.ts\n@@ -15,6 +15,7 @@ import * as scenarioProvenance from \"../src/score/scenarioProvenance.js\";\n import * as simulationValidity from \"../src/score/simulationValidity.js\";\n import * as syntheticIdentityGovernance from \"../src/score/syntheticIdentityGovernance.js\";\n import { scoreResponse, scoreToLevel } from \"../src/score/diagnosticResponseScoring.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-01-main/diagnostic-response-scoring\";\n const modules = [\n@@ -122,7 +123,7 @@ for (const [name, publicFunction, expectedHash] of modules) {\n \n   describe(`diagnostic scoring parity: ${name}`, () => {\n     test(\"preserves all criteria, public reports, exports and infrastructure functions\", () => {\n-      expect(untouched(currentSource, forecast)).toBe(untouched(originalSource, forecast));\n+      expect(untouched(landedText(`src/score/${name}.ts`), forecast)).toBe(untouched(originalSource, forecast));\n       expect(ids.length).toBeGreaterThan(0);\n       expect(current.privateLevel.length).toBe(original.privateLevel.length);\n       expect(current.privateResponse.length).toBe(original.privateResponse.length);\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 14,
+      "expectCountMerged": 14,
+      "expectCountCurrent": 14,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "beforeSha256": "98f26f4650aa2ac00414340ebe84168d1f6f7c306433b6d3f86733bf14b97e6b",
+      "mergedSha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6",
+      "currentSha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6",
+      "originalRoutingDiff": "diff --git a/tests/explainabilityContractParity.test.ts b/tests/explainabilityContractParity.test.ts\nindex a9f85b3b1..3d340e6b6 100644\n--- a/tests/explainabilityContractParity.test.ts\n+++ b/tests/explainabilityContractParity.test.ts\n@@ -12,6 +12,7 @@ import * as realHash from \"../src/utils/hash.js\";\n import * as realJson from \"../src/utils/json.js\";\n import { buildWatchObsStudioSourceArtifactLinks } from \"../src/watch/evidenceDrilldown.js\";\n import type { DiagnosticReport } from \"../src/types.js\";\n+import { landedBytes, landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-02-native/explainability-contracts\";\n const hash = (value: string | Buffer) => createHash(\"sha256\").update(value).digest(\"hex\");\n@@ -125,7 +126,7 @@ describe(\"explainability shared contracts retain complete original exported flow\n     expect(restoration.statusSites).toHaveLength(18);\n     expect(restoration.projections).toHaveLength(9);\n     for (const row of originals.files.filter(item => item.path.startsWith(\"src/\"))) {\n-      let restored = readFileSync(resolve(row.path), \"utf8\");\n+      let restored = landedText(row.path);\n       for (const edit of [...restoration.inverseEdits].reverse().filter(item => item.path === row.path)) {\n         expect(restored.split(edit.after)).toHaveLength(2);\n         restored = restored.replace(edit.after, edit.before);\n@@ -134,9 +135,9 @@ describe(\"explainability shared contracts retain complete original exported flow\n     }\n     const immutableContracts = originals.heldReadOnly.filter(row => !row.path.startsWith(\"tests/\")\n       && ![\"src/api/scoreRouter.ts\", \"package.json\"].includes(row.path));\n-    for (const row of immutableContracts) expect(hash(readFileSync(resolve(row.path)))).toBe(row.sha256);\n+    for (const row of immutableContracts) expect(hash(landedBytes(row.path))).toBe(row.sha256);\n     expect(originals.heldReadOnly.find(row => row.path === \"package.json\")?.sha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);\n-    expect(packageEntriesSha256(readFileSync(resolve(\"package.json\")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n+    expect(packageEntriesSha256(landedBytes(\"package.json\"))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n     expect(Object.keys(currentQuestion)).toEqual(Object.keys(originalQuestion));\n     expect(Object.keys(currentDrilldown)).toEqual(Object.keys(originalDrilldown));\n   });\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 25,
+      "expectCountMerged": 25,
+      "expectCountCurrent": 25,
+      "currentLandedCalls": 3,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/liveDriftProofStatsParity.test.ts",
+      "beforeSha256": "2f4cb71b40b308bccd25984c5e4ece9c4371349af09ae521735dc7bb054c4e5f",
+      "mergedSha256": "bf0b8ed6baa42418e1d1d0004e83b9dae92ebfcd0a61a607a9bd533eb78137be",
+      "currentSha256": "bf0b8ed6baa42418e1d1d0004e83b9dae92ebfcd0a61a607a9bd533eb78137be",
+      "originalRoutingDiff": "diff --git a/tests/liveDriftProofStatsParity.test.ts b/tests/liveDriftProofStatsParity.test.ts\nindex 1ce0e1be7..9ff07fb0d 100644\n--- a/tests/liveDriftProofStatsParity.test.ts\n+++ b/tests/liveDriftProofStatsParity.test.ts\n@@ -14,6 +14,7 @@ import * as references from \"../src/watch/evidenceRefs.js\";\n import * as drift from \"../src/watch/liveDriftAlerts.js\";\n import { collectLiveDriftProofStats } from \"../src/watch/proofStats.js\";\n import { restoreWatchReceiptSharing } from \"./helpers/restoreWatchReceiptSharing.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const archive = \"unused-code/2026-10-01-main/live-drift-proof-stats\";\n const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), \"utf8\");\n@@ -99,7 +100,7 @@ exports.rowFields = REQUIRED_ROW_PROOF_FIELDS;\n   );\n   describe(`${name} actual public and archived proof accounting parity`, () => {\n     test(\"preserves every other declaration, mismatch policy, row hash and public API\", () => {\n-      expect(unchangedDeclarations(restoreWatchReceiptSharing(sourcePath, read(sourcePath)))).toBe(unchangedDeclarations(source));\n+      expect(unchangedDeclarations(restoreWatchReceiptSharing(sourcePath, landedText(sourcePath)))).toBe(unchangedDeclarations(source));\n       expect(Reflect.get(realRun as object, \"length\")).toBe(Reflect.get(oldRun as object, \"length\"));\n       expect(Object.keys(actualModule).sort()).toEqual(Object.keys(original)\n         .filter(key => ![\"privateProofStats\", \"metadataMismatchReasons\", \"metadataFields\", \"rowFields\"].includes(key)).sort());\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 14,
+      "expectCountMerged": 14,
+      "expectCountCurrent": 14,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/metricParameterContractParity.test.ts",
+      "beforeSha256": "8eab00c0ec650fb9f2c5c7af334517f6d6a6cb9968e0afcea7f6bfb598c1cdbc",
+      "mergedSha256": "ee6d067eea61d70709be898efff83537ff226ed8edff2cd53a84b15f303e9370",
+      "currentSha256": "ee6d067eea61d70709be898efff83537ff226ed8edff2cd53a84b15f303e9370",
+      "originalRoutingDiff": "diff --git a/tests/metricParameterContractParity.test.ts b/tests/metricParameterContractParity.test.ts\nindex 7f365eb08..5f722014a 100644\n--- a/tests/metricParameterContractParity.test.ts\n+++ b/tests/metricParameterContractParity.test.ts\n@@ -3,6 +3,7 @@ import { readFileSync } from \"node:fs\";\n import { resolve } from \"node:path\";\n import ts from \"typescript\";\n import { beforeAll, describe, expect, it } from \"vitest\";\n+import { landedBytes, landedText } from \"./helpers/landedSource.js\";\n \n const map = JSON.parse(readFileSync(resolve(\n   \"unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json\"), \"utf8\")) as {\n@@ -17,7 +18,7 @@ const hash = (bytes: string | Buffer) => createHash(\"sha256\").update(bytes).dige\n const originalBytes = readFileSync(resolve(map.archivePath));\n if (hash(originalBytes) !== map.originalSha256) throw new Error(\"Complete original metric source changed\");\n const original = originalBytes.toString(\"utf8\");\n-const current = readFileSync(resolve(map.originalPath), \"utf8\");\n+const current = landedText(map.originalPath);\n type PropertyContract = { name: string; type: string; optional: boolean; readonly: boolean };\n type Contract = { properties: PropertyContract[]; parameterName: string; parameterOptional: boolean;\n   parameterRest: boolean; parameterCount: number; returnType: string; public: boolean };\n@@ -130,8 +131,8 @@ it(\"preserves entire runtime emission and actual built public contracts\", () =>\n   const emit = (source: string) => ts.transpileModule(source, { fileName: map.originalPath,\n     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true } }).outputText;\n   expect(emit(current)).toBe(emit(original));\n-  for (const contract of map.compiledContracts) expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);\n-  expect(hash(readFileSync(resolve(map.typesReadOnly.file)))).toBe(map.typesReadOnly.sha256);\n+  for (const contract of map.compiledContracts) expect(hash(landedBytes(contract.file))).toBe(contract.sha256);\n+  expect(hash(landedBytes(map.typesReadOnly.file))).toBe(map.typesReadOnly.sha256);\n });\n it(\"changes only the declared private annotations and introduces no new public API\", () => {\n   expect(map.baseCommit).toBe(\"b30e1c771b89e23ecedb13604cc0bf9102078136\");\n@@ -162,7 +163,7 @@ it(\"changes only the declared private annotations and introduces no new public A\n       modifier => modifier.kind === ts.SyntaxKind.ExportKeyword) || false).toBe(false);\n   }\n   const typesAst = ts.createSourceFile(map.typesReadOnly.file,\n-    readFileSync(resolve(map.typesReadOnly.file), \"utf8\"), ts.ScriptTarget.ES2022, true);\n+    landedText(map.typesReadOnly.file), ts.ScriptTarget.ES2022, true);\n   const shared = typesAst.statements.find(node => ts.isInterfaceDeclaration(node)\n     && node.name.text === \"MetricValidationSharedFields\");\n   expect(shared).toBeDefined();\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 27,
+      "expectCountMerged": 27,
+      "expectCountCurrent": 27,
+      "currentLandedCalls": 4,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/metricRowPublicContract.test.ts",
+      "beforeSha256": "704d8bcdd3a39ab018c2c4cd3c3544fc0a57956b30593819d1bf8632009bfd58",
+      "mergedSha256": "d9ce68af8dc229679d72d1142be26d0cf68a25d7fa854e0d0ee46c67a2c68ce7",
+      "currentSha256": "d9ce68af8dc229679d72d1142be26d0cf68a25d7fa854e0d0ee46c67a2c68ce7",
+      "originalRoutingDiff": "diff --git a/tests/metricRowPublicContract.test.ts b/tests/metricRowPublicContract.test.ts\nindex ff4673033..da4c525df 100644\n--- a/tests/metricRowPublicContract.test.ts\n+++ b/tests/metricRowPublicContract.test.ts\n@@ -3,6 +3,7 @@ import { resolve } from \"node:path\";\n import ts from \"typescript\";\n import { beforeAll, describe, expect, test } from \"vitest\";\n import { restorePrivateHelperVisibility } from \"./helpers/restorePrivateHelperVisibility.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const metricNames = [\"MetricValidationRow\", \"MetricValidationEvalPackRow\"] as const;\n const providerNames = [\"ProviderDriftComparison\", \"ProviderDriftEvalPackRow\"] as const;\n@@ -59,8 +60,8 @@ beforeAll(() => {\n       \"unused-code/2026-10-01-main/provider-row-types/providerDriftBenchmark.ts.original\"), \"utf8\"))\n   };\n   current = {\n-    ...publicContracts(\"src/types.ts\", metricNames),\n-    ...publicContracts(\"src/benchmarks/providerDriftBenchmark.ts\", providerNames)\n+    ...publicContracts(\"src/types.ts\", metricNames, landedText(\"src/types.ts\")),\n+    ...publicContracts(\"src/benchmarks/providerDriftBenchmark.ts\", providerNames, landedText(\"src/benchmarks/providerDriftBenchmark.ts\"))\n   };\n }, 120_000);\n \n@@ -85,7 +86,7 @@ let inputCurrent: Record<string, PropertyContract[]>;\n describe(\"metric validation input public TypeScript contracts\", () => {\n   beforeAll(() => {\n     inputOriginal = publicContracts(\"src/score/metricValidity.ts\", inputNames, inputOriginalSource);\n-    inputCurrent = publicContracts(\"src/score/metricValidity.ts\", inputNames);\n+    inputCurrent = publicContracts(\"src/score/metricValidity.ts\", inputNames, landedText(\"src/score/metricValidity.ts\"));\n   }, 120_000);\n \n   for (const name of inputNames) {\n@@ -97,7 +98,7 @@ describe(\"metric validation input public TypeScript contracts\", () => {\n \n   test(\"all original input names remain interfaces supporting declaration merging\", () => {\n     expect(inputNames).toHaveLength(50);\n-    const currentSource = readFileSync(resolve(process.cwd(), \"src/score/metricValidity.ts\"), \"utf8\");\n+    const currentSource = landedText(\"src/score/metricValidity.ts\");\n     const currentAst = ts.createSourceFile(\"metricValidity.ts\", currentSource, ts.ScriptTarget.ES2022, true);\n     const names = currentAst.statements.filter(ts.isInterfaceDeclaration).map(node => node.name.text);\n     for (const name of inputNames) expect(names).toContain(name);\n@@ -108,7 +109,7 @@ describe(\"metric validation input public TypeScript contracts\", () => {\n       const originalSource = readFileSync(resolve(process.cwd(),\n         \"unused-code/2026-10-01-main/metric-input-contracts/originals/\" + file + \".original\"), \"utf8\");\n       const currentSource = restorePrivateHelperVisibility(file,\n-        readFileSync(resolve(process.cwd(), file), \"utf8\"));\n+        landedText(file));\n       const emit = (source: string) => ts.transpileModule(source, { compilerOptions: {\n         target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true\n       } }).outputText;\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 9,
+      "expectCountMerged": 9,
+      "expectCountCurrent": 9,
+      "currentLandedCalls": 5,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/mobileFetchSdk.test.ts",
+      "beforeSha256": "a36fded03bad8cdb1444a8495d647d87833d20e29c60d641ae2708036239e95d",
+      "mergedSha256": "2412d3386d7fc09123b73c2f1a34f00508c926d9c12203fefae81f3c1cada12d",
+      "currentSha256": "2412d3386d7fc09123b73c2f1a34f00508c926d9c12203fefae81f3c1cada12d",
+      "originalRoutingDiff": "diff --git a/tests/mobileFetchSdk.test.ts b/tests/mobileFetchSdk.test.ts\nindex d3a06f2dd..8af09def2 100644\n--- a/tests/mobileFetchSdk.test.ts\n+++ b/tests/mobileFetchSdk.test.ts\n@@ -6,6 +6,7 @@ import * as sdkExports from \"../src/sdk/index.js\";\n import { orgSignatureSchema, orgScorecardSignatureSchema } from \"../src/org/orgSchema.js\";\n import { createHash } from \"node:crypto\";\n import ts from \"typescript\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n function headersObject(headers: HeadersInit | undefined): Record<string, string> {\n   const headersObj = new Headers(headers);\n@@ -159,7 +160,7 @@ describe(\"public SDK and scorecard identity aliases\", () => {\n     for (const row of restoration.files.filter(item => item.originalPath.startsWith(\"src/\"))) {\n       const original = readFileSync(join(process.cwd(), row.archivePath), \"utf8\");\n       expect(createHash(\"sha256\").update(original).digest(\"hex\")).toBe(row.sha256);\n-      expect(unchanged(readFileSync(join(process.cwd(), row.originalPath), \"utf8\"))).toBe(unchanged(original));\n+      expect(unchanged(landedText(row.originalPath))).toBe(unchanged(original));\n     }\n   });\n });\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 26,
+      "expectCountMerged": 26,
+      "expectCountCurrent": 26,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/nativeSecondSharingRestoration.test.ts",
+      "beforeSha256": "4e88334d512db46a78fbec2cd25abc701d3812638b7b393517ed126df781e64b",
+      "mergedSha256": "1160171a6e4deba51b816a04e820abc7f948d197f79c4e1839eabde8dff42dc1",
+      "currentSha256": "1160171a6e4deba51b816a04e820abc7f948d197f79c4e1839eabde8dff42dc1",
+      "originalRoutingDiff": "diff --git a/tests/nativeSecondSharingRestoration.test.ts b/tests/nativeSecondSharingRestoration.test.ts\nindex bba005d2c..3c1867f17 100644\n--- a/tests/nativeSecondSharingRestoration.test.ts\n+++ b/tests/nativeSecondSharingRestoration.test.ts\n@@ -3,6 +3,7 @@ import { readFileSync } from \"node:fs\";\n import { resolve } from \"node:path\";\n import { describe, expect, test } from \"vitest\";\n import { restoreNativeSecondSharing } from \"./helpers/restoreNativeSecondSharing.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n const read = (path: string) => readFileSync(resolve(path), \"utf8\");\n const hash = (source: string) => createHash(\"sha256\").update(source).digest(\"hex\");\n type File = { originalPath: string; archivePath: string; originalSha256: string; currentSha256: string;\n@@ -14,17 +15,17 @@ describe(\"bounded second native sharing provenance\", () => {\n   });\n   for (const row of manifest.files) {\n     test(row.originalPath + \" restores the complete preserved original\", () => {\n-      expect(hash(read(row.originalPath))).toBe(row.currentSha256);\n+      expect(hash(landedText(row.originalPath))).toBe(row.currentSha256);\n       expect(hash(read(row.archivePath))).toBe(row.originalSha256);\n-      expect(restoreNativeSecondSharing(row.originalPath, read(row.originalPath))).toBe(read(row.archivePath));\n+      expect(restoreNativeSecondSharing(row.originalPath, landedText(row.originalPath))).toBe(read(row.archivePath));\n     });\n     test(row.originalPath + \" refuses any unrelated byte change\", () => {\n-      expect(() => restoreNativeSecondSharing(row.originalPath, read(row.originalPath) + \"\\n\")).toThrow(\"Source changed beyond declared\");\n+      expect(() => restoreNativeSecondSharing(row.originalPath, landedText(row.originalPath) + \"\\n\")).toThrow(\"Source changed beyond declared\");\n     });\n   }\n   test(\"preserves the complete previous Watch core and binds its declared inverse, current core and new helper\", () => {\n     const row = manifest.watchCore;\n-    const current = read(row.originalPath);\n+    const current = landedText(row.originalPath);\n     expect(hash(current)).toBe(row.currentSha256);\n     expect(hash(read(row.archivePath))).toBe(row.originalSha256);\n     const lines = current.match(/[^\\n]*\\n|[^\\n]+$/g) ?? [];\n@@ -36,7 +37,7 @@ describe(\"bounded second native sharing provenance\", () => {\n     const old = JSON.parse(read(\"unused-code/2026-10-02-main/native-five-integration/watch-source-restoration.json\"));\n     expect(old.currentProductionFiles).toHaveLength(9);\n     expect(old.currentProductionFiles.find((item: { path: string }) => item.path === row.originalPath).sha256).toBe(row.currentSha256);\n-    expect(hash(read(old.laterSharingProvenance.newHelper))).toBe(old.laterSharingProvenance.helperSha256);\n+    expect(hash(landedText(old.laterSharingProvenance.newHelper))).toBe(old.laterSharingProvenance.helperSha256);\n   });\n   test(\"leaves every unowned module unchanged\", () => {\n     expect(restoreNativeSecondSharing(\"src/watch/proofStats.ts\", \"unowned source\")).toBe(\"unowned source\");\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 13,
+      "expectCountMerged": 13,
+      "expectCountCurrent": 13,
+      "currentLandedCalls": 5,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/pdfRenderingParity.test.ts",
+      "beforeSha256": "8b402389db43c09bf27197ef29763b4cddd6c4a6f4912afebc21db300453670f",
+      "mergedSha256": "06ee2b25f18995f971ebc6c396ccb0daa83b666f07d348832b451101ed17d24a",
+      "currentSha256": "b789c9191916f8d7ddc981d9c3a6e4f155a37a62b7f69351e4855dd7663c55e3",
+      "originalRoutingDiff": "diff --git a/tests/pdfRenderingParity.test.ts b/tests/pdfRenderingParity.test.ts\nindex cd7b9697a..c33cb29cd 100644\n--- a/tests/pdfRenderingParity.test.ts\n+++ b/tests/pdfRenderingParity.test.ts\n@@ -19,6 +19,7 @@ import {\n import { initWorkspace } from \"../src/workspace.js\";\n import { defaultPassportPolicy } from \"../src/passport/passportPolicySchema.js\";\n import { savePassportPolicy } from \"../src/passport/passportStore.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const roots: string[] = [];\n afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });\n@@ -82,7 +83,7 @@ const originals = restoration.files.map(row => {\n for (const original of originals) {\n   describe(`text PDF parity against ${original.originalPath}`, () => {\n     test(\"preserves all caller declarations, crypto policy and public APIs\", () => {\n-      expect(unchangedDeclarations(read(original.originalPath))).toBe(unchangedDeclarations(original.source));\n+      expect(unchangedDeclarations(landedText(original.originalPath))).toBe(unchangedDeclarations(original.source));\n       expect(escapePdfText.length).toBe(original.functions.escapePdfText.length);\n       expect(renderPdfFromLines.length).toBe(original.functions.renderPdfFromLines.length);\n     });\n",
+      "currentChangeDiff": "diff --git a/tests/pdfRenderingParity.test.ts b/tests/pdfRenderingParity.test.ts\nindex c33cb29cd..7f8f91642 100644\n--- a/tests/pdfRenderingParity.test.ts\n+++ b/tests/pdfRenderingParity.test.ts\n@@ -20,6 +20,7 @@ import { initWorkspace } from \"../src/workspace.js\";\n import { defaultPassportPolicy } from \"../src/passport/passportPolicySchema.js\";\n import { savePassportPolicy } from \"../src/passport/passportStore.js\";\n import { landedText } from \"./helpers/landedSource.js\";\n+import { workspaceKeyTrust } from \"./helpers/trustContext.js\";\n \n const roots: string[] = [];\n afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });\n@@ -112,11 +113,12 @@ function workspace() {\n function dataset(count: number): VerifierEvidenceDataset {\n   const ts = 1_700_000_000_000;\n   return {\n-    schemaVersion: 1, generatedTs: ts, workspace: \"owned metadata fixture\", agentFilter: \"agent (fixture) \\\\\",\n+    schemaVersion: 2, generatedTs: ts, workspace: \"owned metadata fixture\",\n+    agentFilter: { agentId: \"agent (fixture) \\\\\", mode: \"row-meta-or-owned-session\", sessionsIncluded: [\"fixture-session\"], rowsExcluded: 0 },\n     includeChain: true, includeRationale: true, eventCount: count, chainInvalidCount: count,\n     records: Array.from({ length: count }, (_, index) => ({\n       eventId: `fixture-${index}`, ts, isoTs: new Date(ts).toISOString(), sessionId: \"fixture-session\",\n-      runtime: \"fixture\", eventType: \"fixture (event)\", actorId: 'actor,\"fixture\"', payloadSha256: \"a\".repeat(64),\n+      runtime: \"fixture\", eventType: \"fixture (event)\", actorId: 'actor,\"fixture\"', claimKind: \"self_reported\", payloadSha256: \"a\".repeat(64),\n       prevEventHash: \"b\".repeat(64), eventHash: \"c\".repeat(64), writerSignature: \"fixture-unverified\",\n       chainIndex: index, chainValid: false, chainExpectedPrevHash: \"b\".repeat(64), incidentIds: [], correctionIds: [],\n       correctionStatuses: [], corrected: false, correctedTs: null, rationale: \"fixture \\\\ (reason)\", rationaleChain: [], meta: {},\n@@ -127,7 +129,9 @@ describe(\"actual public evidence and passport rendering\", () => {\n   for (const count of [0, 1, 112]) {\n     test(`public evidence PDF preserves archived bytes for ${count} supplied metadata rows`, () => {\n       const value = dataset(count), original = originals.find(row => row.originalPath === \"src/evidence/exporter.ts\")!;\n-      const expected = original.functions.renderVerifierEvidencePdf!(value), actual = renderVerifierEvidencePdf(value);\n+      // The archived renderer read the v1 bare agent id; v2 (P0-27) carries it as agentFilter.agentId.\n+      const v1 = { ...value, schemaVersion: 1, agentFilter: value.agentFilter!.agentId } as unknown as VerifierEvidenceDataset;\n+      const expected = original.functions.renderVerifierEvidencePdf!(v1), actual = renderVerifierEvidencePdf(value);\n       expect(actual.equals(expected)).toBe(true);\n       expect((renderVerifierEvidence(value, \"pdf\") as Buffer).equals(expected)).toBe(true);\n       byteStructure(actual);\n@@ -166,7 +170,7 @@ describe(\"actual public evidence and passport rendering\", () => {\n       expect(passportPolicyPrintCli(ws)).toEqual(init.policy);\n     }\n     const created = passportCreateCli({ workspace: ws, scope: \"agent\", id: \"default\", outFile: join(ws, \"owned.amcpass\") });\n-    expect(passportVerifyCli({ workspace: ws, file: created.outFile }).ok).toBe(true);\n+    expect(passportVerifyCli({ workspace: ws, file: created.outFile, trust: workspaceKeyTrust(ws) }).ok).toBe(true);\n     expect(passportShowCli({ file: created.outFile, format: \"json\" })).toHaveProperty(\"passport.passportId\", created.passport.passportId);\n     expect(passportShowCli({ file: created.outFile, format: \"badge\" })).toContain(\"AMC \");\n     expect(passportBadgeCli({ workspace: ws, agentId: \"default\" }).badge).toContain(\"AMC \");\n",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 34,
+      "expectCountMerged": 34,
+      "expectCountCurrent": 34,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "beforeSha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "mergedSha256": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+      "currentSha256": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+      "originalRoutingDiff": "diff --git a/tests/privateModuleHelperVisibility.test.ts b/tests/privateModuleHelperVisibility.test.ts\nindex a85e1d597..5f8081506 100644\n--- a/tests/privateModuleHelperVisibility.test.ts\n+++ b/tests/privateModuleHelperVisibility.test.ts\n@@ -5,6 +5,7 @@ import { readFileSync } from \"node:fs\";\n import { resolve } from \"node:path\";\n import ts from \"typescript\";\n import { describe, expect, it } from \"vitest\";\n+import { landedBytes, landedText } from \"./helpers/landedSource.js\";\n \n const prefix = \"unused-code/2026-10-02-main/private-module-helpers\";\n const map = JSON.parse(readFileSync(resolve(prefix, \"restoration.json\"), \"utf8\")) as {\n@@ -53,24 +54,24 @@ describe(\"individually reviewed module-private helper visibility\", () => {\n     expect(map.files.filter(file => file.declarations.length)).toHaveLength(map.changedSourceFiles);\n     expect(map.heldContractSources).toHaveLength(5);\n     for (const contract of map.heldContractSources) {\n-      expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);\n+      expect(hash(landedBytes(contract.file))).toBe(contract.sha256);\n     }\n     expect(map.files.reduce((sum, file) => sum + file.declarations.length, 0)).toBe(map.declarations);\n-    const manifest = readFileSync(resolve(\"package.json\"));\n+    const manifest = landedBytes(\"package.json\");\n     expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);\n     expect(packageEntriesSha256(manifest)).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n     const pkg = JSON.parse(manifest.toString(\"utf8\")) as { exports: Record<string, { types: string }> };\n     expect(Object.keys(pkg.exports).sort()).toEqual(map.packageEntries.map(row => row.name).sort());\n     for (const entry of map.packageEntries) {\n       expect(pkg.exports[entry.name].types.replace(/^\\.\\/dist\\//, \"src/\").replace(/\\.d\\.ts$/, \".ts\")).toBe(entry.file);\n-      expect(hash(readFileSync(resolve(entry.file)))).toBe(entry.sha256);\n+      expect(hash(landedBytes(entry.file))).toBe(entry.sha256);\n     }\n   });\n   for (const row of map.files) {\n     describe(row.originalPath, () => {\n       const bytes = readFileSync(resolve(row.archivePath));\n       if (hash(bytes) !== row.sha256) throw new Error(\"Complete source original changed: \" + row.originalPath);\n-      const original = bytes.toString(\"utf8\"), current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), \"utf8\"));\n+      const original = bytes.toString(\"utf8\"), current = restoreWorkspacePathSharing(row.originalPath, landedText(row.originalPath));\n       it(\"retains every function, parameter, body and caller while changing only the declared visibility\", () => {\n         let expected = original;\n         for (const declaration of [...row.declarations].sort((a, b) => b.start - a.start)) {\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 21,
+      "expectCountMerged": 21,
+      "expectCountCurrent": 21,
+      "currentLandedCalls": 4,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/privateStoreLocatorVisibility.test.ts",
+      "beforeSha256": "af4bd29c5302206120204e204a2262f74eefab18316f248de7bea95cf1337236",
+      "mergedSha256": "ec8f85b6aa1a9b80fb69fc63216b88f086845097f3c13e7541135a03028b073f",
+      "currentSha256": "ec8f85b6aa1a9b80fb69fc63216b88f086845097f3c13e7541135a03028b073f",
+      "originalRoutingDiff": "diff --git a/tests/privateStoreLocatorVisibility.test.ts b/tests/privateStoreLocatorVisibility.test.ts\nindex 0adbb5149..c55226436 100644\n--- a/tests/privateStoreLocatorVisibility.test.ts\n+++ b/tests/privateStoreLocatorVisibility.test.ts\n@@ -5,6 +5,7 @@ import { resolve } from \"node:path\";\n import ts from \"typescript\";\n import { describe, expect, it } from \"vitest\";\n import { restorePrivateHelperVisibility } from \"./helpers/restorePrivateHelperVisibility.js\";\n+import { landedBytes, landedText } from \"./helpers/landedSource.js\";\n \n const prefix = \"unused-code/2026-10-02-main/private-store-locators\";\n const map = JSON.parse(readFileSync(resolve(prefix, \"restoration.json\"), \"utf8\")) as {\n@@ -53,9 +54,9 @@ describe(\"reviewed module-private store locator visibility\", () => {\n     expect(map.changedSourceFiles).toBe(46);\n     expect(map.files.filter(file => file.declarations.length)).toHaveLength(map.changedSourceFiles);\n     expect(map.preservedExports).toHaveLength(4);\n-    expect(hash(readFileSync(resolve(map.preservedBarrel.file)))).toBe(map.preservedBarrel.sha256);\n+    expect(hash(landedBytes(map.preservedBarrel.file))).toBe(map.preservedBarrel.sha256);\n     for (const declaration of map.preservedExports) {\n-      const ast = sourceAst(declaration.file, readFileSync(resolve(declaration.file), \"utf8\"));\n+      const ast = sourceAst(declaration.file, landedText(declaration.file));\n       const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === declaration.name);\n       if (!node || !ts.isFunctionDeclaration(node)) throw new Error(\"Referenced barrel export missing: \" + declaration.name);\n       expect(node.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)).toBe(true);\n@@ -63,14 +64,14 @@ describe(\"reviewed module-private store locator visibility\", () => {\n       expect(hash(node.body!.getText(ast))).toBe(declaration.bodySha256);\n     }\n     expect(map.files.reduce((sum, file) => sum + file.declarations.length, 0)).toBe(map.declarations);\n-    const manifest = readFileSync(resolve(\"package.json\"));\n+    const manifest = landedBytes(\"package.json\");\n     expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);\n     expect(packageEntriesSha256(manifest)).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n     const pkg = JSON.parse(manifest.toString(\"utf8\")) as { exports: Record<string, { types: string }> };\n     expect(Object.keys(pkg.exports).sort()).toEqual(map.packageEntries.map(row => row.name).sort());\n     for (const entry of map.packageEntries) {\n       expect(pkg.exports[entry.name].types.replace(/^\\.\\/dist\\//, \"src/\").replace(/\\.d\\.ts$/, \".ts\")).toBe(entry.file);\n-      expect(hash(readFileSync(resolve(entry.file)))).toBe(entry.sha256);\n+      expect(hash(landedBytes(entry.file))).toBe(entry.sha256);\n     }\n   });\n   for (const row of map.files) {\n@@ -78,7 +79,7 @@ describe(\"reviewed module-private store locator visibility\", () => {\n       const bytes = readFileSync(resolve(row.archivePath));\n       if (hash(bytes) !== row.sha256) throw new Error(\"Complete source original changed: \" + row.originalPath);\n       const original = bytes.toString(\"utf8\"), current = restorePrivateHelperVisibility(\n-        row.originalPath, readFileSync(resolve(row.originalPath), \"utf8\"));\n+        row.originalPath, landedText(row.originalPath));\n       it(\"retains every function, parameter, body and caller while changing only the declared visibility\", () => {\n         let expected = original;\n         for (const declaration of [...row.declarations].sort((a, b) => b.start - a.start)) {\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 24,
+      "expectCountMerged": 24,
+      "expectCountCurrent": 24,
+      "currentLandedCalls": 5,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "beforeSha256": "bf6b3820ee6fcb4418880fcea56939eb1ee1e4a83a480f95b359489273b9c3e8",
+      "mergedSha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "currentSha256": "14a842b3872cab223d6587c344a409a22d41f3405aeb4d11ed5a7d42c8539eca",
+      "originalRoutingDiff": "diff --git a/tests/studioRouteRoleContextParity.test.ts b/tests/studioRouteRoleContextParity.test.ts\nindex aedf0cf38..16e99f7e9 100644\n--- a/tests/studioRouteRoleContextParity.test.ts\n+++ b/tests/studioRouteRoleContextParity.test.ts\n@@ -6,6 +6,7 @@ import ts from \"typescript\";\n import { describe, expect, it } from \"vitest\";\n import { enforceRoleOrAdmin } from \"../src/auth/rbac.js\";\n import { USER_ROLES, type UserRole } from \"../src/auth/roles.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const prefix = \"unused-code/2026-10-01-main/studio-route-role-context\";\n const map = JSON.parse(readFileSync(resolve(prefix, \"restoration.json\"), \"utf8\")) as {\n@@ -150,6 +151,7 @@ const groups = [...new Map(map.calls.map((row, index) => [JSON.stringify(row.rol\n describe(\"Studio request role context sharing\", () => {\n   it(\"reverses exactly the declared calls to the complete unchanged source\", () => {\n     expect(map.calls).toHaveLength(232);\n+    const current = landedText(\"src/studio/studioServer.ts\");\n     expect(current.split(map.helperText)).toHaveLength(2);\n     let restored = undoVaultSharing(current).replace(map.helperText, \"\");\n     const ast = sourceAst(restored), calls: ts.CallExpression[] = [];\n",
+      "currentChangeDiff": "diff --git a/tests/studioRouteRoleContextParity.test.ts b/tests/studioRouteRoleContextParity.test.ts\nindex 16e99f7e9..7a8ec260d 100644\n--- a/tests/studioRouteRoleContextParity.test.ts\n+++ b/tests/studioRouteRoleContextParity.test.ts\n@@ -98,7 +98,9 @@ function guardFactory(source: string, shared: boolean, verify: (workspace: strin\n     throw new Error(\"Actual guard fragment did not compile\");\n   }\n   const exports: { make?: Factory } = {};\n-  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify }, { timeout: 1_000 });\n+  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.\n+  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;\n+  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify, withClaimBody }, { timeout: 1_000 });\n   return exports.make!;\n }\n \n",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 13,
+      "expectCountMerged": 13,
+      "expectCountCurrent": 13,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/studioVaultSigningContextParity.test.ts",
+      "beforeSha256": "c85b044baf0428021ccf12c4a9837b171a93ffe6a694348a4cec4c49020e98a3",
+      "mergedSha256": "87f99d77daaa252b7399c1fef534733fcf63be0d37b3f89d92fd6f81f89ad58c",
+      "currentSha256": "31efea65532fcdfa6272c0bbe2160c019596c72e1506194233c58b74faf772ec",
+      "originalRoutingDiff": "diff --git a/tests/studioVaultSigningContextParity.test.ts b/tests/studioVaultSigningContextParity.test.ts\nindex 1fc2d0717..4812bf64a 100644\n--- a/tests/studioVaultSigningContextParity.test.ts\n+++ b/tests/studioVaultSigningContextParity.test.ts\n@@ -10,6 +10,7 @@ import { nativeCsrfTokenForSession, NATIVE_CSRF_HEADER, NATIVE_INTENT_HEADER, NA\n import { startStudioApiServer } from \"../src/studio/studioServer.js\";\n import { lockVault } from \"../src/vault/vault.js\";\n import { initWorkspace } from \"../src/workspace.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const prefix = \"unused-code/2026-10-02-main/studio-vault-signing-context\";\n const map = JSON.parse(readFileSync(resolve(prefix, \"restoration.json\"), \"utf8\")) as {\n@@ -98,6 +99,7 @@ function outcome(factory: Factory, index: number, value: unknown, failure: typeo\n describe(\"actual Studio signing-vault guard parity\", () => {\n   it(\"reverses only the declared sharing to the complete unchanged source\", () => {\n     expect(map.guards).toHaveLength(40);\n+    const current = landedText(\"src/studio/studioServer.ts\");\n     expect(current.split(map.helperText)).toHaveLength(2);\n     let restored = current.replace(map.helperText, \"\");\n     const guards = currentGuards(restored);\n",
+      "currentChangeDiff": "diff --git a/tests/studioVaultSigningContextParity.test.ts b/tests/studioVaultSigningContextParity.test.ts\nindex 4812bf64a..66c9a4d93 100644\n--- a/tests/studioVaultSigningContextParity.test.ts\n+++ b/tests/studioVaultSigningContextParity.test.ts\n@@ -76,7 +76,9 @@ function guardFactory(source: string, shared: boolean): Factory {\n   const compiled = ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }, reportDiagnostics: true });\n   if (compiled.diagnostics?.some(row => row.category === ts.DiagnosticCategory.Error)) throw new Error(\"Actual vault guard fragment did not compile\");\n   const exports: { make?: Factory } = {};\n-  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup }, { timeout: 1_000 });\n+  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.\n+  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;\n+  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup, withClaimBody }, { timeout: 1_000 });\n   return exports.make!;\n }\n const before = guardFactory(original, false), after = guardFactory(current, true);\n",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 18,
+      "expectCountMerged": 18,
+      "expectCountCurrent": 18,
+      "currentLandedCalls": 1,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/watchReceiptSharingRestoration.test.ts",
+      "beforeSha256": "ca5e857599fb5bc708d113edc1146a7fd4279a83b706b27083a15b872616b9de",
+      "mergedSha256": "59a9869b6bb7f1082e89b944178f0fef6085d3f1a99148f33f20336eb54b6869",
+      "currentSha256": "59a9869b6bb7f1082e89b944178f0fef6085d3f1a99148f33f20336eb54b6869",
+      "originalRoutingDiff": "diff --git a/tests/watchReceiptSharingRestoration.test.ts b/tests/watchReceiptSharingRestoration.test.ts\nindex b21f63df6..a3ac29f0f 100644\n--- a/tests/watchReceiptSharingRestoration.test.ts\n+++ b/tests/watchReceiptSharingRestoration.test.ts\n@@ -3,6 +3,7 @@ import { readFileSync } from \"node:fs\";\n import { resolve } from \"node:path\";\n import { describe, expect, test } from \"vitest\";\n import { restoreWatchReceiptSharing } from \"./helpers/restoreWatchReceiptSharing.js\";\n+import { landedText } from \"./helpers/landedSource.js\";\n \n const read = (path: string) => readFileSync(resolve(path), \"utf8\");\n const hash = (source: string) => createHash(\"sha256\").update(source).digest(\"hex\");\n@@ -19,23 +20,23 @@ describe(\"bounded watch receipt sharing reversal\", () => {\n     ].map(name => `src/watch/${name}LiveDrift.ts`).sort());\n     expect(manifest.currentProductionFiles).toHaveLength(9);\n     expect(manifest.currentProductionFiles.some(row => row.path === \"src/watch/liveDriftReceiptValidation.ts\")).toBe(true);\n-    for (const row of manifest.currentProductionFiles) expect(hash(read(row.path))).toBe(row.sha256);\n+    for (const row of manifest.currentProductionFiles) expect(hash(landedText(row.path))).toBe(row.sha256);\n   });\n   for (const row of manifest.files) {\n     test(`${row.originalPath} reconstructs the complete preserved original`, () => {\n-      const current = read(row.originalPath), original = read(row.archivePath);\n+      const current = landedText(row.originalPath), original = read(row.archivePath);\n       expect(hash(current)).toBe(row.currentSha256);\n       expect(hash(original)).toBe(row.originalSha256);\n       expect(restoreWatchReceiptSharing(row.originalPath, current)).toBe(original);\n     });\n     test(`${row.originalPath} refuses unrelated mismatch-policy changes`, () => {\n-      const current = read(row.originalPath);\n+      const current = landedText(row.originalPath);\n       const changed = current.replace(\"function metadataMismatchReasons\", \"function alteredMetadataMismatchReasons\");\n       expect(changed).not.toBe(current);\n       expect(() => restoreWatchReceiptSharing(row.originalPath, changed)).toThrow(\"Source changed beyond declared\");\n     });\n     test(`${row.originalPath} refuses a changed receipt-sharing edit`, () => {\n-      const current = read(row.originalPath);\n+      const current = landedText(row.originalPath);\n       const changed = current.replace(\"createLiveDriftMetadataReceiptEnricher\", \"alteredReceiptEnricher\");\n       expect(changed).not.toBe(current);\n       expect(() => restoreWatchReceiptSharing(row.originalPath, changed)).toThrow(\"Source changed beyond declared\");\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 12,
+      "expectCountMerged": 12,
+      "expectCountCurrent": 12,
+      "currentLandedCalls": 4,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    },
+    {
+      "path": "tests/workspacePathRedactionParity.test.ts",
+      "beforeSha256": "40a53fb1cdc97b7939d8d4c9090ba116cb7f42b094bcecf1cee51abf7c6662d0",
+      "mergedSha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d",
+      "currentSha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d",
+      "originalRoutingDiff": "diff --git a/tests/workspacePathRedactionParity.test.ts b/tests/workspacePathRedactionParity.test.ts\nindex bc1ded737..5be669563 100644\n--- a/tests/workspacePathRedactionParity.test.ts\n+++ b/tests/workspacePathRedactionParity.test.ts\n@@ -13,6 +13,7 @@ import { redactFixerRcaReport } from \"../src/mechanic/fixerRca.js\";\n import { redactOrgRunArtifact } from \"../src/org/orgRun.js\";\n import { redactObservabilityLaneRecord } from \"../src/lifecycle/observabilityLane.js\";\n import { restoreWorkspacePathSharing } from \"./helpers/restoreWorkspacePathSharing.js\";\n+import { landedBytes, landedText } from \"./helpers/landedSource.js\";\n \n type RuntimeFunction = (...args: unknown[]) => unknown;\n type Row = { originalPath: string; archivePath: string; sha256: string; currentSha256: string;\n@@ -210,7 +211,7 @@ it(\"freezes every actual source byte outside the declared imports and private bo\n   expect(map.files.filter(row => row.nullable)).toHaveLength(6);\n   expect(map.compiledContracts).toHaveLength(15);\n   for (const row of map.files) {\n-    const original = archived(row), current = readFileSync(resolve(row.originalPath), \"utf8\");\n+    const original = archived(row), current = landedText(row.originalPath);\n     expect(hash(current)).toBe(row.currentSha256);\n     const ast = ts.createSourceFile(row.originalPath, original, ts.ScriptTarget.ES2022, true);\n     const nodes = ast.statements.filter(node => ts.isFunctionDeclaration(node) && node.name?.text === row.name);\n@@ -223,11 +224,11 @@ it(\"freezes every actual source byte outside the declared imports and private bo\n     expect(() => restoreWorkspacePathSharing(row.originalPath, current + \"\\n\")).toThrow(\"Source changed beyond declared\");\n     expect(() => restoreWorkspacePathSharing(row.originalPath, current.replace(row.afterBody, row.beforeBody))).toThrow();\n   }\n-  expect(hash(readFileSync(resolve(map.utility.path)))).toBe(map.utility.sha256);\n+  expect(hash(landedBytes(map.utility.path))).toBe(map.utility.sha256);\n   expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);\n-  expect(packageEntriesSha256(readFileSync(resolve(\"package.json\")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n+  expect(packageEntriesSha256(landedBytes(\"package.json\"))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);\n   for (const contract of map.compiledContracts) {\n-    expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);\n+    expect(hash(landedBytes(contract.file))).toBe(contract.sha256);\n   }\n });\n it(\"retains all previous freeze assertions with only the bounded reversal inserted\", () => {\n@@ -242,7 +243,7 @@ it(\"retains all previous freeze assertions with only the bounded reversal insert\n       : 'import { restoreWorkspacePathSharing } from \"./helpers/restoreWorkspacePathSharing.js\";\\n' + original.replace(\n         'current = readFileSync(resolve(row.originalPath), \"utf8\");',\n         'current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), \"utf8\"));');\n-    expect(readFileSync(resolve(row.originalPath), \"utf8\"))\n+    expect(landedText(row.originalPath))\n       .toBe(row.originalPath.includes(\"/helpers/\") ? expected : withPackageEntriesPin(expected));\n   }\n });\n",
+      "currentChangeDiff": "",
+      "assertionBodies": "Reviewed original diff: all existing assertion/matcher structure retained; changes route only live historical freeze reads and add helper imports or a block-local freeze variable. No original assertion was deleted.",
+      "expectCountBefore": 42,
+      "expectCountMerged": 42,
+      "expectCountCurrent": 42,
+      "currentLandedCalls": 5,
+      "behaviorAndArchiveReads": "Original archive-byte reads remain real filesystem reads; behavioral execution imports/transpiles live source. metricRowPublicContract’s compiler-host override and emission checks are historical contract freezes, intentionally routed, not actual runtime execution.",
+      "fsMockAddedInPR38": false
+    }
+  ],
+  "currentLaterTestDiffs": {
+    "tests/apiRouterResponseParity.test.ts": "diff --git a/tests/apiRouterResponseParity.test.ts b/tests/apiRouterResponseParity.test.ts\nindex cfe606efc..6a5a72035 100644\n--- a/tests/apiRouterResponseParity.test.ts\n+++ b/tests/apiRouterResponseParity.test.ts\n@@ -156,10 +156,20 @@ async function call(port: number, path: string, method: string, payload?: unknow\n     }); req.once(\"error\", reject); req.setTimeout(10_000, () => req.destroy(new Error(\"Router HTTP timeout\"))); req.end(data);\n   });\n }\n+// P0-23: the current dispatcher appends claim fields to result routes; the archived one predates them.\n+function withoutClaim(body: Buffer): string {\n+  const text = body.toString(\"utf8\");\n+  if (!text.startsWith(\"{\")) return text;\n+  const { claimKind, statusDimensions, claimLabel, ...rest } = JSON.parse(text) as Record<string, unknown>;\n+  return claimKind === undefined && statusDimensions === undefined && claimLabel === undefined ? text : JSON.stringify(rest);\n+}\n async function parity(path: string, method: string, payload?: unknown, headers?: IncomingHttpHeaders): Promise<Wire> {\n   const before = await call(ports[0], path, method, payload, headers), after = await call(ports[1], path, method, payload, headers);\n-  expect({ ...after, body: after.body.toString(\"utf8\") }).toEqual({ ...before, body: before.body.toString(\"utf8\") });\n-  expect(after.body).toEqual(before.body); return after;\n+  expect({ ...after, body: withoutClaim(after.body) }).toEqual({ ...before, body: before.body.toString(\"utf8\") });\n+  if (after.status === 200 && path.startsWith(\"/api/v1/\") && !path.endsWith(\"/status\") && !path.includes(\"/watch/\")) {\n+    expect(JSON.parse(after.body.toString(\"utf8\")).claimKind).toBe(\"self_reported\");\n+  }\n+  return after;\n }\n \n for (const lane of laneSpecs) for (const surface of [\"score\", \"shield\", \"watch\", \"benchmarks\"]) {\n",
+    "tests/auditEvidenceAccountingParity.test.ts": "diff --git a/tests/auditEvidenceAccountingParity.test.ts b/tests/auditEvidenceAccountingParity.test.ts\nindex 55bf25b80..19b97f165 100644\n--- a/tests/auditEvidenceAccountingParity.test.ts\n+++ b/tests/auditEvidenceAccountingParity.test.ts\n@@ -249,7 +249,14 @@ test(\"unsigned CI initialization preserves real policy/workflow bytes and disclo\n     const actual = gate.initCiForAgent(options);\n     expect(actual).toEqual(expected);\n     expect(readFileSync(actual.policyPath).equals(policy)).toBe(true);\n-    expect(readFileSync(actual.workflowPath).equals(workflow)).toBe(true);\n+    // P0-09: the one intended change is the bundle verify step, which now pins keys recorded outside the checkout\n+    // (repository variables), because an unpinned `amc bundle verify` fails since PR 2. Every other byte is preserved.\n+    const pinned = (bundle: string, pubFile: string) => `amc bundle verify ${bundle} --pubkey \"${pubFile}\" --expect-monitor \"$AMC_MONITOR_FINGERPRINT\"`;\n+    const expectedWorkflow = workflow.toString(\"utf8\").replace(/( {6}- name: Verify evidence bundle\\n) {8}run: amc bundle verify (\\S+)\\n/, (_line, name: string, bundle: string) =>\n+      `${name}        env:\\n          AMC_AUDITOR_PUBKEY: \\${{ vars.AMC_AUDITOR_PUBKEY }}\\n          AMC_MONITOR_FINGERPRINT: \\${{ vars.AMC_MONITOR_FINGERPRINT }}\\n` +\n+      `        run: printf '%s\\\\n' \"$AMC_AUDITOR_PUBKEY\" > \"$RUNNER_TEMP/amc-auditor.pub\" && ${pinned(bundle, \"$RUNNER_TEMP/amc-auditor.pub\")}\\n`);\n+    expect(expectedWorkflow).not.toBe(workflow.toString(\"utf8\"));\n+    expect(readFileSync(actual.workflowPath, \"utf8\")).toBe(expectedWorkflow);\n     expect(statSync(actual.policyPath).mode & 0o777).toBe(policyMode);\n     expect(statSync(actual.workflowPath).mode & 0o777).toBe(workflowMode);\n     expect(policyMode).toBe(0o644);\n@@ -260,7 +267,8 @@ test(\"unsigned CI initialization preserves real policy/workflow bytes and disclo\n     expect(actual.workflowPath).toBe(join(workspace, \".github\", \"workflows\", \"amc.yml\"));\n     expect(workflow.toString(\"utf8\")).toContain(\"--no-sign\");\n     expect(workflow.toString(\"utf8\")).toContain(\"UNSIGNED CI mode: maturity BOM signing skipped\");\n-    expect(gate.printCiSteps(options)).toEqual(original.printCiSteps!(options));\n+    expect(gate.printCiSteps(options)).toEqual((original.printCiSteps!(options) as string[]).map(step =>\n+      step.replace(/^amc bundle verify (\\S+)$/, (_step, bundle: string) => pinned(bundle, \"$AMC_AUDITOR_PUB_FILE\"))));\n     expect(gate.printCiSteps(options).join(\"\\n\")).toContain(\"amc bundle verify .amc/\");\n   } finally {\n     rmSync(workspace, { recursive: true, force: true });\n",
+    "tests/pdfRenderingParity.test.ts": "diff --git a/tests/pdfRenderingParity.test.ts b/tests/pdfRenderingParity.test.ts\nindex c33cb29cd..7f8f91642 100644\n--- a/tests/pdfRenderingParity.test.ts\n+++ b/tests/pdfRenderingParity.test.ts\n@@ -20,6 +20,7 @@ import { initWorkspace } from \"../src/workspace.js\";\n import { defaultPassportPolicy } from \"../src/passport/passportPolicySchema.js\";\n import { savePassportPolicy } from \"../src/passport/passportStore.js\";\n import { landedText } from \"./helpers/landedSource.js\";\n+import { workspaceKeyTrust } from \"./helpers/trustContext.js\";\n \n const roots: string[] = [];\n afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });\n@@ -112,11 +113,12 @@ function workspace() {\n function dataset(count: number): VerifierEvidenceDataset {\n   const ts = 1_700_000_000_000;\n   return {\n-    schemaVersion: 1, generatedTs: ts, workspace: \"owned metadata fixture\", agentFilter: \"agent (fixture) \\\\\",\n+    schemaVersion: 2, generatedTs: ts, workspace: \"owned metadata fixture\",\n+    agentFilter: { agentId: \"agent (fixture) \\\\\", mode: \"row-meta-or-owned-session\", sessionsIncluded: [\"fixture-session\"], rowsExcluded: 0 },\n     includeChain: true, includeRationale: true, eventCount: count, chainInvalidCount: count,\n     records: Array.from({ length: count }, (_, index) => ({\n       eventId: `fixture-${index}`, ts, isoTs: new Date(ts).toISOString(), sessionId: \"fixture-session\",\n-      runtime: \"fixture\", eventType: \"fixture (event)\", actorId: 'actor,\"fixture\"', payloadSha256: \"a\".repeat(64),\n+      runtime: \"fixture\", eventType: \"fixture (event)\", actorId: 'actor,\"fixture\"', claimKind: \"self_reported\", payloadSha256: \"a\".repeat(64),\n       prevEventHash: \"b\".repeat(64), eventHash: \"c\".repeat(64), writerSignature: \"fixture-unverified\",\n       chainIndex: index, chainValid: false, chainExpectedPrevHash: \"b\".repeat(64), incidentIds: [], correctionIds: [],\n       correctionStatuses: [], corrected: false, correctedTs: null, rationale: \"fixture \\\\ (reason)\", rationaleChain: [], meta: {},\n@@ -127,7 +129,9 @@ describe(\"actual public evidence and passport rendering\", () => {\n   for (const count of [0, 1, 112]) {\n     test(`public evidence PDF preserves archived bytes for ${count} supplied metadata rows`, () => {\n       const value = dataset(count), original = originals.find(row => row.originalPath === \"src/evidence/exporter.ts\")!;\n-      const expected = original.functions.renderVerifierEvidencePdf!(value), actual = renderVerifierEvidencePdf(value);\n+      // The archived renderer read the v1 bare agent id; v2 (P0-27) carries it as agentFilter.agentId.\n+      const v1 = { ...value, schemaVersion: 1, agentFilter: value.agentFilter!.agentId } as unknown as VerifierEvidenceDataset;\n+      const expected = original.functions.renderVerifierEvidencePdf!(v1), actual = renderVerifierEvidencePdf(value);\n       expect(actual.equals(expected)).toBe(true);\n       expect((renderVerifierEvidence(value, \"pdf\") as Buffer).equals(expected)).toBe(true);\n       byteStructure(actual);\n@@ -166,7 +170,7 @@ describe(\"actual public evidence and passport rendering\", () => {\n       expect(passportPolicyPrintCli(ws)).toEqual(init.policy);\n     }\n     const created = passportCreateCli({ workspace: ws, scope: \"agent\", id: \"default\", outFile: join(ws, \"owned.amcpass\") });\n-    expect(passportVerifyCli({ workspace: ws, file: created.outFile }).ok).toBe(true);\n+    expect(passportVerifyCli({ workspace: ws, file: created.outFile, trust: workspaceKeyTrust(ws) }).ok).toBe(true);\n     expect(passportShowCli({ file: created.outFile, format: \"json\" })).toHaveProperty(\"passport.passportId\", created.passport.passportId);\n     expect(passportShowCli({ file: created.outFile, format: \"badge\" })).toContain(\"AMC \");\n     expect(passportBadgeCli({ workspace: ws, agentId: \"default\" }).badge).toContain(\"AMC \");\n",
+    "tests/studioRouteRoleContextParity.test.ts": "diff --git a/tests/studioRouteRoleContextParity.test.ts b/tests/studioRouteRoleContextParity.test.ts\nindex 16e99f7e9..7a8ec260d 100644\n--- a/tests/studioRouteRoleContextParity.test.ts\n+++ b/tests/studioRouteRoleContextParity.test.ts\n@@ -98,7 +98,9 @@ function guardFactory(source: string, shared: boolean, verify: (workspace: strin\n     throw new Error(\"Actual guard fragment did not compile\");\n   }\n   const exports: { make?: Factory } = {};\n-  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify }, { timeout: 1_000 });\n+  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.\n+  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;\n+  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify, withClaimBody }, { timeout: 1_000 });\n   return exports.make!;\n }\n \n",
+    "tests/studioVaultSigningContextParity.test.ts": "diff --git a/tests/studioVaultSigningContextParity.test.ts b/tests/studioVaultSigningContextParity.test.ts\nindex 4812bf64a..66c9a4d93 100644\n--- a/tests/studioVaultSigningContextParity.test.ts\n+++ b/tests/studioVaultSigningContextParity.test.ts\n@@ -76,7 +76,9 @@ function guardFactory(source: string, shared: boolean): Factory {\n   const compiled = ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }, reportDiagnostics: true });\n   if (compiled.diagnostics?.some(row => row.category === ts.DiagnosticCategory.Error)) throw new Error(\"Actual vault guard fragment did not compile\");\n   const exports: { make?: Factory } = {};\n-  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup }, { timeout: 1_000 });\n+  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.\n+  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;\n+  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup, withClaimBody }, { timeout: 1_000 });\n   return exports.make!;\n }\n const before = guardFactory(original, false), after = guardFactory(current, true);\n"
+  },
+  "packageHandling": {
+    "verdict": "preserve_later_accepted_package_snapshot_handling",
+    "commits": [
+      {
+        "commit": "80abdaf02da615fbe6797b593270d363d7a36163",
+        "ancestorOfMain": true,
+        "message": "test: let D-15 snapshot package.json before an issue edits its entries\n\nThe snapshot script and validatePlanEdits refused package.json because the\nP0-01 package-entries pin froze it by its entries alone. P0-09 must add the\n./trust export and a files entry, so package.json is now archived like any\nother frozen file. The four tests that pin the entries already read\nlandedBytes(\"package.json\"), so they keep checking the landed manifest.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n"
+      },
+      {
+        "commit": "742330c5c03c57e8beb2cf517eaf8dbcc54796dc",
+        "ancestorOfMain": true,
+        "message": "test: expect package.json to be snapshotted like any frozen file (D-15)\n\nP0-09 changes package.json exports and files, which the P0-01 package-entries\npin freezes. Snapshot-on-edit already covers every other frozen file; these\ntests now expect it to cover package.json too.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n"
+      }
+    ],
+    "currentVsPR38Diff": "diff --git a/scripts/snapshot-plan-edit.mjs b/scripts/snapshot-plan-edit.mjs\nindex a46b6074c..faaab384d 100644\n--- a/scripts/snapshot-plan-edit.mjs\n+++ b/scripts/snapshot-plan-edit.mjs\n@@ -24,7 +24,7 @@ const MANIFEST = \"unused-code/plan-edits/manifest.json\";\n const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;\n const USAGE = \"Usage: node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <rev> <path>...\";\n const EMPTY = { schemaVersion: 1, decision: \"D-15\", files: [] };\n-const PACKAGE_JSON = \"package.json is pinned by entries in tests/helpers/packageEntries.ts, not by snapshot\";\n+// package.json is archived like any other frozen file: the P0-01 package-entries pin reads its landed bytes.\n const sha256 = bytes => createHash(\"sha256\").update(bytes).digest(\"hex\");\n \n function git(cwd, args, encoding = \"utf8\") {\n@@ -88,7 +88,6 @@ function snapshotPlanEdit({ cwd, issue, base, paths }) {\n   const requested = paths.map(input => {\n     const path = relative(root, resolve(cwd, input)).split(sep).join(\"/\");\n     if (!path || isAbsolute(path) || path === \"..\" || path.startsWith(\"../\")) throw new Error(`Path is outside the repository: ${input}`);\n-    if (path === \"package.json\") throw new Error(PACKAGE_JSON);\n     if (registered(path)) throw new Error(`${path} is already registered; the first issue's snapshot stays: ${JSON.stringify(registered(path))}`);\n     return path;\n   });\ndiff --git a/tests/helpers/landedSource.ts b/tests/helpers/landedSource.ts\nindex 5c0869e99..4af907a92 100644\n--- a/tests/helpers/landedSource.ts\n+++ b/tests/helpers/landedSource.ts\n@@ -14,6 +14,8 @@ export type PlanEdit = { path: string; issue: string; baseCommit: string; archiv\n const PLAN_EDITS_MANIFEST = \"unused-code/plan-edits/manifest.json\";\n const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;\n const sha256 = (bytes: Buffer) => createHash(\"sha256\").update(bytes).digest(\"hex\");\n+// package.json was refused here while only P0-01's package-entries pin froze it. P0-09 must change its\n+// exports and files, so it is snapshotted like any other frozen file and the entries pin reads landed bytes.\n \n export function validatePlanEdits(value: unknown): readonly PlanEdit[] {\n   const manifest = value as { schemaVersion?: unknown; decision?: unknown; files?: unknown } | null;\n@@ -25,7 +27,6 @@ export function validatePlanEdits(value: unknown): readonly PlanEdit[] {\n     const fail = (reason: string) => { throw new Error(`Invalid plan-edits entry ${index} (${String(row?.path)}): ${reason}`); };\n     if (typeof row?.path !== \"string\" || row.path.includes(\"\\\\\")\n       || row.path.split(\"/\").some(part => part === \"\" || part === \".\" || part === \"..\")) fail(\"path must be repo-relative POSIX\");\n-    if (row.path === \"package.json\") fail(\"package.json is pinned by entries in tests/helpers/packageEntries.ts, not by snapshot\");\n     if (!ISSUE_KEY.test(row.issue)) fail(\"issue must match \" + ISSUE_KEY);\n     if (!/^[0-9a-f]{40}$/.test(row.baseCommit)) fail(\"baseCommit must be 40 hex\");\n     if (row.archivePath !== `unused-code/plan-edits/${row.issue}/${row.path}.landed`) fail(\"archivePath must be unused-code/plan-edits/<issue>/<path>.landed\");\ndiff --git a/tests/planEditsManifest.test.ts b/tests/planEditsManifest.test.ts\nindex 780a37de8..23c590cc5 100644\n--- a/tests/planEditsManifest.test.ts\n+++ b/tests/planEditsManifest.test.ts\n@@ -93,9 +93,11 @@ describe(\"committed plan-edits manifest (D-15)\", () => {\n       [manifest([entry({ issue: \"P9-01\", archivePath: \"unused-code/plan-edits/P9-01/src/a.ts.landed\" })]), \"issue\"],\n       [manifest([entry({ path: \"../outside.ts\", archivePath: \"unused-code/plan-edits/P0-06/../outside.ts.landed\" })]), \"path\"],\n       [manifest([entry({ path: \"src\\\\a.ts\", archivePath: \"unused-code/plan-edits/P0-06/src\\\\a.ts.landed\" })]), \"path\"],\n-      [manifest([entry({ path: \"package.json\", archivePath: \"unused-code/plan-edits/P0-06/package.json.landed\" })]), \"tests/helpers/packageEntries.ts\"],\n     ];\n     for (const [value, reason] of bad) expect(() => validatePlanEdits(value), reason).toThrow(reason);\n+    // package.json is snapshotted like any frozen file; the entries pin then reads its landed bytes.\n+    const pkg = entry({ path: \"package.json\", archivePath: \"unused-code/plan-edits/P0-06/package.json.landed\" });\n+    expect(validatePlanEdits(manifest([pkg]))).toEqual([pkg]);\n   });\n });\n \n@@ -180,7 +182,6 @@ describe(\"scripts/snapshot-plan-edit.mjs\", () => {\n       [[\"--issue\", \"P0-06\", \"--base\", \"HEAD\", \"../outside.ts\"], \"outside the repository\"],\n       [[\"--issue\", \"P0-06\", \"--base\", \"HEAD\", \"src/missing.ts\"], \"not present at HEAD\"],\n       [[\"--issue\", \"P0-06\", \"--base\", \"HEAD\", \"src\"], \"not present at HEAD\"],\n-      [[\"--issue\", \"P0-06\", \"--base\", \"HEAD\", \"package.json\"], \"pinned by entries in tests/helpers/packageEntries.ts\"],\n       [[\"--issue\", \"P0-06\", \"--base\", \"HEAD\"], \"Usage\"],\n     ] as const) {\n       const result = snapshot(root, ...args);\n@@ -190,6 +191,19 @@ describe(\"scripts/snapshot-plan-edit.mjs\", () => {\n     expect(git(root, \"status\", \"--porcelain\", \"--untracked-files=all\")).toBe(\"M src/a.ts\");\n   });\n \n+  it(\"archives package.json at the base, so the package-entries pin keeps reading the landed manifest\", () => {\n+    const { root } = repo();\n+    put(root, \"package.json\", '{\"name\":\"at-base\"}\\n');\n+    git(root, \"add\", \"package.json\");\n+    git(root, \"commit\", \"-q\", \"-m\", \"package\");\n+    put(root, \"package.json\", '{\"name\":\"edited\",\"exports\":{\"./trust\":\"./dist/trust/index.js\"}}\\n');\n+    const result = snapshot(root, \"--issue\", \"P0-09\", \"--base\", \"HEAD\", \"package.json\");\n+    expect(result.stderr).toBe(\"\");\n+    expect(result.status).toBe(0);\n+    expect(read(root).files.map(row => [row.path, row.baseCommit])).toEqual([[\"package.json\", git(root, \"rev-parse\", \"HEAD\")]]);\n+    expect(landedSourceAt(root).landedText(\"package.json\")).toBe('{\"name\":\"at-base\"}\\n');\n+  });\n+\n   it(\"runs when invoked through a symlinked script path\", () => {\n     const { root } = repo(), link = join(scratch(), \"scripts\");\n     symlinkSync(dirname(SCRIPT), link);\ndiff --git a/unused-code/plan-edits/README.md b/unused-code/plan-edits/README.md\nindex 3cead2abe..6c2a7b4cf 100644\n--- a/unused-code/plan-edits/README.md\n+++ b/unused-code/plan-edits/README.md\n@@ -20,7 +20,7 @@ Run this once, before you rebuild `dist/`, with your issue key and the commit yo\n node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <base-commit> <path>...\n ```\n \n-Commit `manifest.json` and the new `.landed` archive with the edit. The first issue to edit a file archives it; a later issue that edits the same file keeps that entry, because the proof is about the original landed bytes. The script refuses a path that is already registered, an issue key that does not match `P[0-3]-NN`, a path that is outside the repository or is not a file at the base commit, and `package.json`, which `tests/helpers/packageEntries.ts` pins by its entries instead.\n+Commit `manifest.json` and the new `.landed` archive with the edit. The first issue to edit a file archives it; a later issue that edits the same file keeps that entry, because the proof is about the original landed bytes. The script refuses a path that is already registered, an issue key that does not match `P[0-3]-NN` and a path that is outside the repository or is not a file at the base commit. `package.json` is snapshotted the same way: `tests/helpers/packageEntries.ts` pins its entries (name, type, main, types, exports, bin and files), and the four tests that use that pin read its landed bytes.\n \n ## Build outputs under `dist/`\n \n",
+    "scope": "Original PR38 refused package.json, but later P0-09 needs ./trust exports/files edits. The two accepted-main commits document and test package snapshot handling. The same four package-entries freezes already route via landedBytes; entry fields remain name/type/main/types/exports/bin/files. Do not restore the obsolete PR38 package refusal.",
+    "packageSnapshot": {
+      "path": "package.json",
+      "issue": "P0-09",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    "helper": {
+      "path": "tests/helpers/packageEntries.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "370c39d382c1c850f635a2562a78896093bc59ae",
+      "sha256": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+      "firstLine": 1,
+      "lastLine": 17,
+      "excerpt": "import { createHash } from \"node:crypto\";\n\n/** The package surface a consumer imports or runs. Scripts, dependencies and the version are not part of it. */\nconst ENTRY_FIELDS = [\"name\", \"type\", \"main\", \"types\", \"exports\", \"bin\", \"files\"] as const;\n\n/** sha256 of the whole package.json the archived restoration manifests recorded. */\nexport const ARCHIVED_PACKAGE_MANIFEST_SHA256 = \"56035a95df5ba813dc470ad15d85f5439a880cfca823f940530c4c5f0ad6563d\";\n\n/** packageEntriesSha256 of that archived package.json (main @ 786d8abb). */\nexport const ARCHIVED_PACKAGE_ENTRIES_SHA256 = \"4b4daa61bf086bcade2c015fbe0c15174e0e62a018b69cc293c10f23bd1d35c8\";\n\nexport function packageEntriesSha256(manifest: string | Buffer): string {\n  const pkg = JSON.parse(manifest.toString()) as Record<string, unknown>;\n  const entries = Object.fromEntries(ENTRY_FIELDS.map(field => [field, pkg[field] ?? null]));\n  return createHash(\"sha256\").update(JSON.stringify(entries)).digest(\"hex\");\n}\n"
+    }
+  },
+  "metaFreeze": {
+    "verdict": "historical_meta_freeze_preserved",
+    "row": {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "issue": "P0-47",
+      "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+      "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+      "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    "freezeReader": {
+      "path": "tests/workspacePathRedactionParity.test.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "5be669563dda153b8022693172210d6c4833844a",
+      "sha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d",
+      "firstLine": 233,
+      "lastLine": 250,
+      "excerpt": "});\nit(\"retains all previous freeze assertions with only the bounded reversal inserted\", () => {\n  for (const row of map.priorTests) {\n    const bytes = readFileSync(resolve(row.archivePath));\n    expect(hash(bytes)).toBe(row.sha256);\n    const original = bytes.toString(\"utf8\");\n    const expected = row.originalPath.includes(\"/helpers/\")\n      ? 'import { restoreWorkspacePathSharing } from \"./restoreWorkspacePathSharing.js\";\\n' + original.replace(\n        \"  const row = manifest.files.find(value => value.originalPath === file);\",\n        \"  source = restoreWorkspacePathSharing(file, source);\\n  const row = manifest.files.find(value => value.originalPath === file);\")\n      : 'import { restoreWorkspacePathSharing } from \"./helpers/restoreWorkspacePathSharing.js\";\\n' + original.replace(\n        'current = readFileSync(resolve(row.originalPath), \"utf8\");',\n        'current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), \"utf8\"));');\n    expect(landedText(row.originalPath))\n      .toBe(row.originalPath.includes(\"/helpers/\") ? expected : withPackageEntriesPin(expected));\n  }\n});\n"
+    },
+    "scope": "P0-47 legitimately snapshots its pre-edit frozen test at P0-01 head51f425bf. Current archive equals exact base bytes and that base is an ancestor. workspacePathRedactionParity reads this snapshot for the text freeze; the actual test itself still executes current code."
+  },
+  "manifestProvenance": [
+    {
+      "path": "dist/index.d.ts",
+      "issue": "P0-08",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-08/dist/index.d.ts.landed",
+      "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "compiledPins": [
+        {
+          "manifest": "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json",
+          "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+        },
+        {
+          "manifest": "unused-code/2026-10-02-main/workspace-path-redaction/restoration.json",
+          "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+        }
+      ],
+      "allCompiledPinsMatch": true
+    },
+    {
+      "path": "dist/sdk/nativeAgentClient.d.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
+      "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "compiledPins": [
+        {
+          "manifest": "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json",
+          "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+        },
+        {
+          "manifest": "unused-code/2026-10-02-main/workspace-path-redaction/restoration.json",
+          "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+        }
+      ],
+      "allCompiledPinsMatch": true
+    },
+    {
+      "path": "package.json",
+      "issue": "P0-09",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "issue": "P0-49",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/agent/nativeToolCapabilities.ts",
+      "issue": "P1-43",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
+      "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/api/benchmarkRouter.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/api/benchmarkRouter.ts.landed",
+      "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/api/exportRouter.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/api/exportRouter.ts.landed",
+      "sha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/api/index.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/src/api/index.ts.landed",
+      "sha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/api/scoreRouter.ts",
+      "issue": "P0-55",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P0-55/src/api/scoreRouter.ts.landed",
+      "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assuranceCertificates.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assuranceCertificates.ts.landed",
+      "sha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "issue": "P0-19",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/auth/authApi.ts",
+      "issue": "P1-56",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-56/src/auth/authApi.ts.landed",
+      "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/bench/benchRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryClient.ts.landed",
+      "sha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/bench/benchRegistryStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
+      "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/bom/bomVerifier.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/bom/bomVerifier.ts.landed",
+      "sha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/bridge/bridgeServer.ts",
+      "issue": "P2-01",
+      "baseCommit": "f60406454b94e213290587911e6b8066c4126869",
+      "archivePath": "unused-code/plan-edits/P2-01/src/bridge/bridgeServer.ts.landed",
+      "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/ci/gate.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/ci/gate.ts.landed",
+      "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "issue": "P0-17",
+      "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
+      "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/demo/prospectDemo.ts",
+      "issue": "P0-15",
+      "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
+      "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
+      "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/l5DeltaReport.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/l5DeltaReport.ts.landed",
+      "sha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/questionScoreExplainability.ts.landed",
+      "sha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/diagnostic/runner.ts.landed",
+      "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/spineEvidenceProjection.ts",
+      "issue": "P1-07",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/spineEvidenceProjection.ts.landed",
+      "sha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/domains/industryPackEntitlement.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/domains/industryPackEntitlement.ts.landed",
+      "sha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/drift/alerts.ts",
+      "issue": "P2-01",
+      "baseCommit": "29118e02e5ae3c1ea46d2df04a7dc4838134a852",
+      "archivePath": "unused-code/plan-edits/P2-01/src/drift/alerts.ts.landed",
+      "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/enforce/resourceManifest.ts",
+      "issue": "P1-59",
+      "baseCommit": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
+      "archivePath": "unused-code/plan-edits/P1-59/src/enforce/resourceManifest.ts.landed",
+      "sha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/evidence/exporter.ts.landed",
+      "sha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/executive/brief.ts",
+      "issue": "P0-22",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-22/src/executive/brief.ts.landed",
+      "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/federation/federationStore.ts",
+      "issue": "P0-52",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+      "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/gateway/config.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/governor/emergencyOverride.ts",
+      "issue": "P0-10",
+      "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
+      "archivePath": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
+      "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/importers/dshSessionImport.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/importers/dshSessionImport.ts.landed",
+      "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/index.ts",
+      "issue": "P0-08",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-08/src/index.ts.landed",
+      "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/leases/leaseStore.ts",
+      "issue": "P1-67",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-67/src/leases/leaseStore.ts.landed",
+      "sha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
+      "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/lifecycle/signedControlJournal.ts.landed",
+      "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/notary/notaryAttestation.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/notary/notaryAttestation.ts.landed",
+      "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/ops/policy.ts",
+      "issue": "P1-15",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
+      "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/passport/passportCli.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/passport/passportCli.ts.landed",
+      "sha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/passport/passportCollector.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
+      "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/plugins/pluginPackage.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginPackage.ts.landed",
+      "sha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/plugins/pluginRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginRegistryClient.ts.landed",
+      "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/prompt/promptPackVerifier.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
+      "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/studio/studioServer.ts.landed",
+      "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/studio/studioState.ts",
+      "issue": "P1-02",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-02/src/studio/studioState.ts.landed",
+      "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/toolhub/toolhubValidators.ts",
+      "issue": "P1-05",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
+      "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/trust/trustConfig.ts",
+      "issue": "P0-45",
+      "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
+      "archivePath": "unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "sha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/types.ts",
+      "issue": "P0-44",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "issue": "P1-25",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/apiRouterResponseParity.test.ts.landed",
+      "sha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "issue": "P0-47",
+      "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+      "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+      "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
+      "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "archiveHashMatches": true,
+      "baseAncestorOfCurrentMain": true,
+      "sourceArchiveEqualsBaseBlob": true
+    }
+  ],
+  "limits": [
+    "All19 original routing changes were reviewed. Counts are supporting inventory, not a substitute for body inspection.",
+    "Current later diffs in5 routed files concern P0-09 trust pinning, P0-23 claim labels and P0-27 v2 PDF input. They remain behavioral qualification dependencies; this P0-47 review does not qualify those issues.",
+    "In a shallow clone missing a base, the provenance test may skip by explicit contract. This checkout is complete, not shallow.",
+    "Compiled archives prove equality to restoration pins; without external build receipts, those bytes alone do not prove the compiler/environment or build was actually produced at baseCommit.",
+    "No tests, builds, historical probes or mutants were run by this reviewer.",
+    "No source, candidate, refs, trackers, original archives, helper or frozen assertion was edited by this reviewer."
+  ],
+  "trackedDiffAtFinish": [
+    "tests/planEditsManifest.test.ts"
+  ]
+}

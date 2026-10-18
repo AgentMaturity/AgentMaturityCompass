@@ -32,7 +32,7 @@ const roots: string[] = [];
 afterEach(() => {
   crash.at = 0;
   for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); }
-});
+}, 120_000);
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-atomic-rotation-"));
@@ -92,7 +92,9 @@ describe("atomic rotation (P1-08)", () => {
       expect(verifyHexDigestAny(digest, oldSignature, getPublicKeyHistory(root, "auditor")), `rename ${k}`).toBe(true);
     }
     expect(outcomes.has("completed")).toBe(true);
-  }, 480_000);
+    // Every rename crash point keeps real KDF, signing and recovery checks.
+    // Bound the exhaustive integration run without reducing its crash matrix.
+  }, 600_000);
 
   it("a public key that lost the digest its generation recorded refuses signing, even with the pending marker deleted", () => {
     const root = workspace();

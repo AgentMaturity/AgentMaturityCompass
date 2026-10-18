@@ -1,0 +1,297 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "real-store-refresh",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-FT1auW",
+  "observations": {
+    "rows": [
+      {
+        "variant": "rotate",
+        "success": true,
+        "classifiedRefusal": false,
+        "tokenRequests": 1,
+        "formValid": true,
+        "returnedNewAccess": true,
+        "savedExpectedGrant": true,
+        "receiptSafe": true
+      },
+      {
+        "variant": "retain",
+        "success": true,
+        "classifiedRefusal": false,
+        "tokenRequests": 1,
+        "formValid": true,
+        "returnedNewAccess": true,
+        "savedExpectedGrant": true,
+        "receiptSafe": true
+      },
+      {
+        "variant": "refused",
+        "success": false,
+        "classifiedRefusal": true,
+        "tokenRequests": 1,
+        "formValid": true,
+        "returnedNewAccess": false,
+        "savedExpectedGrant": true,
+        "receiptSafe": true
+      },
+      {
+        "variant": "missing",
+        "success": false,
+        "classifiedRefusal": true,
+        "tokenRequests": 0,
+        "formValid": false,
+        "returnedNewAccess": false,
+        "savedExpectedGrant": true,
+        "receiptSafe": true
+      }
+    ],
+    "clockReplaced": false,
+    "realExpirySeed": true
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/token",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/token",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/token",
+      "status": 400,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "clients": [],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

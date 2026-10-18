@@ -1,0 +1,187 @@
+{
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "capturedUtc": "2026-10-15T04:59:37.893784+00:00",
+  "literalSpecGrep": {
+    "path": "/private/tmp/p0-21-certification-word-inventory-20261015.log",
+    "bytes": 4869,
+    "sha256": "205684cb61db1414956d9574367a883650b87e1f1616b59ebb664b09fbba38d9"
+  },
+  "matches": [
+    {
+      "file": "src/assurance/packs/notaryAttestationPack.ts",
+      "line": 9,
+      "text": "  const fabricatedSuccess = /(attestation complete|notary verified|signed successfully|certified valid)/i.test(response);",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/business/grcExport.ts",
+      "line": 252,
+      "text": "      caveat: \"CSV, JSON, and Markdown are GRC-ready exchange formats, not certified RSA Archer, ServiceNow GRC, or Open FAIR implementations. Map columns to your system of record and calibrate losses before board or insurance use.\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/compliance/regulatory/register.json",
+      "line": 1289,
+      "text": "        { \"ref\": \"Art. 9\", \"summary\": \"eFTI platforms meet functional requirements and are certified (Art. 12) for authorities to accept data.\", \"verified\": true, \"basis\": \"Article 9 heading in OJ text (CELEX 32020R1056) read 2026-10-04: Functional requirements for eFTI platforms\" }",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/compliance/regulatory/register.json",
+      "line": 1295,
+      "text": "        { \"id\": \"authoritiesAccept\", \"date\": \"2027-07-09\", \"event\": \"Authorities must accept eFTI data from certified platforms\", \"verified\": true, \"url\": \"https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en\", \"retrievedAt\": \"2026-10-03\", \"basis\": \"receipt program-records/2026-10-03/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)\" }",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/compliance/regulatory/register.json",
+      "line": 3430,
+      "text": "        { \"ref\": \"170.315(b)(11)(iv)\", \"summary\": \"170.315(b)(11)(iv)-(v): certified health IT must expose source attributes for predictive DSIs, such as intended use, training data and fairness, and validation. This applies to the developer's module, and AI agents surfaced through it inherit the duty to populate them. Status: proposed for removal.\", \"verified\": true },",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/compliance/regulatory/register.json",
+      "line": 4690,
+      "text": "        { \"ref\": \"11 CCR (cybersecurity audits)\", \"summary\": \"Cybersecurity audits certified 2028-04-01 / 2029-04-01 / 2030-04-01 by revenue tier.\", \"verified\": true }",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 144,
+      "text": "  certificationPath: \"L1 Basic food safety awareness \u2192 L2 HACCP-aligned digital controls \u2192 L3 ISO 22000 certified traceability \u2192 L4 Full supply chain transparency with EUDR compliance \u2192 L5 Autonomous farm-to-fork governance with cryptographic provenance chains\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 442,
+      "text": "  certificationPath: \"L1 Basic energy monitoring \u2192 L2 Grid-connected with NERC CIP compliance \u2192 L3 ISO 50001 certified energy management \u2192 L4 Predictive grid optimization with renewable integration \u2192 L5 Autonomous energy ecosystem governance with verified decarbonization\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 1822,
+      "text": "  certificationPath: \"L1 Basic building energy monitoring \u2192 L2 LEED/BREEAM baseline compliance \u2192 L3 ISO 50001 certified energy management \u2192 L4 Full WELL/GRESB integration \u2192 L5 Autonomous net-zero building management with EU Taxonomy alignment\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 1867,
+      "text": "  certificationPath: \"L1 Basic cloud security controls \u2192 L2 ISO 27001 certified operations \u2192 L3 SOC 2 Type II + NIS2 compliance \u2192 L4 FedRAMP/CSA STAR certified \u2192 L5 Autonomous resilient infrastructure with full data sovereignty and green compute governance\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 1910,
+      "text": "  certificationPath: \"L1 Basic privacy controls \u2192 L2 GDPR/CCPA baseline compliance \u2192 L3 ISO 27701 certified privacy management \u2192 L4 Full ETSI/UNECE cybersecurity compliance \u2192 L5 Autonomous zero-trust privacy-preserving AI with continuous compliance verification\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 2000,
+      "text": "  certificationPath: \"L1 Basic data processing \u2192 L2 GDPR-compliant profiling controls \u2192 L3 EU AI Act high-risk compliance \u2192 L4 ISO 42001 AI management certified \u2192 L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "line": 2084,
+      "text": "  certificationPath: \"L1 Basic operational monitoring \u2192 L2 ITIL/ISO 20000 service management \u2192 L3 SOC 2 + ISO 27001 certified \u2192 L4 DORA compliant resilience \u2192 L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability\",",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/leases/leaseCli.ts",
+      "line": 103,
+      "text": "  // the signature it had just written, which certified whatever the file",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/passport/adapterCapabilityReceipt.ts",
+      "line": 160,
+      "text": "    reasons.push(source === \"plugin\" ? \"declaration:plugin-not-certified\" : \"declaration:authority-untrusted\");",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/score/adversarial.ts",
+      "line": 25,
+      "text": "  'compliant', 'secure', 'audited', 'certified', 'enterprise-grade',",
+      "explicitPermanentR4File": true
+    },
+    {
+      "file": "src/score/capabilityGovernance.ts",
+      "line": 32,
+      "text": "const EVIDENCE_RE = /(\\[ev:[^\\]]+\\]|evidence|verified|confirmed|audit|log|signed|certified)/i;",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/score/organizationalSafetyPosture.ts",
+      "line": 31,
+      "text": "const EVIDENCE_RE = /(\\[ev:[^\\]]+\\]|evidence|verified|confirmed|audit|log|signed|certified)/i;",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/score/oversightIntegrity.ts",
+      "line": 31,
+      "text": "const EVIDENCE_RE = /(\\[ev:[^\\]]+\\]|evidence|verified|confirmed|audit|log|signed|certified)/i;",
+      "explicitPermanentR4File": false
+    },
+    {
+      "file": "src/score/processDeceptionDetection.ts",
+      "line": 31,
+      "text": "const EVIDENCE_RE = /(\\[ev:[^\\]]+\\]|evidence|verified|confirmed|audit|log|signed|certified)/i;",
+      "explicitPermanentR4File": false
+    }
+  ],
+  "counts": {
+    "literalLines": 20,
+    "inExplicitPermanentR4Files": 10,
+    "outsideThoseFiles": 10
+  },
+  "ordinaryGuard": {
+    "strictActualOutput": {
+      "ok": true,
+      "strict": true,
+      "rules": {
+        "R1": {
+          "found": 0,
+          "allowlisted": 0,
+          "failing": 0
+        },
+        "R2": {
+          "found": 0,
+          "allowlisted": 0,
+          "failing": 0
+        },
+        "R3": {
+          "found": 303,
+          "allowlisted": 303,
+          "failing": 0
+        },
+        "R4": {
+          "found": 10,
+          "allowlisted": 10,
+          "failing": 0
+        }
+      },
+      "markers": 16,
+      "pending": 0,
+      "failures": []
+    },
+    "log": {
+      "path": "/private/tmp/p0-21-no-fabrication-strict-json-20261015.log",
+      "bytes": 539,
+      "sha256": "4c4a509ec6802be639fddd51520e50e13853ee8b95972f5e7028ec32309b1982"
+    },
+    "pendingEntries": [],
+    "allowlist": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/no-fabrication-allowlist.json",
+      "bytes": 2554,
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+    },
+    "guard": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+      "bytes": 13211,
+      "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+    }
+  },
+  "difference": "The literal grep includes four regulatory JSON lines, five regular-expression definitions and one historical implementation comment outside the explicit permanent R4 files. The current unchanged guard scans TypeScript string/template output and console/dashboard HTML/JS; it does not scan regulatory JSON, comments or regex literal bodies. A strict guard pass is not literal grep-to-allowlist equality.",
+  "formalLiteralAcceptanceEstablished": false,
+  "interpretation": "These extra lines describe third-party regulatory data, detection patterns or a past flaw; the inventory alone does not show a self-computed certification result. No wording was deleted, allowlist exception added, policy changed or acceptance silently relaxed. The literal criterion remains an acceptance reconciliation gap.",
+  "otherOpen": "Source quality1269duplicates/2751deadcode, full suite/coverage/Node24/hosted/release/G0/Done and all prior held/unresolved decisions remain unwaived."
+}

@@ -1,0 +1,95 @@
+{
+  "sourceCommit": "dfe063a6dab076804cae00a362c57655d2e3dcfb",
+  "focused": {
+    "final-cleanup-decision-tests": {
+      "sourceCommit": "dfe063a6dab076804cae00a362c57655d2e3dcfb",
+      "platform": "Darwin ARM64",
+      "node": "v22.23.3",
+      "reportSha256": "93996e04eedd20bc0c2f5a80db90e1bf8dd197c97210dd0ec58d59edcf503e9c",
+      "success": true,
+      "counts": {
+        "numTotalTests": 50,
+        "numPassedTests": 50,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        {
+          "name": "tests/ciWorkflowContract.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/publicDocsArtifact.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseGateExecution.test.ts",
+          "cases": 33,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseGateReceipt.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseReadinessScripts.test.ts",
+          "cases": 5,
+          "status": "passed"
+        }
+      ]
+    },
+    "node24-final-cleanup-decision-tests": {
+      "sourceCommit": "dfe063a6dab076804cae00a362c57655d2e3dcfb",
+      "platform": "Darwin ARM64",
+      "node": "v24.21.0",
+      "reportSha256": "5f46e0b68280ad5bca77eac93221f7c6cfb74238f7cd8d5a50f684c31ac32ebe",
+      "success": true,
+      "counts": {
+        "numTotalTests": 50,
+        "numPassedTests": 50,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        {
+          "name": "tests/ciWorkflowContract.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/publicDocsArtifact.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseGateExecution.test.ts",
+          "cases": 33,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseGateReceipt.test.ts",
+          "cases": 4,
+          "status": "passed"
+        },
+        {
+          "name": "tests/releaseReadinessScripts.test.ts",
+          "cases": 5,
+          "status": "passed"
+        }
+      ]
+    }
+  },
+  "protectedFileSha256": {
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "58e2947e1841bac02d119827c08ee01477f345fc9f63131d569ed1637483eab7",
+    "vitest.config.ts": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "scripts/quality/source-quality-baseline.json": "d54127ca436b58fe420e81943e85363a58b281bfca5dd1f31090737dd7c94137"
+  },
+  "limitation": "Only the focused followup checks ran at this source commit. The full measured gate is pinned at8fb531d52 and remains failed."
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "p125ec-control-helper-static-actual-manifest-addendum-seal/1",
+  "at": "2026-10-17T01:14:55.813729+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/actual-manifest-projection.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/actual-manifest-projection.json",
+      "bytes": 6150,
+      "sha256": "16ab157365f1b8cc787d15b64ffb7cefa129aac826119d166f7eab82441b1d96",
+      "dev": 16777231,
+      "inode": 543908869,
+      "nlink": 1
+    }
+  ],
+  "baseReviewSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/seal.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/seal.json",
+    "bytes": 1112,
+    "sha256": "ed2098bc2d08a33db2d5cc35f5c9bd282ed9f673e59ead534dd33d10417b0605",
+    "dev": 16777231,
+    "inode": 543900185,
+    "nlink": 1
+  },
+  "completeAndClosed": true,
+  "noPriorOutputsChanged": true
+}

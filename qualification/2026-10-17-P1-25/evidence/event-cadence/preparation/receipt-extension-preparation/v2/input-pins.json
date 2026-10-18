@@ -1,0 +1,71 @@
+{
+  "schema": "p125ec-receipt-helper-v2-static-input-pins/1",
+  "at": "2026-10-17T01:17:57.632108+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "bytes": 36597,
+      "sha256": "ff8100686d0c3c73e6c1955e1fbf9116005a11e2fb4e4b1f6904fecc984c7d12",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "dev": 16777231,
+      "inode": 543906142,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal-v2.json",
+      "bytes": 4825,
+      "sha256": "f66174340810708671ab8c6bb8a6aedffcc315197ef969b7e4b1de1806a36015",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal-v2.json",
+      "dev": 16777231,
+      "inode": 543908804,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README-preferred.md",
+      "bytes": 3929,
+      "sha256": "9f914257e80e7d23592621b73d2989c0a8861a3e55a4d762dd32b57985deec89",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README-preferred.md",
+      "dev": 16777231,
+      "inode": 543908802,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 2415,
+      "sha256": "52eb9cd367fc8afd70ede0b2af337e4917d6d5a4b54dfc802e800033f56ea90a",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "dev": 16777231,
+      "inode": 543906335,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/fields.json",
+      "bytes": 2536,
+      "sha256": "22077806f1239afd926a12008f8ea61259aa6b84b630c3e05cdcbcfc382f3183",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/fields.json",
+      "dev": 16777231,
+      "inode": 543906336,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+      "bytes": 404183,
+      "sha256": "60ea0f2802db7defa832a2b5618160a56eb02f285af669de0f243f0347334654",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+      "dev": 16777231,
+      "inode": 543908695,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "bytes": 541,
+      "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "dev": 16777231,
+      "inode": 543836072,
+      "nlink": 1
+    }
+  ],
+  "allInputsVerified": true,
+  "noHelperImportParseCompileOrExecution": true
+}

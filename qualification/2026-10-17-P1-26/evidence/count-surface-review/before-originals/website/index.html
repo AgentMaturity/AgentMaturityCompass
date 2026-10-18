@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23071C26'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-family='monospace' font-size='18' font-weight='700'%3Ea%3C/text%3E%3C/svg%3E">
+  <script defer data-domain="agentmaturity.co" src="https://plausible.io/js/script.js"></script>
+  <title>Agent Maturity Compass — Score Your AI Agent</title>
+  <meta name="description" content="Install AMC, run amc, and get an evidence-backed AI agent maturity score with 244 default questions, 264 lifecycle coverage, proof receipts, Watch, Fleet, and compliance docs.">
+  <meta name="theme-color" content="#071C26">
+  <link rel="canonical" href="https://agentmaturity.co/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Agent Maturity Compass — Score Your AI Agent">
+  <meta property="og:description" content="No setup maze. Run one command and get an evidence-backed AI agent trust score with proof receipts, Watch, Fleet, and compliance outputs.">
+  <meta property="og:url" content="https://agentmaturity.co/">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css?v=14">
+  <noscript><style>.gs{opacity:1!important;transform:none!important}</style></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="#capabilities">how it works</a></li>
+        <li><a href="#pricing">pricing</a></li>
+        <li><a href="docs/index.html">docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-cta">github →</a>
+        <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile">
+    <a href="#capabilities">how it works</a>
+    <a href="#pricing">pricing</a>
+    <a href="docs/index.html">docs</a>
+    <a href="#install">install</a>
+    <a href="#desktop">desktop app</a>
+    <a href="#domains">industry packs</a>
+    <a href="executive.html">for executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
+  </div>
+
+  <span id="main-content" tabindex="-1"></span>
+<main id="main">
+    <section class="hero">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="container hero-grid">
+        <div class="hero-left gs">
+          <p class="label">score &amp; fix your ai agent</p>
+          <h1 style="white-space:nowrap">Download it<span class="accent blink-cursor">_</span></h1>
+          <h1 class="hero-h1-gray">Get the full score<span style="color:var(--text)">.</span></h1>
+          <h1 class="hero-h1-accent">Fix the gaps<span style="color:var(--text)">.</span></h1>
+          <p class="hero-sub">It's like a report card for your AI agent. Download AMC, open it, and in about a minute you'll see what's strong, what's weak, and exactly what to fix. Then AMC <span class="hl">fixes the gaps for you</span> and writes them into your agent. <span class="hl">No account</span>. <span class="hl">No signup</span>. <span class="hl">No terminal</span>. <span class="hl">Free forever</span>, bring your own AI key.</p>
+        </div>
+        <div class="hero-right gs">
+          <div class="hero-download">
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for macOS →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for Windows →</a>
+          </div>
+          <p class="hero-reassure">No Docker · No terminal · No signup · Free forever</p>
+          <a href="playground.html" class="btn btn-outline btn-xl hero-browser">Try it in your browser →</a>
+          <div class="hero-dev">
+            <span class="hero-dev-label">Prefer the terminal?</span>
+            <div class="hero-install" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh')" title="Copy the verified macOS/Linux installer">
+              <span class="hi-prompt">$</span><code class="hero-install-command">curl -fsSL https://agentmaturity.co/install.sh | sh</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="amc-watermark" aria-hidden="true">amc</div>
+
+    <section class="stats-strip">
+      <div class="container">
+        <div class="stats-row">
+          <div class="stat gs"><span class="stat-value">244</span><span class="stat-label">checks in the full score</span></div>
+          <div class="stat gs"><span class="stat-value">264</span><span class="stat-label">deep-dive checks</span></div>
+          <div class="stat gs"><span class="stat-value">1,236</span><span class="stat-label">CLI commands</span></div>
+          <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">attack test packs</span></div>
+          <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
+          <div class="stat gs"><span class="stat-value">1,689</span><span class="stat-label">test source files</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">install</p>
+          <h2>Get AMC in <strong>under a minute<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">Two easy ways: download the app for macOS or Windows, or paste one line into your terminal. Both give you the same full score and one-click fix — every download is a pinned, SHA-256-verified GitHub release.</p>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card gs">
+            <span class="tier">macOS + Linux</span>
+            <h3>Verified release install</h3>
+            <div class="items install-command"><span class="hl">$</span> curl -fsSL https://agentmaturity.co/install.sh | sh<br><span class="hl">$</span> amc</div>
+            <p>Downloads the pinned platform archive and checks SHA-256 before installing its included AMC package.</p>
+            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('curl -fsSL https://agentmaturity.co/install.sh | sh');return false;" class="btn btn-primary btn-xl">copy command →</a>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">Windows</span>
+            <h3>PowerShell install</h3>
+            <div class="items install-command"><span class="hl">PS&gt;</span> irm https://agentmaturity.co/install.ps1 | iex<br><span class="hl">PS&gt;</span> amc</div>
+            <p>Uses the same pinned release and checksum contract, then opens the same CLI and local Studio.</p>
+            <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText('irm https://agentmaturity.co/install.ps1 | iex');return false;" class="btn btn-outline btn-xl">copy command →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="desktop" class="section-alt">
+      <div class="container">
+        <div class="product-showcase">
+          <div class="product-intro gs">
+            <div>
+              <p class="product-kicker">desktop studio</p>
+              <h3>Prefer buttons? Run Studio.</h3>
+              <p>AMC includes macOS and Windows launcher apps for Agent Maturity Compass Studio, plus the same local control panel for scores, evidence, reports, assurance packs, Industry Packs, and run history.</p>
+            </div>
+            <div class="product-badges">
+              <span class="product-badge">macOS app</span>
+              <span class="product-badge">Windows app</span>
+              <span class="product-badge">no account</span>
+              <span class="product-badge">score dashboard</span>
+              <span class="product-badge">signed evidence</span>
+            </div>
+          </div>
+          <div class="desktop-download" style="grid-column:1/3">
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for macOS →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-outline btn-xl" rel="noopener">Download for Windows →</a>
+          </div>
+          <div class="product-terminal" style="grid-column:1/3">
+            <div class="terminal-bar"><div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div><div class="terminal-title">amc up</div></div>
+            <div class="terminal-body">
+              <div class="terminal-code">$ open "Agent Maturity Compass Studio.app"</div>
+              <div class="terminal-line"><span class="terminal-label">Studio</span><span class="terminal-value">http://127.0.0.1:3212</span></div>
+              <div class="terminal-line"><span class="terminal-label">Windows</span><span class="terminal-value">Agent Maturity Compass Studio.cmd</span></div>
+              <div class="terminal-line"><span class="terminal-label">Run full score</span><span class="terminal-value">button + CLI</span></div>
+              <div class="terminal-line"><span class="terminal-label">Assurance packs</span><span class="terminal-value">142 adversarial packs</span></div>
+              <div class="terminal-line"><span class="terminal-label">Industry Packs</span><span class="terminal-value">commercial checkout not live</span></div>
+              <div class="terminal-line"><span class="terminal-label">Reports</span><span class="terminal-value">artifact + evidence status</span></div>
+            </div>
+          </div>
+          <div class="product-info" style="grid-column:1/3">
+            <div class="product-info-grid">
+              <div class="product-info-card"><span>apps</span><strong>Launch locally</strong><p>The macOS native WebKit app and Windows system-browser launcher use a version-pinned AMC runtime, without bundling Electron or trusting a stale global CLI.</p></div>
+              <div class="product-info-card"><span>score</span><strong>See the trust baseline</strong><p>Overall level, layer bars, evidence coverage, top gaps, and an explicit READY or blocked claim state.</p></div>
+              <div class="product-info-card"><span>packs</span><strong>Browse free and paid depth</strong><p>Assurance is free core. Industry Packs show locked and unlocked states.</p></div>
+              <div class="product-info-card"><span>reports</span><strong>Share with the team</strong><p>Generate outputs for engineering, compliance, and leadership review.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="capabilities" class="section-alt">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">current capabilities</p>
+          <h2>More than a score<span class="accent">.</span><br><strong>Proof you can operate<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:740px">AMC now connects the default score to proof receipts, provider-neutral action observation, runtime Watch signals, fleet topology, policy enforcement, compliance binders, and portable evidence. The first-run Activation path separates signed setup readiness from real runtime completion. These are AMC-owned surfaces, not source-specific wrappers.</p>
+        </div>
+        <div class="product-info-grid gs">
+          <div class="product-info-card"><span>activation + proof</span><strong>READY setup is not COMPLETE</strong><p><code>amc connect --status</code> and Studio track connected agent, first observed action, first control decision, and first signed proof. Only verified runtime receipts complete the path.</p></div>
+          <div class="product-info-card"><span>domain proof lane</span><strong><code>amc proof check</code></strong><p>Source-to-rule checks emit <code>amcproof</code> artifacts and fail closed as unsupported when correctness proof is missing.</p></div>
+          <div class="product-info-card"><span>watch + enforce</span><strong>Observed actions, signed decisions</strong><p>Observe Claude Code and Gemini CLI actions by default, or opt into loopback control that reuses AMC policies and binds the exact native response to a signed receipt.</p></div>
+          <div class="product-info-card"><span>fleet</span><strong>Overview + trust graph</strong><p>Use fleet overview, graph validation, SLO status, and trust-graph exports before scoring multi-agent systems.</p></div>
+          <div class="product-info-card"><span>enforce + shield</span><strong>Policy and safe proof</strong><p>Runtime firewall decisions, resource snapshots, safe confirmation proof, and 142 assurance packs stay in the free core.</p></div>
+          <div class="product-info-card"><span>docs + API</span><strong>1,236 CLI paths</strong><p>The generated command inventory, API reference, OpenAPI playground, and docs hub expose the same product surface users run locally.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="big-number">
+      <div class="container">
+        <div class="gap-visual gs">
+          <div class="gap-col">
+            <span class="gap-label">self-reported</span>
+            <div class="gap-bar gap-bar-full"><span>100</span></div>
+          </div>
+          <div class="gap-arrow">→</div>
+          <div class="gap-col">
+            <span class="gap-label">evidence-verified</span>
+            <div class="gap-bar gap-bar-real"><span>16</span></div>
+          </div>
+          <div class="gap-arrow">=</div>
+          <div class="gap-col gap-col-main">
+            <span class="gap-label">trust gap</span>
+            <div class="big-number-value">84</div>
+          </div>
+        </div>
+        <p class="big-number-desc gs">AMC separates what an agent <span class="text-w">claims</span> from what <span class="hl">execution evidence</span> proves.</p>
+        <div class="gap-details gs">
+          <div class="gap-detail"><span class="gap-detail-val">0.4x</span><span class="gap-detail-label">self-reported weight</span></div>
+          <div class="gap-detail"><span class="gap-detail-val">1.0x</span><span class="gap-detail-label">observed evidence weight</span></div>
+          <div class="gap-detail"><span class="gap-detail-val">2.5x</span><span class="gap-detail-label">trust multiplier</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">the trust stack</p>
+          <h2>Eight named surfaces<span class="accent blink-cursor">_</span><br><strong>One complete trust platform</strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">The top of the page is intentionally simple. This is the deeper AMC map: score, harden, enforce, prove, monitor, comply, govern fleets, and issue portable trust identity.</p>
+        </div>
+        <div class="product-showcase">
+          <div class="product-intro gs">
+            <div>
+              <p class="product-kicker">platform surfaces</p>
+              <h3 id="product-headline">Score trust before you ship</h3>
+              <p id="product-summary">Execution-backed scoring, assurance, enforcement, evidence, monitoring, compliance, fleet management, and portable trust identity.</p>
+            </div>
+            <div class="product-badges" id="product-badges"></div>
+          </div>
+          <div class="product-tabs" id="product-tabs">
+            <button class="product-tab active" data-idx="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Score</button>
+            <button class="product-tab" data-idx="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z"/></svg>Shield</button>
+            <button class="product-tab" data-idx="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Enforce</button>
+            <button class="product-tab" data-idx="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Vault</button>
+            <button class="product-tab" data-idx="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>Watch</button>
+            <button class="product-tab" data-idx="5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Comply</button>
+            <button class="product-tab" data-idx="6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Fleet</button>
+            <button class="product-tab" data-idx="7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.5"/></svg>Passport</button>
+          </div>
+          <div class="product-terminal">
+            <div class="terminal-bar"><div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div><div class="terminal-title" id="term-title">amc score</div></div>
+            <div class="terminal-body" id="product-term"></div>
+          </div>
+          <div class="product-info" id="product-info"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">integrations</p>
+          <h2>Works with <strong>your stack<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center">16 built-in adapters, one-command Claude Code and Gemini CLI hooks, and portable signed receipts that show exact events, controls, runtime version, effective mode, and lossiness. No second policy engine required.</p>
+        </div>
+        <div class="logos-grid logos-grid-icons gs">
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/langchain/ffffff" alt="LangChain" loading="lazy"><p>LangChain</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/crewai/ffffff" alt="CrewAI" loading="lazy"><p>CrewAI</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/anthropic/ffffff" alt="Anthropic" loading="lazy"><p>Anthropic</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/google/ffffff" alt="Google" loading="lazy"><p>Google</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/meta/ffffff" alt="Meta" loading="lazy"><p>Meta</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/claude/ffffff" alt="Claude" loading="lazy"><p>Claude</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/googlegemini/ffffff" alt="Gemini" loading="lazy"><p>Gemini</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/python/ffffff" alt="Python SDK" loading="lazy"><p>Python SDK</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/huggingface/ffffff" alt="Hugging Face" loading="lazy"><p>Hugging Face</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/googlecloud/ffffff" alt="Google Cloud" loading="lazy"><p>Google Cloud</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/databricks/ffffff" alt="Databricks" loading="lazy"><p>Databricks</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/docker/ffffff" alt="Docker" loading="lazy"><p>Docker</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/pytorch/ffffff" alt="PyTorch" loading="lazy"><p>PyTorch</p></div>
+          <div class="logo-icon-item"><img src="https://cdn.simpleicons.org/github/ffffff" alt="GitHub" loading="lazy"><p>GitHub</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="methodology">
+      <div class="container">
+        <div class="section-heading gs">
+          <p class="label">our approach</p>
+          <h2>Expertise built on<br><strong>evidence<span class="accent blink-cursor">_</span></strong></h2>
+        </div>
+        <div class="steps">
+          <div class="step-list">
+            <div class="step gs"><span class="step-num">01</span><div><h3>Score and analyze</h3><p>Point AMC at any agent. The default <span class="hl">244-question full score</span> runs against execution evidence, while the optional <span class="hl">264-question lifecycle set</span> adds runtime, proof, memory, and fleet coverage.</p></div></div>
+            <div class="step gs"><span class="step-num">02</span><div><h3>Fix and harden</h3><p>AMC identifies high-signal gaps, generates targeted guardrail work, and uses <span class="hl">142 assurance packs</span> for prompt injection, exfiltration, memory risk, sycophancy, and other adversarial failures.</p></div></div>
+            <div class="step gs"><span class="step-num">03</span><div><h3>Ship and monitor</h3><p>Add CI gates, keep signed local evidence, prevent trust regressions, and generate compliance artifacts for <span class="hl">EU AI Act, ISO 42001, NIST AI RMF</span>, SOC 2, and OWASP LLM Top 10 review.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="research">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">research foundation</p>
+          <h2>Built on <strong>primary sources<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:650px">AMC is grounded in AI safety, security, governance, compliance, and agent-system research. The modules map papers and standards into scoring controls, assurance packs, and operational evidence.</p>
+        </div>
+        <div class="research-grid">
+          <div class="research-item gs"><span class="research-tag">NIST</span><h3>NIST AI Risk Management Framework</h3><p>Core governance structure for trustworthy AI deployment and evaluation.</p><span class="research-maps">maps to governance, risk, and cross-framework evidence</span><a href="https://www.nist.gov/itl/ai-risk-management-framework" class="card-link" target="_blank" rel="noopener">nist.gov →</a></div>
+          <div class="research-item gs"><span class="research-tag">ICML 2024</span><h3>Levels of AGI — Operationalizing Progress</h3><p>Maturity levels framework for AI capabilities and autonomy.</p><span class="research-maps">maps to L0-L5 maturity and autonomy scoring</span><a href="https://arxiv.org/abs/2311.02462" class="card-link" target="_blank" rel="noopener">arxiv 2311.02462 →</a></div>
+          <div class="research-item gs"><span class="research-tag">NeurIPS 2024</span><h3>Connecting the Dots — LLMs Infer Latent Info</h3><p>Frontier models infer information from distributed evidence.</p><span class="research-maps">maps to context leakage and information barriers</span><a href="https://arxiv.org/abs/2406.14546" class="card-link" target="_blank" rel="noopener">arxiv 2406.14546 →</a></div>
+          <div class="research-item gs"><span class="research-tag">memory</span><h3>Persistent Memory Injection</h3><p>Cross-session memory poisoning through self-reinforcing payloads.</p><span class="research-maps">maps to memory integrity and persistence checks</span><a href="https://arxiv.org/abs/2602.15654" class="card-link" target="_blank" rel="noopener">arxiv 2602.15654 →</a></div>
+          <div class="research-item gs"><span class="research-tag">agents</span><h3>Monitor Bypass and Agent-as-a-Proxy Risk</h3><p>Shows why monitoring-only defenses can fail without runtime controls.</p><span class="research-maps">maps to monitor bypass resistance and enforcement</span><a href="https://arxiv.org/abs/2602.05066" class="card-link" target="_blank" rel="noopener">arxiv 2602.05066 →</a></div>
+          <div class="research-item gs"><span class="research-tag">security</span><h3>MCP Security Bench</h3><p>Evaluation coverage for MCP-specific attack vectors and tool-boundary failures.</p><span class="research-maps">maps to MCP compliance and security resilience packs</span><a href="https://arxiv.org/abs/2510.15994" class="card-link" target="_blank" rel="noopener">arxiv 2510.15994 →</a></div>
+          <div class="research-item gs"><span class="research-tag">cost</span><h3>Economic Denial of Service</h3><p>Cost amplification through tool-calling and hidden runtime loops.</p><span class="research-maps">maps to budget controls and cost predictability</span><a href="https://arxiv.org/abs/2601.10955" class="card-link" target="_blank" rel="noopener">arxiv 2601.10955 →</a></div>
+          <div class="research-item gs"><span class="research-tag">alignment</span><h3>Sycophancy and Objective Drift</h3><p>Agent behavior can optimize social approval while drifting from ground truth.</p><span class="research-maps">maps to sycophancy, alignment, and refusal checks</span><a href="https://arxiv.org/abs/2602.08092" class="card-link" target="_blank" rel="noopener">arxiv 2602.08092 →</a></div>
+        </div>
+        <p class="gs" style="text-align:center;margin-top:2rem">
+          <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" class="card-link" target="_blank" rel="noopener">Agent Maturity Compass whitepaper →</a>
+          <span style="color:var(--text-muted);margin:0 .75rem">/</span>
+          <a href="docs/index.html#RESEARCH_PAPERS_2026" class="card-link">see research notes and gap analysis →</a>
+        </p>
+      </div>
+    </section>
+
+    <section id="pricing" class="section-alt">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">pricing</p>
+          <h2>Free forever<span class="accent">.</span> <strong>Pro packs for industries<span class="accent blink-cursor">_</span></strong></h2>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card gs">
+            <span class="tier">free / open source</span>
+            <h3>AMC Core</h3>
+            <p>Everything to score and fix your agent: the app, the CLI, the full score, one-click fix, assurance packs, reports, and CI gates. Bring your own AI key.</p>
+            <div class="items"><span class="hl">244</span> default questions · <span class="hl">264</span> lifecycle questions · <span class="hl">142</span> assurance packs · <span class="hl">14</span> adapters · <span class="hl">MIT</span> licensed</div>
+            <a href="#install" class="btn btn-primary btn-xl">start free →</a>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">planned · $9.99 / month · per user</span>
+            <h3>Industry Packs — preview</h3>
+            <p><span class="hl">All 41 Industry Domain Packs</span> for regulated verticals. Public checkout is not yet publicly live or available.</p>
+            <div class="items">Health · Wealth · Education · Mobility · Technology · Governance · Environment</div>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions" class="btn btn-outline btn-xl">follow launch status →</a>
+          </div>
+        </div>
+        <p class="pricing-buyer-link gs">
+          Procurement path:
+          <a href="./docs/#BUYER_PACKAGES">Compare buyer packages</a>
+          for commercial offers by buyer type, proof surfaces, and purchase-ready artifacts.
+        </p>
+      </div>
+    </section>
+
+    <section id="domains">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">industry packs</p>
+          <h2>7 stations<span class="accent">.</span> 41 packs<span class="accent">.</span><br><strong>regulated depth<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">The planned commercial packs add sector-specific diagnostics grounded in real regulations: EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO, and other domain frameworks. The target tier is $9.99/month per user for all 41 packs; public checkout and license issuance are not live.</p>
+        </div>
+        <div class="station-cards gs">
+          <a href="station-environment.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+            <h3>Environment</h3>
+            <p class="station-card-meta">6 packs · 91 questions</p>
+            <p class="station-card-desc">Farm to Fork, Weave to Wear, Material to Machines, Source to Sustenance, Ubiquity to Utility, Sip to Sanitation.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-health.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <h3>Health</h3>
+            <p class="station-card-meta">9 packs · 151 questions</p>
+            <p class="station-card-desc">Digital Health Record, Wellness, Patient Lifecycle, Clinical Lifecycle, Professional Practice, Life Technology, Drug Discovery, Clinical Trials, Specialized Medicine.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-wealth.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+            <h3>Wealth</h3>
+            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-desc">Future of Work, Digital Payments, No Poverty, Circular Economy, Blockchain and DeFi.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-education.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+            <h3>Education</h3>
+            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-desc">K-12, Higher Education, Skills and Vocational, Specialized Education, Differently Abled.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-mobility.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
+            <h3>Mobility</h3>
+            <p class="station-card-meta">6 packs · 90 questions</p>
+            <p class="station-card-desc">Sustainable Communities, Sustainable Ports, Sustainable Real Estate, Virtual Infrastructure, Privacy and Security, Freight/3PL/Warehouse.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-technology.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></div>
+            <h3>Technology</h3>
+            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-desc">Cognition to Intelligence, Networked Ecosystems, OS for Sustainable Outcomes, Infotainment, Partnerships for Prosperity.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+          <a href="station-governance.html" class="station-card">
+            <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>
+            <h3>Governance</h3>
+            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-desc">Digital Citizens and Rights, Dance of Democracy, Petition to Law, Citizen Services, Public and Private Collaboration.</p>
+            <span class="station-card-link">SEE +</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center"><p class="label">faq</p><h2>Common <strong>questions<span class="accent blink-cursor">_</span></strong></h2></div>
+        <div class="faq-list">
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Is this just a quick score?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. The default <code>amc</code> command generates the full 244-question score. Use <code>amc run --question-set lifecycle</code> for the 264-question lifecycle-expanded set.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. No account, no API key, no cloud. AMC runs on your machine and your data stays there.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">My first score was terrible. Is that normal?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes — and it's the point. A fresh agent with no evidence starts at L0. The score grows as AMC watches your agent actually work.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What does a signed score mean?<span class="faq-icon">+</span></button><div class="faq-a"><p>Every report carries a cryptographic signature. Change one character and verification fails. That is why you can hand it to an auditor or a customer — they can check it without trusting you. <a href="verify.html">Try it on a real bundle we published</a>.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is the 84-point documentation inflation gap?<span class="faq-icon">+</span></button><div class="faq-a"><p>Self-reported documentation can claim 100/100 while execution-verified evidence shows a much weaker score. AMC closes that gap with observed evidence, signed artifacts, and repeatable proof chains.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon">+</span></button><div class="faq-a"><p>AMC is a trusted observer. Self-reported evidence is capped at <span class="hl">0.4x weight</span>; observed runtime evidence carries <span class="hl">1.0x weight</span>. It scores maturity, finds gaps, runs assurance packs, and preserves verifiable evidence.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">16 adapters</span>: AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Optional DeepSeek Harness capture requires a reviewed, signed launcher and does not prove internal tool or provider coverage. Run <code>amc adapters capabilities</code> for signed, current coverage instead of relying on a static badge.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Use gates such as <code>amc gate --min-score L3</code> to fail builds below threshold and prevent trust regressions.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do Industry Packs require an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs are a planned commercial add-on; checkout is not publicly live.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can non-engineers use it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc up</code> and use the local Studio dashboard.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can AMC fix my agent, not just score it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc fix</code> — it scores your agent, explains the top gaps in plain words, asks once, then writes guardrail rules into your agent's own file (AGENTS.md, CLAUDE.md, .cursorrules, and 12 more). It never touches your API keys, and it leaves a hash-sealed receipt of exactly what changed.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. AMC plans a <span class="hl">$9.99/month per user</span> Industry Packs add-on, but public checkout and automatic license issuance are not yet available.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gradient-cta">
+    <div class="gradient-cta-lines" aria-hidden="true">
+      <div class="gradient-cta-line" style="left:4%;--dur:5s;--delay:0s;--tk:'score';--tk2:'amc'"></div>
+      <div class="gradient-cta-line" style="left:16%;--dur:8s;--delay:1.8s;--tk:'trust';--tk2:'L4'"></div>
+      <div class="gradient-cta-line" style="left:28%;--dur:6.5s;--delay:0.6s;--tk:'verify';--tk2:'264'"></div>
+      <div class="gradient-cta-line" style="left:40%;--dur:7s;--delay:2.2s;--tk:'agent';--tk2:'1.0×'"></div>
+      <div class="gradient-cta-line" style="left:52%;--dur:5.5s;--delay:0.3s;--tk:'proof';--tk2:'L3'"></div>
+      <div class="gradient-cta-line" style="left:64%;--dur:9s;--delay:1.5s;--tk:'evidence';--tk2:'audit'"></div>
+      <div class="gradient-cta-line" style="left:76%;--dur:6s;--delay:0.9s;--tk:'shield';--tk2:'pass'"></div>
+      <div class="gradient-cta-line" style="left:88%;--dur:7.5s;--delay:2s;--tk:'watch';--tk2:'L5'"></div>
+    </div>
+    <div class="gradient-cta-watermark" aria-hidden="true">amc</div>
+    <div class="gradient-cta-content gs">
+      <p class="label">start today</p>
+      <h2>Score your agent <strong>with one command<span class="accent blink-cursor">_</span></strong></h2>
+      <a href="#install" class="btn btn-primary btn-xl">install amc →</a>
+    </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span style="color:var(--accent)">_</span></div><p class="footer-tagline">Score, fix, ship AI agents.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h3>Product</h3><a href="#install">Install</a><a href="#desktop">Desktop Studio</a><a href="#capabilities">Capabilities</a><a href="executive.html">Executives</a><a href="#products">Trust Stack</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h3>Depth</h3><a href="#methodology">Approach</a><a href="#research">Research</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
+        <div class="footer-col"><h3>Industry Packs</h3><a href="#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="particles.js?v=11"></script>
+  <script src="script.js?v=11"></script>
+</body>
+</html>

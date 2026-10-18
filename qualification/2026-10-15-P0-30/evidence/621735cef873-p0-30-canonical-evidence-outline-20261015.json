@@ -1,0 +1,1754 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:17:23.279621+00:00",
+  "key": "P0-30",
+  "state": "Private canonical authoring inventory/outline only;13 issues,1518 active excluded, no Done approval.",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "spec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-30.md",
+    "bytes": 13749,
+    "sha256": "f58d1716546c6f4525c5d9353a07f5e19fcaadd2737ef1d894f97d4dcdd4c97a"
+  },
+  "rootOutcomePins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-original-root-bounded-outcome-20261015.json",
+      "bytes": 3499,
+      "sha256": "55df46871e685b2fad9e6bd4d5300db57c0136e76ccd621961acca23f26a010d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-root-bounded-outcome-20261015.json",
+      "bytes": 5348,
+      "sha256": "f77edf3cbd0cf06da801b6feb7506600d8e65d242a2e10c23a8a7d1bd75e61de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-root-bounded-outcome-20261015.json",
+      "bytes": 27855,
+      "sha256": "b06ae049c0268c7fcb9b6cbb6ef85497c453201e70f911558724077f33206629"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-root-bounded-outcome-20261015.json",
+      "bytes": 5250,
+      "sha256": "3d3aadb0ee62746f5cde5bc8f62b0f6b43fb1da1784f27c51253ffbfead683c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-root-bounded-outcome-20261015.json",
+      "bytes": 4725,
+      "sha256": "a02ab2de674341d1b40dfa88f3a364e2bf55c062ed7555dbc2e9b5de2ec36f0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-root-bounded-outcome-20261015.json",
+      "bytes": 4972,
+      "sha256": "667c8d82405551d9d4a38a56c0806c9b813dbc11f3fa3918cb8147ffe9bc8274"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+      "bytes": 9932,
+      "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-root-bounded-outcome-20261015.json",
+      "bytes": 5122,
+      "sha256": "2ec1d662a36bf59efc610fab049eb7341b4539e61f1472545cec808fc809aad6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-root-bounded-outcome-20261015.json",
+      "bytes": 3772,
+      "sha256": "312608c0a901d7a6902bba24ad455f1a3b7e5646d09e3221752136c8270efaee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-root-bounded-outcome-20261015.json",
+      "bytes": 6424,
+      "sha256": "81218e954ed7c1e7932a87019e047d6ead68ccce092f4d89ea8ce32fa365e377"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-root-bounded-outcome-20261015.json",
+      "bytes": 3727,
+      "sha256": "31452abfac3cecd9fd890e292190b74f05d4e0c8fca1b9b835834e784c47b5da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-original-root-bounded-outcome-20261015.json",
+      "bytes": 21183,
+      "sha256": "e31db680b9cef8c184e0c237dc40429df3131ff34900062573780d219af3faf7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-root-bounded-outcome-20261015.json",
+      "bytes": 19549,
+      "sha256": "2c953b1122230676fd099d29d5a3b50b75aa47abc85f95f41d66c776f5dd597e"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+      "bytes": 3626,
+      "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+    }
+  ],
+  "frozenS7Receipt": {
+    "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+    "bytes": 93748,
+    "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+  },
+  "oldIssueCount": 13,
+  "issues": [
+    {
+      "oldIssue": "AMC-1525",
+      "counting": "62 original +2 loaded-list; readonly10 subset",
+      "meaningAndResidual": "Five current guard sensitivities; original full62 cold44/3/15 remains partial; P1-08 anti-rollback/anchor open.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1525-root-bounded-outcome-20261015.json",
+        "bytes": 4725,
+        "sha256": "a02ab2de674341d1b40dfa88f3a364e2bf55c062ed7555dbc2e9b5de2ec36f0f"
+      },
+      "state": "Five distinct current guard mutations produced guard-specific behavioral assertion failures and passing restorations. Default signed-list delegation was separately exercised on two genuine portable artifacts.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+          "bytes": 95234,
+          "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-independent-review-20261015.json",
+          "bytes": 51121,
+          "sha256": "8a6b6c4d284d9db20d00a650c1e2c392f749f8d64123138beb6f2edb1a1c687d"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+          "bytes": 21149,
+          "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-independent-review-20261015.json",
+          "bytes": 16062,
+          "sha256": "ea08bd72cab138cf8bdcc1bdbeb003ae36ada72fecfdc093d4334e5dd6104646"
+        },
+        {
+          "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+          "bytes": 66869,
+          "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+        }
+      ],
+      "residuals": {
+        "residuals": [
+          "Old held 76-entry runner/batch was not transferred or rerun; missing held guard-test file remains absent.",
+          "Full P0-30 acceptance, reusable runner, full suite, Node24, coverage, hosted CI, release and issue Done are not established.",
+          "Key-history anti-rollback and independent revocation anchoring remain P1-08.",
+          "The ordinary P0-30 baseline freeze check passed. Prior unresolved freeze exceptions, inherited duplicate/dead findings and ownership holds remain unresolved."
+        ],
+        "counting": "The supplemental ten cases are a subset of the original 62, not ten new distinct cases. Two private loaded-list cases are separate. Guard failure totals may overlap by case and are not distinct-case counts. Original generators create fresh random keys and times per run; only separately documented fixed-effect probes reuse identical fixtures."
+      }
+    },
+    {
+      "oldIssue": "AMC-1542",
+      "counting": "35 original +7 new; writer10 subset",
+      "meaningAndResidual": "Seven distinct guards; shared-reader repeated. Publication/crash/races/rollback/stale wire-docs open.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1542-root-bounded-outcome-20261015.json",
+        "bytes": 6424,
+        "sha256": "81218e954ed7c1e7932a87019e047d6ead68ccce092f4d89ea8ce32fa365e377"
+      },
+      "state": "BOUNDED CURRENT-SOURCE QUALIFICATION COMPLETE; FORMAL ACCEPTANCE REMAINS OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+          "bytes": 142868,
+          "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.json",
+          "bytes": 66381,
+          "sha256": "58bf7220d3e6139c0f96c8b4a5987413c74b687fbd09db89f4259a3178975ad2"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+          "bytes": 8254,
+          "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+          "bytes": 69989,
+          "sha256": "694f13036a023f239565f9e9c6b9309c07b1821d9016152c065ff5c458ccb45f"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+          "bytes": 67992,
+          "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+          "bytes": 128759,
+          "sha256": "96d92711ed37a6f581e8af72e4f74b5c210a3c7e13a57642c5606ba6aae718a1"
+        }
+      ],
+      "residuals": {
+        "remainingOpen": [
+          "Prepared-signature publication guard is absent from current and observed held source; no nonexistent-guard mutation or production publication fix was adopted.",
+          "Two-file publication/crash window, five verify-then-reload race windows, anchored rollback/deleting both files/P1-08 migration and stale wire/docs wording remain outside these static-state results.",
+          "Held runner, held consumers and newer P1-08 layout, held writer/bootstrap additions and source ownership reservations remain untransferred and unwaived.",
+          "Synthetic local role keys establish operational test artifacts, not independent people/external authority/claim truth. Cleaned hash-only crypto inputs cannot support offline replay.",
+          "No full old76batch, fresh literal Git clone, full suite, Node24, coverage, hosted CI, G0 release or Done acceptance. Inherited duplication/dead-code failures and earlier freeze/qualification debt remain."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1546",
+      "counting": "20 binding +10 scopes",
+      "meaningAndResidual": "20-17-20 and20-13-20; two auth recipes not all scope/class helpers. Missing heldHTTP22/named HTTP test.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1546-root-bounded-outcome-20261015.json",
+        "bytes": 3727,
+        "sha256": "31452abfac3cecd9fd890e292190b74f05d4e0c8fca1b9b835834e784c47b5da"
+      },
+      "state": "BOUNDED CURRENT-SOURCE QUALIFICATION COMPLETE; NO FORMAL CLOSURE",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+          "bytes": 31431,
+          "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1546-independent-review-20261015.json",
+          "bytes": 71686,
+          "sha256": "b451c922527b0f89e5ca509ebf52f984ee9c5e167ebe7266e07b5ba26c5f7349"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Synthetic diagnostic/action-policy fixtures establish local enforcement, not measured maturity, external operators or independent receipt/identity attestation. Raw fixture crypto preimages are cleaned, with no offline replay claim.",
+          "Absent held HTTP22 corpus, held source/runner and ownership scopes stay untransferred. No production/permanent test/config/counter/doc/tracker/Git edit.",
+          "No literal fresh clone, full oldbatch, full suite, Node24, coverage, hosted CI, G0 release or Done acceptance. All earlier qualification/freeze/publication/ownership debt remains."
+        ],
+        "counting": "30 unique original cases. The two20-case mutation matrices reuse the binding subset; they do not add40 unique cases. TokenScopes10 is formal baseline coverage, not causal qualification of scopeRefusal/agentExecuteClassCheck by these two recipes."
+      }
+    },
+    {
+      "oldIssue": "AMC-1508",
+      "counting": "21 original +1 HTTP",
+      "meaningAndResidual": "Five original controls and two genuine-cookie controls. Strict400 vs old override-spec wording unresolved; tenant/identity/hash-only limits.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1508-root-bounded-outcome-20261015.json",
+        "bytes": 5348,
+        "sha256": "f77edf3cbd0cf06da801b6feb7506600d8e65d242a2e10c23a8a7d1bd75e61de"
+      },
+      "state": "BOUNDED ORIGINAL AND ACTUAL-COOKIE HTTP QUALIFICATION COMPLETE; FORMAL SPECIFICATION DISCREPANCY REMAINS OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+          "bytes": 39183,
+          "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.json",
+          "bytes": 51693,
+          "sha256": "d5ce510d9104e795d1d5a06d3defe85997c246c6ff9601871aad194848072f47"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+          "bytes": 48220,
+          "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.json",
+          "bytes": 40800,
+          "sha256": "81005e5a842229a19c8c2a708a3c8dd95381c9d4834d5b7eace48b0e58152cfd"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-original-root-bounded-outcome-20261015.json",
+          "bytes": 3499,
+          "sha256": "55df46871e685b2fad9e6bd4d5300db57c0136e76ccd621961acca23f26a010d"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Current strict400 refusal conflicts with old override wording; no specification/policy decision, source repair or formalDone closure was made.",
+          "Local synthetic OWNER identity is not an independently authenticated person/external authority. Product verdict supplies selected identity/policy claims; crypto procedure does not independently decode/revalidate every credential policy field.",
+          "Cleanup removes raw crypto/session preimages. Fingerprints/hashes and runtime booleans do not permit offline replay; within-phase effect overwrites are not immutable intermediate history. Missing marker timestamp was not replaced by an invented chronology.",
+          "Selected row facts do not prove universal filesystem no-effects, tenant/race/CSRF/browser/hosted/installed/provider behavior. M1/M3/M4 seam-specific guard meanings are not generalized to all real HTTPcredentials.",
+          "No literal freshclone, full old76batch, wholeP030, Node24/fullsuite/coverage/hostedCI/G0/release/Done claim. Earlier ownership/quality/freeze/publication debt remains."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1547",
+      "counting": "170 registrations/164 titles +2 new",
+      "meaningAndResidual": "Six sensitive original guards; store15/transport30 survive. New store2-0-2 repeats same guard. Transport not global equivalent; export-destination gap,1522P032.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1547-root-bounded-outcome-20261015.json",
+        "bytes": 19549,
+        "sha256": "2c953b1122230676fd099d29d5a3b50b75aa47abc85f95f41d66c776f5dd597e"
+      },
+      "state": "BOUNDED_ORIGINAL_AND_NEW_STORAGE_ROOT_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+          "bytes": 64984,
+          "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.json",
+          "bytes": 74013,
+          "sha256": "c01c0422941c2e92bcc8bf6542c705cec07a63a43cc3940713902f60dae9d901"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-original-root-bounded-outcome-20261015.json",
+          "bytes": 21183,
+          "sha256": "e31db680b9cef8c184e0c237dc40429df3131ff34900062573780d219af3faf7"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+          "bytes": 10348,
+          "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.json",
+          "bytes": 42074,
+          "sha256": "957a68e6f6d51b9b36453dad8ec57d2819b72044ff8bcdce7f1e16ec56a9df28"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.md",
+          "bytes": 3445,
+          "sha256": "be9a561c0ddb444f3977f90f474b528daae64d020b95058e8cb4b679c4be33a4"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.md",
+          "bytes": 4499,
+          "sha256": "f95fa75031d7dd80262f14a73a3cdc554deefe34bc8cf0096f8bd0cd44c5351b"
+        }
+      ],
+      "residuals": {
+        "open": [
+          "Transport-dotdot original30survivor remains bounded with unchanged upstream public path constraints; no universal equivalence.",
+          "Missing separate current conflicting/unauthentic export-destination case is not filled by damaged-ciphertext directory effect.",
+          "AMC1522 belongs P0-32; no closure here.",
+          "Full old runner/batch, Node24, full suite/coverage/hosted/G0/formalDone and earlier ownership/freeze/quality debt remain open."
+        ],
+        "counting": "Original170registered cases and new2registered cases are separate corpora, not a combined172-case test run. The 2-case control repeats the same source guard previously surviving original15, so no extra distinct guard is counted."
+      }
+    },
+    {
+      "oldIssue": "AMC-1534",
+      "counting": "25 native +9 separateCLI +1 newrace",
+      "meaningAndResidual": "Compare25-23-25; original transaction25 survives; newrace1-0-1 signed pending2. No retroactive kill or every-schedule/P027-cause proof.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1534-root-bounded-outcome-20261015.json",
+        "bytes": 5122,
+        "sha256": "2ec1d662a36bf59efc610fab049eb7341b4539e61f1472545cec808fc809aad6"
+      },
+      "state": "BOUNDED_ORIGINAL_AND_NEW_TWO_PROCESS_SUPPLEMENT_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+          "bytes": 9932,
+          "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+          "bytes": 12191,
+          "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+          "bytes": 71494,
+          "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+          "bytes": 111829,
+          "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+          "bytes": 15816,
+          "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.json",
+          "bytes": 42050,
+          "sha256": "006a1c53d540a376c6da1dbc255c22646f71d727045b573d83b62048dc832286"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.md",
+          "bytes": 3841,
+          "sha256": "43a07d35d1ba7650cdfcd767e9c1d1276fa681c13b11d58e66c6939bb9838107"
+        }
+      ],
+      "residuals": {
+        "open": [
+          "Original25 transaction-removal coverage gap remains a fixed-corpus result, now supplemented by one separate bounded race witness.",
+          "No every-schedule proof, provider execution, hardware identity, whole-cold P0-27 cause repair or external authority claim.",
+          "Current exact-source required duplicates1269/dead2751 failures remain unwaived.",
+          "No old full batch, whole P0-30, full suite/coverage/Node24/hosted/G0/release/Done or dependency closure."
+        ],
+        "counting": "Original25, separately runCLI9 and newone scenario are separate corpora. Original no-transaction survivor is unchanged; the new causal witness does not retroactively turn it into a kill. Held27/historical26 and old76 batch are distinct. Four new executions/24children/9reservations are not additional unique cases."
+      }
+    },
+    {
+      "oldIssue": "AMC-1529",
+      "counting": "16 original; lifetime6 subset",
+      "meaningAndResidual": "Bytes16-13-16; lifetime6-5-6; no Docker/log probe; wildcard listener and original child/pool limitations.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1529-root-bounded-outcome-20261015.json",
+        "bytes": 4972,
+        "sha256": "667c8d82405551d9d4a38a56c0806c9b813dbc11f3fa3918cb8147ffe9bc8274"
+      },
+      "state": "BOUNDED_ORIGINAL_NOTARY_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+          "bytes": 18352,
+          "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.json",
+          "bytes": 45719,
+          "sha256": "17bffa7e4fa36debc8ef8c33274e6b3288f0b24936cc705c7862ff89dfd8b884"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.md",
+          "bytes": 3548,
+          "sha256": "5ff84489b3fe964b2f05fa4a993b2f7f2a7f198ebdff70c6abf301c006627bee"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Original16 cases are distinct from82 repeated executions; lifetime reuses6. Four failed assertions are not four new tests.",
+          "Real local SOFTWARE Ed25519/HMAC and pinned local policy are fixture authority, not hardware/provider or independently accredited external identity.",
+          "Original deliberate0.0.0.0 listener with127requests and sync bridge remain. No blanket network isolation, retained whole internal-child streams or P0-27 cold corruption-cause repair.",
+          "Compose/Caddy is configuration inspection only. No container, pack/install, old batch, full P0-30, full suite/coverage/Node24/hosted/release/G0/Done.",
+          "Exact-source required duplicate1269/dead2751 failures remain unwaived.",
+          "Protected source/dist/native/prior evidence preservation does not mean absence of tool cache writes."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1537",
+      "counting": "11 source +8 source +2 mixed-built",
+      "meaningAndResidual": "Pin11-5-11; installed UNEXECUTED behind normal pack/base-freeze and unwaived duplicates1269/dead2751; not measured failedpack.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-root-bounded-outcome-20261015.json",
+        "bytes": 3772,
+        "sha256": "312608c0a901d7a6902bba24ad455f1a3b7e5646d09e3221752136c8270efaee"
+      },
+      "state": "BOUNDED_ORIGINAL_SOURCE_AND_BUILT_COMPANION_REVIEWED_INSTALLED_ACCEPTANCE_OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+          "bytes": 22735,
+          "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.json",
+          "bytes": 71191,
+          "sha256": "33b0fe9a535dd39f2d4ed53cbc84a36868a45088ae2a39a812c165ca5eda8aec"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.md",
+          "bytes": 2781,
+          "sha256": "c1478cec1ae29dd0b07b203a8d8c2dac88feb83e8c79bc27fcf814cd6d88aa7b"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Per-worker/service loaded-native/ABI/PIDs are not independently recorded bytheseoriginaltests. Launcherfingerprint22.23.3/127andpinnednativeidentityareseparatefacts.",
+          "No OSconfinement, externallyaccreditedidentity, genuineinstalledlivepolicychange, attemptedproviderwrite, all-effectsabsence, P027corruptioncauserepair, oldbatch/fullP030/fullsuite/coverage/Node24/hosted/release/G0/Done/dependencyclosure."
+        ],
+        "installedAcceptance": "OPEN_UNEXECUTED: normal outerpack/release/fullGit-basefreeze prerequisites unwaived. Required duplicate1269/dead2751 failures are exact-source reusedevidence, not a new actualpackfailure. No agenthookshortcut/fakeGit/floorwaiver/newskip or installedobserverrun. Existingunmodifiedinternalpackrecursionmechanics are allowed onlyinsidefullnormaloutergate, neveragentfallback."
+      }
+    },
+    {
+      "oldIssue": "AMC-1516",
+      "counting": "44 original;9 guards/10 IDs",
+      "meaningAndResidual": "M17b alias; M11 emitted-JS only with actual tsc2/TS2345; M12 later branch masked; mapping10 overlaps1517.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1516-root-bounded-outcome-20261015.json",
+        "bytes": 27855,
+        "sha256": "b06ae049c0268c7fcb9b6cbb6ef85497c453201e70f911558724077f33206629"
+      },
+      "state": "Nine distinct guards produced intended runtime failures and passing restorations; ten historical IDs retained with one duplicate alias.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+          "bytes": 103946,
+          "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+          "bytes": 91692,
+          "sha256": "264a473f739447a651c4094291f1c0c003167dbdeed910b49e1cc6dd9e1e8aed"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+          "bytes": 2685,
+          "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "M11 is emitted-JavaScript runtime sensitivity only: actual mutant tsc exit2/TS2345 is retained, with independently verified sole guard deletion plus formatting. Two stopped compiler/observer attempts remain unqualified. Normal source and restored compilation are separate.",
+          "M11 tests permissive direct-JavaScript authority input; no claim that the normal strict authority loader accepted imported evidence.",
+          "M12 first lower-declaration assertion fails; its later SELF_REPORTED branch is not independently killed.",
+          "M15 fails with unchanged-validator refusal of malformed Unicode; M16 fails with Date.toISOString RangeError. Neither demonstrates accepted unsafe output.",
+          "M17 isolated duration loss and M19 isolated timestamp loss have separate measured assertions; M17b reuses the exact M17 execution, not an additional distinct kill.",
+          "M18 qualifies the requested caller-redaction notice, not exhaustive secret scanning.",
+          "The current 44 original cases overlap later mapping/callback corpora; repeated B/M/R executions and duplicate IDs are not added as distinct cases.",
+          "No source repair, original test/helper/guard edit, held runner transfer, full suite, Node24, coverage, hosted CI, release or Done follows.",
+          "Freeze/quality findings, historical strict failures, missing held scopes and ownership decisions remain preserved."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1519",
+      "counting": "4 scripted original",
+      "meaningAndResidual": "Four S7 guard controls; review now supplied. Unsigned peer fields not genuine signed-ledger/cold-anchor proof.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+        "bytes": 3626,
+        "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+      },
+      "packet": {
+        "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+        "bytes": 93748,
+        "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+      },
+      "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+          "bytes": 93748,
+          "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+          "bytes": 64027,
+          "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+          "bytes": 2823,
+          "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+        }
+      ],
+      "controls": [
+        {
+          "id": "S7-M26-sdk-close-before-verify-753",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Premature live verification expected rejection fails; verifierRuns0 and later explicit-close checks are masked. Original afterEach still closes. Scripted receipt is not a genuine ledger."
+        },
+        {
+          "id": "S7-M27-sdk-trust-anchor-789",
+          "counts": [
+            4,
+            2,
+            4
+          ],
+          "meaning": "Both mismatched and missing expected-anchor rows resolve when refusal is required. Chosen unsigned peer fields are not cryptographic anchor evidence."
+        },
+        {
+          "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Only the reported mismatch row loses refusal; missing expected-anchor row retains its guard. Matching f/f positive remains."
+        },
+        {
+          "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Only the missing expected-anchor row loses refusal; mismatch remains guarded. No independently authenticated monitor or genuine cold history is produced."
+        }
+      ]
+    },
+    {
+      "oldIssue": "AMC-1517",
+      "counting": "13 original +3 new",
+      "meaningAndResidual": "Three13-12-13; M23original13survives/newgetter3-2-3; ordinary2benign; old equivalence not inherited; mapping10 overlaps1516.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1517-root-bounded-outcome-20261015.json",
+        "bytes": 5250,
+        "sha256": "3d3aadb0ee62746f5cde5bc8f62b0f6b43fb1da1784f27c51253ffbfead683c8"
+      },
+      "state": "All four distinct guards show current sensitivity within the declared corpora. The closed disjunct is necessary for the public-getter witness; its historical global-equivalence reason does not cover this supported input. The existing production guard protects this case, so this is a private removed-guard failure rather than a new production failure.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+          "bytes": 189825,
+          "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.json",
+          "bytes": 54043,
+          "sha256": "8b26547d4bd22cd3aac98eab4ffdd7668c01a8c3f98b1d0c74b4cbe017645fb3"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.json",
+          "bytes": 82486,
+          "sha256": "7e23a25c052a393c8f26163066a1e72d570aad9c5f8dd5d8be9c680bfae3fe58"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+          "bytes": 23017,
+          "sha256": "84ae6261b55be5d3b6399aad71eec563156325fe4ff427964369f40011e93337"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-reentrant-static-review-20261015.json",
+          "bytes": 4208,
+          "sha256": "2febb1a895c5d0bfcc4638581c62a4a7fcb981967613cb98c589f1c1cc6e5fd2"
+        }
+      ],
+      "residuals": {
+        "residuals": [
+          "No permanent source/test transfer, original helper/guard edit, whole held batch rerun, full suite, Node24, coverage, hosted CI, upstream Pi conformance, real HTTP/tenant qualification, release or Done.",
+          "Ordinary baseline freeze passed; prior unresolved freeze exceptions, inherited duplicate/dead quality findings, paused work and ownership decisions remain unresolved."
+        ],
+        "counting": "Sixteen distinct cases in this old-issue qualification: thirteen original plus three private. Ten mapping cases overlap AMC-1516; repeated B/M/R runs and cross-issue corpora are not summed as distinct cases."
+      }
+    },
+    {
+      "oldIssue": "AMC-1513",
+      "counting": "21 pure original",
+      "meaningAndResidual": "Ten S7 pure controls; review now supplied. Status/BPF model not real Linux/bwrap/kernel/seccomp confinement.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+        "bytes": 3626,
+        "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+      },
+      "packet": {
+        "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+        "bytes": 93748,
+        "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+      },
+      "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+          "bytes": 93748,
+          "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+          "bytes": 64027,
+          "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+          "bytes": 2823,
+          "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+        }
+      ],
+      "controls": [
+        {
+          "id": "S7-M01-bwrap-child-guard",
+          "counts": [
+            21,
+            17,
+            21
+          ],
+          "meaning": "Duplicate-child refusal fails before the duplicate-exit assertion in that body. Fractional, text and unsafe-integer positive child IDs also fail; nonpositive guard remains."
+        },
+        {
+          "id": "S7-M02-bwrap-exit-before-child",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Exit-only refusal remains null at final return; the exit-before-later-child order assertion detects the missing preceding-child guard."
+        },
+        {
+          "id": "S7-M03-bwrap-exit-dup",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Duplicate-child refusal passes first; duplicate-exit refusal then fails. Distinct from removal of the preceding-child guard."
+        },
+        {
+          "id": "S7-M04-bwrap-exit-range",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Out-of-range256 exit receipt is admitted; other integer/type/range clauses remain."
+        },
+        {
+          "id": "S7-M05-bwrap-nonobject-row",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Array row is admitted/ignored before final receipt; primitive in-operator exceptions still return null via unchanged catch. Do not infer all malformed rows admitted."
+        },
+        {
+          "id": "S7-M06-bwrap-child-positive",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Nonpositive integer child IDs0/-1 are admitted; safe-integer/type refusal remains."
+        },
+        {
+          "id": "S7-M07-bpf-arch-check",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Both foreign-architecture first verdicts fail. Later syscall loops and allowed calls in those two bodies are masked."
+        },
+        {
+          "id": "S7-M08-bpf-x32-rule",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Prior architecture and ordinary-denial loop checks pass; first x32 verdict fails, masking later x32/allowed assertions."
+        },
+        {
+          "id": "S7-M09-bpf-io-uring",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Both supported-architecture denial loops fail first at io_uring425 after ordinary socket checks. Later426/427 and other assertions are masked."
+        },
+        {
+          "id": "S7-M10-bpf-connect",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "x64 connect42 first fails after41/53 pass, masking later x64 checks; separate arm64 case remains unchanged."
+        }
+      ]
+    },
+    {
+      "oldIssue": "AMC-1518",
+      "counting": "PENDING activev2 EXCLUDED",
+      "meaningAndResidual": "No final packet/index/review/new phase collected; original harness43/two recipes not run in frozen S7.",
+      "formalAcceptanceClosed": false,
+      "state": "PENDING_ACTIVE_LANE_EXCLUDED",
+      "evidencePins": []
+    }
+  ],
+  "formalSourcePresence": {
+    "scripts/mutation-batch.mjs": false,
+    "tests/mutationBatch.test.ts": false,
+    "tests/crypto/keyHistoryMutationGuards.test.ts": false,
+    "tests/leaseRevocationConsumers.test.ts": false,
+    "tests/studioCredentialBindingHttp.test.ts": false
+  },
+  "formalChecklistGaps": [
+    "Landed reusable runner/tests absent; private controllers do not satisfy dirty-tree/exact-once/restoration runner acceptance.",
+    "No single full reusable76-entry batch at recorded main/batchSHA; source58 serial controls are distinct bounded series. Held runner/batch/tests remain untransferred.",
+    "Named permanent/additive guard files absent; reviewed private supplements do not rewrite literal named-file/fresh-clone acceptance.",
+    "1518-v2 pending/excluded. Final frozen S7 root outcome74d41 and actual review11f526 now included as parent supplied; no harness43/two-recipe qualification inferred.",
+    "Revocation publication/crash/reload/rollback/anchor and stale wire/docs criterion open despite static seven-consumer results.",
+    "1537 installed tarball read/write-denied/empty/mismatch/MCP UNEXECUTED. Normal outerpack/fullGit-basefreeze plus required duplicate1269/dead2751 failures UNWAIVED; no shortcut/fakeGit/newskip/measured failedpack.",
+    "Optional notary Docker rebuild+secret-log probe not run; source service/config checks are not container execution.",
+    "Canonical five files/validator not created/run here; root authors after1518 final reviewed evidence.",
+    "No current fullsuite/Node24/coverage/hosted/PR+merge/G0/release/Done or formal dependency closure; preserve all quality/freeze/ownership holds."
+  ],
+  "overlapRules": [
+    "Do not synthesize global unique-case/killed/survived/equivalent totals by summing BMR runs, subsets, aliases or shared files.",
+    "1525 readonly10 subset62; loaded2 separate; partial44/3/15 retained.",
+    "1516 M17b exact alias; mapping10 overlaps1517.",
+    "1517 original13/new3 separate; ordinary2 benign and originalM23 survivor unchanged.",
+    "1542 writer10 subset35; shared-reader7 repeated not eighth guard; reporter repeats/126observations not new cases.",
+    "1508 original21/HTTP1 separate; current reconstructions and exact historical composite keep provenance.",
+    "1547 170registrations/164rendered titles; supplement2 repeats same sourceguard.",
+    "1534 original25/CLI9/new1 separate;4runs/24children/9reservations not extra definitions.",
+    "1529 lifetime6 subset16;82 executions not82 unique tests.",
+    "1537 pin11 repeats source11; original8 and built2 separate; no installed cases.",
+    "S7 pure21+scripted4=25 original;14controls/703executions not703 unique; harness43 excluded."
+  ],
+  "canonicalOutline": [
+    "README: bounded source58 scope,13-row dispositions,1518pending, meaningful residuals, exact review status and unwaived prerequisites.",
+    "receipt: source/base/branch/protected pins, actual commands/corpus counts, frozen journals, selected small artifacts and private indices; never embed giantstdout/stderr.",
+    "outcomes: exactly13 old issues, original/supplement provenance, firstfailures/masking/survivors/review pins; no Done lines.",
+    "batch/results metadata: accurately name measured bounded series; preserve historical IDs/expectations/aliases. Do not fabricate reusable76batch or M11 compile success.",
+    "Retain raw bytes. Code/native/fullclosures/huge manifests/oversizeindices remain private references; ordinary max-size/secret/hash rules apply.",
+    "After1518 final actual review, root incorporates new evidence explicitly and runs normal qualification validation/independent review. Outline is not an executable builder."
+  ],
+  "packetPins": [
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+      "bytes": 93748,
+      "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+      "bytes": 39183,
+      "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+      "bytes": 48220,
+      "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+      "bytes": 21149,
+      "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+      "bytes": 66869,
+      "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+      "bytes": 18352,
+      "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+      "bytes": 12191,
+      "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+      "bytes": 15816,
+      "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+      "bytes": 22735,
+      "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+      "bytes": 142868,
+      "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+      "bytes": 8254,
+      "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+      "bytes": 67992,
+      "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+      "bytes": 31431,
+      "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+      "bytes": 64984,
+      "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+      "bytes": 10348,
+      "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+    }
+  ],
+  "reviewPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.json",
+      "bytes": 51693,
+      "sha256": "d5ce510d9104e795d1d5a06d3defe85997c246c6ff9601871aad194848072f47"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.json",
+      "bytes": 40800,
+      "sha256": "81005e5a842229a19c8c2a708a3c8dd95381c9d4834d5b7eace48b0e58152cfd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+      "bytes": 91692,
+      "sha256": "264a473f739447a651c4094291f1c0c003167dbdeed910b49e1cc6dd9e1e8aed"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+      "bytes": 2685,
+      "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.json",
+      "bytes": 54043,
+      "sha256": "8b26547d4bd22cd3aac98eab4ffdd7668c01a8c3f98b1d0c74b4cbe017645fb3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.json",
+      "bytes": 82486,
+      "sha256": "7e23a25c052a393c8f26163066a1e72d570aad9c5f8dd5d8be9c680bfae3fe58"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+      "bytes": 23017,
+      "sha256": "84ae6261b55be5d3b6399aad71eec563156325fe4ff427964369f40011e93337"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-static-review-20261015.json",
+      "bytes": 4208,
+      "sha256": "2febb1a895c5d0bfcc4638581c62a4a7fcb981967613cb98c589f1c1cc6e5fd2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-independent-review-20261015.json",
+      "bytes": 51121,
+      "sha256": "8a6b6c4d284d9db20d00a650c1e2c392f749f8d64123138beb6f2edb1a1c687d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-independent-review-20261015.json",
+      "bytes": 16062,
+      "sha256": "ea08bd72cab138cf8bdcc1bdbeb003ae36ada72fecfdc093d4334e5dd6104646"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.json",
+      "bytes": 45719,
+      "sha256": "17bffa7e4fa36debc8ef8c33274e6b3288f0b24936cc705c7862ff89dfd8b884"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.md",
+      "bytes": 3548,
+      "sha256": "5ff84489b3fe964b2f05fa4a993b2f7f2a7f198ebdff70c6abf301c006627bee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+      "bytes": 71494,
+      "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+      "bytes": 111829,
+      "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.json",
+      "bytes": 42050,
+      "sha256": "006a1c53d540a376c6da1dbc255c22646f71d727045b573d83b62048dc832286"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.md",
+      "bytes": 3841,
+      "sha256": "43a07d35d1ba7650cdfcd767e9c1d1276fa681c13b11d58e66c6939bb9838107"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.json",
+      "bytes": 71191,
+      "sha256": "33b0fe9a535dd39f2d4ed53cbc84a36868a45088ae2a39a812c165ca5eda8aec"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.md",
+      "bytes": 2781,
+      "sha256": "c1478cec1ae29dd0b07b203a8d8c2dac88feb83e8c79bc27fcf814cd6d88aa7b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.json",
+      "bytes": 66381,
+      "sha256": "58bf7220d3e6139c0f96c8b4a5987413c74b687fbd09db89f4259a3178975ad2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+      "bytes": 69989,
+      "sha256": "694f13036a023f239565f9e9c6b9309c07b1821d9016152c065ff5c458ccb45f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+      "bytes": 128759,
+      "sha256": "96d92711ed37a6f581e8af72e4f74b5c210a3c7e13a57642c5606ba6aae718a1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-independent-review-20261015.json",
+      "bytes": 71686,
+      "sha256": "b451c922527b0f89e5ca509ebf52f984ee9c5e167ebe7266e07b5ba26c5f7349"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.json",
+      "bytes": 74013,
+      "sha256": "c01c0422941c2e92bcc8bf6542c705cec07a63a43cc3940713902f60dae9d901"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.json",
+      "bytes": 42074,
+      "sha256": "957a68e6f6d51b9b36453dad8ec57d2819b72044ff8bcdce7f1e16ec56a9df28"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.md",
+      "bytes": 3445,
+      "sha256": "be9a561c0ddb444f3977f90f474b528daae64d020b95058e8cb4b679c4be33a4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.md",
+      "bytes": 4499,
+      "sha256": "f95fa75031d7dd80262f14a73a3cdc554deefe34bc8cf0096f8bd0cd44c5351b"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+      "bytes": 64027,
+      "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+      "bytes": 2823,
+      "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+    }
+  ],
+  "indexPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 1218493,
+      "sha256": "ac2a16d3be820bd26d047a91966b3d97f778311c629ba2bb9a616c6319409494",
+      "references": 4881,
+      "privateReferenceOnly": true
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/artifact-index.json",
+      "bytes": 407341,
+      "sha256": "99b6cb7958585b0d02ec871cab10a00f8907b27e578d8789d373241f037e3321",
+      "references": 1677,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/artifact-index.json",
+      "bytes": 434796,
+      "sha256": "c81e5ade81ec393a0cc32a16c771b6cf2a4302c3cdba32d401442ad0023ee556",
+      "references": 1792,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+      "bytes": 83180,
+      "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903",
+      "references": 344,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/artifact-index.json",
+      "bytes": 45637,
+      "sha256": "ece9597aee903d7788f836a0610ece5bd3bf32c3c8b4fac99d22075fdd705331",
+      "references": 186,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+      "bytes": 80407,
+      "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339",
+      "references": 322,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+      "bytes": 15704,
+      "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7",
+      "references": 62,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015/indices/artifact-index.json",
+      "bytes": 37481,
+      "sha256": "8e3c1bed083aeb5d76af57b721e95d1ca0845bb8f79f0e6f4558ec7b6edae617",
+      "references": 162,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/artifact-index.json",
+      "bytes": 1054164,
+      "sha256": "167a58b054e636b0c1c219e10b175686121f65130fc259073cfb07cd0a2ba465",
+      "references": 4211,
+      "privateReferenceOnly": true
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+      "bytes": 709120,
+      "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e",
+      "references": 2961,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+      "bytes": 558115,
+      "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0",
+      "references": 2331,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/artifact-index.json",
+      "bytes": 1097854,
+      "sha256": "07801102d5284ab7583203db401d5161552dce41bb88c7b82a3531a8c41516fb",
+      "references": 4392,
+      "privateReferenceOnly": true
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/artifact-index.json",
+      "bytes": 23209,
+      "sha256": "fdac085c74624c508572bdc469d3561583caa08d491bc7b048c66365461733a8",
+      "references": 103,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/artifact-index.json",
+      "bytes": 33613,
+      "sha256": "7b9eeaf467195bfe6e8d27143c3ce75cf6a86ff5958d49552a65ed0bfc76f838",
+      "references": 149,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/artifact-index.json",
+      "bytes": 103100,
+      "sha256": "a89f1cbc8bf2df408fc15ec6e4994162340d156bf0d299d25d65c11a3d90bed4",
+      "references": 417,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/artifact-index.json",
+      "bytes": 366956,
+      "sha256": "1c8aeee438947396eb2923381c4f657a93fcf89bc9de85630c72ce8680acfe57",
+      "references": 1512,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/artifact-index.json",
+      "bytes": 503425,
+      "sha256": "546348ba9dab584c48e0ffacd628216fc338b92db0976196041327629bded9dc",
+      "references": 2091,
+      "privateReferenceOnly": false
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/artifact-index.json",
+      "bytes": 523773,
+      "sha256": "409f4bc4cc25b1933939d19f3d9c024ffd3e69f8d670a7109aa0962d6f026814",
+      "references": 2179,
+      "privateReferenceOnly": false
+    }
+  ],
+  "oversizePrivateOnlyIndices": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 1218493,
+      "sha256": "ac2a16d3be820bd26d047a91966b3d97f778311c629ba2bb9a616c6319409494",
+      "references": 4881,
+      "privateReferenceOnly": true
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/artifact-index.json",
+      "bytes": 1054164,
+      "sha256": "167a58b054e636b0c1c219e10b175686121f65130fc259073cfb07cd0a2ba465",
+      "references": 4211,
+      "privateReferenceOnly": true
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/artifact-index.json",
+      "bytes": 1097854,
+      "sha256": "07801102d5284ab7583203db401d5161552dce41bb88c7b82a3531a8c41516fb",
+      "references": 4392,
+      "privateReferenceOnly": true
+    }
+  ],
+  "selectedVerifiedPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-original-root-bounded-outcome-20261015.json",
+      "bytes": 3499,
+      "sha256": "55df46871e685b2fad9e6bd4d5300db57c0136e76ccd621961acca23f26a010d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-root-bounded-outcome-20261015.json",
+      "bytes": 5348,
+      "sha256": "f77edf3cbd0cf06da801b6feb7506600d8e65d242a2e10c23a8a7d1bd75e61de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-root-bounded-outcome-20261015.json",
+      "bytes": 27855,
+      "sha256": "b06ae049c0268c7fcb9b6cbb6ef85497c453201e70f911558724077f33206629"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-root-bounded-outcome-20261015.json",
+      "bytes": 5250,
+      "sha256": "3d3aadb0ee62746f5cde5bc8f62b0f6b43fb1da1784f27c51253ffbfead683c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-root-bounded-outcome-20261015.json",
+      "bytes": 4725,
+      "sha256": "a02ab2de674341d1b40dfa88f3a364e2bf55c062ed7555dbc2e9b5de2ec36f0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-root-bounded-outcome-20261015.json",
+      "bytes": 4972,
+      "sha256": "667c8d82405551d9d4a38a56c0806c9b813dbc11f3fa3918cb8147ffe9bc8274"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+      "bytes": 9932,
+      "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-root-bounded-outcome-20261015.json",
+      "bytes": 5122,
+      "sha256": "2ec1d662a36bf59efc610fab049eb7341b4539e61f1472545cec808fc809aad6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-root-bounded-outcome-20261015.json",
+      "bytes": 3772,
+      "sha256": "312608c0a901d7a6902bba24ad455f1a3b7e5646d09e3221752136c8270efaee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-root-bounded-outcome-20261015.json",
+      "bytes": 6424,
+      "sha256": "81218e954ed7c1e7932a87019e047d6ead68ccce092f4d89ea8ce32fa365e377"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-root-bounded-outcome-20261015.json",
+      "bytes": 3727,
+      "sha256": "31452abfac3cecd9fd890e292190b74f05d4e0c8fca1b9b835834e784c47b5da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-original-root-bounded-outcome-20261015.json",
+      "bytes": 21183,
+      "sha256": "e31db680b9cef8c184e0c237dc40429df3131ff34900062573780d219af3faf7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-root-bounded-outcome-20261015.json",
+      "bytes": 19549,
+      "sha256": "2c953b1122230676fd099d29d5a3b50b75aa47abc85f95f41d66c776f5dd597e"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+      "bytes": 3626,
+      "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+      "bytes": 93748,
+      "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+      "bytes": 39183,
+      "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.json",
+      "bytes": 51693,
+      "sha256": "d5ce510d9104e795d1d5a06d3defe85997c246c6ff9601871aad194848072f47"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+      "bytes": 48220,
+      "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.json",
+      "bytes": 40800,
+      "sha256": "81005e5a842229a19c8c2a708a3c8dd95381c9d4834d5b7eace48b0e58152cfd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+      "bytes": 91692,
+      "sha256": "264a473f739447a651c4094291f1c0c003167dbdeed910b49e1cc6dd9e1e8aed"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+      "bytes": 2685,
+      "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.json",
+      "bytes": 54043,
+      "sha256": "8b26547d4bd22cd3aac98eab4ffdd7668c01a8c3f98b1d0c74b4cbe017645fb3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.json",
+      "bytes": 82486,
+      "sha256": "7e23a25c052a393c8f26163066a1e72d570aad9c5f8dd5d8be9c680bfae3fe58"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+      "bytes": 23017,
+      "sha256": "84ae6261b55be5d3b6399aad71eec563156325fe4ff427964369f40011e93337"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-static-review-20261015.json",
+      "bytes": 4208,
+      "sha256": "2febb1a895c5d0bfcc4638581c62a4a7fcb981967613cb98c589f1c1cc6e5fd2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-independent-review-20261015.json",
+      "bytes": 51121,
+      "sha256": "8a6b6c4d284d9db20d00a650c1e2c392f749f8d64123138beb6f2edb1a1c687d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+      "bytes": 21149,
+      "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-independent-review-20261015.json",
+      "bytes": 16062,
+      "sha256": "ea08bd72cab138cf8bdcc1bdbeb003ae36ada72fecfdc093d4334e5dd6104646"
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+      "bytes": 66869,
+      "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+      "bytes": 18352,
+      "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.json",
+      "bytes": 45719,
+      "sha256": "17bffa7e4fa36debc8ef8c33274e6b3288f0b24936cc705c7862ff89dfd8b884"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.md",
+      "bytes": 3548,
+      "sha256": "5ff84489b3fe964b2f05fa4a993b2f7f2a7f198ebdff70c6abf301c006627bee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+      "bytes": 12191,
+      "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+      "bytes": 71494,
+      "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+      "bytes": 111829,
+      "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+      "bytes": 15816,
+      "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.json",
+      "bytes": 42050,
+      "sha256": "006a1c53d540a376c6da1dbc255c22646f71d727045b573d83b62048dc832286"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.md",
+      "bytes": 3841,
+      "sha256": "43a07d35d1ba7650cdfcd767e9c1d1276fa681c13b11d58e66c6939bb9838107"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+      "bytes": 22735,
+      "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.json",
+      "bytes": 71191,
+      "sha256": "33b0fe9a535dd39f2d4ed53cbc84a36868a45088ae2a39a812c165ca5eda8aec"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.md",
+      "bytes": 2781,
+      "sha256": "c1478cec1ae29dd0b07b203a8d8c2dac88feb83e8c79bc27fcf814cd6d88aa7b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+      "bytes": 142868,
+      "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.json",
+      "bytes": 66381,
+      "sha256": "58bf7220d3e6139c0f96c8b4a5987413c74b687fbd09db89f4259a3178975ad2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+      "bytes": 8254,
+      "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+      "bytes": 69989,
+      "sha256": "694f13036a023f239565f9e9c6b9309c07b1821d9016152c065ff5c458ccb45f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+      "bytes": 67992,
+      "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+      "bytes": 128759,
+      "sha256": "96d92711ed37a6f581e8af72e4f74b5c210a3c7e13a57642c5606ba6aae718a1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+      "bytes": 31431,
+      "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-independent-review-20261015.json",
+      "bytes": 71686,
+      "sha256": "b451c922527b0f89e5ca509ebf52f984ee9c5e167ebe7266e07b5ba26c5f7349"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+      "bytes": 64984,
+      "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.json",
+      "bytes": 74013,
+      "sha256": "c01c0422941c2e92bcc8bf6542c705cec07a63a43cc3940713902f60dae9d901"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+      "bytes": 10348,
+      "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.json",
+      "bytes": 42074,
+      "sha256": "957a68e6f6d51b9b36453dad8ec57d2819b72044ff8bcdce7f1e16ec56a9df28"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.md",
+      "bytes": 3445,
+      "sha256": "be9a561c0ddb444f3977f90f474b528daae64d020b95058e8cb4b679c4be33a4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.md",
+      "bytes": 4499,
+      "sha256": "f95fa75031d7dd80262f14a73a3cdc554deefe34bc8cf0096f8bd0cd44c5351b"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+      "bytes": 64027,
+      "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+      "bytes": 2823,
+      "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 1218493,
+      "sha256": "ac2a16d3be820bd26d047a91966b3d97f778311c629ba2bb9a616c6319409494"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/artifact-index.json",
+      "bytes": 407341,
+      "sha256": "99b6cb7958585b0d02ec871cab10a00f8907b27e578d8789d373241f037e3321"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/artifact-index.json",
+      "bytes": 434796,
+      "sha256": "c81e5ade81ec393a0cc32a16c771b6cf2a4302c3cdba32d401442ad0023ee556"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+      "bytes": 83180,
+      "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/artifact-index.json",
+      "bytes": 45637,
+      "sha256": "ece9597aee903d7788f836a0610ece5bd3bf32c3c8b4fac99d22075fdd705331"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+      "bytes": 80407,
+      "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+      "bytes": 15704,
+      "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015/indices/artifact-index.json",
+      "bytes": 37481,
+      "sha256": "8e3c1bed083aeb5d76af57b721e95d1ca0845bb8f79f0e6f4558ec7b6edae617"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/artifact-index.json",
+      "bytes": 1054164,
+      "sha256": "167a58b054e636b0c1c219e10b175686121f65130fc259073cfb07cd0a2ba465"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+      "bytes": 709120,
+      "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+      "bytes": 558115,
+      "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/artifact-index.json",
+      "bytes": 1097854,
+      "sha256": "07801102d5284ab7583203db401d5161552dce41bb88c7b82a3531a8c41516fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/artifact-index.json",
+      "bytes": 23209,
+      "sha256": "fdac085c74624c508572bdc469d3561583caa08d491bc7b048c66365461733a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/artifact-index.json",
+      "bytes": 33613,
+      "sha256": "7b9eeaf467195bfe6e8d27143c3ce75cf6a86ff5958d49552a65ed0bfc76f838"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/artifact-index.json",
+      "bytes": 103100,
+      "sha256": "a89f1cbc8bf2df408fc15ec6e4994162340d156bf0d299d25d65c11a3d90bed4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/artifact-index.json",
+      "bytes": 366956,
+      "sha256": "1c8aeee438947396eb2923381c4f657a93fcf89bc9de85630c72ce8680acfe57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/artifact-index.json",
+      "bytes": 503425,
+      "sha256": "546348ba9dab584c48e0ffacd628216fc338b92db0976196041327629bded9dc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/artifact-index.json",
+      "bytes": 523773,
+      "sha256": "409f4bc4cc25b1933939d19f3d9c024ffd3e69f8d670a7109aa0962d6f026814"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.md",
+      "bytes": 2351,
+      "sha256": "daba845d494f79278c4e07344a8096c5588078e6b387a60c0490e6aadf0e0a46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.md",
+      "bytes": 3838,
+      "sha256": "1b719c5480ad8daad9c68a0adcd39aacecd93d0ae622a7b6b8c67fa12f0c17ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.md",
+      "bytes": 3666,
+      "sha256": "f69170a10c2c4664d22fe4362a66af0a689944e37d78bbace843472023e82b6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.md",
+      "bytes": 2900,
+      "sha256": "b6032d4dbd002d22d3703bd91002b82b9fba0be1a708f4cce78bd0029851b1e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.md",
+      "bytes": 2153,
+      "sha256": "104ea6a122191bd06fe51425a703da59267efcfebdd6b66926f821fa9f13ad91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.md",
+      "bytes": 2742,
+      "sha256": "77d12b860e6747093ececf69f79f43e26988de7c2d0b55c69905235218391b6a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.md",
+      "bytes": 1464,
+      "sha256": "c325cea2e7f4c6c1284a4c937f8cba4fd32288dacde7c4352e541937ee618662"
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.md",
+      "bytes": 3864,
+      "sha256": "8a2a28eab568154bcebaf39134039bced1e777411a75f3fce4a694d8926208e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.md",
+      "bytes": 2109,
+      "sha256": "2410c9e41c4c2610c47a3f5f01f9feccdc4b3429399c017310033fd7ec0ad73f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.md",
+      "bytes": 2103,
+      "sha256": "db95cdd826e7d27967c9d435e1f01ab367e275e07a3407622b12ee21dca0466c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.md",
+      "bytes": 4591,
+      "sha256": "033079965c79589f11ecd435a9b06f8e380f017a4f4ac6208bea8f88e7d2b7c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.md",
+      "bytes": 2485,
+      "sha256": "a040691a7b4ea7aa274ff5011a0d69d6a74ce340ea0db7741daf682de3c0a067"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.md",
+      "bytes": 2759,
+      "sha256": "9f9287dab4ecad6a898b5a1a3cc51fe5e5072fff5b8abedf1657651960584710"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.md",
+      "bytes": 2920,
+      "sha256": "b089457a1246fae287dd00937607c567e1523e1959de8ac18523e19ca4f75c4e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.md",
+      "bytes": 2930,
+      "sha256": "9d2f013eb8699153b309d061bf3b77ab68c63a5937db167476fc2a3ca4c5e748"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.md",
+      "bytes": 2522,
+      "sha256": "ef56efd20406fbdc44d328de6b48d0405be7ddcf4a77b5ddf6ea45964c0a8665"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.md",
+      "bytes": 10127,
+      "sha256": "933a9fb3fb42918d3002162495e414d8a5672954a8e032d90e79337d7e3bb557"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.md",
+      "bytes": 3291,
+      "sha256": "8b6649c184ed5dba96b0cbba7682c50594dc7d2c90c352a409e0b06902d42c8e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.md",
+      "bytes": 3513,
+      "sha256": "98d597b9f57a29e69773895a5b9c307d05ebb8e10a27a5a952abbac79d0a3650"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.md",
+      "bytes": 3298,
+      "sha256": "3a80ba2483e831204f8c24d2377ee74c1096ec6344b08ddf6025388a0b189d87"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.md",
+      "bytes": 3332,
+      "sha256": "06c4898b3928950dc59b55d5843a99b011825a6ce3cfbfd6df2d35310a3b1632"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.md",
+      "bytes": 2783,
+      "sha256": "123563dcc047032d903cc684cb9fafc420119cd22748839826d8e3d7d217b626"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.md",
+      "bytes": 3772,
+      "sha256": "c45d396f42705e11a62367f370086021e1f519a880961094d6e818a59523a7fc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.md",
+      "bytes": 2752,
+      "sha256": "842ac1c731ff9c12c175bec368bd34abdb5ddb09fab522bbc97f295af775d5f6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-independent-review-20261015.md",
+      "bytes": 2981,
+      "sha256": "475cf4d16844c53c5a209f7d473443465589f65f3cad5c10eddfff21dcf9eb20"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-independent-review-20261015.md",
+      "bytes": 2333,
+      "sha256": "019bbfa30c137ea68fa3d78ea51c896ff5b8cbd138902da13470479a112ff7db"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.md",
+      "bytes": 4177,
+      "sha256": "59e1a101b885f1965710789070c625b1764c6c0333cfa1798fcbd7e9a60f149c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.md",
+      "bytes": 3425,
+      "sha256": "d1c9444a1c65e55245f49a0c11b652c300f325839b0d01980082665a9f44f85f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.md",
+      "bytes": 3195,
+      "sha256": "079b375babce876d38423b9496c747a91ce3319a4992a07e4f81b2f6925d80b9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.md",
+      "bytes": 3115,
+      "sha256": "bf2ab7ab5124d46decaabec59c13547150b76a62c166716384a29273c803be92"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.md",
+      "bytes": 3542,
+      "sha256": "df778b4cd00d49bd70ffbb3571ffcbb59472cf101152823f364dba19be52d428"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-independent-review-20261015.md",
+      "bytes": 3152,
+      "sha256": "1c6f13350f911d6703153b20a3c8fa52514e9070ee31ded93dd205e3373645b2"
+    }
+  ],
+  "verificationLimit": "Selected frozen root outcome/packet/index/review references rehashed; no transitive raw-artifact or old physical-closure audit. No live COPY/source/native product execution.",
+  "globalResiduals": [
+    "P027 corruption cause/every-schedule/all-effects/wholecold/provider/hardware/external-person authority remain open.",
+    "CIT0023/CIT004620/ISO31expert holds/47echo/arrays/issuer contradictions/heldscope and all prior debt unwaived."
+  ],
+  "observerHistory": [
+    "Metadata-only drafts stopped before any report write on aggregate oldIssues versus oldIssue and list-form portable index assumptions. One tool code serialization failed before local execution. Final fixed input set and both index forms are supported; no product failure/rerun/acceptance change.",
+    "Parent subsequently supplied final S7 outcome/review, now incorporated; authoring1518-v2 remains excluded."
+  ],
+  "operations": {
+    "productRuntime": 0,
+    "productImportsParsers": 0,
+    "tests": 0,
+    "builds": 0,
+    "GitMutations": 0,
+    "canonicalWrites": 0,
+    "ClaudeTrackerMessages": 0,
+    "active1518v2Reads": 0
+  },
+  "allInventoryReadsFinished": true
+}

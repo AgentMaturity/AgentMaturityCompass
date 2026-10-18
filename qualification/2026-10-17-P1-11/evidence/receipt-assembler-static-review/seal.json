@@ -1,0 +1,20 @@
+{
+  "schema": "p111-root-assembler-static-seal/1",
+  "at": "2026-10-16T19:27:46.085917+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/receipt-assembler-static-review/review.json",
+      "bytes": 2395,
+      "sha256": "7bf37241497f7763ba8a96eeb2ca192ea7e999b48400e3fce6f31b2719d30322"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/receipt-assembler-static-review/input-pins.json",
+      "bytes": 794,
+      "sha256": "eada8522d2067ed5ae7740c86e1df46ba19d0d4a052439961733cbad505150fe"
+    }
+  ],
+  "helperExecutedOrParsed": false,
+  "checkoutWrites": false
+}

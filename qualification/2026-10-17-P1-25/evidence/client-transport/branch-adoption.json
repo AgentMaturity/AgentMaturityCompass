@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T21:31:24.886290+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "baseCommit": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "previousBranch": "codex/p1-26-tree-qualification",
+  "newBranch": "codex/p1-25-client-qualification",
+  "ordinaryBranchCreateExit": 0,
+  "workingTreeAndIndexClean": true,
+  "priorBranchRetainedAtCorrectedMetadata": true,
+  "sourceAllocation": false,
+  "next": "Final181-root scope/held-input rebind, currenthosted/D15/freeze checks, then exact new testpath admission. Existing P125packet requires explicit versioned extension."
+}

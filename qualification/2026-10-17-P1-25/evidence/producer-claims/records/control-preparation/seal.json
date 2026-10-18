@@ -1,0 +1,131 @@
+{
+  "schema": "p125pc-inert-source-control-preparation-seal/1",
+  "at": "2026-10-17T01:46:45.980167+00:00",
+  "base": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-control.py",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-control.py",
+    "bytes": 26289,
+    "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+    "dev": 16777231,
+    "inode": 543900281,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.base.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.base.source.txt",
+      "bytes": 26289,
+      "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+      "dev": 16777231,
+      "inode": 543919672,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "bytes": 27807,
+      "sha256": "2443ea996758e3fcc557b39ab3474d53abd5bb55ab0a639f7c3b57c19935252a",
+      "dev": 16777231,
+      "inode": 543919673,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control-from-C39.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control-from-C39.patch.txt",
+      "bytes": 15447,
+      "sha256": "25c565b35cdeaee82387e65892e7b4e90fc2f04a35109a82fd57faab1e0c2a8a",
+      "dev": 16777231,
+      "inode": 543919674,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+      "bytes": 7181,
+      "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06",
+      "dev": 16777231,
+      "inode": 543919671,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/DROP-PRODUCER-TS.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/DROP-PRODUCER-TS.patch.txt",
+      "bytes": 404,
+      "sha256": "63bc82d4bd12cff95009f82c76687175d027c2fb29aa9cb3e81ade9f1d9a943f",
+      "dev": 16777231,
+      "inode": 543919669,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt",
+      "bytes": 470,
+      "sha256": "aa30899cbc50767f87b9f0583e986eef8d2b3290491e377ee0efd96d7f281243",
+      "dev": 16777231,
+      "inode": 543919670,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/control-root-bindings.template.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/control-root-bindings.template.json",
+      "bytes": 3292,
+      "sha256": "5c5c3bacf333353073fd1dba2416a3c8d59ee403afe4b267f249a65260419e25",
+      "dev": 16777231,
+      "inode": 543919675,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/input-pins.json",
+      "bytes": 3927,
+      "sha256": "5a805febe9a31ac82f7888d7085a320110ff9a5fee75cd0bcf09881d59645af6",
+      "dev": 16777231,
+      "inode": 543919676,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/README.md",
+      "bytes": 5171,
+      "sha256": "ecb30c1f3ae7b82150958f2eabee7666df6f1f122656e3bd6e52141052e963b4",
+      "dev": 16777231,
+      "inode": 543919677,
+      "nlink": 1
+    }
+  ],
+  "preferredBaseline": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "bytes": 88277,
+    "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+    "dev": 16777231,
+    "inode": 543919520,
+    "nlink": 1
+  },
+  "candidatePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "bytes": 61752,
+    "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+    "dev": 16777231,
+    "inode": 543909995,
+    "nlink": 1
+  },
+  "peerReviewPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "bytes": 8070,
+    "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7",
+    "dev": 16777231,
+    "inode": 543910559,
+    "nlink": 1
+  },
+  "fiveAdmissionFlagsFalse": true,
+  "futureSemanticCommitFreshRuntimeSelectionBindingOutcomeActionFieldsUnready": true,
+  "allProjectionHashesStaticRecipeBytesOnly": true,
+  "noParserImportCompilerHelperProductTestOpenSslNativeNetworkKeyStreamOrReservationOperation": true,
+  "noSourceIndexQaPriorArtifactOrAllocationMutation": true,
+  "fullAuthorReadPending": true,
+  "requiresRootFullReadIndependentReviewAndActualSourceFreshAdmission": true,
+  "blockers": []
+}

@@ -290,9 +290,22 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false,
   const apiOutput = resolve(resolvedOutput, "api");
   // Invoke the pinned renderer directly so the timeout owns it, rather than
   // TypeDoc's bin launcher which forks another process.
+  // TypeDoc only discovers .git directories, not linked-worktree .git files.
+  // Its entry points share src/ as their source root. Keep module names stable
+  // while supplying the repository-relative path in explicitly pinned links.
+  // (--basePath would root {path} at the repository too, but it renames every
+  // module page.) The src/ prefix holds only while every entry point is under
+  // src/, so an entry point outside it refuses the build instead of linking wrong.
+  const typeDocOptions = JSON.parse(readFileSync(resolve(repositoryRoot, "typedoc.json"), "utf8"));
+  const outsideSrc = typeDocOptions.entryPoints.filter((entry) => !entry.startsWith("src/"));
+  if (revision && outsideSrc.length > 0) {
+    throw new Error(`TypeDoc source links assume entry points under src/; move or re-root: ${outsideSrc.join(", ")}`);
+  }
   execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/dist/cli.js"),
     "--options", resolve(repositoryRoot, "typedoc.json"), "--out", apiOutput,
-    "--json", resolve(apiOutput, "reflection.json"), ...(revision ? ["--gitRevision", revision] : [])],
+    "--json", resolve(apiOutput, "reflection.json"),
+    ...(revision ? ["--gitRevision", revision, "--disableGit", "--sourceLinkTemplate",
+      typeDocOptions.sourceLinkTemplate.replace("{path}", "src/{path}")] : [])],
   { cwd: repositoryRoot, stdio: "inherit", timeout: 120_000 });
 
   return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };

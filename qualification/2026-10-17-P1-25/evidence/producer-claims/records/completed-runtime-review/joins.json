@@ -1,0 +1,1154 @@
+[
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-source-combined",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-fresh-canonical",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "failed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore1",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "failed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-m2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+    "observerId": "-455678311_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+    "observerId": "-455678311_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 3,
+    "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+    "observerId": "-455678311_0_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 4,
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "observerId": "-455678311_0_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "occurrence": 5,
+    "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+    "observerId": "-455678311_0_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 1,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+    "observerId": "-1799767685_0_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/tsaGrant.test.ts",
+    "occurrence": 2,
+    "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+    "observerId": "-1799767685_0_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 1,
+    "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+    "observerId": "353594614_0",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 2,
+    "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+    "observerId": "353594614_1",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 3,
+    "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+    "observerId": "353594614_2",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 4,
+    "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+    "observerId": "353594614_3",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 5,
+    "fullName": "refuses the independently located signed-attribute corruption",
+    "observerId": "353594614_4",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 6,
+    "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+    "observerId": "353594614_5",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 7,
+    "fullName": "refuses a policy excluded by the correctly pinned real root",
+    "observerId": "353594614_6",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 8,
+    "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+    "observerId": "353594614_7",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 9,
+    "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+    "observerId": "353594614_8",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 10,
+    "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+    "observerId": "353594614_9",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 11,
+    "fullName": "refuses explicit rejection status before requiring a timestamp token",
+    "observerId": "353594614_10",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 12,
+    "fullName": "refuses a truncated copy of the genuine token",
+    "observerId": "353594614_11",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 13,
+    "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+    "observerId": "353594614_12",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 14,
+    "fullName": "keeps claimed time separate from the genuine attested upper bound",
+    "observerId": "353594614_13",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 15,
+    "fullName": "keeps an artifact without a timestamp at claimed time",
+    "observerId": "353594614_14",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 16,
+    "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "observerId": "353594614_15",
+    "status": "passed"
+  },
+  {
+    "phase": "p125pc-restore2",
+    "path": "tests/time/verifyTimestamp.test.ts",
+    "occurrence": 17,
+    "fullName": "reports a broken supplied token as an artifact integrity error",
+    "observerId": "353594614_16",
+    "status": "passed"
+  }
+]

@@ -17,6 +17,8 @@ process.env.AMC_GUARD_RECEIPTS_WORKSPACE = workspace;
 // A test that needs its own home still stubs AMC_HOME; this only replaces an unset one.
 if (!previousAmcHome) process.env.AMC_HOME = join(workspace, "amc-home");
 
+// Closing real guard stores and removing owned fixtures can exceed the default
+// hook budget under parallel coverage. Preserve the complete cleanup and restore.
 afterAll(async () => {
   try {
     // Do not preload product modules: individual test files must remain free to
@@ -36,4 +38,4 @@ afterAll(async () => {
     if (previousAmcHome === undefined) delete process.env.AMC_HOME;
     else process.env.AMC_HOME = previousAmcHome;
   }
-});
+}, 120_000);

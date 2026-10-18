@@ -1,0 +1,1317 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-47",
+  "preparedOn": "2026-10-14",
+  "status": "HISTORICAL_INTEGRATION_SLICE_PASSED",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass",
+  "historicalBaseline": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+  "toolingRevision": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "toolingScope": "Only accepted-main script, helper and helper/manifest test were overlaid. Root compiled-dist ancestry guard fix at 0fef1989a is not in this historical tooling overlay.",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "probeAppend": "\nexport const p47Probe=1;\n",
+  "corpus": [
+    "tests/apiRouterResponseParity.test.ts",
+    "tests/archiveFilesParity.test.ts",
+    "tests/assuranceScenarioContextParity.test.ts",
+    "tests/auditEvidenceAccountingParity.test.ts",
+    "tests/controlHttpResponsesParity.test.ts",
+    "tests/diagnosticResponseScoringParity.test.ts",
+    "tests/explainabilityContractParity.test.ts",
+    "tests/liveDriftProofStatsParity.test.ts",
+    "tests/metricParameterContractParity.test.ts",
+    "tests/metricRowPublicContract.test.ts",
+    "tests/mobileFetchSdk.test.ts",
+    "tests/nativeSecondSharingRestoration.test.ts",
+    "tests/pdfRenderingParity.test.ts",
+    "tests/privateModuleHelperVisibility.test.ts",
+    "tests/privateStoreLocatorVisibility.test.ts",
+    "tests/studioRouteRoleContextParity.test.ts",
+    "tests/studioVaultSigningContextParity.test.ts",
+    "tests/watchReceiptSharingRestoration.test.ts",
+    "tests/workspacePathRedactionParity.test.ts",
+    "tests/planEditsManifest.test.ts"
+  ],
+  "corpusBasis": "Exact19 live-freeze parity test files changed by merged PR38 plus current approved helper/manifest test. No current-only test files added.",
+  "corpusSha256": "99929f62754f26d0c563e967311f0cbe4eb9ab181279b97ad6b6b88007aeb269",
+  "corpusAudit": {
+    "preMergeUnusedCodeLinkedPaths": 29,
+    "preMergeActualTestFiles": 25,
+    "preMergeHelperFiles": [
+      "tests/helpers/restoreNativeSecondSharing.ts",
+      "tests/helpers/restorePrivateHelperVisibility.ts",
+      "tests/helpers/restoreWatchReceiptSharing.ts",
+      "tests/helpers/restoreWorkspacePathSharing.ts"
+    ],
+    "omittedActualTests": [
+      {
+        "path": "tests/liveDriftEvidenceFieldsParity.test.ts",
+        "sha256": "b7be0456731e606b3b541e4678ba6ab9e864ab42c05143e700347057080673f2",
+        "reason": "Archived hash and live drift behavioral proof-field comparisons; no freeze comparison of the four probe source or build outputs."
+      },
+      {
+        "path": "tests/metricCoverageSummaryParity.test.ts",
+        "sha256": "760f3cf90d8083027c3e23ce5a8ee785df7086d14d562cebdf6f6e4d954c6e06",
+        "reason": "Archived metricValidity hashes and live extracted summary/public report behavior; no freeze comparison of the four probe source or build outputs."
+      },
+      {
+        "path": "tests/providerDriftDescriptorParity.test.ts",
+        "sha256": "14f45f14e4a57ba90792a91ddca41aed0f426fc88358becf8eed4573fde54bf6",
+        "reason": "Archived provider lane hashes and live provider descriptor behavior; no freeze comparison of the four probe source or build outputs."
+      },
+      {
+        "path": "tests/providerDriftRowContractsParity.test.ts",
+        "sha256": "a33259774bbd429e20976a959f1689069738ac0a5b4f9ce3dce97d8319103382",
+        "reason": "Archived provider lane hashes and compiled provider lane behavior; no freeze comparison of the four probe source or build outputs."
+      },
+      {
+        "path": "tests/signedArtifactVerificationParity.test.ts",
+        "sha256": "93a2515db7ccd90346628eecb3de785544072775e52377d23492051249a9f9f7",
+        "reason": "Archived binder/passport verification hashes and live signing/verification/cleanup behavior. Imported initWorkspace remains live, without a source-byte or declaration freeze."
+      },
+      {
+        "path": "tests/watchReceiptValidationParity.test.ts",
+        "sha256": "c36039caa34fc0cf0c1a71e0ae991d0bd5fc7e572a46cef3453ba6edd0c81819",
+        "reason": "Archived watch receipt hashes, parsed drift test fixtures, and live receipt behavior; no freeze comparison of the four probe source or build outputs."
+      }
+    ],
+    "interpretation": "The reproducible pre-merge marker inventory has 29 paths: 25 actual test files and 4 helpers. The 19 routed tests, 6 untouched tests and 4 helpers account for the PR count. This fixed 20-file corpus is the 19 routed tests plus the approved helper/manifest test. It is an integration slice, not a whole historical parity or full-suite qualification. No direct four-probe freeze comparisons were found in the six omitted test files; behavior outside this slice remains unqualified."
+  },
+  "probes": [
+    {
+      "source": "src/types.ts",
+      "baselineSourceSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "probeSourceSha256": "e3134d967423903fb159deca726772d6ae4661ccc8246fec3b92d021da38af7c",
+      "finalSourceSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "sourceRestored": true,
+      "assertionRegistries": {
+        "baseline": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "red": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "green": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        }
+      },
+      "sameAssertionRegistry": true,
+      "baseline": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "red": {
+        "success": false,
+        "numTotalTests": 3017,
+        "numPassedTests": 3014,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 5
+      },
+      "green": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "redAndGreenSourceBytesEqual": true,
+      "redAndGreenOwnBuildBytesEqual": true,
+      "redBuiltOutputHashes": {
+        "dist/types.d.ts": "8520dbe3c96a534d0ab81e46bf51e954b8a53066ff0e365a67e9e9d64a4c6761",
+        "dist/types.js": "5d7234db90223ff5036b245c4756f0a0f383eb375986dd1c544e9e429fdbd33a"
+      },
+      "greenBuiltOutputHashes": {
+        "dist/types.d.ts": "8520dbe3c96a534d0ab81e46bf51e954b8a53066ff0e365a67e9e9d64a4c6761",
+        "dist/types.js": "5d7234db90223ff5036b245c4756f0a0f383eb375986dd1c544e9e429fdbd33a"
+      },
+      "redFailures": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/explainabilityContractParity.test.ts",
+          "name": "explainability shared contracts retain complete original exported flows restores full original bytes and keeps public types, callers, package entries and historical guards untouched",
+          "firstErrorLine": "AssertionError: expected 'e3134d967423903fb159deca726772d6ae466\u2026' to be '61ca2bd7d2394b3ef1d38666868c50f43698f\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/metricParameterContractParity.test.ts",
+          "name": "preserves entire runtime emission and actual built public contracts",
+          "firstErrorLine": "AssertionError: expected 'e3134d967423903fb159deca726772d6ae466\u2026' to be '61ca2bd7d2394b3ef1d38666868c50f43698f\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/metricRowPublicContract.test.ts",
+          "name": "metric validation input public TypeScript contracts src/types.ts preserves identical emitted runtime JavaScript",
+          "firstErrorLine": "AssertionError: expected 'export const p47Probe = 1;\\n' to be 'export {};\\n' // Object.is equality"
+        }
+      ],
+      "fixtureSnapshots": [
+        {
+          "path": "src/types.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/src/types.ts.landed",
+          "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+        }
+      ],
+      "finalRestoredBuildExit": 0,
+      "phases": [
+        {
+          "phase": "types-baseline-build",
+          "exitCode": 0,
+          "durationSeconds": 29.268,
+          "startedAt": "2026-10-14T13:12:43.192646+00:00",
+          "endedAt": "2026-10-14T13:13:12.460681+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-baseline-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": null,
+          "manifestSha256": null,
+          "sourceSha256": null,
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "types-baseline",
+          "exitCode": 0,
+          "durationSeconds": 26.166,
+          "startedAt": "2026-10-14T13:13:26.338754+00:00",
+          "endedAt": "2026-10-14T13:13:52.505243+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-baseline.log",
+          "logSha256": "8d21a28c1f1309e29af5a0434cc46cbf0b64b575fc5c65440e1b12b8a9acaba0",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-baseline.json",
+          "reportSha256": "e986d33e13dc5bdcd85cfb3a51c1f1365881c8f62d159b752aa7d55211454347",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": null,
+          "manifestSha256": null,
+          "sourceSha256": null,
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "types-red-build",
+          "exitCode": 0,
+          "durationSeconds": 27.709,
+          "startedAt": "2026-10-14T13:14:39.273741+00:00",
+          "endedAt": "2026-10-14T13:15:06.983406+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-red-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 1,
+          "manifestSha256": "64f71fce2ece6c872ae09073fef1748e3ce26cdcf44032ce0589a54444f8088f",
+          "sourceSha256": "e3134d967423903fb159deca726772d6ae4661ccc8246fec3b92d021da38af7c",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "types-red",
+          "exitCode": 1,
+          "durationSeconds": 27.785,
+          "startedAt": "2026-10-14T13:15:18.773229+00:00",
+          "endedAt": "2026-10-14T13:15:46.558643+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-red.log",
+          "logSha256": "cc9b24b64f5de8ca574f96e31c93ec85f87b93a20ee9e7e13198b4613977c995",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-red.json",
+          "reportSha256": "01ec9307d69f795c60b57d41307f6a6ae74865877743424381d0310e743eae98",
+          "result": {
+            "success": false,
+            "numTotalTests": 3017,
+            "numPassedTests": 3014,
+            "numFailedTests": 3,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 5
+          },
+          "manifestRows": 1,
+          "manifestSha256": "64f71fce2ece6c872ae09073fef1748e3ce26cdcf44032ce0589a54444f8088f",
+          "sourceSha256": "e3134d967423903fb159deca726772d6ae4661ccc8246fec3b92d021da38af7c",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "types-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 27.875,
+          "startedAt": "2026-10-14T13:16:57.456278+00:00",
+          "endedAt": "2026-10-14T13:17:25.331944+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 1,
+          "manifestSha256": "64f71fce2ece6c872ae09073fef1748e3ce26cdcf44032ce0589a54444f8088f",
+          "sourceSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "types-snapshot",
+          "exitCode": 0,
+          "durationSeconds": 0.146,
+          "startedAt": "2026-10-14T13:17:25.390509+00:00",
+          "endedAt": "2026-10-14T13:17:25.536638+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-snapshot.log",
+          "logSha256": "b544db84e55e7d23772451cfdcec679793391cf271a1c6852a0205baa35a47f9",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+          "command": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/snapshot-plan-edit.mjs",
+            "--issue",
+            "P0-99",
+            "--base",
+            "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+            "src/types.ts"
+          ]
+        },
+        {
+          "phase": "types-green-build",
+          "exitCode": 0,
+          "durationSeconds": 27.383,
+          "startedAt": "2026-10-14T13:17:25.600000+00:00",
+          "endedAt": "2026-10-14T13:17:52.983048+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-green-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "e3134d967423903fb159deca726772d6ae4661ccc8246fec3b92d021da38af7c",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "types-green",
+          "exitCode": 0,
+          "durationSeconds": 26.487,
+          "startedAt": "2026-10-14T13:17:53.041616+00:00",
+          "endedAt": "2026-10-14T13:18:19.528827+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-green.log",
+          "logSha256": "9f5b52b1505d4af8046ab9f7c8e211a0e44aa2c919a1771023b2ef418a1b4651",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-green.json",
+          "reportSha256": "c0aba41224fb02864368a4fab3d48b8ebb80185d6dd9bb12bdd4f00f8bc6ac0d",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "e3134d967423903fb159deca726772d6ae4661ccc8246fec3b92d021da38af7c",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "types-final-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 27.481,
+          "startedAt": "2026-10-14T13:18:19.597947+00:00",
+          "endedAt": "2026-10-14T13:18:47.079298+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/types-final-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "src/index.ts",
+      "baselineSourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "probeSourceSha256": "382495618e1c580b0bd4304f0ad95b44d59309b7af0941fd26a2468062711379",
+      "finalSourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "sourceRestored": true,
+      "assertionRegistries": {
+        "baseline": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "red": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "green": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        }
+      },
+      "sameAssertionRegistry": true,
+      "baseline": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "red": {
+        "success": false,
+        "numTotalTests": 3017,
+        "numPassedTests": 3012,
+        "numFailedTests": 5,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 8
+      },
+      "green": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "redAndGreenSourceBytesEqual": true,
+      "redAndGreenOwnBuildBytesEqual": true,
+      "redBuiltOutputHashes": {
+        "dist/index.d.ts": "91dc1ed0370eaea5e8476e28c4885e48ccc76c0fd13b255fa385314e57d2f2b7",
+        "dist/index.js": "b107032f495a6cf69df222a54d2b589bab5c7d2dd130926e9275b4223ea85116"
+      },
+      "greenBuiltOutputHashes": {
+        "dist/index.d.ts": "91dc1ed0370eaea5e8476e28c4885e48ccc76c0fd13b255fa385314e57d2f2b7",
+        "dist/index.js": "b107032f495a6cf69df222a54d2b589bab5c7d2dd130926e9275b4223ea85116"
+      },
+      "redFailures": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/explainabilityContractParity.test.ts",
+          "name": "explainability shared contracts retain complete original exported flows restores full original bytes and keeps public types, callers, package entries and historical guards untouched",
+          "firstErrorLine": "AssertionError: expected '382495618e1c580b0bd4304f0ad95b44d5930\u2026' to be '9c33ae512e09e0526550c34a94c49001d9979\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/metricParameterContractParity.test.ts",
+          "name": "preserves entire runtime emission and actual built public contracts",
+          "firstErrorLine": "AssertionError: expected '91dc1ed0370eaea5e8476e28c4885e48ccc76\u2026' to be '9aa3559ae0aa5ab9e73bd3f5f335e46bd2b24\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateModuleHelperVisibility.test.ts",
+          "name": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+          "firstErrorLine": "AssertionError: expected '382495618e1c580b0bd4304f0ad95b44d5930\u2026' to be '9c33ae512e09e0526550c34a94c49001d9979\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateStoreLocatorVisibility.test.ts",
+          "name": "reviewed module-private store locator visibility retains the exact finite declaration manifest and supported package entries",
+          "firstErrorLine": "AssertionError: expected '382495618e1c580b0bd4304f0ad95b44d5930\u2026' to be '9c33ae512e09e0526550c34a94c49001d9979\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/workspacePathRedactionParity.test.ts",
+          "name": "freezes every actual source byte outside the declared imports and private bodies",
+          "firstErrorLine": "AssertionError: expected '91dc1ed0370eaea5e8476e28c4885e48ccc76\u2026' to be '9aa3559ae0aa5ab9e73bd3f5f335e46bd2b24\u2026' // Object.is equality"
+        }
+      ],
+      "fixtureSnapshots": [
+        {
+          "path": "dist/index.d.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/dist/index.d.ts.landed",
+          "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+        },
+        {
+          "path": "src/index.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/src/index.ts.landed",
+          "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+        }
+      ],
+      "finalRestoredBuildExit": 0,
+      "phases": [
+        {
+          "phase": "index-baseline-build",
+          "exitCode": 0,
+          "durationSeconds": 45.263,
+          "startedAt": "2026-10-14T13:19:12.549966+00:00",
+          "endedAt": "2026-10-14T13:19:57.814013+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-baseline-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "index-baseline",
+          "exitCode": 0,
+          "durationSeconds": 30.905,
+          "startedAt": "2026-10-14T13:19:57.929703+00:00",
+          "endedAt": "2026-10-14T13:20:28.834538+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-baseline.log",
+          "logSha256": "25a5f604bb18551d4d024d6d914eafcc75c3b6e2ce6e1202d2e11108a6a4ba9b",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-baseline.json",
+          "reportSha256": "031b6e12e6882ee783fa5bfa0d3131587cc9b3c09c3698eb1974407b00a51a3b",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "index-red-build",
+          "exitCode": 0,
+          "durationSeconds": 29.448,
+          "startedAt": "2026-10-14T13:20:28.919884+00:00",
+          "endedAt": "2026-10-14T13:20:58.368545+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-red-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "382495618e1c580b0bd4304f0ad95b44d59309b7af0941fd26a2468062711379",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "index-red",
+          "exitCode": 1,
+          "durationSeconds": 26.791,
+          "startedAt": "2026-10-14T13:20:58.471490+00:00",
+          "endedAt": "2026-10-14T13:21:25.262820+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-red.log",
+          "logSha256": "3d687fa858c5a5dbd76278b29d197ec587f2e5c8677a1504b053115c32a9d05d",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-red.json",
+          "reportSha256": "097331cb9049c012ded9155285efcce302611abe94509e2b6f8f195ee34c874f",
+          "result": {
+            "success": false,
+            "numTotalTests": 3017,
+            "numPassedTests": 3012,
+            "numFailedTests": 5,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 8
+          },
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "382495618e1c580b0bd4304f0ad95b44d59309b7af0941fd26a2468062711379",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "index-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 27.458,
+          "startedAt": "2026-10-14T13:22:19.275215+00:00",
+          "endedAt": "2026-10-14T13:22:46.733324+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 2,
+          "manifestSha256": "048707c278a3aaedbb867e1d70e123ce55cde14e8f97819e9126f82156ffef3f",
+          "sourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "index-snapshot",
+          "exitCode": 0,
+          "durationSeconds": 0.139,
+          "startedAt": "2026-10-14T13:22:46.794248+00:00",
+          "endedAt": "2026-10-14T13:22:46.933461+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-snapshot.log",
+          "logSha256": "e9f253c43b286abc9c1c2cebf723dc475bb75f39d8c65c4ce3db46e55f61ed8e",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+          "command": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/snapshot-plan-edit.mjs",
+            "--issue",
+            "P0-99",
+            "--base",
+            "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+            "src/index.ts"
+          ]
+        },
+        {
+          "phase": "index-green-build",
+          "exitCode": 0,
+          "durationSeconds": 31.65,
+          "startedAt": "2026-10-14T13:22:46.989912+00:00",
+          "endedAt": "2026-10-14T13:23:18.639761+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-green-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "382495618e1c580b0bd4304f0ad95b44d59309b7af0941fd26a2468062711379",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "index-green",
+          "exitCode": 0,
+          "durationSeconds": 28.781,
+          "startedAt": "2026-10-14T13:23:18.746541+00:00",
+          "endedAt": "2026-10-14T13:23:47.527557+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-green.log",
+          "logSha256": "b9db0ed9288ada850997e940f227ebccd97dca8744899927f6c2f8356cca4aeb",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-green.json",
+          "reportSha256": "991859145af2b3d1052bf71c235cb290521406dc3c9fb4428991745b7b6a6c8a",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "382495618e1c580b0bd4304f0ad95b44d59309b7af0941fd26a2468062711379",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "index-final-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 28.611,
+          "startedAt": "2026-10-14T13:23:47.643627+00:00",
+          "endedAt": "2026-10-14T13:24:16.254994+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/index-final-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "src/sdk/nativeAgentClient.ts",
+      "baselineSourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "probeSourceSha256": "e7cca0c35410d15a7230ee29d6679f2de64986793f76c8c42d44e2c8dd31b205",
+      "finalSourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "sourceRestored": true,
+      "assertionRegistries": {
+        "baseline": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "red": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "green": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        }
+      },
+      "sameAssertionRegistry": true,
+      "baseline": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "red": {
+        "success": false,
+        "numTotalTests": 3017,
+        "numPassedTests": 3012,
+        "numFailedTests": 5,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 8
+      },
+      "green": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "redAndGreenSourceBytesEqual": true,
+      "redAndGreenOwnBuildBytesEqual": true,
+      "redBuiltOutputHashes": {
+        "dist/sdk/nativeAgentClient.d.ts": "9c91dacb3860102a66cd6ac7dd2eb44930c0e42c09b11d29af91b2868b01cdbc",
+        "dist/sdk/nativeAgentClient.js": "aa5e5c217bfae5654afa969bc217ac4532b08c786e58697ba42a582c37106cea"
+      },
+      "greenBuiltOutputHashes": {
+        "dist/sdk/nativeAgentClient.d.ts": "9c91dacb3860102a66cd6ac7dd2eb44930c0e42c09b11d29af91b2868b01cdbc",
+        "dist/sdk/nativeAgentClient.js": "aa5e5c217bfae5654afa969bc217ac4532b08c786e58697ba42a582c37106cea"
+      },
+      "redFailures": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/explainabilityContractParity.test.ts",
+          "name": "explainability shared contracts retain complete original exported flows restores full original bytes and keeps public types, callers, package entries and historical guards untouched",
+          "firstErrorLine": "AssertionError: expected 'e7cca0c35410d15a7230ee29d6679f2de6498\u2026' to be '824475754824d4e4f4625b8545c3053241831\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/metricParameterContractParity.test.ts",
+          "name": "preserves entire runtime emission and actual built public contracts",
+          "firstErrorLine": "AssertionError: expected '9c91dacb3860102a66cd6ac7dd2eb44930c0e\u2026' to be '8652b7c9ffded332a5e277ce4511f3a8a0e06\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateModuleHelperVisibility.test.ts",
+          "name": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+          "firstErrorLine": "AssertionError: expected 'e7cca0c35410d15a7230ee29d6679f2de6498\u2026' to be '824475754824d4e4f4625b8545c3053241831\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateStoreLocatorVisibility.test.ts",
+          "name": "reviewed module-private store locator visibility retains the exact finite declaration manifest and supported package entries",
+          "firstErrorLine": "AssertionError: expected 'e7cca0c35410d15a7230ee29d6679f2de6498\u2026' to be '824475754824d4e4f4625b8545c3053241831\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/workspacePathRedactionParity.test.ts",
+          "name": "freezes every actual source byte outside the declared imports and private bodies",
+          "firstErrorLine": "AssertionError: expected '9c91dacb3860102a66cd6ac7dd2eb44930c0e\u2026' to be '8652b7c9ffded332a5e277ce4511f3a8a0e06\u2026' // Object.is equality"
+        }
+      ],
+      "fixtureSnapshots": [
+        {
+          "path": "dist/sdk/nativeAgentClient.d.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/dist/sdk/nativeAgentClient.d.ts.landed",
+          "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+        },
+        {
+          "path": "src/sdk/nativeAgentClient.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/src/sdk/nativeAgentClient.ts.landed",
+          "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+        }
+      ],
+      "finalRestoredBuildExit": 0,
+      "phases": [
+        {
+          "phase": "native-baseline-build",
+          "exitCode": 0,
+          "durationSeconds": 27.323,
+          "startedAt": "2026-10-14T13:24:59.376647+00:00",
+          "endedAt": "2026-10-14T13:25:26.699656+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-baseline-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "native-baseline",
+          "exitCode": 0,
+          "durationSeconds": 25.025,
+          "startedAt": "2026-10-14T13:25:26.763046+00:00",
+          "endedAt": "2026-10-14T13:25:51.790665+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-baseline.log",
+          "logSha256": "16b8351a9ead7471606da5fc555ee3ef03401e3805c745fbedd689d4b6388007",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-baseline.json",
+          "reportSha256": "baf65f774736a510fc18d4d7a5a7945781c07f48d762cc8df67d4e0425412335",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "native-red-build",
+          "exitCode": 0,
+          "durationSeconds": 27.167,
+          "startedAt": "2026-10-14T13:25:51.860180+00:00",
+          "endedAt": "2026-10-14T13:26:19.028080+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-red-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "e7cca0c35410d15a7230ee29d6679f2de64986793f76c8c42d44e2c8dd31b205",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "native-red",
+          "exitCode": 1,
+          "durationSeconds": 28.642,
+          "startedAt": "2026-10-14T13:26:19.087550+00:00",
+          "endedAt": "2026-10-14T13:26:47.730376+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-red.log",
+          "logSha256": "1bb15138703f8b167490768911b77cd97e88ca0573c09b5d9681c5e7297b4e09",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-red.json",
+          "reportSha256": "2cf555c892292815d9ed1bea57303dc8dbcbab8b24caf277b54c944ce3b5d4bb",
+          "result": {
+            "success": false,
+            "numTotalTests": 3017,
+            "numPassedTests": 3012,
+            "numFailedTests": 5,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 8
+          },
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "e7cca0c35410d15a7230ee29d6679f2de64986793f76c8c42d44e2c8dd31b205",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "native-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 32.573,
+          "startedAt": "2026-10-14T13:27:20.617323+00:00",
+          "endedAt": "2026-10-14T13:27:53.190275+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 4,
+          "manifestSha256": "c2cfeb4abb54100f52bd82e7e8c9192896aa521bf858f630d440c9c268c6d503",
+          "sourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "native-snapshot",
+          "exitCode": 0,
+          "durationSeconds": 0.161,
+          "startedAt": "2026-10-14T13:27:53.260121+00:00",
+          "endedAt": "2026-10-14T13:27:53.420949+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-snapshot.log",
+          "logSha256": "af20786e6d004c20bffed5d5fd77dd6e21a541ccf4f465c7e67904d04da814e3",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+          "command": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/snapshot-plan-edit.mjs",
+            "--issue",
+            "P0-99",
+            "--base",
+            "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+            "src/sdk/nativeAgentClient.ts"
+          ]
+        },
+        {
+          "phase": "native-green-build",
+          "exitCode": 0,
+          "durationSeconds": 28.988,
+          "startedAt": "2026-10-14T13:27:53.489107+00:00",
+          "endedAt": "2026-10-14T13:28:22.477291+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-green-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "e7cca0c35410d15a7230ee29d6679f2de64986793f76c8c42d44e2c8dd31b205",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "native-green",
+          "exitCode": 0,
+          "durationSeconds": 24.829,
+          "startedAt": "2026-10-14T13:28:22.537190+00:00",
+          "endedAt": "2026-10-14T13:28:47.366303+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-green.log",
+          "logSha256": "6ad1ed1c6d0a83d9a320dacb8947b4b2e3942b7c591b80eae9c138c0acecc2e8",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-green.json",
+          "reportSha256": "bc0dc2f9cf6abdcfca64923e2d981a8129d7969997f5cdc7661a2c070db5cb60",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "e7cca0c35410d15a7230ee29d6679f2de64986793f76c8c42d44e2c8dd31b205",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "native-final-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 27.49,
+          "startedAt": "2026-10-14T13:28:47.436580+00:00",
+          "endedAt": "2026-10-14T13:29:14.926563+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/native-final-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "src/workspace.ts",
+      "baselineSourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "probeSourceSha256": "a9c4f787c04295b17b1100ed7f8a5021880bceb89844ec16e0411ea6af654cf2",
+      "finalSourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "sourceRestored": true,
+      "assertionRegistries": {
+        "baseline": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "red": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        },
+        "green": {
+          "cases": 3017,
+          "sha256": "043fca62eb0e8751972cb9cb2af15c78abada7d11db004d247cdbd76d81271a5"
+        }
+      },
+      "sameAssertionRegistry": true,
+      "baseline": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "red": {
+        "success": false,
+        "numTotalTests": 3017,
+        "numPassedTests": 3015,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 3
+      },
+      "green": {
+        "success": true,
+        "numTotalTests": 3017,
+        "numPassedTests": 3017,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "redAndGreenSourceBytesEqual": true,
+      "redAndGreenOwnBuildBytesEqual": true,
+      "redBuiltOutputHashes": {
+        "dist/workspace.d.ts": "35d2a7fe72beec1cc76c131cdefcf1d73f584ea4924d55358335cbf854043d6e",
+        "dist/workspace.js": "020f4828dd213f8e7af427aec3ebe3446ad77831fb6ebe86f0b803197d7f234d"
+      },
+      "greenBuiltOutputHashes": {
+        "dist/workspace.d.ts": "35d2a7fe72beec1cc76c131cdefcf1d73f584ea4924d55358335cbf854043d6e",
+        "dist/workspace.js": "020f4828dd213f8e7af427aec3ebe3446ad77831fb6ebe86f0b803197d7f234d"
+      },
+      "redFailures": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateModuleHelperVisibility.test.ts",
+          "name": "individually reviewed module-private helper visibility src/workspace.ts retains every function, parameter, body and caller while changing only the declared visibility",
+          "firstErrorLine": "AssertionError: expected 'import { spawnSync } from \"node:child\u2026' to be 'import { spawnSync } from \"node:child\u2026' // Object.is equality"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tests/privateModuleHelperVisibility.test.ts",
+          "name": "individually reviewed module-private helper visibility src/workspace.ts retains the entire emitted implementation except those unused export assignments",
+          "firstErrorLine": "AssertionError: expected '\"use strict\";\\nvar __createBinding = \u2026' to be '\"use strict\";\\nvar __createBinding = \u2026' // Object.is equality"
+        }
+      ],
+      "fixtureSnapshots": [
+        {
+          "path": "src/workspace.ts",
+          "issue": "P0-99",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-99/src/workspace.ts.landed",
+          "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
+        }
+      ],
+      "finalRestoredBuildExit": 0,
+      "phases": [
+        {
+          "phase": "workspace-baseline-build",
+          "exitCode": 0,
+          "durationSeconds": 26.976,
+          "startedAt": "2026-10-14T13:29:36.370872+00:00",
+          "endedAt": "2026-10-14T13:30:03.347234+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-baseline-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "workspace-baseline",
+          "exitCode": 0,
+          "durationSeconds": 24.859,
+          "startedAt": "2026-10-14T13:30:03.407196+00:00",
+          "endedAt": "2026-10-14T13:30:28.266500+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-baseline.log",
+          "logSha256": "befc0ed40a756401a81d97a933a36979cc73390663f70b2d15803ff86a7f9c0e",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-baseline.json",
+          "reportSha256": "c69dbd8a1ad6b186beac26bcfac4a081e1f8d145de53b796e9561be7c03916bb",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "workspace-red-build",
+          "exitCode": 0,
+          "durationSeconds": 27.206,
+          "startedAt": "2026-10-14T13:30:28.337771+00:00",
+          "endedAt": "2026-10-14T13:30:55.544582+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-red-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "a9c4f787c04295b17b1100ed7f8a5021880bceb89844ec16e0411ea6af654cf2",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "workspace-red",
+          "exitCode": 1,
+          "durationSeconds": 24.889,
+          "startedAt": "2026-10-14T13:30:55.606457+00:00",
+          "endedAt": "2026-10-14T13:31:20.495964+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-red.log",
+          "logSha256": "be0c9ffdc94b5be2a1a2e4ac5dc924191755e53753db87e7d9fc6d7a27836490",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-red.json",
+          "reportSha256": "963b3327c18b14fd9e3cfdaa9842e9a913b64f547ea97fcba35b4439541f20ab",
+          "result": {
+            "success": false,
+            "numTotalTests": 3017,
+            "numPassedTests": 3015,
+            "numFailedTests": 2,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 3
+          },
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "a9c4f787c04295b17b1100ed7f8a5021880bceb89844ec16e0411ea6af654cf2",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "workspace-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 46.835,
+          "startedAt": "2026-10-14T13:32:00.937806+00:00",
+          "endedAt": "2026-10-14T13:32:47.773195+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 6,
+          "manifestSha256": "ab731a7cc9fc2d8499747062d8af83e34bf82be7579e6f8170c289d5f4dcace3",
+          "sourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "workspace-snapshot",
+          "exitCode": 0,
+          "durationSeconds": 0.272,
+          "startedAt": "2026-10-14T13:32:47.956274+00:00",
+          "endedAt": "2026-10-14T13:32:48.228631+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-snapshot.log",
+          "logSha256": "624d0b9601b323a3e6f61f0b0bff91d3aaff906a4608bed3f4bcdb35b2ccb698",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 7,
+          "manifestSha256": "07e075a6e475bdc4b4e91fa1f2ae4734b1acdeb98195b19e193ec277a34bb67d",
+          "sourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+          "command": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/snapshot-plan-edit.mjs",
+            "--issue",
+            "P0-99",
+            "--base",
+            "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+            "src/workspace.ts"
+          ]
+        },
+        {
+          "phase": "workspace-green-build",
+          "exitCode": 0,
+          "durationSeconds": 36.933,
+          "startedAt": "2026-10-14T13:32:48.330592+00:00",
+          "endedAt": "2026-10-14T13:33:25.264633+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-green-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 7,
+          "manifestSha256": "07e075a6e475bdc4b4e91fa1f2ae4734b1acdeb98195b19e193ec277a34bb67d",
+          "sourceSha256": "a9c4f787c04295b17b1100ed7f8a5021880bceb89844ec16e0411ea6af654cf2",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "phase": "workspace-green",
+          "exitCode": 0,
+          "durationSeconds": 30.217,
+          "startedAt": "2026-10-14T13:33:25.340747+00:00",
+          "endedAt": "2026-10-14T13:33:55.558439+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-green.log",
+          "logSha256": "3e42e090d4286038d01877b6a2d1ff8f8ed43b45b926ba2d33249d33db29db33",
+          "report": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-green.json",
+          "reportSha256": "838ff49886db60309a2de3eff50d6f9074bc8967f9f6128269ba121ac1dc86ff",
+          "result": {
+            "success": true,
+            "numTotalTests": 3017,
+            "numPassedTests": 3017,
+            "numFailedTests": 0,
+            "numPendingTests": 0,
+            "numTodoTests": 0,
+            "numFailedTestSuites": 0
+          },
+          "manifestRows": 7,
+          "manifestSha256": "07e075a6e475bdc4b4e91fa1f2ae4734b1acdeb98195b19e193ec277a34bb67d",
+          "sourceSha256": "a9c4f787c04295b17b1100ed7f8a5021880bceb89844ec16e0411ea6af654cf2",
+          "command": "fixed-corpus Vitest command in raw phase evidence"
+        },
+        {
+          "phase": "workspace-final-restored-build",
+          "exitCode": 0,
+          "durationSeconds": 28.887,
+          "startedAt": "2026-10-14T13:33:55.637113+00:00",
+          "endedAt": "2026-10-14T13:34:24.524914+00:00",
+          "log": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/workspace-final-restored-build.log",
+          "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+          "report": null,
+          "reportSha256": null,
+          "result": null,
+          "manifestRows": 7,
+          "manifestSha256": "07e075a6e475bdc4b4e91fa1f2ae4734b1acdeb98195b19e193ec277a34bb67d",
+          "sourceSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+          "command": [
+            "npm",
+            "run",
+            "build"
+          ]
+        }
+      ]
+    }
+  ],
+  "integrity": {
+    "allOriginalArchiveBytesPreserved": true,
+    "originalManifestEntriesPreserved": true,
+    "original19ParityTestBytesPreserved": true,
+    "approvedThreeFileOverlayUnchanged": true,
+    "allFourSourcesRestored": true,
+    "manifestRows": 7,
+    "newFixtureEntries": [
+      {
+        "path": "dist/index.d.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/dist/index.d.ts.landed",
+        "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+      },
+      {
+        "path": "dist/sdk/nativeAgentClient.d.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/dist/sdk/nativeAgentClient.d.ts.landed",
+        "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+      },
+      {
+        "path": "src/index.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/src/index.ts.landed",
+        "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+      },
+      {
+        "path": "src/sdk/nativeAgentClient.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/src/sdk/nativeAgentClient.ts.landed",
+        "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+      },
+      {
+        "path": "src/types.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/src/types.ts.landed",
+        "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+      },
+      {
+        "path": "src/workspace.ts",
+        "issue": "P0-99",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-99/src/workspace.ts.landed",
+        "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
+      }
+    ],
+    "trackedChangedPaths": [
+      "scripts/snapshot-plan-edit.mjs",
+      "tests/helpers/landedSource.ts",
+      "tests/planEditsManifest.test.ts",
+      "unused-code/plan-edits/manifest.json"
+    ]
+  },
+  "rawPhaseEvidence": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/tmp/p0-47-historical/plan.json",
+  "overlayHashes": {
+    "scripts/snapshot-plan-edit.mjs": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+    "tests/helpers/landedSource.ts": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+    "tests/planEditsManifest.test.ts": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63"
+  },
+  "limits": [
+    "This is a historical 20-file integration slice, not current-main qualification, whole historical parity, full-suite or coverage qualification.",
+    "The actual live-read and omitted-SHA helper mutations and current-main semantic guard qualification belong to the separate root run.",
+    "No original snapshot was removed or reassigned. New P0-99 entries are fixture-only and are retained with logs and reports. No cleanup, commit or push was performed."
+  ]
+}

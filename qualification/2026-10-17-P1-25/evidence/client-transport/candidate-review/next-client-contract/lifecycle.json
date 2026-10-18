@@ -1,0 +1,32 @@
+{
+  "schema": "p125-inline-http-ownership-design/1",
+  "fixture": "Small inline node:http server; no signed-native workspace/fake-chat helper ornewpackage.",
+  "sourceAuthority": "Prospective relative../../src imports from actual S/Qtest path; root must rebind finalP126source/metadataHEAD before allocation. No heldRsourceauthority.",
+  "workspace": "Each HTTP family gets an explicit new owned temporary unregulated workspace, passed as fourth argument with undefined thirdtimeout argument to exercise the real default. No initWorkspace/keys/vault/activeplan/registry is fabricated, deleted or disabled. All real checkScopedEgress calls remain.",
+  "preflight": "Exact127.0.0.1literal uses checkedAddress directIPbranch. No localhost/DNSresolvermock/raw-arrayTCP/Unix-sockettunnel/remoteTSA. No claim OS/futureinheritedguard permits it; actual refusal stays failure.",
+  "setup": [
+    "Allocate serverhandle and attach error/connection listeners before listen. Keep handle even if bind/setup fails; close only if actually listening, retaining setup+cleanup errors.",
+    "For every accepted socket, attach close/error terminals immediately. For every request/response, attach bounded-body/end/aborted/finish/close/error observers before processing. Capture async handler failure and end a finite500reply if feasible; never drop unhandled listener rejections.",
+    "All non-timeout endpoint responses are finite and end; Connection:close on fixture replies is an ordinary fixture primitive. Preserve exact sourceclient options/headers and no new retry or forcedabort."
+  ],
+  "finally": [
+    "Await the actual client outcome and preserve the first body/assertion failure. Then stop accepting via ordinary server.close(callback) and await all already-tracked request/response/socket terminal promises and serverclose. Attach terminal promises at creation so early events cannot be lost.",
+    "For oversized/defaulttimeout rows, distinguish expected client-triggered peerabort/close from unexpected endpoint errors; all owned streams must reach terminal states. No closeAllConnections/socketdestroy cleanup may manufacture an otherwise missing natural closure.",
+    "If setup/body/cleanup all fail, retain the first error and additional cleanup errors together; do not overwrite the primary assertion, swallow cleanup errors or retry closing to create a pass.",
+    "Retain temporary private files/root for forensic evidence if chosen; a retained directory is not an open network/nativehandle. No environment mutation is needed; setup-owned guard environment remains unchanged."
+  ],
+  "guardNegativeExcluded": "No invalid-empty-workspace or malformed-registrynegative in this first cohort. They can call real emitGuardEvent and open ledger/native/vault services; currentsetup only closes its ownimplicitguardworkspace and does not automatically own an explicit negative fixture. Such a test needs separate scope/resource design, never a forged registry or sourcebypass.",
+  "clientHandleBoundary": "postTimestampQuery does not expose its internal ClientRequest. Peer/socket terminal observations plus natural frozen process closure are finite lifecycle evidence, not universal enumeration of hidden client handles/descendants.",
+  "safePublicFacts": [
+    "Family id, actual clientresolved/refusedboolean/refusalcategory, request/routecount, status/MIME, byte sizes/hashes and fixed-header-match booleans.",
+    "DER version/OID/digest/nonce/certReq-match booleans and noncewirewidth; no need publish noncevalue, body or rawuserinfo.",
+    "Owned resource counts/terminal states plus original body/setup/cleanuperror categories with syntheticcanary redaction ifneeded."
+  ],
+  "notCoverage": [
+    "HTTPS trust/systemCA,SNIorhostnameDNSrebinding proof",
+    "ConfiguredTSAfallbackandgenuinefreshnoncegrant",
+    "time.requiredsealing/issuance/checkpointwindows",
+    "Signedtrust-list/PKI/verifiedtimestamp/publicanchor",
+    "F37rawarrayorUnixsocketguardqualification"
+  ]
+}

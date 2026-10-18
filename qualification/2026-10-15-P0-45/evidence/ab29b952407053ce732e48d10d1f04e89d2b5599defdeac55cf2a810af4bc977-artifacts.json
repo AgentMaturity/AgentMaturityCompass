@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/classification.json",
+    "bytes": 11240,
+    "sha256": "800c12a0eeebc23de83b6b9ee928e9191abdbf60b1e43a5670ad6552e65eaa13"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/command.json",
+    "bytes": 1722,
+    "sha256": "394e7d7cbd552feebdff81a3d3baac4ffd8f2f25fd2fcee5a17819722765c955"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/inputs-after.json",
+    "bytes": 866,
+    "sha256": "4313d3ce746234faf2843f745338122d75677063eed641e8daeb58288f4d3da4"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/inputs-before.json",
+    "bytes": 866,
+    "sha256": "8e82794c3dbe7caef30530991ba1391f0f25e04a6a851a771179658d1b3a1bc4"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/observer.json",
+    "bytes": 12442,
+    "sha256": "0f5f18c684bc3c719cde9dc55b06cc02233961a0152200d420ea11611e7a5a29"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "f7c08ce47b45c9aae1f0c427ed7e7654e08496a6e7ccbf5644dad078becdfd76"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/owned-process.json",
+    "bytes": 1347,
+    "sha256": "676758ae8598c662389a48cb08032118c61918cb0b5481fc7d4b00eef7f8edaf"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json",
+    "bytes": 8232,
+    "sha256": "bec4808ffcdb7beda92372c5ce82c2f966994b5398e17dfdc69772282b49c987"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/stdout-stderr.log",
+    "bytes": 3055,
+    "sha256": "adc64b6b0341076c3466c7985ddc2b68b0e5ac50b436c2c44d91768de80ce1ba"
+  }
+]

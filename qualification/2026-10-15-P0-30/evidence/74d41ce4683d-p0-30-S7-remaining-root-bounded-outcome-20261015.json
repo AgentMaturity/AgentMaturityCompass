@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssues": [
+    "AMC-1513",
+    "AMC-1519"
+  ],
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:12:08.457945+00:00",
+  "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_INDEPENDENTLY_REVIEWED",
+  "packet": {
+    "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+    "bytes": 93748,
+    "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+  },
+  "report": {
+    "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.md",
+    "bytes": 2351,
+    "sha256": "daba845d494f79278c4e07344a8096c5588078e6b387a60c0490e6aadf0e0a46"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+    "bytes": 64027,
+    "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+  },
+  "independentReviewMarkdown": {
+    "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+    "bytes": 2823,
+    "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+  },
+  "actual": {
+    "commands": 45,
+    "corpusProcesses": 44,
+    "caseExecutions": 703,
+    "passedExecutions": 682,
+    "privateMutantAssertionFailureExecutions": 21,
+    "uniqueOriginalCases": 25,
+    "originalCasesFailingAtLeastOneControl": 14,
+    "pureOriginalBaseline": 21,
+    "scriptedOriginalBaseline": 4,
+    "pureControls": 10,
+    "scriptedControls": 4,
+    "allRestorationsGreen": true,
+    "zeroPendingTodoInfrastructureKnownLateDiagnosticsOuterSignalsOrForcedActions": true
+  },
+  "schedulerHistory": [
+    "Original completed M26 then stopped on literal AssertionError stack prefix. Structured actual matcher AssertionError had rewritten Error stack.",
+    "First continuation completed M27 then stopped on root erroneous line70 versus actual69:50 predicate.",
+    "Separate final continuation validated saved M26 and M27 before only M28/M29. No completed baseline/control was rerun. Original controller/reporter/tests were unchanged."
+  ],
+  "preservation": {
+    "finalRootPrivate12268": true,
+    "rootGitCleanAtSource58": true,
+    "artifactReferences": 4881,
+    "finishedPredecessorClosuresIndependentlyRehashed": 16,
+    "nativeAnd307DependencyLinksExact": true,
+    "proof": {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-final-readonly-preservation.json",
+      "bytes": 971,
+      "sha256": "5311d65192f04a938395ce73582f9a4cfddca8906f9ffbfe3e3bf88d77454da8"
+    }
+  },
+  "limits": [
+    "Pure JSON/parser and BPF evaluator decisions do not establish Linux/kernel/Bubblewrap/seccomp confinement. First assertion masks remain per recipe.",
+    "SDK real stdio scripted peers choose unsigned receipts; no genuine signed writer, independent key authority, SQLite cold ledger/history or real verifier truth.",
+    "Normal outer observations are not universal per-child ABI/exit/signal/streams or universal no-effects proof.",
+    "Original harness43 and its two controls were not executed by this lane. It requires a separate released observer route. Historical41/55/53 and held76 batch remain distinct.",
+    "No source/test/config/helper/guard/import/deadline repair or adoption, build/dist mutation, fullsuite/coverage/Node24/installed/hosted/release/G0/Done/dependency closure. Duplicate1269/dead2751 and ownership/earlier strict failures remain unwaived."
+  ],
+  "formalAcceptanceClosed": false,
+  "allBoundedReviewsComplete": true,
+  "next": "Separate AMC1518 observer v2 final independent static review and root release, then original43/two controls if all gates hold."
+}

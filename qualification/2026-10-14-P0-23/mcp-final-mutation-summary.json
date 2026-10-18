@@ -1,0 +1,17 @@
+{
+  "source": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "testSha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc",
+  "sourceBeforeAndRestoredSha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+  "faultSha256": "b1f7df9870155e6dcc8790cd7491d0f24a04b873a0693d02d5e86c8561d7459b",
+  "reportSha256": "7b31bb998bae81e45faecb57d42c53ccbcc84cffe516776bf44ffedf12b496cd",
+  "counts": {
+    "numTotalTests": 23,
+    "numPassedTests": 7,
+    "numFailedTests": 16,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "restoredExactly": true,
+  "scope": "Actual owned withClaim helper drops only its canonical text block and structuredContent; no protected source edits"
+}

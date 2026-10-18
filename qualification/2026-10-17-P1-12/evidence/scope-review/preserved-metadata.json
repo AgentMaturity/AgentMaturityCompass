@@ -1,0 +1,32 @@
+{
+  "schema": "p112-preserved-branch-and-held-ignore-metadata/1",
+  "priorP111Branch": {
+    "argv": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "rev-parse",
+      "refs/heads/codex/p1-11-evidence-qualification"
+    ],
+    "exit": 0,
+    "stdout": "85dd9d9bda246a78407bb06c9123e78c1745ea15\n",
+    "stderr": ""
+  },
+  "heldProviderArchiveIgnore": {
+    "argv": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "check-ignore",
+      "-v",
+      "--",
+      "unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed"
+    ],
+    "exit": 0,
+    "stdout": "/Users/sid/AgentMaturityCompass/.git/info/exclude:19:/unused-code/\tunused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed\n",
+    "stderr": ""
+  },
+  "boundary": "Exact read-only metadata; no staging, force-add, unignore, branch mutation or D15 execution."
+}

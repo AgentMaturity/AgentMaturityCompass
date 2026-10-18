@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "vitest";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 import {
   createResidencyPolicy,
   getResidencyPolicies,
@@ -368,6 +369,10 @@ describe("markdown rendering", () => {
     expect(md).toContain("## Tenant Isolation Checks");
     expect(md).toContain("## Legal Holds");
     expect(md).toContain("## Privacy Redaction Tests");
+    expect(md).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(md).toContain("**Applicability:** unresolved");
+    expect(md.split("\n").find((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+    expect(md).toContain(renderClaimLegend("markdown"));
   });
 
   test("renders non-compliant report with violations", () => {
@@ -378,6 +383,9 @@ describe("markdown rendering", () => {
     expect(md).toMatch(/\d+ violation\(s\) found/);
     expect(md).not.toMatch(/\bCOMPLIANT\b/);
     expect(md).toContain("### Violations");
+    expect(md).toContain("**Claim:** Self-reported · **Result:** fail");
+    expect(md.split("\n").find((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+    expect(md).toContain(renderClaimLegend("markdown"));
   });
 });
 

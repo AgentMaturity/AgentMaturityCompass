@@ -1,0 +1,149 @@
+{
+  "freezeLog": "Freeze guard passed: {\"cliCommandPaths\":1236,\"cliInventoryPaths\":1236,\"stationPacks\":41,\"stationPackQuestions\":632}\n",
+  "countLiteralProof": {
+    "at": "2026-10-16T10:55:32.951768+00:00",
+    "files": [
+      {
+        "path": "README.md",
+        "beforeSha256": "0ea904abbf32e7bc0334b457735ea2d6d2060f15f039d96872011fbc5a1498dd",
+        "afterSha256": "ccd0c1404c37fc70022968a28fe58c7199f470e45ab07b756816291ba686288a",
+        "literalOnly": true
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "beforeSha256": "f492477cd9a569e28014f01fdc61e463207c8a3780fd27ea0b0e1c824b54b9b2",
+        "afterSha256": "afc55d16c70d6b3a5a4bf68fbe071d902cf6d7853bb90db92e03a44c22415fe6",
+        "literalOnly": true
+      },
+      {
+        "path": "website/index.html",
+        "beforeSha256": "e9bbfcd0144e0440aa26bc5fe6d9612d7d20b06400e60ab1687cc5b578f120dc",
+        "afterSha256": "531623bbee6cef5529e60d4d385781292afab4b2f58123d9662df8cd3a7e2022",
+        "literalOnly": true
+      },
+      {
+        "path": "website/lite.html",
+        "beforeSha256": "85ded49355a2e8d7861512ad3e3902db9401eb6cf9315f25862df8692ba06dc2",
+        "afterSha256": "3a946fe5aa9d6ec644b86f6ca8c0d501632b29891c1d8d0d7e8e70a7fe29ab3f",
+        "literalOnly": true
+      },
+      {
+        "path": "website/i18n.js",
+        "beforeSha256": "c452fb156b6e19ed47579b140b8e8244927850dc2fdce05badcf5a8f92060734",
+        "afterSha256": "d9ac61410f8fb2c23d8e91dd66dfc50bff9b7d2f187647b282978d6353810c79",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "beforeSha256": "67df8a4f97629b03f54301eea7614f9d955153061d3bd912a42919c2229481f9",
+        "afterSha256": "25c52168c201bff93fa61ea6932de0ac6d23a75cadc760306b3eb9dbf32316fa",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "beforeSha256": "d02330a7330aa13f13072d9686d179650cd4be29523bc146fe88eb150c29d1de",
+        "afterSha256": "4531d5a2ccd8d164bc27d306588cc7efe92509447920f7ff66ceb45d1907b710",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "beforeSha256": "979d0a610b3d149e9909db89aa65b712fa55b4d0cb340cfcce2cad8690e2cfad",
+        "afterSha256": "79c12a5ecda93fb303b2a6eee2848165c8ce053a639b38d95b05a83cde2977f3",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "beforeSha256": "bd8c076d51a4705608e410c4ec5f43a2b030097dc33e6f228bd6fda98acfbd56",
+        "afterSha256": "16b4d8f7abf5c56280d0d13d6b0ef7050e214090c042567bde83372aedd781dd",
+        "literalOnly": true
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "beforeSha256": "00980c0268e2d08d076460d0252cf11a279456ee5d1b1a091553077bbf128e99",
+        "afterSha256": "3f1983cb7f5474b53ee195ff509cd7763c0784a08473d072b9e08ce7cae66c39",
+        "literalOnly": true
+      }
+    ],
+    "onlyTrackedChangesAreTenCountSurfaces": true,
+    "newTestRemainsUntrackedUntilOrdinaryCommit": true,
+    "passingResultsInvented": false
+  },
+  "architecture": {
+    "architectureStatus": "passed",
+    "architectureFailures": [],
+    "architecturePrefixBranchCount": 2,
+    "architectureRatchetNotice": "Line ratchet: 6 file(s) shrank by 218 lines.\n  src/api/scoreRouter.ts: 901 -> 896\n  src/assurance/assuranceRunner.ts: 976 -> 975\n  src/enforce/resourceManifest.ts: 2034 -> 2032\n  src/gateway/server.ts: 1814 -> 1784\n  src/studio/studioServer.ts: 8858 -> 8854\n  src/toolhub/toolhubServer.ts: 1201 -> 1025\nRun with --update to lower the baselines and lock this in.\n",
+    "architectureJsonParsedEntirely": true,
+    "duplicatesByteEqualP124": true,
+    "duplicatesSha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d",
+    "noRatchetAdoption": true
+  },
+  "duplicates": {
+    "status": "failed",
+    "tool": "jscpd",
+    "version": "5.4.0",
+    "findingCount": 1268,
+    "statistics": {
+      "clones": 1268,
+      "duplicatedLines": 14771,
+      "duplicatedTokens": 95638,
+      "lines": 527288,
+      "newClones": 0,
+      "newDuplicatedLines": 0,
+      "percentage": 2.8013154101743263,
+      "percentageTokens": 2.9100736783747547,
+      "sources": 2146,
+      "tokens": 3286446
+    },
+    "representativeFindings": [
+      "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+      "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+      "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+      "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+      "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+      "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+    ]
+  },
+  "deadCode": {
+    "status": "failed",
+    "tool": "knip",
+    "version": "6.39.0",
+    "findingCount": 2729,
+    "representativeFindings": [
+      "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+      "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+      "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+      "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+      "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+      "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+      "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+      "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+      "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]",
+      "[\"src/a4/a4Conformance.ts\",\"types\",{\"name\":\"StoredControl\"}]"
+    ]
+  },
+  "deadCodeExactDelta": {
+    "schema": "amc-p137-deadcode-exact-delta-v1",
+    "previousPath": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-deadcode-delta/stdout-stderr.log",
+    "previousCount": 2730,
+    "currentCount": 2729,
+    "tool": "knip",
+    "version": "6.39.0",
+    "added": [],
+    "removed": [
+      "[\"src/session/surfaceCompactionValidation.ts\",\"exports\",{\"name\":\"surfaceCompactionReceiptSchema\"}]"
+    ],
+    "waived": false
+  },
+  "fullDeadCodeDeltaPrivatePin": {
+    "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-deadcode-delta/stdout-stderr.log",
+    "bytes": 248954,
+    "sha256": "3734e60edfd694ddb25afd436ad39f9431326dde0f429a5ff93e171071ddd3c6"
+  },
+  "baselinesAdoptedOrWaived": false,
+  "boundary": "The one removed unused-export finding is test usage, not production integration. No global quality green is claimed."
+}

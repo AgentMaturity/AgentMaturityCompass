@@ -1,0 +1,567 @@
+{
+  "kind": "Read-only bounded P0-27 qualification-test runtime compatibility preflight. Only this private JSON/Markdown pair is written; no test/source edits, next runtime, install/build, live dist read, private compiled mutation or next P0-24 work occurred.",
+  "observedWorkspace": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+  "sourceRef": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "observedHead": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "observedGitStatus": "",
+  "assignedNewTree": "Root creates and assigns the managed compatibility worktree only after bounded P0-19 canonical closure; no new checkout is created by this preflight.",
+  "graph": {
+    "reuseLog": "/private/tmp/p0-52-graph-navigation-w8xr443v/p0-20-next-routing-query.log",
+    "sha256": "d15bf7a7100a787d77646f35721db66f291fcdf52c7ea429ce38cef85fa7d5cd",
+    "copy": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "nodes": 36459,
+    "originalGraphDate": "2026-09-08",
+    "reviewedVersion": "0.9.56",
+    "installedVersion": "0.9.74",
+    "limits": "Existing scoped assurance/session/store navigation query was read first. It found 219 nodes and displayed 18; it is stale navigation only. Exact current source, helper and proposal bytes establish this test-only scope. No refresh/server/watcher was used."
+  },
+  "proposal": {
+    "target": "tests/assuranceSessionQualification.test.ts",
+    "originalSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+    "proposedSha256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+    "patch": "/private/tmp/p0-27-node-runtime-guard-proposal-20261015.patch",
+    "patchSha256": "4622cd6eb87c0c60bdcda1f53a4e37593adfcb2793d613aa78068ebaea62d205",
+    "metadata": "/private/tmp/p0-27-node-runtime-guard-proposal-20261015.json",
+    "metadataSha256": "3137bfc86699f0d13a203916a0efb22fa23b106b16802e768b0e94bce32dde9f",
+    "originalLines": 200,
+    "proposedLines": 200,
+    "changes": [
+      {
+        "line": 22,
+        "old": "assert.equal(Number(process.versions.node.split('.')[0]),22);",
+        "proposed": "assert.ok([22,24].includes(Number(process.versions.node.split('.')[0])));"
+      },
+      {
+        "line": 139,
+        "old": "expect(Number(process.versions.node.split(\".\")[0])).toBe(22);",
+        "proposed": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+      }
+    ],
+    "behaviorUnchanged": "Both replacements were computed in memory and match the exact proposed digest. All eight behavior cases, compiled API imports, independent public-pin capture, transport denial, minimal child environment, timeouts, row/signature/seal/error/fault/isolation and byte assertions remain identical. No proposal is applied here.",
+    "helperOriginalSha256": "78117b7dab247d67e99f070eed632278f471932f6f00e51fccf5b81cda6b5027",
+    "helperOriginalBytes": 11920
+  },
+  "whyNecessary": {
+    "ciSource": ".github/workflows/ci.yml:43 and nightly-compatibility-matrix.yml:18 explicitly list Node 22 and 24. package.json engine>=20 is broader and is not new Node20 qualification here.",
+    "guardLocation": "The test parent rejects 24 before writing the helper or calling any child. The helper rejects 24 before importing compiled product APIs or initializing a workspace. These are authored test-runtime constraints, not a product refusal policy."
+  },
+  "unchangedEightCases": [
+    {
+      "case": "signed-supervise",
+      "contract": "Real unavailable resolver emits exactly started/aborted audit rows, no fabricated report/assurance_runs row; original unavailable error is retained and real monitor rows/seal plus whole integrity are healthy."
+    },
+    {
+      "case": "signed-sandbox",
+      "contract": "Same signed abort contract with the genuine sandbox audit, exact 3 rather than 2 audit rows."
+    },
+    {
+      "case": "unsigned-noSign-false",
+      "contract": "AMC_NO_SIGN=1 forces unsigned store despite false caller option, leaves signed DB/WAL/SHM bytes and semantic rows unchanged, writes literal unsigned session rows/seal outside main, then signed operational evidence still verifies."
+    },
+    {
+      "case": "unsigned-noSign-true",
+      "contract": "Same actual isolation under explicit noSign true, with signed before/after operational controls and genuine unsigned abort."
+    },
+    {
+      "case": "first-row-fault",
+      "contract": "Owned SQLite trigger refuses first started row; session/row transaction and blobs remain unchanged; actual healthy sealed retry succeeds."
+    },
+    {
+      "case": "seal-update-fault",
+      "contract": "Owned real SQLite seal trigger keeps unavailable error primary, attaches exact seal cause and retains the unsealed/invalid negative; no fabricated success."
+    },
+    {
+      "case": "seal-helper-error-identity",
+      "contract": "Actual helper returns the same original error object and attaches the real database cause, preserving the unsealed negative."
+    },
+    {
+      "case": "unsigned-store-diversion",
+      "contract": "Without AMC_NO_SIGN, actual store option refuses without creating unsigned DB or changing signed bytes/rows."
+    }
+  ],
+  "childRuntimeContract": {
+    "executable": "spawnSync(process.execPath,...) makes the child use the same22/24 executable as its actual parent. The inherited executable directory is the complete child PATH, not a switch through generic node or nvm.",
+    "environment": "Existing minimal HOME/AMC_HOME, external owned checkpoint root, harmless vault fixture phrase, deliberately unavailable loopback endpoint, UTC/C and transport-denial NODE_OPTIONS are retained. Provider credential keys must remain empty; no model/external transport is called.",
+    "bounds": "Child timeout 60s, each test timeout 75s, afterAll 120s; requests/streams/results and independent public monitor pin are retained, and only generated state roots are cleaned.",
+    "compiledClosure": "The actual helper dynamically imports root/dist/workspace, ledger, assurance runner/evidence writers/responder, keys, trust and sqlitePool, all from the assigned runtime-owned build. No module mock, parser/help success, live dist mutation or copied code substitution qualifies these cases."
+  },
+  "otherPermanentQualificationFiles": [
+    {
+      "path": "tests/a4GuardQualification.test.ts",
+      "sha256": "b402f8aed22f144c7421000bbb76ae5e72afdc9654d70b41aa6986d10cc451bb",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 26,
+          "text": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+        },
+        {
+          "line": 32,
+          "text": "writeFileSync(join(evidenceRoot, \"inputs.json\"), JSON.stringify({ node: process.version, executable: process.execPath,"
+        },
+        {
+          "line": 47,
+          "text": "const environment = { HOME: home, AMC_HOME: home, PATH: dirname(process.execPath), LANG: \"C\", TZ: \"UTC\" };"
+        },
+        {
+          "line": 48,
+          "text": "const actual = spawnSync(process.execPath, args, { cwd: root, env: environment, encoding: \"utf8\", timeout: 30_000 });"
+        },
+        {
+          "line": 51,
+          "text": "writeFileSync(join(root, \"actual.json\"), JSON.stringify({ command: [process.execPath, ...args], cwd: root,"
+        }
+      ]
+    },
+    {
+      "path": "tests/a4OwnerModeQualification.test.ts",
+      "sha256": "f848651383cedbeb17f8bdc2ef9eb6647b47804c6cd21bb18e03bf754d8f4fd8",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 35,
+          "text": "if (![\"22\", \"24\"].includes(process.versions.node.split(\".\")[0]!)) throw new Error(\"Use a qualified Node 22 or 24 fixture runtime.\");"
+        }
+      ]
+    },
+    {
+      "path": "tests/amcActionLocalPnpmQualification.test.ts",
+      "sha256": "a121280c7ec6dcddf8cfe82054720a5919ce850cf23979f9f92c048c32bce717",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 44,
+          "text": "const shim = `#!${process.execPath}"
+        },
+        {
+          "line": 61,
+          "text": "if (![\"22\", \"24\"].includes(process.versions.node.split(\".\")[0]!)) {"
+        },
+        {
+          "line": 75,
+          "text": "PATH: [bin, dirname(process.execPath), \"/usr/bin\", \"/bin\"].join(delimiter),"
+        },
+        {
+          "line": 88,
+          "text": "runtime: process.version, executable: process.execPath, scope: \"command observers; no actual installation or build\" });"
+        }
+      ]
+    },
+    {
+      "path": "tests/assuranceGradingQualification.test.ts",
+      "sha256": "13607bc9ffe886bb399792bad520c08f43e9920ec03362ed280d1ada4d438f04",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": [
+        {
+          "line": 41,
+          "text": "node: process.version, executable: process.execPath, privateModules: privateRoot ?? null,"
+        }
+      ]
+    },
+    {
+      "path": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "sha256": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": [
+        {
+          "line": 102,
+          "text": "records.push({ phase: \"inputs\", node: process.version, executable: process.execPath, sourceHashes: [\"src/assurance/assuranceRunner.ts\", \"src/assurance/evidenceWriters.ts\","
+        }
+      ]
+    },
+    {
+      "path": "tests/assuranceSessionQualification.test.ts",
+      "sha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+      "classification": "Current parent/child Node 22-only assertions are the exact target; proposed guards accept 22/24.",
+      "runtimeLines": [
+        {
+          "line": 22,
+          "text": "assert.equal(Number(process.versions.node.split('.')[0]),22);"
+        },
+        {
+          "line": 68,
+          "text": "const report={caseName,node:process.version,executable:process.execPath,runnerModule:request.runnerModule??moduleAt('assurance/assuranceRunner.js'),success:false,checks:{},originalError:null};"
+        },
+        {
+          "line": 139,
+          "text": "expect(Number(process.versions.node.split(\".\")[0])).toBe(22);"
+        },
+        {
+          "line": 160,
+          "text": "const environment = { HOME: join(state, \"home\"), AMC_HOME: join(state, \"home\"), PATH: dirname(process.execPath),"
+        },
+        {
+          "line": 163,
+          "text": "const child = spawnSync(process.execPath, [join(evidence, \"actual-session-helper.mjs\"), request],"
+        }
+      ]
+    },
+    {
+      "path": "tests/budgetIntegrityQualification.test.ts",
+      "sha256": "1e3eae62d2c49bccafd36f9ae0a6a3e442cfa57c27f8be217a08b1c1f55dfff8",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": []
+    },
+    {
+      "path": "tests/compliance/assuranceGradingEligibilityQualification.test.ts",
+      "sha256": "c83a77b468373230a6c4fbb140a7deb8092bb1679585d4c2153c4a541df3ae82",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": [
+        {
+          "line": 13,
+          "text": "const runtime = process.execPath;"
+        },
+        {
+          "line": 81,
+          "text": "result={...saved,...observe(saved.workspace),replayFile,distRoot,networkAttempts,node:process.version,executable:process.execPath};}"
+        },
+        {
+          "line": 103,
+          "text": "result={input,caseDir,workspace,distRoot,pins,mapProof,reportProof,tamperProof,prior,...observe(workspace),networkAttempts,node:process.version,executable:process.execPath};"
+        },
+        {
+          "line": 150,
+          "text": "expect(out.node).toBe(process.version);"
+        },
+        {
+          "line": 151,
+          "text": "expect(out.executable).toBe(process.execPath);"
+        }
+      ]
+    },
+    {
+      "path": "tests/controlCheckpointQualification.test.ts",
+      "sha256": "7569ac285ff36b9e8cb1e4f8878d2b71be614ab4f752c444d6ebb0d98686dbcd",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 58,
+          "text": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+        },
+        {
+          "line": 61,
+          "text": "records.push({ kind: \"inputs\", node: process.version, sources: [\"src/lifecycle/signedControlJournal.ts\", \"src/utils/pathSafety.ts\"]"
+        }
+      ]
+    },
+    {
+      "path": "tests/evidenceAgentFilterQualification.test.ts",
+      "sha256": "33ee082ab1d053fd7821c2936ea8cd9fcc0324273c2fe1e1778214786d889c79",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 113,
+          "text": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+        },
+        {
+          "line": 116,
+          "text": "records.push({ kind: \"inputs\", node: process.version, sourceHashes: [\"src/evidence/exporter.ts\", \"src/ledger/ledger.ts\","
+        }
+      ]
+    },
+    {
+      "path": "tests/federationFollowupQualification.test.ts",
+      "sha256": "405ae7dbe2d10929f15b8b6dd2c9aa4a24250ef0ca9b58bfdc81608f621eb57e",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 95,
+          "text": "if (![\"22\", \"24\"].includes(process.versions.node.split(\".\")[0]!)) throw new Error(\"Use a qualified Node 22 or 24 fixture runtime.\");"
+        }
+      ]
+    },
+    {
+      "path": "tests/federationImportDestinationQualification.test.ts",
+      "sha256": "49ca8059fc8c2d1e683c2c6f2bd5b0cb154ca6e99be4dfb06a4e29deb7758fae",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 20,
+          "text": "expect(process.versions.node.split(\".\")[0]).toMatch(/^(22|24)$/);"
+        },
+        {
+          "line": 26,
+          "text": "node: process.version, executable: process.execPath,"
+        }
+      ]
+    },
+    {
+      "path": "tests/federationPublisherHistoryQualification.test.ts",
+      "sha256": "7954589131acf8be6f9761c2312a76e6adee65af897d482cca0ac496dcb88426",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 25,
+          "text": "expect(process.versions.node.split(\".\")[0], \"Use the prepared Node 22 or 24 runtime\").toMatch(/^(22|24)$/);"
+        },
+        {
+          "line": 32,
+          "text": "phase: process.env.AMC_P0_52_HISTORY_PHASE ?? \"unspecified\", node: process.version, executable: process.execPath,"
+        }
+      ]
+    },
+    {
+      "path": "tests/industryPackAuditReaderQualification.test.ts",
+      "sha256": "57920ea38d71e41b1317dba365098202f2cb5aeae15dd6337ae1d551e15e1775",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 88,
+          "text": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+        },
+        {
+          "line": 113,
+          "text": "pinCapturedBeforeArtifact: true, independentEd25519DigestVerification: true, node: process.version, executable: process.execPath });"
+        },
+        {
+          "line": 225,
+          "text": "const actual = spawnSync(process.execPath, [\"--input-type=module\", \"--eval\", code], { encoding: \"utf8\", timeout: 8_000,"
+        },
+        {
+          "line": 226,
+          "text": "killSignal: \"SIGKILL\", cwd: f.workspace, env: { HOME: home, AMC_HOME: home, PATH: dirname(process.execPath), LANG: \"C\", TZ: \"UTC\" } });"
+        },
+        {
+          "line": 230,
+          "text": "records.push({ name: \"fifo-child\", file, before, after, executable: process.execPath, codeSha256: sha256Hex(code),"
+        }
+      ]
+    },
+    {
+      "path": "tests/industryPackAuditSigningQualification.test.ts",
+      "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 91,
+          "text": "expect([22, 24]).toContain(Number(process.versions.node.split(\".\")[0]));"
+        },
+        {
+          "line": 119,
+          "text": "writeFileSync(join(evidence, \"pins-before-signing.json\"), JSON.stringify({ node: process.version,"
+        },
+        {
+          "line": 120,
+          "text": "executable: process.execPath, capturedAt: new Date().toISOString(),"
+        }
+      ]
+    },
+    {
+      "path": "tests/industryPackCli.test.ts",
+      "sha256": "66539767422adcbb6d47232433da927b7fa9f1616e503b1a46b7f22b7f3f5ad0",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 23,
+          "text": "expect(process.versions.node.split(\".\")[0], \"CLI qualification requires the prepared Node 22 or 24 runtime\").toMatch(/^(22|24)$/);"
+        },
+        {
+          "line": 49,
+          "text": "PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: fixtureHome,"
+        },
+        {
+          "line": 57,
+          "text": "root, workspace, home: fixtureHome, node: process.version, executable: process.execPath,"
+        },
+        {
+          "line": 73,
+          "text": "execFile(process.execPath, [\"--import\", pathToFileURL(guard).href, cli, ...args], {"
+        }
+      ]
+    },
+    {
+      "path": "tests/mcpClaimLabels.test.ts",
+      "sha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": []
+    },
+    {
+      "path": "tests/portableVerifierCliQualification.test.ts",
+      "sha256": "86f45ab5601d53ae0dc274a52a113d7bb2cbdc9451c74c0e68668f46ce8e286f",
+      "classification": "The observed explicit runtime predicate accepts 22 and 24.",
+      "runtimeLines": [
+        {
+          "line": 99,
+          "text": "expect(process.versions.node.split(\".\")[0], \"Use the prepared Node 22 or 24 executable\").toMatch(/^(22|24)$/);"
+        },
+        {
+          "line": 119,
+          "text": "environment = { PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: home, AMC_HOME: operatorHome,"
+        },
+        {
+          "line": 240,
+          "text": "node: process.version, executable: process.execPath, cli, cliSha256: sha256Hex(readFileSync(cli)),"
+        },
+        {
+          "line": 257,
+          "text": "execFile(process.execPath, [\"--import\", pathToFileURL(guard).href, cli, ...args, \"--json\"], {"
+        }
+      ]
+    },
+    {
+      "path": "tests/portableVerifierServerQualification.test.ts",
+      "sha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+      "classification": "No Node-major refusal predicate was found; runtime/executable recording or inherited actual process.execPath is retained as applicable.",
+      "runtimeLines": []
+    }
+  ],
+  "availableExecutables": [
+    {
+      "path": "/opt/homebrew/opt/node@22/bin/node",
+      "realPath": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "size": 67024,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "exists": true,
+      "executable": true,
+      "invokedNow": false
+    },
+    {
+      "path": "/opt/homebrew/opt/node@24/bin/node",
+      "realPath": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+      "size": 50320,
+      "sha256": "798d7f9c0d38051608d11ba87a12fbb01e92bfa457cd77ec612b5bad2a73a05e",
+      "exists": true,
+      "executable": true,
+      "invokedNow": false
+    },
+    {
+      "path": "/opt/homebrew/bin/pnpm",
+      "realPath": "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+      "size": 1102,
+      "sha256": "b276da51dc8ca5b0d3ee3371695b50fc8b3244b281b091c63a3f082a88dadeb9",
+      "exists": true,
+      "executable": true,
+      "invokedNow": false
+    }
+  ],
+  "dependencyIsolation": {
+    "packageManager": "Pinned packageManager pnpm@10.33.0; lockfile better-sqlite3 version 12.11.1; workspace nodeLinker hoisted and onlyBuiltDependencies permits better-sqlite3/esbuild.",
+    "localOptionVerification": "The installed pnpm bundle declares store-dir:String, side-effects-cache:Boolean and package-import-method:[auto,hardlink,clone,copy]. Flags below are supported by inspected local code; no CLI was executed.",
+    "node22Environment": "Fresh assigned managed tree, qualified Node 22 executable and matching PATH; own frozen installation/build. Capture actual native binding real path, hash, device/inode/nlink, process.version/modules ABI and an in-memory SELECT1 result before testing.",
+    "node24Environment": "Fresh separate owned source checkout/export at the exact same pin and candidate bytes, without node_modules, dist, user runtime state, dirty Claude work or copied native artifacts. Install with a new private store, package-import-method copy, side-effects-cache false and explicit Node 24 executable/PATH. Do not use the shared default store or rebuild Node 22 dependencies.",
+    "futureInstallCommand": "<Node 24> <pnpm.cjs> install --frozen-lockfile --store-dir <fresh-private-store-24> --package-import-method copy --side-effects-cache=false (with dirname(Node 24) prepended to PATH and cwd=<owned-24-source>).",
+    "installEvidence": "Retain exact command/env-path policy, frozen lock hashes, actual native install outcome and actual Node 24/modules ABI/in-memory SELECT1. Resolve the real .node paths; prove the Node 22 and Node 24 files are different objects and rehash the Node 22 binding after every Node 24 install/build/test. No hardlink/ref-link assumption or parent folder name is ABI proof.",
+    "failureTreatment": "If native installation or ABI smoke fails, retain it as dependency/infrastructure failure and stop claiming behavior pass. Repair only the fresh owned runtime/dependency environment under root authorization. Never run pnpm rebuild against shared22 to accommodate24 or bypass native scripts with ignore-scripts."
+  },
+  "baselinePlan": [
+    {
+      "phase": "unchanged22-baseline",
+      "action": "After readiness, normal build and actual ABI smoke, run the original exact file under explicit Node 22. Expect all 8 genuine behavior cases; retain actual failures without inventing outcome."
+    },
+    {
+      "phase": "unchanged24-parent-guard",
+      "action": "In the fresh separately installed/built Node 24 environment with ABI smoke already passing, run the original exact file. Retain actual beforeAll failure 24 versus 22 at line 139 and prove no product child/helper/state was started. Do not count it as product/SQLite refusal."
+    },
+    {
+      "phase": "unchanged24-child-guard",
+      "action": "If root assigns the narrow additional witness, invoke the byte-equal extracted original helper under explicit Node 24 with a valid newly owned request/minimal environment. Capture the exact line 22 refusal before dynamic product import/workspace creation, missing result marker and preserved fixture names. Do not mutate the helper to get this baseline."
+    }
+  ],
+  "candidatePlan": {
+    "scope": "Only the assigned existing authored test file receives these two guard replacements, after ownership/readiness. No private/source compiled mutation is required; the compiled product is unchanged.",
+    "node22": "Run the same 8 cases under explicit Node 22 against its runtime-owned built dependencies. Retain all genuine child requests/results/pins/streams/snapshots.",
+    "node24": "Apply the exact same candidate test bytes to the isolated 24 source environment and run the same 8 cases against the runtime-owned24 built closure. Child process.execPath/modules/nativefile must match24, not a silent fallback to22.",
+    "requiredActualEvidence": "Each runtime has 8 actual passed cases, no pending/todo and successful child results; exact row/session/seal/error/fault/isolation/byte assertions remain. Signature/seal admission and unsigned failure semantics remain original. Any Node 24 SQLite byte/sidecar difference that contradicts an original assertion stays RED, not normalized away.",
+    "comparison": "Record unchanged source/package/lock/helper behavior hashes and candidate test digest, separate runtime/ABI/native hashes, full raw totals/commands/durations and child witnesses. No broad full-suite, hostedCI, platform, coverage or release acceptance follows."
+  },
+  "freezeAndD15": {
+    "active": true,
+    "freezeSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "testAlreadyInD15Manifest": false,
+    "decision": "D-15 archives frozen production files. This existing authored qualification test is not a manifest path; only two test-runtime guards change. No snapshot re-registration, archive/helper/production/shared/freeze/budget/inventory edit is proposed.",
+    "ownership": "User-authorized qualification/fix work and root assignment establish this narrow owned-test correction; absent reservations and spare runtime capacity do not authorize other files. Root owns managed creation, install/build/static/freeze and commit."
+  },
+  "inputPins": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "lines": 975
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "lines": 288
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "lines": 1295
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "lines": 71
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "lines": 755
+    },
+    {
+      "path": "src/storage/sqlitePool.ts",
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc",
+      "lines": 251
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "lines": 24430
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "lines": 314
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "lines": 520
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "lines": 32
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "lines": 66
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "lines": 405
+    },
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "lines": 218
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "lines": 4839
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "lines": 36
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+      "lines": 392
+    },
+    {
+      "path": ".github/workflows/nightly-compatibility-matrix.yml",
+      "sha256": "cfb6446ee95f99655f2eedc087982dd79c0333ef648adf852e28f67a5379114f",
+      "lines": 44
+    }
+  ],
+  "preservedLimits": [
+    "P0-19 actual validity RED and unapplied seal-order proof remain separately pending; compatibility is not a production repair or a waiver.",
+    "P0-27 strict tagged-system RED and parent SQLite observations remain retained.",
+    "The 47 echo P2-27 deferral, paused P2-02, A4/privacy/native held sources, P0-20 shared-line pending, P0-52 decision, P0-29/P0-22 skips and P0-51 contradictions remain unchanged.",
+    "No next P0-24, Node20/25, external provider/model/live licence, hostedCI/full suite, platform/release/Done/G0 result is asserted."
+  ]
+}

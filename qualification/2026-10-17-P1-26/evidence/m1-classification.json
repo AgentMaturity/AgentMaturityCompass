@@ -1,0 +1,162 @@
+{
+  "phase": "p126-m1",
+  "rootAllFailuresRead": true,
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "operator": "M1-prefix-swap",
+  "outcomeSha256": "37b584889b59b7cd0323e247753be4b205df72fb738a5da8132d5d6734b2ffe9",
+  "noHookOrEnvironmentFailure": true,
+  "tests": {
+    "total": 54,
+    "passed": 43,
+    "failed": 11,
+    "skipped": 0
+  },
+  "hookTaskEntries": 46,
+  "individualHookValues": 46,
+  "failures": [
+    {
+      "name": "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 241,
+        "column": 40
+      },
+      "assertion": "expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality",
+      "classification": "Empty-root literal at line 240 passed before leaf-domain literal failed at line 241. Later node-domain/order assertions in this body were not reached.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 261,
+        "column": 73
+      },
+      "assertion": "vendor root at 1: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality",
+      "classification": "Vendor root size 0 passed; size 1 produced swapped leaf-domain digest. Later vendor roots and independent-reference assertions after this first failure were masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 274,
+        "column": 57
+      },
+      "assertion": "testdata/inclusion/0/happy-path.json: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality",
+      "classification": "First vector wantErr passed; generated leaf mismatch against literal upstream digest failed before tree root, proof bytes and verification for that vector. Later vectors masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 287,
+        "column": 74
+      },
+      "assertion": "testdata/consistency/0/happy-path.json: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality",
+      "classification": "First vector wantErr passed; old root mismatch at size 1 failed before new root, proof bytes and verification. Later vectors masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 296,
+        "column": 78
+      },
+      "assertion": "root at 2: expected '2cb69667dbd01036ebb0ae5afbf05fbe5cb84\u2026' to be 'abc1fc3bc01edb8067ef6e7b0b6f38c4ef41f\u2026' // Object.is equality",
+      "classification": "Independent raw leaf root size 1 passed. Size 2 root mismatch detected node-domain swap; later sizes masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 305,
+        "column": 120
+      },
+      "assertion": "index 0, size 2: expected false to be true // Object.is equality",
+      "classification": "Size 1 positive passed. Index 0, size 2 valid proof returned false against independent root; later pairs masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 315,
+        "column": 122
+      },
+      "assertion": "1 to 2: expected false to be true // Object.is equality",
+      "classification": "Earlier empty/equal boundary positives passed until old size 1 to new size 2 valid proof returned false against independent roots; later pairs masked.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 324,
+        "column": 82
+      },
+      "assertion": "incremental at 1: expected '33fcc3ca27d301bb0c22992a18060b3b1340d\u2026' to be 'b210cd38c696c3466d11028ff86196cbd52a6\u2026' // Object.is equality",
+      "classification": "Zero frontier checks passed. Incremental size 1 root mismatch failed before rebuilt size 1 and later shape/append iterations.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 336,
+        "column": 36
+      },
+      "assertion": "expected false to be true // Object.is equality",
+      "classification": "Exact size-2 proof-shape assertion passed. Canonical valid-size verification failed at line 336; intended wrong-size rejection line 337 was masked in M1 and receives no M1 credit.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 344,
+        "column": 36
+      },
+      "assertion": "expected false to be true // Object.is equality",
+      "classification": "Valid size-8 inclusion control failed before all malformed/tampered rejection assertions; those refusals receive no M1 credit.",
+      "environmentOrHookFailure": false
+    },
+    {
+      "name": "RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+        "line": 372,
+        "column": 38
+      },
+      "assertion": "expected false to be true // Object.is equality",
+      "classification": "Valid size-3 to size-8 consistency control failed before all malformed/tampered and boundary rejection assertions; those refusals receive no M1 credit.",
+      "environmentOrHookFailure": false
+    }
+  ],
+  "unchangedCohort": {
+    "passed": 41,
+    "total": 41
+  },
+  "legacyNewBodies": {
+    "passed": 2,
+    "total": 2,
+    "boundary": "They discriminate algorithm roots/adapters with self-consistent construction, not independent byte-domain literals."
+  },
+  "primaryWitness": "Independent empty-leaf upstream literal fails at line 241 after unchanged empty-root literal; node-domain independent root mismatch separately observed at size 2, line 296. This is source-test sensitivity to the exact paired operator, not proof of every branch or corpus row.",
+  "boundary": "All 11 are assertion-level failures; ordered raw/observer join, 46 individual hook values, no unhandled/late errors, natural exit 1/ESRCH/no signals. No retry or automatic restore.",
+  "at": "2026-10-16T20:54:20.785944+00:00"
+}

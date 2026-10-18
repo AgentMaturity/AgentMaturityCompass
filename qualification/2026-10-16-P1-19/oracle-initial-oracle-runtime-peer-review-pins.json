@@ -1,0 +1,73 @@
+{
+  "schema": "p119-initial-oracle-runtime-peer-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/README.md",
+      "bytes": 2524,
+      "sha256": "887692bb9ad5899ccd2193cc2387623b5bafb0cbcc63e7ce3436df5cf43c385c",
+      "device": 16777231,
+      "inode": 541769880,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/review.json",
+      "bytes": 86071,
+      "sha256": "4fc12e33961394eb7dccf88a140942994289832efe9aee4d5ab6fc8ce055b574",
+      "device": 16777231,
+      "inode": 541769881,
+      "nlink": 1
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/command.json",
+      "bytes": 2786,
+      "sha256": "b502f7bda089cc3966dba866708aa205989587f21f58fa71db353cfb1dde4b85",
+      "device": 16777231,
+      "inode": 541769714,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-process.json",
+      "bytes": 820,
+      "sha256": "ae16cfa701b761a7eaec4cd156842bea16688485139ed2ee78dbefb467a27be0",
+      "device": 16777231,
+      "inode": 541767610,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "dce336a0bd17ba1bae09e7cf55c88cbc4ffd527b416d6e78ffcf74a87394cf0a",
+      "device": 16777231,
+      "inode": 541769712,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+      "bytes": 10219,
+      "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93",
+      "device": 16777231,
+      "inode": 541769713,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+      "bytes": 20987,
+      "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc",
+      "device": 16777231,
+      "inode": 541769711,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+      "bytes": 276235,
+      "sha256": "ff395adf08d0be9d897f26a18829c05b41c601efdc440c3f16ac8c5690646555",
+      "device": 16777231,
+      "inode": 541767609,
+      "nlink": 1
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}

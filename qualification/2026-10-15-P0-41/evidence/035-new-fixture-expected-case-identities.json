@@ -1,0 +1,110 @@
+[
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q2 missing evidence stays null before any status or current-value assertions"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q3 pure closure computation counts only a shaped declaration and does not authenticate it"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q4 absent registered report, workflow and JSON inputs remain pending"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q5 supplied partial surface report distinguishes two passes, one failure and two missing"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q6b a failed registered file outranks its absent sibling"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q6c duplicate matching report paths refuse rather than double count"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q7a YAML matrices count distinct configured OS families, not versions or containment"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q8a a dated sourced manual zero is measured while malformed provenance refuses"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q9a genuine CLI check reports structural validity only"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q9c explicit and default markdown agree with 15 rows and funded columns"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q10a a dirty gap closure cannot override committed open registrations"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q10b committed registered JSON zero survives changed and deleted working copies"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q11a a committed closed gap without a closing declaration refuses"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q11b invalid manual provenance refuses all output modes"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q11c conflicting modes, unknown flags and invalid report paths refuse"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12a a missing qualification path at HEAD refuses a shaped closure"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12b untracked-only evidence cannot satisfy the HEAD path check"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12c a zero merged SHA refuses even with a committed evidence path"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12d a nonexistent full merged SHA refuses with a committed evidence path"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12e a genuine sibling commit is not an ancestor of the closure commit"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q12f a committed synthetic path and real ancestor pass structural checks only"
+  },
+  {
+    "file": "tests/p041ProgramMetricsQualification.test.ts",
+    "fullName": "P041 supplied-input and genuine local Git qualification Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped"
+  }
+]

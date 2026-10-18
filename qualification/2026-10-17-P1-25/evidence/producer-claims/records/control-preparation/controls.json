@@ -1,0 +1,150 @@
+{
+  "schema": "p125pc-future-function-bounded-source-control-recipes/1",
+  "at": "2026-10-17T01:46:45.977820+00:00",
+  "candidatePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "bytes": 61752,
+    "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+    "dev": 16777231,
+    "inode": 543909995,
+    "nlink": 1
+  },
+  "independentStaticReviewPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "bytes": 8070,
+    "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7",
+    "dev": 16777231,
+    "inode": 543910559,
+    "nlink": 1
+  },
+  "operators": [
+    {
+      "id": "DROP-PRODUCER-TS",
+      "target": "src/ledger/ledger.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+        "dev": 16777231,
+        "inode": 542460160,
+        "nlink": 1
+      },
+      "scopeStart": "  appendEvidenceDetailed(input: AppendEvidenceInput): AppendEvidenceResult {\n",
+      "scopeEnd": "  appendEvidenceBatch(\n",
+      "scopeBoundariesMatchCountRequired": 1,
+      "before": "const ts = input.ts ?? Date.now();",
+      "after": "const ts = Date.now();",
+      "matchCountRequired": 1,
+      "beforeLine": 580,
+      "originalFunction": {
+        "bytes": 790,
+        "sha256": "d5cb8183fcb889952d115649cbf0d5d145c211772dcb8891291dbda66af53c7e"
+      },
+      "proposedFunction": {
+        "bytes": 778,
+        "sha256": "19187e1e1adc58832a9bd8c0219874300f12795b11c99c348a4117a9e089adad"
+      },
+      "proposedWholeFile": {
+        "bytes": 43780,
+        "sha256": "57acf173f4fd336601e482fe5da13448f36eae72632eb1d603b407e5ed459634"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/DROP-PRODUCER-TS.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/DROP-PRODUCER-TS.patch.txt",
+        "bytes": 404,
+        "sha256": "63bc82d4bd12cff95009f82c76687175d027c2fb29aa9cb3e81ade9f1d9a943f",
+        "dev": 16777231,
+        "inode": 543919669,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          698
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+          "bytes": 61752,
+          "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+          "dev": 16777231,
+          "inode": 543909995,
+          "nlink": 1
+        },
+        "masking": "First genuine checkpoint/grant/token/row and actual ledger positives precede the backdated stored-row equality. With input.ts discarded, the postdated append, second checkpoint/grant, reader findings and final checks are masked. Actual first frame and every other failure remain manual classifications.",
+        "expectedDirectFailuresProspective": 1,
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "CLAMP-FUTURE-PRODUCER-TS",
+      "target": "src/ledger/ledger.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+        "dev": 16777231,
+        "inode": 542460160,
+        "nlink": 1
+      },
+      "scopeStart": "  appendEvidenceDetailed(input: AppendEvidenceInput): AppendEvidenceResult {\n",
+      "scopeEnd": "  appendEvidenceBatch(\n",
+      "scopeBoundariesMatchCountRequired": 1,
+      "before": "const ts = input.ts ?? Date.now();",
+      "after": "const ts = input.ts === undefined ? Date.now() : Math.min(input.ts, Date.now());",
+      "matchCountRequired": 1,
+      "beforeLine": 580,
+      "originalFunction": {
+        "bytes": 790,
+        "sha256": "d5cb8183fcb889952d115649cbf0d5d145c211772dcb8891291dbda66af53c7e"
+      },
+      "proposedFunction": {
+        "bytes": 836,
+        "sha256": "9f089bbc768d621790804b52e16a6ab66db1259eaba55d96158a79cf61d72a4e"
+      },
+      "proposedWholeFile": {
+        "bytes": 43838,
+        "sha256": "adf7767e241bdf1233f123a794eb1e550dadffc471160695cb25b169907607aa"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt",
+        "bytes": 470,
+        "sha256": "aa30899cbc50767f87b9f0583e986eef8d2b3290491e377ee0efd96d7f281243",
+        "dev": 16777231,
+        "inode": 543919670,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          707
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+          "bytes": 61752,
+          "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+          "dev": 16777231,
+          "inode": 543909995,
+          "nlink": 1
+        },
+        "masking": "The intended past claim remains supplied through the unchanged signed append path and its stored-row equality should precede the postdated stored-row witness. The future claim is clamped only inside appendEvidenceDetailed. Later second checkpoint/grant, reader findings and final checks remain masked if that witness fails. All outcomes remain prospective.",
+        "expectedDirectFailuresProspective": 1,
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "targetFunctionOnly": "appendEvidenceDetailed",
+  "allOtherFunctionsByteExact": true,
+  "noSourceMutantStored": true,
+  "futureQualificationHashesNotPredicted": true,
+  "sourceProjectionHashesAreExactStaticRecipeBytesOnly": true,
+  "noPredictedActualFailuresHooksOrQualificationCredit": true
+}

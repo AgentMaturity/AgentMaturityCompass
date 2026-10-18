@@ -1,0 +1,57 @@
+{
+  "schema": "amc-p207-local-oidc/2",
+  "label": "algorithm-PS256",
+  "synthetic": true,
+  "issuer": "http://127.0.0.1:63423/d3b63f6b-edac-4bec-882d-f035d6f44b77",
+  "requests": [
+    {
+      "id": 1,
+      "connectionId": 1,
+      "method": "GET",
+      "path": "/d3b63f6b-edac-4bec-882d-f035d6f44b77/jwks",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 200,
+      "responseBodyBytes": 445,
+      "responseDelayMs": null,
+      "headers": {
+        "accept": "application/json"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "algorithm": "PS256",
+      "result": {
+        "ok": true,
+        "claims": {
+          "iss": "http://127.0.0.1:63423/d3b63f6b-edac-4bec-882d-f035d6f44b77",
+          "aud": "synthetic-oidc-client",
+          "sub": "synthetic-subject",
+          "nonce": "synthetic-exact-nonce",
+          "iat": 1800000000,
+          "exp": 1800000600
+        }
+      },
+      "requests": 1
+    }
+  ],
+  "handlerErrors": [],
+  "transportErrors": [],
+  "transportErrorClassifications": [],
+  "lifecycle": {
+    "inProcessServer": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "connectionCount": 1,
+    "childProcessCreated": false,
+    "signalsSent": false,
+    "exactOptInRestored": true
+  },
+  "failed": false,
+  "originalError": null,
+  "cleanupError": null
+}

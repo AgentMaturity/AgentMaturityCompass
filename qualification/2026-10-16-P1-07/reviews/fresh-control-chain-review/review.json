@@ -1,0 +1,530 @@
+{
+  "schema": "p107-fresh-control-chain-peer-review/1",
+  "at": "2026-10-16T18:23:56.611890+00:00",
+  "state": "ACTUAL_FRESH_CANONICAL_AND_THREE_SOURCE_CONTROLS_CLOSED",
+  "blockers": [],
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "sourceCwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "borrowedRunnerCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+  "canonicalAuthority": "The one actual p107-fresh-canonical raw971/971 report and exact971 joined cases are the canonical total. No totals are summed across prior subsets or seven runs.",
+  "corpus": {
+    "files": 17,
+    "cases": 971,
+    "samePerFileFullNameOrderedOccurrenceAcrossSevenRuns": true,
+    "uniqueObserverTestIdsEachPhase": 971,
+    "perFileCounts": [
+      {
+        "relativeFile": "tests/antiGaming.test.ts",
+        "cases": 17
+      },
+      {
+        "relativeFile": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+        "cases": 9
+      },
+      {
+        "relativeFile": "tests/diagnostic/fullDiagnostic.test.ts",
+        "cases": 12
+      },
+      {
+        "relativeFile": "tests/diagnostic/levelCumulative.test.ts",
+        "cases": 12
+      },
+      {
+        "relativeFile": "tests/diagnostic/quickscoreShare.test.ts",
+        "cases": 8
+      },
+      {
+        "relativeFile": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+        "cases": 1
+      },
+      {
+        "relativeFile": "tests/diagnostic/traceEvidenceMapper.test.ts",
+        "cases": 6
+      },
+      {
+        "relativeFile": "tests/diagnosticAssuranceCoverage.test.ts",
+        "cases": 4
+      },
+      {
+        "relativeFile": "tests/diagnosticQuestions7x.test.ts",
+        "cases": 56
+      },
+      {
+        "relativeFile": "tests/diagnosticReportProvenance.test.ts",
+        "cases": 4
+      },
+      {
+        "relativeFile": "tests/diagnosticReportStatus.test.ts",
+        "cases": 7
+      },
+      {
+        "relativeFile": "tests/diagnosticResponseScoringParity.test.ts",
+        "cases": 791
+      },
+      {
+        "relativeFile": "tests/evidenceGatingCorrection.test.ts",
+        "cases": 12
+      },
+      {
+        "relativeFile": "tests/liveEvidenceProjection.test.ts",
+        "cases": 16
+      },
+      {
+        "relativeFile": "tests/publicMethodology.test.ts",
+        "cases": 4
+      },
+      {
+        "relativeFile": "tests/questionBank.test.ts",
+        "cases": 3
+      },
+      {
+        "relativeFile": "tests/spineEvidenceProjection.test.ts",
+        "cases": 9
+      }
+    ]
+  },
+  "runs": [
+    {
+      "phase": "p107-fresh-canonical",
+      "actualExit": 0,
+      "durationMs": 5503,
+      "ownedPgid": 5334,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 971,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": []
+    },
+    {
+      "phase": "p107-m1",
+      "actualExit": 1,
+      "durationMs": 4684,
+      "ownedPgid": 5587,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 968,
+      "failed": 3,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": [
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+          "message": "AssertionError: expected 3 to be 1 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:55:23",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:55:23"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+          "message": "AssertionError: expected 3 to be +0 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:71:24",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:71:24"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) not_evaluated below a passing later gate stops the contiguous level",
+          "message": "AssertionError: expected 3 to be 1 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:85:26",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:85:26"
+        }
+      ]
+    },
+    {
+      "phase": "p107-m1-restored",
+      "actualExit": 0,
+      "durationMs": 4689,
+      "ownedPgid": 5658,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 971,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": []
+    },
+    {
+      "phase": "p107-m2",
+      "actualExit": 1,
+      "durationMs": 4722,
+      "ownedPgid": 5730,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 969,
+      "failed": 2,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": [
+        {
+          "file": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+          "fullName": "P1-07 emitter registry finite correspondence the registry excludes seeder modules and synthetic claims and caps importers at L1",
+          "message": "AssertionError: expected [ 'p107-seeder-mutation' ] to deeply equal []",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:36:21",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:36:21"
+        },
+        {
+          "file": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+          "fullName": "P1-07 emitter registry finite correspondence every current module contains its exact quoted literal in this physical checkout",
+          "message": "AssertionError: p107-seeder-mutation: expected '/**\\n * Dogfood evidence seeding: a d\u2026' to contain '\"AMC_P107_SYNTHETIC_MUTANT\"'",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:55:37",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:55:37"
+        }
+      ]
+    },
+    {
+      "phase": "p107-m2-restored",
+      "actualExit": 0,
+      "durationMs": 4664,
+      "ownedPgid": 5838,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 971,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": []
+    },
+    {
+      "phase": "p107-m3",
+      "actualExit": 1,
+      "durationMs": 4709,
+      "ownedPgid": 5898,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 961,
+      "failed": 10,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": [
+        {
+          "file": "tests/liveEvidenceProjection.test.ts",
+          "fullName": "what live scoring can honestly claim L2 is evaluated only where an evidence map names an observed emitter",
+          "message": "AssertionError: expected [ 'AMC-2.15', 'AMC-OPDISC-6', \u2026(1) ] to deeply equal [ 'AMC-2.15', 'AMC-5.29', \u2026(2) ]",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/liveEvidenceProjection.test.ts:292:47",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/liveEvidenceProjection.test.ts:292:47"
+        },
+        {
+          "file": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+          "fullName": "P1-07 emitter registry finite correspondence registered IDs are unique and keep both canonical tool-decision anchors",
+          "message": "AssertionError: expected [ 'tool-call-allowed', \u2026(9) ] to include 'tool-call-denied'",
+          "firstOriginalFrame": "    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:28:61"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+          "message": "AssertionError: expected [ [ 1, 'pass' ], \u2026(2) ] to deeply equal [ [ 1, 'pass' ], [ 2, 'fail' ], \u2026(1) ]",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:52:27",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:52:27"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) gate levels rather than array positions determine the contiguous result",
+          "message": "AssertionError: expected 1 to be 3 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:62:50",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:62:50"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+          "message": "AssertionError: expected [ [ 2, 'not_evaluated' ], \u2026(1) ] to deeply equal [ [ 2, 'pass' ], [ 3, 'pass' ] ]",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:69:28",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:69:28"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 canonical map with synthetic unverified parser-built rows independent allowed and denied literals across two synthetic days and sessions reach only L2",
+          "message": "AssertionError: expected 1 to be 2 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:95:26",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:95:26"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 canonical map with synthetic unverified parser-built rows missing denied evidence and independent session or day minima remain failures",
+          "message": "AssertionError: no denied: expected 'not_evaluated' to be 'fail' // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:109:95",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:109:95"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 canonical map with synthetic unverified parser-built rows map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index",
+          "message": "AssertionError: expected 1 to be 2 // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:116:56",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:116:56"
+        },
+        {
+          "file": "tests/diagnostic/levelCumulative.test.ts",
+          "fullName": "P1-07 canonical map with synthetic unverified parser-built rows self-reported import and keyword input can earn L1 but cannot create higher map evidence",
+          "message": "AssertionError: expected 'not_evaluated' to be 'fail' // Object.is equality",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:157:68",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:157:68"
+        },
+        {
+          "file": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+          "fullName": "binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+          "message": "AssertionError: expected [] to deeply equal [ \u2026(4) ]",
+          "firstOriginalFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:364:55",
+          "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:364:55"
+        }
+      ]
+    },
+    {
+      "phase": "p107-m3-restored",
+      "actualExit": 0,
+      "durationMs": 4809,
+      "ownedPgid": 6021,
+      "naturalOwnedESRCH": true,
+      "total": 971,
+      "passed": 971,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "allHookValuesPass": true,
+      "unhandledErrors": [],
+      "failureIdentities": []
+    }
+  ],
+  "sourceControls": [
+    {
+      "number": 1,
+      "name": "M1-highest-pass",
+      "target": "src/diagnostic/levelSemantics.ts",
+      "original": {
+        "bytes": 12367,
+        "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+      },
+      "mutant": {
+        "bytes": 12304,
+        "sha256": "923d8204905bb192a266857be27ec7a22842e0b1533f62fbf46057db169543fb"
+      },
+      "originalBackupExact": true,
+      "singlePatchReconstructedInMemoryExact": true,
+      "applyAndRestoreRecordsExact": true,
+      "boundClassificationPreservesOriginal": true,
+      "maskedAssertions": [
+        "noL2.level assertion after first noL1.level failure on line71",
+        "not_evaluated reason assertion on line86 after line85 failure"
+      ],
+      "compiledMutation": false
+    },
+    {
+      "number": 2,
+      "name": "M2-register-seeder",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "original": {
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "mutant": {
+        "bytes": 13197,
+        "sha256": "5a837201d16449baf1c93da9342709510fa2fe8b0363dad5b94836af91684890"
+      },
+      "originalBackupExact": true,
+      "singlePatchReconstructedInMemoryExact": true,
+      "applyAndRestoreRecordsExact": true,
+      "boundClassificationPreservesOriginal": true,
+      "maskedAssertions": [
+        "same-line synthetic exclusion after seeder exclusion at36",
+        "import caps later in exclusion body",
+        "requiresMeta/event-vocabulary assertions and later registry rows after first source-literal failure at55"
+      ],
+      "compiledMutation": false
+    },
+    {
+      "number": 3,
+      "name": "M3-remove-denied",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "original": {
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "mutant": {
+        "bytes": 12795,
+        "sha256": "086ad9d62d267e3733b9d51d1ba2605484b228105d75e561ffc771859471ed47"
+      },
+      "originalBackupExact": true,
+      "singlePatchReconstructedInMemoryExact": true,
+      "applyAndRestoreRecordsExact": true,
+      "boundClassificationPreservesOriginal": true,
+      "maskedAssertions": {
+        "liveEvidenceProjection292": "acceptedTrustTiers loop after evaluated-question list failure",
+        "graph52": "contiguous status/positive level and gap level assertions at53\u201355",
+        "missingLower69": "noL2 status and both missing-lower final level assertions70\u201371",
+        "canonical95": "per-level status, exact four IDs and row effective-tier assertions96\u201398",
+        "minima109": "first reason and subsequent one-session/one-day assertions after no-denied status failure",
+        "mapBinding116": "retagged/index/tagged/unmapped assertions after first untagged level failure",
+        "selfReport157": "first L3 status, keyword iteration and final import-tier assertion after first import L2 status failure",
+        "native364": "per-emitter, continuity/final-level, higher-level, body input/native equalities and post-body success predicates"
+      },
+      "compiledMutation": false
+    }
+  ],
+  "causalInterpretation": {
+    "M1": "Only highest-pass final selection changes. Actual graph statuses remain pass/fail/pass but gap returns3 at55 while adjacent all-pass positive already succeeded. Missing lower71 and not_evaluated lower85 independently fail; later same-body assertions are masked exactly as recorded. Native same-day fixture still passes.",
+    "M2": "Only one declared synthetic seeder entry is added. Direct seeder exclusion fails36; its subsequent synthetic and importer-cap assertions are masked. A separate fixed literal-correspondence body fails55 because exact unique quoted marker is absent from unchanged seeder source. Full589-line/26213-byte merged source diff was read in two bounded segments; no seeder executes or supplies evidence. Native fixture still passes.",
+    "M3": "Only denied registry entry is removed. Ten actual first failures are preserved. Native OK/DENIED/OK/DENIED,24signed rows,two signed one-turn/seal roots and projection prerequisites pass before first mapping assertion364. Canonical L2 becomes not_evaluated with0matched IDs versus4 independently observed audits, rather than merely dropping the2denied IDs. The native earned level remains1 on one actual day; a separate synthetic unverified two-day canonical-map positive drops2\u21921 at95. No real earned-L2 drop is claimed. Later per-emitter/gate/level/body pin/native/final-success assertions in that native case are masked, while ordinary final cleanup independently checks all10input/native pins without cleanup error.",
+    "restorations": "Each exact original source was restored from its exclusive preserved backup after classified actual RED, then the unchanged971-case corpus passed. Preferred bound classifications preserve all original fields and add exact source commit/apply/binding provenance; originals remain unchanged."
+  },
+  "preservation": {
+    "currentSAndQSelectedPairs": 32,
+    "currentHashChecks": 64,
+    "compiledPairsAmongThose": 5,
+    "all32PairsDistinctInodes": true,
+    "threeNativePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543031862,
+        "nlink": 1
+      }
+    ],
+    "precommitRowsRehashed": 96,
+    "directPathPrefixCounts": {
+      "S": 35,
+      "R": 24,
+      "Claude": 10,
+      "Other": 27
+    },
+    "heldRRelatedPinCategory": "24paths physically underR plus2private R-related preserved patch/count-overlay records,26related total; not26physicalRfiles.",
+    "statusBoundary": "Clean S/Q and held R18status/head/empty index are root actual final-preservation assertions, not independently re-probed by this static peer. No owner release inferred. Archive/common-exclude hold and all other decisions remain open.",
+    "currentOwnedFixturePinsRechecked": 70
+  },
+  "finalChecks": [
+    {
+      "phase": "p107-node-version",
+      "actualExit": 0,
+      "durationMs": 23,
+      "ownedPgid": 6142,
+      "naturalESRCH": true,
+      "fullLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-node-version/stdout-stderr.log",
+        "bytes": 9,
+        "sha256": "33e26f35db6e57ce0c486ddc815fe966867e4f649e418eaf323f75f4720eb8e9",
+        "readScope": "Full actual final version/count/gate/freeze log read."
+      }
+    },
+    {
+      "phase": "p107-pnpm-version",
+      "actualExit": 0,
+      "durationMs": 163,
+      "ownedPgid": 6146,
+      "naturalESRCH": true,
+      "fullLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-pnpm-version/stdout-stderr.log",
+        "bytes": 8,
+        "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf",
+        "readScope": "Full actual final version/count/gate/freeze log read."
+      }
+    },
+    {
+      "phase": "p107-q-final-counts",
+      "actualExit": 0,
+      "durationMs": 426,
+      "ownedPgid": 6153,
+      "naturalESRCH": true,
+      "fullLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-counts/stdout-stderr.log",
+        "bytes": 255,
+        "sha256": "69ddf339d15353e175547870481750757702c7dcff7988b45cb5c774151d66a0",
+        "readScope": "Full actual final version/count/gate/freeze log read."
+      }
+    },
+    {
+      "phase": "p107-q-final-gates",
+      "actualExit": 0,
+      "durationMs": 439,
+      "ownedPgid": 6174,
+      "naturalESRCH": true,
+      "fullLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-gates/stdout-stderr.log",
+        "bytes": 837,
+        "sha256": "d626bac3bc2138bf4fb238b60503a1578ff29e6e3ed9407959005ed589c632f0",
+        "readScope": "Full actual final version/count/gate/freeze log read."
+      }
+    },
+    {
+      "phase": "p107-q-final-freeze",
+      "actualExit": 0,
+      "durationMs": 1187,
+      "ownedPgid": 6189,
+      "naturalESRCH": true,
+      "fullLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-freeze/stdout-stderr.log",
+        "bytes": 284,
+        "sha256": "95e14e63f3c79c51ab30c673bca2c71d8df94f6c5015e2302da9b79f20d9c070",
+        "readScope": "Full actual final version/count/gate/freeze log read."
+      }
+    }
+  ],
+  "finalFreezeCounts": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "qualityGreen": false,
+  "fullNpmTestRun": false,
+  "compiledSensitivityCredit": false,
+  "limits": [
+    "All control commands mutate TypeScript source only. Five bound compiled modules in each S/Q remain unchanged and no control compiler/rebuild runs; compiled sensitivity is not established. Fresh helper includes no Vitest; canonical qualification is its separately closed971-case run.",
+    "Each phase has46task entries with hooks and47individual hook values, allpass; no unhandled or extra hook/file errors. Expected three evidence-binding warnings remain ordinary log output.",
+    "All7safe public records retain actual signed native/ledger/root facts, ten exact physical input/native pins and ordinary cleanup. Public guard close is best-effort invocation only; no universal native-handle or process-isolation proof. Actual confinement is unconfined while sandbox backend availability is true.",
+    "The public record precedes final two assertions. Passing phases execute them; M3 first mapping failure masks them and no success credit is granted. Owned PGID ESRCH is finite process-group evidence, not universal descendant cleanup.",
+    "No vault/private-key/database/decrypted-payload contents were inspected or copied. Known canary content and private-key PEM headers are absent from actual evidence artifacts.",
+    "FinalQcounts,gates,freeze records now exist and are independently read/pinned; they do not convert existing unwaived source-quality RED into global quality success. No fullP1-07 or complete-plan Done claim."
+  ],
+  "readBoundary": "All seven raw/observer/log/public artifacts loaded in full; exact cases/errors/IDs checked independently. Full merged logs reviewed, with structured JSON markers parsed separately; M2 full source diff read in bounded segments after initial combined displays truncated. Actual final/bound records added before sealing. No product/helper/parser/compiler/native/SQL/network/process-probe or Git command was executed.",
+  "checkoutIndexQaWrites": false,
+  "privateOutputsOnly": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review"
+}

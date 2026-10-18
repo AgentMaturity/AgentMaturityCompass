@@ -1,0 +1,140 @@
+{
+  "schema": "p125pc-independent-completed-source-prose-evidence-review/1",
+  "at": "2026-10-17T02:18:52.323293+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "blockers": [],
+  "materialProseFindings": [],
+  "preferredReadme": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/final-README-v2.md",
+    "bytes": 46411,
+    "sha256": "5bb1be6b4a3d6f3083e2bb8b710d0ec8d2b176c407a9a9ee9fd30a5640d869ca"
+  },
+  "wholeIssueGaps": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 4548,
+    "sha256": "acc041aa1514efd452fb05f83b6e57f82bedfbc001c773bef4f9205a67253803"
+  },
+  "checks": {
+    "complete46411ByteReadmeRead": true,
+    "exact39139ByteHistoricalSuffixPreserved": true,
+    "new7272BytePrefixActual24PerRun12ChecksAndSourceOnlyMasksFitCompletedReview": true,
+    "source24Fresh24EachRed23AndEachRestoration24NotSummed": true,
+    "producerGreenTwoOwnQueryProofsRedOnlyOneAndLaterFactsMasked": true,
+    "175Protected102Paths23Pairs204Files13NativesFitActualBoundedRecords": true,
+    "perRunChildSocketLedgerOwnerResourcesMatchNoAggregateCaseCredit": true,
+    "all12NormalCommandRecordsExactArgvNatural0": true,
+    "quality2712OrderedFindingsAndAllNonRoleFieldsExact": true,
+    "duplicate1268EntireLogBytesExact": true,
+    "qualityGatesRemainExit1Diagnostic0NotGatePass": true,
+    "snapshot2378SourceHead5d4eBlobMatchRecordAndOrderStopPreserved": true,
+    "hosted13VerifiedDependabot30FileRowsWip0OverlapNone": true,
+    "metadataScopeFreeze0AndD15NoneNaturallyClosed": true,
+    "compactOnlyNewActiveAssemblyOld877972RawAndCompleteRoundTripContractsFitReviewedHelper": true,
+    "capsPrivacyMarkersInertSourceAndExplicitPublicOnlySelectionRetained": true,
+    "futureSelectionFiveFalsePolicyAndLaterPublicationBoundariesExplicit": true,
+    "allHeldDecisionsClaudeMissingReservationBoundaryF37SkipAndWholeIssuePlanOpen": true
+  },
+  "normalSourceChecks": [
+    {
+      "phase": "p125pc-test-types",
+      "exit": 0,
+      "durationMs": 36566
+    },
+    {
+      "phase": "p125pc-source-types",
+      "exit": 0,
+      "durationMs": 25779
+    },
+    {
+      "phase": "p125pc-source-lint",
+      "exit": 0,
+      "durationMs": 2926
+    },
+    {
+      "phase": "p125pc-source-build",
+      "exit": 0,
+      "durationMs": 29891
+    },
+    {
+      "phase": "p125pc-source-counts",
+      "exit": 0,
+      "durationMs": 562
+    },
+    {
+      "phase": "p125pc-source-gates",
+      "exit": 0,
+      "durationMs": 475
+    },
+    {
+      "phase": "p125pc-source-threat-model",
+      "exit": 0,
+      "durationMs": 298
+    },
+    {
+      "phase": "p125pc-source-architecture",
+      "exit": 0,
+      "durationMs": 1768
+    },
+    {
+      "phase": "p125pc-source-docs-drift",
+      "exit": 0,
+      "durationMs": 340
+    },
+    {
+      "phase": "p125pc-source-freeze",
+      "exit": 0,
+      "durationMs": 1319
+    },
+    {
+      "phase": "p125pc-source-notices",
+      "exit": 0,
+      "durationMs": 239
+    },
+    {
+      "phase": "p125pc-source-qualification",
+      "exit": 0,
+      "durationMs": 1176
+    }
+  ],
+  "quality": {
+    "deadCodeBefore": 2712,
+    "deadCodeAfter": 2712,
+    "added": 0,
+    "removed": 0,
+    "roleBefore": "after-metadata",
+    "roleAfter": "after-source",
+    "allOtherSnapshotFieldsExact": true,
+    "duplicateFindings": 1268,
+    "fullDuplicateLogByteExact": true,
+    "gatesRemainRedUnwaived": true,
+    "noBaselineAdoption": true
+  },
+  "scopeAndProvenance": {
+    "oldPacket": "Actual pinset506921B/SHA860123709cfd11075a6983574c4ad8cf62bf1d52cd70747b2066b8b514f01117 names source5d4e, metadata888978 and prior semantic80268079. Its2378-file current-HEAD blob match is root-recorded; the prior order-only comparison stop precedes destination creation.",
+    "runtimeEvidence": "The separately sealed completed-runtime-review supplies the detailed6-phase joins/errors/actions/current preservation; this review pins and reuses it rather than rerunning product or broad ownership checks.",
+    "historicalText": "All39139 old README bytes remain historical verbatim. Their cohorts, gaps and earlier technical statements are not promoted to current producer facts.",
+    "metadataParagraphBoundary": "Metadata serialization/preservation prose describes the reviewed enforced assembly contract. The explicit later-boundary paragraph grants no prospective private assembly, validator, source-copy, index, commit, export or QA success.",
+    "routing": "Signed nonzero accuracy remains future preparation requiring complete current closure and separate admission. No source allocation or TTL contract is introduced."
+  },
+  "limitations": [
+    "No helper/product import, syntax parser, compiler, test, native, OpenSSL, SQL, network or process-probe execution. No key/private-stream/native-payload or missing-reservation read.",
+    "Actual metadata records/log bytes were consumed and pinned; a combined display of the architecture line-count map was truncated. Its command status/argv/closure remain exact, and no baseline --update was invoked.",
+    "Root snapshot-order read error and earlier V1 preservation-helper optional-lock issue remain preserved; neither supplies mutation or runtime retry credit. V2 helper is separately reviewed/adopted by root.",
+    "No author prose, source, existing evidence, index, QA or ownership write. No readiness or current assembly/publication/whole P1-25/plan/release/F37 completion claim."
+  ],
+  "inputCount": 58,
+  "readCommandChunks": [
+    "da5799",
+    "5627c4",
+    "63dfb2",
+    "9323b7",
+    "d36c15",
+    "aa1ef0",
+    "c82d63",
+    "529380",
+    "78e1db",
+    "f19943"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "capturedUtc": "2026-10-15T07:11:17.374655+00:00",
+  "trackedSourceCount": 8574,
+  "trackedSourceAllMatch": true,
+  "compiledCount": 4529,
+  "compiledMatchesP011": true,
+  "compiledManifest": {
+    "path": "/private/tmp/p0-41-qualification-20261015/compiled-after-build.json",
+    "bytes": 485185,
+    "sha256": "7366e9fb3ab0c66386420af2a5794f55899a78854aabc7a0a92a17af0b70f879",
+    "bodyPrivateOnly": true
+  },
+  "native": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "modulesABI": "127",
+    "napi": "10",
+    "cwd": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+    "sqliteSelected": 1,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538905647,
+      "nlink": 1
+    },
+    "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+  },
+  "yamlOwnedPackage": {
+    "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/yaml/package.json",
+    "bytes": 3254,
+    "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+  },
+  "gitStatus": "",
+  "formalAcceptanceClosed": false
+}

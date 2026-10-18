@@ -1,0 +1,74 @@
+{
+  "schema": "p139-compiler-natural-closure/1",
+  "capturedUtc": "2026-10-16T15:48:37.334914+00:00",
+  "phase": "p139-tests-typecheck-final",
+  "childExit": 2,
+  "wrapperExit": 70,
+  "processDurationMs": 37828,
+  "ownedPgid": 80402,
+  "ownedGroupAbsentByESRCH": true,
+  "errno": 3,
+  "signalsOtherThanZeroSent": false,
+  "freshOwnedProbes": [
+    {
+      "kind": "pid",
+      "id": 80402,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    },
+    {
+      "kind": "pgid",
+      "id": 80402,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "pins": [
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/ACTIVE.json",
+      "bytes": 263,
+      "sha256": "34977fb3f0a53ac88d962477a2033d20e7164f1eddbbb577fa1d88adfc4bbebc"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/HALTED.json",
+      "bytes": 297,
+      "sha256": "353fa43c9f24eaf9ae5723458782e04b8347540d75b57ef72a9c00b39f54a2eb"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-tests-typecheck-final/owned-process.json",
+      "bytes": 512,
+      "sha256": "d64fdc58fa0955b2c51090f7d24e7e32e8dcd8487391d4cfa9fa619b31b74b4f"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-tests-typecheck-final/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "4f1298c35c2c0fc70aca2a7f394a413a62d9cdfc7aac08ca890daeb31bb6f79f"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-tests-typecheck-final/stdout-stderr.log",
+      "bytes": 313,
+      "sha256": "fb683360310af9ad793d0180a832bc5b2e532b62f64c9ba2520584aa99e25f8b"
+    },
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 13593,
+      "sha256": "db4eedc8a92405a19fd1368e1a77ecaba713d668cb55456af81cbdb0c2832d01"
+    }
+  ],
+  "sourceAtClosure": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+      "bytes": 60903,
+      "sha256": "211dc2917d286fc9e91870881a66a91abfe26b684686adeeeb550f3ab25a67fb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    }
+  ],
+  "failure": "TS2322 tests/mcp/mcpOauth.test.ts629,13: kind string is widened across nested server union object spread; expected literal oauth2.",
+  "boundary": "Old ACTIVE/HALTED and wrapper remain unchanged. Natural failed compiler, no signals/retry/cleanup/guard relaxation. Only separately admitted narrow test typing repair may follow."
+}

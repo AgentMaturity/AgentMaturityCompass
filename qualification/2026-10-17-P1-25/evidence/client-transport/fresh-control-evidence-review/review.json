@@ -1,0 +1,202 @@
+{
+  "schema": "p125c-fresh-control-evidence-independent-review/1",
+  "at": "2026-10-16T21:52:39.646769+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+  "heldWrapperRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "heldWrapperHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+  "actualFreshBinding": {
+    "selectedPathsEachRoot": 71,
+    "sourceFreshRegularDistinctPhysicalPins": 142,
+    "compiledPreservationPairs": 8,
+    "protectedInputs": 121,
+    "priorNativePins": 6,
+    "freshNativeInode": 543499352,
+    "nativePinsTotal": 7,
+    "sourceFreshCleanHead": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+    "helper": {
+      "phase": "p125c-clean-source",
+      "exit": 0,
+      "durationMs": 47892,
+      "ownedPgid": 44187,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "frozenInstallBuildDoctorAndSignedOneCrossProcessTwoTurnChecks": true,
+      "vitestCredit": false
+    }
+  },
+  "actualFivePhaseChain": [
+    {
+      "phase": "p125c-fresh-canonical",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 12574,
+      "ownedPgid": 44753,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125c-m1",
+      "tests": {
+        "total": 28,
+        "passed": 26,
+        "failed": 2,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11664,
+      "ownedPgid": 44882,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125c-restore1",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11664,
+      "ownedPgid": 44995,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125c-m2",
+      "tests": {
+        "total": 28,
+        "passed": 27,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11643,
+      "ownedPgid": 45054,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125c-restore2",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11676,
+      "ownedPgid": 45184,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    }
+  ],
+  "identity": {
+    "sameOrderedUnique28AcrossSourceAndFiveFreshRuns": true,
+    "sourceFiles": 2,
+    "newClientBodies": 11,
+    "unchangedVerifierBodies": 17,
+    "canonicalTotal": 28,
+    "noCohortOrPhaseSum": true
+  },
+  "causalFindings": [
+    {
+      "operator": "C1-certReq-false",
+      "sourceOnlySingleReplacement": true,
+      "actualFailedCases": 2,
+      "firstFrames": [
+        193,
+        201
+      ],
+      "primary": "The complete version/imprint/positive nonce prefix at191 passes before the fixed certReq0101ff assertion at193 actually sees010100. The independently literal policy wire at201 also differs only in its last BOOLEAN content byte.",
+      "masking": [
+        "Full-wire assertion194 is masked by193.",
+        "The policy nonce shape positive199 precedes201.",
+        "Twenty-six passing bodies, including HTTP comparisons against the same generated request, do not add independent certReq sensitivity."
+      ],
+      "restoration": "Exact original source restored explicitly after actual full-failure review; restore1 passes28/28."
+    },
+    {
+      "operator": "C2-ignore-response-MIME",
+      "sourceOnlySingleReplacement": true,
+      "actualFailedCases": 1,
+      "firstFrames": [
+        280
+      ],
+      "primary": "The adjacent actual positive278 passes. The promise-refusal witness at280-281 receives resolved raw Buffer[0,255,128,129,127]. First project frame is280:102.",
+      "masking": [
+        "Request-path/count assertion282 is masked.",
+        "The fixture finally completes and cleanly rethrows the original assertion; no cleanup AggregateError, hook or environment failure is observed.",
+        "The five synthetic bytes are transport bytes, not CMS or an attested/trusted timestamp grant."
+      ],
+      "restoration": "Exact original source restored explicitly after actual full-failure review; restore2 passes28/28."
+    }
+  ],
+  "manualAndPhysicalProtocol": {
+    "rootAllActualFailuresReadBeforeEachRestore": true,
+    "sourceOperatorOutcomeHashBoundClassificationsExact": true,
+    "firstSensitiveAssertionReadAndMaskingExplicit": true,
+    "exclusiveOriginalsPreparedRecordsLivePatchesExact": true,
+    "targetRegularSingleLinkBeforeEachWrite": true,
+    "targetInode": 543459613,
+    "sourceTargetInode": 542461053,
+    "actualTargetPhysicallyDistinctFromS": true,
+    "restoresByteExact": true,
+    "noAutomaticRestoreRetryCompiledOrNativeMutation": true
+  },
+  "finiteHttpLifecycle": {
+    "fixtureSourceSha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+    "sourceSemantics": "Fixture binds literal127.0.0.1 with finite response bodies/Connection:close. It attaches socket/request/response terminal promises at acquisition, calls ordinary server.close, awaits terminals, retains unexpected errors, asserts listener and owned terminals/request end, and removes only its private0700 temporary workspace. Only over-cap/stall paths admit expected ECONNRESET/EPIPE. No fixture socket destruction, retries, mock, clock, policy, key/native/vault or deadline edit.",
+    "actualObservation": "Every HTTP body passes in C1; only the intended MIME body fails in C2. Its clean finally path rethrows the unchanged primary assertion, so cleanup failures do not replace the causal frame. All same-corpus restoration bodies and hooks pass.",
+    "timeout": "The unchanged10000ms client default executes in all five runs; actual measured facts are retained per phase. Vitest default30000ms remains unchanged. No scheduler/DNS/full-operation deadline claim.",
+    "scopeLimit": "No separate per-resource public transcript, universal descendant/socket/secret isolation, CMS grant/client-verifier integration, HTTPS/public TSA, hostname lookup/fallback or F37 proof."
+  },
+  "finalPreservation": {
+    "retainedBeforeControlsAfterM1AndFinalSnapshotsExact": true,
+    "current71SAndQPathsBytePhysicalExact": true,
+    "allEightCompiledPairsRemainOriginal": true,
+    "protected121BytePinsExact": true,
+    "allSevenNativeBytePhysicalPinsExactDistinct": true,
+    "SAndQHeadStatusIndexesClean": true,
+    "heldRHead18StatusRowsIndexEmptyExact": true,
+    "reservationReprobe": false,
+    "allHoldsAndF37SkipPreserved": true
+  },
+  "remaining": {
+    "quality": "Global RED remains unwaived; source review records1268 duplicates/dead-code2720. This runtime audit does not rerun or waive either quality gate.",
+    "wholeIssueDone": false,
+    "fullSuiteOrCoverageClaim": false,
+    "publicTsaOrGrantOrLibraryApproval": false,
+    "planCompletion": false
+  },
+  "execution": "Only finite JSON/text/byte/hash/stat inspection and read-only Git with --no-optional-locks plus private review writes. No product/helper/import/parser/compiler/native/SQL/network/process probe execution, source/index/Git mutation, reservation probe or QA write."
+}

@@ -11731,8 +11731,8 @@ withTrustFlags(notary
   .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
-    printClaimResult(artifactClaim("notary:attestation"), { json: opts.json });
-    finishVerify("Notary attestation", result.report, { json: opts.json, result });
+    // finishVerify prints the claim, downgraded when verification fails.
+    finishVerify("Notary attestation", result.report, { json: opts.json, result, claim: artifactClaim("notary:attestation") });
   });
 
 notary
@@ -12469,8 +12469,7 @@ withTrustFlags(transparency
   .action((file: string, opts: TrustFlags) => {
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
       opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
-    printClaimResult(artifactClaim("transparency:log"), { json: opts.json });
-    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
+    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified, claim: artifactClaim("transparency:log") });
   });
 
 transparencyMerkle
@@ -18747,7 +18746,7 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const results = lab.simulateExperiment(opts.experiment);
+    const results = lab.simulateExperiment(opts.experiment, process.cwd());
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
       process.exitCode = 1;
@@ -18772,11 +18771,13 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const report = lab.generateLabReport(opts.experiment);
-    if (!report) {
-      console.log(chalk.red("Experiment not found."));
-      return;
-    }
+    const report = lab.generateLabReport(opts.experiment, process.cwd());
+    if (!report) { console.log(chalk.red("Experiment not found.")); process.exitCode = 1; return; }
+    // The CLI records only lab-simulate placeholders, so a stored lab score is never a measurement.
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
+    if (report.probeResults.length > 0) console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(lab.renderLabReportMarkdown(report));
   });
 
@@ -18787,11 +18788,11 @@ program
   .requiredOption("--candidate <id>", "candidate experiment ID")
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
-    if (pairs.length === 0) {
-      console.log(chalk.yellow("No matching probes to compare."));
-      return;
-    }
+    const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
+    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
     for (const p of pairs) {
       console.log(`  ${p.probeId}:`);

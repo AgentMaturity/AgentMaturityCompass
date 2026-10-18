@@ -1,0 +1,3810 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-14T23:01:52.327Z",
+  "scope": "One new14-case signed-list ingestion/cold-reader qualification and three private guard matrices. This is not whole P0-18 acceptance.",
+  "workspace": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+  "measuredSource": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "headAtFinalRead": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "statusAtFinalRead": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? tests/claims/evidenceProvenanceQualification.test.ts\n",
+  "newOwnedFile": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenanceQualification.test.ts",
+    "bytes": 26678,
+    "sha256": "ce2e8353fd3925d41b38b1790887d921c25aa922e7795aaadfee6335b1f4c494",
+    "lines": 346,
+    "registeredCases": 14,
+    "authoredNoIndexCheck": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "",
+      "meaning": "No whitespace diagnostics. No-index different-file exit1 is retained; root ordinary staged source whitespace is separate."
+    }
+  },
+  "designAndStaticReview": [
+    {
+      "path": "/private/tmp/p0-18-qualification-design-20261015.json",
+      "bytes": 35386,
+      "sha256": "efa36c86f2c6ca2343e0333d66585dfe1eecdc72c0dc33ca308575737c9074cb"
+    },
+    {
+      "path": "/private/tmp/p0-18-qualification-design-20261015.md",
+      "bytes": 5385,
+      "sha256": "0a010cbc398c99aa478a68a220d52a02ac7bf2017bfd55260b1a8eb1923a73a1"
+    },
+    {
+      "path": "/private/tmp/p0-18-crypto-design-independent-review-20261015.json",
+      "bytes": 33197,
+      "sha256": "307222dd4e5bb5db92e91990c85f9aa43d7b54f26bc9bb45f4abf6a7eaea7df9"
+    },
+    {
+      "path": "/private/tmp/p0-18-crypto-design-independent-review-20261015.md",
+      "bytes": 8053,
+      "sha256": "d1cd9c9f31367f6fa9fd663168ada5c802e6173950bc7f1129fff176dc8c0423"
+    }
+  ],
+  "rootScopeInputs": [
+    {
+      "path": "/private/tmp/p0-18-root-scope-preflight-20261015.json",
+      "bytes": 10599,
+      "sha256": "0bf29c39bd04663e2fc9eba8e410907f41227c43a5685802b5b54583e35ff6f6"
+    },
+    {
+      "path": "/private/tmp/p0-18-initial-tracked-manifest-20261015.json",
+      "bytes": 1449575,
+      "sha256": "cf8a134cfe5cae07dd8c500b8325ce50ce63ab2d5192d361f74f088ca03fcb71"
+    }
+  ],
+  "phaseInventory": [
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-first-20261015.json",
+        "bytes": 6179,
+        "sha256": "44d700a10e213f867edf8c8398a873841dacc7fdede5296d8233c0955c1883d6"
+      },
+      "name": "crypto-first",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-first",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-first-20261015.json",
+        "exit": 0,
+        "durationMs": 8454,
+        "startedUtc": "2026-10-14T22:54:48.495647+00:00",
+        "log": "/private/tmp/p0-18-crypto-first-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+        "bytes": 6164,
+        "sha256": "95468f12ceb40bcd8f0143c90a52add73c16875b698c665d8bca0f784ceafdff"
+      },
+      "name": "crypto-private-baseline",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-private-baseline",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+        "exit": 0,
+        "durationMs": 7414,
+        "startedUtc": "2026-10-14T22:56:35.393694+00:00",
+        "log": "/private/tmp/p0-18-crypto-private-baseline-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+        "bytes": 7475,
+        "sha256": "312acf7957e673da87561f8f2ab5bae7f94159978c392da26e569a557964efbf"
+      },
+      "name": "crypto-legacy-cap-mutant",
+      "total": 14,
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-legacy-cap-mutant",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+        "exit": 1,
+        "durationMs": 7042,
+        "startedUtc": "2026-10-14T22:58:00.906846+00:00",
+        "log": "/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": [
+        {
+          "name": "P0-18 actual pinned ingestion and cold provenance readers local legacy, unverified and synthetic projections never gain provenance credit",
+          "messages": [
+            "AssertionError: expected { legacyObserved: 'OBSERVED', …(3) } to deeply equal { …(4) }\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:344:21\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+        "bytes": 6160,
+        "sha256": "994ad5057bc86cdcb7e47ea5addc62461310edbbe85fea6ab8f71b353db5a9b7"
+      },
+      "name": "crypto-legacy-cap-restored",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-legacy-cap-restored",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+        "exit": 0,
+        "durationMs": 7187,
+        "startedUtc": "2026-10-14T22:58:08.118281+00:00",
+        "log": "/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+        "bytes": 6157,
+        "sha256": "91e06b13bd03b50a21ac677341d24ee5d57ad5897264c3599bc90b5c8a7c6888"
+      },
+      "name": "crypto-unpin-refusal-baseline",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-unpin-refusal-baseline",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+        "exit": 0,
+        "durationMs": 7252,
+        "startedUtc": "2026-10-14T22:58:15.344483+00:00",
+        "log": "/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+        "bytes": 7459,
+        "sha256": "8ee50f117dcde082cdf929efcb3dd483e6f6b149289f01624b75c589c5f85f45"
+      },
+      "name": "crypto-unpin-refusal-mutant",
+      "total": 14,
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-unpin-refusal-mutant",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+        "exit": 1,
+        "durationMs": 7354,
+        "startedUtc": "2026-10-14T22:58:22.636174+00:00",
+        "log": "/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": [
+        {
+          "name": "P0-18 actual pinned ingestion and cold provenance readers a real signed list with unpinned admission cannot confer ATTESTED",
+          "messages": [
+            "AssertionError: expected 'ATTESTED' to be 'SELF_REPORTED' // Object.is equality\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:317:63\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+        "bytes": 6168,
+        "sha256": "af0dcb73114da7a7050fdd426b052c02412e1fcd146d8fef8f6c5bb6bb7055e2"
+      },
+      "name": "crypto-unpin-refusal-restored",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-unpin-refusal-restored",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+        "exit": 0,
+        "durationMs": 7325,
+        "startedUtc": "2026-10-14T22:58:30.159214+00:00",
+        "log": "/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+        "bytes": 6159,
+        "sha256": "603ea6da42effb78b7a59bf4e96ce37f44bf00e2f2a1acdb553223d934fe0cbb"
+      },
+      "name": "crypto-agent-binding-baseline",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-agent-binding-baseline",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+        "exit": 0,
+        "durationMs": 7563,
+        "startedUtc": "2026-10-14T22:58:37.525463+00:00",
+        "log": "/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+        "bytes": 7505,
+        "sha256": "ec6ed29384ddff206e4bcac42933ec0e91106d4b95ec7d2aa379d41fb5c0ec88"
+      },
+      "name": "crypto-agent-binding-mutant",
+      "total": 14,
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-agent-binding-mutant",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+        "exit": 1,
+        "durationMs": 7574,
+        "startedUtc": "2026-10-14T22:58:45.129206+00:00",
+        "log": "/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": [
+        {
+          "name": "P0-18 actual pinned ingestion and cold provenance readers a genuine signature binds agent, session, payload, original ID and recorded time",
+          "messages": [
+            "AssertionError: expected [ { field: 'agent', …(1) }, …(4) ] to deeply equal [ { field: 'agent', …(1) }, …(4) ]\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:328:21\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+        "bytes": 6172,
+        "sha256": "c6841113b684418c18bb9af9a86fc7c589c1314033941d3d02473a2b4af3db95"
+      },
+      "name": "crypto-agent-binding-restored",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "command": {
+        "phase": "crypto-agent-binding-restored",
+        "major": "22",
+        "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+        "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+        "exit": 0,
+        "durationMs": 8051,
+        "startedUtc": "2026-10-14T22:58:52.863600+00:00",
+        "log": "/private/tmp/p0-18-crypto-agent-binding-restored-20261015.log",
+        "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+      },
+      "failures": []
+    }
+  ],
+  "uniqueCaseNames": [
+    "P0-18 actual pinned ingestion and cold provenance readers a genuinely signed loaded list and bound ingest copy survive a cold reader",
+    "P0-18 actual pinned ingestion and cold provenance readers a default signed list without its separate root pin refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine foreign-root signature cannot admit its carried root",
+    "P0-18 actual pinned ingestion and cold provenance readers parseable post-signature list tamper refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers genuine own-key signatures fail both the actual writer and bound local cold projections",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with wrong-purpose admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with revoked admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with expired admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with unpinned admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine key B signature claiming pinned key A refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine signature binds agent, session, payload, original ID and recorded time",
+    "P0-18 actual pinned ingestion and cold provenance readers actual duplicate copies count once in both orders and only in the signed-time window",
+    "P0-18 actual pinned ingestion and cold provenance readers actual inline elevated-producer refusal preserves the measured rows and files",
+    "P0-18 actual pinned ingestion and cold provenance readers local legacy, unverified and synthetic projections never gain provenance credit"
+  ],
+  "matrices": [
+    {
+      "name": "legacy-cap",
+      "baseline": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+          "bytes": 6164,
+          "sha256": "95468f12ceb40bcd8f0143c90a52add73c16875b698c665d8bca0f784ceafdff"
+        },
+        "name": "crypto-private-baseline",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-private-baseline",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+          "exit": 0,
+          "durationMs": 7414,
+          "startedUtc": "2026-10-14T22:56:35.393694+00:00",
+          "log": "/private/tmp/p0-18-crypto-private-baseline-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "mutant": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+          "bytes": 7475,
+          "sha256": "312acf7957e673da87561f8f2ab5bae7f94159978c392da26e569a557964efbf"
+        },
+        "name": "crypto-legacy-cap-mutant",
+        "total": 14,
+        "passed": 13,
+        "failed": 1,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-legacy-cap-mutant",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+          "exit": 1,
+          "durationMs": 7042,
+          "startedUtc": "2026-10-14T22:58:00.906846+00:00",
+          "log": "/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": [
+          {
+            "name": "P0-18 actual pinned ingestion and cold provenance readers local legacy, unverified and synthetic projections never gain provenance credit",
+            "messages": [
+              "AssertionError: expected { legacyObserved: 'OBSERVED', …(3) } to deeply equal { …(4) }\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:344:21\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          }
+        ]
+      },
+      "restored": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+          "bytes": 6160,
+          "sha256": "994ad5057bc86cdcb7e47ea5addc62461310edbbe85fea6ab8f71b353db5a9b7"
+        },
+        "name": "crypto-legacy-cap-restored",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-legacy-cap-restored",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+          "exit": 0,
+          "durationMs": 7187,
+          "startedUtc": "2026-10-14T22:58:08.118281+00:00",
+          "log": "/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "patch": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/legacy-cap-mutation.patch",
+        "bytes": 572,
+        "sha256": "42bb7c1dc1119570d83a77d27c0071e20827005cf9162e3af433910b4679745b"
+      },
+      "mutationMetadata": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/legacy-cap-mutation.json",
+        "bytes": 414,
+        "sha256": "39915b89e87520c583accc83783d243563a73b333d02f88f032c783b5bf569c3"
+      },
+      "semanticLimit": "The imported legacy OBSERVED projection reads OBSERVED when the cap is removed; all other cases still pass."
+    },
+    {
+      "name": "unpin-refusal",
+      "baseline": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+          "bytes": 6157,
+          "sha256": "91e06b13bd03b50a21ac677341d24ee5d57ad5897264c3599bc90b5c8a7c6888"
+        },
+        "name": "crypto-unpin-refusal-baseline",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-unpin-refusal-baseline",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+          "exit": 0,
+          "durationMs": 7252,
+          "startedUtc": "2026-10-14T22:58:15.344483+00:00",
+          "log": "/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "mutant": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+          "bytes": 7459,
+          "sha256": "8ee50f117dcde082cdf929efcb3dd483e6f6b149289f01624b75c589c5f85f45"
+        },
+        "name": "crypto-unpin-refusal-mutant",
+        "total": 14,
+        "passed": 13,
+        "failed": 1,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-unpin-refusal-mutant",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+          "exit": 1,
+          "durationMs": 7354,
+          "startedUtc": "2026-10-14T22:58:22.636174+00:00",
+          "log": "/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": [
+          {
+            "name": "P0-18 actual pinned ingestion and cold provenance readers a real signed list with unpinned admission cannot confer ATTESTED",
+            "messages": [
+              "AssertionError: expected 'ATTESTED' to be 'SELF_REPORTED' // Object.is equality\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:317:63\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          }
+        ]
+      },
+      "restored": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+          "bytes": 6168,
+          "sha256": "af0dcb73114da7a7050fdd426b052c02412e1fcd146d8fef8f6c5bb6bb7055e2"
+        },
+        "name": "crypto-unpin-refusal-restored",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-unpin-refusal-restored",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+          "exit": 0,
+          "durationMs": 7325,
+          "startedUtc": "2026-10-14T22:58:30.159214+00:00",
+          "log": "/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "patch": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/unpin-refusal-mutation.patch",
+        "bytes": 736,
+        "sha256": "e03bcf76bcdba4d54357c2c185017683b980f4b9ce92b0e35228382ecb2d1164"
+      },
+      "mutationMetadata": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/unpin-refusal-mutation.json",
+        "bytes": 534,
+        "sha256": "0953b34be89a5e8e916011326a0368136e362e66d93f114287eb4a97cadd774e"
+      },
+      "semanticLimit": "The private missing-entry branch deliberately returns verified:true. The genuine bound fixture signature is independently valid, and the same negative reads ATTESTED. This is an explicit semantic refusal bypass, not a TypeError kill or a proposed source repair."
+    },
+    {
+      "name": "agent-binding",
+      "baseline": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+          "bytes": 6159,
+          "sha256": "603ea6da42effb78b7a59bf4e96ce37f44bf00e2f2a1acdb553223d934fe0cbb"
+        },
+        "name": "crypto-agent-binding-baseline",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-agent-binding-baseline",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+          "exit": 0,
+          "durationMs": 7563,
+          "startedUtc": "2026-10-14T22:58:37.525463+00:00",
+          "log": "/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "mutant": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+          "bytes": 7505,
+          "sha256": "ec6ed29384ddff206e4bcac42933ec0e91106d4b95ec7d2aa379d41fb5c0ec88"
+        },
+        "name": "crypto-agent-binding-mutant",
+        "total": 14,
+        "passed": 13,
+        "failed": 1,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-agent-binding-mutant",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+          "exit": 1,
+          "durationMs": 7574,
+          "startedUtc": "2026-10-14T22:58:45.129206+00:00",
+          "log": "/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": [
+          {
+            "name": "P0-18 actual pinned ingestion and cold provenance readers a genuine signature binds agent, session, payload, original ID and recorded time",
+            "messages": [
+              "AssertionError: expected [ { field: 'agent', …(1) }, …(4) ] to deeply equal [ { field: 'agent', …(1) }, …(4) ]\n    at /private/tmp/p0-18-crypto-qualification-20261015/closure/tests/claims/evidenceProvenanceQualification.test.ts:328:21\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          }
+        ]
+      },
+      "restored": {
+        "raw": {
+          "path": "/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+          "bytes": 6172,
+          "sha256": "c6841113b684418c18bb9af9a86fc7c589c1314033941d3d02473a2b4af3db95"
+        },
+        "name": "crypto-agent-binding-restored",
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "crypto-agent-binding-restored",
+          "major": "22",
+          "cwd": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+          "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+          "exit": 0,
+          "durationMs": 8051,
+          "startedUtc": "2026-10-14T22:58:52.863600+00:00",
+          "log": "/private/tmp/p0-18-crypto-agent-binding-restored-20261015.log",
+          "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+        },
+        "failures": []
+      },
+      "patch": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/agent-binding-mutation.patch",
+        "bytes": 529,
+        "sha256": "e188d6536feee8923794be85a269ab96185f4f7a15f7e8a3955c13dce20cd9b4"
+      },
+      "mutationMetadata": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/agent-binding-mutation.json",
+        "bytes": 439,
+        "sha256": "c7857bdc3302378ee1a1c4ffda0bb1479317a0991cc07c32e60ce0bd2fbedfba"
+      },
+      "semanticLimit": "The additional P0-55 subject-binding control fails solely because another agent reads ATTESTED. It is separate from the six recovered P0-18 mutation duties."
+    }
+  ],
+  "sameInputProof": {
+    "fixturePin": {
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/fixture.json",
+      "bytes": 152178,
+      "sha256": "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+    },
+    "fixtureHashAcrossPrivatePhases": "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb",
+    "publicInputs": [
+      {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/public-pins-before-signatures.json",
+        "bytes": 962,
+        "sha256": "55c14a9c35e0c0cb293dd1843db98ac48c9b7e585f1a8710b37e7cfcc65f97e5"
+      },
+      {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/own-public-pins-before-attestation.json",
+        "bytes": 506,
+        "sha256": "d69c5ed53cb4dffb5de84d16094ccfeef9f9d4c3085a2193b8ff4a7cd90673ee"
+      }
+    ],
+    "initializerOrder": [
+      "independent-public-pins-persisted",
+      "workspace-own-public-exclusions-persisted",
+      "signed-list:valid",
+      "signed-list:missing-root",
+      "signed-list:foreign-root",
+      "signed-list:tamper",
+      "signed-list:wrong-purpose",
+      "signed-list:revoked",
+      "signed-list:expired",
+      "signed-list:unpinned",
+      "signed-list:own",
+      "signed-attestation:attesterA",
+      "signed-attestation:own-monitor",
+      "signed-attestation:own-auditor"
+    ],
+    "independentPublicPins": {
+      "rootA": {
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEANQHeNnn3HTje2ueCJA8axE5I8EEeXZ6L/pcEP+6gSpw=\n-----END PUBLIC KEY-----\n",
+        "keyId": "1e0755740e3bb0730912f38cde5d5d32f4e4983bf708377530dcdb8202e6dd39"
+      },
+      "rootB": {
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAdOD/ohaK+GA5m9jH/SkYRJ0LghL3eQNIyUZkNpDVnOc=\n-----END PUBLIC KEY-----\n",
+        "keyId": "4954a074e84bb1b642f3a398c2b91900cfdee6237dc5ad5d7eae482baa79f6d4"
+      },
+      "attesterA": {
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAYIZ4OSiZpc0s1kRWIPmD4M/9zJJbNcuaukSFNQxb+Ww=\n-----END PUBLIC KEY-----\n",
+        "keyId": "475bbc02dc392154ed157b56baf7c13ed4fe441021d247a9071f9c674e503f10"
+      },
+      "attesterB": {
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEABH1J5sejx9mlQ6v/kKy2iR4tbHnQOGoA14sqqZgJaAw=\n-----END PUBLIC KEY-----\n",
+        "keyId": "d056829d9aa25f59627167b1356e6d299cd4562c6ea2669607e70c4dbd378a81"
+      }
+    },
+    "independentSignatureProof": {
+      "signedProof": {
+        "valid": true,
+        "missing-root": true,
+        "foreign-root": true,
+        "tamper": false,
+        "wrong-purpose": true,
+        "revoked": true,
+        "expired": true,
+        "unpinned": true,
+        "own": true
+      },
+      "digest": "4a76581dc56a71d4e02c82b8015d0ce1c663b17167c43ee90ccde07dc5512375",
+      "independentDigest": "4a76581dc56a71d4e02c82b8015d0ce1c663b17167c43ee90ccde07dc5512375",
+      "plaintextPayloadHash": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57",
+      "attesterSignatureValid": true,
+      "digestTextSignatureValid": false,
+      "forgedValidUnderB": true,
+      "forgedValidUnderA": false
+    },
+    "originalAndBoundCopy": {
+      "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+      "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+      "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8",
+      "originalPayloadHash": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57",
+      "copyPayloadHash": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57",
+      "copyTs": 1792018490120,
+      "duplicateTs": 1792018490121,
+      "signedBundle": [
+        {
+          "id": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "sha256": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57",
+          "ts": 1792018490065,
+          "agentId": "default",
+          "sessionId": "a7690795-b51f-45c4-980a-15a38ac42c04"
+        }
+      ]
+    },
+    "fixedPublicPinsAndSignedArtifacts": true,
+    "same14NamesEveryPhase": true,
+    "assertionsAndChildDriverByteEqual": true,
+    "privatePhaseArgv": "Identical pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts; only unique outputFile and evidence phase labels differ. All children route through the same private moduleRoot for each private matrix. The live first phase routes through the owned worktree."
+  },
+  "effects": [
+    {
+      "name": "first",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/first/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/first/effects.json",
+        "bytes": 2186125,
+        "sha256": "aa7740f77025ce57e741d40bf86b386d20e109c233918a878a2bb6554a48fdff"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [
+        ".amc/evidence.sqlite-shm",
+        ".amc/evidence.sqlite-wal"
+      ],
+      "parentIntervalChanges": [
+        {
+          "scenario": "initialize",
+          "changes": [
+            {
+              "path": "fixture.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 152178,
+                "sha256": "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+              }
+            },
+            {
+              "path": "homes",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/expired",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/expired/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/expired/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 925,
+                "sha256": "e7b07959bec768c4bdfbf0bd57090583cfdf8143112b1fc4bc56f1446cba2788"
+              }
+            },
+            {
+              "path": "homes/expired/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/foreign-root",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/foreign-root/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/foreign-root/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 903,
+                "sha256": "95cb21c2273fccf3684b7c55e905520f4b275d5c48346a338f6825dd108205c6"
+              }
+            },
+            {
+              "path": "homes/foreign-root/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/missing-root",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/missing-root/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/missing-root/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 903,
+                "sha256": "c1b9d53666821bf281bee134276c8029d790b79b9989f0c2910ac19724e8badd"
+              }
+            },
+            {
+              "path": "homes/own",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/own/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/own/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 1293,
+                "sha256": "9e5b3b0edd8a5cb9d134ddcc7bfabd6c76ae34929c25314db1db69a1af2ee8f7"
+              }
+            },
+            {
+              "path": "homes/own/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/revoked",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/revoked/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/revoked/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 978,
+                "sha256": "6cd8bbc2f6beec851cdcacb10c5cc4f1bb2dc7649e3ace03bd2f280f89455649"
+              }
+            },
+            {
+              "path": "homes/revoked/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/tamper",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/tamper/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/tamper/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 893,
+                "sha256": "4703a14b1a8910fd2871bc75e1a6e196c837b787550e3b54deb7fe83c28028b2"
+              }
+            },
+            {
+              "path": "homes/tamper/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/unpinned",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/unpinned/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/unpinned/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 514,
+                "sha256": "70ecaad3df141295d1db175433ab5f18d0a151679e120dd904ea8473ff4a6697"
+              }
+            },
+            {
+              "path": "homes/unpinned/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/valid",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/valid/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/valid/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 903,
+                "sha256": "c1b9d53666821bf281bee134276c8029d790b79b9989f0c2910ac19724e8badd"
+              }
+            },
+            {
+              "path": "homes/valid/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "homes/wrong-purpose",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/wrong-purpose/trust",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "homes/wrong-purpose/trust/amc-trust-list.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 893,
+                "sha256": "02ce80a601c28523588288a43095a34fe23e5dc261c964f6413aa0d359c3c5c0"
+              }
+            },
+            {
+              "path": "homes/wrong-purpose/trust/trust-roots.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 115,
+                "sha256": "18c5cc879207aa3e7fd270923bcdf097fd8c7a387af2c3485ee973190a42070b"
+              }
+            },
+            {
+              "path": "input.txt",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 47,
+                "sha256": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57"
+              }
+            },
+            {
+              "path": "own-public-pins-before-attestation.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 506,
+                "sha256": "d69c5ed53cb4dffb5de84d16094ccfeef9f9d4c3085a2193b8ff4a7cd90673ee"
+              }
+            },
+            {
+              "path": "public-pins-before-signatures.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 962,
+                "sha256": "55c14a9c35e0c0cb293dd1843db98ac48c9b7e585f1a8710b37e7cfcc65f97e5"
+              }
+            },
+            {
+              "path": "workspace",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16832
+              }
+            },
+            {
+              "path": "workspace/.amc",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/.action-policy-writer-locks",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/action-policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 3680,
+                "sha256": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104"
+              }
+            },
+            {
+              "path": "workspace/.amc/action-policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "381866c1db0dff63022294462ea94f072d6cc1713ef9b8810e2267e5f9be8626"
+              }
+            },
+            {
+              "path": "workspace/.amc/adapters.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 180,
+                "sha256": "c16d702191b9cc839eb217acd070ddf348891419b60da6e4469b2ff490ee640d"
+              }
+            },
+            {
+              "path": "workspace/.amc/adapters.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "5fc831b4eb9e9c8b55f031b41dc4279838a7db830d7fe026c390ff991b422f89"
+              }
+            },
+            {
+              "path": "workspace/.amc/agent.config.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 405,
+                "sha256": "bed14b3590cda3c50302eba42d8ff9a85aea3a7512d3a6b2533fda6a36c861e2"
+              }
+            },
+            {
+              "path": "workspace/.amc/agent.config.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "5ed79340a093d637b1055505df43f30c63c0509e2dc0156193ab0d2fcc769f37"
+              }
+            },
+            {
+              "path": "workspace/.amc/agents",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/amc.config.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 447,
+                "sha256": "2d9b480fe7694b76156b1dc7633167c6dfe290b33f02c458e84ca2887d3de935"
+              }
+            },
+            {
+              "path": "workspace/.amc/amc.config.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "141f28703b5335a76f287bbeb2d6f91e65088a1fa831a1c8cc6e8f978a43be6d"
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance/certificates",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 873,
+                "sha256": "bbd681c5807233f7590e499f835c5717dc656439e524ae910413e4e8469b8623"
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "53b3c35b484227e5f735b4765e4feadbcd213bbe86ff629a5e55df23450a9a8e"
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance/runs",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/assurance/waivers",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/binders",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/binders/cache",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/binders/exports",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/maps",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/maps/active.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 19631,
+                "sha256": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/maps/active.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "1dc2f2c5e80be3e4eafd28b57fdab5f9971be83ede5daeb1983baef870836075"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/maps/builtin.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 19631,
+                "sha256": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/maps/builtin.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "cadb6240358fe4830f5c74cbc24ed78d8f5c58f33ac5da9e85ede31705b6d0e8"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 990,
+                "sha256": "854ec597fa4f5d4c9a59e08e989cd7b7e41bfca8adbe51f34750e269179fff59"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "a45d4804d00a2746511520fbda9742254ca4dbdba3c954cacaf018fe03d1b0f2"
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/requests",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/requests/closed",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/audit/requests/open",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/comparisons",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/exports",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/imports",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/imports/benches",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/imports/cache",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1456,
+                "sha256": "a3bcb8e7a502bc6e396c9516950fbe58283069953fa8f1c5a749206772111c36"
+              }
+            },
+            {
+              "path": "workspace/.amc/bench/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "d5fd90af658c25292c090c6345bdc8ce9b73865eb36d7ffb79ec11e4f2837846"
+              }
+            },
+            {
+              "path": "workspace/.amc/blob-keys",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/blob-keys/current.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 91,
+                "sha256": "531e2cb7f7bca7c82546efdedbe4c04a43dbea0483835a5160d47abee55150ca"
+              }
+            },
+            {
+              "path": "workspace/.amc/blob-keys/current.json.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "f976279a6b9ef7bc4c8f2e4ba4003d10c5271a0ec14aacf6e36023a1bb592074"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/blob_addhm56hmg4pxwsdyzr6orbxoy.blob",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 158,
+                "sha256": "6eced79fa4d788f2089ce8bceef35b0906650ff880840d3bb2fff09b569472ea"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/blob_ahtyztcomosnqsq34cyeaxxn5a.blob",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 158,
+                "sha256": "0e3139f47c2fb52524a308454bbe5a8392e5a295d09442dfe1debcc875344509"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/blob_h3w56xl4u2nhaxuvtrx5nv7tpe.blob",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 158,
+                "sha256": "6681537d90b297b9da4434bb29b239972717cc663060e5057c33a18d36e031ec"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/blob_l2gpzicj7uxelkk5czghnqhuqy.blob",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 158,
+                "sha256": "3bcf8d43a25055098401f09d4b5fea6cdbc89f15f71d6299b72b503a40b89c63"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/index.jsonl",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1512,
+                "sha256": "7b3b153daf51e2ba69d7f502ac752df943cfd72c6ef208a4325f53c4a1b879f3"
+              }
+            },
+            {
+              "path": "workspace/.amc/blobs/index.jsonl.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "5b3d19fcf6a8b4926cff9200b352de2edfb0590648b27aedb53915fb1761abb1"
+              }
+            },
+            {
+              "path": "workspace/.amc/bridge.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 827,
+                "sha256": "9fac7907041631982f77b57b692cbbf61cd46f94bd3bc4be2026d62ed8fa4350"
+              }
+            },
+            {
+              "path": "workspace/.amc/bridge.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "9c4ef2f0d3fc343c6be4711650f52b9e6a9e0ef44bc21ce1ba3afd3c3f500d11"
+              }
+            },
+            {
+              "path": "workspace/.amc/budgets.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 704,
+                "sha256": "eadcd79d9ac72fa608dcbeb5b9ffa2f77430dcd687d0ec96d2f45e87d1cbea52"
+              }
+            },
+            {
+              "path": "workspace/.amc/budgets.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "3954efd2945596f777bbd9927694a18d6e444c270b47b658cf86b94dc389662e"
+              }
+            },
+            {
+              "path": "workspace/.amc/bundles",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/canon",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/canon/canon.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 65764,
+                "sha256": "4156c99d6dff2ae65279c28ffe9c978a04de60d115f5dac47488e29fa5ac18fe"
+              }
+            },
+            {
+              "path": "workspace/.amc/canon/canon.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "5c554350cc361af4c19c82fea225befc8cc8d4c6df1c0bcf552cc1422380406c"
+              }
+            },
+            {
+              "path": "workspace/.amc/cgx",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/cgx/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 444,
+                "sha256": "db84a129a529c04c167176020149521ac23d9ab553b538026c6b7b54cb98e8c5"
+              }
+            },
+            {
+              "path": "workspace/.amc/cgx/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "4590002972de4197eb824c0ae65baeb56f7599949071127ff714806368d06714"
+              }
+            },
+            {
+              "path": "workspace/.amc/context-graph.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1958,
+                "sha256": "a3c48fd3e92f41db74a978a59e410979fd66842b598aa68674aab515ec42e534"
+              }
+            },
+            {
+              "path": "workspace/.amc/current-agent",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 8,
+                "sha256": "01666ec060466c14b9fa06c613fbac449163f2a2017558fe16526209ab78c6b0"
+              }
+            },
+            {
+              "path": "workspace/.amc/diagnostic",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/diagnostic/bank",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/diagnostic/bank/bank.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1894080,
+                "sha256": "609ba843a068df9410042bab698531ad55a64dfeac9a882bbd5f36d4edfd1fee"
+              }
+            },
+            {
+              "path": "workspace/.amc/diagnostic/bank/bank.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "4cdf81d464521cfc6eb5a7ee4adbdc5618cb1318f2056ce9278588193c1f1c3d"
+              }
+            },
+            {
+              "path": "workspace/.amc/eval-harness.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 253,
+                "sha256": "693988ae6ef5d1aa908e7d91c6c5470536ad16e00d47616d82ced1b81e44228e"
+              }
+            },
+            {
+              "path": "workspace/.amc/evidence.sqlite",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 565248,
+                "sha256": "c1f518e50a8a6902f57d451e7079bfffb1ab745bb534947321b8677e439b8ac8"
+              }
+            },
+            {
+              "path": "workspace/.amc/fleet.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 315,
+                "sha256": "c65de7d214e64993cb38fcc9c854ef31b4218c05bfa04e3ee853ecf404ce2e0a"
+              }
+            },
+            {
+              "path": "workspace/.amc/fleet.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "b6f2df7297e0c3edb83a77287269db0359c1edcfc65118cf00d48c2b43b9eabb"
+              }
+            },
+            {
+              "path": "workspace/.amc/forecast",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/forecast/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 850,
+                "sha256": "fe083f2f1602a057827e73cc7ecc90b18cbdef69d97b3771705b8609c7cf704a"
+              }
+            },
+            {
+              "path": "workspace/.amc/forecast/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "3a8be07faac1d475eff6e359f89facb835442bd39053ba36ee600785d71d6c74"
+              }
+            },
+            {
+              "path": "workspace/.amc/gateway.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 2018,
+                "sha256": "fe6ad26df7c2a48b6eb53529092116473f9d3e57d4b206b30205c73908a36c4c"
+              }
+            },
+            {
+              "path": "workspace/.amc/gateway.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "f51a244d648c53afa32d575a444b32109f37667c48146788f9162400b8f52370"
+              }
+            },
+            {
+              "path": "workspace/.amc/guardrails.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 233,
+                "sha256": "4783669f0a6e3ca50a4debb581c8eadddf70e213d00d67fa3b2f044f56176709"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/auditor_ed25519.pub",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 113,
+                "sha256": "9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/auditor_history.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 717,
+                "sha256": "d4e63ea71b723b8570db6fe4c2432e394548b0d447975445933184d3a481e1e0"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/lease_ed25519.pub",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 113,
+                "sha256": "9200609ec27945945c31e0679efcac5bb13d07d9380bface3891cd9e8a56760a"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/lease_history.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 715,
+                "sha256": "f82e7f5cb031f31c7e0b6300aaf911ed987969371379fc53f98ec814337923b9"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/monitor_ed25519.pub",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 113,
+                "sha256": "44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/monitor_history.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 717,
+                "sha256": "bef71b525653c4a94d000647c95dbe95180060e7714739fc9c6a36cfc5054c57"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/session_ed25519.pub",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 113,
+                "sha256": "d21ef8a31c59fd314ab698170575326ee86767f9fb217437517c87cdfbe532ae"
+              }
+            },
+            {
+              "path": "workspace/.amc/keys/session_history.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 717,
+                "sha256": "daac1b4e10a3e310be823ae65ef24bed112d32bc6850dc246b3a016ec79d0f3d"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/profiles.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 39039,
+                "sha256": "fdea1cd1d9005fe22e66b16849fa0319813421e803251c2cefb4f27e6d314b50"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/profiles.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "528c6fc710e1afb33365c7dff2a270de33020acae69a9d5b6e7985d954a5bc16"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/targets.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 4275,
+                "sha256": "46b13d0296e53a099171f3539347cf97700e8ab41603ce4038e8c9e5a5375881"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/targets.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "55011a3701d6f87ac633f61c0afcfababdc1998220407e11bbfd5ce02bde6467"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/tuning.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 977,
+                "sha256": "f90d09f36cc9f4586c16425221f38647a683789325ea30da136d74ad11133ac9"
+              }
+            },
+            {
+              "path": "workspace/.amc/mechanic/tuning.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "7f5cd7aad7fa8872657a855117b17f99fa4769ff675024ec563bc738abfe8c3b"
+              }
+            },
+            {
+              "path": "workspace/.amc/model-taxonomy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1200,
+                "sha256": "1b0de0272af89cc648ad6e3a0c53c0672f6bb6e3748e72784e2f3a1762d70c44"
+              }
+            },
+            {
+              "path": "workspace/.amc/model-taxonomy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "5b8aab29dcbd92af860d46fd6bfa963b659e93af0b60e2796266f67b49b2baf1"
+              }
+            },
+            {
+              "path": "workspace/.amc/ops-policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 831,
+                "sha256": "b3554faece681eae3fec9e8bc19bb62a5dfe2e9979fa6f9e05e3fb32ba877a06"
+              }
+            },
+            {
+              "path": "workspace/.amc/ops-policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "71487ec7b76838124b30887b254ae3d37b12612167f1487a4f22bf373267fb5e"
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/lint",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/lint/agents",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/packs",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/packs/agents",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/policy.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 1782,
+                "sha256": "2237af4bf3691bc3147a93b16039ced81f4270a905ba4a032a1afcc22fe874f2"
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/policy.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "634660c7b0703b8cfec1c28c5ccf32d18d9fadc8b5c37b2b8163b9dfbc313881"
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/snapshots",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt/snapshots/agents",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/prompt-addendum.md",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 181,
+                "sha256": "52d9b04cb2b962af0698973e48f0e37b1a49e66905caf0bf99f185682cf25d70"
+              }
+            },
+            {
+              "path": "workspace/.amc/reports",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/runs",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/targets",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/targets/default.target.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 5030,
+                "sha256": "bfe6dd86946b16001afbe184e37fc4e83446669b3297cbe3e478a8d5e4fe926e"
+              }
+            },
+            {
+              "path": "workspace/.amc/tools.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 2054,
+                "sha256": "5c905e75193056ed990b41424c28c79ae10920f70682141e58d9dad1b7d83549"
+              }
+            },
+            {
+              "path": "workspace/.amc/tools.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "957d053310d5537bf1e972a302f363141c20b2632efd4006fe472d8e46769bab"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/log.jsonl",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 291,
+                "sha256": "0621ebf9414759abdb77bb8bb4792c995b1c626d1dff30f7d4a158f83c6d99b7"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/log.seal.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 247,
+                "sha256": "201105a39776cfad592e60aab0f81ae3f26e95bb396fd71759ebf05b4f07f4f8"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/log.seal.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "914ede03cf205e0de3425aca7f72c58106306156a5f899096059168dca8e0a81"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle",
+              "before": null,
+              "after": {
+                "kind": "directory",
+                "mode": 16877
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle/current.root.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 251,
+                "sha256": "c1316f9f6abd264a4d6af2c924f4bc61622591c2462e0c6e2d13da9063df64dc"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle/current.root.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "c85ecc427923c6d7de7b3875c9c535d364d1218e88d3677904b7f93db5b410b5"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle/frontier.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 372,
+                "sha256": "6660ac8836fcc39ac00ae5c1ffa540f68ad4cfa22e6c563ec07861d9c1e2bed1"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle/leaves.jsonl",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 175,
+                "sha256": "62dd309ee1007973f58c4ace6ae82a809937d6228c39716de9422198523579ed"
+              }
+            },
+            {
+              "path": "workspace/.amc/transparency/merkle/roots.jsonl",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 227,
+                "sha256": "f8f6412782468e8eac079360d03cf19883d39d9bc8b4cac97bf0f86acc32e1e0"
+              }
+            },
+            {
+              "path": "workspace/.amc/trust.yaml",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 977,
+                "sha256": "028a43dedf8605e6c2b619b39d0c483dd5f4c1b04df68ff65387bee35885a7cc"
+              }
+            },
+            {
+              "path": "workspace/.amc/trust.yaml.sig",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 781,
+                "sha256": "6c7716710b94a573a54aeda38bfabf9217b557f2c9fa6eb18e809a85d3e2f4f5"
+              }
+            },
+            {
+              "path": "workspace/.amc/vault.amcvault",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33152,
+                "bytes": 1264,
+                "sha256": "c559c3d7e524a5f3e8c5d8045804500ac7fcd0105c916e39b4c84c228067dc04"
+              }
+            },
+            {
+              "path": "workspace/.amc/vault.amcvault.meta.json",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 411,
+                "sha256": "b427c2f440d4365a04decd8224dcb22e9058cb208fa1f187289aa50680e327c6"
+              }
+            }
+          ]
+        },
+        {
+          "scenario": "positive",
+          "changes": [
+            {
+              "path": "workspace/.amc/evidence.sqlite-shm",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 32768,
+                "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+              }
+            },
+            {
+              "path": "workspace/.amc/evidence.sqlite-wal",
+              "before": null,
+              "after": {
+                "kind": "file",
+                "mode": 33188,
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            }
+          ]
+        }
+      ],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "private-baseline",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/private-baseline/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/private-baseline/effects.json",
+        "bytes": 2331132,
+        "sha256": "65b98321c4f1fa77b14e170273632cd8d57204976a7e41c36aa9868016852fe9"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "legacy-cap-mutant",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/legacy-cap-mutant/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/legacy-cap-mutant/effects.json",
+        "bytes": 2509963,
+        "sha256": "f347beee78b71e75825b441dc04be3f92b676ba1a086ae369e3b6f54339580b2"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "OBSERVED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "legacy-cap-restored",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/legacy-cap-restored/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/legacy-cap-restored/effects.json",
+        "bytes": 2690036,
+        "sha256": "f15f97c4f13c17e3434b7d2c35d8bdd37b3a4055b81b76868c958fd6c4d511ea"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "unpin-refusal-baseline",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-baseline/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-baseline/effects.json",
+        "bytes": 2872176,
+        "sha256": "980f537dd325e44bbb4ecc3a59054c26f8683bdc5a6b5f29ebd397c797a0ce56"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "unpin-refusal-mutant",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-mutant/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-mutant/effects.json",
+        "bytes": 3054805,
+        "sha256": "0ecbdec95d5a0b9a4517706d70f21255f15d54944196a6ae33908a9ffb713823"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "ATTESTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "unpin-refusal-restored",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-restored/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/unpin-refusal-restored/effects.json",
+        "bytes": 3237464,
+        "sha256": "5df0915647391f691b77312eac094a213df075f8a30c53af52592bbde744b754"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "agent-binding-baseline",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-baseline/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-baseline/effects.json",
+        "bytes": 3420948,
+        "sha256": "4e730cad97413df39662a8397f4f2988386bb6df31ce4cd4bc9c5b916ef21efd"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "agent-binding-mutant",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-mutant/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-mutant/effects.json",
+        "bytes": 3603643,
+        "sha256": "d91c78a99e1e27d1a0b122bdbd055d70caba573c19618f928cf192fa0aecd31f"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "ATTESTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    },
+    {
+      "name": "agent-binding-restored",
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-restored/effects.json",
+      "pin": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/phases/agent-binding-restored/effects.json",
+        "bytes": 3786236,
+        "sha256": "5fd47246b0df9365f08147b8fd48845f659d8baee1575ce9dfebd3c197b128c0"
+      },
+      "readCases": 14,
+      "allRowsUnchanged": true,
+      "coordinationChanges": [],
+      "parentIntervalChanges": [],
+      "specialValues": {
+        "positive": "ATTESTED",
+        "missing-root": "SELF_REPORTED",
+        "foreign-root": "SELF_REPORTED",
+        "tamper": "SELF_REPORTED",
+        "own": [
+          {
+            "role": "monitor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 44db9848cfd20cb83060fe9fe7a33b8b69acad5178b4ed550f37e70529552f5f is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          },
+          {
+            "role": "auditor",
+            "writerTier": "SELF_REPORTED",
+            "writerReason": "key 9015ab646f89df0b5fa0c215fa48376a1ebf6063237842a5d791d380ac80977c is one of the operator's own keys, not a third party",
+            "signatureValid": true,
+            "readerTier": "SELF_REPORTED"
+          }
+        ],
+        "wrong-purpose": "SELF_REPORTED",
+        "revoked": "SELF_REPORTED",
+        "expired": "SELF_REPORTED",
+        "unpinned": "SELF_REPORTED",
+        "forged": "SELF_REPORTED",
+        "binding": [
+          {
+            "field": "agent",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "session",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "payload",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "original",
+            "tier": "SELF_REPORTED"
+          },
+          {
+            "field": "time",
+            "tier": "SELF_REPORTED"
+          }
+        ],
+        "dedup": {
+          "forward": [
+            "941cef28-74d9-4702-862a-910882a3a3f7",
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "reverse": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+            "941cef28-74d9-4702-862a-910882a3a3f7"
+          ],
+          "outside": [
+            "f8976ef2-8aed-4c6f-a6ff-19352309d252"
+          ],
+          "copyId": "941cef28-74d9-4702-862a-910882a3a3f7",
+          "originalId": "f8976ef2-8aed-4c6f-a6ff-19352309d252",
+          "duplicateId": "bf6f2132-b644-4dd6-99d5-da3233d400d8"
+        },
+        "guard": [
+          {
+            "error": "trust tier OBSERVED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          },
+          {
+            "error": "trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+            "rowsUnchanged": true,
+            "filesUnchanged": true,
+            "beforeCount": 4,
+            "afterCount": 4
+          }
+        ],
+        "legacy": {
+          "legacyObserved": "SELF_REPORTED",
+          "unverifiedAttested": "SELF_REPORTED",
+          "syntheticClaim": null,
+          "syntheticProvenance": null
+        }
+      },
+      "fixtureHashes": [
+        "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+      ]
+    }
+  ],
+  "closure": {
+    "privateRoot": "/private/tmp/p0-18-crypto-qualification-20261015/closure",
+    "trackedSourceFiles": 7738,
+    "compiledFiles": 4529,
+    "sourceCopyEquals072BeforeAndAfter": true,
+    "completeCompiledBeforeAndEveryRestorationEquals": true,
+    "liveCompiledBeforeAndAfterEquals": true,
+    "rootProtectedPins": [
+      {
+        "relativePath": "src/claims/evidenceProvenance.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+        "bytes": 12211,
+        "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+        "actualSha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+        "finalSha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+      },
+      {
+        "relativePath": "src/trust/trustList.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "bytes": 10386,
+        "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+        "actualSha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+        "finalSha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+      },
+      {
+        "relativePath": "src/trust/trustContext.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+        "bytes": 7037,
+        "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+        "actualSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+        "finalSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+      },
+      {
+        "relativePath": "src/trust/admission.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/admission.ts",
+        "bytes": 9401,
+        "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "actualSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "finalSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+      },
+      {
+        "relativePath": "src/trust/keyPurposes.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+        "bytes": 604,
+        "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+        "actualSha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+        "finalSha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd"
+      },
+      {
+        "relativePath": "src/crypto/keys.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+        "bytes": 9168,
+        "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+        "actualSha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+        "finalSha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+      },
+      {
+        "relativePath": "src/utils/json.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/utils/json.ts",
+        "bytes": 540,
+        "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+        "actualSha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+        "finalSha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+      },
+      {
+        "relativePath": "src/ledger/ledger.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+        "actualSha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+        "finalSha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+      },
+      {
+        "relativePath": "src/ledger/ledgerConnection.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+        "bytes": 3137,
+        "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+        "actualSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+        "finalSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+      },
+      {
+        "relativePath": "src/ledger/trustTierValidation.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+        "bytes": 3447,
+        "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+        "actualSha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+        "finalSha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+      },
+      {
+        "relativePath": "src/ingest/ingest.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+        "bytes": 10253,
+        "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+        "actualSha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+        "finalSha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+      },
+      {
+        "relativePath": "src/eval/evalImporters.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+        "bytes": 70432,
+        "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+        "actualSha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+        "finalSha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+      },
+      {
+        "relativePath": "src/eval/evalCli.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+        "bytes": 1521,
+        "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+        "actualSha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+        "finalSha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6"
+      },
+      {
+        "relativePath": "src/dogfood/maturityEvidence.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+        "bytes": 15973,
+        "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+        "actualSha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+        "finalSha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779"
+      },
+      {
+        "relativePath": "src/credentials/credentialsPaths.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+        "bytes": 4710,
+        "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+        "actualSha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+        "finalSha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0"
+      },
+      {
+        "relativePath": "tests/claims/evidenceProvenance.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+        "bytes": 17646,
+        "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+        "actualSha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+        "finalSha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212"
+      },
+      {
+        "relativePath": "tests/evalImportTrust.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+        "bytes": 5728,
+        "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+        "actualSha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+        "finalSha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4"
+      },
+      {
+        "relativePath": "tests/ingestAttestation.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+        "bytes": 15700,
+        "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+        "actualSha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+        "finalSha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa"
+      },
+      {
+        "relativePath": "tests/trustTierWriteGuard.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+        "bytes": 5739,
+        "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+        "actualSha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+        "finalSha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62"
+      },
+      {
+        "relativePath": "tests/dogfoodMaturityEvidence.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+        "bytes": 4544,
+        "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+        "actualSha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+        "finalSha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c"
+      },
+      {
+        "relativePath": "tests/externalEvidenceProfile.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+        "bytes": 7956,
+        "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+        "actualSha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+        "finalSha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+      },
+      {
+        "relativePath": "tests/externalEvidenceExport.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+        "bytes": 5707,
+        "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+        "actualSha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+        "finalSha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+      },
+      {
+        "relativePath": "tests/compliance/evidenceBinding.test.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+        "bytes": 11569,
+        "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+        "actualSha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+        "finalSha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a"
+      },
+      {
+        "relativePath": "src/compliance/complianceEngine.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+        "bytes": 14631,
+        "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+        "actualSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+        "finalSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+      },
+      {
+        "relativePath": "src/diagnostic/gates.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+        "bytes": 9684,
+        "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+        "actualSha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+        "finalSha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+      },
+      {
+        "relativePath": "src/outcomes/outcomeCli.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+        "bytes": 5678,
+        "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19",
+        "actualSha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19",
+        "finalSha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19"
+      },
+      {
+        "relativePath": "src/assurance/agentResponder.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+        "bytes": 21889,
+        "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+        "actualSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+        "finalSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807"
+      },
+      {
+        "relativePath": "src/cli.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli.ts",
+        "bytes": 1064339,
+        "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "actualSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "finalSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+      },
+      {
+        "relativePath": "src/standard/externalEvidenceProfile.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+        "bytes": 16961,
+        "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+        "actualSha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+        "finalSha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+      },
+      {
+        "relativePath": "docs/EVIDENCE_TRUST.md",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+        "bytes": 10946,
+        "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+        "actualSha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+        "finalSha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499"
+      },
+      {
+        "relativePath": "tests/helpers/trustContext.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+        "bytes": 4280,
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "actualSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "finalSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      },
+      {
+        "relativePath": "tests/trust/trustFixtures.ts",
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+        "bytes": 2312,
+        "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+        "actualSha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+        "finalSha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+      }
+    ],
+    "liveChangedTrackedPaths": [
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "ba2d1f54f67fe94c2fc8b5507510f6e5a52bebb2d106ef2e577519600e1ed933",
+        "actualSha256": "2ae376f727529f6abbf50f9408f8779f80904b2623a8c75e63d587c173b02d30",
+        "matches": false
+      },
+      {
+        "relativePath": "README.md",
+        "bytes": 59828,
+        "sha256": "c53c6ea477e2a5edc9099cdd46d883e9ec519efc6c748ce8f9c18c756274161d",
+        "actualSha256": "7392b86cc5e6cf87af92844ccdb26f8f3c2624f15395c103943b5d4c1883d571",
+        "matches": false
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "26374366a8cdf1c1f8936442b6d502375e1bd07fdc8c3045fbc08ad628516c7a",
+        "actualSha256": "be20e1587ec1dd68fc5abf840d72a32bc601ab46a8e5d48a116add489121983f",
+        "matches": false
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "13bd3e85bef3fb4c45de988cf9a37268955fc425798faa366d2d47d713fc3d75",
+        "actualSha256": "0db24b5557da28661ab90dbcfc66e1f4fdcb7e6efdd2165e31515015bd22909f",
+        "matches": false
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "588af022cf907d72731e68f907cbf203f1b7a40cd03cf9c7fac6292abfc7213b",
+        "actualSha256": "1e1565b2f0757e0919aa7d08ba1eeb2b26b84be155d6887b10176b9ae335ba16",
+        "matches": false
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "b179c4ecd44c4d461e8891d868569aa9e1fe2d23f84c20628fffe445b5d1c3ed",
+        "actualSha256": "038cc4f3da14e644df517b050afecd6ebe28c5d76968af53830e88972e363ada",
+        "matches": false
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "4be226ac51815404d5bf8861802a81e49e0b62cb135071fb6e78a9cce7258fc0",
+        "actualSha256": "8a28dfc7b31a09c02c571396209d16bbd5afb3422347b11e5ca5fcf0beb0caab",
+        "matches": false
+      },
+      {
+        "relativePath": "website/index.html",
+        "bytes": 43520,
+        "sha256": "2ae0119d4c2227eb0ec71d1b489958c593b9286ebb6874c02d200dc518d5ecc8",
+        "actualSha256": "bbe59e5e408932707027e6aa9463b9018b928811bf15a80d803c4acdaa719f3d",
+        "matches": false
+      },
+      {
+        "relativePath": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "608ca03ba2118b2181d69f4e549448b726fdb2eb5028d85d45f8a3c71580c381",
+        "actualSha256": "5e0deb4c273468279fd05f87f4cfbbba97439345651b10aa6c1d723315862519",
+        "matches": false
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "ba9309480f27f7d9003b926e371e711164d274e053dc2c492d1c1701486eba67",
+        "actualSha256": "00605e079be76e620c61295ce7d4f0ac6f50e731334d577d6915f859dba57fec",
+        "matches": false
+      }
+    ],
+    "liveChangeAuthorization": "Root-owned exact10factual count documents1637→1638. They are retained as explicit observed differences; no later live 7,738-file exact claim is made.",
+    "before": {
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/closure-before-mutations.json",
+      "bytes": 3890439,
+      "sha256": "8dc39048e335e11c510122c855a790f1de997dfd5c7e2ba247a39f49bec3e234"
+    },
+    "after": {
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/closure-after-restoration.json",
+      "bytes": 6197471,
+      "sha256": "0fcea8a3450bcee2fb1209e74c071b30d6ff048f74e96fe29a1fbd4e38457e5e"
+    },
+    "restorationManifests": [
+      {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/legacy-cap-restored-compiled.json",
+        "bytes": 729162,
+        "sha256": "33606f8f8bb19193b4d9338a72faf77f207324e4b77b1c37427e908e8a6ca479"
+      },
+      {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/unpin-refusal-restored-compiled.json",
+        "bytes": 729162,
+        "sha256": "33606f8f8bb19193b4d9338a72faf77f207324e4b77b1c37427e908e8a6ca479"
+      },
+      {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015/agent-binding-restored-compiled.json",
+        "bytes": 729162,
+        "sha256": "33606f8f8bb19193b4d9338a72faf77f207324e4b77b1c37427e908e8a6ca479"
+      }
+    ],
+    "originalSetupAndPackagePins": [
+      {
+        "relativePath": "vitest.config.ts",
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "tests/setup/guardWorkspace.ts",
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "package.json",
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "pnpm-lock.yaml",
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "matchesParent": true
+      },
+      {
+        "relativePath": "pnpm-workspace.yaml",
+        "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+        "matchesParent": true
+      }
+    ],
+    "adaptation": "No permanent-test or helper adaptation. Full source072 local shared Git clone plus complete actual compiled dist copy and exact new test. Owned node_modules symlinks reuse installed same-ABI dependencies; mutable .vite/.cache directories are private regular directories. No install, rebuild, source mutation or live dist mutation.",
+    "nativeBefore": {
+      "node": "v22.23.3",
+      "abi": "127",
+      "entry": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/better-sqlite3/lib/index.js",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "ino": 537476941,
+      "nlink": 1,
+      "select": {
+        "value": 1
+      }
+    },
+    "nativeAfter": {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "mode": 33261,
+      "nlink": 1,
+      "uid": 501,
+      "gid": 20,
+      "rdev": 0,
+      "blksize": 4096,
+      "ino": 537476941,
+      "size": 1931552,
+      "blocks": 3776,
+      "atimeMs": 1792018740839.7092,
+      "mtimeMs": 1781543731000,
+      "ctimeMs": 1792017434372.9504,
+      "birthtimeMs": 1781543731000
+    },
+    "firstCompleteHashTiming": "Complete7738/4529 hash capture happened after the14-green private baseline and before all mutations, following the retained preparation observer refusal. Every later restored closure was rehashed completely."
+  },
+  "retainedPreparationFailure": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015/prepare-observer-failure.json",
+    "bytes": 3792,
+    "sha256": "05a323ab1e16df7205829434b021d48925464e4b908cea048ce841d4091fb74e"
+  },
+  "frozenCryptoCommands": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015/commands-crypto-only-frozen.json",
+    "bytes": 5400,
+    "sha256": "b6ce16795eef4b4131e88813b751e1e7b2f78e79228648d6a6e4e0617be26e47"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015/artifact-index.json",
+    "bytes": 82284,
+    "sha256": "29fcbb8566ae10857597b78304fbb518b325da1ee426c016331cc9ac72fbfbb1"
+  },
+  "artifactIndexCount": 374,
+  "rootReportedStatic": "Root independently reported final test types0/36.988s, normal freeze0/1.705s, counts/docs/API0, and required quality RED1269/2751 with no dead-findings delta. Those remain root-owned evidence, not rerun or reclassified here.",
+  "limits": [
+    "Only14unique registered behavior cases;10executions of the same14corpus are not140unique acceptance cases. No pending/todo or hidden setup skip in any phase.",
+    "Local operator-authored cryptographic fixtures do not prove external review, content truth, authenticated people, regulatory eligibility or independent assessment. attestedBy/statement are outside the attester signature; changed labels are explicitly local in-memory projections.",
+    "Actual ingestion and attestation use normal default AMC_HOME signed-list loading, empty explicitPins and both allow flagsfalse. Root and attester public PEM pins were recorded before list/attestation signatures.",
+    "The monitor/auditor cold ATTESTED records are local projections, not stored rows. Actual own-key writer refusals storeSELF_REPORTED. Local legacy/synthetic projections are not historical migrations or live rows.",
+    "Dedup window filtering here applies only to admissible attested copies. The original SELF_REPORTED row passes through outside the attested signed-time window. Duplicate ts=copy.ts+1 is an explicit locally supplied timestamp covered by the actual ledger writer; no trusted clock claim follows.",
+    "All8actual stored rows remain unchanged across cold reads. The first readonly connection creates WAL/SHM sidecars; these are retained, not erased. Parent fixture snapshots surround child execution and end before observer stdout/stderr writes. Directory mode/content/path snapshots do not claim race freedom or every metadata attribute.",
+    "Actual inline refusal interval begins after writer/session initialization. Both attempts retain four evidence rows and unchanged measured file bytes; no general claim for non-inline payloads or all failed writes follows.",
+    "Node22.23.3/ABI 127 is actual recorded runtime; the new permanent test has no Node-major predicate. Node24 behavior, full suite and all six recovered mutation obligations are outside this receipt.",
+    "The C importer/seeder/S7 lane and all source/static/freeze/canonical duties remain separate. No models/providers/HTTP were requested; owned children deny Node fetch/http/https/net transports, not OS syscalls.",
+    "Purpose/version source-spec drifts and prior P0-51 admission-precedence contradictions remain unresolved. Production/shared CLI/registry/REPL, old tests, dependencies, guards, archives, all held paths and Claude work are unchanged by this agent."
+  ],
+  "allRuntimeAndLiveSourceReadsComplete": true,
+  "onlyRepositoryEdit": "tests/claims/evidenceProvenanceQualification.test.ts",
+  "productionEdit": false,
+  "commit": false
+}

@@ -1,0 +1,37 @@
+{
+  "nodeExecutable": "/opt/homebrew/opt/node@24/bin/node",
+  "helper": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-original-child-guard/byte-equal-original-helper.mjs",
+  "helperSha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3",
+  "helperBytes": 11921,
+  "byteEqualToRetainedEmittedHelpers": [
+    "/private/tmp/p0-27-session-evidence-89CZNg/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-GuQqFA/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-crr3GL/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-ZDjc0i/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-ul2dQw/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-pBP4Eg/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-JNYZxY/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-ggbYhi/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-Ws7F2y/actual-session-helper.mjs",
+    "/private/tmp/p0-27-session-evidence-C2xuhJ/actual-session-helper.mjs"
+  ],
+  "request": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-original-child-guard/case/request.json",
+  "exit": 1,
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSha256": "354059f6b4056a17721fd07012e83a4e68f4b5d0c69ead4d9772e212d0f7aa7e",
+  "before": [
+    {
+      "path": "request.json",
+      "sha256": "4cbe0341bea427be90683e2f2a7f4ae3f0575205a15a5ca499309f53e24643cb"
+    }
+  ],
+  "after": [
+    {
+      "path": "request.json",
+      "sha256": "4cbe0341bea427be90683e2f2a7f4ae3f0575205a15a5ca499309f53e24643cb"
+    }
+  ],
+  "noProductStateOrResultMarker": true,
+  "reason": "Original Node24 child refuses its Node22-only assertion before dynamically importing product APIs or initializing the fixture. This is a test guard baseline, not a product or SQLite failure.",
+  "literalBoundary": "The source literal includes its final newline before the closing backtick; the whole emitted helper is compared byte-for-byte."
+}

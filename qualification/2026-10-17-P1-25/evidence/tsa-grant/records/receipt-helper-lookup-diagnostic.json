@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T23:01:19.970720+00:00",
+  "operation": "Read-only receipt skeleton filename lookup",
+  "error": "FileNotFoundError: receipt-extension-preparation/assemble-extension.py",
+  "cause": "Inert helper uses a sealed source-text filename; guessed executable name did not exist.",
+  "mutationOrHelperExecution": false,
+  "correctedNextAction": "Use exact preferred V2 seal output paths before root full review.",
+  "qualificationCredit": false,
+  "sourceCheckpointAndControlsUnchanged": true
+}

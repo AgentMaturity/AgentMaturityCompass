@@ -1,0 +1,768 @@
+{
+  "issue": "P0-20",
+  "scope": "Only the new tests/industryPackAuditReaderQualification.test.ts was authored. Actual helper containment tests and one bounded compiled FIFO child; no authenticated HTTP or licensed CLI behavior claim.",
+  "capturedUtc": "2026-10-14T20:03:48.610403+00:00",
+  "sourceHeadDuringBothPhases": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "worktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+  "test": {
+    "path": "tests/industryPackAuditReaderQualification.test.ts",
+    "sha256": "57920ea38d71e41b1317dba365098202f2cb5aeae15dd6337ae1d551e15e1775",
+    "lines": 237,
+    "cases": 19
+  },
+  "sourceInputs": [
+    {
+      "path": "src/audit/auditApi.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/audit/auditApi.ts",
+      "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "bytes": 18208
+    },
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "bytes": 26330
+    },
+    {
+      "path": "src/domains/packSelfAssessment.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/domains/packSelfAssessment.ts",
+      "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e",
+      "bytes": 2580
+    },
+    {
+      "path": "src/audit/binderSigner.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/audit/binderSigner.ts",
+      "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+      "bytes": 1124
+    },
+    {
+      "path": "src/audit/binderVerifier.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/audit/binderVerifier.ts",
+      "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+      "bytes": 10692
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "bytes": 7037
+    },
+    {
+      "path": "dist/audit/auditApi.js",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/dist/audit/auditApi.js",
+      "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304",
+      "bytes": 16642
+    },
+    {
+      "path": "dist/trust/trustContext.js",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/dist/trust/trustContext.js",
+      "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+      "bytes": 5605
+    },
+    {
+      "path": "tests/industryPackAuditReaderQualification.test.ts",
+      "privateCopy": "/private/tmp/p0-20-reader-inputs-20261015/tests/industryPackAuditReaderQualification.test.ts",
+      "sha256": "57920ea38d71e41b1317dba365098202f2cb5aeae15dd6337ae1d551e15e1775",
+      "bytes": 15703
+    }
+  ],
+  "phases": [
+    {
+      "name": "reader-first",
+      "command": {
+        "name": "reader-first",
+        "cmd": "env AMC_P0_20_READER_EFFECTS_DIR=/private/tmp/p0-20-reader-first-20261015 pnpm exec vitest run tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-reader-first-20261015.json",
+        "exit": 1,
+        "durationMs": 3783,
+        "startedUtc": "2026-10-14T19:59:31.093946+00:00",
+        "log": "/private/tmp/p0-20-reader-first-20261015.log",
+        "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+      },
+      "raw": "/private/tmp/p0-20-reader-first-20261015.json",
+      "rawSha256": "c84d552c1e63288dcbd50e8ef2accd43dc08c2fd1182849f5fefe81905182429",
+      "effects": "/private/tmp/p0-20-reader-first-20261015/reader-effects.json",
+      "effectsSha256": "603e846426e61ee51267aef378fb8d6775dadfdd8b808ed082e52b22944df246",
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 10,
+        "numFailedTests": 9,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "allSnapshotPairsEqual": true,
+      "snapshotPairCount": 13,
+      "callResults": [
+        {
+          "name": "nested",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "workspace-alias",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "unpinned",
+          "errors": [
+            {
+              "code": "SIGNER_UNTRUSTED",
+              "message": "not-pinned: key aaedff2928979b593fc340eb9eea7794d8596994a4834349901da054caa57ac0 is not pinned for artifact-seal by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "missing",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "leaf-link-false",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "leaf-link-true",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "hardlink-control",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "directory",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-not JSON",
+          "errors": [
+            {
+              "code": "VERIFY_EXCEPTION",
+              "message": "Error: failed to list archive: tar: Error opening archive: Unrecognized archive format"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-null",
+          "errors": [
+            {
+              "code": "VERIFY_EXCEPTION",
+              "message": "Error: failed to list archive: tar: Error opening archive: Unrecognized archive format"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-signature",
+          "errors": [
+            {
+              "code": "SIGNATURE_INVALID",
+              "message": "the signature block is malformed"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "tampered",
+          "errors": [
+            {
+              "code": "CHECKSUM_MISMATCH",
+              "message": "receiptHash does not match the audit body"
+            },
+            {
+              "code": "DIGEST_MISMATCH",
+              "message": "the audit does not match the signed digest"
+            },
+            {
+              "code": "SIGNATURE_INVALID",
+              "message": "the signature does not verify, or its keyFingerprint names another key"
+            }
+          ],
+          "ok": false
+        }
+      ],
+      "fifo": {
+        "exit": 0,
+        "signal": null,
+        "error": null,
+        "timeoutMs": 8000,
+        "stdoutSha256": "8795cad919a08ca207ac32ed7ffa4511ee75e75f7f4b761842f983f956c28ee5",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compiledSha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304",
+        "codeSha256": "a4420f652806be79c99f0c10cdfa220f0f850e26986d7779767e371ab66c52f5"
+      },
+      "publicArtifacts": [
+        {
+          "path": "/private/tmp/p0-20-reader-first-20261015/genuine-audit.json",
+          "sha256": "71e6b22232278617f4d51b22df25a3c61a69ffb6e0adf79aa7837bf56b66b5ef",
+          "bytes": 40599
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-first-20261015/operator-auditor.pub",
+          "sha256": "aaedff2928979b593fc340eb9eea7794d8596994a4834349901da054caa57ac0",
+          "bytes": 113
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-first-20261015/fifo-stdout.json",
+          "sha256": "8795cad919a08ca207ac32ed7ffa4511ee75e75f7f4b761842f983f956c28ee5",
+          "bytes": 1134
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-first-20261015/fifo-stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "inputs": {
+        "kind": "inputs",
+        "inputs": [
+          {
+            "path": "src/audit/auditApi.ts",
+            "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a"
+          },
+          {
+            "path": "src/domains/industryPackAudit.ts",
+            "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+          },
+          {
+            "path": "src/audit/binderVerifier.ts",
+            "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
+          },
+          {
+            "path": "src/audit/binderSigner.ts",
+            "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d"
+          },
+          {
+            "path": "dist/audit/auditApi.js",
+            "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304"
+          },
+          {
+            "path": "dist/trust/trustContext.js",
+            "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390"
+          }
+        ],
+        "publicPinSha256": "aaedff2928979b593fc340eb9eea7794d8596994a4834349901da054caa57ac0",
+        "artifactSha256": "71e6b22232278617f4d51b22df25a3c61a69ffb6e0adf79aa7837bf56b66b5ef",
+        "pinCapturedBeforeArtifact": true,
+        "independentEd25519DigestVerification": true,
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "assertions": [
+        {
+          "name": "P0-20 actual industry-pack audit helper containment admits a genuine /3 signed file under an independently captured operator pin",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment admits a regular nested file without promoting self-reported answers",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment preserves a caller workspace-root alias while rejecting internal links separately",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment does not let the embedded genuine signer vouch for itself without the operator pin",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an otherwise genuine and verifiable signed file outside exports",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment returns the same generic unreadable semantics for a missing file",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a leaf symlink to an owned signed file, outside=false",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a leaf symlink to an owned signed file, outside=true",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a hardlinked signed file after its regular control was admitted",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a directory without reading it as an audit",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment rejects a genuine path escaping exports through parent segments",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a static parent link to an owned genuine signed file, outside=false",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a static parent link to an owned genuine signed file, outside=true",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an exports-directory parent link even when its signed target is genuine",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected { \u2026(12) } to match object { \u2026(2) }"
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses readable malformed content \"not JSON\" using its current verifier result",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses readable malformed content \"null\" using its current verifier result",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a malformed signature block without inventing a readable-file UNREADABLE verdict",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses changed signed body bytes under the same independently captured pin",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an actual FIFO without a writer using a bounded compiled-reader child",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ]
+    },
+    {
+      "name": "reader-current-level-contract",
+      "command": {
+        "name": "reader-current-level-contract",
+        "cmd": "env AMC_P0_20_READER_EFFECTS_DIR=/private/tmp/p0-20-reader-current-level-contract-20261015 pnpm exec vitest run tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-reader-current-level-contract-20261015.json",
+        "exit": 0,
+        "durationMs": 3910,
+        "startedUtc": "2026-10-14T20:00:55.587232+00:00",
+        "log": "/private/tmp/p0-20-reader-current-level-contract-20261015.log",
+        "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+      },
+      "raw": "/private/tmp/p0-20-reader-current-level-contract-20261015.json",
+      "rawSha256": "5061b188e97aca3ee6a827f5e4022fcda832ba06da9f9fdffa1cfd27e837e568",
+      "effects": "/private/tmp/p0-20-reader-current-level-contract-20261015/reader-effects.json",
+      "effectsSha256": "9c653fdaa8b7543b99275de795ce83fe0a3c0074a7274c1d750caa7efa80a4e6",
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 19,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "allSnapshotPairsEqual": true,
+      "snapshotPairCount": 20,
+      "callResults": [
+        {
+          "name": "genuine",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "nested",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "workspace-alias",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "unpinned",
+          "errors": [
+            {
+              "code": "SIGNER_UNTRUSTED",
+              "message": "not-pinned: key 165fad828998a862f6938e4ec4c7d03c700c3899b8b0a42bf22de996db8ba225 is not pinned for artifact-seal by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "outside",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "missing",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "leaf-link-false",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "leaf-link-true",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "hardlink-control",
+          "errors": [],
+          "ok": true
+        },
+        {
+          "name": "hardlink",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "directory",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "path-escape",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "parent-link-false",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "parent-link-true",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "exports-parent-link",
+          "errors": [
+            {
+              "code": "UNREADABLE",
+              "message": "cannot read audit file"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-not JSON",
+          "errors": [
+            {
+              "code": "VERIFY_EXCEPTION",
+              "message": "Error: failed to list archive: tar: Error opening archive: Unrecognized archive format"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-null",
+          "errors": [
+            {
+              "code": "VERIFY_EXCEPTION",
+              "message": "Error: failed to list archive: tar: Error opening archive: Unrecognized archive format"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "malformed-signature",
+          "errors": [
+            {
+              "code": "SIGNATURE_INVALID",
+              "message": "the signature block is malformed"
+            }
+          ],
+          "ok": false
+        },
+        {
+          "name": "tampered",
+          "errors": [
+            {
+              "code": "CHECKSUM_MISMATCH",
+              "message": "receiptHash does not match the audit body"
+            },
+            {
+              "code": "DIGEST_MISMATCH",
+              "message": "the audit does not match the signed digest"
+            },
+            {
+              "code": "SIGNATURE_INVALID",
+              "message": "the signature does not verify, or its keyFingerprint names another key"
+            }
+          ],
+          "ok": false
+        }
+      ],
+      "fifo": {
+        "exit": 0,
+        "signal": null,
+        "error": null,
+        "timeoutMs": 8000,
+        "stdoutSha256": "0af093e02bb0e603a7d2548ce6a62c57a24387741fabf96c0a151dd92618b9e5",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compiledSha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304",
+        "codeSha256": "bb49f619b77f7e29b04ce1e6e55771ce79303cc106c7a62aa206eff949e3d8d5"
+      },
+      "publicArtifacts": [
+        {
+          "path": "/private/tmp/p0-20-reader-current-level-contract-20261015/genuine-audit.json",
+          "sha256": "2b636f5fc248a30455627e2b7092cf7484450ba9292b89da197b15dea2688aab",
+          "bytes": 40599
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-current-level-contract-20261015/operator-auditor.pub",
+          "sha256": "165fad828998a862f6938e4ec4c7d03c700c3899b8b0a42bf22de996db8ba225",
+          "bytes": 113
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-current-level-contract-20261015/fifo-stdout.json",
+          "sha256": "0af093e02bb0e603a7d2548ce6a62c57a24387741fabf96c0a151dd92618b9e5",
+          "bytes": 1134
+        },
+        {
+          "path": "/private/tmp/p0-20-reader-current-level-contract-20261015/fifo-stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "inputs": {
+        "kind": "inputs",
+        "inputs": [
+          {
+            "path": "src/audit/auditApi.ts",
+            "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a"
+          },
+          {
+            "path": "src/domains/industryPackAudit.ts",
+            "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+          },
+          {
+            "path": "src/audit/binderVerifier.ts",
+            "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
+          },
+          {
+            "path": "src/audit/binderSigner.ts",
+            "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d"
+          },
+          {
+            "path": "dist/audit/auditApi.js",
+            "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304"
+          },
+          {
+            "path": "dist/trust/trustContext.js",
+            "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390"
+          }
+        ],
+        "publicPinSha256": "165fad828998a862f6938e4ec4c7d03c700c3899b8b0a42bf22de996db8ba225",
+        "artifactSha256": "2b636f5fc248a30455627e2b7092cf7484450ba9292b89da197b15dea2688aab",
+        "pinCapturedBeforeArtifact": true,
+        "independentEd25519DigestVerification": true,
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "assertions": [
+        {
+          "name": "P0-20 actual industry-pack audit helper containment admits a genuine /3 signed file under an independently captured operator pin",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment admits a regular nested file without promoting self-reported answers",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment preserves a caller workspace-root alias while rejecting internal links separately",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment does not let the embedded genuine signer vouch for itself without the operator pin",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an otherwise genuine and verifiable signed file outside exports",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment returns the same generic unreadable semantics for a missing file",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a leaf symlink to an owned signed file, outside=false",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a leaf symlink to an owned signed file, outside=true",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a hardlinked signed file after its regular control was admitted",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a directory without reading it as an audit",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment rejects a genuine path escaping exports through parent segments",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a static parent link to an owned genuine signed file, outside=false",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a static parent link to an owned genuine signed file, outside=true",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an exports-directory parent link even when its signed target is genuine",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses readable malformed content \"not JSON\" using its current verifier result",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses readable malformed content \"null\" using its current verifier result",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses a malformed signature block without inventing a readable-file UNREADABLE verdict",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses changed signed body bytes under the same independently captured pin",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-20 actual industry-pack audit helper containment refuses an actual FIFO without a writer using a bounded compiled-reader child",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ]
+    }
+  ],
+  "fixtureCorrection": {
+    "firstOwnedTest": "/private/tmp/p0-20-reader-first-owned-test-20261015.ts",
+    "firstTestSha256": "aa68284b322fd9be74ae63b795b5a02a7ee4065bcfe93cb49fa9514c3bc4b595",
+    "exactChange": "Only the eligibleLevel assertion changed from null to 1.",
+    "basis": "src/domains/packSelfAssessment.ts explicitly caps self-declared answers at L1 and copies envelope.eligibleLevel. The actual genuine /3 artifact is self_reported with eligibleLevel 1 before and after verification. This is a test-contract correction, not a producer repair or waived claim failure.",
+    "firstRunLimit": "Nine tests failed on the incorrectly null genuine-control assertion. Some aborted before their containment branch; the first run is not presented as complete containment coverage."
+  },
+  "qualifiedBehavior": "Corrected suite passes all19 cases with0pending/todo. It admits genuine regular/nested/workspace-root-alias files only under the pre-artifact operator pin, refuses an unpinned embedded genuine signer, and refuses outside/missing/static leaf/parent/exports links, hardlinks, directory, path escape and FIFO without disclosing bytes. Readable invalid JSON/null falls through to the current binder VERIFY_EXCEPTION result; a malformed signature returns SIGNATURE_INVALID; changed signed body returns checksum/digest/signature refusal. These readable malformed verdicts were not forced to UNREADABLE.",
+  "cryptographicFixture": "Actual initWorkspace and buildIndustryPackAudit/signIndustryPackAudit create the /3 file. The operator PEM is captured before signing and supplied through actual loadTrustContext for artifact-seal. An independent Node crypto.verify checks the genuine Ed25519 signature over the canonical body digest. Signature admission leaves answers self_reported with the existing L1 cap and report satisfaction/completeness not-evaluated.",
+  "snapshotEvidence": "The corrected effects contain20 exact before/after recipient-root snapshots for19 cases, including an extra regular pre-hardlink control. They preserve observed names, regular-file content hashes/sizes, mode, inode, link count, mtime and link target. Owned outside sentinels and all requested signed targets are included. Symlinks/FIFO are inspected through lstat without traversing or reading them.",
+  "fifoEvidence": "A real mkfifo with no writer is tested only through an explicit Node22 compiled-reader child. spawnSync is capped at8000ms with SIGKILL, and the outer test at15000ms. Both actual phases complete with child exit0, no signal/error/stderr and generic UNREADABLE. The reader uses O_NONBLOCK and regular/single-link descriptor checks; no unbounded direct FIFO read occurs in the test.",
+  "boundaries": [
+    "No src/audit, API, Studio, A4, held P1-78 initiator source, original tests, archives, freeze baselines, floors, budgets, dependencies, tracker, reservation or ref was edited by this child.",
+    "No server, provider/model call, external transport, live license activation or paywall override was used. Root owns the actual licensed compiled CLI.",
+    "Input/generated fixture hashes differ across fresh phases; the receipt does not claim identical keys, timestamps or artifact bytes across those phases.",
+    "Snapshots cover the observed recipient roots and requested owned targets. They are not an absolute global no-effects, arbitrary external-path, atime/ctime/xattr or race guarantee. Expected constructor/signing fixture writes and cleanup remain separate.",
+    "The helper contract does not establish authentication, initiator binding, routed HTTP status/claims, safe concurrent file swapping, whole-suite/coverage, Node24, hosted CI, G0, release or whole P0-20 Done.",
+    "Root owns final test typecheck, static/freeze/source review and commit. No typecheck result is claimed by this child."
+  ],
+  "graph": {
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/p0-20-audit-reader-query.log",
+    "sha256": "68a6b3868bb2beee2c3edaece0e8cb28b43242aa2effcf3868475610372a00cf",
+    "limit": "Existing 36459-node graph is stale navigation; actual reader/signer/trust sources and current schemas supplied current evidence. No refresh/watch/server."
+  }
+}

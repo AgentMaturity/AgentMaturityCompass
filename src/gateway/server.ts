@@ -430,6 +430,7 @@ function verifyLeaseAndMapError(input: {
     maxTokensPerMinute: number;
     leaseId: string;
     agentId: string;
+    claimKind?: "synthetic_example";
   };
   statusCode: number;
   auditType:
@@ -479,7 +480,8 @@ function verifyLeaseAndMapError(input: {
             maxRequestsPerMinute: verification.payload.maxRequestsPerMinute,
             maxTokensPerMinute: verification.payload.maxTokensPerMinute,
             leaseId: verification.payload.leaseId,
-            agentId: verification.payload.agentId
+            agentId: verification.payload.agentId,
+            ...(verification.payload.claimKind === undefined ? {} : { claimKind: verification.payload.claimKind })
           }
         : undefined,
       statusCode: 200,
@@ -1504,7 +1506,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         run_id: runId ?? null,
         leaseId: leaseVerification.payload?.leaseId ?? null,
         lease_carrier: leaseCarrier.leaseCarrier,
-        trustTier: "OBSERVED",
+        ...(leaseVerification.payload?.claimKind === "synthetic_example"
+          ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
+          : { trustTier: "OBSERVED" }),
         bodySha256: sha256Hex(requestBodyRedaction.redactedBytes)
       };
       if (requestBodyRedaction.originalPayloadSha256) {
@@ -1590,7 +1594,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         correlation_id: correlationId ?? null,
         run_id: runId ?? null,
         leaseId: leaseVerification.payload?.leaseId ?? null,
-        trustTier: "OBSERVED",
+        ...(leaseVerification.payload?.claimKind === "synthetic_example"
+          ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
+          : { trustTier: "OBSERVED" }),
         bodySha256: sha256Hex(responseBodyRedaction.redactedBytes)
       };
       if (responseBodyRedaction.originalPayloadSha256) {

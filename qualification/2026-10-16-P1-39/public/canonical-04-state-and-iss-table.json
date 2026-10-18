@@ -1,0 +1,82 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "state-and-iss-table",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-PGnxsA",
+  "observations": {
+    "rows": [
+      {
+        "label": "required-match",
+        "acceptedExactCode": true,
+        "classifiedRefusal": false,
+        "serverTextHidden": true
+      },
+      {
+        "label": "required-absent",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      },
+      {
+        "label": "required-wrong",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      },
+      {
+        "label": "optional-absent",
+        "acceptedExactCode": true,
+        "classifiedRefusal": false,
+        "serverTextHidden": true
+      },
+      {
+        "label": "optional-match",
+        "acceptedExactCode": true,
+        "classifiedRefusal": false,
+        "serverTextHidden": true
+      },
+      {
+        "label": "optional-wrong",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      },
+      {
+        "label": "wrong-state",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      },
+      {
+        "label": "wrong-issuer-error",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      },
+      {
+        "label": "server-error",
+        "acceptedExactCode": false,
+        "classifiedRefusal": true,
+        "serverTextHidden": true
+      }
+    ]
+  },
+  "requests": [],
+  "clients": [],
+  "sockets": [],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

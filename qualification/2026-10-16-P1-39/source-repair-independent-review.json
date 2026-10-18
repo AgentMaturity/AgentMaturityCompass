@@ -1,0 +1,166 @@
+{
+  "schema": "p139-typed-unknown-repair-independent-static-review/1",
+  "createdAt": "2026-10-16T15:34:04.250320+00:00",
+  "sourceCwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHeadAtAllocation": "81758acea6c861a00a27f48475a93a79307a29d5",
+  "scope": "Independent static review of applied four-path repair and finite already-closed strict three-case evidence. Root retains all execution and checkout writes.",
+  "blockers": [],
+  "sourceChecks": [
+    {
+      "relativePath": "src/mcp/nativeMcpClient.ts",
+      "exactReviewedHunksOnly": true,
+      "originalAndAppliedPinsMatch": true,
+      "ClaudeBeforePinStillExact": true
+    },
+    {
+      "relativePath": "src/tools/toolTypes.ts",
+      "exactReviewedHunksOnly": true,
+      "originalAndAppliedPinsMatch": true,
+      "ClaudeBeforePinStillExact": true
+    },
+    {
+      "relativePath": "src/tools/toolPipeline.ts",
+      "exactReviewedHunksOnly": true,
+      "originalAndAppliedPinsMatch": true,
+      "ClaudeBeforePinStillExact": true
+    },
+    {
+      "relativePath": "src/agent/pipelineToolSeam.ts",
+      "exactReviewedHunksOnly": true,
+      "originalAndAppliedPinsMatch": true,
+      "ClaudeBeforePinStillExact": true
+    }
+  ],
+  "findings": [
+    {
+      "topic": "Typed classification",
+      "result": "nativeMcpClient.ts:372 uses NativeMcpHttpTransport.failureCode exactly. Output/error text does not classify outcomes. Only the existing typed TOOL_OUTCOME_UNKNOWN catch path declares unknown. Transport source is unchanged."
+    },
+    {
+      "topic": "Deny/cancel precedence",
+      "result": "pipelineToolSeam.ts:47 keeps cancellation first. No-journal abort still wins; with a journal receipt, only cancelled state yields CANCELLED. Unknown requires denied===null; a refusal cannot become UNKNOWN."
+    },
+    {
+      "topic": "Journal precedence",
+      "result": "The new marker is considered only without action.state. Existing started/outcome_unknown receipts remain authoritative; completed/denied/cancelled keep their prior paths. The authorization/recheck/start/dispatch sequence is byte-preserved."
+    },
+    {
+      "topic": "Other body effects",
+      "result": "The carrier is optional and omitted when undefined. applied/not_applied/undefined retain prior no-journal OK/ERROR mapping. Explicit unknown from any nonjournal adapter conservatively maps UNKNOWN. Existing journal effectVerdict and finance body declarations remain unchanged; the carrier creates no receipt."
+    },
+    {
+      "topic": "Receipt hashes/evidence",
+      "result": "toolPipeline.ts:181 still hashes explicit ok/exitCode/timedOut/bytes/outputSha256, not all ToolOutcome fields. Journal effect verdict is separately bound as before. toolEvidenceFor constructs unchanged explicit audit/metric/stdout projections. ToolhubJournal hashes its independent ToolhubOutcome.result and is unchanged."
+    },
+    {
+      "topic": "Compatibility limit",
+      "result": "Old typed literals require no new property. Inspected internal projected evidence/hash consumers do not acquire an extra field. An external consumer serializing the whole ToolOutcome may now see a declared effect; that is the intended additive fact, not external-consumer qualification."
+    }
+  ],
+  "observedClosedEvidence": {
+    "rootOutcomePin": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/typed-outcome-three-case-outcome.json",
+      "bytes": 3783,
+      "sha256": "bc45e27e14c034d0c870b2077df2a0ab584c5c3f8a8af4ea1a47a89ed64858eb"
+    },
+    "readActualRawObserverAndOuterLog": true,
+    "verifiedAllTenOutcomeInputPins": true,
+    "rawTestsPassed": 3,
+    "rawTestsFailed": 0,
+    "observerAfterAllPassed": true,
+    "observerUnhandledErrors": [],
+    "rootRecordedNaturalExit": 0,
+    "rootRecordedDurationMs": 4227,
+    "rootRecordedPgidAbsentByESRCH": 77357,
+    "originalStrictCandidatePin": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/stateless-test-proposal/mcp20260728.test.ts",
+      "bytes": 23562,
+      "sha256": "ebd351efc27427bf044b9184179b7241fb3429bcf104e9038572fd9c36400ce2"
+    },
+    "historicalRedRetained": true,
+    "publicRelevantOutcomeAndClosureFacts": [
+      {
+        "label": "stateless-governed-call",
+        "remoteEffects": 1,
+        "outcomes": [
+          "OK"
+        ],
+        "requestRows": 6,
+        "cleanOwnedLifecycle": true,
+        "environmentRestored": true
+      },
+      {
+        "label": "stateless-tool-no-replay",
+        "remoteEffects": 1,
+        "outcomes": [
+          "TOOL_OUTCOME_UNKNOWN",
+          "DENIED"
+        ],
+        "requestRows": 6,
+        "cleanOwnedLifecycle": true,
+        "environmentRestored": true
+      },
+      {
+        "label": "strict-typed-unknown-evidence",
+        "remoteEffects": 1,
+        "outcomes": [
+          "TOOL_OUTCOME_UNKNOWN"
+        ],
+        "requestRows": 6,
+        "cleanOwnedLifecycle": true,
+        "environmentRestored": true
+      }
+    ],
+    "boundary": "No broader regression, compiler, build, fresh-source control, full P1-39 or release credit. Root-reported later compiler/build status is outside these finite outcome pins."
+  },
+  "minimalExistingRegressionSelection": [
+    {
+      "relativePath": "tests/toolPipeline.test.ts",
+      "purpose": "Stage refusal/filter precedence, thrown failures, independent timeout/exit facts."
+    },
+    {
+      "relativePath": "tests/actions/failureBehaviour.test.ts",
+      "purpose": "Real journal effect table, denial before dispatch, cancelled-before-start and post-start receipt authority over later abort."
+    },
+    {
+      "relativePath": "tests/toolEvidenceRecording.test.ts",
+      "purpose": "Recorder loss preserves completed effect/receipt, explicit outcomeDigest, signed chain and one actual effect."
+    },
+    {
+      "relativePath": "tests/workflowTool.test.ts",
+      "purpose": "Existing nonjournal cancellation after body dispatch wins and suppresses partial loop output."
+    },
+    {
+      "relativePath": "tests/nativeMcpClient.test.ts",
+      "purpose": "Existing stdio, catalog, ordinary tool error and cancellation flow."
+    },
+    {
+      "relativePath": "tests/nativeMcpHttp.test.ts",
+      "purpose": "Existing remote-error/timeout distinction, cancellation, grant disposal and public HTTP mount flow."
+    },
+    {
+      "relativePath": "tests/reconciliationDefectsMcp.test.ts",
+      "purpose": "Reuse the already-selected public MCP reconciliation regressions."
+    },
+    {
+      "relativePath": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "purpose": "Reuse the already-selected public HTTP MCP reconciliation regressions."
+    }
+  ],
+  "regressionSelectionNote": "The four shared pipeline/seam/journal files are the repair-specific additions to the already-selected four MCP files. These are useful existing regressions, not redundant new mirror tests. This reviewer did not execute them.",
+  "missingMeaningfulAssertion": {
+    "blocking": false,
+    "behavior": "A received remote isError:true tool response containing untrusted literal TOOL_OUTCOME_UNKNOWN text, without that typed transport failure, must remain ERROR and not be replayed.",
+    "evidence": "Scoped current MCP/seam tests contain ordinary received errors and real typed broken-response UNKNOWN, but no explicit diagnostic-marker-only contrast.",
+    "suggestedPublicBoundary": "Use existing stateless public fixture; assert returned plus recorded ERROR and one tools/call. Current source already separates the cases.",
+    "noNewGateOrSourceChangeRequested": true
+  },
+  "preservation": {
+    "fourReviewedHunksOnly": true,
+    "ClaudeFourCurrentBytesPreserved": true,
+    "noSourceTestCheckoutOrIndexWrites": true,
+    "noProductHelperCodeParserCompilerTestsNativeSqlNetworkOrProcessProbes": true,
+    "heldDecisionsFreezeGuardsDeadlinesUntouched": true
+  },
+  "inputPinCount": 48
+}

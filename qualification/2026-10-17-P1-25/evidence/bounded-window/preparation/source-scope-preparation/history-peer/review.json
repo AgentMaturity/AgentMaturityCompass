@@ -1,0 +1,65 @@
+{
+  "schema": "p125-window-three-root-history-peer-review/1",
+  "at": "2026-10-17T00:03:43.330916+00:00",
+  "blockers": [],
+  "scope": "Current read-only Git history in exactly S, Claude clone and held R; finite prior B36/B37 reports and B38 protection metadata only.",
+  "currentHeads": {
+    "S": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+    "Claude": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "R": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d"
+  },
+  "currentBranches": {
+    "S": "codex/p1-25-window-qualification",
+    "Claude": "int",
+    "R": "codex/p2-07-provider-validation"
+  },
+  "currentTwoPathHistories": {
+    "S": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2 2026-10-17T05:08:08+05:30 AgentMaturity AgentMaturity test(time): qualify signed checkpoint completion and required refusal\n\nA\ttests/time/checkpointWindow.test.ts\nA\ttests/time/tsaTestFixture.ts\n",
+    "Claude": "",
+    "R": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2 2026-10-17T05:08:08+05:30 AgentMaturity AgentMaturity test(time): qualify signed checkpoint completion and required refusal\n\nA\ttests/time/checkpointWindow.test.ts\nA\ttests/time/tsaTestFixture.ts\n"
+  },
+  "historyConclusion": [
+    "Both current paths first appear in the observed all-ref shared authority as additions in e49e21348e454ba8f1556cb6dfd3ed69e0e883c2. This is the separately root-qualified B37 source commit, whose metadata successor is ac7759702ecbfda304b57e78eb1bd946340adc0f.",
+    "S and R show the same all-ref addition because they share the primary repository authority. That result is not an authored change on R's current branch and does not establish that either path exists in R's working tree.",
+    "Claude clone all-ref two-path history is empty at the observed int HEAD 990cb586fb481bb7db75977a4e5d332c6fd1ddb4. Its eight recent HEAD commits concern the retained P1-41 release train; history absence releases no ownership.",
+    "Held R remains at bf3b7766e7b2e70d8e72135773a5c0e612ae013d on codex/p2-07-provider-validation. Its eight recent HEAD commits include persisted OIDC-state qualification, verifier qualification and previous bounded lanes. They remain owned and unchanged by this review.",
+    "The generic AgentMaturity author and committer strings do not distinguish coding agents. Attribution of e49/ac775 as our closed B37 work comes from root's explicit task and finite prior packet, not the author name alone."
+  ],
+  "lastKnownReservationBinding": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "reservationRulesActuallySupportedByFiniteInputs": [
+    "The last-known 275,376-byte reservation binding remains binding; disappearance does not release existing work.",
+    "Current reservation deltas cannot be checked through the missing file, and no shared append is claimed.",
+    "No missing reservation probe, search, recreation or Claude message was performed.",
+    "The supplied finite prior ownership reports preserve the binding and ownership limitations, but not the complete reservation text. No more specific rule is invented."
+  ],
+  "protectionManifestReadOnlyContext": {
+    "inputs": 151,
+    "nativePins": 10,
+    "onlyFutureOwnSourceSuccessors": [
+      "tests/time/checkpointWindow.test.ts",
+      "tests/time/tsaTestFixture.ts"
+    ],
+    "allOther149MustRemainExactAfterSeparateSourceAdmission": true,
+    "allHoldsRetained": true,
+    "manifestRowsNotIndependentlyRehashedByThisPeer": true
+  },
+  "closure": {
+    "gitChildren": 12,
+    "all12NaturalExit0": true,
+    "allStdoutStderrArgvPidTimestampsExitAndNaturalCommunicateRetained": true,
+    "execSessionWasYielded": false,
+    "commandToolChunk": "b1cad2",
+    "metadataToolChunk": "cc7832",
+    "toolResultsPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/history-peer/read-tool-results.json"
+  },
+  "initialMetadataInspectionLimitation": "The first non-mutating metadata inspection rendered a truncated preview (tool chunk 57c312, natural exit 0). It is not used as a full-output evidence claim. The exact source JSON files are byte-pinned and the later finite selective reads and closed history observations supply the conclusions.",
+  "noSourceIndexQaRuntimeOrClaudeWrites": true,
+  "noAbsenceCleanStateOrAuthorshipOwnershipRelease": true,
+  "noProductHelperCompilerTestNativeOpenSslSqlNetworkOrProcessProbe": true,
+  "nextOwner": "Parent/root owns refreshed all-root inventories, 17-plus authority histories, physical and protected-state rechecks, hosted/all-path/WIP, D15/freeze, exact source admission and all materialization.",
+  "verdict": "No new two-path history conflict observed in these three known roots. B37 own additions and every Claude/R ownership boundary remain intact. This bounded peer review allocates no source and supplies no runtime, freeze, quality, issue or plan-completion credit."
+}

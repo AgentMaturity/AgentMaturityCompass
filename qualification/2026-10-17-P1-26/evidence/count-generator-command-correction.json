@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T20:40:16.613428+00:00",
+  "phase": "p126-gen-counts",
+  "actualExit": 1,
+  "error": "ERR_PNPM_NO_SCRIPT Missing script: gen:counts",
+  "generatorExecutedByFailedCall": false,
+  "correctExistingScript": "gen-counts",
+  "actualPackageCommand": "node scripts/gen-counts.mjs --write",
+  "packageOrGeneratorChanged": false,
+  "automaticRetryOrCheckBypass": false,
+  "correction": "Root read the actual error, current package.json and earlier successful command before this explicitly corrected invocation."
+}

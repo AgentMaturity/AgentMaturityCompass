@@ -1,0 +1,551 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "reviewer": "/root/native_race_static_review",
+  "decision": "BOUNDED_ACTUAL_EVIDENCE_VERIFIED_WITH_OPEN_ACCEPTANCE_GAPS",
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent read-only actual evidence audit after all original runs, six causal phases, normal guards and metadata freezing closed. This reviewer authored the earlier original-corpora summary and reviews; root/other author executed the product commands and controls. No product rerun occurred in this audit.",
+  "blockingPacketFindings": [],
+  "formalAcceptanceClosed": false,
+  "findings": [
+    {
+      "id": "A1",
+      "kind": "qualified-bounded-result",
+      "finding": "Four original runs pass separately12/5/4/10. Two controls repeat the same12 source-mode cases in six phases:72 executions68 passes4 body AssertionErrors across4 distinct file/title cases, zero pending/todo; no whole-control survivor. This adds no new unique cases and is not a combined31- or72-case corpus."
+    },
+    {
+      "id": "A2",
+      "kind": "causal-meaning-and-masking",
+      "finding": "C1 removes both unknown/active hold refusals. Three fixture callbacks then fail at expectRefused99:18 with callers221:5,213:5,203:5 because caught is undefined. Reason100 and subsequent snapshot/quarantine/byte-reachability assertions are masked. The callback's throw-to-unknown normalization remains; these failures support injected-callback admission sensitivity with a stub signer, not actual signed-registry or built-CLI hold bypass. Failed-case receipt/effects are not independently retained after cleanup."
+    },
+    {
+      "id": "A3",
+      "kind": "open-acceptance-gap",
+      "finding": "C2 changes only forward rename to faithful copy/unlink; rollback rename is unchanged. Its one failed case reaches expectRefused99:18 from268:5 because the rename-fault spy no longer causes refusal. Inline restore269, counter270, snapshot271, quarantine272 and every-byte273 are masked; original afterEach restores mocks/cleans roots and recorded hooks pass. Other11 mutant cases, including the positive byte-reachability case, pass. This establishes mechanism/fault-path sensitivity, not observed lost bytes, crash danger or the spec's stronger byte-invariant mutation criterion. That criterion remains open."
+    },
+    {
+      "id": "A4",
+      "kind": "preservation-and-packet",
+      "finding": "All224 indexed refs and235 unique recursive pin triples match. Frozen15-row journal equals the now-closed original byte-for-byte;14 exit0 plus exactly the designated empty grep exit1. Final8205 source+4529dist=12734 parent/private files and physical manifest are exact; private regular nlink1 files have12734 unique inodes disjoint from12734 parent inodes. Borrowed node_modules link, current native inode538734665,108 immutable external pins and10 own inputs match. No ACTIVE/HALTED remains."
+    },
+    {
+      "id": "A5",
+      "kind": "unapproved-adjacent-source-gap",
+      "finding": "Retained doctor static note identifies a dangling top-level .amc symlink-unlink branch without evidence-name exclusion/deletion gate; cache deletion already uses its existing gate. This is unapproved adjacent follow-up with no owner, not observed deletion/byte loss or a verify-repair-path runtime defect. No doctor/hold source was changed."
+    },
+    {
+      "id": "A6",
+      "kind": "open-formal-and-quality-limits",
+      "finding": "formalAcceptanceClosed remains false. No separately retained CLI repair-receipt sample, historical origin/main red, PR/merge/full-suite/installed-P031/formal-dependency acceptance is established. Older1269 duplicates/2751 dead-code quality failures remain failed/unwaived, not fresh P045 runs. All existing held ownership and prior unresolved work stay open."
+    }
+  ],
+  "packetPins": [
+    {
+      "path": "/private/tmp/p0-45-bounded-qualification-20261015.json",
+      "bytes": 66642,
+      "sha256": "449f3d99f3ed644be2694797a241c92292497acf6557450cdb47296248baac30"
+    },
+    {
+      "path": "/private/tmp/p0-45-bounded-qualification-20261015.md",
+      "bytes": 4697,
+      "sha256": "8949080a9e150b2f5cba750bd577d4cf52b7fc9a57ac8974383422056e6c213d"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015.json",
+      "bytes": 76872,
+      "sha256": "16a37b402eb7777b01ff68d205845f29616f4ce73c9259e1b1a78901dfc8b13e"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015.md",
+      "bytes": 4617,
+      "sha256": "12bcb9c70ce4f5d91adb86fba8d30479a020c9f5c661284bc7ab6978f0739324"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 50431,
+      "sha256": "032e4ec6ee8e1041c4116ec8ac571620bda7871459c7572f3a51be0dac7978bb"
+    },
+    {
+      "path": "/private/tmp/p0-45-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 23738,
+      "sha256": "20d514fee74f4725688d26b05a315199d5cf3decda33cc4cb73158eaf45793b3"
+    },
+    {
+      "path": "/private/tmp/p0-45-qualification-20261015/final-source-preservation.json",
+      "bytes": 3063,
+      "sha256": "eb68c2db7cf340cda1dcf4652cd71459fd94fd57b35a5d9711351f1273e2ffd7"
+    }
+  ],
+  "priorReviewsReusedByPin": [
+    {
+      "path": "/private/tmp/p0-45-original-corpora-independent-review-20261015.json",
+      "bytes": 44245,
+      "sha256": "699e0c65ac32bfc9705ad4c978d12494e0f49ce699e24da188ef29504914c939"
+    },
+    {
+      "path": "/private/tmp/p0-45-controller-sealed-setup-review-20261015.json",
+      "bytes": 20040,
+      "sha256": "91b1cc2d9a7856d4e8177e5fde967ac1a76f71d8932ac011f9de2d306a58ed19"
+    },
+    {
+      "path": "/private/tmp/p0-45-controller-code-static-review-20261015.json",
+      "bytes": 9129,
+      "sha256": "725d5b9b832baf828de85f884eaf5ed0c92ff8692751e13f01ab7cf4bf1bd013"
+    },
+    {
+      "path": "/private/tmp/p0-45-recipes-static-review-20261015.json",
+      "bytes": 15708,
+      "sha256": "6ae309898f6b772144c7b24120800c3c94db85d034788cb570739bcb33697a46"
+    },
+    {
+      "path": "/private/tmp/p0-45-freezer-v2-static-review-20261015.json",
+      "bytes": 3649,
+      "sha256": "af8bdb2f33e845298413e1898135ec0d9ab35d106d5c3aa4ad3f32315a813261"
+    }
+  ],
+  "originalCorpora": {
+    "separateRuns": [
+      {
+        "phase": "original-core",
+        "registered": 12,
+        "passed": 12,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      {
+        "phase": "original-cli",
+        "registered": 5,
+        "passed": 5,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      {
+        "phase": "original-separation",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      {
+        "phase": "original-read-only",
+        "registered": 10,
+        "passed": 10,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    ],
+    "distinctFileTitleCases": 31,
+    "primaryCoreCases": 12,
+    "summary": {
+      "path": "/private/tmp/p0-45-qualification-20261015/original-corpora-summary.json",
+      "bytes": 24298,
+      "sha256": "571e35ee51bbe85e25dbc9c7a852d6275eeaf11f686b16445112219914a8f6b3"
+    },
+    "originalInformationalFindingsRetained": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5"
+    ],
+    "detailReuse": "All original raw identities, streams, hook/suite/file/unhandled/pending/known-late checks and original trust boundaries are recorded in the unchanged original review above."
+  },
+  "causal": {
+    "repeatedCorpusRegistrations": 12,
+    "phases": [
+      {
+        "phase": "P045-C1-fail-closed-hold-admission--baseline",
+        "passed": 12,
+        "failed": 0,
+        "pid": 19285,
+        "exit": 0,
+        "durationMs": 5434,
+        "ownedGroupESRCH": true,
+        "lateMatches": []
+      },
+      {
+        "phase": "P045-C1-fail-closed-hold-admission--mutant",
+        "passed": 9,
+        "failed": 3,
+        "pid": 19305,
+        "exit": 1,
+        "durationMs": 5212,
+        "ownedGroupESRCH": true,
+        "lateMatches": []
+      },
+      {
+        "phase": "P045-C1-fail-closed-hold-admission--restored",
+        "passed": 12,
+        "failed": 0,
+        "pid": 19315,
+        "exit": 0,
+        "durationMs": 5299,
+        "ownedGroupESRCH": true,
+        "lateMatches": []
+      },
+      {
+        "phase": "P045-C2-forward-copy-then-unlink--baseline",
+        "passed": 12,
+        "failed": 0,
+        "pid": 19530,
+        "exit": 0,
+        "durationMs": 5761,
+        "ownedGroupESRCH": true,
+        "knownLateHits": [],
+        "positiveByteReachabilityCasePassed": true
+      },
+      {
+        "phase": "P045-C2-forward-copy-then-unlink--mutant",
+        "passed": 11,
+        "failed": 1,
+        "pid": 19542,
+        "exit": 1,
+        "durationMs": 5492,
+        "ownedGroupESRCH": true,
+        "knownLateHits": [],
+        "positiveByteReachabilityCasePassed": true
+      },
+      {
+        "phase": "P045-C2-forward-copy-then-unlink--restored",
+        "passed": 12,
+        "failed": 0,
+        "pid": 19555,
+        "exit": 0,
+        "durationMs": 5594,
+        "ownedGroupESRCH": true,
+        "knownLateHits": [],
+        "positiveByteReachabilityCasePassed": true
+      }
+    ],
+    "executionCounts": {
+      "total": 72,
+      "passed": 68,
+      "failed": 4,
+      "pending": 0,
+      "todo": 0
+    },
+    "distinctFailedFileTitlePairs": 4,
+    "survivingControls": [],
+    "controlPins": [
+      {
+        "control": "P045-C1-fail-closed-hold-admission",
+        "release": {
+          "path": "/private/tmp/p0-45-causal-qualification-20261015/releases/P045-C1-fail-closed-hold-admission.json",
+          "bytes": 3370,
+          "sha256": "ccde67e6833dbcad27995bbe720b2ef590b5d7f1d06268baef2d6003ecc6ae3c"
+        },
+        "result": {
+          "path": "/private/tmp/p0-45-causal-qualification-20261015/result--P045-C1-fail-closed-hold-admission.json",
+          "bytes": 13356,
+          "sha256": "36f12f708c42b590866b18cf6f5a125116c56a8cdf8fcbf4e364a1f8f942baa1"
+        }
+      },
+      {
+        "control": "P045-C2-forward-copy-then-unlink",
+        "release": {
+          "path": "/private/tmp/p0-45-causal-qualification-20261015/releases/P045-C2-forward-copy-then-unlink.json",
+          "bytes": 3410,
+          "sha256": "450b3d91a124990f64d623d2a159b05724df52106e71bbedf6a7ff9bb5aa0ab8"
+        },
+        "result": {
+          "path": "/private/tmp/p0-45-causal-qualification-20261015/result--P045-C2-forward-copy-then-unlink.json",
+          "bytes": 5910,
+          "sha256": "e1abf593851c78daa90a95b51ae06889f96dfdb23c15b713561fb629be67a426"
+        }
+      }
+    ],
+    "actualFirstFailures": [
+      {
+        "control": "P045-C1-fail-closed-hold-admission",
+        "file": "tests/verifyRepair.test.ts",
+        "fullName": "applyVerifyRepair refuses under an active hold and names it",
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of RepairRefused",
+        "sourceFrames": [
+          {
+            "method": "expectRefused",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 99,
+            "column": 18
+          },
+          {
+            "method": "",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 221,
+            "column": 5
+          }
+        ],
+        "rawFailureMessages": 1,
+        "observerErrors": 1,
+        "rawAndObserverStackExact": true
+      },
+      {
+        "control": "P045-C1-fail-closed-hold-admission",
+        "file": "tests/verifyRepair.test.ts",
+        "fullName": "applyVerifyRepair refuses when the hold check itself throws",
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of RepairRefused",
+        "sourceFrames": [
+          {
+            "method": "expectRefused",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 99,
+            "column": 18
+          },
+          {
+            "method": "",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 213,
+            "column": 5
+          }
+        ],
+        "rawFailureMessages": 1,
+        "observerErrors": 1,
+        "rawAndObserverStackExact": true
+      },
+      {
+        "control": "P045-C1-fail-closed-hold-admission",
+        "file": "tests/verifyRepair.test.ts",
+        "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of RepairRefused",
+        "sourceFrames": [
+          {
+            "method": "expectRefused",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 99,
+            "column": 18
+          },
+          {
+            "method": "",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 203,
+            "column": 5
+          }
+        ],
+        "rawFailureMessages": 1,
+        "observerErrors": 1,
+        "rawAndObserverStackExact": true
+      },
+      {
+        "control": "P045-C2-forward-copy-then-unlink",
+        "file": "tests/verifyRepair.test.ts",
+        "fullName": "applyVerifyRepair puts moved files back when a rename fails part way",
+        "name": "AssertionError",
+        "message": "expected undefined to be an instance of RepairRefused",
+        "sourceFrames": [
+          {
+            "method": "expectRefused",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 99,
+            "column": 18
+          },
+          {
+            "method": "",
+            "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+            "line": 268,
+            "column": 5
+          }
+        ],
+        "rawFailureMessages": 1,
+        "observerErrors": 1,
+        "rawAndObserverStackExact": true
+      }
+    ],
+    "mutantEvidencePins": [
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/observer.json",
+        "bytes": 12442,
+        "sha256": "0f5f18c684bc3c719cde9dc55b06cc02233961a0152200d420ea11611e7a5a29"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json",
+        "bytes": 8232,
+        "sha256": "bec4808ffcdb7beda92372c5ce82c2f966994b5398e17dfdc69772282b49c987"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/stdout-stderr.log",
+        "bytes": 3055,
+        "sha256": "adc64b6b0341076c3466c7985ddc2b68b0e5ac50b436c2c44d91768de80ce1ba"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/classification.json",
+        "bytes": 11240,
+        "sha256": "800c12a0eeebc23de83b6b9ee928e9191abdbf60b1e43a5670ad6552e65eaa13"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/observer.json",
+        "bytes": 8266,
+        "sha256": "99717e7631311c2284a14ebde0f323afc62cec4d73e720620f7de2d914a5412d"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json",
+        "bytes": 5523,
+        "sha256": "7c085e56dc6c4b1b0caa7be0625e6b6f1fd6842f369b1b4e7f1ef30f152fba62"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/stdout-stderr.log",
+        "bytes": 1959,
+        "sha256": "24debb849944edecfc72133344ab920c6f5804a250d5cc9304347b1e29db3c22"
+      },
+      {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/classification.json",
+        "bytes": 3920,
+        "sha256": "cba5e68aeaff48a717653d30fbea3ea224780fb696f5c7f989a154526ebb38d7"
+      }
+    ],
+    "originalTestPin": {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+      "bytes": 13875,
+      "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+    },
+    "sourceDeltaChecks": {
+      "target": "src/ledger/verifyRepair.ts",
+      "baselineSha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb",
+      "C1MutantSha256": "75bf1ce550fd79842e17816935939b4edc046317ae49d9a463ef8d0275861bfe",
+      "C2MutantSha256": "062cbc9bb2be83c47f3550fa3c2ad6f970150b41c603f0e63b587eb61dc34145",
+      "onlyNamedSourceFileChanges": true,
+      "all4529CompiledFilesUntouched": true,
+      "exactRecipeAnchors": true,
+      "rollbackAnchorUnchanged": true,
+      "restoredExactly": true
+    },
+    "infra": {
+      "original12IdentitySetUnchanged": true,
+      "rawObserverStatusesAndMessagesExact": true,
+      "rawObserverMessageMultiplicityExact": true,
+      "bodyFailuresOnly": true,
+      "fileSuiteHookUnhandledPendingErrors": 0,
+      "knownLateDiagnostics": 0,
+      "normalExitCodesOnly": [
+        0,
+        1
+      ],
+      "signalTermination": false,
+      "allSixOwnedPidsEqualObservedPgid": true,
+      "positiveESRCHBeforeEachRestoration": true,
+      "eightReleaseBindingsAndNestedProofPinsExact": true,
+      "C1RestoredBeforeC2Release": true
+    }
+  },
+  "frozenMetadataChecks": {
+    "runtimeIndexRefsChecked": 224,
+    "uniqueRecursivePinTriplesChecked": 235,
+    "allPinsExact": true,
+    "embeddedOriginalSummaryExact": true,
+    "causalClassificationsEqualDirectResultsAndPhaseFiles": true,
+    "causalCommandRecordsEqualSixDirectCommandFiles": true,
+    "failureListEqualsActualMutantClassifications": true,
+    "rootJournalBytesEqualClosedOriginal": true,
+    "rootJournalRows": 15,
+    "rootExitCounts": {
+      "0": 14,
+      "1": 1
+    },
+    "onlyExit1": "git grep -n 'Removed corrupted' -- src; empty stream is designated no-match inventory",
+    "separateCausalCommands": 6,
+    "rootAndCausalAreSeparate": true,
+    "finalNormalFreeze": {
+      "exit": 0,
+      "durationMs": 1701
+    },
+    "allRootCommandMetadataAndRecordedGroupProofsExact": true,
+    "excluded": [
+      "causal BASE/closure",
+      "causal BASE/home",
+      "causal BASE/tmp",
+      "PARENT/home",
+      "PARENT/store",
+      "live root journal",
+      "this index",
+      "new causal and whole-lane summaries"
+    ],
+    "freezer": {
+      "preservedV1": "Unexecuted, blocked F1: incorrectly required all informational findings to be empty.",
+      "executedV2": {
+        "path": "/private/tmp/p0-45-freeze-qualified-evidence-v2-20261015.py",
+        "bytes": 39181,
+        "sha256": "a1c0de3feaf6fd5a7b2e823ca4b92b096a153c371d28da6ad2d2b6c35571137b"
+      },
+      "v2Correction": "Uses blockingFindings/approved decision/allReadsFinished/formalfalse and preserves O1–O5; v1 and its review unchanged. No product reruns."
+    }
+  },
+  "finalPreservation": {
+    "sourceFiles": 8205,
+    "distFiles": 4529,
+    "privateFiles": 12734,
+    "manifestRows": 12734,
+    "physicalFailures": [],
+    "membershipExact": true,
+    "rootDistMembershipExact": true,
+    "privateUniqueInodes": 12734,
+    "parentUniqueInodes": 12734,
+    "rootPrivateInodeOverlap": 0,
+    "links": [
+      {
+        "path": "node_modules",
+        "target": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+        "resolved": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules"
+      }
+    ],
+    "privateGitExists": false,
+    "nativeActual": {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538734665,
+      "nlink": 1,
+      "mode": 493
+    },
+    "nativeExact": true,
+    "immutableInputsChecked": 108,
+    "immutableInputsFailed": [],
+    "frozenOwnInputsChecked": 10,
+    "frozenOwnInputsFailed": [],
+    "activeExists": false,
+    "haltedExists": false,
+    "phaseDirs": 6,
+    "resultFiles": 2,
+    "startedMarkers": 2,
+    "releaseFiles": 2,
+    "allMeasuredAfterFinalPacketFreeze": true
+  },
+  "trustAndLifecycleLimits": [
+    "Core fixture uses real owned encrypted-blob writer/verifier and SHA256 snapshots, injected hold callbacks and stub SignedDigest. Writers/pools close before repair.",
+    "BuiltCLI5 uses real dist/cli.js children and local REPAIR_RECEIPT signature/altered-byte assertions. It is separate from the two TS-only controls; all compiled files remain unchanged. Fixture afterAll removes receipts; no separately retained sample or external issuer.",
+    "Separation4 is local signed event/config discrimination. Read-only10 includes six source Node/tsx cold-child cases and four in-process cases; disk SHA/mtime/mode excludes WAL/SHM. No whole-filesystem or per-child transcript claim.",
+    "Original wrappers inherit environment plus private HOME/Node22 PATH; causal phases use seven-key allowlist and borrowed dependencies, not an independent install or OS/network/cache isolation.",
+    "420s outer supervisor sends no terminating signal/retry; original30s tests and60s CLI child timeouts remain. Reporter run-end precedes global teardown; complete exit and known late/global-teardown patterns were separately checked. Recorded signal0 ESRCH proves only owned group absence, not universal descendant absence.",
+    "Full JSONL repair, live writer/WAL, interactive TTY, genuine active/unknown signed registry, second signing failure, rollback failure, crash/interrupted publication and arbitrary hostile-plan/symlink containment remain unqualified.",
+    "P021 literal20/10 outside R4, P029 user skip, P022 arrays, P023 held API/Studio, P051 issuer/formal, P024 ISO/expert, P019/P020 proposals and P030 held runner/fullbatch/installed-pack gaps stay unresolved. Claude/shared CLI/API/Studio/A4, paused P2-02 and pending transfers are preserved.",
+    "Full suite, coverage, Node24, hosted CI, PR/merge/release/formal dependencies/G0/Done are not established. P011 is conditional read-only preparation only."
+  ],
+  "calculationMethod": "Read completed immutable JSON/text artifacts and original source; compare exact identities/messages/frames, hashes and recorded PID/PGID/ESRCH, compute counts, rehash final manifests/source/dist/native and designated refs using Python standard-library filesystem/JSON/SHA/stat only. Reused prior full original/code/sealed/recipe reviews by exact pins. No source modules or fixture executed.",
+  "calculationNote": "A first local metadata inspection assumed root-group fields were top-level; corrected to actual observations[] and verified all15 receipts. One shape-discovery KeyError also preceded this calculation. Neither ran product code or changed evidence.",
+  "performed": {
+    "productRuntime": false,
+    "reruns": false,
+    "sourceImportsOrParserCompiler": false,
+    "buildInstall": false,
+    "gitCommands": false,
+    "network": false,
+    "processProbesOrSignals": false,
+    "productOrProducerEdits": false,
+    "inputHashingAndStatOnly": true,
+    "readsAfterRuntimeClosed": true,
+    "writes": "Only this new independent review JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T06:22:56.403383+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-45-bounded-independent-review-20261015.md",
+    "bytes": 3340,
+    "sha256": "b734b33cb6a45de391b4a876307e09079d2711a04a58b4908176ac3bee4be1c0"
+  }
+}

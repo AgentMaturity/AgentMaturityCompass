@@ -1,0 +1,87 @@
+{
+  "schema": "p111-root-preparation-review/1",
+  "at": "2026-10-16T19:22:39.893034+00:00",
+  "sourceHead": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "sourceBranch": "codex/p1-11-evidence-qualification",
+  "proposedScope": [
+    "tests/catalog/evidence/decisive.test.ts",
+    "qualification/2026-10-17-P1-11/"
+  ],
+  "sourceAllocationMade": false,
+  "hosted": "hosted-path-admission.json",
+  "scopeReview": "scope-review/README-v2.md",
+  "protectedInputs": "protected-inputs.json",
+  "commands": [
+    {
+      "phase": "p111-pre-d15",
+      "exit": 0,
+      "durationMs": 341,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p111-pre-d15/command.json",
+        "bytes": 1702,
+        "sha256": "f10a4576181a071452fc83fedfce18b8ff90b964971d599746ec8c06b7e86c19"
+      }
+    },
+    {
+      "phase": "p111-pre-freeze",
+      "exit": 0,
+      "durationMs": 1144,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p111-pre-freeze/command.json",
+        "bytes": 1351,
+        "sha256": "3937557b37a6ae2bdb37ddf9e5af3fb8f3079badcbccf815dd5e4fb3ee15f5f9"
+      }
+    },
+    {
+      "phase": "p111-unchanged-compliance",
+      "exit": 0,
+      "durationMs": 6998,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p111-unchanged-compliance/command.json",
+        "bytes": 2951,
+        "sha256": "c9d31a1540a7ad24006f9b3e5df5f9e25b40d7d700f7541002067b7f24d3206c"
+      }
+    },
+    {
+      "phase": "p111-duplicates-before",
+      "exit": 1,
+      "durationMs": 638,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p111-duplicates-before/command.json",
+        "bytes": 1372,
+        "sha256": "44a592a3d30fe460ad30656cd2736f352bb19d4f3bf62bb742051d5a30b7b294"
+      }
+    },
+    {
+      "phase": "p111-dead-code-before",
+      "exit": 1,
+      "durationMs": 2882,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p111-dead-code-before/command.json",
+        "bytes": 1369,
+        "sha256": "85449478169677b953926dcfb0b98d09fe7ad2bf8ecdbf0d8105e3488594fdee"
+      }
+    }
+  ],
+  "unchangedTests": {
+    "total": 63,
+    "passed": 63,
+    "failed": 0,
+    "skipped": 0
+  },
+  "unchangedTestCwdBoundary": "Vitest --root names S source. Process cwd remains R; the unchanged evidenceBinding source-literal census reads R/src, so it does not prove an S-wide census. Other selected public tests and new evaluator imports resolve through S.",
+  "qualityBefore": {
+    "duplicates": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "deadCode": {
+      "exit": 1,
+      "findings": 2724
+    },
+    "waived": false,
+    "baselineAdopted": false
+  },
+  "reservations": "Exact live file missing; last-known binding remains. Existing production/source/tests/docs/package/guards read-only. Proposed shared entry remains private/pending. No current delta or release claimed.",
+  "holds": "F37 skipped; provider archive staging held; P1-01 and all prior decisions remain open. No general Claude messaging authorization. No PR/push/merge/release."
+}

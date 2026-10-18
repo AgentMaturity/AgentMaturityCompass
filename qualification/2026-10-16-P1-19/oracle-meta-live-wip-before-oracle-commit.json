@@ -1,0 +1,191 @@
+{
+  "capturedUtc": "2026-10-15T22:54:04.130995+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "list",
+    "--state",
+    "open",
+    "--limit",
+    "1000",
+    "--json",
+    "number,title,author,isDraft,headRefName,baseRefName,url,updatedAt"
+  ],
+  "readOnly": true,
+  "open": 13,
+  "dependabotExcluded": 13,
+  "wip": 0,
+  "nonDependabot": [],
+  "allOpenPrs": [
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/dev-dependencies-3ecedad193",
+      "isDraft": false,
+      "number": 33,
+      "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+      "updatedAt": "2026-07-10T20:35:08Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/33"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/better-sqlite3-12.11.1",
+      "isDraft": false,
+      "number": 28,
+      "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+      "updatedAt": "2026-06-22T06:27:11Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/28"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/semver-7.8.5",
+      "isDraft": false,
+      "number": 27,
+      "title": "deps: bump semver from 7.7.4 to 7.8.5",
+      "updatedAt": "2026-06-22T06:25:16Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/27"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/commander-15.0.0",
+      "isDraft": false,
+      "number": 21,
+      "title": "deps: bump commander from 14.0.3 to 15.0.0",
+      "updatedAt": "2026-07-09T20:50:37Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/21"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/inquirer-14.0.2",
+      "isDraft": false,
+      "number": 20,
+      "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+      "updatedAt": "2026-07-09T20:50:36Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/20"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/yaml-2.9.0",
+      "isDraft": false,
+      "number": 19,
+      "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+      "updatedAt": "2026-06-26T16:05:36Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/19"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/zod-4.4.3",
+      "isDraft": false,
+      "number": 17,
+      "title": "deps: bump zod from 4.3.6 to 4.4.3",
+      "updatedAt": "2026-06-26T16:05:35Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/17"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/github_actions/actions/setup-node-6",
+      "isDraft": false,
+      "number": 8,
+      "title": "ci: bump actions/setup-node from 4 to 6",
+      "updatedAt": "2026-05-22T07:31:27Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/8"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/github_actions/azure/setup-helm-5",
+      "isDraft": false,
+      "number": 7,
+      "title": "ci: bump azure/setup-helm from 4 to 5",
+      "updatedAt": "2026-05-22T07:31:26Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/7"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/github_actions/docker/setup-buildx-action-4",
+      "isDraft": false,
+      "number": 6,
+      "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+      "updatedAt": "2026-05-22T07:31:25Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/6"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/github_actions/actions/deploy-pages-5",
+      "isDraft": false,
+      "number": 5,
+      "title": "ci: bump actions/deploy-pages from 4 to 5",
+      "updatedAt": "2026-05-22T07:31:24Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/5"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/github_actions/actions/upload-artifact-7",
+      "isDraft": false,
+      "number": 4,
+      "title": "ci: bump actions/upload-artifact from 4 to 7",
+      "updatedAt": "2026-05-22T07:31:23Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/4"
+    },
+    {
+      "author": {
+        "is_bot": true,
+        "login": "app/dependabot"
+      },
+      "baseRefName": "main",
+      "headRefName": "dependabot/npm_and_yarn/modelcontextprotocol/sdk-1.29.0",
+      "isDraft": false,
+      "number": 3,
+      "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+      "updatedAt": "2026-05-22T07:31:22Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/3"
+    }
+  ],
+  "excludeOnly": "Dependabot author identity; all other authors count"
+}

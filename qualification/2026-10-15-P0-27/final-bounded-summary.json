@@ -1,0 +1,37 @@
+{
+  "source": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "counts": {
+    "numTotalTests": 72,
+    "numPassedTests": 71,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "files": 6,
+  "components": {
+    "originalBudgetAndAgentLoop": 34,
+    "sessionAbortIsolation": 8,
+    "budgetIntegrity": 6,
+    "checkpoint": 13,
+    "agentExport": 11
+  },
+  "singleFailure": "P0-27 genuine seeded evidence collector [strict spec conflict] never includes a system row even when its direct metadata names the agent",
+  "rawSha256": "bcec11f4b28d2a5c7455829029e5b5d5348e37c0c7c72def695ce1f8ce20c4f9",
+  "actualColdCli": {
+    "total": 9,
+    "passed": 9,
+    "twoNativeTurns": {
+      "eventsEach": 24,
+      "totalExportedNativeIds": 48,
+      "datasetRecords": 54
+    },
+    "finalCompiledInputsExactlyMatchEarlierRuntime": true
+  },
+  "causalChecks": {
+    "session": "baseline2/2, skipseal0/1, remapstore0/1, restored2/2; standalone exact-input matrices",
+    "checkpoint": "4/4 \u2192 3/4 \u2192 4/4; only ..cache loses refusal",
+    "export": "10/10 \u2192 7/10 \u2192 10/10; owned rows/IDs/counts fail"
+  },
+  "limits": "No whole-suite/coverage/Node24/live model or hosted/release acceptance. Seeded/helper/canned-wire/private copies stay separate from actual cold CLI. Mixed parent/child SQLite snapshot observation remains unqualified."
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/producer-claims/records/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt",
+    "bytes": 470,
+    "sha256": "aa30899cbc50767f87b9f0583e986eef8d2b3290491e377ee0efd96d7f281243"
+  },
+  "dataBase64": "LS0tIGZ1dHVyZS1mcmVzaC9zcmMvbGVkZ2VyL2xlZGdlci50cworKysgZnV0dXJlLWZyZXNoL3NyYy9sZWRnZXIvbGVkZ2VyLnRzIChDTEFNUC1GVVRVUkUtUFJPRFVDRVItVFMpCkBAIC01NzcsNyArNTc3LDcgQEAKICAgICB0aGlzLmFzc2VydFRydXN0ZWRXcml0ZXIoKTsKICAgICBjb25zdCBwcmVwYXJlZCA9IHRoaXMucnVuSW1tZWRpYXRlVHJhbnNhY3Rpb24oKCkgPT4gewogICAgICAgY29uc3QgaWQgPSBpbnB1dC5pZCA/PyByYW5kb21VVUlEKCk7Ci0gICAgICBjb25zdCB0cyA9IGlucHV0LnRzID8/IERhdGUubm93KCk7CisgICAgICBjb25zdCB0cyA9IGlucHV0LnRzID09PSB1bmRlZmluZWQgPyBEYXRlLm5vdygpIDogTWF0aC5taW4oaW5wdXQudHMsIERhdGUubm93KCkpOwogICAgICAgY29uc3QgY2FuZGlkYXRlID0gdGhpcy5idWlsZEV2aWRlbmNlSW5zZXJ0KHsKICAgICAgICAgaW5wdXQsCiAgICAgICAgIGlkLAo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

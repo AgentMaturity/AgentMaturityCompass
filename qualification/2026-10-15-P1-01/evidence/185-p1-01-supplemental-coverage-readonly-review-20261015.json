@@ -1,0 +1,509 @@
+{
+  "schema": "amc-private-p1-01-supplemental-coverage-static-review/1",
+  "createdAt": "2026-10-15T08:30:39.660352+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "scope": "Read-only source, fixture-layout and closed original-result review; final unexecuted v2 supplemental probe static review. No product module imported or executed by this reviewer.",
+  "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "sourceHeadFromClosedCommand": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionCodeAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "blockingPacketFindings": [],
+  "staticBlockers": [],
+  "runtimeAuthorizedByThisReview": false,
+  "formalAcceptanceClosed": false,
+  "probe": {
+    "final": {
+      "path": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+      "bytes": 8360,
+      "sha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab"
+    },
+    "supersededUnexecutedV1": {
+      "path": "/private/tmp/p1-01-contract-probe-prepared-20261015.mjs",
+      "bytes": 8591,
+      "sha256": "c5c395f95edcafa17d43280a2ffbfec602b2245a927997fbcc063465fc245a1a"
+    },
+    "reviewMethod": "Read all v1 source, then complete v1-to-v2 diff. Final v2 changes argument order and narrows receipt witness; unchanged vectors/publication sections were fully read in v1. No parser/import/runtime.",
+    "interface": "node PROBE vectors|receipt ROOT; node PROBE publication ROOT EXISTING_PAGES_OUTPUT; all mode exists but independent modes preserve section outcomes.",
+    "writesOrSpawnsInProbe": false,
+    "receiptWitness": "Actual authorized.json positive and an object with the same fields plus qualificationExtra. Compiled receiptV2Schema.safeParse, exported assertContract, and Ajv2020 committed schema all queried before observation emission and assertions.",
+    "firstNegativeAssertion": "assert.equal(observation.extraZod, false, \"receipt V2 must refuse the unrecognized top-level member\")",
+    "masking": "If first negative fails, later assertContract/Ajv negative assertions and completion marker are masked, although their previously collected observation values have been emitted. Separate modes avoid masking vectors/publication.",
+    "publicationWitness": "Reads existing Pages output only; checks exactly 38 fixed names, expected IDs, source/index/copy digests, external-evidence ID path, byte-equal index and four HTML content markers. Does not invoke copySpec or full build."
+  },
+  "fixtureReconciliation": {
+    "jsonFileInventory": 84,
+    "directGeneratorCases": 75,
+    "coreDirectCases": 41,
+    "a4DirectSchemaCases": 34,
+    "outsideDirectLayout": [
+      "a4-record/builder-approved-own-revision.json",
+      "a4-record/dangling-evidence-ref.json",
+      "a4-record/deleted-evidence-ref.json",
+      "a4-record/second-vote-lands.json",
+      "a4-record/stale-approval.json",
+      "a4-record/tampered-transition.json",
+      "a4-record/trust/amc-trust-list.json",
+      "a4-record/trust/trust-roots.json",
+      "a4-record/valid.json"
+    ],
+    "outsideDirectLayoutMeaning": "Seven A4 record normative/verifier fixtures and two trust support fixtures. Generator compiles that contract but iterates only immediate valid/invalid JSONs; these nine are not measured cases in its log.",
+    "contractDirectories": 26,
+    "testsContractsDirectoryExists": false,
+    "perContract": [
+      {
+        "contract": "a4-conformance-statement",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      },
+      {
+        "contract": "a4-decision",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-deployment-receipt",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-gate",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-gate-policy",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-integration-claim",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-intent",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-package",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-project",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-readiness",
+        "valid": 1,
+        "invalid": 3,
+        "allJson": 4
+      },
+      {
+        "contract": "a4-record",
+        "valid": 0,
+        "invalid": 0,
+        "allJson": 9
+      },
+      {
+        "contract": "a4-release",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-revision",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-rollback-receipt",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-transition",
+        "valid": 1,
+        "invalid": 1,
+        "allJson": 2
+      },
+      {
+        "contract": "a4-value-claim",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      },
+      {
+        "contract": "authorization-record",
+        "valid": 1,
+        "invalid": 3,
+        "allJson": 4
+      },
+      {
+        "contract": "claim-envelope",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      },
+      {
+        "contract": "control-result",
+        "valid": 2,
+        "invalid": 3,
+        "allJson": 5
+      },
+      {
+        "contract": "evidence-event",
+        "valid": 2,
+        "invalid": 3,
+        "allJson": 5
+      },
+      {
+        "contract": "legacy-receipt",
+        "valid": 2,
+        "invalid": 2,
+        "allJson": 4
+      },
+      {
+        "contract": "receipt",
+        "valid": 3,
+        "invalid": 5,
+        "allJson": 8
+      },
+      {
+        "contract": "scoped-attestation",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      },
+      {
+        "contract": "signature-envelope",
+        "valid": 2,
+        "invalid": 1,
+        "allJson": 3
+      },
+      {
+        "contract": "trust-list",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      },
+      {
+        "contract": "verifier-report",
+        "valid": 1,
+        "invalid": 2,
+        "allJson": 3
+      }
+    ],
+    "inventoryRowsEncoding": "UTF-8 Python json.dumps(rows, sort_keys=True, separators=(comma,colon)); rows contain relative path, bytes, SHA256 and directVerdictCase, sorted by path.",
+    "inventoryRowsSha256": "cf4d70532ebb445eddeb491c662084e165267ac142dbdd90d558658d2976d751"
+  },
+  "closedOriginalEvidence": {
+    "schemas": {
+      "exitCode": 0,
+      "reportedSchemas": 38,
+      "reportedFixtureCases": 75
+    },
+    "vitest": {
+      "invocations": 1,
+      "total": 16,
+      "passed": 16,
+      "externalEvidence": 15,
+      "standardSchema": 1,
+      "uniqueFileFullNameCases": 16,
+      "identities": [
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt id without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt parent without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt tool without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt duration without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt calendar without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt digest without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile rejects corrupt unicode without accepting a trust claim",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile a signing key cannot promote imports or self-admit",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile independent authority is scoped to producer and capture method",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile the verifier never raises a producer's own lower declaration",
+          "status": "passed"
+        },
+        {
+          "file": "externalEvidenceProfile.test.ts",
+          "fullName": "external evidence profile future fields/versions and duplicate tool settlements refuse",
+          "status": "passed"
+        },
+        {
+          "file": "standardSchemaCaveat.test.ts",
+          "fullName": "published standard schemas are the generated spec schemas, with no permissiveness caveat",
+          "status": "passed"
+        }
+      ],
+      "observerRunEndErrors": 0,
+      "observerPending": 0,
+      "commandOwnedGroupESRCH": true
+    },
+    "meaning": "The 15 external-evidence cases use local synthetic bytes and locally generated signing keys/explicit authority objects. The one standard-schema case compares nine generated standard schemas to committed schema bytes. This is not 16 core-contract tests or the absent planned tests/contracts corpus."
+  },
+  "sourceFindings": [
+    {
+      "id": "C1",
+      "severity": "coverage",
+      "finding": "Receipt V2 source and current compiled first branch are strict. No receipt unknown-top-level JSON exists; unknown-nested and five other current invalid cases do exist. This missing witness is a test gap, not an established source defect."
+    },
+    {
+      "id": "C2",
+      "severity": "coverage",
+      "finding": "The absent tests/contracts suite leaves requested original parity/generation/vector/publication/exporter test files unestablished. check:schemas covers all 75 current direct fixtures and freshness; proposed private probe adds bounded supplementary observations, not those missing repository tests."
+    },
+    {
+      "id": "C3",
+      "severity": "boundary",
+      "finding": "ACCEPTANCE_RULES intentionally permits extra members for legacy-receipt, signature-envelope and standard artifacts. Do not generalize the receipt refusal to all contracts or tighten signed artifacts."
+    },
+    {
+      "id": "C4",
+      "severity": "boundary",
+      "finding": "Canonical and ledger-preimage vectors match the stated JS integer-key order, UTF-8 literal and receipt-field removal. A vector probe proves helper/preimage agreement only, with no ledger chain, signature, issuer admission, trust, portability or external claim truth."
+    },
+    {
+      "id": "C5",
+      "severity": "boundary",
+      "finding": "Publication mode establishes existing local artifact bytes/ID paths and selected HTML markers only. No hosted URL, deployment, full rendered-source equivalence or new build is proved by this probe."
+    },
+    {
+      "id": "C6",
+      "severity": "boundary",
+      "finding": "A4 schema copying and 34 schema-fixture parity cases do not qualify A4 record verification or any of the nine outside-layout fixtures. A4 source/tests remain protected."
+    }
+  ],
+  "prospectiveMutationStaticOnly": {
+    "file": "src/contracts/v1/receipt.ts",
+    "find": "z.strictObject({ ...v2Fields, state: z.enum([\"requested\", \"authorized\", \"started\", \"outcome_unknown\"]) })",
+    "replacement": "z.object({ ...v2Fields, state: z.enum([\"requested\", \"authorized\", \"started\", \"outcome_unknown\"]) }).passthrough()",
+    "findCount": 1,
+    "originalSha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20",
+    "hypotheticalReplacementSha256": "e231a41470dd0c8be2c4f71597fb5329bff63b6cf1544bb6ef4e965d92f8058f",
+    "assessment": "Installed Zod declarations expose object().passthrough() returning ZodObject; the replacement preserves the state discriminator and all fields while permitting extras only in requested/authorized/started/outcome_unknown. No syntax/typecheck/build or actual mutation occurred. Existing invalid receipt fixtures need not exercise that difference. Only a later owned rebuild plus independent actual check:schemas/refusal results can establish causality."
+  },
+  "navigationLimits": "Current P1-01 worktree has no graphify-out; inherited older graph navigation is not current source proof. Relevant current files were verified directly. Missing local specs path was resolved to the recovered historical P1-01 spec; path misses are observer-only, not product failures.",
+  "preservation": "No repository/product/A4/test/config writes, imports, parsing/compilation of product code, generation, runtime, cleanup, Git operations or hosted mutations by this reviewer. No active Pages artifacts read.",
+  "inputPins": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-01.md",
+      "bytes": 15658,
+      "sha256": "4d9743e9bbbdba999f36ccf45ec7d6e5252ada6267c2bb498da88e19ab43ad57"
+    },
+    {
+      "path": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+      "bytes": 8360,
+      "sha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab"
+    },
+    {
+      "path": "/private/tmp/p1-01-contract-probe-prepared-20261015.mjs",
+      "bytes": 8591,
+      "sha256": "c5c395f95edcafa17d43280a2ffbfec602b2245a927997fbcc063465fc245a1a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/ACCEPTANCE_RULES.md",
+      "bytes": 34039,
+      "sha256": "af79570a16abbf50945778dadf2563f1e60ee95e7850f3f5a8e6cff0fad6d794"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/README.md",
+      "bytes": 3828,
+      "sha256": "7126d8a496c5e28359bfc4b0dc3860489679eb5db7ed39b7c994d8fa69eca56b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/v1/common.ts",
+      "bytes": 796,
+      "sha256": "968ad85a0fa59a226e22371f7d8917cfe9fe493690f8c2a2a52a9200637b6f00"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/index.ts",
+      "bytes": 8308,
+      "sha256": "5cd1a9079ccf194093965f7f7ba127aca108faa1e0fb795007527287dde9bd1b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/gen-spec-schemas.mjs",
+      "bytes": 4307,
+      "sha256": "48ba5eedc013bef2c20a106d61a2948c56163f4779900b84aad196d431303e22"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/build-pages-site.mjs",
+      "bytes": 14553,
+      "sha256": "33ff3ac2dd0cf1f49c0ac77806cccaa1a01990b3fc4a1790f7b4647c1300756a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/lib/published-installer-version.mjs",
+      "bytes": 1613,
+      "sha256": "bf962dd5deded55166928ad0d1cfdfad42e2610b4891b56a0cb1226bbb7a0c66"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts",
+      "bytes": 2574,
+      "sha256": "5c03f8cbbee2c9a619f7fead8d49c2324709f7f133aa53916b45d19aa1f5a127"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/schemas/index.json",
+      "bytes": 8467,
+      "sha256": "ef869ba2c25c14902b537893e3663c30b821516daa39abf60891a1e1df44f339"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/valid/authorized.json",
+      "bytes": 609,
+      "sha256": "aa6d322383c5fb01cd5c0be29e713707c548d163382f00c0ce7364968f26bba1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/dist/utils/json.js",
+      "bytes": 496,
+      "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/dist/ledger/eventHash.js",
+      "bytes": 1436,
+      "sha256": "8a2aff867e3771f8db189b44d8459e791c59ab6f09880af8bb789914dc544751"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/dist/contracts/v1/receipt.js",
+      "bytes": 2234,
+      "sha256": "5312f76c1a911eed1cda044deed98ebfcf75fee1aa861fe1ef67c368fb2d4975"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/dist/contracts/index.js",
+      "bytes": 7965,
+      "sha256": "bbbcc219df5d3cea5b0c405596067b44dd8fce203127d1f0239019bb3593511a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules/zod/v4/classic/schemas.d.ts",
+      "bytes": 48770,
+      "sha256": "133c61534a2a482caef2795db34d503c3f0c24f0ec620eb2afd56198d0ae977f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules/zod/v4/classic/schemas.js",
+      "bytes": 51378,
+      "sha256": "eb4af7946a092aff8678b9251728ea58dab40154920cd65ec4a2ca1d4df68393"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-schemas/command.json",
+      "bytes": 1129,
+      "sha256": "97f2fb22ba7ca375f6a03a989998501378daa603dce23ec43bc3385d34dd70c6"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-schemas/stdout-stderr.log",
+      "bytes": 156,
+      "sha256": "849606697dacfee9445fc3fc4531721aa625215435c65e556ad0581f8583d5ce"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/command.json",
+      "bytes": 2653,
+      "sha256": "ee5dae8343b2b31bd75076dcb4c0e9f79063cf519b7f2012d8f236210454b620"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/stdout-stderr.log",
+      "bytes": 94,
+      "sha256": "bbe138685d86bac22498ccc6a6ec55232f5320ba506a5ad57d72794524276fe4"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/raw.json",
+      "bytes": 6024,
+      "sha256": "f64ba17ac20f6d65c290e727a66603e9895f89977292d1e63254fa43b56f2a5f"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/observer.json",
+      "bytes": 8461,
+      "sha256": "0d2bb7b83e82a6d5a4a25adacb356ce5898fa5b02b0fff17f9d446b69bddf7c1"
+    }
+  ],
+  "allReadsFinished": true
+}

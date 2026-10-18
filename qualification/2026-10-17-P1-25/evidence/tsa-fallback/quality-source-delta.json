@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T22:16:36.130416+00:00",
+  "beforeFindings": 2720,
+  "afterFindings": 2719,
+  "removed": [
+    "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"requestTimestamp\"}]"
+  ],
+  "added": [],
+  "qualityRemainsRed": true,
+  "baselineOrWaiverAdopted": false,
+  "diagnosticExit0IsNotQualityPass": true,
+  "beforeReport": "/private/tmp/p1-25-client-qualification-20261017/after-metadata-full.json",
+  "beforeReportSha256": "5279fd99df8c6cf6052cd16f7dac47ed481d2207ea367b6637e881945caa9edb",
+  "afterReportSha256": "0c0ad51bb621ff2208fab191e0e431f01b7086c5ca80230ae407572825f91a5d"
+}

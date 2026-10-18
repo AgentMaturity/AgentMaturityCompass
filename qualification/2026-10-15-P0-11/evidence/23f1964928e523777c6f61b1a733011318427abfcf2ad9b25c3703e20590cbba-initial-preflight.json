@@ -1,0 +1,583 @@
+{
+  "key": "P0-11",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T06:29:06.331399+00:00",
+  "branch": "codex/p0-11-current-qualification",
+  "gitStatus": "clean",
+  "trackedSourceFiles": 8362,
+  "trackedSourceManifest": {
+    "path": "/private/tmp/p0-11-qualification-20261015/tracked-source-before.json",
+    "bytes": 1031176,
+    "sha256": "757fc432259404ed8b4db216b0627e07ac60159aea801dd9dc3b6c129048871e"
+  },
+  "qualificationOnlyDifferencesFromCodeSource": 623,
+  "directPinsMappedCurrent": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/THREAT_MODEL.md",
+      "bytes": 49246,
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/channel-map.json",
+      "bytes": 20174,
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/channel-map.schema.json",
+      "bytes": 2669,
+      "sha256": "6d11b2bf91471c4da936d793e686d755f147d444bed09600994c5a2d8c7cce42"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/THREAT_MODEL.md",
+      "bytes": 403,
+      "sha256": "9172c2a1e3c9b25eced0fb70972658158ea658f5090936f3b681e1f8dbaa40d3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/archive/THREAT_MODEL-2026-02.md",
+      "bytes": 2943,
+      "sha256": "6449f0bc83aa43fed09986238fc2c98757c5f0667d8ac1db29667a1ca762de28"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/HARDENING.md",
+      "bytes": 1598,
+      "sha256": "7ac55a463b818f70d415472e900cdc992ff22e907310d152ac53499296530d6a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/READING_ORDER.md",
+      "bytes": 15006,
+      "sha256": "9348552e0dbba4aba2c5075970943231298f5f87c86dacdae1787b9c99002b1c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "bytes": 873,
+      "sha256": "fbf932970bfb250de91121430ff8903b28787d609977119f5cbedac85130c298"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+      "bytes": 3560,
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 29435,
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "bytes": 18803,
+      "sha256": "0d835399a02ebb3ce8b22daee1eccfcf4864dc1533342657d39983a5d3f79a5c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/otelExporter.ts",
+      "bytes": 29231,
+      "sha256": "8e6fee4594df8b74c87e3fa0b583888cbe1bb126195a4f49d2ddf973390a9d58"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/otelExportTransport.ts",
+      "bytes": 3282,
+      "sha256": "b47298f37f681a75c68919d8c8de0b7dfe700281ac357ab8780b1195bbfe71b3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/telemetryDrops.ts",
+      "bytes": 705,
+      "sha256": "3648fb9dd42536b2822f6e97fe984c0cd103c4ee2fea05f563d0a1cfee4bbe96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ops/otelExporter.ts",
+      "bytes": 13248,
+      "sha256": "250eb6d4ebe930eaef7f1e8df4a47ae75eddabe2ab373ba09b171aaf91cb18ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+      "bytes": 3263,
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+      "bytes": 4746,
+      "sha256": "fcf694842227d513eaf52e2c62c57910ccbb332e420cf82f38a57bc29d836e16"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+      "bytes": 5975,
+      "sha256": "4bab25e8a2d72c4c9c2d703a45434a15b5f5005c89aa8d7f1e5f6287568986d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+      "bytes": 11449,
+      "sha256": "8dcbb281f950c7f0f60cf50e9b2e3c1c620db985b684b7c2005885818bc73168"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/bad-owner.json",
+      "bytes": 867,
+      "sha256": "05a6739b2a7b881cb62e5f76cc55b4ebc190876041a48bed33a3c6a327c8150e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-path.json",
+      "bytes": 869,
+      "sha256": "fd72bcc1821a8461370a3624be441e9f51ad53c0d9008f0294d2cf7e8e440f77"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-symbol.json",
+      "bytes": 868,
+      "sha256": "012beba72e467ed34a0b56626c444864df13e19d00b04c6d21a08231675eb967"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/orphan-failure-row.json",
+      "bytes": 791,
+      "sha256": "2d6292637d403a8dbcbf43fc15213c76cf6c076b6f245ed9d6db73f7e71a049d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/valid.json",
+      "bytes": 867,
+      "sha256": "d5b5e641c830ccb5c0ca5014b5b5e44f7a324818494522694631e94bf6887661"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/deploy/compose/docker-compose.yml",
+      "bytes": 1816,
+      "sha256": "6b3bb1d6df4ff79ea64da152f32ca7a9b01036defd05a0f83a7b6be11b1f67d6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/deploy/helm/amc/templates/secret.yaml",
+      "bytes": 561,
+      "sha256": "bf65938c1b7b9444016790940862dfb8932526606d394590ed06a9239578c5b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/a4/a4Identity.ts",
+      "bytes": 12907,
+      "sha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/a4/a4Router.ts",
+      "bytes": 45906,
+      "sha256": "15d1ba135a81f1b7561051c02835a0121cce7f1e386a5c965cc990b9c65de94e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/acp/acpAgentServer.ts",
+      "bytes": 30835,
+      "sha256": "610e6133606ed5bda3cf141f9eaac3c0a01f6f329e051e14c85a23ecc12451e5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/adapters/managedHookLease.ts",
+      "bytes": 2173,
+      "sha256": "a8877d45b882fc17eedee87a3cb9b8edc6c114e8ada4e192fcf96ef6c50f9470"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/agent/nativeToolCapabilities.ts",
+      "bytes": 3510,
+      "sha256": "40266971f3e6feafc6924a04da62789fe8374cc07dc2d168d5d47d894dca7a44"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/bridge/hookControl.ts",
+      "bytes": 48026,
+      "sha256": "437e972888298aefa36ef18296f5924e5ddd0901a78d34f6dc958fb69ad8653e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+      "bytes": 8093,
+      "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/extensions/nativeExtensionRuntime.ts",
+      "bytes": 10239,
+      "sha256": "f5e5115bc703c0c9c9811919cbc4e522d2edc848680c0ae3dadb5d55007d836e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/gateway/requestFieldGuard.ts",
+      "bytes": 10355,
+      "sha256": "e37b362e82476c298e86a2d7bb62cdca9b8dec6ef9175b562183c9a6385085c7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/gateway/server.ts",
+      "bytes": 68401,
+      "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/importers/dshSessionContract.ts",
+      "bytes": 9596,
+      "sha256": "bdfe228ee9119f60e85e8d2fb0896f9dc8ce7abed42369ca549d62e5e09a79b3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/importers/piSessionImport.ts",
+      "bytes": 20249,
+      "sha256": "0dac5dd10c9355eddf192a8d3d08f41772397f7bf8acb5071e920196376b1e10"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/llm/adapter/adapterRegistry.ts",
+      "bytes": 10935,
+      "sha256": "9d8479ded01f1a500cb8a5eb92f3cf006fe8e6e261b477fd434e0a280cdb6e3e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/llm/adapter/llmRuntime.ts",
+      "bytes": 22504,
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/llm/adapter/providerCapabilities.ts",
+      "bytes": 13151,
+      "sha256": "29160f7f8fb8899c4856fac2286dfd8bdaac836250b199a77281a9de734a0d73"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/mcp/nativeMcpClient.ts",
+      "bytes": 25454,
+      "sha256": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+      "bytes": 41548,
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/mcp/oauth/authorize.ts",
+      "bytes": 14742,
+      "sha256": "7a73271cccd63f81abd4b3417decd0ef2393420d34c2f607648a90fe5e1878ad"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/mcp/oauth/discovery.ts",
+      "bytes": 13603,
+      "sha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/mcp/oauth/tokenStore.ts",
+      "bytes": 2544,
+      "sha256": "02ec50a11780f42ec41bc5781029f44a50eb6943cd1ee26cf87520d2b2d80ab8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/notary/notaryAuth.ts",
+      "bytes": 3821,
+      "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/notary/notaryLog.ts",
+      "bytes": 5990,
+      "sha256": "71ae01cea6e4eff4a2c817f9ebd9966aad068b2bc9e83455d70ba3978f211e7d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/notary/notaryServer.ts",
+      "bytes": 13001,
+      "sha256": "f97c992ca0043e0b8fcf8c7e2a3f2048b5284b8729efc91f0e0aa96e7308f120"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/plugins/nativeExecutableRunner.ts",
+      "bytes": 14286,
+      "sha256": "8619e028486eb6a2eefc397cd3e943ff8ea27649e33ec13516bf9b8a66dc3fa3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/policy/effectivePolicyReceipt.ts",
+      "bytes": 7579,
+      "sha256": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+      "bytes": 14615,
+      "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/egress/shellEgressProxy.ts",
+      "bytes": 6819,
+      "sha256": "78927f47b6f98ac04a68d862e78f72ac238a1cab0e4ce97bebbd12c5d2abe550"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/nativeSandboxBinding.ts",
+      "bytes": 7003,
+      "sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/nativeShellGate.ts",
+      "bytes": 6328,
+      "sha256": "27f4c9a6d3776bd0214b167783a229ab2c5a5a2e7058cf0090c1016050e8b2d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/processCap.ts",
+      "bytes": 2402,
+      "sha256": "c7b3cc7f51d51bc240c5aabc1172b18b6452356edb90e285bb1f7877ecf1bdfb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sandbox/seatbeltNativeShell.ts",
+      "bytes": 12224,
+      "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+      "bytes": 47921,
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/studio/nativeAdmission.ts",
+      "bytes": 7292,
+      "sha256": "70c7e9cff9e9a09468810073e0e5f754b64b54a9844b03ab33d9fcd914960125"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/askUserTool.ts",
+      "bytes": 8984,
+      "sha256": "51e961564058bc728c588d119cde363595fee842c59ab82f3a6e8ff843580654"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/bashTool.ts",
+      "bytes": 6113,
+      "sha256": "1c6277340a2cc336186485ed6b15fb4a014d3082924ca644134513196df9f7df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/fsTools.ts",
+      "bytes": 9098,
+      "sha256": "66cece4b743e715dfcc6b296f17713caec027991348961b9b6777b0cc78d4771"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+      "bytes": 10592,
+      "sha256": "ecf0aae9dc6f83cd52d9dbb713e3d8dd9ef7bacb0b52b282e838492467a6e209"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/nativeReceipt.ts",
+      "bytes": 1979,
+      "sha256": "965b299e44f992ade3c31ea82c21284f7b9f252fb36cb37bb8c249c35bbb1e81"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/originPolicy.ts",
+      "bytes": 4151,
+      "sha256": "62e6a15cfba8ef670cce0c4699e9127236c6ed63a7b4dc7a261e22620fcccdce"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/sessionListTool.ts",
+      "bytes": 6363,
+      "sha256": "cd2121bff70a99115b90793e3f5823f4ee61c278fefe23bb07f274a316570f97"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/builtin/readBeforeEdit.ts",
+      "bytes": 4531,
+      "sha256": "a776895cb04b874555caf063ede3f63450aa2e639f5a544e0144ecc53e21dda8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    }
+  ],
+  "planPins": [
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    }
+  ],
+  "reservation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "recoveredSpec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+    "bytes": 16346,
+    "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8"
+  },
+  "readiness": {
+    "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+    "bytes": 59639,
+    "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+  },
+  "priorP045Handoff": {
+    "path": "/private/tmp/p0-45-canonical-postcommit-handoff-20261015.json",
+    "bytes": 3882,
+    "sha256": "baba589557056bce672295ef22c99c2219740052885b9759a9338ce7f5e5d082"
+  },
+  "wrapper": {
+    "path": "/private/tmp/p0-11-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "b28dec64355192e41615628c8219fe831b83a62f8ee709834844a962301e079a"
+  },
+  "wrapperStaticReview": {
+    "path": "/private/tmp/p0-11-wrapper-static-review-20261015.json",
+    "bytes": 3720,
+    "sha256": "43390cccbc1f122267cd822f5f72b107759dc51fd66363636471605459006fcf"
+  },
+  "reporter": {
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "bytes": 2110,
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "runtimeFingerprintScript": {
+    "path": "/private/tmp/p0-11-qualification-20261015/runtime-fingerprint.cjs",
+    "bytes": 1147,
+    "sha256": "fdf7b37b945ee337b8a3929da8c05b543ce5d0a75e7653b4e7013e32a1985493"
+  },
+  "inboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "bytes": 876841,
+    "sha256": "fd4f5e769f2ad1d3c548b5c76b1dd3f00af155d92f47b6cc5c6b1442fced1b8b"
+  },
+  "telemetryEnvironmentPreflight": {
+    "endpointKeys": {
+      "AMC_OTEL_OTLP_ENDPOINT": {
+        "set": false,
+        "loopbackIfSet": null
+      },
+      "AMC_OTEL_JAEGER_ENDPOINT": {
+        "set": false,
+        "loopbackIfSet": null
+      },
+      "AMC_OTEL_ZIPKIN_ENDPOINT": {
+        "set": false,
+        "loopbackIfSet": null
+      }
+    },
+    "defaultOTLPWhenAbsent": "http://127.0.0.1:4318",
+    "boundary": "Inherited environment is not isolated; original tests enable OTEL before initialization and install spies afterward. Loopback target classification is static environment preflight, not observed transport absence or an actual collector outage."
+  },
+  "runtimeBoundary": "Fresh original-source install/build/freeze first. No test/config/guard/assertion/deadline/cleanup changes. Actual map7/telemetry2 and optionalpreview5/recording7 kept separate; staticcounts not measured. No product/source ownership transfer.",
+  "plannedCorpora": {
+    "map": [
+      "tests/threatModelMap.test.ts"
+    ],
+    "telemetry": [
+      "tests/telemetryExporterFailure.test.ts"
+    ],
+    "preview": [
+      "tests/observabilityOtelExporter.test.ts"
+    ],
+    "recording": [
+      "tests/toolEvidenceRecording.test.ts"
+    ]
+  },
+  "formalAcceptanceClosed": false
+}

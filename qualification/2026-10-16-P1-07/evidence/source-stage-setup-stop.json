@@ -1,0 +1,7 @@
+{
+  "operation": "first private precommit reader",
+  "error": "KeyError: inputs",
+  "cause": "This manifest uses rows; schema inspected before corrected attempt",
+  "beforeAnyStagingOrCommit": true,
+  "sourceChangeOrQualificationCredit": false
+}

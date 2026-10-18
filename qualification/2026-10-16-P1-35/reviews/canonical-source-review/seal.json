@@ -1,0 +1,26 @@
+{
+  "schema": "amc-private-static-audit-seal/1",
+  "phase": "p135-canonical-source",
+  "allReadsFinished": true,
+  "blockers": [],
+  "inputPinCount": 53,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/canonical-source-review/review.json",
+      "bytes": 11797,
+      "sha256": "83e4ea6e884e7523caca2a25b1944e567967066a745e1fbccd67bb46960221d4"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/canonical-source-review/README.md",
+      "bytes": 3072,
+      "sha256": "5fb749e9d22d87783cf4f4a0031b168c04d67ded02bc8c206ec671314cc62f3b"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/canonical-source-review/pins.json",
+      "bytes": 20278,
+      "sha256": "a8ba094b28d90fcea20514de0e7644305268c1eb22d348f7733b9ef6e4bcc098"
+    }
+  ],
+  "noExecution": true,
+  "checkoutWrites": false
+}

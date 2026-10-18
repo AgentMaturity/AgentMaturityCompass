@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-51",
+  "date": "2026-10-14",
+  "commit": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "branch": "codex/p0-51-current-qualification",
+  "node": "v22.23.3; Node24 not qualified on final source",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 30747
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 786
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 1319
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 2617
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 3386
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3884
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 6501
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 7780
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 35321
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 46718
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 57715
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/cliTrustFlags.test.ts tests/trust/verifySurfaces.test.ts tests/trust/admission.test.ts tests/trust/verifierReport.test.ts tests/trust/trustContext.test.ts tests/studioNativeTaskService.test.ts tests/studioNativeTaskAdmission.test.ts tests/publicBenchmarkRegistry.test.ts tests/zeroKeyLeaseBudgetDriftBom.test.ts tests/notaryTrust.test.ts tests/federationComplianceIntegrationMerkle.test.ts tests/sessionAnchorOfflineProof.test.ts tests/industryPackEntitlement.test.ts tests/externalEvidenceProfile.test.ts tests/formalVerification.test.ts tests/trustInterchange.test.ts tests/industryPackPortableVerification.test.ts tests/portableVerifierCliQualification.test.ts tests/transparencyProofExportContainment.test.ts tests/portableVerifierServerQualification.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/archiveFilesParity.test.ts tests/signedArtifactVerificationParity.test.ts --reporter=json --outputFile=/private/tmp/p0-51-final-bounded-node22-20261014.json",
+      "exit": 1,
+      "durationMs": 74863
+    }
+  ],
+  "tests": {
+    "total": 822,
+    "passed": 789,
+    "failed": 33,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "772da5a4eb119bd99cd2ea59a4a97ccc723af2fe9cd72cb4593f39f99ac50ecb"
+    },
+    {
+      "path": "claim-helper-repairs.json",
+      "sha256": "24858b4fd7f9a0480f3405042b7372d83425c34c2a09903d7c188a0a93f75583"
+    },
+    {
+      "path": "claim-helper-repairs.md",
+      "sha256": "bf32070b7f72634467b3816edece178fb4b1fe46ff6b1bb97a65e8ea1548d2ff"
+    },
+    {
+      "path": "claim-helper-repairs.patch",
+      "sha256": "857f51be82189a443c2f696cb141d9602516669a4297443c12a30de4b949b174"
+    },
+    {
+      "path": "claim-helper-scope.json",
+      "sha256": "a2996b788351b85c8fab5d00e87443a224292cfddf5f0212c2966a260d539c34"
+    },
+    {
+      "path": "cli-canonical-claim-output.json",
+      "sha256": "d1112abb20a3d8d7e93d78d5443dac48535b2256cce52fde0d87188a8189a197"
+    },
+    {
+      "path": "cli-original-dist.json",
+      "sha256": "bc19b2c08515cec7d8d60f6c759d9af492d796a4d902706702d95f6b795a1b5f"
+    },
+    {
+      "path": "cli-original-dist.md",
+      "sha256": "39f655d03a0ef4e40ec49285e04d8e4e2c75c135e2432e83a9e3d48f3356811d"
+    },
+    {
+      "path": "cli-rebuilt-candidate.json",
+      "sha256": "2e191277c1e4fa942d472b2e56e0bc8f7e59d8c4fe58226d2dc0be30d1a4eda1"
+    },
+    {
+      "path": "cli-rebuilt-candidate.md",
+      "sha256": "02aa327df0e5a107f83962f201e02652d27f865092b0dfc880c76a3cb576b16d"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "e05bb4563027cea5d229447ef358f603b08d2bc5475bf2f0e1309ea19191427e"
+    },
+    {
+      "path": "export-expanded-green.json",
+      "sha256": "af7797eaf827f12b5613121dba4631a064aec0a71df0bdf51487915ef7f15a05"
+    },
+    {
+      "path": "export-first-red.json",
+      "sha256": "b6478ad33f7c2c963d813a5e3efb0251c7ba34608ed22d5ba295ca82d9e7d628"
+    },
+    {
+      "path": "export-first-red.md",
+      "sha256": "776f9a86d0ae6eee95e9bd47b6907249c035d4947fd79a532cd20bf8b2be1e39"
+    },
+    {
+      "path": "export-guard-removal.patch",
+      "sha256": "263384f3245efbdf3f234a5646027a024d9e266a9f1ebf695d23e75867381a58"
+    },
+    {
+      "path": "export-guard-removed-mutant.json",
+      "sha256": "0661ec8cefd1c963129478bf8de937d591ef55bfe27b708bfd0883f3d54d6581"
+    },
+    {
+      "path": "export-independent-review.json",
+      "sha256": "9550b67d25cbba1dab758f9396191ebc3607bb92873258f816cef6ee54a60fe7"
+    },
+    {
+      "path": "export-independent-review.md",
+      "sha256": "e066977c788ca050524bded0857639ff2ddbf8a8a041f79bfc8878f0b4fd40b0"
+    },
+    {
+      "path": "export-mutation-summary.json",
+      "sha256": "be457e6374043ea305366a86d201a236730f2022196d579d7df20c3fb31d2326"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "62ab5681a5448da6af481ced42469c74d6d1b69bf7c0a607af8a80319f3cc95e"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "ae6e1cecde9a2da53094d563b1118899692b9ae23eae1f1543a9386bd9a4adf6"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "fc63a684c09a1edf1bfa6c884af0a1aa23159732b77b406f6c819b1642767224"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "2a37992664254e1ce3692328681c5a5e30b8d7ef393250328ad41d433f353616"
+    },
+    {
+      "path": "final-build.log",
+      "sha256": "24d51a73a6595d8ee9577150627f24dd863d50ed3c6ad79a4577a798767cc809"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "294ef40a57a97cf139789348636a33d99f25a8ba2d7e5f611ce2b28e4a5455fb"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "cca15c5c9a0fec0a3333713303fbc1bf53ebe4e7d9460fc0ec1d4959511b6de1"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "291b8358e69463046cacd488cb59080311b2549ad45005dc93ed256e4870f7c9"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "8da7dc7ff8370214ded743cdf4eca5906afb74aad0f59396e68bb4cfe29005b6"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "e7f58796bbcbe93e4775cf95119455d079fe93d8a60cd30fd5e4867aefaded46"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "e6aa27d701797e9f2f5c8fade3e30e0d9c590fac2cc0ed933ee4318990dac35f"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "e3f49f948babd87d2546d8741a5a8fdd523cafaabc8dacea9a52b5ac9da67856"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "2bae771b18d59b04c4177941fc2a93d5d1085ac2f13d1213715af65e4862a299"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "45901d0573985ee66af02add7ebdc275363a6d782ed061221c00c30797696474"
+    },
+    {
+      "path": "final-types.log",
+      "sha256": "eec5369c32a366600692abcebd99e49148e008adc719bac49fbb4bc84b955cc7"
+    },
+    {
+      "path": "graph-navigation.json",
+      "sha256": "11295549fafe4441aea6e0b96ca57cfcce8756fa1eba83dbfe62b36fa48c2c0f"
+    },
+    {
+      "path": "license-pure-green.json",
+      "sha256": "e5d21dfc3390032b8ee8b74880d9dd4991aa21e53df59462cb509d778ff4bd69"
+    },
+    {
+      "path": "license-pure-red.json",
+      "sha256": "3c2fdc94abe28edb6d493bf64857ddf91f756c065346e042a7cb31f6d90d9845"
+    },
+    {
+      "path": "license-qualification.json",
+      "sha256": "356a8cee96144b51c47873ffa127de2b2a82a72a306024568159cd3de7075904"
+    },
+    {
+      "path": "license-qualification.md",
+      "sha256": "72fd18de1ee0a43bad12d540f89cad0a4e57fef3080c3ea8ef0459d07e873dbd"
+    },
+    {
+      "path": "next-p0-46-preflight.json",
+      "sha256": "c1c80b80faa7b2d666a5e9e33d1bf151f1e874a9ba28fe3da77aa6f6f676ce29"
+    },
+    {
+      "path": "next-p0-46-preflight.md",
+      "sha256": "ee8e0061082f725e5785cc605e8c419a012423df345e026df7329f3dba23bde7"
+    },
+    {
+      "path": "original-trust-native-baseline.json",
+      "sha256": "5a3b50e2d376869b3a0e0e377d2de864d0c42b4d8d1f7a1c1a0f427a41d4ad2c"
+    },
+    {
+      "path": "override-mutation-summary.json",
+      "sha256": "9750bc62f7fcb83dfd975cdded9c98d4892a04a20e1cd1a8b4f713cd55b2aad8"
+    },
+    {
+      "path": "override-promoted-mutant.json",
+      "sha256": "822c8138b3a0371758594608725c3bd860c8e753e14e22b25607c294e579f305"
+    },
+    {
+      "path": "override-promotion.patch",
+      "sha256": "f83b31709a844d9aea667efcea631a5f982d12d56ea95bc41264b103a55755f2"
+    },
+    {
+      "path": "pin-precedence-conflict.json",
+      "sha256": "1c99990a88e800f982ff2450864f73a15876cf77e24d7997e548b98fbff78af7"
+    },
+    {
+      "path": "pin-precedence-conflict.md",
+      "sha256": "b3ede3aa74d747b48c9fdaaf8aabda18f1147dea52f551f8c78bf9dbfa8c12c6"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "ceb3fde588c6c242d0b28c5b711b8868fd3fd30649436f65802340f25e987f05"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "fd132c74afd20c4090728e934e8b1d82a2fd9ff9672785758c329722223ed81e"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "5b6ccf9e9763b9e6a057ce864ef8275d6e6e757e7c818991116fe3be07221cd4"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "0bd737438dab4834ac89d7f6c4d259c899475297307e5d9dbd7c88356b1680dc"
+    },
+    {
+      "path": "server-native-qualification.json",
+      "sha256": "4c0f7262e7f0e6829ef3a7b3a90675523a6ac14e037e6382a29dcdd7ba814c5d"
+    },
+    {
+      "path": "server-native-qualification.md",
+      "sha256": "58712217cc5a103eaaa5066df06b9f317d360dbf6a9b5c6131ac63d4f51298c9"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "7383f20c34f21ee21c8f4a7cf61f954edad5c0781661c8f915baec564d20e09f"
+    }
+  ],
+  "notes": "Bounded qualification remains unresolved, not Done or full CI, coverage or release acceptance. The final 24 files retain 33 failures and zero pending/todo: three pin-precedence conflicts and 30 reserved formal API refusals. CLI 81/84; license 21/21; export 6/6; server/native 67/97. Actual causal RED/GREEN and two restored mutations are retained; the filtered five-case mutation has 79 pending and is not full-file proof. Build, types, lint, freeze, architecture, counts, docs and clean-source pass. Required source-quality checks fail with 1,269 duplicates and 2,780 dead-code findings. The initial native checkpoint fixture failure is retained; final explicit live/cold trust withdrawal passes. Whole suite, coverage, Node24, hosted CI and release acceptance remain open. Prior P0-22/P0-23/P0-29 debt is preserved. No protected, Claude, archive, freeze, floor, baseline or dependency edits; no paused work, held overlay, tracker closure, external message, push or publication. Next is P0-46 qualification of the unchanged accepted action."
+}

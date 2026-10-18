@@ -1,0 +1,72 @@
+{
+  "utc": "2026-10-15T08:22:02.262719+00:00",
+  "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "head": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "branch": "codex/p1-01-current-qualification",
+  "sourceCount": 8751,
+  "manifest": "/private/tmp/p1-01-qualification-20261015/original-tracked-files.json",
+  "wrapperChange": "Only P0-41/P041/p0-41 namespace substitutions; process behavior/reporter/guards unchanged. Prepared, not yet executed.",
+  "pins": [
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/original-tracked-files.json",
+      "bytes": 1432354,
+      "sha256": "4e9cb8099bb2faab68082a7ee231970f6c2741319dfa36f0f902b238f2b1176a"
+    },
+    {
+      "path": "/private/tmp/p0-41-run-command-prepared-20261015.py",
+      "bytes": 10488,
+      "sha256": "e1dc7f607d992d38b94ab8b12218de579bc1d58f2adee77a0d788190c345bbbe"
+    },
+    {
+      "path": "/private/tmp/p1-01-run-command-prepared-20261015.py",
+      "bytes": 10488,
+      "sha256": "4e3eac5c592c708ebce09ff8aa0814b0e5d7da4b2ada64b4aad1733fc1106736"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    }
+  ],
+  "scope": "Bounded existing-source P1-01 checks, current accepted input 559fafc4. No held adoption, A4/schema/baseline/source-quality exception or formal dependency closure."
+}

@@ -1,0 +1,73 @@
+{
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "metadataCommands": [
+    {
+      "phase": "freeze-evidence",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p0-45-freeze-qualified-evidence-v2-20261015.py",
+      "exit": 0,
+      "durationMs": 1554,
+      "startedUtc": "2026-10-15T06:16:10.147747+00:00",
+      "log": "/private/tmp/p0-45-freeze-evidence-20261015.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227"
+    },
+    {
+      "phase": "build-canonical",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p0-45-build-canonical-packet-v2-20261015.py",
+      "exit": 0,
+      "durationMs": 1570,
+      "startedUtc": "2026-10-15T06:27:06.870889+00:00",
+      "log": "/private/tmp/p0-45-build-canonical-20261015.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227"
+    },
+    {
+      "phase": "canonical-qualification-first",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 405,
+      "startedUtc": "2026-10-15T06:27:15.586296+00:00",
+      "log": "/private/tmp/p0-45-canonical-qualification-first-20261015.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227"
+    },
+    {
+      "phase": "precommit-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1380,
+      "startedUtc": "2026-10-15T06:27:16.102552+00:00",
+      "log": "/private/tmp/p0-45-precommit-normal-freeze-20261015.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227"
+    },
+    {
+      "phase": "staged-diff-check",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "git diff --cached --check",
+      "exit": 2,
+      "durationMs": 26,
+      "startedUtc": "2026-10-15T06:27:17.869846+00:00",
+      "log": "/private/tmp/p0-45-staged-diff-check-20261015.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227"
+    }
+  ],
+  "qualificationGuardPassed": true,
+  "normalFreezePassed": true,
+  "stagedWhitespaceCheck": {
+    "exit": 2,
+    "log": {
+      "path": "/private/tmp/p0-45-staged-diff-check-20261015.log",
+      "bytes": 150,
+      "sha256": "ebcc53d5a9b2369fd11299bd0ee054e1eae89aa36ea994a424158c553636fe5e"
+    },
+    "interpretation": "Exactly one blank EOF line in byte-exact copied successful build log. Original evidence is retained unchanged. No trim, ignore flag, guard change or bypass was used. The ordinary staged whitespace check remains recorded as nonzero."
+  },
+  "formalAcceptanceClosed": false,
+  "countBoundary": "Packaging/validation commands are separate from frozen15 original root records and6 causal processes. Primary receipt tests remains original12."
+}

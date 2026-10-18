@@ -1,0 +1,1424 @@
+{
+  "kind": "Independent read-only P0-27 own qualification runtime compatibility review",
+  "reviewedUtc": "2026-10-14T21:50:14.669897+00:00",
+  "findings": [],
+  "result": "No actionable findings in the exact two-line test-runtime candidate and assigned8-case Node22/Node24 evidence.",
+  "source": {
+    "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "directParent": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+    "onlyChangedPath": "tests/assuranceSessionQualification.test.ts",
+    "originalTestSHA256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+    "originalGitBlob": "4c0826a9b47d343acd423c699b0bf334d2d4e86a",
+    "candidateTestSHA256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+    "candidateLines": 200,
+    "exactExpectedTwoSubstitutionsIndependentlyCompared": true,
+    "unchangedAllBehaviorInputsSecurityCryptoErrorCleanupAndTimeoutBytes": true,
+    "predicateMeaning": "Only major22 or24 is admitted in both parent and child. The existing refusal for every other major is retained as static behavior; no unsupported-major runtime witness is claimed.",
+    "proposal": {
+      "path": "/private/tmp/p0-27-node-runtime-guard-proposal-20261015.patch",
+      "bytes": 1062,
+      "sha256": "4622cd6eb87c0c60bdcda1f53a4e37593adfcb2793d613aa78068ebaea62d205"
+    }
+  },
+  "actualRuns": [
+    {
+      "phase": "node22-original",
+      "raw": {
+        "path": "/private/tmp/p0-27-compat-node22-original-eight-baseline-20261015.json",
+        "bytes": 4148,
+        "sha256": "1dca182d2b85593fff5051a69c2563ccaf90f09daa5de11082583e31f8325930"
+      },
+      "counts": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "evidenceRoot": "/private/tmp/p0-27-session-evidence-C2xuhJ",
+      "sameEightNames": [
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed supervise abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed sandbox abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=false",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=true",
+        "P0-27 actual assurance session and isolated unsigned evidence an owned first-row database fault rolls back session creation and permits a genuine sealed retry",
+        "P0-27 actual assurance session and isolated unsigned evidence an actual abort seal-update fault retains the original resolver error and reports the unsealed negative",
+        "P0-27 actual assurance session and isolated unsigned evidence the real abort helper returns the same error object and attaches the actual database failure",
+        "P0-27 actual assurance session and isolated unsigned evidence signed callers cannot divert evidence into the unsigned store"
+      ],
+      "caseWitnesses": [
+        {
+          "case": "first-row-fault",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "first-row-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/first-row-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/first-row-fault/result.json",
+            "bytes": 2960,
+            "sha256": "a25288a41b21207e83adb76dcc832a038e2a74892b294296033ad60f528580a5"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/first-row-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "c56c04dddc942554e30f6102d10d33e54f64f08ca13977023f05480bbfa63e33"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "rollback",
+            "healthyRetry"
+          ],
+          "error": {
+            "name": "SqliteError",
+            "message": "P0_27_FIRST_ROW_FAULT",
+            "code": "SQLITE_CONSTRAINT_TRIGGER",
+            "reason": null,
+            "cause": null
+          },
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": true,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "seal-fault",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "seal-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-fault/result.json",
+            "bytes": 9200,
+            "sha256": "344fc531bf06ed7407ce37314a089c59781712901837ba10af9b90c9ecf8f06d"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "f62a3f48761aa9d5656eaf89103aba7db4ee66d8302925f45e3359321a513bb5"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "seal-helper-identity",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "seal-helper-identity",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-helper-identity",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-helper-identity/result.json",
+            "bytes": 9030,
+            "sha256": "1ebd3d5b5fdf1d884bbb10a82ee3a6258c844f5f4a323d60f25ba58c6f4a71fd"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/seal-helper-identity/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "1a1632b7127543355927c0eda8eed4b54dd7349040bc8b6a66c764b18e9d796d"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "originalObjectIdentityRetained",
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: owned unavailable fixture",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "owned unavailable fixture",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-sandbox",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-sandbox",
+            "mode": "sandbox",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-sandbox/result.json",
+            "bytes": 19997,
+            "sha256": "bfd3156b84c6bdea5c5859fc93252ca071a9971f285ef605caf664b77879a596"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-sandbox/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "f4052019f0d0d617011d9a2e4e4d491839d9851fbc81aceae32aa2d7a1be43e4"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-supervise",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-supervise",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-supervise/result.json",
+            "bytes": 12764,
+            "sha256": "e1ceaaac2b61e62889d12df30178f9849fa54962889c82603e874dc869b07578"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/signed-supervise/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "60f263ae778c74f0e65f3f9a0c4e52130b9debf228f670387eb0978135f90a3b"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "store-guard",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "store-guard",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/store-guard",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/store-guard/result.json",
+            "bytes": 2954,
+            "sha256": "a03748b8d1954e997d3971a5b6597e9df5208d8f6c179cc73f37fa6ebed06bf4"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/store-guard/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "fb7776dc6bf17635a7ddd476e46e195fc23231ab19d1d4e1a03316da22b2afad"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "refusedDiversion"
+          ],
+          "error": null,
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "unsigned-false",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-false",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-false/result.json",
+            "bytes": 18128,
+            "sha256": "2d3ebd0b23a871b20dad7edf72bf913ac875d3ae197ce99fff457da7aa4af0ed"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-false/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "afa3d1bde51f6d4062c30804d34547d40e41d6f198d66f9d5a3ff535d4cd25ac"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        },
+        {
+          "case": "unsigned-true",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-true",
+            "mode": "supervise",
+            "noSign": true
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-true/result.json",
+            "bytes": 18122,
+            "sha256": "0f0cf9f52b9c0a4345ff10e078fab842e9f24f0f927d5518778a431be0a3008f"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-C2xuhJ/unsigned-true/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "8d581046d3eb210bf52b4f3a5c854657e882f3592c36abda1f02ce321e4d403a"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        }
+      ],
+      "evidenceFileCount": 42
+    },
+    {
+      "phase": "node22-candidate",
+      "raw": {
+        "path": "/private/tmp/p0-27-compat-node22-candidate-eight-20261015.json",
+        "bytes": 4150,
+        "sha256": "f22d67ed7bb896afbd65a5e451ba997f53a6b12049b02a7b5293ba8c75fdd945"
+      },
+      "counts": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "evidenceRoot": "/private/tmp/p0-27-session-evidence-petbBm",
+      "sameEightNames": [
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed supervise abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed sandbox abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=false",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=true",
+        "P0-27 actual assurance session and isolated unsigned evidence an owned first-row database fault rolls back session creation and permits a genuine sealed retry",
+        "P0-27 actual assurance session and isolated unsigned evidence an actual abort seal-update fault retains the original resolver error and reports the unsealed negative",
+        "P0-27 actual assurance session and isolated unsigned evidence the real abort helper returns the same error object and attaches the actual database failure",
+        "P0-27 actual assurance session and isolated unsigned evidence signed callers cannot divert evidence into the unsigned store"
+      ],
+      "caseWitnesses": [
+        {
+          "case": "first-row-fault",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "first-row-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/result.json",
+            "bytes": 2960,
+            "sha256": "5696a75cce86696e5758fe2e3c7c6830ff2019f5440ecf568a867e97512a6907"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/first-row-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "73baff5dea2ce6440b81ac607ecbfbda105834aafe675053e3203efdc73539d5"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "rollback",
+            "healthyRetry"
+          ],
+          "error": {
+            "name": "SqliteError",
+            "message": "P0_27_FIRST_ROW_FAULT",
+            "code": "SQLITE_CONSTRAINT_TRIGGER",
+            "reason": null,
+            "cause": null
+          },
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": true,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "seal-fault",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "seal-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/result.json",
+            "bytes": 9200,
+            "sha256": "f363e5ab3cbd17352e93af08227180ff496e633974a1585c802acdab2d6a1264"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "c0ab2d57b5cd5bf1f58c75601fd1c732b4ecc34d0b700595f7c8108eea6e9525"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "seal-helper-identity",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "seal-helper-identity",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/result.json",
+            "bytes": 9030,
+            "sha256": "a29a635dbd5f19adb33351f16578e264d919bdf1cd5082fbb6a6306f0759c130"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/seal-helper-identity/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "6c2a6ca24b7a5890eadb478804a1c2953b40259c5813da7e5f656b80accd00d3"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "originalObjectIdentityRetained",
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: owned unavailable fixture",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "owned unavailable fixture",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-sandbox",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox",
+            "mode": "sandbox",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/result.json",
+            "bytes": 19997,
+            "sha256": "552632f698acc0c286347011e8323d24ea6a57be56f3477a6766156b7dd34efc"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-sandbox/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "5d66469d65424eaacdd3c6067d2d70ba603903c263501d0c2811d0ad73cdc39f"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-supervise",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/result.json",
+            "bytes": 12764,
+            "sha256": "9255887c60cec80a1c2c7663f5651b788a5813c8f78c17f9bd35fee50045fcc5"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/signed-supervise/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "2c1955d06509d0be6dec7cd6ade005c040ccc5be540e960c1c9d63ba7b17373a"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "store-guard",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "store-guard",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/store-guard",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/result.json",
+            "bytes": 2954,
+            "sha256": "736ff3d1fcf19e8400926cf6a77318ef36282fe43c4d890aa26af2301d7e1caa"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/store-guard/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "e967e234a0b15d6bb4dd52e79b1c7ab2930b2b62173062cbb4984b21fa171811"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "refusedDiversion"
+          ],
+          "error": null,
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "unsigned-false",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/result.json",
+            "bytes": 18128,
+            "sha256": "4d42f816fb80493baaa578c92f72dcc541b5dc413fe98f7dd781a54eedee268d"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-false/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "d5c8afbd74ab3ff1c9c45625c344a0c269ecab81c82d041aad5acc5f79e9efeb"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        },
+        {
+          "case": "unsigned-true",
+          "request": {
+            "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true",
+            "mode": "supervise",
+            "noSign": true
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/result.json",
+            "bytes": 18122,
+            "sha256": "f149298a2dadbf36cfad53bbceeb26f4e1fd2f295d7c893cd2b56edb3cb163d4"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-petbBm/unsigned-true/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "d620a03074789a4ff7f1094e82fac7326e7307312fb9f3c01bc9c0b870545210"
+          },
+          "node": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        }
+      ],
+      "evidenceFileCount": 42
+    },
+    {
+      "phase": "node24-candidate",
+      "raw": {
+        "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-eight-cases.json",
+        "bytes": 4142,
+        "sha256": "f2813d1537f31868898344239659ce7fb451e3af22edd88b58fe8b8a7f1710ac"
+      },
+      "counts": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "evidenceRoot": "/private/tmp/p0-27-session-evidence-IvBpIP",
+      "sameEightNames": [
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed supervise abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed sandbox abort without a fabricated report",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=false",
+        "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=true",
+        "P0-27 actual assurance session and isolated unsigned evidence an owned first-row database fault rolls back session creation and permits a genuine sealed retry",
+        "P0-27 actual assurance session and isolated unsigned evidence an actual abort seal-update fault retains the original resolver error and reports the unsealed negative",
+        "P0-27 actual assurance session and isolated unsigned evidence the real abort helper returns the same error object and attaches the actual database failure",
+        "P0-27 actual assurance session and isolated unsigned evidence signed callers cannot divert evidence into the unsigned store"
+      ],
+      "caseWitnesses": [
+        {
+          "case": "first-row-fault",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "first-row-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/first-row-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/first-row-fault/result.json",
+            "bytes": 2947,
+            "sha256": "1c0d62d734550ccb4b673596c1a3a9e1bd1d20f0723ce3df2c9a8f2a9660d054"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/first-row-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "225ceb67468bd0220a0273118d34b59494d2eb6ad6ed6dbed181d0ec77c83a2b"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "rollback",
+            "healthyRetry"
+          ],
+          "error": {
+            "name": "SqliteError",
+            "message": "P0_27_FIRST_ROW_FAULT",
+            "code": "SQLITE_CONSTRAINT_TRIGGER",
+            "reason": null,
+            "cause": null
+          },
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": true,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "seal-fault",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "seal-fault",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-fault",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-fault/result.json",
+            "bytes": 9187,
+            "sha256": "cda109257c6f7ca2e2389d3ab7c7709dfeea73f25f080edba4eaa12bc878b85a"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-fault/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "2ea3cc8f5f51e94d7a2eb3cb5c4d28574a0d5c9d67f3fffd79752330ec4e6c23"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "seal-helper-identity",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "seal-helper-identity",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-helper-identity",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-helper-identity/result.json",
+            "bytes": 9017,
+            "sha256": "b51e35197fdc130e9d6826a4be76050f3f18b2de3ac0951894af354cf1fbfdfd"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-helper-identity/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "8b65f1a7947fa6544e02acdb2efea6fd565b3fbcd0074c387d88382ebb0495ad"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "originalObjectIdentityRetained",
+            "abort",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: owned unavailable fixture",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "owned unavailable fixture",
+            "cause": {
+              "name": "SqliteError",
+              "message": "P0_27_ABORT_SEAL_FAULT",
+              "code": "SQLITE_CONSTRAINT_TRIGGER",
+              "reason": null,
+              "cause": null
+            }
+          },
+          "wholeLedgerVerdict": false,
+          "chainVerdict": false,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-sandbox",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-sandbox",
+            "mode": "sandbox",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-sandbox/result.json",
+            "bytes": 19984,
+            "sha256": "509ab80e3d9cc9fa0a01fd179a4d32791a8f64a04c3699c678298028b113fc02"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-sandbox/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "395fe94545dc13d84e24d2384e50f1f3ab1746f2794b3ecf377e8603bfe4edc8"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "signed-supervise",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "signed-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-supervise",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-supervise/result.json",
+            "bytes": 12751,
+            "sha256": "61c30afc3da3cd8e4022476f4f358a5b0631170511f9153fc1424ef7484e45f7"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-supervise/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "9896252f3f032656f107fb51f022d2bb03a869ac4bfbf5e7e2cc59a404af1e13"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "abort",
+            "crypto",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": null,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "signed-or-missing-see-result"
+        },
+        {
+          "case": "store-guard",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "store-guard",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/store-guard",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/store-guard/result.json",
+            "bytes": 2941,
+            "sha256": "cae4cf7627d24a8726eef9b118bc6dbc81804878ccdea5967c9c36a11a6b45e3"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/store-guard/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "b39e8eade22c9eacb3b94181b4a4ea754ba1cbb427bbcbcf28261667945fb41b"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "refusedDiversion"
+          ],
+          "error": null,
+          "wholeLedgerVerdict": null,
+          "chainVerdict": null,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": null,
+          "sessionSeal": null
+        },
+        {
+          "case": "unsigned-false",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-false",
+            "mode": "supervise",
+            "noSign": false
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-false/result.json",
+            "bytes": 18115,
+            "sha256": "f86cf8d9e95b35e8f3ddf95206137c55d7d93fd54a31eb3fbc71b2c2f69095a5"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-false/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "dafafd53ab7bb14ad69d18e18fd28446c60fbaa8a1dd0f1b93c25eecea4b834c"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        },
+        {
+          "case": "unsigned-true",
+          "request": {
+            "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+            "caseName": "unsigned-abort",
+            "caseDir": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-true",
+            "mode": "supervise",
+            "noSign": true
+          },
+          "result": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-true/result.json",
+            "bytes": 18109,
+            "sha256": "3558e14822bbdb8c16ca454715ad03d16dc195a5b1e80112d8578600cf982974"
+          },
+          "beforePublicPin": {
+            "path": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-true/monitor-before-artifacts.json",
+            "bytes": 694,
+            "sha256": "34225bb9efc09d40bcf5ce2a651aeae966ce8e26cf3dfcdaff08fc25449eceef"
+          },
+          "node": "v24.21.0",
+          "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+          "success": true,
+          "providerCredentialKeysPresent": [],
+          "checks": [
+            "beforeOperational",
+            "signedStoreDuringUnsigned",
+            "unsigned",
+            "afterOperational",
+            "integrity"
+          ],
+          "error": {
+            "name": "AgentResponderUnavailableError",
+            "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "code": "AGENT_RESPONDER_UNAVAILABLE",
+            "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+            "cause": null
+          },
+          "wholeLedgerVerdict": true,
+          "chainVerdict": true,
+          "signedBytesAndRowsBoundaryEqual": true,
+          "rollbackRowsAndBlobBoundaryEqual": null,
+          "assuranceRuns": 0,
+          "sessionSeal": "unsigned"
+        }
+      ],
+      "evidenceFileCount": 42
+    }
+  ],
+  "candidateTotals": {
+    "executions": 16,
+    "passed": 16,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "uniqueCases": 8
+  },
+  "originalNode24GuardWitnesses": {
+    "parentRaw": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-unchanged-parent-guard.json",
+      "bytes": 3963,
+      "sha256": "8fc9dd5f32b2817e636f9d5f016c149944c8a263885b90a13c7f241ca9276cb4"
+    },
+    "parentCounts": {
+      "numTotalTests": 8,
+      "numPassedTests": 0,
+      "numFailedTests": 0,
+      "numPendingTests": 8,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 1
+    },
+    "parentSuiteFailure": "expected24 to be22 beforeAll; eight cases skipped/unexecuted.",
+    "child": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-original-child-guard/actual.json",
+      "bytes": 2081,
+      "sha256": "8e4fdda3a5b0157c0e47a677d9bd2c20b125fa96a11802dab82598a3818fac1e"
+    },
+    "childActualExit": 1,
+    "wrapperExit": 0,
+    "interpretation": "Wrapper exit0 means its expected-refusal observation completed; child exit1 occurs on24!==22 before product imports or fixture state. These are test-guard/infrastructure REDs, not SQLite or killed product mutations.",
+    "byteEqualOriginalEmittedHelperSHA256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3",
+    "childStateBeforeAfterEqual": true
+  },
+  "candidateEmittedHelper": {
+    "sha256": "a497a40b3403deb2a3ddb2e7ab2aed97261788a2c20dcb2f9e6ada3b5e7ae670",
+    "exactOneChildRuntimePredicateReplacementComparedToOriginal": true,
+    "sameBytesAcross22And24": true
+  },
+  "nativeIsolation": {
+    "node22Before": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-abi-before.json",
+      "bytes": 1142,
+      "sha256": "fe49d6f1f4e8a9a7b51ecaca56cc2b3ba64890eed12e54bc715af436f76910ce"
+    },
+    "node22Final": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-abi-final.json",
+      "bytes": 1142,
+      "sha256": "6ebe31d881ef901dd88923655641b4f0009d0bcc2dcdf3d481153caaf573d937"
+    },
+    "node24Before": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-native-abi-before.json",
+      "bytes": 1090,
+      "sha256": "818b87a30f0fbfd6fed84b02945461c2167a3267d08101d8a91add36e97ec793"
+    },
+    "node24After": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-native-after-runtime.json",
+      "bytes": 1090,
+      "sha256": "d004e297fc5e4d18e2af818ab0feb66d37a105d30991fae98710fabbd75b341b"
+    },
+    "abis": {
+      "Node22": "127",
+      "Node24": "137"
+    },
+    "genuineRecordedSelect1": {
+      "Node22": 1,
+      "Node24": 1
+    },
+    "node22SHA256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "node24SHA256": "c6fac315df023cf5efec45a3511e6515c6b0f7461a4a284b1b7a79c7ef8febe7",
+    "distinctActualDeviceInodePairs": true,
+    "bothActualLinkCounts": 1,
+    "bothActualFileBytesRehashedMatchOriginal": true,
+    "allNineProtectedNode22Rechecks": [
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-baseline-build.json",
+          "bytes": 408,
+          "sha256": "4b85dfe54dd0b4020e5a81ee6118f606a309fb1c1861454da32f309a3446a775"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-build.json",
+          "bytes": 470,
+          "sha256": "c2318dee8074e91e9184d65fd361c581c81905ad0fe39aa4ef85e21338d1874e"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-checkout.json",
+          "bytes": 424,
+          "sha256": "16b1446b3cbdeffcb924dfb2ac335c3f64c9552c35e7c54bfe77732657491629"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-native.json",
+          "bytes": 471,
+          "sha256": "4a279cdef5df6efbfbeadf07034740cd72526f968567cafc1e98ed525349e5f2"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-clone.json",
+          "bytes": 399,
+          "sha256": "7c01ac9af6aa3155d79b298ac99a7765698e4cc5a26c039a302889c369bc4c40"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-eight-cases.json",
+          "bytes": 466,
+          "sha256": "507cb0d1d00bd8f52aaf5634ff457904a8ca23d59bb200d8be155e402fe4c9c2"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-final-native.json",
+          "bytes": 467,
+          "sha256": "5079869988c14e5ba9627e5f0234fb2f465a25d76a74ad7d7537a2a6255ae17c"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-guards.json",
+          "bytes": 426,
+          "sha256": "e6f430c0bfb92413046f422953ffb31814569b9925eed165dcc9aa2a06c05c1b"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-install-and-smoke.json",
+          "bytes": 457,
+          "sha256": "ba184eb75c5fbb8b7e1948a26f841c7c46687cddeadb6418a1d1c0f9c0048e4e"
+        },
+        "matchesOriginal": true,
+        "native": {
+          "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537153698,
+          "links": 1,
+          "bytes": 1931552
+        }
+      }
+    ]
+  },
+  "writerPackage": {
+    "json": {
+      "path": "/private/tmp/p0-27-node24-runtime-compatibility-qualification-20261015.json",
+      "bytes": 27136,
+      "sha256": "b0eee97222ed2382dffa1d089be1b6633ed368e3f964a7c1b44d360dd7b48a47"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-27-node24-runtime-compatibility-qualification-20261015.md",
+      "bytes": 3331,
+      "sha256": "4306b0bfaa0e60f2bf366934d1bef0a41e9158672f927ec87ddb7b91c93c9228"
+    },
+    "artifactIndex": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-qualification-artifact-index.json",
+      "sha256": "78817445e497638102ba7105ef3e8a3943a112d8e11a8bc6c72d9f36cc63d4a4",
+      "count": 87
+    },
+    "all87ArtifactReferenceHashesAndSizesVerified": true,
+    "node22OriginalIndex": {
+      "path": "/private/tmp/p0-27-compat-node22-baseline-artifact-index-20261015.json",
+      "bytes": 8854,
+      "sha256": "46b9f2c509f07671f3b90bea324caeeedd577e567d7c4aac4094d6519e1e650e"
+    },
+    "node22CandidateIndex": {
+      "path": "/private/tmp/p0-27-compat-node22-candidate-artifact-index-20261015.json",
+      "bytes": 8854,
+      "sha256": "5c4be66a477511227b762a24b5792050163f60d30daac372dd1f073be7a5b21e"
+    },
+    "both42FileIndicesVerified": true
+  },
+  "node24Conservation": {
+    "before": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-before-runtime-pins.json",
+      "bytes": 1424307,
+      "sha256": "4df55e881f34d90e55059a2b1d6d7762a11da1a42c0e4c913c7621dc87b4f8e0"
+    },
+    "after": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-after-runtime-pins.json",
+      "bytes": 1424464,
+      "sha256": "117b6b18ab13ae22087c7bf4ce4a632ef1780c03bbc35378cfc4192b521b1132"
+    },
+    "all7737TrackedHashesAnd4529CompiledHashesBeforeAfterEqual": true,
+    "all7737TrackedAnd4529CompiledCurrentFilesIndependentlyRehashedMatch": true,
+    "seventeenProtectedSourceConfigLockWorkflowPinsEqualOriginalBase": true
+  },
+  "rootFinalSummary": {
+    "path": "/private/tmp/p0-27-runtime-compatibility-final-bounded-summary-20261015.json",
+    "bytes": 2105,
+    "sha256": "0d79cf920490d20fac8f5609c4ff831cd4255be338eb7fccc17180bd26987080"
+  },
+  "rootNormalChecks": "Root reports ordinary production/test types, lint, freeze, architecture, counts, docs, API reference and clean source pass at75cb. This review does not execute or substitute those commands.",
+  "sourceQuality": {
+    "candidateActualDuplicates": 1269,
+    "candidateActualDeadCode": 2774,
+    "result": "failed",
+    "priorF10ContextDeadCode": 2779,
+    "interpretation": "Fresh dependency contexts give different actual Knip findings. The five-finding count decline is not credited to the two runtime guards, accepted as remediation or waived; root retains full findings from both contexts."
+  },
+  "reviewObserverHistory": "Two initial read-only metadata traversals assumed one uniform recheck JSON shape and stopped on missing matchesBefore/modulesAbi keys. The two actual schemas were then explicitly inspected; all nine receipts, native fields and true matchesBefore/matchesBaseline values were independently checked. These reviewer script errors are not test/runtime failures or mutation kills.",
+  "limits": [
+    "The signed and unsigned aborts use real keyless offline resolver refusal, true signatures/seals under public keys pinned before the artifacts, literalunsigned rows/store, byte/row preservation and genuine owned SQLite trigger faults. The constructed helper-identity exception is a narrow object-identity control, not a provider result.",
+    "Seal-fault verdictfalse/missing seal remains negative on both runtimes; original error and actual SQLite cause stay explicit. First-row rollback remains a direct helper control, not proof of full runner pre-try resource cleanup.",
+    "The unsigned signed-store byte boundary is captured before later signed reads can coordinate WAL/SHM. Later operational/control/cleanup effects are separate; no entire-lifecycle no-effects, universal race or cross-context DB-stability guarantee follows.",
+    "Only native objects and public receipt/snapshot hashes were independently read. Actual crypto and product assertions were executed by the retained original/candidate tests; this reviewer invoked no product runtime, tests, builds, installs, guards, app actions or source edits.",
+    "All selected cases passed on local Darwin Node22.23.3/Node24.21.0. This does not establish full Node24/platform compatibility, hostedCI, wholeP0-27/fullsuite/coverage/release/G0/Done, live models or regulatory behavior.",
+    "Current source-quality failures and inherited source contracts remain open. P0-19 seal-order source proposal remains unapplied/unapproved; no nextP0-24 work, primary/Claude/source overlay, paused-source resumption or artifact-history rewrite occurred."
+  ]
+}

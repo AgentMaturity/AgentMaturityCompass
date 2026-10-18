@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T19:01:53.491982+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceClean": true,
+  "ordinaryCommit": true,
+  "originalRecord": {
+    "path": "/private/tmp/p1-25-time-qualification-20261016/source-commit.json",
+    "bytes": 1373,
+    "sha256": "f217c4a162e276dd6f9174e5d83070cc3d1061d8899706d8e16bf2bf841e8348"
+  },
+  "noForceOrNoVerify": true,
+  "PRPushMergeRelease": false,
+  "fullIssueDone": false
+}

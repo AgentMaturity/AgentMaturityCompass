@@ -1,0 +1,164 @@
+{
+  "schema": "p124-fresh-canonical-independent-audit/1",
+  "recordedUtc": "2026-10-16T10:20:34.220810+00:00",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "tests": {
+    "total": 109,
+    "passed": 109,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "uniqueFileFullNamePairs": 109,
+    "files": 7,
+    "existing": 31,
+    "newImporterDshPi": 37,
+    "gateway": 41,
+    "exactIdentityStatusMatchPriorWorkingRun": true,
+    "countingBoundary": "Fresh repeat of the same 109 cases, not 109 additional unique tests."
+  },
+  "rawObserver": {
+    "identitiesStatusesMultiplicitiesMatch": true,
+    "actualFilePathsAllQ": true,
+    "tasks": 124,
+    "recordedHooks": 28,
+    "allStatesHooksPassed": true,
+    "taskErrors": 0,
+    "unhandledErrors": 0,
+    "snapshotTotal": 0,
+    "latePatternsMatched": []
+  },
+  "command": {
+    "exit": 0,
+    "durationMs": 5694,
+    "pidPgid": 33922,
+    "observerPidMatches": true,
+    "positiveGroupESRCHerrno": 3,
+    "signalsOtherThanZeroSent": false,
+    "pins": [
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/command.json",
+        "bytes": 3148,
+        "sha256": "ae07e1bef3b4e16dda57ee1a3b21fa94324ec8898741b772be89faae997ec248"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/owned-process.json",
+        "bytes": 1045,
+        "sha256": "ab1fa1dc610b993ae8b10d4efa0f568201b731b91fa6d2965f534587064027f9"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "bbff02b0e0988c3ab5762079198829f50ad97ce221dbca45127143e4db862fbd"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/raw.json",
+        "bytes": 42327,
+        "sha256": "9b31d62cbbd3692625788e59ca649fdc6b202ec0ad26d699a1ba3ead00216c6a"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/observer.json",
+        "bytes": 56211,
+        "sha256": "9e1657efd67a2f171e5a39f99f8e37414ea333b4f2fa6b9419d9535a72aa5022"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/stdout-stderr.log",
+        "bytes": 3384,
+        "sha256": "52edf685199537ea566803159630113cad7334081337e3896360483b72a387c1"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/p124-fresh-canonical.raw.json",
+        "bytes": 42327,
+        "sha256": "9b31d62cbbd3692625788e59ca649fdc6b202ec0ad26d699a1ba3ead00216c6a"
+      }
+    ]
+  },
+  "freshness": {
+    "physicalQ": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+    "preMutationBinding": {
+      "path": "/private/tmp/p1-24-qualification-20261016/fresh-source-binding.json",
+      "bytes": 16233,
+      "sha256": "55c4855511c5f64907090ca2bf2994c2d17f2ada66e6d3d7615306c1acf3c729"
+    },
+    "bindingCapturedUtc": "2026-10-16T10:16:25.949091+00:00",
+    "scopedPins": 40,
+    "singleLinkScopedBaselineFiles": true,
+    "nativeQ": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542078588,
+      "nlink": 1
+    },
+    "nativeR": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "borrowedRunner": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "currentQCleanClaim": false,
+    "boundary": "The immutable binding predates mutation phases. This audit does not describe the active/current Q source as clean."
+  },
+  "publicProof": {
+    "pin": {
+      "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/public-proof.json",
+      "bytes": 15556,
+      "sha256": "edf9cb731a5a56b58119c0d9ab5d7017b825bf31175bfa85c28c086c049a1683"
+    },
+    "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF",
+    "actualSourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+    "children": [
+      [
+        "init",
+        33930,
+        0
+      ],
+      [
+        "http",
+        33964,
+        0
+      ],
+      [
+        "read",
+        33965,
+        0
+      ]
+    ],
+    "captures": 6,
+    "selectedBuildNodeNativePins": 15,
+    "forwards": 2,
+    "refusals": 3,
+    "upstreamCapturedBodiesBeforeAfterRefusals": [
+      2,
+      2
+    ],
+    "independentEd25519Checks": 5,
+    "allValid": true,
+    "successSecretRootsAbsent": true
+  },
+  "limits": [
+    "Whole source was freshly cloned/installed/built by clean-source; the test runner and outer CWD are borrowed R. Actual seven tests and HTTP worker modules resolve to Q/Q-dist.",
+    "Successful importer/field workspace and vault roots were removed after cleanup. Passing assertions and retained public observations are evidence, not an independently retained SQLite/vault snapshot.",
+    "Independent config/refusal-hash/seal signatures supplement the actual cold product chain/governance/payload verifier; they do not replace full independent ledger canonicalization.",
+    "Synthetic import fixtures and source-reported delivery counts do not establish real DSH v4 support or deployment-wide zero upload. Pi/generic source revisions remain null.",
+    "This canonical pass does not establish causal controls, final restoration, global/full-suite/coverage, hosted/Node24/release/Done or legal/expert truth. Separate closed control audit follows. F37 remains skipped."
+  ],
+  "amcRuntimePerformedByReviewer": false,
+  "offlineNodeBuiltinCryptoPerformed": true,
+  "sqlPerformedByReviewer": false,
+  "repositoryOrQWrites": false
+}

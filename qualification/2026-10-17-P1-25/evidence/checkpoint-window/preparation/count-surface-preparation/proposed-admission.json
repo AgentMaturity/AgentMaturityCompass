@@ -1,0 +1,766 @@
+{
+  "schema": "p125-checkpoint-private-generated-count-scope-proposal/1",
+  "at": "2026-10-16T23:28:45.135771+00:00",
+  "state": "UNEXECUTED_PROPOSAL_ROOT_SOLE_GENERATOR_WRITER",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headAtObservation": "3468e29027c32209a5f794b7ffea3f1565de490e",
+    "branchAtObservation": "codex/p1-25-checkpoint-qualification",
+    "statusAtObservation": " M tests/time/tsaGrant.test.ts\n?? tests/time/checkpointWindow.test.ts\n?? tests/time/tsaTestFixture.ts\n",
+    "indexEmpty": true,
+    "snapshotOnlyNotContinuousClaim": true
+  },
+  "actualCountRed": null,
+  "actualCountRedBoundary": "Root must bind its own actual closed count failure before separate count admission. This author ran no count/generator/product command.",
+  "expectedInventory": {
+    "publishedBefore": 1694,
+    "prospectiveAfter": 1695,
+    "onlyNewCountedFile": "tests/time/checkpointWindow.test.ts",
+    "helperNotCounted": "tests/time/tsaTestFixture.ts does not end .test.ts",
+    "existingGrantStillOneTestSourceFile": "tests/time/tsaGrant.test.ts",
+    "generatorExecutedHere": false,
+    "sourceInventoryNotRuntimeCaseOrPassTotal": true
+  },
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+    "bytes": 9141,
+    "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+  },
+  "generatorFullSourceReadButNotExecuted": true,
+  "candidateDelta": {
+    "paths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "pathCount": 10,
+    "formattedSpans": 14,
+    "encodedBadgeSpans": 1,
+    "totalNumericSpans": 15,
+    "allCurrentBeforePinsMatchB36GeneratedActualAfterAndGit188And3468": true,
+    "surfaces": [
+      {
+        "relativePath": "README.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 59828,
+            "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 59828,
+            "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "encoded-badge",
+            "line": 17,
+            "byteStart": 1345,
+            "byteEnd": 1352,
+            "before": "1%2C694",
+            "anticipatedAfter": "1%2C695"
+          },
+          {
+            "kind": "marker-testFiles",
+            "line": 918,
+            "byteStart": 58651,
+            "byteEnd": 58656,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 59828,
+          "sha256": "7b19c2b09835977976c5a6f38abff99cbc9b522fdce72dcda45c2c5fef2870e4"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+              "bytes": 62243,
+              "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+              "bytes": 59828,
+              "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 16220,
+            "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 16220,
+            "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "marker-testFiles",
+            "line": 54,
+            "byteStart": 1886,
+            "byteEnd": 1891,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 16220,
+          "sha256": "a00544afa8dc3271694fed5a7fa6fbf62ec693d5bf2f2053dd00ee94e3a9812e"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+              "bytes": 19504,
+              "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+              "bytes": 16220,
+              "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/index.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 43520,
+            "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 43520,
+            "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "website-stat",
+            "line": 90,
+            "byteStart": 5872,
+            "byteEnd": 5877,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 43520,
+          "sha256": "b1edca14e7b3c0bae53edff70220be007ef5715f1d46d673749517a9cd85b61d"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+              "bytes": 44023,
+              "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+              "bytes": 43520,
+              "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/lite.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 11197,
+            "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 11197,
+            "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "lite-stat",
+            "line": 74,
+            "byteStart": 4426,
+            "byteEnd": 4431,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 11197,
+          "sha256": "04b882a274579841f767133444091f1bd08daf2db03658a5b7ddcb735c156d20"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+              "bytes": 11197,
+              "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+              "bytes": 11197,
+              "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 44169,
+            "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 44169,
+            "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 17,
+            "byteStart": 789,
+            "byteEnd": 794,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 44169,
+          "sha256": "fda86f006536cb6d6a7d0d7e3cd66fb674dda79a91e0bac8ebc49ba7866e0506"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 1951,
+            "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 1951,
+            "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 33,
+            "byteStart": 1734,
+            "byteEnd": 1739,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 1951,
+          "sha256": "89a709d6036d058230884aad46870641a8cb0e55f06828e2d0d3b6df454518ad"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 3075,
+            "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 3075,
+            "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 25,
+            "byteStart": 1341,
+            "byteEnd": 1346,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 49,
+            "byteStart": 2892,
+            "byteEnd": 2897,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3075,
+          "sha256": "38d8774b93f149f2e697bccc9ff854e941e16d8dab17e4612bc1b21bf008d444"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 3880,
+            "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 3880,
+            "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 57,
+            "byteStart": 2871,
+            "byteEnd": 2876,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3880,
+          "sha256": "73076d52e089b9ae7926e5561fd8742be150f295e026f34af07c174a1f9441a2"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 2489,
+            "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 2489,
+            "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 6,
+            "byteStart": 206,
+            "byteEnd": 211,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 2489,
+          "sha256": "a884b11cb23d6eb12ae12a261fa40c4b8f21df1c3e71b60a6e01dde6cbc05ff7"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+        },
+        "matchesB36ActualAfter": true,
+        "git188And3468Exact": [
+          {
+            "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+            "bytes": 107509,
+            "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+          },
+          {
+            "commit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+            "bytes": 107509,
+            "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+          }
+        ],
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 22,
+            "byteStart": 3964,
+            "byteEnd": 3969,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 415,
+            "byteStart": 42275,
+            "byteEnd": 42280,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 423,
+            "byteStart": 42797,
+            "byteEnd": 42802,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 873,
+            "byteStart": 88911,
+            "byteEnd": 88916,
+            "before": "1,694",
+            "anticipatedAfter": "1,695"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 107509,
+          "sha256": "b6fe791cc31d705fc0d4121f95456d5f8ccdf5f25f6276948d5d7354f610b39d"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 108101,
+              "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 107509,
+              "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+            },
+            "matchesPreservedB36Variant": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      }
+    ],
+    "allOtherAuthoredBytesExactInCandidate": true,
+    "prospectiveHashesSupplyNoGeneratedOutputCredit": true
+  },
+  "ownership": {
+    "knownPhysicalRoots": 184,
+    "countFilePins": 1840,
+    "targetedStatusesNatural0": 184,
+    "distinctKnownAllRefFullHistoryAuthoritiesNatural0": 17,
+    "all228ReadOnlyGitCommandsNatural0": true,
+    "sourceChangesOnlyAdmittedThreeTestPathsOutsideCountScope": true,
+    "nonemptyCountStatuses": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "status": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n"
+      }
+    ],
+    "prior183CountDeltasOnlyTenOwnQualifiedB36Advances": true,
+    "all20ClaudeRVariantsExactReadOnlyNotReplacementInputs": true,
+    "all36HeldExact": true,
+    "initialProtected142RetainedAsHistorical": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/protected-inputs.json",
+      "bytes": 68779,
+      "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca"
+    },
+    "other141PinsByteExact": true,
+    "soleExpectedOwnGrantSuccessor": {
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 27505,
+        "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+        "dev": 16777231,
+        "inode": 543583997,
+        "nlink": 1
+      },
+      "actual": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 2964,
+        "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+      },
+      "exact": false
+    },
+    "actualThreeSourceFilesMatchReviewedCandidates": [
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+          "bytes": 24968,
+          "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663"
+        },
+        "reviewedCandidate": {
+          "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaTestFixture.ts.source.txt",
+          "bytes": 24968,
+          "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663"
+        }
+      },
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        },
+        "reviewedCandidate": {
+          "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        }
+      },
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+          "bytes": 2964,
+          "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+        },
+        "reviewedCandidate": {
+          "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaGrant.test.ts.source.txt",
+          "bytes": 2964,
+          "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+        }
+      }
+    ],
+    "native9RegularDistinctSingleLinkByteAndPhysicalPinsExact": true,
+    "heldR18HeadIndexExact": true,
+    "noOwnershipReleased": true
+  },
+  "readClosure": {
+    "primaryToolInitialSessionId": 11306,
+    "explicitWaitNaturalExit": 0,
+    "fullToolResults": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/read-tool-results.json",
+      "bytes": 30443,
+      "sha256": "f4011a51d82c9248fc12c23dacca147932b81f212f138f5a3ff56635e5d03004"
+    },
+    "fullReadObservations": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/closed-read-observations.json",
+      "bytes": 7718679,
+      "sha256": "af8fe29de44f24cb8cb7385b6cbf11a209d2f42b0784dc8df83fecaf7ea1c416"
+    },
+    "filePresenceNotUsedAsClosure": true,
+    "failedFilenameLookupExcluded": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/lookup-limitation.json",
+      "bytes": 458,
+      "sha256": "79cff381b0d18ef0e96477189084d8cacf4c0e4d82eee3056506c8bcfd95e3e9"
+    },
+    "noUnknownOldScanUsed": true
+  },
+  "receiptCopyBoundary": "Only compact proposal/review/pins may be selected. Raw private-originals and large closed-read observations remain private; do not relocate or encode ignored historical bytes.",
+  "rootAdmissionStillRequired": [
+    "Actual closed count RED",
+    "Current hosted/D15/freeze and exact separate count-scope admission",
+    "Unchanged ordinary generator only",
+    "Actual output must match exactly these15spans/10files and ordinary count check afterward"
+  ],
+  "missingReservationProbeSearchRecreation": false,
+  "sourceGeneratorHelperCompilerTestProductNativeSqlOpenSslKeysStreamsOrProcessProbesExecuted": false,
+  "sourceIndexQaWrites": false,
+  "allHoldsQualityF37AndClaudeOwnershipRetained": true
+}

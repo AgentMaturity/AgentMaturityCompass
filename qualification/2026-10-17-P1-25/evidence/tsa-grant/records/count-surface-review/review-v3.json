@@ -1,0 +1,51 @@
+{
+  "schema": "p125g-count-surface-independent-closed-read-review/1",
+  "at": "2026-10-16T22:52:21.871684+00:00",
+  "sourceHead": "da61205c0817267133451bac11e57bd0318fe44f",
+  "branch": "codex/p1-25-grant-qualification",
+  "blockers": [],
+  "allReadsFinished": true,
+  "pathCount": 10,
+  "numericSpans": 15,
+  "formattedSpans": 14,
+  "encodedBadgeSpans": 1,
+  "actualCountRed": null,
+  "prospectiveInventory": [
+    1693,
+    1694
+  ],
+  "allTenBeforeMatchB35ActualAfterAndGitD8Da612": true,
+  "allOtherAuthoredBytesExactInCandidate": true,
+  "all1830CurrentPinsRead": true,
+  "all183TargetedStatusReadsHaveActualExit0": true,
+  "distinct16FullHistoryAuthorityReadsHaveActualExit0": true,
+  "prior182DeltasOnlyTenQualifiedSCountAdvances": true,
+  "allTwentyVariants36Held135ProtectedEightNativeAndR18Exact": true,
+  "current897Packet896Artifacts110Commands1137PinsExact": true,
+  "sourceStatusOnlyExactAdmittedNewGrantTest": true,
+  "nonemptyCountScopeStatusRoots": [
+    {
+      "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "status": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n"
+    }
+  ],
+  "lostScanAndItsV1V2SealsExcluded": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/lost-session-limitation.json",
+    "bytes": 1243,
+    "sha256": "200805ac3c855952a4406bc52815f26b63c7fa7d80ac9fa3c224af2c17e6e561"
+  },
+  "preferredProposal": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/proposed-admission-v3.json",
+    "bytes": 21007,
+    "sha256": "61605cf3a30deb76d77ce510f490b82f284735b8665057bba7c18378482cce47"
+  },
+  "currentIndependentReadEvidence": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/closed-read-observations.json",
+    "bytes": 3325962,
+    "sha256": "f64caecb76f1e6d60c868a95522346a469d04369cc4432c5daa84f3f1060d25e"
+  },
+  "sourceGeneratorRuntimeNativeSqlQaExecution": false,
+  "sourceIndexQaWrites": false,
+  "rootNext": "Actual closed count evidence, current hosted/D15/freeze and exact root count admission must precede the unchanged generator. Actual output must match only fifteen spans across ten files. Prospective hashes do not establish any generated or runtime result.",
+  "allHoldsAndF37Retained": true
+}

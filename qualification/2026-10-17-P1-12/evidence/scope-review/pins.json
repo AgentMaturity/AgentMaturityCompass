@@ -1,0 +1,52 @@
+{
+  "schema": "p112-initial-scope-refresh-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+      "bytes": 1289,
+      "sha256": "e87884b5c0498b03dfdbd94451c4a06ab30d7a5edae2c1c66cd4d2f94bb0e8fc"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+      "bytes": 5801,
+      "sha256": "09e92c155ab416a35edaf58c930dcb931c7c7c0c9efddb2405a090b4471360ad"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/observations.json",
+      "bytes": 1233815,
+      "sha256": "49e2e38a2676fb4dd1fefc9b6809f4721b4f7f98b74ba0f334c6797ed8408ac1"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+      "bytes": 10189,
+      "sha256": "dd4767117dd66c42658ef10ac5ab0c6b9d5d44b1903021886407efb451d40525"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/observations.json",
+      "bytes": 1227405,
+      "sha256": "d7a8621abc6d4ae7c501353f99e89911df5213d43d3e5363a82547344f219e34"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/preserved-metadata.json",
+      "bytes": 1027,
+      "sha256": "1f34fa5e60d942dcbe5545ae697fa167138577840e5796ab797fc45582ae4b49"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1645,
+      "sha256": "8024bb26c9af2319e1dbdd99830cade2815fbe24165dd8d58ae98364fdda8d1c"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/review.json",
+      "bytes": 5374,
+      "sha256": "d1ceaea72459512a560e79e4c9e406a94a3c17b3cdad564b0ab1c5d89548fb4a"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/README.md",
+      "bytes": 1774,
+      "sha256": "e01df2c5ccc1e24dd33f046906c59acf38f13ba1a8a2eb9a725091e41b3253da"
+    }
+  ]
+}

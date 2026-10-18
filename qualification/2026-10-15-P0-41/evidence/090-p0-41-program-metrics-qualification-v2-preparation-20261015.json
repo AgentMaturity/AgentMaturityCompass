@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "kind": "NEW_PRIVATE_FIXTURE_V2_PREPARATION_ONLY",
+  "decision": "ONE_FIXTURE_PRECONDITION_CORRECTION_READY_FOR_INDEPENDENT_REVIEW",
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizedByThisNote": false,
+  "candidate": {
+    "path": "/private/tmp/p0-41-program-metrics-qualification-v2-prepared.test.ts",
+    "bytes": 38030,
+    "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+  },
+  "futureRelativePath": "tests/p041ProgramMetricsQualification.test.ts",
+  "futureOwnedNamespace": "/private/tmp/p0-41-causal-qualification-v2-20261015",
+  "preservedV1": [
+    {
+      "path": "/private/tmp/p0-41-program-metrics-qualification-prepared.test.ts",
+      "bytes": 37984,
+      "sha256": "98ed903d584d706f08323abbd4b584350f5c5a8dd18587dca93ee5ea178049f0"
+    },
+    {
+      "path": "/private/tmp/p0-41-program-metrics-qualification-preparation-20261015.json",
+      "bytes": 15654,
+      "sha256": "2418e9c90d9ce911e250eeecf4a525c19fd6be60d84c1ffa3da385e6c3577d59"
+    }
+  ],
+  "exactChange": {
+    "occurrences": 1,
+    "before": "expect(absent.error).toBeNull(); expect(absent.signal).toBeNull(); expect(absent.status).toBe(128);",
+    "after": "expect(absent.error).toBeNull(); expect(absent.signal).toBeNull(); expect(absent.status).toBeTypeOf(\"number\"); expect(absent.status).not.toBe(0);",
+    "scope": "Only the Q12d native Git absence precondition. All bytes outside that exact anchor are unchanged.",
+    "justification": "The actual retained native git cat-file -e child returned1 with no error/signal. An absent object requires nonzero status;128 is not the contract. A numeric nonzero expectation rejects null andzero while retaining exact following product CLI refusal andallotheroracles.",
+    "sourceCorrection": false,
+    "generalOracleRelaxation": false
+  },
+  "actualV1Observation": {
+    "source": "Finished, halted v1 baseline records only; no rerun or Git command by this author.",
+    "baseline": {
+      "registered": 27,
+      "passed": 26,
+      "failed": 1,
+      "pending": 0
+    },
+    "failure": "Q12d AssertionError expected1to128 at508:94; fixture precondition failed.",
+    "gitChild": {
+      "pid": 29008,
+      "status": 1,
+      "signal": null,
+      "error": null,
+      "argv": [
+        "git",
+        "cat-file",
+        "-e",
+        "ffffffffffffffffffffffffffffffffffffffff"
+      ]
+    },
+    "productRefusalMasked": "Q12d following program-metrics CLI invocation was not executed because the native Git status assertion failed first. Retained Q12d command intents contain no script invocation. No product bug/fix or thatproductnegative result is inferred.",
+    "controller": "Root reports HALTED before any mutant. Finished command PID/PGID28685 exited1 with positiveESRCH andno nonzero signals. Originalnamespace/markers remain untouched.",
+    "pins": [
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/command.json",
+        "bytes": 1946,
+        "sha256": "2ed1434820f0b46922b0178b2fc4763687e5f43c88f99fc0b9ebd3c57686ff56"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/owned-process.json",
+        "bytes": 1579,
+        "sha256": "347cff59c89811358a77d830e5960065cf6276ae86608b473ef443308d26ba5f"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/raw.json",
+        "bytes": 12603,
+        "sha256": "5da72813fddc2bdaf25d302039c3636e5e1483d4cb7e93a0a15a917f7cce4ed8"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/observer.json",
+        "bytes": 16517,
+        "sha256": "45a01aff62979aadc60fed5f31672957388af36ec92a2f268492c91c9c838260"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline/Q12-nonexistent-p041-G2yz2k/evidence/012/result.json",
+        "bytes": 351,
+        "sha256": "79fedfc93aa8495cd7ecb12847f30bdce9316b442db72c763c9adf45577ba3f6"
+      }
+    ],
+    "markersPreserved": [
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/ACTIVE",
+        "bytes": 216,
+        "sha256": "cc2aae4fe4d385e01c1ee1ff890236aeba50e04ac7069e05b4ccf67569f3fcea"
+      },
+      {
+        "path": "/private/tmp/p0-41-causal-qualification-20261015/HALTED.json",
+        "bytes": 288,
+        "sha256": "86bdfab8265284d92a659a8a50a9f9348698be2941a52b81d5761db77d8b5f11"
+      }
+    ]
+  },
+  "staticPreservation": {
+    "method": "Text replacement andbyte inverse equality only; no parser/import/typecheck/collection.",
+    "literalDefinitions": 27,
+    "namesUnchanged": true,
+    "q2FirstAssertion": "expect(missing.value).toBeNull()",
+    "q6aFirstAssertion": "expect(empty.value).toBeNull()",
+    "sameExactProductRefusal": "refusal(cli(owned, [\"--json\"]), CLOSED_ERROR) remains immediately after the absence precondition.",
+    "unchanged": "Direct .mjs import, allhelpers/inputs/fixtures/Gitargv/envkeys/retention/file-backedstreams/testnames andallremainingassertions are byte-exact; no deadlines/config/guard/product/source change."
+  },
+  "artifactContract": "Same as v1 preparation note: optional AMC_P041_QUALIFICATION_ARTIFACT_ROOT; later qualification must supply a fresh existing root outside source. Allowned Git roots andwx streams/snapshots remain retained; no environment values serialized.",
+  "requiredBeforeExecution": [
+    "Independent v2 fixture/import/type/code review.",
+    "Separately reviewed fresh C2 setup/controller withnew exact sourcehash andfixtureidentities; retain v1 ACTIVE/HALTED evidence.",
+    "Explicit root runtime release. No survivor/kill/pass prediction orautomatic retry follows thisnote."
+  ],
+  "performed": {
+    "onlyNewV2CandidateAndNoteWritten": true,
+    "productOrTestRuntime": false,
+    "parserSyntaxTypecheckCollection": false,
+    "gitCommands": false,
+    "setupCopyControllerMutation": false,
+    "sourceConfigGuardOrV1Edits": false,
+    "network": false
+  },
+  "allReadsFinished": true
+}

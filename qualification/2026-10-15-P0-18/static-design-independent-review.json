@@ -1,0 +1,681 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-14T22:49:37.310Z",
+  "mode": "READ_ONLY_STATIC_DESIGN_REVIEW",
+  "workspace": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+  "measuredSource": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "branch": "codex/p0-18-current-qualification",
+  "statusAtCapture": "",
+  "conclusion": "No blocking contradiction in the 14-case design. Three fixture/nonvacuity requirements need the bounded handling below. This is not actual runtime qualification or whole P0-18 acceptance.",
+  "designInputs": [
+    {
+      "path": "/private/tmp/p0-18-qualification-design-20261015.json",
+      "bytes": 35386,
+      "sha256": "efa36c86f2c6ca2343e0333d66585dfe1eecdc72c0dc33ca308575737c9074cb"
+    },
+    {
+      "path": "/private/tmp/p0-18-qualification-design-20261015.md",
+      "bytes": 5385,
+      "sha256": "0a010cbc398c99aa478a68a220d52a02ac7bf2017bfd55260b1a8eb1923a73a1"
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "designSha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "relativePath": "src/trust/trustList.ts",
+      "designSha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "relativePath": "src/trust/trustContext.ts",
+      "designSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "relativePath": "src/trust/admission.ts",
+      "designSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "relativePath": "src/trust/keyPurposes.ts",
+      "designSha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "relativePath": "src/crypto/keys.ts",
+      "designSha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "relativePath": "src/utils/json.ts",
+      "designSha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "relativePath": "src/ledger/ledger.ts",
+      "designSha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "relativePath": "src/ledger/ledgerConnection.ts",
+      "designSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+      "relativePath": "src/ledger/trustTierValidation.ts",
+      "designSha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+      "relativePath": "src/ingest/ingest.ts",
+      "designSha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+      "relativePath": "src/eval/evalImporters.ts",
+      "designSha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+      "relativePath": "src/eval/evalCli.ts",
+      "designSha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+      "relativePath": "src/dogfood/maturityEvidence.ts",
+      "designSha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+      "bytes": 4710,
+      "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "relativePath": "src/credentials/credentialsPaths.ts",
+      "designSha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+      "bytes": 17646,
+      "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+      "relativePath": "tests/claims/evidenceProvenance.test.ts",
+      "designSha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+      "bytes": 5728,
+      "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+      "relativePath": "tests/evalImportTrust.test.ts",
+      "designSha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+      "bytes": 15700,
+      "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+      "relativePath": "tests/ingestAttestation.test.ts",
+      "designSha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+      "bytes": 5739,
+      "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+      "relativePath": "tests/trustTierWriteGuard.test.ts",
+      "designSha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+      "bytes": 4544,
+      "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+      "relativePath": "tests/dogfoodMaturityEvidence.test.ts",
+      "designSha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+      "relativePath": "tests/externalEvidenceProfile.test.ts",
+      "designSha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+      "relativePath": "tests/externalEvidenceExport.test.ts",
+      "designSha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+      "matchesDesign": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "relativePath": "tests/compliance/evidenceBinding.test.ts",
+      "designSha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "matchesDesign": true
+    }
+  ],
+  "extraReadPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/standard/externalEvidenceFiles.ts",
+      "bytes": 4470,
+      "sha256": "8884260742d322c82fe73aea2aa22aa9962635dce8991d568ed8a7fb2d2c08c9",
+      "relativePath": "src/standard/externalEvidenceFiles.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/eventPayload.ts",
+      "bytes": 3228,
+      "sha256": "184cafbb80a100ee7f68b4273868305f8c3ca049497cd9caa5b888d1417bc900",
+      "relativePath": "src/session/eventPayload.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/storage/blobs/blobStore.ts",
+      "bytes": 12178,
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277",
+      "relativePath": "src/storage/blobs/blobStore.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84",
+      "relativePath": "src/vault/vault.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+      "bytes": 10946,
+      "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+      "relativePath": "docs/EVIDENCE_TRUST.md"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "relativePath": "tests/helpers/trustContext.ts"
+    }
+  ],
+  "specPin": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-18.md",
+    "bytes": 14225,
+    "sha256": "44892a201424c5271c9ebb936608c22d0ddca2f512fa5d840193118fa74590c4"
+  },
+  "routingPin": {
+    "path": "/private/tmp/p0-24-next-key-readonly-routing-preflight-20261015.json",
+    "bytes": 51638,
+    "sha256": "c081db3fc51120aeb70b427e52170a2d72b3fb684df39b114fdda7fa11573771"
+  },
+  "reservationPin": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "graph": {
+    "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "reviewedRefreshPin": "graphifyy==0.9.56",
+    "installedQueryVersion": "0.9.74",
+    "freshness": "Stale navigation only; currentsource75cb verifieddirectly",
+    "queries": [
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "citations",
+          "--budget",
+          "1400"
+        ],
+        "exit": 0,
+        "found": 46,
+        "shown": 36,
+        "truncated": 10,
+        "result": "Vocabulary did not identify currentlinter/provenance seam; do not inferdependencies."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "effectiveTrustTier",
+          "--budget",
+          "1800"
+        ],
+        "exit": 0,
+        "result": "No matching nodes found."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "evalImporters",
+          "--budget",
+          "1200"
+        ],
+        "exit": 0,
+        "found": 219,
+        "shown": 42,
+        "truncated": 177,
+        "result": "OldevalImporters/ledger/test navigation; no currentbehavior claim."
+      }
+    ],
+    "refreshWatchServer": false,
+    "pin": {
+      "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "use": "Reused the recorded existing-graph queries before direct-source verification. Stale navigation only; no graph refresh, watcher or server."
+  },
+  "candidateAtReview": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenanceQualification.test.ts",
+    "exists": false,
+    "bodyPin": null,
+    "scope": "Author A owns this prospective file. No test edits or product execution by this reviewer."
+  },
+  "observations": [
+    {
+      "id": "writer-payload-before-guard",
+      "classification": "Fixture hazard and bounded source observation",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+          "line": 502,
+          "detail": "payloadPath may be materialized before provenance admission"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+          "line": 519,
+          "detail": "non-inline payload is stored as a blob"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+          "line": 527,
+          "detail": "provenance guard follows payload materialization"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+          "line": 716,
+          "detail": "receipt-bearing append also guards after payload preparation"
+        }
+      ],
+      "finding": "An elevated producer refusal prevents the evidence row but can have payload filesystem effects. A no-new-row assertion is appropriate; an unconditional zero-effects claim is not.",
+      "advice": "For the bounded writeguard control, use an explicit harmless inline payload and initialize writer/session before the measured interval, or retain every actual payload effect. Keep refusal row snapshots and filesystem inventories separate."
+    },
+    {
+      "id": "own-key-reader-nonvacuity",
+      "classification": "Required assertion strengthening within the planned own-key case",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+          "line": 182,
+          "detail": "writer passes actual workspace own-key exclusions"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+          "line": 194,
+          "detail": "refused own signatures become SELF_REPORTED/self_attested"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 153,
+          "detail": "reader exclusions require workspace argument"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 199,
+          "detail": "only declared ATTESTED plus valid binding reaches reader key verification"
+        }
+      ],
+      "finding": "Cold-reading the writer-refused self_attested rows cannot exercise reader own-key exclusion because they already declare SELF_REPORTED.",
+      "advice": "Retain actual writer refusals, and add a clearly labelled local bound ATTESTED projection carrying a genuinely verified monitor/auditor signature and a real signed list naming that key. readerTrustFor(workspace) must downgrade it. Do not append or rewrite this projection, and do not claim it is a stored historical row."
+    },
+    {
+      "id": "dedup-distinct-time",
+      "classification": "Fixture determinism requirement",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 218,
+          "detail": "earliest copy replacement uses strictly smaller row.ts"
+        }
+      ],
+      "finding": "Equal-timestamp copies are tied by input order. Reversing rows need not choose the same ID when both copy timestamps are equal.",
+      "advice": "Require distinct actual copy timestamps before the reversed-order assertion, or record a deliberately supplied owned duplicate timestamp greater than the genuine copy timestamp. The real ledger signature must cover that row; do not silently infer elapsed time."
+    }
+  ],
+  "caseMapping": [
+    {
+      "id": "loaded-trust-ingest-cold",
+      "title": "Actual signed trust-list load and genuine third-party ingestion survive a cold reader",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "missing-root",
+      "title": "A signed list with no separately recorded root refuses",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "foreign-root-envelope",
+      "title": "A genuinely foreign-root-signed list cannot self-admit its carried root",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "list-tamper",
+      "title": "Parseable signed-list bytes changed after signing refuse before admission",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "own-key-refusal",
+      "title": "Monitor and auditor signatures remain self-attested even when actually pinned",
+      "staticAssessment": "Compatible writer control; add meaningful reader projection as described",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "wrong-purpose",
+      "title": "A genuine list that pins signer only forartifact-seal cannot conferATTESTED",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "revoked",
+      "title": "A newly cold loaded signed key-compromise revocation downgrades a previously valid copy",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "expired-entry",
+      "title": "A signer validity window that expired refuses while its signed list remains valid",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "unpinned-attester",
+      "title": "Genuine signature alone does not admit a signer absent from a valid signed list",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "forged-attestation",
+      "title": "Signature from keyB claiming keyA refuses after real list admission",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "bound-subject-matrix",
+      "title": "Cold genuine signature cannot be reused across bound fields",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "dedup-window",
+      "title": "Real persisted duplicate copies count once for the original event and signed-time window",
+      "staticAssessment": "Compatible with distinct actual copy timestamps",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "writeguard-effects",
+      "title": "Actual elevated producer refusal creates no new evidence row",
+      "staticAssessment": "Compatible no-new-row contract with explicit side-effect boundary",
+      "runtimeExecuted": false
+    },
+    {
+      "id": "legacy-synthetic-caps",
+      "title": "Cold-read local legacy projections and synthetic rows never gain provenance credit",
+      "staticAssessment": "Compatible with current source within the stated scope",
+      "runtimeExecuted": false
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Default loader and separately admitted root",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+          "line": 74,
+          "detail": "AMC_HOME override wins; fallback is os.homedir()/.config/amc"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+          "line": 76,
+          "detail": "default list and roots file live beneath AMC home/trust"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+          "line": 85,
+          "detail": "a present list without roots throws signature-invalid"
+        }
+      ],
+      "detail": "Use the owned process AMC_HOME/HOME for the actual no-argument loader in both initializer and cold reader. Empty/default missing list gives an empty pinned context, not a missing-root error. Root fingerprints are operator inputs, not trust-list-root purpose entries or values learned from the artifact."
+    },
+    {
+      "name": "Independent key fingerprint encoding",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+          "line": 41,
+          "detail": "sha256 of Node-canonical Ed25519 SPKI PEM UTF-8"
+        }
+      ],
+      "detail": "Record root and attester public PEM plus independent Node-canonical PEM SHA256 before list/attestation signatures. This is not the SHA256 of DER SPKI bytes. Carried root PEM must match an independently recorded root ID."
+    },
+    {
+      "name": "Signed list domain and attested digest bytes",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+          "line": 156,
+          "detail": "ASCII AMC_TRUST_LIST_V1 plus zero byte plus canonical JSON"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+          "line": 156,
+          "detail": "signHexDigest signs 32 decoded hexadecimal digest bytes"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/utils/json.ts",
+          "line": 6,
+          "detail": "recursive object-key sorting preserves array order"
+        }
+      ],
+      "detail": "Independent checks must use the same domain and encoding but independent crypto/canonical observer code. A signature over the 64-character digest text or list digest is a different message."
+    },
+    {
+      "name": "Entry admission at verifier time",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 128,
+          "detail": "attestation admission does not pass claimedSignedAt"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/admission.ts",
+          "line": 52,
+          "detail": "entry checks claimed time or context.asOf"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+          "line": 183,
+          "detail": "list expiry uses now >= expiresAt"
+        }
+      ],
+      "detail": "These attestation fixtures check current loaded context.asOf. Entry validTo is exclusive; list expiry is separate. Keep explicitPins empty and both allow flags false. The loader does not reject future issuedAt; no signing-time authenticity or complete timestamp-policy claim follows."
+    },
+    {
+      "name": "Workspace own-key exclusions",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 109,
+          "detail": "monitor/auditor current and authenticated public history IDs"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+          "line": 133,
+          "detail": "history reader combines current key with authenticated history"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 123,
+          "detail": "own-key exclusion precedes trust-list admission"
+        }
+      ],
+      "detail": "Always pass workspace to the actual reader closure. Current-key fixtures do not prove every rotation/history scenario. Public-key history reads do not initialize signing keys."
+    },
+    {
+      "name": "Bundle binding and actor-label scope",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 174,
+          "detail": "bundle digest and original ID/payload/agent/session/row time must bind"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+          "line": 195,
+          "detail": "attestedBy and statement added after bundle digest"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+          "line": 239,
+          "detail": "audit metadata lacks originalEventId"
+        }
+      ],
+      "detail": "The attester signs bundle entries, not attestedBy or statement. Root-signed subject text is list metadata, not authenticated human identity. Genuine bound review copy may read ATTESTED while the stamped audit reads SELF_REPORTED. The five-minute future skew is inclusive; the proposed +1ms refusal does not by itself test all boundaries."
+    },
+    {
+      "name": "Deduplication and window scope",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 216,
+          "detail": "key is original event ID plus agent"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 223,
+          "detail": "signed entry time is tested inclusively against window"
+        }
+      ],
+      "detail": "Only rows classified ATTESTED with valid bound entries are deduplicated. Other rows pass through, including unrelated/self-reported controls. This helper check does not qualify full diagnostic/compliance window selection or regulatory eligibility."
+    },
+    {
+      "name": "Reader and metadata caches",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 47,
+          "detail": "parsed metadata cached per row object"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 153,
+          "detail": "trust context and own IDs loaded once per reader closure"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "line": 138,
+          "detail": "loader failure catches to null trust"
+        }
+      ],
+      "detail": "Use fresh objects for adversarial metadata variants and a fresh cold reader per signed-list variant. Record actual loader errors separately from tier downgrade. This is evaluation-local caching, not live revocation monitoring."
+    },
+    {
+      "name": "Read-only connection and measured effects",
+      "evidence": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+          "line": 33,
+          "detail": "readonly fileMustExist connection avoids writer pool, migrations, key initialization"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+          "line": 36,
+          "detail": "SQLite coordination sidecars can still be created"
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+          "line": 208,
+          "detail": "readonly ledger close closes its direct database"
+        }
+      ],
+      "detail": "Close initializer writers and process before cold reads. Inventory files and raw rows before open and after close. WAL/SHM are possible real effects; do not claim nonexistent zero-effects. Payload reads use the actual reader and must preserve setup/read errors."
+    }
+  ],
+  "independentSubreview": {
+    "agent": "/root/p0_22_report_audit/p024_packet_meaning",
+    "result": "No blocking contradiction; independently confirmed asOf admission, separately pinned root, canonical PEM ID, explicit-pin precedence limit, cache behavior and future-issuedAt limit.",
+    "writes": false,
+    "runtime": false
+  },
+  "limits": [
+    "No runtime, build, install, AMC module imports, tests, new qualification packet edits, or source changes were performed. Node standard-library commands were used only for metadata, hashing and these two private documents.",
+    "Root reported 144/144 old baseline cases and freeze0; this static review did not independently execute or certify them.",
+    "The 14 planned cases do not alone qualify all six recovered mutation duties, source-literal inventory, Studio/API/outcomes behavior, full suite, Node24, legal truth, authenticated people, independent assessment, or G0.",
+    "The recovered spec uses evidence-attestation/1.2.0 while current accepted implementation uses independent-attestation/2.0.0. These are preserved scope/wording drifts, not policy choices made here.",
+    "Generic production reservation1496, shared CLI/registry/REPL1588, D-15 constraints and all prior held/paused/unresolved work remain unchanged. Lack of a named source reservation is not clearance."
+  ],
+  "operations": {
+    "onlyWrittenPaths": [
+      "/private/tmp/p0-18-crypto-design-independent-review-20261015.json",
+      "/private/tmp/p0-18-crypto-design-independent-review-20261015.md"
+    ],
+    "teamAdviceSentTo": [
+      "/root",
+      "/root/failure_diagnosis"
+    ],
+    "routingCorrection": "failure_diagnosis owns separate C runtime, not A crypto file; root was asked to forward A fixture advice.",
+    "preparationErrors": "Read-only searches initially referenced nonexistent ledger/evidenceProvenance and ledger payload filenames. Correct locations were then read; no product test or acceptance outcome was inferred from those search errors."
+  }
+}

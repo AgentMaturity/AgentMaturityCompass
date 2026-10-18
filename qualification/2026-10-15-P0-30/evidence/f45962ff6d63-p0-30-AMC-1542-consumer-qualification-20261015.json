@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T00:53:20.950432+00:00",
+  "state": "SEVEN_CONSUMER_STATIC_STATE_BASELINE_COMPLETE_NO_MUTANTS",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015",
+  "construction": "Fresh independent filesystem copy, not a Git clone.",
+  "firstBaseline": {
+    "counts": {
+      "numTotalTests": 7,
+      "numPassedTests": 7,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/command.json",
+      "bytes": 1760,
+      "sha256": "21e1197ed32b094016b00c107bf75951a1faf9d4fdf9f13d87737accf36849fb"
+    },
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/raw-tests.json",
+      "bytes": 2596,
+      "sha256": "7aa7b7050359c7588c555b369d8c5665cf7bcfdd2f4b779a08225d4d54648bb6"
+    },
+    "durationMs": 5771,
+    "retainedObservations": 0,
+    "qualification": "Actual7/7 execution baseline. JSON-only reporter did not retain console observations, so detailed-effect retention was incomplete."
+  },
+  "reporterOnlyRerun": {
+    "counts": {
+      "numTotalTests": 7,
+      "numPassedTests": 7,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/command.json",
+      "bytes": 1745,
+      "sha256": "7c1295a5ad210493812e6660b0c19ffb6cf2b998cf43307b23a8cadf27dfedf2"
+    },
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/raw-tests.json",
+      "bytes": 2603,
+      "sha256": "d8b613bf9c0f557e23de9bab49d86140b986994c10381b751cc9f50f5462fa15"
+    },
+    "durationMs": 5710,
+    "retainedObservations": 7,
+    "stateTokenCalls": 56,
+    "observations": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/observations.json",
+      "bytes": 429203,
+      "sha256": "8ee83998b80a8fa48b0c8674816c89bdb531fc77f9ec77db501917f7e39c8674"
+    },
+    "correction": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/reporter-retention-correction.json",
+      "bytes": 1440,
+      "sha256": "d530366f4f1bebe3e755e5e29deafb8498b4677b3eaa58489bb3955a9131cf64"
+    },
+    "difference": "Only default reporter added beside JSON and report destination changed. Environment, test source, expectations, normal config, guards and deadlines are identical. Fixtures use the unchanged generator with fresh physical random keys and paths."
+  },
+  "actualCaseNames": [
+    "private AMC-1542 current public revocation consumers managedHookLease",
+    "private AMC-1542 current public revocation consumers bridgeAuth",
+    "private AMC-1542 current public revocation consumers gateway",
+    "private AMC-1542 current public revocation consumers workspaceRouter",
+    "private AMC-1542 current public revocation consumers wireDispatcher",
+    "private AMC-1542 current public revocation consumers agentCredentialAuth",
+    "private AMC-1542 current public revocation consumers studioServer"
+  ],
+  "semanticSummary": {
+    "consumers": [
+      "managedHookLease",
+      "bridgeAuth",
+      "gateway",
+      "workspaceRouter",
+      "wireDispatcher",
+      "agentCredentialAuth",
+      "studioServer"
+    ],
+    "publicPinRows": 56,
+    "genuineSignedLeaseRows": 14,
+    "retainedFinalObservations": 7,
+    "retainedStateTokenCalls": 56,
+    "admissions": 14,
+    "refusals": 42,
+    "namedInputAndPairWithinCallChanges": 0,
+    "errors": 0,
+    "failureLabels": 0,
+    "namedEffects": "Gateway upstream requests, wire work/accepted rows and Studio public pending-intent count each increase only for the two actual admitted live calls. Denied calls preserve the named counter/IDs. Helper/read-only counters remain null, not invented zero audit/filesystem effects.",
+    "evidence": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/semantic-observation-validation.json",
+      "bytes": 40395,
+      "sha256": "a5e6cb9036b7a9eafd35090db04f463b6fca87d1527506da0570a1c0c0073c99"
+    }
+  },
+  "runtime": {
+    "directWorkerObservations": "All seven final observations directly record Node v22.23.3, actualCellar22 executable and ABI 127.",
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "environment": "Exact allowlisted credential-free environment and0700 privateHOME/AMC_HOME reused across the reporter correction. Actual fixture loopback HTTP is allowed; no broad external-network isolation claim."
+  },
+  "preservation": {
+    "originalSourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newPrivateCaseFiles": 1,
+    "completePrivateClosureFiles": 12269,
+    "originalSourceAndCompiledExact": true,
+    "newSourceByteExactSha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c",
+    "normalConfigGlobalSetupGuards": "Unchanged",
+    "newCaseDeadlineMs": 90000,
+    "original 35DeadlineMs": 30000,
+    "readinessPins": 92,
+    "rootProtectedPins": 31,
+    "additionalProposalPins": 5,
+    "coreOriginalReferences": 103,
+    "coreReferencePinsIncludingReceiptAndIndex": 106,
+    "coreClosureFiles": 12268,
+    "coreAndReferencedPriorPackagesUnchanged": true,
+    "nativeBytesDeviceInodeNlinkExact": true,
+    "rootGitStatus": "clean"
+  },
+  "retentionAndCryptoLimits": "The actual fixture independently verifies signatures using pre-recorded synthetic role public keys during execution. Normal cleanup removes raw public keys, lease tokens and signed pair bytes. Retained fingerprints/hashes and runtime booleans cannot support a later offline independent cryptographic re-verification. Synthetic local role keys do not prove external authority, authenticated people, review or claim truth.",
+  "otherLimits": [
+    "Baseline only; no consumer mutation was authorized or performed.",
+    "Static damaged/restored pair states do not qualify the five verify-then-reload race windows, anti-rollback, deleting both files, atomic pair publication or crash behavior.",
+    "Router uses an actual owner session plus supplied lease; Studio uses configured bootstrap admin plus supplied lease. These explicit branches are not all authentication flows.",
+    "Studio proves SIMULATE intent admission, not tool execution, permission to fs.read or an actual file read. Gateway upstream is unsigned harmless local transport data, not a real model response.",
+    "The port probe-close-reuse race remains; no port/setup/transport error occurred here and none would count as a guard kill.",
+    "Seven distinct cases are not doubled by the reporter rerun or silently added to a claimed combined suite with the separate original 35.",
+    "No production change, compiler, build, installed CLI, literal clone, held code transfer, whole P0-30, oldbatch, Node24, full suite, coverage, hosted CI, G0, release or Done qualification."
+  ],
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 5540,
+    "sha256": "7f72e8609ee1d711bea4733b9113c783af1e25a3f4ba95760d30ac550f83d180"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/artifact-index.json",
+    "bytes": 33613,
+    "sha256": "7b9eeaf467195bfe6e8d27143c3ce75cf6a86ff5958d49552a65ed0bfc76f838"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "p125f-extension-preparation-seal/1",
+  "at": "2026-10-16T22:24:31.848837+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/assemble-extension.py",
+      "bytes": 14973,
+      "sha256": "42b220c161ba7945537b680fe496ecc90e69e422c2b608ebc2652bfd9c9eb9eb"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/b34-v2-adaptation.patch",
+      "bytes": 14427,
+      "sha256": "c230e58d2f33acb9aab1eb0160382eb2c8c58e48f9dc3b8890febc4cc88ebdc9"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/old-packet-pins.json",
+      "bytes": 232105,
+      "sha256": "dec0d14bcb827f3481e8ee52509af8eb995c8cc4a089f5324b63b7179e1343f8"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 5884,
+      "sha256": "4d8f893b987de0ed897cfa0be503b600eae3c86e188fe5d84d93f8847ebe5b44"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/plan.json",
+      "bytes": 5590,
+      "sha256": "b740efde63df1bd04713f634a2f73d0501719747dffd267b4eec31e2e4841d8a"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/README.md",
+      "bytes": 3607,
+      "sha256": "d1062a01f87b2bf450d0d9f698e4cb47e9b82fa47192a95ca5250fac1bf8646e"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/input-pins.json",
+      "bytes": 3330,
+      "sha256": "19e887cf04d881c1ce7501fb76bee0b96726312d5ad77bdf150bd3ac6d133ae1"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/author-static-review.json",
+      "bytes": 602,
+      "sha256": "b6123c13c6dfbb3b05fab10546ebbfb6acf662f536437089398b19114d07d852"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/private-authoring-stop.json",
+      "bytes": 530,
+      "sha256": "b55d235354e093cf6433f8381c54cd2345c1c9ec7d9d0aa03db57d0964de9acb"
+    }
+  ],
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "inputPinCount": 14,
+  "oldPacketFilesBound": 613,
+  "futureInputsUnfilled": true,
+  "helpersImportedParsedCompiledOrExecuted": false,
+  "sourceIndexQaWrites": false,
+  "rootActualReviewRequired": true
+}

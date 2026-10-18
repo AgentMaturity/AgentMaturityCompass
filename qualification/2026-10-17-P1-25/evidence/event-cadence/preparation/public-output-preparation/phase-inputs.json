@@ -1,0 +1,98 @@
+{
+  "schema": "p125ec-explicit-public-output-inputs/1",
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "rootRuntimeReview": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/root-runtime-review.json",
+    "bytes": 6566,
+    "sha256": "94d03fc652ff9b8d791ec59e0f42836e2754382967b2c28081c1cab4fa4c6919"
+  },
+  "phases": [
+    {
+      "phase": "p125ec-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-outcome.json",
+        "bytes": 7255,
+        "sha256": "2847c63bd72828703121ab2446666e27e68083daab7940bb3dbbf75c3df3b530"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-public-audit.json",
+        "bytes": 172418,
+        "sha256": "bca42c746df72564357ec3adae673a3935b7fa1442f3c16641dd4e7976b4adc9"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+        "bytes": 7287,
+        "sha256": "5918838b7ce27c61d646e41382f2e9c5d543a1e914cd42bf6fddb4179e6a8cef"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-public-audit.json",
+        "bytes": 172436,
+        "sha256": "9f65d1fff003e26b6e683054912e8ec46515eaf654c3792a22d817502eaec3b2"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-outcome.json",
+        "bytes": 10830,
+        "sha256": "05591fd30f6df13644c6e19d4f26658146c9c22992353bbddd444431ad54cb96"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-public-audit.json",
+        "bytes": 138322,
+        "sha256": "0876c695fe7e757bfcd5d2247d2d57f1c7381fa8e0011058901cbd612238c998"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-outcome.json",
+        "bytes": 7273,
+        "sha256": "c26baa683c91b668c3ba362ca10afd34658941440dc0b63e86614934d87c13fa"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-public-audit.json",
+        "bytes": 172421,
+        "sha256": "fe0de03edd25b4970b137f3903a691ae6ebb30d69d7db87224da31efaab1d859"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-outcome.json",
+        "bytes": 10754,
+        "sha256": "94130c6533cef3be6155a5565671163f4f7adc9fecae83cdf94e90691886894a"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-public-audit.json",
+        "bytes": 142136,
+        "sha256": "a75b1efa30692cfc3a04c087bddf13d0e0c5da8567dd37a888e187a6713a59cd"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-outcome.json",
+        "bytes": 7273,
+        "sha256": "afd28e893705a21c37a4a9a87b943b7a8d49dede43126cb57a9865beded4842d"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-public-audit.json",
+        "bytes": 172420,
+        "sha256": "1696bd21c89a0e4c023b46c5337c523366f27a54972425e011c063d26cb89c21"
+      }
+    }
+  ],
+  "noCurrentDiagnosticPhase": true,
+  "historicalDiagnosticRetainedOnlyInPriorReceiptBase": true,
+  "boundary": "Exact completed current six-phase inputs only. This document is an inert selector; no public bundles or allowlist have been produced by its author."
+}

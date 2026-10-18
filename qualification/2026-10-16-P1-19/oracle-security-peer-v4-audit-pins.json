@@ -1,0 +1,105 @@
+{
+  "schema": "p119-oracle-v4-security-review-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v4-audit/README.md",
+      "bytes": 1501,
+      "sha256": "6b8f3d1973cd3ea59bda02b456830b8dd77becd7e2fff45259f392b56aa23d10",
+      "device": 16777231,
+      "inode": 541770167,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v4-audit/review.json",
+      "bytes": 7889,
+      "sha256": "60dd394903aa3eaa5ab67e6aba4c6014ca329918afd1bd659d9d37dfbadfa7af",
+      "device": 16777231,
+      "inode": 541770168,
+      "nlink": 1
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8",
+      "device": 16777231,
+      "inode": 541767456,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b",
+      "device": 16777231,
+      "inode": 541767457,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 20151,
+      "sha256": "3b1ba99969949ebf2bcde9a25718216f362993272527f0828121b667d730c021",
+      "device": 16777231,
+      "inode": 541769862,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29506,
+      "sha256": "d7c2bf58e7cac21e36bf12117c237e840903d1aa0316a44b15f9a9671e31c921",
+      "device": 16777231,
+      "inode": 541769863,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f",
+      "device": 16777231,
+      "inode": 541769998,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869",
+      "device": 16777231,
+      "inode": 541769999,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/v2-to-v3.patch",
+      "bytes": 6422,
+      "sha256": "fe8ad3cc7c730a45d942638e1b8e3a26a8cf87c4b3e6d859cd2879d3342ccd8e",
+      "device": 16777231,
+      "inode": 541769864,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/v3-to-v4.patch",
+      "bytes": 5736,
+      "sha256": "e05c950558f03fab54e8a443e1be59724c1d2bf1c818403b3caed0ec94c4ded8",
+      "device": 16777231,
+      "inode": 541770000,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/root-empty-wal-diagnosis.json",
+      "bytes": 3870,
+      "sha256": "1a6f9dada0deea88e01074046ac5345b91766fa81a3a923a14441170cfb96231",
+      "device": 16777231,
+      "inode": 541769787,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/review.json",
+      "bytes": 9651,
+      "sha256": "6911176ec93dccdbe1919f0a076128d07a6c745b992da73ec2d3a1df1d196ecb",
+      "device": 16777231,
+      "inode": 541767574,
+      "nlink": 1
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}

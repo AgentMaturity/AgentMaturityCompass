@@ -1,0 +1,49 @@
+{
+  "schema": "p107-runtime-test-proposal-seal/2",
+  "at": "2026-10-16T17:57:20.077818+00:00",
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "candidateExecuted": false,
+  "checkoutWrites": false,
+  "sourceProductionWrites": false,
+  "preservedV1Seal": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/seal.json",
+    "bytes": 1162,
+    "sha256": "6716e4689bb10df9a6f5fb5e3ea9399d47046aadd4151a805ffbc45757378b3c",
+    "readScope": "full-byte pin"
+  },
+  "inputCount": 71,
+  "allReadsFinished": true,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28111,
+      "sha256": "4dfc2dc3a9c96a900286a728d5c2e0bace934a37c4ec549d45ef49486509c8ed",
+      "readScope": "exact preferred private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/v1-to-v2.patch",
+      "bytes": 4506,
+      "sha256": "5cb4c1bea57581ac6f6e24474134aeb83e0a982d60f4b8759fda981e294f539c",
+      "readScope": "exact preferred private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/README.md",
+      "bytes": 6091,
+      "sha256": "14bbdca73eec9e95e8d212f726609e2f326dda449a7576b86d9634d747591a43",
+      "readScope": "exact preferred private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/input-pins.json",
+      "bytes": 25606,
+      "sha256": "dbd86a43aa9205e5eccfddcbce8d659772edcd48c1dc39beb871ddf6130865d0",
+      "readScope": "exact preferred private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/author-review.json",
+      "bytes": 1992,
+      "sha256": "6c4fdb183c4358f6e8b2cd7aab07ce73194063f3ee90d129e5eb69344cee8edf",
+      "readScope": "exact preferred private proposal output"
+    }
+  ]
+}

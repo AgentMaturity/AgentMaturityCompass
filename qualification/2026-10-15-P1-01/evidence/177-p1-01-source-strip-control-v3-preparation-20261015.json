@@ -1,0 +1,16 @@
+{
+  "kind": "distinct-source-control-preparation",
+  "v2": "/private/tmp/p1-01-source-control-v2-prepared-20261015.py",
+  "v2Executed": true,
+  "v2Result": "Literal passthrough compiler TS2339 exit2; no negative checks or restoration. Original C ACTIVE/HALTED retained unchanged.",
+  "v3": "/private/tmp/p1-01-source-strip-control-v3-prepared-20261015.py",
+  "v3Sha256": "2bfcf3374a0d3cd26388d334c887c27cae0c2957ff7d09a9b66eeba2c76fa5b5",
+  "v3Executed": false,
+  "changes": [
+    "Fresh private BASE",
+    "Change only first receipt branch z.strictObject to z.object accepting and stripping unknown keys",
+    "Truthful mutation scope label"
+  ],
+  "typecheck": "Real unchanged compiler remains required; no type assertion, compiler bypass or product-consumer fix.",
+  "literalMutationAcceptance": false
+}

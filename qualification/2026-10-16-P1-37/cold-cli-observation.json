@@ -1,0 +1,155 @@
+{
+  "node": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+  "argv": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+    "agent-loop",
+    "verify",
+    "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+    "--json",
+    "--expect-monitor",
+    "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00"
+  ],
+  "cwd": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-FQyt5p",
+  "pid": 40314,
+  "inheritedProcessGroup": true,
+  "detached": false,
+  "close": {
+    "code": 0,
+    "signal": null
+  },
+  "spawnError": null,
+  "probes": [
+    {
+      "elapsedMs": 0.09399999999914144,
+      "errno": "ESRCH"
+    }
+  ],
+  "pidAbsent": true,
+  "stdout": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stdout",
+    "bytes": 1605,
+    "sha256": "0297e372b0ff2d3a06a83891f9a7330f807d9501e16e2214f05fc868676ee36b"
+  },
+  "stderr": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "selectedInputsBefore": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+      "bytes": 1054132,
+      "dev": 16777231,
+      "ino": 542189046,
+      "nlink": 1,
+      "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+      "bytes": 48429,
+      "dev": 16777231,
+      "ino": 542187982,
+      "nlink": 1,
+      "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+      "bytes": 12428,
+      "dev": 16777231,
+      "ino": 542186277,
+      "nlink": 1,
+      "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+      "bytes": 10826,
+      "dev": 16777231,
+      "ino": 542185499,
+      "nlink": 1,
+      "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+      "bytes": 6191,
+      "dev": 16777231,
+      "ino": 542186260,
+      "nlink": 1,
+      "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "dev": 16777231,
+      "ino": 542184874,
+      "nlink": 1,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "bytes": 67024,
+      "dev": 16777231,
+      "ino": 494874661,
+      "nlink": 1,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+    }
+  ],
+  "selectedInputsAfter": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+      "bytes": 1054132,
+      "dev": 16777231,
+      "ino": 542189046,
+      "nlink": 1,
+      "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+      "bytes": 48429,
+      "dev": 16777231,
+      "ino": 542187982,
+      "nlink": 1,
+      "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+      "bytes": 12428,
+      "dev": 16777231,
+      "ino": 542186277,
+      "nlink": 1,
+      "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+      "bytes": 10826,
+      "dev": 16777231,
+      "ino": 542185499,
+      "nlink": 1,
+      "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+      "bytes": 6191,
+      "dev": 16777231,
+      "ino": 542186260,
+      "nlink": 1,
+      "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "dev": 16777231,
+      "ino": 542184874,
+      "nlink": 1,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "bytes": 67024,
+      "dev": 16777231,
+      "ino": 494874661,
+      "nlink": 1,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+    }
+  ],
+  "limits": "Nested child PID closure only; the root harness owns the outer process-group proof."
+}

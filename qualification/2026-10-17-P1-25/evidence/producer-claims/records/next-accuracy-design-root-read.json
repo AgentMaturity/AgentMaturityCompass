@@ -1,0 +1,15 @@
+{
+  "schema": "p125pc-root-next-accuracy-design-read/1",
+  "at": "2026-10-17T02:18:19.075312+00:00",
+  "design": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/next-accuracy-preparation/design.md",
+    "bytes": 13876,
+    "sha256": "7443724b2642cd43eb4b4b665b23de3139d206540132f6d0b7899f4b8a6df8be"
+  },
+  "full13876BytesRead": true,
+  "onlyDesignNoSourceCandidateAllocationOrExecution": true,
+  "currentProducerPacketMustCloseBeforeNewSourceScope": true,
+  "optInSigned1234msAndDefaultNullUnchanged": true,
+  "realUnsignedSyntheticAttestationClockOrTimeoutSubstitutionForbidden": true,
+  "laterMicrosecondsUnequalProfilesParserControlsAndWholeIssueRemainOpen": true
+}

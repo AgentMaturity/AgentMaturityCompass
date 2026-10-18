@@ -1,0 +1,146 @@
+{
+  "schema": "p125k-control-preparation-inputs/1",
+  "count": 23,
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-preparation/audit-observed.py",
+      "bytes": 1799,
+      "sha256": "0671f636048bb159b449362c00ad1949174be12160421b3f0ed81eadc93db359",
+      "readScope": "full existing adapter read; exact adaptation"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-preparation/capture-quality.mjs",
+      "bytes": 913,
+      "sha256": "771f83b3dd6578c45791a556f2d4768b9b6eb74f7b515882588e99b6c2e43005",
+      "readScope": "full existing wrapper read; destination-only adaptation"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-preparation/seal.json",
+      "bytes": 1837,
+      "sha256": "07cba3a7281b5b4b8370ca7c9c7c8b5cc82fc7a489a900c8e2a0c34ff129d8d8",
+      "readScope": "existing author seal"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15919,
+      "sha256": "8725ba26ae7d0fb7b8a66cba763c14caddc66b07ec6426008232a3e59f046147",
+      "readScope": "full reviewed predecessor source read"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1457,
+      "sha256": "4255f6d908e3ce5cf8eda86ef301d6c92ccefb97793a09fe8a36beba92de274c",
+      "readScope": "full predecessor snapshot source read"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal-v2.json",
+      "bytes": 3448,
+      "sha256": "4407f3ef6911bd11afc87f5c9d1ba4b078f17c558a902b5e28a7e50d0cf1561f",
+      "readScope": "preferred predecessor seal"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7366,
+      "sha256": "7077824c86030863e607e7d19de0d67641cbada2edbdf5b680bda8b9085d2661",
+      "readScope": "old73/eight selected name contract, retained whole"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/seal.json",
+      "bytes": 3204,
+      "sha256": "de3933132164d0ae7ebda4dc1c0dfd046f2c3448d31ae69adfbea0801b258822",
+      "readScope": "exact candidate three-file seal"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "readScope": "full candidate source/read; prospective268/316 witnesses"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaTestFixture.ts.source.txt",
+      "bytes": 24968,
+      "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663",
+      "readScope": "full shared fixture source/read"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaGrant.test.ts.source.txt",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+      "readScope": "preserved original bodies and own import-only candidate"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-candidate-review/review.json",
+      "bytes": 7015,
+      "sha256": "4e97fb10b21f0c59e24d1d98be474e025e6871d7299f07fb2ced9a28cf766649",
+      "readScope": "independent static result; no runtime claim"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/protected-inputs.json",
+      "bytes": 68779,
+      "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca",
+      "readScope": "root pre-change142/nine metadata; never substitute as active post-extraction pinset"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 70694,
+      "sha256": "bd1bae1f206edaed9aaac06650c98d0e8dd8e60eef85d986ca44439c4d02afc5",
+      "readScope": "root actual runtime142/nine; only grant row successor, metadata mapping compared"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/source-path-allocation.json",
+      "bytes": 3057,
+      "sha256": "d615c2c79a8689d72b027ebe55afa92069ecae16caa4cdb1236eeac55a403ce7",
+      "readScope": "root own three-path admission artifact"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/source-materialization.json",
+      "bytes": 1639,
+      "sha256": "666dbcb42c48f6966950649fca06cf090155196c853e2f87fe9d38cec6b4ad67",
+      "readScope": "root exact three-file materialization artifact"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7",
+      "readScope": "unchanged observed auditor provenance; no import/parse/execute by author"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "readScope": "full original source and exact once-only recipe text"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "existing scanner hash only; wrapper does not alter scanner"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "unchanged30s/default discovery"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+      "readScope": "actual admitted ownc8c source hash only"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/original-tsaGrant.test.ts.source.txt",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+      "readScope": "public test-source original9f9 private preservation, not key/child data"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "bytes": 2165,
+      "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e",
+      "readScope": "single preferred adapter bytes"
+    }
+  ],
+  "allReadScopesFinished": true,
+  "noKeysPrivateStreamsOrSigningOutputReads": true
+}

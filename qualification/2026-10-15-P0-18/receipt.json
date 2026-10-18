@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-18",
+  "date": "2026-10-15",
+  "commit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "branch": "codex/p0-18-current-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-18-qualification-20261015/store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4635
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 29804
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1518
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/claims/evidenceProvenance.test.ts tests/evalImportTrust.test.ts tests/ingestAttestation.test.ts tests/trustTierWriteGuard.test.ts tests/dogfoodMaturityEvidence.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts tests/compliance/evidenceBinding.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-18-unchanged-eight-file-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 23087
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2321
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4502
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 28837
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-18-root-static-provenance-inventory-20261015.py",
+      "exit": 0,
+      "durationMs": 297
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-first-20261015.json",
+      "exit": 0,
+      "durationMs": 8454
+    },
+    {
+      "cmd": "pnpm run gen-counts",
+      "exit": 0,
+      "durationMs": 439
+    },
+    {
+      "cmd": "pnpm run check:api-ref",
+      "exit": 0,
+      "durationMs": 419
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 501
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 616
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1705
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1760
+    },
+    {
+      "cmd": "node /private/tmp/p0-24-full-dead-code-diagnostic-20261015.mjs /Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass /private/tmp/p0-18-current-full-dead-code-20261015.json",
+      "exit": 0,
+      "durationMs": 4600
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 4630
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 7414
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36988
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+      "exit": 1,
+      "durationMs": 7042
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+      "exit": 0,
+      "durationMs": 7187
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 7252
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+      "exit": 1,
+      "durationMs": 7354
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+      "exit": 0,
+      "durationMs": 7325
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 7563
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+      "exit": 1,
+      "durationMs": 7574
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+      "exit": 0,
+      "durationMs": 8051
+    },
+    {
+      "cmd": "git diff --cached --check",
+      "exit": 0,
+      "durationMs": 19
+    },
+    {
+      "cmd": "git commit -m 'test: qualify pinned P0-18 evidence provenance'",
+      "exit": 0,
+      "durationMs": 107
+    },
+    {
+      "cmd": "env AMC_P0_18_CRYPTO_EFFECTS_DIR=/private/tmp/p0-18-final-cold-crypto-fixture-20261015 AMC_P0_18_CRYPTO_PHASE=final-nine node node_modules/vitest/vitest.mjs run tests/claims/evidenceProvenanceQualification.test.ts tests/dogfoodMaturityEvidence.test.ts tests/evalImportTrust.test.ts tests/externalEvidenceExport.test.ts tests/externalEvidenceProfile.test.ts tests/ingestAttestation.test.ts tests/trustTierWriteGuard.test.ts tests/claims/evidenceProvenance.test.ts tests/compliance/evidenceBinding.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-18-final-bounded-node22-20261015.json",
+      "exit": 0,
+      "durationMs": 33508
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 51562
+    }
+  ],
+  "tests": {
+    "total": 158,
+    "passed": 158,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "4d415c006cacaa48c1bde2a943018a237eea7ef5f9e76927eed1062e4b315291"
+    },
+    {
+      "path": "actual-static-provenance-inventory.log",
+      "sha256": "f52df9cb3458b51ae5e3639e8244385e57b5827e08655cd6ac08e15bfb0a0d4c"
+    },
+    {
+      "path": "architecture.log",
+      "sha256": "4018f5e2630aae3022a5f0beedee9eba6cda82f319f7684d782e9f8a7f5e5225"
+    },
+    {
+      "path": "baseline-build.log",
+      "sha256": "600dc8e383c0a63f208d787370ae7f8a05543ea041248e4538169f50938f373d"
+    },
+    {
+      "path": "baseline-freeze.log",
+      "sha256": "c18bf59edd50d2894962ebec75b3f6384cb367dd9d1eb5772a85d4917f6ef899"
+    },
+    {
+      "path": "command-journal-before-canonical.jsonl",
+      "sha256": "6e3fc4b4f5a810d8fe4916ee99b5a624e37647cf91cb2716c47b79fbe4a67cfa"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "ad855dd7a7fd2c9f54e22496fe2e55ce04aff355849fad97987a71615521925a"
+    },
+    {
+      "path": "crypto-agent-binding-baseline.log",
+      "sha256": "e7066405a990a491bab4660700b56c522c829670cc1f04a9730e15d68117a26b"
+    },
+    {
+      "path": "crypto-agent-binding-mutant.log",
+      "sha256": "21745c2ed001935e05dca4c45bff6805b5be1b6cf7132960b566e1e8a7d4f20f"
+    },
+    {
+      "path": "crypto-agent-binding-restored.log",
+      "sha256": "d8fc34d72e7bd6950d3dc6e7094f5b09287ca86e72c878d03143fb08ca81f1c5"
+    },
+    {
+      "path": "crypto-first.log",
+      "sha256": "e404bfc0202e24b6540f1f3b2da8a03b36a202c7bad31f70c48898a5510736e7"
+    },
+    {
+      "path": "crypto-independent-review.json",
+      "sha256": "33b3fa075f541d7b049dc509306471d9a28c5ef85860b0613b239907d585d992"
+    },
+    {
+      "path": "crypto-independent-review.md",
+      "sha256": "2d532c88b1b86f53a0c4c1131e6584c284943df446c294974f2d1e39d6c31b69"
+    },
+    {
+      "path": "crypto-legacy-cap-mutant.log",
+      "sha256": "bf243f5a5af77f6b4a51191dba6348357281d0f422a31366ce86d632d6a1bf2d"
+    },
+    {
+      "path": "crypto-legacy-cap-restored.log",
+      "sha256": "806e99b693da9fa0e1091e24a7661fa698c7397339abb2954144ffe4b9ec8369"
+    },
+    {
+      "path": "crypto-private-baseline.log",
+      "sha256": "64cb4fc86bdffd7db513eee3464b46182e2101c3d3a59b9935639ae62a79332a"
+    },
+    {
+      "path": "crypto-qualification.json",
+      "sha256": "8b60d2f3e6dc904c12348ead337fc0dfa28e65a4d15b995e45705c83afae6986"
+    },
+    {
+      "path": "crypto-qualification.md",
+      "sha256": "0eaf1cf6607f6f9bb37270556dd2378b50e5daff96b3eefdc221f2b173f5cdaf"
+    },
+    {
+      "path": "crypto-unpin-refusal-baseline.log",
+      "sha256": "7e94cdba5daa6fe4247f3bfe618c809118ed0d8b141ace066cc86d0523edde2d"
+    },
+    {
+      "path": "crypto-unpin-refusal-mutant.log",
+      "sha256": "7e742fdb3c8cdf250fae50ce7d7362ad45aeb3f1153ecf29aded03cbf7bf1823"
+    },
+    {
+      "path": "crypto-unpin-refusal-restored.log",
+      "sha256": "950e672e3dc6989f17675fb457bbfd8707eaab867029672c5b349666f150d732"
+    },
+    {
+      "path": "current-full-dead-code.json",
+      "sha256": "601ef6d8043b0bb4bf0f56d3e095b0e0bc347d848f2a5112e093750ca5b575ae"
+    },
+    {
+      "path": "factual-test-source-counts.log",
+      "sha256": "29b9e2aafa3dcbe2ef2c470eb814d9010ee227ba933505d85786fc13496fa0d1"
+    },
+    {
+      "path": "final-api-reference.log",
+      "sha256": "f9c6abfc48014ed141dfd10f16f1cb691e33bae76300cfe511d997592c51b0d7"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "6750dd76fd13dbc3cb25524c4ae63e97b1e9c5ae08213f03ba6b6253f00ad80f"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "885e44eedbe2d5fac200243dd73d9c1223a229b7e692fe8e7fa324209e75099d"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "ebe54af1624f21cf74ea939ea046d991151562dca63481516f9b62ff339b20eb"
+    },
+    {
+      "path": "final-cold-crypto-evidence-index.json",
+      "sha256": "d623833fe97c33bf6c28379e72374252a6cc0e3657e2834296eb9e27acb4be93"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "b8dc707fa16a9b5fda2954010ec85cb96efec2a716157407b31b6c31d42a662d"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "7b0b9aa327e8458fee26f4b7f18b260e1be0b54826b3d0382432faebd2e8469a"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "c18bf59edd50d2894962ebec75b3f6384cb367dd9d1eb5772a85d4917f6ef899"
+    },
+    {
+      "path": "final-nine-file-bounded-suite.log",
+      "sha256": "26dbabc340c48f3c87614dc95b972fc800facd690116ba8320ee59eeec6d98db"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "124d904c45c9b7ad53bbacb743c4287ab17b7f1e7c01beb65118a3947f718a53"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "147e6f11b6a15605efe27bcd7fab5bd05be8e6eb63d97cd86f431d4a38fc46ac"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "ddf0050eeb08a266364334a5489dadc10a5dd9dfcc23edafd1adf69cadaf4d87"
+    },
+    {
+      "path": "full-dead-code-diagnostic.log",
+      "sha256": "026928fcf70cf361eb2cee7caef19906fae24c8253945efba52d168c00d12854"
+    },
+    {
+      "path": "immutable-private-artifact-index.json",
+      "sha256": "dffbe93fa7459e9a2721cda684c43436206a060fc95a3c3616d570ff680ac608"
+    },
+    {
+      "path": "import-seeder-independent-review.json",
+      "sha256": "cec00fb7c4f12d13efc7ef6bcfe989b86af210712751a4efc06f66ef7bc30010"
+    },
+    {
+      "path": "import-seeder-independent-review.md",
+      "sha256": "ddbc45aeec610afdddc3543ae2e6a9c9fa52dfc197fa6b236c2b019dc19ff002"
+    },
+    {
+      "path": "import-seeder-qualification.json",
+      "sha256": "275caa19bf9c8293d2b3db688959ad4835995d337803a88a72a4858c867771ed"
+    },
+    {
+      "path": "import-seeder-qualification.md",
+      "sha256": "8216349f833f4baf09898f34906c18d2a2de2da01d8604de4609a74c70212b77"
+    },
+    {
+      "path": "import-seeder-readiness.json",
+      "sha256": "9ff1776f45221c4247166d9e2885b35b63bcf8deb9b16747c556e270a324f450"
+    },
+    {
+      "path": "import-seeder-readiness.md",
+      "sha256": "cba822dc8dba92f2ff2027b0d17f300f9752eb62f073b4f0b13bfe3bb13d7bda"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "aa78a5d5fc5d46f46c1c40a7b98310707f90f63a2c04efd0829618a43241b88a"
+    },
+    {
+      "path": "new-test-design.json",
+      "sha256": "efa36c86f2c6ca2343e0333d66585dfe1eecdc72c0dc33ca308575737c9074cb"
+    },
+    {
+      "path": "new-test-design.md",
+      "sha256": "0a010cbc398c99aa478a68a220d52a02ac7bf2017bfd55260b1a8eb1923a73a1"
+    },
+    {
+      "path": "next-key-routing-preflight.json",
+      "sha256": "a146f7b75cf2004213cf46563b9a9819f3c5b6d8708ba3605c1d43cceb937295"
+    },
+    {
+      "path": "next-key-routing-preflight.md",
+      "sha256": "92e1e581d9956cc32f6dae3c54ae129477e31daf3b36e5189bbb0df480191b86"
+    },
+    {
+      "path": "production-types.log",
+      "sha256": "c0a0d69b11dfba4c16af3932aa39f713108c2af39b076c10811f48242cd1a65e"
+    },
+    {
+      "path": "prose-spacing-correction.json",
+      "sha256": "5e8b24a86e412ec768700aa3a4035a423f8b87ba73753a0a8e457c6bb86b69ba"
+    },
+    {
+      "path": "root-scope-preflight.json",
+      "sha256": "0bf29c39bd04663e2fc9eba8e410907f41227c43a5685802b5b54583e35ff6f6"
+    },
+    {
+      "path": "source-checkpoint.log",
+      "sha256": "18a5f550a5cb58739dcbff276e3dbd0d5bd745eb0bf23404accdb0b70afdaba4"
+    },
+    {
+      "path": "source-dead-code.log",
+      "sha256": "5a4d8465f292740c1259c1ba1c90208ca582b18ab00d79bd94d31e0f7974aa88"
+    },
+    {
+      "path": "source-duplicates.log",
+      "sha256": "b323562d2c54aee8d44a5d7222018d1a0935c39217ef8ca694f13a0ded16cd3f"
+    },
+    {
+      "path": "source-pre-checkpoint-manifest.json",
+      "sha256": "e22051f45efd17082602e27b70c4fbef98971ff15350e9abedd8c0597738a040"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "9c76e98914f855802d9701e326f69dcd7c95fed588ce761b148a09ae688079ac"
+    },
+    {
+      "path": "source-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "static-design-independent-review.json",
+      "sha256": "307222dd4e5bb5db92e91990c85f9aa43d7b54f26bc9bb45f4abf6a7eaea7df9"
+    },
+    {
+      "path": "static-design-independent-review.md",
+      "sha256": "d1cd9c9f31367f6fa9fd663168ada5c802e6173950bc7f1129fff176dc8c0423"
+    },
+    {
+      "path": "static-provenance-inventory.json",
+      "sha256": "2f1db07a92c22d9b4272d2d5634e980335079508c3c9ff9c04c15bc83a0a9e9d"
+    },
+    {
+      "path": "unchanged-eight-file-baseline.json",
+      "sha256": "8465b6a5487371353c8de6b3ed423abd7d5bd1a4b1f0d5ab9175cc2500763ad2"
+    },
+    {
+      "path": "unchanged-eight-file-baseline.log",
+      "sha256": "8e07fc177abc3f794f636c8bd0c01f71fa91750b53b68ed8e958602629a2ba7e"
+    }
+  ],
+  "notes": "Bounded P0-18 qualification only. Final nine-file Node 22 corpus is recorded separately from importer/seeder original 59 and operational 16 controls. The original 1.2.0 removed-flag literal remains a strict failure against actual 2.0.0; old evidence-attestation purpose differs from current independent-attestation. No version/purpose decision, issue Done, source repair, release or gate closure is made. All six original mutation checks are separate and retained with exact restoration; the agent-binding control is additional. Readonly SQLite WAL/SHM effects and writer refusal scope remain explicit. Local signed fixtures prove integrity and admission for those fixtures, not authenticated people, external review or claim truth. Full suite, coverage, hosted CI, Node 24 and dependent acceptance remain unqualified. Required duplicate/dead-code quality gates fail with inherited findings; no baseline or guard bypass. All previous strict failures, skips, paused work, Claude ownership and pending decisions remain. Failed owned observer setup/types, if any, retain raw logs and chronology. Raw artifact EOF whitespace is kept intact and assessed separately from clean source whitespace."
+}

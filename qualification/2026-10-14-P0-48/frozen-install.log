@@ -1,0 +1,30 @@
+Scope: all 12 workspace projects
+ WARN  There are cyclic workspace dependencies: /Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass/vendor/cordis, /Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass/vendor/include
+Lockfile is up to date, resolution step is skipped
+Packages: +387
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Progress: resolved 0, reused 383, downloaded 0, added 386
+Progress: resolved 0, reused 383, downloaded 0, added 387, done
+
+devDependencies:
++ @amc/cordis 4.0.1 <- vendor/cordis
++ @amc/cordis-plugin-loader 1.0.2 <- vendor/loader
++ @amc/core 0.1.0 <- packages/amc-core
++ @amc/schemastery 3.18.1 <- vendor/schemastery
+
+. postinstall$ node scripts/postinstall.js || true
+. postinstall:   ┌──────────────────────────────────────────────┐
+. postinstall:   │                                              │
+. postinstall:   │   🧭  Agent Maturity Compass installed!      │
+. postinstall:   │                                              │
+. postinstall:   │   Quick start:                               │
+. postinstall:   │     amc                                      │
+. postinstall:   │     amc up                                   │
+. postinstall:   │     amc quickscore --rapid                   │
+. postinstall:   │                                              │
+. postinstall:   │   Docs:  amc --help                          │
+. postinstall:   │                                              │
+. postinstall:   └──────────────────────────────────────────────┘
+. postinstall: Done
+Done in 1.6s using pnpm v10.33.0

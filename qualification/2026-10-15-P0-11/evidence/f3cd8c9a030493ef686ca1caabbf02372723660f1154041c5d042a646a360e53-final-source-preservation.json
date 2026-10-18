@@ -1,0 +1,69 @@
+{
+  "capturedUtc": "2026-10-15T06:50:28.729879+00:00",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "parentTrackedChecked": 8362,
+  "parentCompiledChecked": 4529,
+  "privateFilesChecked": 12891,
+  "allBytesExact": true,
+  "physicalIdentityExact": true,
+  "physicalManifest": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+    "bytes": 5036200,
+    "sha256": "75ee14d53d89d3552fa8a48d6a6c57102cf782fed90e1483c61be58551813bb8"
+  },
+  "nodeModulesLink": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/closure/node_modules",
+    "target": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+    "resolved": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules"
+  },
+  "borrowedNative": {
+    "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538824643,
+    "nlink": 1,
+    "mode": 493
+  },
+  "frozenOwnInputsChecked": 10,
+  "setupIndexPinsChecked": 11,
+  "planPins": [
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    }
+  ],
+  "reservation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "inboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "bytes": 876841,
+    "sha256": "fd4f5e769f2ad1d3c548b5c76b1dd3f00af155d92f47b6cc5c6b1442fced1b8b"
+  },
+  "boundary": "Full final source/dist bytes/recorded physical identity; borrowed native/helpers, not complete dependency/cache/OS/network or detached-descendant absence."
+}

@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-16T21:37:28.864317+00:00",
+  "baseCommit": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "admittedNewSourcePath": "tests/time/tsaClient.test.ts",
+  "sourceChangeCeiling": "Copy exactly the sealed15569byte11-case candidate. Existing production/tests/config/guards/deadlines/package/source generators/ignoredprivatebytes unchanged.",
+  "existingOwnMetadataExtensionDeferred": [
+    "qualification/2026-10-17-P1-25/README.md",
+    "qualification/2026-10-17-P1-25/receipt.json",
+    "qualification/2026-10-17-P1-25/assembly-inputs.json"
+  ],
+  "newEvidencePrefix": "qualification/2026-10-17-P1-25/evidence/client-transport",
+  "all121ProtectedInputsExactBeforeWrite": true,
+  "scopeRoots": 181,
+  "currentWip": 0,
+  "preD15": "none",
+  "preFreeze": 0,
+  "rootReadFullCandidateAndIndependentReview": true,
+  "allHoldsAndF37SkipPreserved": true
+}

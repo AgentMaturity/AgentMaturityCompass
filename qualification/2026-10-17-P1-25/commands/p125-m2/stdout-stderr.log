@@ -1,0 +1,105 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout
+
+ ❯ tests/time/verifyTimestamp.test.ts (17 tests | 2 failed) 29ms
+   ✓ verifies the genuine raw CMS timestamp against its digest nonce and pinned test root 3ms
+   ✓ verifies the granted response and returns its exact signed CMS token bytes 1ms
+   ✓ refuses a different expected digest for the unchanged genuine signed token 1ms
+   ✓ refuses a different expected nonce for the unchanged genuine signed token 1ms
+   ✓ refuses the independently located signed-attribute corruption 1ms
+   × refuses the genuine token under a different real root with the same permitted policy 5ms
+   ✓ refuses a policy excluded by the correctly pinned real root 1ms
+   ✓ refuses a genuinely signed TSA certificate without an EKU extension 0ms
+   ✓ refuses a genuinely signed TSA certificate with noncritical timestamping EKU 1ms
+   ✓ refuses a genuinely signed TSA certificate expired at the fixed signed genTime 0ms
+   ✓ refuses explicit rejection status before requiring a timestamp token 0ms
+   ✓ refuses a truncated copy of the genuine token 0ms
+   ✓ refuses 65537 bytes at the token size boundary before DER parsing 0ms
+   ✓ keeps claimed time separate from the genuine attested upper bound 1ms
+   ✓ keeps an artifact without a timestamp at claimed time 0ms
+   × reports an untrusted TSA as a warning while the artifact time stays claimed 2ms
+   ✓ reports a broken supplied token as an artifact integrity error 0ms
+ ✓ tests/trust/verifierReport.test.ts (5 tests) 9ms
+ ✓ tests/trust/trustList.test.ts (25 tests) 551ms
+     ✓ accepts 4,096 distinct entries and refuses 4,097 on the size limit  529ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/time/verifyTimestamp.test.ts > refuses the genuine token under a different real root with the same permitted policy
+AssertionError: expected { ok: true, attested: { …(9) } } to match object { Object (ok, code) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "code": "TST_UNTRUSTED_TSA",
+-   "ok": false,
++   "ok": true,
+  }
+
+ ❯ tests/time/verifyTimestamp.test.ts:143:62
+    141| it("refuses the genuine token under a different real root with the sam…
+    142|   validAttestation();
+    143|   expect(verify(fixture.valid, { anchors: [anchor(true)] })).toMatchOb…
+       |                                                              ^
+    144| });
+    145|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/time/verifyTimestamp.test.ts > reports an untrusted TSA as a warning while the artifact time stays claimed
+AssertionError: expected { evidence: { …(4) }, findings: [] } to deeply equal { evidence: { …(3) }, findings: [] }
+
+- Expected
++ Received
+
+  {
+    "evidence": {
+-     "attested": null,
+-     "basis": "claimed",
++     "attested": {
++       "accuracyMs": null,
++       "genTime": "2026-10-16T00:00:00.000Z",
++       "kind": "rfc3161",
++       "messageImprint": {
++         "digest": "6679c6c2ec37c7d84780515bbf7097996da1b76a1fbedab41cde64da97497aab",
++         "hashAlgorithm": "sha256",
++       },
++       "policyOid": "1.2.3.4.1",
++       "revocationChecked": false,
++       "serialNumber": "1",
++       "tokenDerB64": "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",
++       "tsa": {
++         "anchorId": "p125-unrelated",
++         "certSha256": "ed2429134a2ca85502d275ff2b1e47d252962ce7f89e98b86dec2ce2df5fd558",
++         "subject": "CN=AMC P1-25 tsa TEST ONLY",
++       },
++     },
++     "basis": "attested-upper-bound",
+      "claimedAt": "2026-10-15T23:59:00.000Z",
++     "window": {
++       "notAfter": "2026-10-16T00:00:00.000Z",
++       "notBefore": null,
++     },
+    },
+    "findings": [],
+  }
+
+ ❯ tests/time/verifyTimestamp.test.ts:199:23
+    197|   const result = artifactTime({ token: fixture.valid, digestHex: fixtu…
+    198|     claimedAt: claimed, trust: trust([anchor(true)]) });
+    199|   expect(result.time).toEqual({ evidence: { claimedAt: claimed, attest…
+       |                       ^
+    200|   expect(result.integrityError).toBeNull();
+    201|   expect(result.warning).toContain("timestamp TST_UNTRUSTED_TSA:");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 45 passed (47)
+   Start at  00:29:34
+   Duration  818ms (transform 186ms, setup 64ms, import 302ms, tests 589ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p125-m2.raw.json

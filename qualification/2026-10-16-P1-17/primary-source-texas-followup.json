@@ -1,0 +1,11 @@
+{
+  "readUtc": "2026-10-16T09:46:10.829450+00:00",
+  "url": "https://tcss.legis.texas.gov/resources/BC/htm/BC.521.htm",
+  "read": "The existing docs identify this official underlying statute file. Whole chapter returned through browser, including all521.053(a)-(j) and amendment notes. Read confirms base60dayindividual/30dayAGwith250residents and the existing unmodeled exceptions and immediate owner notification.",
+  "relationshipToPriorAttempt": "This is a successful follow-up at the actual statute host. Preserve the earlier oldURL portal failure as distinct evidence.",
+  "currentSourceTableSha256": "3070fa3420062b58e5b3a85469e08b649b8de6a9f41b1380cee12caa2efe8ea0",
+  "sourceMetadataUnchanged": true,
+  "historicalRetrievalDateRetained": "2026-10-07",
+  "expertOrApplicabilityApproval": false,
+  "fullCurrentLegalSourceRequalification": false
+}

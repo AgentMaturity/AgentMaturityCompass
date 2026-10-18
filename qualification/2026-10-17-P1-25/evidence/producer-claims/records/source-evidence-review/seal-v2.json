@@ -1,0 +1,34 @@
+{
+  "schema": "p125pc-independent-source-prose-evidence-review-seal/2",
+  "at": "2026-10-17T02:19:08.841885+00:00",
+  "priorSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/seal.json",
+    "bytes": 1176,
+    "sha256": "8beaf24216baec436bce6cffea3b773edabcbb663981a9fd5d53801b05ff02bf"
+  },
+  "change": "Preferred README only: grammatical spaces around numbers and a sentence split. Review facts, input pins and observations unchanged.",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 5852,
+      "sha256": "43b11bdfd9c2556cd3f0067d31dfb1f0ab02ec2db0175ff0f5b060baff75bd1c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/README-v2.md",
+      "bytes": 1484,
+      "sha256": "6c3744420a8b34f6acd60658906fb65b121303c668cb537a1a8c1dd4c4c4bfdb"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 12796,
+      "sha256": "4a1fe4c791bec287b3584e54d4d3e69e76ec7d1f9cb539a3533fec544082e16d"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/observations.json",
+      "bytes": 2555,
+      "sha256": "9dbaaf44c79f68a2646be19613f1bbef976be10941d31cc61bdcd4df2af6333a"
+    }
+  ],
+  "blockers": [],
+  "productOrHelperExecuted": false
+}

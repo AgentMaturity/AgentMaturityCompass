@@ -163,6 +163,7 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("compliance roadmap", "compliance:euAiActRoadmap"),
   self("comms-check", "comms-check"),
   self("audit binder create", "audit:binder"),
+  // An .amcaudit binder carries "audit:binder"; a signed industry-pack audit (.json) verifies as "audit:industry-pack".
   self("audit binder verify", "audit:binder"),
   self("audit verify", "audit:workspace"),
   self("residency-report", "residency"),
@@ -228,7 +229,10 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   example("mirofish run", "mirofish:run"),
   example("mirofish compare", "mirofish:compare"),
   example("mirofish stress", "mirofish:stress"),
-  example("lab-simulate", "lab:simulate")
+  example("lab-simulate", "lab:simulate"),
+  // The CLI stores only lab-simulate placeholders, so a lab report or comparison is never a measurement.
+  example("lab-report", "lab:simulate"),
+  example("lab-compare", "lab:simulate")
 ];
 
 const GROUP = "command group: lists its subcommands";

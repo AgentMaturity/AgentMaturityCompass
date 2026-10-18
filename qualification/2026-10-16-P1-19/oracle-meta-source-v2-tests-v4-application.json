@@ -1,0 +1,40 @@
+{
+  "capturedUtc": "2026-10-15T22:44:14.562098+00:00",
+  "rootReview": "Full v1 bodies, full v2 source delta, v2/v3/v4 helper and suite deltas, closed READMEs and independent peer review considered",
+  "D15": "Exact four paths none",
+  "testFirst": "Actual genuine producer succeeded; missing oracle failure normal1/2090ms PGID2459ESRCH, raw1failed7skipped",
+  "sourceHead": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923",
+      "beforeSha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b",
+      "originalCandidatePreserved": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d",
+      "beforeSha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5",
+      "originalCandidatePreserved": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8",
+      "beforeSha256": null,
+      "originalCandidatePreserved": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b",
+      "beforeSha256": null,
+      "originalCandidatePreserved": true
+    }
+  ],
+  "unchangedProtectedPins": true,
+  "formalP119Acceptance": false,
+  "runtimeExecutedForAppliedVersions": false
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "p125pc-root-source-fresh-control-admission-review/1",
+  "at": "2026-10-17T02:02:01.342402+00:00",
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+    "bytes": 7969,
+    "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045",
+    "dev": 16777231,
+    "inode": 543926549,
+    "nlink": 1
+  },
+  "freshOutcome": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+    "bytes": 8001,
+    "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac",
+    "dev": 16777231,
+    "inode": 543992114,
+    "nlink": 1
+  },
+  "ordered24IdentitiesAndHooks3And4Exact": true,
+  "actualPublic": [
+    {
+      "audit": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+        "bytes": 235594,
+        "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b",
+        "dev": 16777231,
+        "inode": 543926557,
+        "nlink": 1
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerTwoOwnQueryBoundProofs": true,
+      "completeStoredClaimAndReaderFacts": true
+    },
+    {
+      "audit": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+        "bytes": 235614,
+        "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b",
+        "dev": 16777231,
+        "inode": 543992141,
+        "nlink": 1
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerTwoOwnQueryBoundProofs": true,
+      "completeStoredClaimAndReaderFacts": true
+    }
+  ],
+  "preservation": {
+    "selectedPathsEachRoot": 102,
+    "compiledPairs": 23,
+    "protectedInputs": 175,
+    "nativePhysicalPins": 13,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true,
+    "runtimeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    "prechangeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+      "dev": 16777231,
+      "inode": 543919520,
+      "nlink": 1
+    },
+    "oldOneTestSourcePreservedAndOnlyOneExplicitSuccessor": true
+  },
+  "sourceFreshCleanIndexesEmpty": true,
+  "sourceOnlyControlsNotExecuted": true,
+  "allHoldsAndFreezeQualityChecksRetained": true
+}

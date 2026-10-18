@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-17T00:33:01.103200+00:00",
+  "rootReadFullRuntimePeerReportAndFullPreferredAssembler530Lines": true,
+  "independentBlockers": [],
+  "reviews": [
+    {
+      "report": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/review.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/review.json",
+        "bytes": 17143,
+        "sha256": "34db3d1ea446aca16e40ea66d5c98a7f56397c0b315dc315798d17fc4e0ce077",
+        "dev": 16777231,
+        "inode": 543820380,
+        "nlink": 1
+      },
+      "seal": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/seal.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/seal.json",
+        "bytes": 1025,
+        "sha256": "e720e4972cb9a0b525bcd510500a525f2e7e7c3a50298f9ead06766e81d64628",
+        "dev": 16777231,
+        "inode": 543820382,
+        "nlink": 1
+      }
+    },
+    {
+      "report": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/review.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/review.json",
+        "bytes": 8661,
+        "sha256": "38d36ed245c5d99dab686ae8d8e77ac15e3c2514ccdfd31d820a3b07cba3fdc7",
+        "dev": 16777231,
+        "inode": 543820595,
+        "nlink": 1
+      },
+      "seal": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/seal.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-helper-static-review/seal.json",
+        "bytes": 1079,
+        "sha256": "8d198dd4e146365ee2c20a3243d938c86e8933bab5c8f76b58e3b52fd0da3c2d",
+        "dev": 16777231,
+        "inode": 543820597,
+        "nlink": 1
+      }
+    }
+  ],
+  "preferredSource": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "bytes": 36997,
+    "sha256": "4a446052426c9ed59637dd0952d483d64bc8a4ea1dccb55bf1d821aaac989683",
+    "dev": 16777231,
+    "inode": 543820201,
+    "nlink": 1
+  },
+  "activeExactCopy": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/assemble-extension.py",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/assemble-extension.py",
+    "bytes": 36997,
+    "sha256": "4a446052426c9ed59637dd0952d483d64bc8a4ea1dccb55bf1d821aaac989683",
+    "dev": 16777231,
+    "inode": 543820680,
+    "nlink": 1
+  },
+  "rootRequiresActiveAssemblerHashOnlyPinInActualManifest": true,
+  "all151PhysicalTenOldNativePinsStillExact": true,
+  "sixAcceptedPhasesAndOriginalDiagnosticExclusionAdopted": true,
+  "filledManifestAndPrivateAssemblyAndPublicationStillPending": true,
+  "sourceMetadataAndIndexesUntouched": true,
+  "allHoldsRemain": true
+}

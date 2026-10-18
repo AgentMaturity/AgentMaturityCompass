@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T21:37:28.927119+00:00",
+  "source": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/tsaClient.test.ts",
+  "target": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaClient.test.ts",
+  "bytes": 15569,
+  "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+  "literalBodies": 11,
+  "byteExact": true,
+  "onlyNewTestPathUntracked": true,
+  "indexUntouched": true,
+  "compilerAndRuntimeNotYetObserved": true
+}

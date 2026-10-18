@@ -1,0 +1,766 @@
+{
+  "schema": "amc-p207-scim-hardening/1",
+  "label": "group-patch-validation",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+  "childProcessCreated": false,
+  "observations": [
+    {
+      "kind": "port-probe",
+      "started": true,
+      "closed": true,
+      "listening": false
+    },
+    {
+      "kind": "router",
+      "port": 55494,
+      "started": true,
+      "closed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-missing-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 401,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-valid-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "auth-controls",
+      "unauthenticated": {
+        "status": 401,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:api:messages:2.0:Error"
+          ],
+          "status": "401",
+          "detail": "missing SCIM bearer token"
+        }
+      },
+      "authenticated": {
+        "status": 200,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+          ],
+          "patch": {
+            "supported": true
+          },
+          "bulk": {
+            "supported": false,
+            "maxOperations": 0,
+            "maxPayloadSize": 0
+          },
+          "filter": {
+            "supported": true,
+            "maxResults": 200
+          },
+          "changePassword": {
+            "supported": false
+          },
+          "sort": {
+            "supported": false
+          },
+          "etag": {
+            "supported": false
+          },
+          "authenticationSchemes": [
+            {
+              "name": "Bearer Token",
+              "description": "Authorization: Bearer <token>",
+              "type": "oauthbearertoken",
+              "primary": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-target",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "target",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+        "userName": "target@example.test",
+        "active": true,
+        "displayName": "Synthetic target",
+        "externalId": "ext-target"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-survivor",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "survivor",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "4c9c3707-5054-4412-b189-1f18bf22803c",
+        "userName": "survivor@example.test",
+        "active": true,
+        "displayName": "Synthetic survivor",
+        "externalId": "ext-survivor"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-mapped-group",
+      "path": "/host/scim/v2/Groups",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-group",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+          "4c9c3707-5054-4412-b189-1f18bf22803c"
+        ]
+      }
+    },
+    {
+      "kind": "http",
+      "label": "before-group-refusals",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "absent-user-control",
+      "path": "/host/scim/v2/Users/synthetic-absent-user",
+      "method": "GET",
+      "status": 404,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "missing-user-positive-control",
+      "missing": {
+        "status": 404,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:api:messages:2.0:Error"
+          ],
+          "status": "404",
+          "detail": "User not found"
+        }
+      }
+    },
+    {
+      "kind": "group-refusal-rows",
+      "initial": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+          "4c9c3707-5054-4412-b189-1f18bf22803c"
+        ]
+      },
+      "initialRoles": {
+        "target": [
+          "AUDITOR",
+          "VIEWER"
+        ],
+        "survivor": [
+          "VIEWER"
+        ]
+      },
+      "rows": [
+        {
+          "label": "unknown-group-path",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        },
+        {
+          "label": "unsupported-member-filter",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        },
+        {
+          "label": "filtered-add",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        },
+        {
+          "label": "filtered-remove-with-value",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        },
+        {
+          "label": "invalid-member-id-value",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        },
+        {
+          "label": "absent-member-add",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:Group"
+            ],
+            "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+            "displayName": "synthetic-scim-viewers",
+            "externalId": "synthetic-group-external",
+            "members": [
+              "184ad2fb-8620-43e3-b1c9-88047f2a09ca",
+              "4c9c3707-5054-4412-b189-1f18bf22803c"
+            ]
+          },
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "kind": "http",
+      "label": "unknown-group-path",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "unknown-group-path-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "unsupported-member-filter",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "unsupported-member-filter-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "filtered-add",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "filtered-add-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "filtered-remove-with-value",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "filtered-remove-with-value-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "invalid-member-id-value",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "invalid-member-id-value-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "absent-member-add",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "absent-member-add-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "replace-single-member-object",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "replace-single-member-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "remove-members-without-value",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "PATCH",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "removed-members-get",
+      "path": "/host/scim/v2/Groups/grp_72b084361faa47a6861ab133d9a5bb2b",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "supported-group-controls",
+      "replaced": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "4c9c3707-5054-4412-b189-1f18bf22803c"
+        ]
+      },
+      "replacedGet": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "4c9c3707-5054-4412-b189-1f18bf22803c"
+        ]
+      },
+      "replacedRoles": {
+        "target": [
+          "AUDITOR"
+        ],
+        "survivor": [
+          "VIEWER"
+        ]
+      },
+      "removed": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": []
+      },
+      "removedGet": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_72b084361faa47a6861ab133d9a5bb2b",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": []
+      },
+      "removedRoles": {
+        "target": [
+          "AUDITOR"
+        ],
+        "survivor": []
+      }
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-qXdFvA"
+}

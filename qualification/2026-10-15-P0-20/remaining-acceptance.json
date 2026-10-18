@@ -1,0 +1,29 @@
+{
+  "status": "bounded signing/reader tests pass; two actual compiled CLI label failures and quality failures remain; not Done",
+  "cli": "Trusted genuine text and JSON exits70 under strict labels. One-line shared CLI proposal is privately reviewed/proven only; human transfer pending.",
+  "sourceQuality": {
+    "duplicates": 1269,
+    "deadCode": 2779
+  },
+  "open": [
+    "shared CLI narrow decision",
+    "whole suite and global/per-file coverage on exact source",
+    "Node24",
+    "authenticated HTTP/initiator binding",
+    "notary/HSM/live providers",
+    "hosted fullCI and release gate"
+  ],
+  "observerCorrections": [
+    "First reader9 failures and first signed-text failure asserted eligibleLevel null; current answered /3 envelope is self_reported capped at1. Only observer corrected, baseline still null.",
+    "Rejected wrapper adds JSON fields but silently marks text labelled without actual output. Its12/12 and helper23/23 are not acceptance; source and live test restored exactly.",
+    "Restored real-label observer used lowercase text; exact canonical renderer is Claim: Self-reported. Its two failures remain actual exits70, so this casing correction changes no product verdict.",
+    "Digest comparison removal only loses a diagnostic; crypto still rejects changed body. Private envelope self-pin really causes foreign/attacker wrong admission."
+  ],
+  "inherited": "P0-52 seven destination/history failures and pending narrow decision, P0-51 three precedence/30formal refusals, P0-22 two arrays, P0-23 seven held failures, P0-29 unrouted successors and previous coverage/release debt remain unresolved.",
+  "nextRouting": {
+    "nextKey": "P0-27",
+    "basis": "Prioritize the direct prerequisite of Urgent P0-55 after P0-20. P0-27 is High due October25 with no issue blockers and also blocks installed acceptance/G0. P0-19 is High due October22 and appears earlier in its workstream, but does not block P0-55 and still carries the explicit P2-27 echo deferral. This is a dependency-driven choice, not an assertion that P0-27 has an earlier date or higher intrinsic priority.",
+    "startCondition": "Close P0-20 bounded receipt first, then branch from the committed parent candidate1291b900f2c345a55ee5b1800ec9c44cceb2bce4 (or the newer actual final pin) and recheck reservations. Do not incorporate held pending-main.",
+    "scope": "Qualification of existing accepted F1-F4 and relevant implemented P0-55 follow-ups; new owned tests/private fixtures first, no generic session/writer rewrite."
+  }
+}

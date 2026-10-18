@@ -1,0 +1,8 @@
+{
+  "sourceSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+  "splitlines": 975,
+  "normalArchitectureMeasurement": 976,
+  "normalArchitectureBudget": 976,
+  "proposedNormalMeasurement": 976,
+  "limits": "The existing normal count is976/976, not headroom. Moving the existing statement is net-zero. No source/live-dist/guard/budget/manifest edits or exceptions occurred. This is proposal metadata only."
+}

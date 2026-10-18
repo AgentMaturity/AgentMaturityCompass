@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-independent-inert-adapter-review-seal/1",
+  "at": "2026-10-17T01:51:59.192409+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-adapter-review/review.json",
+      "bytes": 6206,
+      "sha256": "0315239cfc8b59072e11d1fb49662f74dcd78c3745836242951d9404dfe79321"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-adapter-review/README.md",
+      "bytes": 1266,
+      "sha256": "0f49f75fc03375ec31d17da3e277c9e1387a4ee58b301481847d563eb25c4b2e"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-adapter-review/input-pins.json",
+      "bytes": 8409,
+      "sha256": "7307d4af200144b65fb21f573b5a7d14f0bc21849e2ca13d389f1565c30adcc3"
+    }
+  ],
+  "inputCount": 36,
+  "blockers": [],
+  "codeImportedParsedCompiledOrExecuted": false,
+  "sourceOrRuntimeAdmission": false
+}

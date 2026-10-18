@@ -1,0 +1,31 @@
+{
+  "capturedUtc": "2026-10-15T22:53:10.491020+00:00",
+  "D15": "Exact thirteen relevant paths none",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "beforeBytes": 8551,
+      "beforeSha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5",
+      "appendBytes": 2930,
+      "bytes": 11481,
+      "sha256": "37e41257bae8be1e8ec1177dc8e3083f36d3eaf44af1a75645dafc2a206d893c",
+      "originalPrefixPreserved": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/README.md",
+      "beforeBytes": 1409,
+      "beforeSha256": "f474b3fb3f0687d92413faa445f440723868a5b14af158f8db2aa22600e04181",
+      "appendBytes": 795,
+      "bytes": 2204,
+      "sha256": "4997a2c78ef77eadf16dadee40451f66f5016d4f1416ef8c7bb0c04d787a8406",
+      "originalPrefixPreserved": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/finance-independent-oracle.md",
+      "bytes": 289,
+      "sha256": "9cd61cf5e9c34b489394425f8d7d4232b8e5b91e68c22dcd4f1a55f955a303be",
+      "newFile": true
+    }
+  ],
+  "qualificationClaim": "Local finite10/10 only; all normative statuses remainnot_run"
+}

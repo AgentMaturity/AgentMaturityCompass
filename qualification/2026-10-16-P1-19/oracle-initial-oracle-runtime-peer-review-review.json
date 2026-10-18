@@ -1,0 +1,2128 @@
+{
+  "schema": "p119-initial-oracle-runtime-independent-peer-review/1",
+  "capturedUtc": "2026-10-15T22:47:02.197380+00:00",
+  "scope": "Closed command/raw/observer/streams/group evidence and public markers only. No retained secret configs, private keys, token files, SQL, product imports/runtime, mutable oracle source or R writes.",
+  "conclusion": "Reports confirm the actual 10-case run with 5 passes and 5 failures. The genuine positive remains red; all passing negatives are provisional. Three planned mutations were not reached because their initial positive assertions failed. No blanket oracle qualification is established.",
+  "command": {
+    "phase": "p119-oracle-v2-tests-v4-initial",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json",
+    "exit": 1,
+    "durationMs": 23159,
+    "startedUtc": "2026-10-15T22:44:26.309934+00:00",
+    "endedUtc": "2026-10-15T22:44:49.482753+00:00",
+    "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+    "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+    "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+    "ownedProcess": {
+      "pid": 3089,
+      "ownedPgid": 3089,
+      "observedPgidAfterLaunch": 3089,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/lighthouse/financeOracle.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json"
+      ],
+      "startedUtc": "2026-10-15T22:44:26.309934+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": true,
+    "artifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json",
+        "bytes": 10219,
+        "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+        "bytes": 10219,
+        "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+        "bytes": 20987,
+        "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "commandJournalMultiplicity": 1,
+  "journalEntryExact": true,
+  "ownedProcess": {
+    "pid": 3089,
+    "ownedPgid": 3089,
+    "observedPgidAfterLaunch": 3089,
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "argv": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/lighthouse/financeOracle.test.ts",
+      "--reporter=default",
+      "--reporter=json",
+      "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json"
+    ],
+    "startedUtc": "2026-10-15T22:44:26.309934+00:00",
+    "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+    "overriddenEnvironmentKeys": [
+      "PATH",
+      "HOME",
+      "GIT_NO_LAZY_FETCH",
+      "AMC_P021_RUNTIME_OBSERVER_PATH"
+    ]
+  },
+  "ownedGroupAfterExit": {
+    "exit": 1,
+    "processDurationMs": 23159,
+    "observations": [
+      {
+        "capturedUtc": "2026-10-15T22:44:49.471187+00:00",
+        "pgid": 3089,
+        "signal": 0,
+        "absentByESRCH": true,
+        "errno": 3
+      }
+    ],
+    "maxPollingSeconds": 5,
+    "pollIntervalSeconds": 0.05,
+    "signalsOtherThanZeroSent": false
+  },
+  "reportAgreement": {
+    "physicalFiles": 1,
+    "rawAggregateSuiteNodes": 2,
+    "observerTasks": 12,
+    "observerKinds": {
+      "file": 1,
+      "suite": 1,
+      "test": 10
+    },
+    "testIdentities": 10,
+    "identityMultiplicity": 1,
+    "exactIdentityOrder": true,
+    "exactRawObserverStatusAndErrorStackAgreement": true,
+    "passed": 5,
+    "failed": 5,
+    "skipped": 0,
+    "pending": 0,
+    "todo": 0,
+    "nonterminal": 0,
+    "fileAndSuiteOwnedErrors": [],
+    "hooks": [
+      {
+        "kind": "file",
+        "afterAll": "pass"
+      }
+    ],
+    "unhandledErrors": [],
+    "knownLateDiagnostics": [],
+    "snapshotSummary": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 0,
+      "total": 0,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    }
+  },
+  "failureInterpretation": [
+    {
+      "indices": [
+        1,
+        5,
+        7,
+        8
+      ],
+      "actualAssertion": "Expected oracle verdict pass but received fail",
+      "positiveFrame": "tests/lighthouse/financeOracle.test.ts:24:44",
+      "callerFrames": [
+        "tests/lighthouse/financeOracle.test.ts:30:53",
+        "tests/lighthouse/financeOracle.test.ts:52:7",
+        "tests/lighthouse/financeOracle.test.ts:65:7",
+        "tests/lighthouse/financeOracle.test.ts:70:7"
+      ],
+      "scope": "Four completed fixtures show cold-ledger true, action selectedCount1/errors[], authorization errors[]/preimages1/signedFiles17, matched1/commit1/problems[], but snapshot-stable false and seven dependent check results false. The public snapshot evidence has differing before/after hashes. This audit does not determine which physical DB/WAL/key input changed."
+    },
+    {
+      "indices": [
+        5,
+        7,
+        8
+      ],
+      "actualReach": "Initial positive() failed before truncateLog/tamperPreimage/tamperApprovalSignature. Each marker contains exactly one oracle output and zero controlledMutation observations. The intended mutation refusal was not executed and is not a measured result."
+    },
+    {
+      "indices": [
+        9
+      ],
+      "actualAssertion": "action-chain: expected false to be true",
+      "frame": "tests/lighthouse/financeOracle.test.ts:77:41",
+      "scope": "The weaker fixture records the specific actual external default-policy digest mismatch, but also snapshot-stable false; its prerequisite action-chain true assertion fails. The intended policy control is not qualified by this run."
+    },
+    {
+      "indices": [
+        2,
+        3,
+        4,
+        6,
+        10
+      ],
+      "actualStatus": "Passed test bodies",
+      "scope": "These are actual reported passes, not waived errors. Their overall negative qualification remains provisional because the suite genuine positive failed. Unsupported-expectation specifically returns the intended input diagnostic and false placeholders; its cold-verifier stage was not reached in the output."
+    }
+  ],
+  "caseEvidence": [
+    {
+      "caseIndex": 1,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "title": "a real completed journaled payment passes every mandatory oracle check",
+      "status": "failed",
+      "mode": "completed",
+      "root": "/private/tmp/lhfo-u44EX3",
+      "successful": false,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_fc3b18d8-8c83-4acd-a5cc-db3b857a45d7\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"6b9cd4cb93f3984ad74cd90260220c8d0c7ec45e042668ae0ee51a4b9123db95\",\"dataAndKeysAfter\":\"3d25bf2e8551b1040885cb08a9dd4ea881574c86e7acdbe9fa58b412ceab6d19\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541767832,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [
+        "AssertionError: expected 'fail' to be 'pass' // Object.is equality\n    at positive (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:24:44)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:53\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:361:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:295:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "name": "AssertionError",
+          "message": "expected 'fail' to be 'pass' // Object.is equality",
+          "stacks": [
+            {
+              "method": "positive",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 24,
+              "column": 44
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 30,
+              "column": 53
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 361,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 295,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 30,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseIndex": 2,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "title": "a second real payment under another key and the same reference specifically fails no-duplicate",
+      "status": "passed",
+      "mode": "duplicate",
+      "root": "/private/tmp/lhfo-76eyTQ",
+      "successful": true,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": false,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "no-duplicate",
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":1,\"commits\":2,\"problems\":[{\"seq\":10,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_fa004b91-8c79-4bb4-b635-33f7ebf531cf\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"d288b191aa6843ad0a18540483ac58b9c96a394be67bb3158db25be3f86be7da\",\"dataAndKeysAfter\":\"a9f5979c1d7ee8f730546dd83a73403e4c06ec5723c59adfe093b79889ac6690\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-76eyTQ/workspaces/p119-oracle-d46ca7e0-6e6c-434e-8c26-8e69822c0098/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-76eyTQ/workspaces/p119-oracle-d46ca7e0-6e6c-434e-8c26-8e69822c0098/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541768046,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [],
+      "observerErrors": []
+    },
+    {
+      "caseIndex": 3,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "title": "an actual post-authorization amount corruption specifically fails payload-bound",
+      "status": "passed",
+      "mode": "body-mismatch",
+      "root": "/private/tmp/lhfo-TswbXt",
+      "successful": true,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"provider payload differs from approved facts\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_f37ff803-cfe8-4fc8-a37e-ff7e16bf94cd\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"7c83f99c6ad0f1958dba078c19038aee400a903b6aba393ae63ed723894b8a06\",\"dataAndKeysAfter\":\"614842c076a7e05046f51deeec9d63ab478cb89910ef75612f4f497f04d6cf1c\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-TswbXt/workspaces/p119-oracle-482b0be1-69b7-451f-ae0e-e2693d392928/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-TswbXt/workspaces/p119-oracle-482b0be1-69b7-451f-ae0e-e2693d392928/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541768256,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [],
+      "observerErrors": []
+    },
+    {
+      "caseIndex": 4,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "title": "a genuine provider-only commit has no matching completed AMC receipt",
+      "status": "passed",
+      "mode": "provider-only",
+      "root": "/private/tmp/lhfo-8qJG3U",
+      "successful": true,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":3,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"5258b0e5ac8547668884c52a84c4e00a6f15b0aa3c59fae6b4c1c65d8f9ca94b\",\"dataAndKeysAfter\":\"8dfe1f8f3901326fa96659d0172a1000860dd8393ff0dcd57ea9fc1e5ec93443\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-8qJG3U/workspaces/p119-oracle-3b28e2cd-cc56-49f4-9dc8-7dc48c86f18e/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-8qJG3U/workspaces/p119-oracle-3b28e2cd-cc56-49f4-9dc8-7dc48c86f18e/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541768452,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":0,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":0,\"independentlySignedFiles\":0,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [],
+      "observerErrors": []
+    },
+    {
+      "caseIndex": 5,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "title": "a copied closed log with its final newline removed specifically fails txlog-chain",
+      "status": "failed",
+      "mode": "completed",
+      "root": "/private/tmp/lhfo-aKPiV0",
+      "successful": false,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_26f05a09-b528-4457-b82f-e146a8ac6247\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"e20a158fb15d0f4be44f82bb5a456f5a3513a0528aeb93f47379ba63bf4e6bcb\",\"dataAndKeysAfter\":\"f1848c409d4e30211f32971e642b80d9860219b107af3967d9d0eada7cdf35e4\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541768665,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [
+        "AssertionError: expected 'fail' to be 'pass' // Object.is equality\n    at positive (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:24:44)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:52:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:361:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:295:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:51:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "name": "AssertionError",
+          "message": "expected 'fail' to be 'pass' // Object.is equality",
+          "stacks": [
+            {
+              "method": "positive",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 24,
+              "column": 44
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 52,
+              "column": 7
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 361,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 295,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 51,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseIndex": 6,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "title": "adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "status": "passed",
+      "mode": "provider-only",
+      "root": "/private/tmp/lhfo-qeWzPa",
+      "successful": true,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":3,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"4f1c3416e81815e070b98f0f73341b504e094bc8b1506d004cc13154fa56cacd\",\"dataAndKeysAfter\":\"c4358401fa453cfd81bc898e749869c3be59915aea96cfb08b19d5dea851da3a\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-qeWzPa/workspaces/p119-oracle-46a8e489-58ba-45c4-88c1-058d93c849ad/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-qeWzPa/workspaces/p119-oracle-46a8e489-58ba-45c4-88c1-058d93c849ad/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541768857,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":0,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":0,\"independentlySignedFiles\":0,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [],
+      "observerErrors": []
+    },
+    {
+      "caseIndex": 7,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "title": "changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "status": "failed",
+      "mode": "completed",
+      "root": "/private/tmp/lhfo-OsoKtQ",
+      "successful": false,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_94e845e1-2419-43c1-9e86-84cbf6da1a4d\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"f50a4c21f7272b656d73dabb75398d3c748091de918dc2366028cddd1b4b2046\",\"dataAndKeysAfter\":\"a718a9cbb480148bf008bf411db41ad1a85db07abd2abf451cd6f7c06a5f3525\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541769068,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [
+        "AssertionError: expected 'fail' to be 'pass' // Object.is equality\n    at positive (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:24:44)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:65:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:361:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:295:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:64:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "name": "AssertionError",
+          "message": "expected 'fail' to be 'pass' // Object.is equality",
+          "stacks": [
+            {
+              "method": "positive",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 24,
+              "column": 44
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 65,
+              "column": 7
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 361,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 295,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 64,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseIndex": 8,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "title": "a corrupted genuine decision signature is refused without re-signing authority",
+      "status": "failed",
+      "mode": "completed",
+      "root": "/private/tmp/lhfo-r4Tdb5",
+      "successful": false,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_6590ccba-a0d7-42f2-992d-461e06b44a17\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"0eb7fda7807a8dada78dfd31e6c081332e8059ba515fe4d8065a5bed6e29ce0e\",\"dataAndKeysAfter\":\"35ceab0e78027f47980d664ba477727b17abf446b6178ee748f1f36e86ce6e1b\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541769279,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [
+        "AssertionError: expected 'fail' to be 'pass' // Object.is equality\n    at positive (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:24:44)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:70:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:361:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:295:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:69:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "name": "AssertionError",
+          "message": "expected 'fail' to be 'pass' // Object.is equality",
+          "stacks": [
+            {
+              "method": "positive",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 24,
+              "column": 44
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 70,
+              "column": 7
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 361,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 295,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 69,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseIndex": 9,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+      "title": "a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+      "status": "failed",
+      "mode": "weaker-policy",
+      "root": "/private/tmp/lhfo-8PtUcU",
+      "successful": false,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": true,
+        "txlog-chain": true,
+        "post-count": true,
+        "commit-count": true,
+        "no-duplicate": true,
+        "no-dispatch-on-deny": true,
+        "payload-bound": false,
+        "payload-minimal": true,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": true,
+        "cold-ledger-verifier": true,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority.",
+        "payload-bound": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}",
+        "receipt-state": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_61245df6-5abe-4569-afd5-dd251f3bdf49\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}",
+        "snapshot-stable": "{\"dataAndKeysBefore\":\"54da63796c867b1d2e86f15b280a647359af52a9ee552ab6eb06cb74446a025b\",\"dataAndKeysAfter\":\"a674c11788ac2fef55c172f97e642c0f5f9808ec5428fe35b326e4a0ffd4b8d7\",\"shmBefore\":{\"path\":\"/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/evidence.sqlite-shm\",\"absent\":true},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541769495,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual workspace DB/WAL and key/history bytes; readonly coordination may change SHM\"}",
+        "action-chain": "{\"selectedCount\":1,\"errors\":[]}",
+        "authorization": "{\"errors\":[{\"executionId\":\"exec_61245df6-5abe-4569-afd5-dd251f3bdf49\",\"message\":\"signed approval policy differs from the external reviewed default FINANCIAL policy pin\"}],\"preimages\":0,\"independentlySignedFiles\":9,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+      },
+      "failureMessages": [
+        "AssertionError: action-chain: expected false to be true // Object.is equality\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:77:41\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:361:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:295:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:74:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "name": "AssertionError",
+          "message": "action-chain: expected false to be true // Object.is equality",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 77,
+              "column": 41
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 361,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 295,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 74,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseIndex": 10,
+      "identity": "P1-19 finite independent oracle with genuine signed action producers unsupported case expectations fail inputs instead of being silently ignored",
+      "title": "unsupported case expectations fail inputs instead of being silently ignored",
+      "status": "passed",
+      "mode": "unsupported-expectation",
+      "root": "/private/tmp/lhfo-HLmYwC",
+      "successful": true,
+      "oracleOutputCount": 1,
+      "controlledMutationCount": 0,
+      "checkResults": {
+        "inputs": false,
+        "txlog-chain": false,
+        "post-count": false,
+        "commit-count": false,
+        "no-duplicate": false,
+        "no-dispatch-on-deny": false,
+        "payload-bound": false,
+        "payload-minimal": false,
+        "receipt-state": false,
+        "unauthorized-effects": false,
+        "action-evidence-coverage": false,
+        "control-result": false,
+        "cold-ledger-verifier": false,
+        "snapshot-stable": false,
+        "action-chain": false,
+        "authorization": false
+      },
+      "falseIds": [
+        "inputs",
+        "txlog-chain",
+        "post-count",
+        "commit-count",
+        "no-duplicate",
+        "no-dispatch-on-deny",
+        "payload-bound",
+        "payload-minimal",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "control-result",
+        "cold-ledger-verifier",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "selectedEvidence": {
+        "inputs": "Oracle could not establish its complete input/lifecycle proof: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits",
+        "payload-bound": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits",
+        "receipt-state": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits",
+        "snapshot-stable": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits",
+        "action-chain": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits",
+        "authorization": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+      },
+      "failureMessages": [],
+      "observerErrors": []
+    }
+  ],
+  "publicMarkerSummary": {
+    "oracleMarkers": 10,
+    "financeMarkers": 10,
+    "oneOutputEach": true,
+    "allOracleVerdicts": "fail",
+    "allCheckProtocolsValid": true,
+    "cleanupErrors": [],
+    "zeroControlledMutationObservations": true
+  },
+  "publicClosureSummary": {
+    "outerPgid": 3089,
+    "outerPgidAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "launcherChildren": 30,
+    "allLauncherChildrenNaturalExit0AndStreamsClosedAndPidESRCH": true,
+    "coldVerifierChildren": 9,
+    "allReachedColdVerifierChecksTrue": true,
+    "providerChildren": 10,
+    "allProviderChildrenNaturalExit0AndStreamsClosedAndPidESRCH": true,
+    "boundary": "Nested child facts are recorded public observations. This peer audit did not re-probe processes or claim universal descendant/kernel isolation."
+  },
+  "launcherChildren": [
+    {
+      "caseIndex": 1,
+      "label": "initializer",
+      "pid": 3092,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 1,
+      "label": "producer",
+      "pid": 3103,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 1,
+      "label": "oracle-1",
+      "pid": 3111,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4583,
+          "sha256": "34f19a9e664a4494726f2c443cac5970a762c99d305afc6255d51df8e6d78033"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 2,
+      "label": "initializer",
+      "pid": 3114,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 2,
+      "label": "producer",
+      "pid": 3115,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 2,
+      "label": "oracle-1",
+      "pid": 3116,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4672,
+          "sha256": "13d601e8e01496c809ea1d71d292164154c003dcddd3753987f94b863cebdc3b"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 3,
+      "label": "initializer",
+      "pid": 3120,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 3,
+      "label": "producer",
+      "pid": 3121,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 3,
+      "label": "oracle-1",
+      "pid": 3122,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4655,
+          "sha256": "fefed91c4307f0f0d9ad69de9dfc74ee8cd0b5d05ff4b690b778a2f70e97ee3b"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 4,
+      "label": "initializer",
+      "pid": 3125,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 4,
+      "label": "producer",
+      "pid": 3132,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 4,
+      "label": "oracle-1",
+      "pid": 3133,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4530,
+          "sha256": "640a296535c02ff91d08e0ce06dcec70a5673cb5485b29111531f33c0b4af462"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 5,
+      "label": "initializer",
+      "pid": 3136,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 5,
+      "label": "producer",
+      "pid": 3137,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 5,
+      "label": "oracle-1",
+      "pid": 3140,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4583,
+          "sha256": "3a1314491948543c267468a0c9873761f4583b3c07c13a94b4e054b3bf848827"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 6,
+      "label": "initializer",
+      "pid": 3143,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 6,
+      "label": "producer",
+      "pid": 3145,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 6,
+      "label": "oracle-1",
+      "pid": 3146,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4530,
+          "sha256": "d9a0bf24307dc524ef8bdea91cf6eb801c1af0ade2207c9a81983d6183eda3d8"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 7,
+      "label": "initializer",
+      "pid": 3153,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 7,
+      "label": "producer",
+      "pid": 3156,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 7,
+      "label": "oracle-1",
+      "pid": 3157,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4583,
+          "sha256": "18a25a14720caaeff505ee60092276f6d26beff22e783795c21d2c3d6586658c"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 8,
+      "label": "initializer",
+      "pid": 3166,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 8,
+      "label": "producer",
+      "pid": 3168,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 8,
+      "label": "oracle-1",
+      "pid": 3169,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4583,
+          "sha256": "8f6d44ed44e91992ce472e536c34b407f9c90f5758007106510fbbdbff68f74d"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 9,
+      "label": "initializer",
+      "pid": 3173,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 9,
+      "label": "producer",
+      "pid": 3174,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 9,
+      "label": "oracle-1",
+      "pid": 3178,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 4833,
+          "sha256": "58ad757af85fa4aa6ab5a287f96cea95bcee044ce40ca416cbebdc9eca4df6e7"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 10,
+      "label": "initializer",
+      "pid": 3181,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 10,
+      "label": "producer",
+      "pid": 3182,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    },
+    {
+      "caseIndex": 10,
+      "label": "oracle-1",
+      "pid": 3183,
+      "exit": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "captured": {
+        "stdout": {
+          "bytes": 3168,
+          "sha256": "56cf7bfb4746950d2d8d22776f7eaaba8d0c95eff95aba20d96de49b13b3e962"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "captureErrors": [],
+      "truncated": false
+    }
+  ],
+  "coldVerifierChildren": [
+    {
+      "caseIndex": 1,
+      "ok": true,
+      "pid": 3112,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "96278c4e19d2518097599eed36b3a70f6c7679279af768f6bfd6f14775a656bc",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "7016936dafb765cf6e21299054c95132348b9acbb7871ffca3a38b17fdb2d469",
+        "expectedFingerprint": "7016936dafb765cf6e21299054c95132348b9acbb7871ffca3a38b17fdb2d469",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "7016936dafb765cf6e21299054c95132348b9acbb7871ffca3a38b17fdb2d469",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 2,
+      "ok": true,
+      "pid": 3117,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "78ea37462ed62fe9a8103b4046eaeaf9ce132133b737da62990e0db6a599ce81",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "34629115588fdfcf67f96948b2e587b80663955bb8022052c100b1cb1f7c9bbc",
+        "expectedFingerprint": "34629115588fdfcf67f96948b2e587b80663955bb8022052c100b1cb1f7c9bbc",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "34629115588fdfcf67f96948b2e587b80663955bb8022052c100b1cb1f7c9bbc",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 3,
+      "ok": true,
+      "pid": 3123,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "4a01c714928bbb4bbb26565455d31ea3510eecb03fdf2787baaa5e6d0b30af4c",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "2734ea7c747650feb249a6c5aee44a8b6197511fb8c745fc0542551cea96d3ce",
+        "expectedFingerprint": "2734ea7c747650feb249a6c5aee44a8b6197511fb8c745fc0542551cea96d3ce",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "2734ea7c747650feb249a6c5aee44a8b6197511fb8c745fc0542551cea96d3ce",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 4,
+      "ok": true,
+      "pid": 3134,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "55e4ff62a1e318a7dfaa028904f06f9291d9a428bc6edafed1778fd529e527b9",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "5d390e3dc1d53ffddc11799a46f88049865743c719139c86166cf40439e1d79f",
+        "expectedFingerprint": "5d390e3dc1d53ffddc11799a46f88049865743c719139c86166cf40439e1d79f",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "5d390e3dc1d53ffddc11799a46f88049865743c719139c86166cf40439e1d79f",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 5,
+      "ok": true,
+      "pid": 3141,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "e723effa29a774fa6460b93b3b35819b076291a019647495452b78e2166c5476",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "00bef5788e4c7d34ef37b1b78989fa125e3e127aaf8ad85e025d1d788491c262",
+        "expectedFingerprint": "00bef5788e4c7d34ef37b1b78989fa125e3e127aaf8ad85e025d1d788491c262",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "00bef5788e4c7d34ef37b1b78989fa125e3e127aaf8ad85e025d1d788491c262",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 6,
+      "ok": true,
+      "pid": 3147,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "d86f55da6e1a69fa716ce1d80f0486fc8993ebd2d928528cbbd48c13df037386",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "2cf3d5d9c921e07258d16923515fb1c545f330b2f66198b1a04bafbe391ef706",
+        "expectedFingerprint": "2cf3d5d9c921e07258d16923515fb1c545f330b2f66198b1a04bafbe391ef706",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "2cf3d5d9c921e07258d16923515fb1c545f330b2f66198b1a04bafbe391ef706",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 7,
+      "ok": true,
+      "pid": 3158,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "81738ba8aa3a2bd47317e9e8376e911711f7509b7542b94ef891649b9798cd32",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "47a030a06ed9711bc648c2a526199e5180622ff570e445e651a140cd01f325fc",
+        "expectedFingerprint": "47a030a06ed9711bc648c2a526199e5180622ff570e445e651a140cd01f325fc",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "47a030a06ed9711bc648c2a526199e5180622ff570e445e651a140cd01f325fc",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 8,
+      "ok": true,
+      "pid": 3170,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "f1afc3c34efd38da68e2321a6caec275aae419a3af89b98760a7c4ebc071ba31",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "1759b360f7718fb1e94846788a25acb900d62edf7be6eed6fdef899046ed6730",
+        "expectedFingerprint": "1759b360f7718fb1e94846788a25acb900d62edf7be6eed6fdef899046ed6730",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "1759b360f7718fb1e94846788a25acb900d62edf7be6eed6fdef899046ed6730",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    },
+    {
+      "caseIndex": 9,
+      "ok": true,
+      "pid": 3179,
+      "pgid": "inherited outer guarded group; not claimed equal to child PID",
+      "code": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamError": null,
+      "overflow": false,
+      "late": false,
+      "capturedStdoutSha256": "df5851b17be0b9802a45be0d9a91a95a19a53c2b5a959871abe511d8025a4b2b",
+      "capturedStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capturedBytes": {
+        "stdout": 1232,
+        "stderr": 0
+      },
+      "pidProbes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ],
+      "errors": [],
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "ab148ae9cb39f75ee2ff32da6999c5d058f79ba049ceeb062558c5183fb6c25c",
+        "expectedFingerprint": "ab148ae9cb39f75ee2ff32da6999c5d058f79ba049ceeb062558c5183fb6c25c",
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "ab148ae9cb39f75ee2ff32da6999c5d058f79ba049ceeb062558c5183fb6c25c",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      }
+    }
+  ],
+  "providerChildren": [
+    {
+      "caseIndex": 1,
+      "root": "/private/tmp/lhf-gNUB8b",
+      "pid": 3091,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 2,
+      "root": "/private/tmp/lhf-wGjNNi",
+      "pid": 3113,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 3,
+      "root": "/private/tmp/lhf-P0ecB6",
+      "pid": 3119,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 4,
+      "root": "/private/tmp/lhf-9YD48F",
+      "pid": 3124,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 5,
+      "root": "/private/tmp/lhf-oCLNvq",
+      "pid": 3135,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 6,
+      "root": "/private/tmp/lhf-te1dqJ",
+      "pid": 3142,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 7,
+      "root": "/private/tmp/lhf-bS2zJp",
+      "pid": 3152,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 8,
+      "root": "/private/tmp/lhf-72KHYi",
+      "pid": 3165,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 9,
+      "root": "/private/tmp/lhf-EisegE",
+      "pid": 3172,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    {
+      "caseIndex": 10,
+      "root": "/private/tmp/lhf-i6L79O",
+      "pid": 3180,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "No retained filesystem diagnosis was performed; the parent owns that separate audit. Public differing snapshot hashes are not enough to identify the exact mutated DB/WAL/key input.",
+    "No private config, role key, provider token or SQL contents were opened. No actual signature validation or independent provider-chain rebuild was repeated in this narrow peer lane.",
+    "The three mutation controls stopped before their mutations and cannot be credited as executed negative witnesses.",
+    "Five actual passing negative test bodies remain provisional until the genuine positive passes the mandatory sixteen-check gate.",
+    "No source fix, artifact waiver, full F01-F38 corpus, formal completion or global quality pass is inferred."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/command.json",
+      "bytes": 2786,
+      "sha256": "b502f7bda089cc3966dba866708aa205989587f21f58fa71db353cfb1dde4b85",
+      "device": 16777231,
+      "inode": 541769714,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-process.json",
+      "bytes": 820,
+      "sha256": "ae16cfa701b761a7eaec4cd156842bea16688485139ed2ee78dbefb467a27be0",
+      "device": 16777231,
+      "inode": 541767610,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "dce336a0bd17ba1bae09e7cf55c88cbc4ffd527b416d6e78ffcf74a87394cf0a",
+      "device": 16777231,
+      "inode": 541769712,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+      "bytes": 10219,
+      "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93",
+      "device": 16777231,
+      "inode": 541769713,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+      "bytes": 20987,
+      "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc",
+      "device": 16777231,
+      "inode": 541769711,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+      "bytes": 276235,
+      "sha256": "ff395adf08d0be9d897f26a18829c05b41c601efdc440c3f16ac8c5690646555",
+      "device": 16777231,
+      "inode": 541767609,
+      "nlink": 1
+    }
+  ],
+  "allReadsAndWritesFinished": true
+}

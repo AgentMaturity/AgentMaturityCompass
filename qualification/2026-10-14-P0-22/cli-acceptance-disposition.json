@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-14T16:41:14.952918+00:00",
+  "authority": "Direct user reply in this chat",
+  "userReply": "Leave this unresolved and continue after bounded qualification",
+  "scope": "P0-22 empty successful JSON arrays only",
+  "implementation": "Keep passport search and leaderboard show literal acceptance failures and current interfaces unchanged; do not add an envelope, no-claim exception or waiver. Finish independent bounded qualification and proceed to next eligible plan item P0-23.",
+  "actualEvidence": {
+    "report": "final-cli-corpus.json",
+    "sha256": "891455b06a21802d9d438ad42469a0e91ce8566383d4a0cd240fe66d980a3744",
+    "total": 186,
+    "passed": 184,
+    "failed": 2,
+    "pending": 0,
+    "todo": 0
+  },
+  "notAuthorized": "No acceptance weakening, tracker closure, freeze exception, paused-scope resumption or publication."
+}

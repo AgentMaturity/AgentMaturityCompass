@@ -1,0 +1,88 @@
+{
+  "schema": "p112-source-run-independent-review/1",
+  "at": "2026-10-16T19:56:56.529294+00:00",
+  "blockers": [],
+  "phase": "p112-source-combined",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceBaseCommit": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+    "dev": 16777231,
+    "inode": 543246712,
+    "nlink": 1
+  },
+  "exactAuthorCandidate": true,
+  "tests": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0
+  },
+  "newAlreadyDerivedUnitCases": 11,
+  "unchangedCases": 24,
+  "actualFiles": {
+    "tests/toolPipeline.test.ts": 18,
+    "tests/toolPolicyGuards.test.ts": 6,
+    "tests/policy/compiledPolicyGuard.test.ts": 11
+  },
+  "identityJoin": {
+    "orderedRawObserverOccurrenceExact": true,
+    "outcomeInventoryExact": true,
+    "uniqueObserverIds": 35,
+    "sha256": "e96c2ee0073b536114ad24908fb9c9490b5af977c2f3035d89354473032d00c4"
+  },
+  "hookTaskEntries": 3,
+  "individualPassingHookValues": 3,
+  "rawFileMessages": [],
+  "rawFailureMessages": [],
+  "observerTaskErrors": [],
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "fullOuterStreamRead": true,
+  "publicEvidencePaths": [],
+  "naturalClosure": {
+    "exit": 0,
+    "durationMs": 3621,
+    "pid": 23530,
+    "ownedPgid": 23530,
+    "recordedAbsentByESRCH": true,
+    "nonzeroSignalsSent": false,
+    "noNewProbe": true
+  },
+  "currentPreservation": {
+    "protectedBytePins": 88,
+    "candidateInputBytePins": 32,
+    "nativePhysicalPins": 4,
+    "nativeInodes": [
+      542501039,
+      539175547,
+      543125595,
+      543200130
+    ],
+    "nativeBytesHashesDevInodeAndNlinkOneExact": true,
+    "nativeIdentitiesDistinct": true,
+    "heldState": "Root protected snapshot retains R18/headbf3/indexempty; this review rechecks finite bytes and performs no fresh Git status.",
+    "reservation": "Missing shared reservation retains last-known binding and existing holds; no release or current delta inferred."
+  },
+  "sourceAuthority": {
+    "selectedTestAndImportRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "borrowedRunnerCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "inheritedEnvironment": "Root records private HOME/Node22 PATH with inherited environment; no full isolation claim.",
+    "nativeBoundary": "Physical preservation only; no per-test loaded-native-path or broader resource cleanup proof.",
+    "lifecycleBoundary": "Three passing hook entries are observed; no explicit public lifecycle records exist. The new pure unit fixtures own no workspace/process/network resources."
+  },
+  "finiteClaims": [
+    "11new cases execute actual guard helper logic against synthetic already-derived policy/authorization fields.",
+    "Visible tools, run_code handling, unsupported guard names, lease/principal consumption, digest/control facts and approval-class projection passed in this cohort.",
+    "Nonempty leaseId/authenticatedVia and placeholder digests are supplied inputs, not proof of plan activation, record binding, signatures, lease expiry/revocation, authenticated principal or approval.",
+    "No active-head wrapper/live approval-policy branch, signed effective receipt, native/kernel session, actual CodeMode dispatch, domain proposal/label table, amount threshold or destination effect is qualified.",
+    "The existing24tests retain their own firewall/budget/pipeline scope; they do not convert the new unit fixtures into full P1-12 acceptance.",
+    "No source-control, compiler/build/fresh-clone/global-quality/full-issue/release or held P1-02-case result is claimed by this review."
+  ],
+  "authorshipDisclosure": "Reviewer authored the new candidate; actual root-run evidence verification and sibling static test review are separate.",
+  "execution": "Read/hash/stat/JSON data join and private metadata only; no product/helper/test/compiler/native/SQL/network/probe or source/index actions."
+}

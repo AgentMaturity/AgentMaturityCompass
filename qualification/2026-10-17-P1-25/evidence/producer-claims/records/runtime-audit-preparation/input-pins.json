@@ -1,0 +1,127 @@
+{
+  "schema": "p125pc-inert-runtime-auditor-input-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+      "bytes": 2197,
+      "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+      "bytes": 27508,
+      "sha256": "dc346333754ba26c06233ba94719b271645513ecb12856c3a14dd5c1bb27f0eb"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/review.json",
+      "bytes": 2642,
+      "sha256": "54aa8e63247397d5b453092b20028b0e5aa1df9765d2c880a0d6e5745c7b0947"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+      "bytes": 61752,
+      "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.original.source.txt",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow-from-80268079.patch.txt",
+      "bytes": 15903,
+      "sha256": "ec9e75935c573a49f1bd1267ff8a7ca1b46fedd6a4f177541385acec03fa3af1"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/seal.json",
+      "bytes": 1883,
+      "sha256": "8be6b473335782481943d806919ddef2b5b635c5309a4dfce99393881407a769"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/author-review.json",
+      "bytes": 2199,
+      "sha256": "f41b2f4a7ab74dc565b529a0a419c648c189ba514a552c3944d2ff3f2e15780d"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/body-map-and-pins.json",
+      "bytes": 4802,
+      "sha256": "e06619775ea1d966388403ecab6ed032464a23a0df986334a6ae380205dac4b4"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/v2/design.md",
+      "bytes": 12327,
+      "sha256": "f83a1cbbc26004557afb3cd6d0d5c562404f68ff0296cabf34114032274037cf"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/v2/seal.json",
+      "bytes": 1226,
+      "sha256": "6b08e7f59a1892ef153db4cc7d2967b1d5b255ebe691f623a22ba2c9744cec7f"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+      "bytes": 8070,
+      "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    }
+  ],
+  "count": 24,
+  "noActiveNativeOrSigningRootOrRawChildStreamRead": true
+}

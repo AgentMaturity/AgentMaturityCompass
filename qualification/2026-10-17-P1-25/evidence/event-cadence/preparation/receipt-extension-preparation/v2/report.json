@@ -1,0 +1,20 @@
+{
+  "schema": "p125ec-receipt-helper-v2-actual-snapshot-provenance-correction/1",
+  "blockers": [],
+  "actualImmutablePinset": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+    "bytes": 404183,
+    "sha256": "60ea0f2802db7defa832a2b5618160a56eb02f285af669de0f243f0347334654",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+    "dev": 16777231,
+    "inode": 543908695,
+    "nlink": 1
+  },
+  "preExecutionV1Mismatch": "V1 required snapshot sourceHead8506539; actual root snapshot uses current source80268079, with separate previous metadata8506539 and prior semantic sourcef11.",
+  "preferredGuard": "Require schema, sourceHead equal manifest actual sourceCommit, exact previous metadata and prior semantic commits, and all1917SourceHeadBlobsExacttrue.",
+  "allOtherV1CodeByteExact": true,
+  "allExisting1917RetentionAndPrivacyControlPublicationGuardsUnchanged": true,
+  "templateUnreadyUnchanged": true,
+  "noPinsetRewriteOrSourceCopyBypass": true,
+  "noExecutionOrSourceIndexQaPriorArtifactMutation": true
+}

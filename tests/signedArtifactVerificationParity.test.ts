@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
@@ -23,7 +24,8 @@ import { cleanupSignedArtifactVerification } from "../src/utils/signedArtifactVe
 import type { TrustContext } from "../src/trust/index.js";
 import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 
-const archive = "unused-code/2026-10-02-native/signed-artifacts";
+const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
+const archive = resolve(repositoryRoot, "unused-code/2026-10-02-native/signed-artifacts");
 const owned: string[] = [];
 const sourceHashes = {
   "src/audit/binderVerifier.ts": "c0497062161defcd8edbf877e463bbd14140b8095a32394f3383cb7991df52c8",
@@ -66,7 +68,7 @@ async function originalModule<T>(path: keyof typeof sourceHashes, applyForwardEd
     if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) continue;
     const specifier = node.moduleSpecifier.text;
     const location = specifier.startsWith(".")
-      ? resolve(dirname(path), specifier).replace(/\.js$/, ".ts")
+      ? resolve(repositoryRoot, dirname(path), specifier).replace(/\.js$/, ".ts")
       : specifier;
     dependencies.set(specifier, await vi.importActual(location));
   }
@@ -180,7 +182,7 @@ describe("entire archived signed artifact workflows against real local signature
     expect(map.baseCommit).toBe("b30e1c771b89e23ecedb13604cc0bf9102078136");
     expect(map.files.map(row => row.sourcePath).sort()).toEqual(Object.keys(sourceHashes).sort());
     for (const entry of map.files) {
-      const bytes = readFileSync(resolve(entry.archivePath));
+      const bytes = readFileSync(resolve(repositoryRoot, entry.archivePath));
       expect(entry.restoreTo).toBe(entry.sourcePath);
       expect(entry.sha256).toBe(sourceHashes[entry.sourcePath]);
       expect(bytes.length).toBe(entry.bytes);

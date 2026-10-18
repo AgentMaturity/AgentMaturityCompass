@@ -1,0 +1,96 @@
+{
+  "schema": "p125w-private-extension-independent-static-helper-review/1",
+  "at": "2026-10-17T00:32:10.002447+00:00",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "bytes": 36997,
+    "sha256": "4a446052426c9ed59637dd0952d483d64bc8a4ea1dccb55bf1d821aaac989683",
+    "dev": 16777231,
+    "inode": 543820201,
+    "nlink": 1
+  },
+  "preferredAuthorSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "bytes": 2194,
+    "sha256": "f5546df952f3731cab2dd2e712c13ad4beaa722db99e5e3eac2ad2939deb389f",
+    "dev": 16777231,
+    "inode": 543820207,
+    "nlink": 1
+  },
+  "scope": "Full530-line preferred V2 helper, full B37V4-to-B38V1 delta and full V1-to-V2 delta, templates and boundary prose read statically. No helper imported, parsed, compiled or executed; no actual filled manifest or output assembled/approved.",
+  "byteChecks": {
+    "allSixPreferredV2OutputPinsExact": true,
+    "allSevenPreservedV1OutputPinsExact": true,
+    "allDeclaredV1V2InputPinsAndNineTemplateHashOnlyPinsExact": true,
+    "bothFullUnifiedDeltasExactlyReproduced": true,
+    "twoV2LineChangesOnly": true,
+    "preferredHelperSha256": "4a446052426c9ed59637dd0952d483d64bc8a4ea1dccb55bf1d821aaac989683",
+    "adoptedControlSupportExactSha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+    "baseAll1484FiniteFilesRehashedExact": true,
+    "base1483Artifacts1481NonIndex173Commands2188OrderedPinsExact": true
+  },
+  "findings": [
+    {
+      "id": "BASE-PRESERVATION",
+      "finding": "The helper rechecks actual ac7759702 base pinset, every1484 old file byte, exact1483 artifact namespace and e49 semantic source. It carries1481 old payload bytes unchanged, retains the old173 command order, original manifest and2188 ordered assembly pins, requires README to end in exact old bytes and notes to start with exact prior notes. New artifacts can enter only evidence/bounded-window/; only README/receipt/assembly are changed existing metadata."
+    },
+    {
+      "id": "CURRENT-BINDING",
+      "finding": "Actual f11 source-checkpoint shape and two explicit paths are used; runtime151 schema matches initial151 plus two exact old/new/original source successors with other149 exact. All151 active inputs remain pinned before private output; ten old and distinct fresh11th native are stat/hash prerequisites only. Actual94 source/fresh selected and19compiled binding plus root/peer preservation is required. This code does not independently rerun all188 source/dist identity checks; the separately sealed actual runtime-chain peer did so."
+    },
+    {
+      "id": "ACCEPTED-CHAIN",
+      "finding": "Six acceptance phase names derive from exact corrected root bindings. Same22 ordered identities, actual equal hook-entry/value counts, zero skipped/unhandled/late diagnostics, normal exit1 controls, GREEN source/fresh/restores and recorded ESRCH/no signals are required. The independent chain report is exact-pinned, schema-named, source/fresh-bound and blocker-free. Control targets derive from each own recipe, supporting checkpoint.ts lower selection and timeEvidence.ts tolerance without the former one-target alias."
+    },
+    {
+      "id": "ACTION-CLOSURE",
+      "finding": "Actual apply/restore action JSON must exit0, exact-match operation argv and emitted JSON, and enclose the operation timestamp. Accepted product starts must follow action endedUtc; restoration reruns follow restore action endedUtc. Closed preceding GREEN, all ordered manual error messages and nonempty masks/classifications, same-inode exact original/mutant/restoration checks remain mandatory. Actual manual messages and action shapes were separately checked against current records statically."
+    },
+    {
+      "id": "DIAGNOSTIC-HISTORY",
+      "finding": "Original p125w-m1 command/log/raw producer+snapshot/observer/outcome/old-binding plus diagnosis and first apply action are mandatory new artifacts. It remains excluded from all six acceptance phases. Its actual47.099ms action overlap is recomputed from endedUtc, while corrected root bindings differ from retained old JSON only in first mutant phase. Historical M1 apply pointers retain original active path plus old bytes/hash; later records bind current corrected bytes. No old evidence is rewritten. B37 launcher/EOF history stays in old preserved payloads without invented B38 equivalents."
+    },
+    {
+      "id": "COMMAND-EXACTNESS",
+      "finding": "Every selected new command requires unique exact path/bytes/SHA projection in artifacts, exactly one selected log path, exact present rawProducer/rawSnapshot/observer projections and byte-identical producer/snapshot before raw equality use. Commands must close naturally before explicit inventory cutoff. V2 restores exact control-support SHA and fixes both diagnostic command sides to identical three-field projections when physical metadata is supplied."
+    },
+    {
+      "id": "PUBLIC-PRIVACY",
+      "finding": "Explicit root allowlist is pinned, role/name/destination-checked and wholly selected. Private signing-root/workspace files require exact allowlist membership; child streams/json, private-run, private key/CSR/P12/vault/PEM, native/compiled helper/bytecode and __pycache__ payloads are refused. Public lifecycle/checkpoint/certificate/query/reply roles are available. Existing public semantic audit and independent actual chain review bind two grants; helper itself supplies no new crypto execution or public semantic proof."
+    },
+    {
+      "id": "REPRESENTATION",
+      "finding": "Literal PRIVATE KEY marker is rejected on original data before any base64 lossless envelope. Eligible code must end inert .source.txt; logs/patches require envelopes preserving byte length/hash and unchanged command results. Final payloads retain1MiB cap and forbidden-name/literal guards. Prefix collisions and duplicate targets are refused before writing a new private output root; all written bytes are checked."
+    },
+    {
+      "id": "LATER-PUBLICATION",
+      "finding": "Template is explicitly unready with actual later chain/public inventory/cutoff/environment/prose fields unfilled. Helper emits expectations only: separate3metadata admission, all full index blobs/default staged and source-range whitespace, ordinary guarded commit and actual HEAD-only export+validator remain later root work. No predicted output totals, future result/hash or publication/whole-issue/plan/global-quality/release credit."
+    }
+  ],
+  "rootFillRequirements": [
+    "Supply the actual sealed runtime-chain peer schema p125w-independent-completed-fresh-control-runtime-chain-review/1 and exact report pin; do not substitute the static code review role.",
+    "Fill actual accepted chain/public audits, every closed command/artifact/log/raw projection, original diagnostic history, exact independent peer and whole-issue records and explicit public allowlist; independently review that filled manifest separately.",
+    "If copied to active B38/assemble-extension.py, add its exact actual path/bytes/hash to hashOnlyPins because __file__ must be hash-only; preserve inert prepared source.",
+    "Obtain separate metadata prefix/path admission, then ordinary private validation/source materialization/index/whitespace/commit/export checks. Preserve unwaived quality, held D15 archive, missing reservation limitation, Claude work, F37skip and all other holds."
+  ],
+  "limits": {
+    "noHelperParserCompilerImportOrExecution": true,
+    "onlyOwnStaticByteHashTextJsonAnalysis": true,
+    "noAMCOpenSSLNativeNetworkOrLedgerExecution": true,
+    "noKeyPrivateStreamOrSigningRootTraversal": true,
+    "noSourceIndexQaOrClaudeWrite": true,
+    "noMissingReservationProbe": true,
+    "filledActualManifestReviewed": false,
+    "privateAssemblyOrValidatorExecuted": false,
+    "metadataAdmissionPublicationOrRuntimeCredit": false,
+    "wholeIssuePlanReleaseComplete": false
+  },
+  "separateActualRuntimePeer": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/review.json",
+    "sha256": "34db3d1ea446aca16e40ea66d5c98a7f56397c0b315dc315798d17fc4e0ce077",
+    "scope": "Actual evidence-only completed chain; neither this helper was executed nor a filled manifest reviewed."
+  }
+}

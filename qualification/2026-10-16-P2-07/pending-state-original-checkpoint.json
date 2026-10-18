@@ -1,0 +1,237 @@
+{
+  "metadataCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+  "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+  "originalPacketPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/M1.observer.json",
+      "bytes": 77654,
+      "sha256": "3e604d956b707abfe05dab0a7d9914ba379a9ce59983c1bdfcead932f0ce398e",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/M1.observer.json",
+      "gitBlob": "32c78d0e416913d7b20429259186d43af91f5693",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/M1.raw.json",
+      "bytes": 57214,
+      "sha256": "03ba4733015c86091e08fa8441b6b212697cd4c83ef8d2e85ee3ae09a5054830",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/M1.raw.json",
+      "gitBlob": "42a328aea6f3b17b8c83ab9205eb0531146c8b2e",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/M2.observer.json",
+      "bytes": 74898,
+      "sha256": "ec9606a2895a660c2b83d72121e4d43702325895ed2f4cac00f6deaf01649c18",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/M2.observer.json",
+      "gitBlob": "ccd7db8a27e04fd355524a455aa918a6b305cd8d",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/M2.raw.json",
+      "bytes": 56471,
+      "sha256": "3f0727853176ea92e0ef1dcd8e1c0808c856ba0123252df338d1ff3e9c66b15c",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/M2.raw.json",
+      "gitBlob": "6cb664d00a28b3f1935687cc510a110bb4749833",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/README.md",
+      "bytes": 9555,
+      "sha256": "8cafe43cc5f8d8195b82b0c0332b424baeaaba62b98660fa13fd0ea7c470769f",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/README.md",
+      "gitBlob": "05f81a7fd86208a24d154c1f5921496835ceb209",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/canonical.observer.json",
+      "bytes": 72274,
+      "sha256": "58a8e23441f2816ab504c84900b06e4de4d5ffff0d29299ed7bc0f48f397793f",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/canonical.observer.json",
+      "gitBlob": "67b9a135b512e07d494d6813092cea584be2185e",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/canonical.raw.json",
+      "bytes": 55726,
+      "sha256": "0b2364ebfc1a5675835a93ad4c5b64256eeb7c6eab8d993cd2315812be948e80",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/canonical.raw.json",
+      "gitBlob": "7128f491f89f603b467692cc7d1325541b4396bd",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/commands.json",
+      "bytes": 81365,
+      "sha256": "b3a0f78dc5400a9e04b10e349c77b201de96f2ab2bfff61d56e264bd27ea0bcb",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/commands.json",
+      "gitBlob": "398ce79bc4909c8db57758a32b616c540463a3be",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/evidence.json",
+      "bytes": 17515,
+      "sha256": "c3ecf4a45909795d3798579c843d98b5801997bb6c6615d0b5bf05b71d4b1f5a",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/evidence.json",
+      "gitBlob": "da8761527ea1be58ee8092878badf3a018d702da",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/independent-review.json",
+      "bytes": 622,
+      "sha256": "5620415488a854a79541d22541bedfebb3caa53c509dd53f2e6ebe09b868eb0c",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/independent-review.json",
+      "gitBlob": "42f91e26ca01ccdd38c25414366157729889fb4a",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/ownership.json",
+      "bytes": 23489,
+      "sha256": "1c8af3ac0881d6e17ef72c8c80eccc340f9d1dad8687cf9b353547a70787c334",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/ownership.json",
+      "gitBlob": "2c6148da33bda4ba2c63db792db8ccaa78a23278",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/private-references.json",
+      "bytes": 37923,
+      "sha256": "7c2c7073654bee6203d4fac96bb1c2a7885c8fa6ec7c1b431a01ef5617c721f0",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/private-references.json",
+      "gitBlob": "f6ea916524be5d02a7877fb4a707f0dd5f45cb50",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-algorithm-ES256.json",
+      "bytes": 1458,
+      "sha256": "394f0ac5e24af11ec4d104f7b3714b93cf9d0d985da04903ccc4a8d5648b974b",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-algorithm-ES256.json",
+      "gitBlob": "b35cc81869beefde22addeeae6bb1978867cf167",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-algorithm-PS256.json",
+      "bytes": 1458,
+      "sha256": "a2c0abb5350064245e9b91bc31cda60569817e2d80843e58a80282aeaf974fed",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-algorithm-PS256.json",
+      "gitBlob": "8d56477a58a893f910990025581ff6e01d3bc156",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-algorithm-RS256.json",
+      "bytes": 1458,
+      "sha256": "ce24ae42eb05038c3e473728509cfcc9f095c3501c890174b21da9582e6bd067",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-algorithm-RS256.json",
+      "gitBlob": "f1fde3620b12a5c39a96edafcf0b5bef9ee66632",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-failed-refresh.json",
+      "bytes": 1616,
+      "sha256": "fdfab89806e2761f717d88bab747381cbf4c9c7ee6f9b3bedc20d84c3cf188af",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-failed-refresh.json",
+      "gitBlob": "343e3c2682709e16bbca892f874901c8199ad3c4",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-real-ten-second-timeout.json",
+      "bytes": 1121,
+      "sha256": "7892d7f5dc20dc8d8aa300cbca32351a3a8a21eed88fc636ab429262271147c0",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-real-ten-second-timeout.json",
+      "gitBlob": "1a6ef6c1ec7d024e67fb94f38317ffc64b9fd886",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/public-fresh-rotation-real-clock.json",
+      "bytes": 1688,
+      "sha256": "6f39aa3ac7555c98b5b72646afd799926fd721b4ab20a18512c28ac6caf1cbd3",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/public-fresh-rotation-real-clock.json",
+      "gitBlob": "51e9524286fbd872b46bf5c0a2fc172a645afa8b",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/quality-and-freeze.json",
+      "bytes": 4632,
+      "sha256": "44632f9dd1f465c5970d1258437d51b19c162869559f35f0322e8f6b3279a1c2",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/quality-and-freeze.json",
+      "gitBlob": "01534b265eb8c6afe7a230dfb72b4a4edcf125b8",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/receipt.json",
+      "bytes": 12344,
+      "sha256": "3047d4326cd92fc16e7fcbf49d2ca7655645b353d2a5d23c56dd683d4d53c20d",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/receipt.json",
+      "gitBlob": "93aa225fd02c26485a597961d348e342f6387f10",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/red-v2.observer.json",
+      "bytes": 73371,
+      "sha256": "149a1b6bb9acdb19a1067fd58dda344fee8bfaabfa949e8be7b2590bc026ba8f",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/red-v2.observer.json",
+      "gitBlob": "f0221896c9da282bc7aa1652f6c3d775871f2a87",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/red-v2.raw.json",
+      "bytes": 56187,
+      "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/red-v2.raw.json",
+      "gitBlob": "df204e0f617d9d9e299291787acfaee4f3a0b777",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/sensitivity.json",
+      "bytes": 41319,
+      "sha256": "efc584a254d545105136a127fcab01011ec76455a7f4d9d894e11e73ec7b890d",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/sensitivity.json",
+      "gitBlob": "e09e8f88b544ff8d0a839a1c68119ccbe2d73029",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/source-inputs.json",
+      "bytes": 34068,
+      "sha256": "ee570d78e220e798fcf857af1484dacf2c8ac5e7a3fa37ad3a3f481d8abc3f5a",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/source-inputs.json",
+      "gitBlob": "acccab44bc0230b4163525487158cc5a21d3263a",
+      "matchesCommittedCheckpoint": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P2-07/test-corrections.json",
+      "bytes": 14249,
+      "sha256": "dd6d159df4add0464ef5c06f3d34974415514bd35f78efa4c93b7cb3c7acb7b3",
+      "gitCommit": "5696f68c241e411e1d55e39319194ddd9a768988",
+      "repositoryPath": "qualification/2026-10-16-P2-07/test-corrections.json",
+      "gitBlob": "337c4e3af344ade61453d8fead5c4410699aca45",
+      "matchesCommittedCheckpoint": true
+    }
+  ],
+  "retainedNonIndexFiles": 23,
+  "activeIndicesVersioned": [
+    "receipt.json",
+    "README.md"
+  ],
+  "boundary": "Original 25-file packet remains archived at its immutable Git commit. Old verifier evidence is not relabeled under the pending-state source commit."
+}

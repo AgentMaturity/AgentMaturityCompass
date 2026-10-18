@@ -1,0 +1,182 @@
+{
+  "schema": "p125-next-window-private-inputs/1",
+  "count": 29,
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+      "readScope": "full actual helper plus exact prior newline-only comparison"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "readScope": "full actual base checkpoint source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+      "readScope": "whole unchanged own grant file/both bodies"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "readScope": "full existing public chain/head/stamp/timeline flow"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "readScope": "full exact default/accuracy/inclusive comparison source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "readScope": "config/digest/transport seam; no changes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "readScope": "actual retained ledger/session/append/seal API"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "readScope": "actual handle/pool ownership"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "readScope": "actual signed ledger/governance/monitor admission"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/config/amcConfigSignature.ts",
+      "bytes": 2665,
+      "sha256": "4ca0ad0b0395fbc289e0df2d1d3aeaace287d9dace5183f5728db32b10c5b4fb",
+      "readScope": "actual owned signed-config update"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "readScope": "existing init/config exports"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "readScope": "actual pinned signed-list loader"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "readScope": "signed-list/TSA shape and admission"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "readScope": "existing independently signed own list helper"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc",
+      "readScope": "zero-active exact-owned pool close"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84",
+      "readScope": "owned lock/status API"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/evidenceEmitter.ts",
+      "bytes": 24443,
+      "sha256": "fc6885586da01b60ce062dedce3d6fde872fd87ae2919ae08e92d280d4190b41",
+      "readScope": "owned ALS/close API"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "unchanged private environment helper"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "readScope": "public key/checkpoint signature APIs"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "readScope": "actual ledger event types"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "unchanged30s deadline/discovery"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "actual test compiler input contract"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+      "readScope": "full current P1-25 acceptance"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-seam-preparation/review.json",
+      "bytes": 10087,
+      "sha256": "787d34db832a2728794274bd2dfaa61b31bad563f15f2cef49e23f9ac05e0c66",
+      "readScope": "root-adopted direct-seam contract"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-seam-preparation/seal.json",
+      "bytes": 790,
+      "sha256": "99faa84e5dae4507733ac910f6434b1646edd24c77135c5d7c979b7d46a86db7",
+      "readScope": "prior static-only route seal"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/source-materialization.json",
+      "bytes": 1639,
+      "sha256": "666dbcb42c48f6966950649fca06cf090155196c853e2f87fe9d38cec6b4ad67",
+      "readScope": "current three own source paths/bytes, not this next admission"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 70694,
+      "sha256": "bd1bae1f206edaed9aaac06650c98d0e8dd8e60eef85d986ca44439c4d02afc5",
+      "readScope": "existing runtime142 solegrant successor/nineold native metadata, no release"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/seal.json",
+      "bytes": 3204,
+      "sha256": "de3933132164d0ae7ebda4dc1c0dfd046f2c3448d31ae69adfbea0801b258822",
+      "readScope": "preserved original proposal"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-candidate-review/seal.json",
+      "bytes": 1138,
+      "sha256": "d87165125ea0f39296d5574cb3f1882c469bd21fb6a7516bb638260de21e4f92",
+      "readScope": "prior independent static review only"
+    }
+  ],
+  "allSpecifiedReadScopesFinished": true,
+  "noKeysPrivateStreamsOrSigningOutputReads": true
+}

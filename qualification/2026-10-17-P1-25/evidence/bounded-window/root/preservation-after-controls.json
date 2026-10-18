@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-17T00:19:25.858627+00:00",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout",
+  "all151BytesAndPhysicalPinsExact": true,
+  "tenOldAndDistinctEleventhNativeExact": true,
+  "all94SourceFreshPhysicalPairsAnd19CompiledPairsExact": true,
+  "bothSourceFreshCleanIndexesEmpty": true,
+  "heldRHead18RowsIndexExact": true,
+  "noMutationOfOriginalSourceProductionOrCompiledOrNative": true
+}

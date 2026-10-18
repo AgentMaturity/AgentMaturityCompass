@@ -1,0 +1,67 @@
+{
+  "schema": "p125pc-whole-issue-gaps/1",
+  "at": "2026-10-17T02:05:37.432645+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "boundedAcceptance": [
+    "A genuine first checkpoint precedes supported appendEvidence input.ts claims. Actual row.ts preserves backdated and postdated values, signed ledger/seals remain valid, and a genuine second checkpoint covers the rows.",
+    "Two separately captured-query OpenSSL verifications and AMC token/digest/signature/event checks establish the actual bounds. Reader uses real stored row.ts and reports exact BACKDATED_CLAIM/POSTDATED_CLAIM with complete final nonmutation.",
+    "Source, fresh and both explicit restorations pass the same24 ordered cases/hooks3and4. All12 normal source checks pass. Actual102 selected paths/23 compiled pairs/204 distinct physical files,175 protected rows and13 distinct natives remain exact.",
+    "DROP-PRODUCER-TS fails only at698:36; CLAMP-FUTURE-PRODUCER-TS fails only at707:36 with past claim already preserved. Every actual error/mask/cleanup was classified before same-inode exact restore. Four direct actions closed naturally before dependent runs.",
+    "Each RED reaches only the first genuine grant; second checkpoint, reader and final checks are masked and not credited. Source-only mutations provide no compiled mutation credit."
+  ],
+  "technicalWorkStillOpen": [
+    "Nonzero accuracy from genuine signed TSA token fields; current issuer accuracy remains null.",
+    "Real elapsed-minute/default Studio interval scheduling; supplementary explicit-now minute API branch coverage cannot substitute for real elapsed time under the unchanged30000ms deadline.",
+    "Actual session-seal checkpoint and required-no-token enforcement need a recursion-aware integration design; raw synchronous ledger.sealSession itself does not await TSA issuance.",
+    "Existing certificate issuance/token archive/verification/artifactTime/report paths need genuine artifact qualification. They already have source wiring; no missing-wiring claim is made here. Attestation/manifest/schema/report consumer parity still needs its own audit.",
+    "Complete full-suite/cross-platform/public issuer/global-quality/release requirements and the rest of the plan."
+  ],
+  "heldDecisionsRemain": [
+    "P1-01 recorded gaps",
+    "P0-29 successor decisions",
+    "P0-22 empty-result contract",
+    "D-03 written live-health skip until P2-06",
+    "P0-09/P0-51 key precedence",
+    "P0-24 expert wording",
+    "P2-02 pause/P2-27 echo",
+    "P1-06 Claude ownership",
+    "P1-02 three held failures and coordination",
+    "Provider D15 ignored archive staging held; no force-add or bypass",
+    "Existing private-provider/package/library/manual-generator/public-entry/CI and other recorded human/external holds"
+  ],
+  "F37": "Skipped, unfixed and unqualified at user request. Ordinary HTTP fixtures supply no F37 proof.",
+  "quality": {
+    "status": "RED",
+    "duplicates": 1268,
+    "deadCode": 2712,
+    "beforeDeadCode": 2712,
+    "addedFindings": 0,
+    "removedFindings": 0,
+    "remainingOrderedFindingsAndFullDuplicateResultExact": true,
+    "waiver": false,
+    "baselineChange": false
+  },
+  "nextRecommendedBoundedSeam": "Genuinely signed nonzero TSA accuracy after current metadata/index/export/QA closure and separate source admission.",
+  "noNewSourceAllocationFromRouting": true,
+  "noTtlContractInvented": true,
+  "noPushPrMergeRelease": true,
+  "preserveClaudeAndMissingReservationOwnership": true,
+  "boundedEvidenceLimits": [
+    "Controlled own trust roots and genuine fixture grants do not establish public issuer trust.",
+    "Current controls prove source-side sensitivity only, not compiled-output mutation sensitivity or universal descendant/native/environment isolation.",
+    "Data auditors observe real source assertions and explicit public facts; they do not independently rerun monitor/PKI/signature verification.",
+    "No current diagnostic product run or retry exists; prior B38 diagnostic history remains preserved in the earlier packet."
+  ],
+  "metadataPublicationOrExportCreditAtThisRecord": false,
+  "priorGapsPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/whole-issue-gaps.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 4438,
+    "sha256": "989ba7da0ce9a821dc3674abb73f56a670c28acefc378f191b24fe8f1da9892c",
+    "dev": 16777231,
+    "inode": 543908816,
+    "nlink": 1
+  }
+}

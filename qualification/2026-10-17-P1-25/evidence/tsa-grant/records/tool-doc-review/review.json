@@ -1,0 +1,89 @@
+{
+  "schema": "p125g-openssl4-installed-documentation-review/1",
+  "at": "2026-10-16T22:45:59.477831+00:00",
+  "blockers": [],
+  "verdict": "No concrete installed-documentation incompatibility found for the exact unchanged candidate. This is static documentation fit only; actual tool help/config/crypto/runtime qualification remains root work.",
+  "candidate": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+    "bytes": 27505,
+    "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+    "regular": true
+  },
+  "fiveSealedCandidateOutputsExact": true,
+  "selectedTool": {
+    "invoked": "/opt/homebrew/bin/openssl",
+    "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+    "bytes": 881424,
+    "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+  },
+  "selectionAuthority": "/private/tmp/p1-25-grant-qualification-20261017/tool-filesystem-inventory.json",
+  "selectionLimit": "The root record reproduces PATH selection by filesystem inspection. It is not a tool invocation/version/help result or current execution proof. No tool binary was opened or executed by this reviewer.",
+  "installedReceipt": "INSTALL_RECEIPT.json source.versions.stable is4.0.3; bottle metadata is contextual package provenance, not fixture/crypto evidence.",
+  "commandCompatibility": [
+    {
+      "command": "req -new/-x509 -newkey rsa:2048 -noenc -sha256 -days/-set_serial -config/-extensions -keyout/-out",
+      "documentation": "openssl-req4.0.3 decoded285-298,349-359,392-419,451-465,476-503",
+      "result": "All used options remain documented. Keyout routes the private key to an owned file instead of stdout. RSA2048 and unencrypted new key match exact test-only plan; this does not assert generation succeeded."
+    },
+    {
+      "command": "x509 -req -in ... -CA ... -CAkey ... -set_serial2 -days1 -sha256 -extfile extensions.cnf -extensions tsa_leaf -out ...",
+      "documentation": "openssl-x5094.0.3 decoded275-282,460-467,490-496,551-590,611-630",
+      "result": "CSR input must be correctly self-signed; direct micro-CA issuance, explicit serial without CA serial database, and exact named extfile section remain documented. Candidate does not depend on4.0 default-config extension discovery."
+    },
+    {
+      "command": "ts -reply -config tsa.cnf -section tsa_local -queryfile actual.tsq -out actual.tsr",
+      "documentation": "openssl-ts4.0.3 decoded336-390,512-584",
+      "result": "Response generation from a DER request, required sole critical timeStamping signer EKU, serial/digests/signer_digest, policy and ESS settings remain documented. Without token_out the output is TimeStampResp. Exact nonce/certReq/response contents are future observations, not claimed from docs."
+    },
+    {
+      "command": "ts -verify -queryfile actual.tsq -in actual.tsr -CAfile root.pem",
+      "documentation": "openssl-ts4.0.3 decoded430-481 and openssl-verification-options4.0.3 decoded415-424,486-500,783-792",
+      "result": "Original-query verification against supplied root is documented and verification errors cause failure. Candidate uses no noverify/nosigs/no_check_time/partial_chain/ignore_critical/auth_level override. Current-time certificate checks remain enabled in the oracle; AMC separately checks certificate validity at signed genTime. Revocation checking is not inferred."
+    }
+  ],
+  "concreteVersionDifferences": [
+    {
+      "difference": "OpenSSL4 req/x509 removed built-in automatic SKI/AKI generation.",
+      "candidateEffect": "Root configuration explicitly sets subjectKeyIdentifier=hash; leaf explicitly sets subjectKeyIdentifier=hash and authorityKeyIdentifier=keyid:always,issuer. Root self-signature does not require a root AKI. No reliance on removed auto-generation was found.",
+      "documentation": "req4 decoded492-495/960-961; x5094 history927-930; x509v3_config4 decoded331-389"
+    },
+    {
+      "difference": "OpenSSL4 x509 accepts extension sections from default config when extfile is omitted.",
+      "candidateEffect": "Both -extfile and -extensions are present, selecting only the owned tsa_leaf section. No new system/default-config dependency is required.",
+      "documentation": "x5094 decoded551-586"
+    },
+    {
+      "difference": "OpenSSL4 removes -engine and ts crypto_device.",
+      "candidateEffect": "Candidate uses neither. The complete ts3.6.5\u21924.0.3 documentation delta contains only version header and these removals/history; no relevant ts option semantic delta appears.",
+      "documentation": "ts4 decoded740-741 and complete local text comparison"
+    },
+    {
+      "difference": "Verification-options4 expands CA/trust/issuer/pathLen/keyUsage explanation and partially revises x509_strict behavior.",
+      "candidateEffect": "Candidate root is explicit CA:true,pathlen0,keyCertSign; only an end-entity leaf is issued, matching direct chain. Leaf is CA:false,digitalSignature,critical sole timeStamping. Candidate does not set x509_strict or weaken verification. This does not claim all4.0 trust behavior is identical to3.6.5.",
+      "documentation": "verification-options4 decoded149-341,425-455,649-692,783-792"
+    }
+  ],
+  "configurationAndAlgorithms": {
+    "explicitExtensions": "x509v3_config4 documents CA:false, root pathlen0 for end-entity issuance, digitalSignature/keyCertSign, timeStamping, SKI hash and mandatory keyid:always binding. SKI hash uses SHA1 as an identifier; it is not a SHA1 signature or ESS hash claim.",
+    "ownedConfig": "config4 decoded305-308 permits leaving modules at defaults; decoded433-441 states default provider is implicit when none is activated. Candidate sets owned OPENSSL_CONF and command-specific configs; it does not copy installed/system config, load a provider or use include directives. No actual system config body or key was read.",
+    "rsa": "Default-provider4 documents RSA signature/key support. EVP_SIGNATURE-RSA4 documents RSA-SHA256/sha256WithRSAEncryption as PKCS1v1.5. This establishes documented availability, not which exact CMS/certificate OIDs the future commands emit. Current AMC accepts RSA PKCS1v1.5/SHA256 and refuses unsupported alternatives.",
+    "serialConcurrency": "ts serial is mutable and documentation says it is not locked. Candidate serial state is per owned fixture and response signing is sequential; no concurrent shared CA state is proposed.",
+    "privacy": "All actual keys/CSR/config files remain future test-owned resources. No existing private key, CA database, generated output or secret body was read; source literals/documents are the only configuration review."
+  },
+  "futureActualEvidenceRequired": [
+    "Root actual version/help using the unchanged wrapper; no credit supplied here",
+    "Exact discovered executable/path/version/hash/environment binding during actual candidate execution",
+    "Actual extension/profile and query-based response generation; exact CMS/ESS/nonce/certReq/policy bytes and query-root oracle success",
+    "Both two named bodies executed without skip and actual returned grants/route ordering/failure preservation",
+    "All child streams/events/exits/signals and natural HTTP/process closure;10s/30s fit without override",
+    "Full current ownership/D15/freeze/quality and metadata allocation remain root responsibilities"
+  ],
+  "heldBoundaries": "No source generator/manual-entry/Knip/package/CI/config/freeze/harness/environment change, ownership release, source allocation or full P1-25/plan closure.",
+  "executed": false,
+  "toolProbe": false,
+  "keysReadOrCreated": false,
+  "candidateChanged": false,
+  "runtimeFitProven": false,
+  "reviewedDocuments": 12
+}

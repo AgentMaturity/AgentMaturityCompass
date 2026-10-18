@@ -1,0 +1,22 @@
+{
+  "phase": "mutant-schemas",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/gen-spec-schemas.mjs",
+    "--check"
+  ],
+  "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+  "pid": 40042,
+  "exit": 1,
+  "expectedExit": 1,
+  "durationMs": 438,
+  "ownedGroupProbes": [
+    {
+      "utc": "2026-10-15T08:39:45.378842+00:00",
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "signalsOtherThanZeroSent": false
+}

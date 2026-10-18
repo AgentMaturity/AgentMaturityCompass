@@ -1,0 +1,458 @@
+{
+  "schema": "p125-client-private-count-surface-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/README.md",
+      "bytes": 2137,
+      "sha256": "ce7675a14905884b0da5dc251997413b1b5fbe7f45ffcf98428b3249194eb491"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/observations.json",
+      "bytes": 1137793,
+      "sha256": "413ba9e97ff225373b484ae5866dcc5c7718475f8f8d9f2b9fcac88b1cdcae73"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/review.json",
+      "bytes": 5638,
+      "sha256": "9e75e7374ddb99670b4e3ee4b8d3cd745b2f97aafa04d2c4502e614d9da4f421"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/input-pins.json",
+      "bytes": 735214,
+      "sha256": "8f9dee0c0067b3b4eb85d68516340b419622ba20087a48e72a63798bc0a3afc6"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/seal.json",
+      "bytes": 2637,
+      "sha256": "4ab2ce6a6a42524287c6efdfa5c63515824bd309f28390b31cba008afec56b1f"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/README.md",
+      "bytes": 1923,
+      "sha256": "895a0be625aac99cbb724ecb0f9793f95e0ccbe0dc5148f955d6c62bd9e175e2"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 27511,
+      "sha256": "3a205ea23bf45a72ce8770afccba695963c04fe12dabec7a2c0372d810d604ac"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 993581,
+      "sha256": "df041e3114d5447822db88a2f2ca8967cf84ed8af48e126373c8a2c624216100"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/pins.json",
+      "bytes": 5957,
+      "sha256": "6596f44684c9f9e505693f5a6149f3cd9cbb78a01979f3eedc0fe2342b86dbd0"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/seal.json",
+      "bytes": 3537,
+      "sha256": "b13abbb8373f30dd8c1d478e98400fd10016656509b04d196edfc1286a4a075c"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-actual.json",
+      "bytes": 5558,
+      "sha256": "cfbb422f421a311e6c236c7eccbf7ed0bfa3a764fa9b2d14d4b7468ee8a8267c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "e3a567782f6d3541a5b075c95ff1e55092071c9a5649cbc856dfba6eeb3d44f0"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "42d2589cdbae8f64deeeb405899d6a9c3d6ead7a530ac3092576f1679e837935"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/owned-process.json",
+      "bytes": 509,
+      "sha256": "3ea321733521e97ce7ee4ab5af8d6ea3d5c903ef3091deb34534050386281a03"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "00b797d2cf4a50210d5838542171c8cd2507805b0975cbdac26e99aa6a2ce2ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "8952f99d0c69024745a3c361a0d3f8c83b90ed07d8a654e7c65c7710b13e1139"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "e326da4767b404a0be570ddb4ff8e43ff7730be5bd9be87aa1e57156e4762123"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "4bd7e2f981a5eca31bb60e4bb00a3c07567cd0aa1ab291eadc3b590b26686beb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "ae50801c6b0b67be2cf7d80bc2658577c0dcddfb9545a68cf370d235a863d7c9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "10bc89bdcc14e2e13a50808a261cb98c67f887d52410b75bb9ede761c7e6f664"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+      "bytes": 62243,
+      "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+      "bytes": 19504,
+      "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+      "bytes": 44023,
+      "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+      "bytes": 11197,
+      "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 108101,
+      "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+      "bytes": 672,
+      "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+      "bytes": 7630,
+      "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+      "bytes": 13743,
+      "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+      "bytes": 13771,
+      "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+      "bytes": 6089,
+      "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+      "bytes": 47452,
+      "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+      "bytes": 25711,
+      "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18504,
+      "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+      "bytes": 13501,
+      "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+      "bytes": 47279,
+      "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+      "bytes": 3952,
+      "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+      "bytes": 8451,
+      "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+      "bytes": 1187,
+      "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+      "bytes": 1876,
+      "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+      "bytes": 5262,
+      "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+      "bytes": 4086,
+      "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+      "bytes": 16329,
+      "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+      "bytes": 10048,
+      "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+      "bytes": 1064495,
+      "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+      "bytes": 880,
+      "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+      "bytes": 14680,
+      "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e"
+    }
+  ],
+  "completePerRootFilePins": {
+    "count": 1810,
+    "containedIn": {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 1987921,
+      "sha256": "565699aa878e3d47a0c97681efb8ce2b09f9a4812e84b790c6e26ca72441a5f6"
+    }
+  },
+  "preservedOriginalsPrivateOnly": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/README.md",
+      "bytes": 59828,
+      "sha256": "8952f99d0c69024745a3c361a0d3f8c83b90ed07d8a654e7c65c7710b13e1139"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "e326da4767b404a0be570ddb4ff8e43ff7730be5bd9be87aa1e57156e4762123"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/website/index.html",
+      "bytes": 43520,
+      "sha256": "4bd7e2f981a5eca31bb60e4bb00a3c07567cd0aa1ab291eadc3b590b26686beb"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/website/lite.html",
+      "bytes": 11197,
+      "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "ae50801c6b0b67be2cf7d80bc2658577c0dcddfb9545a68cf370d235a863d7c9"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/private-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "10bc89bdcc14e2e13a50808a261cb98c67f887d52410b75bb9ede761c7e6f664"
+    }
+  ],
+  "publicationBoundary": "No raw private originals or complete ownership observation adopted as receipt artifacts.",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/README.md",
+      "bytes": 3782,
+      "sha256": "b8e04d7ea76a6de2c7103560381c91963e84a7d2ddcf228b9a1a411c4ed82e5a"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 27641,
+      "sha256": "3aa53ddffba4f8aeb85ab66db101084e5750b564f950d01b75c5e6cbd35cfa53"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/review.json",
+      "bytes": 3071,
+      "sha256": "66083488cbc19ed43321b32440c4dee958e97a44e233e58ef34e5d899b91605e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/initial-static-preparation-stop.json",
+      "bytes": 433,
+      "sha256": "6d66bf912353a1066c419ee1f015e086f5bb3d0ce0806664d1a2cc5210302c12"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/static-read-completion.json",
+      "bytes": 276,
+      "sha256": "11ee759eafdc7866e35bf396adc10a4fe3bf72b7fb929ce576fbceb81ed15fd1"
+    }
+  ]
+}

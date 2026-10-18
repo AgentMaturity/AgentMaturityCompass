@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-48",
+  "date": "2026-10-14",
+  "commit": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "branch": "codex/p0-48-current-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm exec vitest run tests/reconciliationDefectsReleaseGate.test.ts --reporter=json --outputFile=/private/tmp/p0-48-matrix-regression-red-20261014.json",
+      "exit": 1,
+      "durationMs": 1595
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 30038
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4269
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/reconciliationDefectsReleaseGate.test.ts tests/foreignSubagentRunner.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-48-matrix-and-foreign-green-20261014.json",
+      "exit": 0,
+      "durationMs": 29957
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36199
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 511
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 625
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/reconciliationDefectsReleaseGate.test.ts --reporter=json --outputFile=/private/tmp/p0-48-matrix-final-green-20261014.json",
+      "exit": 0,
+      "durationMs": 960
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1778
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/reconciliationDefectsReleaseGate.test.ts --testNamePattern 'both supported Node jobs retain their results' --reporter=json --outputFile=/private/tmp/p0-48-fail-fast-true-20261014.json",
+      "exit": 1,
+      "durationMs": 864
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/reconciliationDefectsReleaseGate.test.ts --testNamePattern 'both supported Node jobs retain their results' --reporter=json --outputFile=/private/tmp/p0-48-continue-on-error-expression-20261014.json",
+      "exit": 1,
+      "durationMs": 620
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 35833
+    }
+  ],
+  "tests": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "356fc1896c602f7896095d70222207c8388bedb0fc92c9e76b5d6bd1f41305aa"
+    },
+    {
+      "path": "build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "commands.jsonl",
+      "sha256": "7e1221287e883ad64f7f79169af48ddc199628f8706d449559d5c9e784948d6a"
+    },
+    {
+      "path": "continue-on-error-expression.json",
+      "sha256": "6bd0873f50aaf4dc8e7d2cf46eeceb8ce6b7c6cfe5b98475488e9d47e3d5c623"
+    },
+    {
+      "path": "continue-on-error-expression.log",
+      "sha256": "7f80bc93c13bd9c8c79b629e23bb0280742a33230216ae5785427af84f9f0912"
+    },
+    {
+      "path": "counts.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "docs.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "fail-fast-true.json",
+      "sha256": "e3bf7042c607f164332750e4d94b446aec65188430329d5b588fb9efa887202a"
+    },
+    {
+      "path": "fail-fast-true.log",
+      "sha256": "fb9f41654a43aa48e1838d5b68fcf6bdb8f237eb1df8a0e4652f1a6b4e7b3f47"
+    },
+    {
+      "path": "final-diff-review.json",
+      "sha256": "6c33fdfb0055183eb0a68865179f2e2661fc125f22a3272691728739d907b701"
+    },
+    {
+      "path": "final-diff-review.md",
+      "sha256": "e413fe908977b8e58ecaf52bea539cc06295913a353fcc4112e22b02e7724cb4"
+    },
+    {
+      "path": "final-readiness-audit.json",
+      "sha256": "46373f675c83c156f68844df4fe32d7f2ba87a4db55a7afed4a5cd5241b5474c"
+    },
+    {
+      "path": "final-readiness-audit.md",
+      "sha256": "41bab373e15b29df49517ca97694200d1cb2fdce0de7fa2765ee6f37a654208f"
+    },
+    {
+      "path": "freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "f3d9d74d5a12abf7f7da95cabc835343c0bf5553a9d3345228f43742b50195b7"
+    },
+    {
+      "path": "graph-limit.json",
+      "sha256": "6ec0f19e0dbb64b7ba762912524e29f2e7bfcbd6e015b3f1b8991a4e0a95587f"
+    },
+    {
+      "path": "graph-navigation-scoped.log",
+      "sha256": "c9cc4b24cd9195313ba94bc3f77aeb7a18600b89cd70e1503bd463a4b85e3a3e"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "b6d4ba0d66c1731b0bcb1ce1a1bcd4e5c6d7ec9f83aa6bea39f2671274e6a03e"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "matrix-and-foreign-green.json",
+      "sha256": "8ef385fe2767f4849b54d38ddfc8a8f9b0b1a8376279d8b3c872d4998e583106"
+    },
+    {
+      "path": "matrix-and-foreign-green.log",
+      "sha256": "ed70aa60c324d584522b917e4203911f48ca57cd38997686feb32e8d1e33592c"
+    },
+    {
+      "path": "matrix-final-green.json",
+      "sha256": "9ff08118533187619d3e1cc82d82040fb96845657a6885509f74e96c3b16fa26"
+    },
+    {
+      "path": "matrix-final-green.log",
+      "sha256": "085ae736335b71a49e4609f9a458f826bf28a7852866cde0882ae19dee0da462"
+    },
+    {
+      "path": "matrix-mutants-summary.json",
+      "sha256": "6f7a58c3bda83063f99175a5676fdb8299e714fb72948b64ffb24da538fc2aec"
+    },
+    {
+      "path": "matrix-regression-red.json",
+      "sha256": "30efbc889bb033ec8645a48edea23e2f725fb4fda3540b833ae576378a2f502f"
+    },
+    {
+      "path": "matrix-regression-red.log",
+      "sha256": "2ceb0433a0f8dcd26eb6722524591b25efc7ac3ef959b3316b38888648d1c499"
+    },
+    {
+      "path": "node24-foreign.json",
+      "sha256": "49cae90c479ffe3398d96b02a4e9d5539b15b28d438b887ba1d98772e09bfefa"
+    },
+    {
+      "path": "node24-foreign.md",
+      "sha256": "169adb376bee8ae5e04cd7b57952635cd360fdaad1281974034ba9fb909ca28b"
+    },
+    {
+      "path": "node24-matrix-final.json",
+      "sha256": "bc81311fea9be8c84caa0a140598d3978bfd846a307ad4dcc927e7569d0e1ac3"
+    },
+    {
+      "path": "node24-matrix-final.md",
+      "sha256": "b0bcdb71b5dd835738b99a11b5653221827d0a21123cf14343431fb1ad85d8e6"
+    },
+    {
+      "path": "pipeline-qualification.json",
+      "sha256": "774bf86a9fda5b90dce71196436f32df353b7e038b76797c72c4bb57f76ae6e4"
+    },
+    {
+      "path": "pipeline-qualification.md",
+      "sha256": "86efd0a7a8838cf35cfb326006551033703715b06cc0bddf0fbce9a14670bfb7"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "a5a0084ede0dcc48a86ca2199d4524ef2d667147984cd736d0970972cadfc4f3"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "ef251e02adcdeb466213398cebc75c540b66199c7f4febcf424e2a70910d5b02"
+    },
+    {
+      "path": "typecheck-tests-final.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "typecheck-tests.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    }
+  ],
+  "notes": "HOSTED ACCEPTANCE OUTSTANDING. Tests field names the final four Node22 reconciliation cases, not a full suite. Node24 passes the same four at exact c4be. Twelve foreign-runner cases pass on Node22 and on Node24 before/after restored spy mutation; unchanged runtime/test blobs justify reuse across c4be. Missing fail-fast regression and actual true/expression fixture mutants intentionally exit1; filtered negative reports retain three pending cases. Actual spy-removal probe passes its unchanged refusal assertion but emits the giant line; eleven cases are intentionally filtered. Four exact pipeline cases retain full output, clip console lines and propagate exits0/17. Build, lint, final test typecheck, counts/docs and accepted-base freeze pass. No production/coverage/freeze weakening; baseline source-quality permissiveness remains P0-33 debt. No fresh hosted both-job completion, whole-suite/coverage qualification, Done, publication or release is claimed."
+}

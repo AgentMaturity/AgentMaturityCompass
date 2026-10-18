@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:09:56.537210+00:00",
+  "scope": "Single-site v2 static follow-up, reusing the unchanged remainder of the completed v1 full-code and contract review.",
+  "decision": "STATIC_F1_RESOLVED_NO_BLOCKING_FINDINGS",
+  "findings": [],
+  "reviewedFreezer": {
+    "path": "/private/tmp/p0-45-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 39181,
+    "sha256": "a1c0de3feaf6fd5a7b2e823ca4b92b096a153c371d28da6ad2d2b6c35571137b"
+  },
+  "preservedV1": {
+    "path": "/private/tmp/p0-45-freeze-qualified-evidence-prepared-20261015.py",
+    "bytes": 38880,
+    "sha256": "3c4685fb48a71c8c9af9497c0c226bbd21583998328c995195d03ffff2f9aac9"
+  },
+  "priorFullReview": {
+    "path": "/private/tmp/p0-45-freezer-code-static-review-20261015.json",
+    "bytes": 9564,
+    "sha256": "3ef6a439febc71add38b793e6f9a36f17d9009876fb67b363d3d4f113b745987"
+  },
+  "actualOriginalReview": {
+    "path": "/private/tmp/p0-45-original-corpora-independent-review-20261015.json",
+    "bytes": 44245,
+    "sha256": "699e0c65ac32bfc9705ad4c978d12494e0f49ce699e24da188ef29504914c939"
+  },
+  "changeNote": {
+    "path": "/private/tmp/p0-45-freezer-v2-change-note-20261015.json",
+    "bytes": 900,
+    "sha256": "a1e84f5a9d7e40eb04856111e03568cce475558d01f62288e0c9080ffea5dec7"
+  },
+  "diff": {
+    "site": "v2 lines313-314",
+    "onlyChange": "Read original_review_data once and gate blockingFindings, allReadsFinished, exact approved decision and formalAcceptanceClosed.",
+    "resolvedFinding": "F1",
+    "actualApprovalFields": {
+      "blockingFindings": [],
+      "allReadsFinished": true,
+      "decision": "FOUR_SEPARATE_ORIGINAL_CORPORA_VERIFIED_WITH_BOUNDED_MEANING",
+      "formalAcceptanceClosed": false
+    },
+    "informationalFindingIdsRetained": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5"
+    ],
+    "allOtherBytesUnchanged": true
+  },
+  "preservedContracts": [
+    "8205 tracked +4529 compiled =12734 baseline files.",
+    "Two exact controls, six future phases, the same12 core identities and72 derived repeated executions; survivors retained.",
+    "Four original12/5/4/10 invocations remain separate.",
+    "Future15-row root journal with final-normal-freeze last; only exact empty old-message grep may exit1.",
+    "Five explicit excluded closure/home/tmp/store roots, private large-manifest reference, write-once nontransactional semantics and acyclic output pin order.",
+    "Formalfalse, first-assertion masking, absent retained receipt sample, adjacent doctor proposal, quality and held ownership limits unchanged."
+  ],
+  "sevenFutureOutputsAbsentAtCheck": true,
+  "prerequisitesStillRequired": [
+    "Root-authorized completed six-phase runtime and release records.",
+    "Final normal freeze and complete closed15-row journal.",
+    "Root review before metadata enactment, followed by independent actual evidence review."
+  ],
+  "performed": {
+    "fullV1V2DiffRead": true,
+    "actualApprovalFieldsRead": true,
+    "targetImported": false,
+    "targetParsedOrSyntaxCompiled": false,
+    "targetExecuted": false,
+    "productRuntime": false,
+    "globalClosureRehash": false,
+    "testsBuildInstallMutation": false,
+    "producerOrRepositoryWrites": false,
+    "writes": "Only NEW v2 review pair."
+  },
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-45-freezer-v2-static-review-20261015.md",
+    "bytes": 1298,
+    "sha256": "1670964ab59de4f6b7bd1501440b61b5565c34bc3e274884889f71501e8caa7e"
+  }
+}

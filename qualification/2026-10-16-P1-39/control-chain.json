@@ -1,0 +1,89 @@
+{
+  "schema": "p139-source-control-chain-closure/1",
+  "capturedUtc": "2026-10-16T16:09:58.303850+00:00",
+  "sourceCommit": "aa198eaf060a656628d4f78a2822ca17ce4df3ab",
+  "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "same81IdentitiesAllPhases": true,
+  "phases": [
+    {
+      "phase": "p139-fresh-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 12884,
+      "ownedPgid": 83341,
+      "ESRCH": true,
+      "allPublicLifecycleClosed": true
+    },
+    {
+      "phase": "p139-issuer-control-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 80,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 11417,
+      "ownedPgid": 83666,
+      "ESRCH": true,
+      "allPublicLifecycleClosed": true
+    },
+    {
+      "phase": "p139-issuer-restored-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 11395,
+      "ownedPgid": 83906,
+      "ESRCH": true,
+      "allPublicLifecycleClosed": true
+    },
+    {
+      "phase": "p139-replay-control-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 79,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 11519,
+      "ownedPgid": 83995,
+      "ESRCH": true,
+      "allPublicLifecycleClosed": true
+    },
+    {
+      "phase": "p139-replay-restored-nine-files",
+      "tests": {
+        "numTotalTests": 81,
+        "numPassedTests": 81,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 11523,
+      "ownedPgid": 84182,
+      "ESRCH": true,
+      "allPublicLifecycleClosed": true
+    }
+  ],
+  "allSourceAndCompiledAndGuardPinsRestored": true,
+  "bothSAndQCleanAtSameCommit": true,
+  "heldR24PinsAnd18PathsIndexExact": true,
+  "allThreeNativeIdentitiesExactDistinct": true,
+  "oldCompilerAndOtherHaltEvidencePreserved": true,
+  "newNamespaceIdleAndNoControlActive": true,
+  "verifiedConcreteRows": 167,
+  "sourceControlsOnlyNoCompiledChildSensitivity": true,
+  "globalQualityGreen": false,
+  "formalDone": false
+}

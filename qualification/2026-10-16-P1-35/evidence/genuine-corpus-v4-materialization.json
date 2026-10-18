@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-16T17:00:54.151164+00:00",
+  "directory": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/legacy-1.1.1",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/legacy-1.1.1/originals.tar.gz",
+      "bytes": 709335,
+      "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c",
+      "source": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/corpus-staging/originals.tar.gz",
+      "copyByteExact": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/legacy-1.1.1/provenance.json",
+      "bytes": 57927,
+      "sha256": "f75e86e46c943f4d92fb06bd4b3d55a2a081ba91bca62953240c10adb6b9c9c1",
+      "source": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/corpus-staging/provenance.json",
+      "copyByteExact": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/legacy-1.1.1/generation.log",
+      "bytes": 3624,
+      "sha256": "c64391454e8cd0319b403c4fe2aae2ecba1094d9e95a58a7b337b50aa3dacd26",
+      "source": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/corpus-staging/generation.log",
+      "copyByteExact": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/legacy-1.1.1/README.md",
+      "bytes": 2870,
+      "sha256": "24e907b0fea78c912cd0c4ca3bf2b239e399612b383f6396ccf93b2002f5452c",
+      "rootAuthoredExplanation": true
+    }
+  ],
+  "storedBytes": 773756,
+  "decodedOriginalBytes": 4104713,
+  "strictCapPassed": true,
+  "originalV3CorpusAndRedEvidencePreserved": true,
+  "allEightOriginalDecodedHashesVerified": true,
+  "ledgerBoundary": "Naturally closed whole inline prefix before diagnostic/assurance; no rows edited, no old blob read/decryption",
+  "sourceAtClosureIsHistorical": true,
+  "completeSpecAcceptance": false
+}

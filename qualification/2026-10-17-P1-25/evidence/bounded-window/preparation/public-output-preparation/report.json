@@ -1,0 +1,64 @@
+{
+  "schema": "p125w-public-output-inert-author-review/1",
+  "at": "2026-10-17T00:28:03.194417+00:00",
+  "blockers": [],
+  "oldHelper": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/prepare-public-output.py",
+    "bytes": 3853,
+    "sha256": "76c81f1a94d4a0dae684c51bd6d6409e2387585267fe623e790a094d5260bdb7"
+  },
+  "preferredSource": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+    "bytes": 9470,
+    "sha256": "3447d186bb9fdf6b26ba63eb934a236c8c799168455e7254e2b61e2b3e76a567"
+  },
+  "phaseInputs": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/public-output-preparation/phase-inputs.json",
+    "bytes": 4655,
+    "sha256": "bace1d117839dddbe5305a9fb96fa5f96772e4eb869fc4f7484959401c85ff46"
+  },
+  "actualPhaseSelection": [
+    {
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    }
+  ],
+  "singleReplyGuardsPreserved": true,
+  "onlyFailedB37LibreSslSpecialBranchRemoved": true,
+  "windowUsesEachActualRequestNamedNaturalVerificationChildAndPerGrantFacts": true,
+  "lastReplyNotUsedForFirstProof": true,
+  "actualEmittedPublicPathsAndAuditPinsBound": true,
+  "greenSemanticProofsMustExactlyMatchAuditedProofsWhenPresent": true,
+  "redOrDiagnosticPerGrantProofsRetainedWithoutWindowSemanticCredit": true,
+  "publicCertificateInputsExactlyRootPemAndTsaPemOnly": true,
+  "futurePemReadRejectsPrivateMarkersAndMultipleCertificateBlocks": true,
+  "noDirectoryTraversalPrivateKeyPrivateRunOrChildStreamRead": true,
+  "actualGenerationOrCopyCount": null,
+  "helperImportedParsedCompiledExecutedOrSslImportedByAuthor": false,
+  "sourceIndexQaWrites": false,
+  "rootFullReadAndIndependentReviewRequiredBeforeUse": true
+}

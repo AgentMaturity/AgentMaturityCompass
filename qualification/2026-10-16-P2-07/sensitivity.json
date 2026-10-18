@@ -1,0 +1,813 @@
+{
+  "controls": [
+    {
+      "recipe": "M1-bypass-signature-refusal",
+      "apply": {
+        "action": "apply",
+        "recipe": "M1-bypass-signature-refusal",
+        "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "after": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12736,
+          "sha256": "83eb1b731243dca7f0ebad9a90f0d8e5aa8da860f513fc9c5f9713cd4d44132e"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/executed-controls/originals/M1-bypass-signature-refusal/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "at": "2026-10-16T11:41:02.769261+00:00"
+      },
+      "failedOutcome": {
+        "schema": "p207-closed-runtime/1",
+        "at": "2026-10-16T11:41:54.895831+00:00",
+        "phase": "p207-mutant-signature",
+        "command": {
+          "phase": "p207-mutant-signature",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-signature.raw.json",
+          "exit": 1,
+          "durationMs": 10875,
+          "startedUtc": "2026-10-16T11:41:13.273984+00:00",
+          "endedUtc": "2026-10-16T11:41:24.162283+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/stdout-stderr.log",
+          "head": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "headAfter": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "ownedProcess": {
+            "pid": 45738,
+            "ownedPgid": 45738,
+            "observedPgidAfterLaunch": 45738,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-signature.raw.json"
+            ],
+            "startedUtc": "2026-10-16T11:41:13.273984+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-signature.raw.json",
+              "bytes": 57214,
+              "sha256": "03ba4733015c86091e08fa8441b6b212697cd4c83ef8d2e85ee3ae09a5054830"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/raw.json",
+              "bytes": 57214,
+              "sha256": "03ba4733015c86091e08fa8441b6b212697cd4c83ef8d2e85ee3ae09a5054830"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/observer.json",
+              "bytes": 77654,
+              "sha256": "3e604d956b707abfe05dab0a7d9914ba379a9ce59983c1bdfcead932f0ce398e"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+        "tests": {
+          "total": 150,
+          "passed": 148,
+          "failed": 2,
+          "skipped": 0
+        },
+        "failures": [
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+            "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuine wrong-key RS256 signature before accepting any claims",
+            "messages": [
+              "AssertionError: expected { ok: true, claims: { \u2026(6) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:267:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:265:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+            "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a flipped signature without a second same-kid refresh",
+            "messages": [
+              "AssertionError: expected { ok: true, claims: { \u2026(6) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:274:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:272:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 26,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/raw.json",
+            "bytes": 57214,
+            "sha256": "03ba4733015c86091e08fa8441b6b212697cd4c83ef8d2e85ee3ae09a5054830"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/observer.json",
+            "bytes": 77654,
+            "sha256": "3e604d956b707abfe05dab0a7d9914ba379a9ce59983c1bdfcead932f0ce398e"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/stdout-stderr.log",
+            "bytes": 16000,
+            "sha256": "3aea0376091eb61213b10810ea64c55e6b59c036578950c832aa6e2d4a60ebf2"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/command.json",
+            "bytes": 2999,
+            "sha256": "e28a3f777d215205b5458c43912c1124ad8b7740568a778b8979ef52e65203fb"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/owned-process.json",
+            "bytes": 963,
+            "sha256": "db356c44d658a044ba50531ee065dfd4b72747600dadfe7cebe5361080de0470"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-signature/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "c060ca8a3a938f0029acc8a920e480700bcc8ba08e7e1f25c81d27a17f36464f"
+          }
+        ],
+        "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      },
+      "firstAssertionAndMasking": {
+        "at": "2026-10-16T11:42:19.440001+00:00",
+        "phase": "p207-mutant-signature",
+        "tests": {
+          "total": 150,
+          "passed": 148,
+          "failed": 2,
+          "skipped": 0
+        },
+        "firstFrames": [
+          267,
+          274
+        ],
+        "meaning": "Bypassing only signature refusal admits both genuine wrong-key and flipped signatures as ok:true with otherwise valid claims. Both exact expected-signature-refusal assertions failed.",
+        "masked": "Wrong-key line268 and flipped-signature line275 request-count assertions were not reached after their failed refusal assertions; no credit assigned to them.",
+        "otherLegacy22Passed": true,
+        "hooksPassed": 26,
+        "publicEvidence": [
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-TtmlEf/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "fb52a9a7ef9aca585984f1e9c1bea3a02f867169dc03b33261d3da3cebf5ed29",
+            "label": "algorithm-RS256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-8YjbIL/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "622d563b75e4979ea72677ea5a434841e26d3174cb1cadabd1abaae56f4e2aac",
+            "label": "algorithm-PS256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-Hin6t5/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "9a78b513321e6cb54d36decb707397cb3b8cc4235e383d69f36ac26004644580",
+            "label": "algorithm-ES256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-RG36Wb/observations/public-evidence.json",
+            "bytes": 1946,
+            "sha256": "195a4d9b2af923663a437bc6b56e2fcbf78982cb5f0cee3c8bf3c38a41205bf9",
+            "label": "wrong-key-signature",
+            "failed": true
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-iXrbVZ/observations/public-evidence.json",
+            "bytes": 1944,
+            "sha256": "72075ca3933931fc5aa651db9b27dc6b2d56ff5b4c0356a53ee5eec4103dfa79",
+            "label": "flipped-signature",
+            "failed": true
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-WysUFp/observations/public-evidence.json",
+            "bytes": 1688,
+            "sha256": "8a7de0b5b41509569eee4c48c772d222c3f4f992f7dc65040863debb7b7bf5f8",
+            "label": "rotation-real-clock",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-N67jqL/observations/public-evidence.json",
+            "bytes": 1616,
+            "sha256": "abecbf37057806d8b9ed8f575b66a974d51ebeb88058bb15390d12928e9fd4e1",
+            "label": "failed-refresh",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-YDPcaR/observations/public-evidence.json",
+            "bytes": 1121,
+            "sha256": "7fa0a9cfa9c65df3f53a205ecc33fd770c1e3c944e7d40923c5bf2a11598e2c1",
+            "label": "real-ten-second-timeout",
+            "failed": false
+          }
+        ],
+        "actualSourceOnlyControl": true,
+        "compilerOrCompiledMutantValidityClaim": false,
+        "formalDone": false
+      },
+      "restore": {
+        "action": "restore",
+        "recipe": "M1-bypass-signature-refusal",
+        "restored": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+        "status": "",
+        "compiledOutputsRebuilt": false,
+        "sourceOnlyMutant": true,
+        "at": "2026-10-16T11:42:19.690995+00:00"
+      },
+      "restoredOutcome": {
+        "schema": "p207-closed-runtime/1",
+        "at": "2026-10-16T11:42:36.937267+00:00",
+        "phase": "p207-restored-signature",
+        "command": {
+          "phase": "p207-restored-signature",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-signature.raw.json",
+          "exit": 0,
+          "durationMs": 11019,
+          "startedUtc": "2026-10-16T11:42:19.812734+00:00",
+          "endedUtc": "2026-10-16T11:42:30.846653+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/stdout-stderr.log",
+          "head": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "headAfter": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "ownedProcess": {
+            "pid": 45875,
+            "ownedPgid": 45875,
+            "observedPgidAfterLaunch": 45875,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-signature.raw.json"
+            ],
+            "startedUtc": "2026-10-16T11:42:19.812734+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-restored-signature.raw.json",
+              "bytes": 55734,
+              "sha256": "e5a2f0220e67366021d32632960904905d4fca9e28a9f28dca4fd244ba2aa7cc"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/raw.json",
+              "bytes": 55734,
+              "sha256": "e5a2f0220e67366021d32632960904905d4fca9e28a9f28dca4fd244ba2aa7cc"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/observer.json",
+              "bytes": 72274,
+              "sha256": "1b17edb0fb6755d9d8322d4f96aacacadde0576d2307bd5766e5c370fc712854"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+        "tests": {
+          "total": 150,
+          "passed": 150,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": [],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 26,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/raw.json",
+            "bytes": 55734,
+            "sha256": "e5a2f0220e67366021d32632960904905d4fca9e28a9f28dca4fd244ba2aa7cc"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/observer.json",
+            "bytes": 72274,
+            "sha256": "1b17edb0fb6755d9d8322d4f96aacacadde0576d2307bd5766e5c370fc712854"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/stdout-stderr.log",
+            "bytes": 3459,
+            "sha256": "7f1a54e20c5bc566123e3eaaf239307362f1ebc2ac332f3f4ce640d9804d1500"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/command.json",
+            "bytes": 3013,
+            "sha256": "0b0f7bdcd660651c10dfc664a6a5732de946ea2408269a9e6399c92b559f1b71"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/owned-process.json",
+            "bytes": 965,
+            "sha256": "705c452d0b28b013eea74586385270845031e1e7bcca183849f5ed993d01ea3f"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-signature/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "d6fa56f80ffdc0a69bba63ecb3691a02cb2b25741a0f741b203d74b2cbc19433"
+          }
+        ],
+        "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      }
+    },
+    {
+      "recipe": "M2-make-exp-optional",
+      "apply": {
+        "action": "apply",
+        "recipe": "M2-make-exp-optional",
+        "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "after": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12791,
+          "sha256": "3554aafd826682b340e7ed5f7f235d51ef8b6eaac8a3406249f9cf9f89d14ee2"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/executed-controls/originals/M2-make-exp-optional/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "at": "2026-10-16T11:42:37.204511+00:00"
+      },
+      "failedOutcome": {
+        "schema": "p207-closed-runtime/1",
+        "at": "2026-10-16T11:42:54.256871+00:00",
+        "phase": "p207-mutant-exp",
+        "command": {
+          "phase": "p207-mutant-exp",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-exp.raw.json",
+          "exit": 1,
+          "durationMs": 11194,
+          "startedUtc": "2026-10-16T11:42:37.321071+00:00",
+          "endedUtc": "2026-10-16T11:42:48.528760+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/stdout-stderr.log",
+          "head": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "headAfter": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "ownedProcess": {
+            "pid": 45920,
+            "ownedPgid": 45920,
+            "observedPgidAfterLaunch": 45920,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-exp.raw.json"
+            ],
+            "startedUtc": "2026-10-16T11:42:37.321071+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-exp.raw.json",
+              "bytes": 56471,
+              "sha256": "3f0727853176ea92e0ef1dcd8e1c0808c856ba0123252df338d1ff3e9c66b15c"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/raw.json",
+              "bytes": 56471,
+              "sha256": "3f0727853176ea92e0ef1dcd8e1c0808c856ba0123252df338d1ff3e9c66b15c"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/observer.json",
+              "bytes": 74898,
+              "sha256": "ec9606a2895a660c2b83d72121e4d43702325895ed2f4cac00f6deaf01649c18"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+        "tests": {
+          "total": 150,
+          "passed": 149,
+          "failed": 1,
+          "skipped": 0
+        },
+        "failures": [
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+            "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuinely signed token missing exp independently of all other claim failures",
+            "messages": [
+              "AssertionError: expected { ok: true, claims: { \u2026(5) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:281:10\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:279:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 26,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/raw.json",
+            "bytes": 56471,
+            "sha256": "3f0727853176ea92e0ef1dcd8e1c0808c856ba0123252df338d1ff3e9c66b15c"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/observer.json",
+            "bytes": 74898,
+            "sha256": "ec9606a2895a660c2b83d72121e4d43702325895ed2f4cac00f6deaf01649c18"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/stdout-stderr.log",
+            "bytes": 14402,
+            "sha256": "b34dca50c751dd09bbe92eab46c8aeb6e3df65fd7169ebf86508a4ef948d7544"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/command.json",
+            "bytes": 2957,
+            "sha256": "90a80d228a7f472ad082106382a1e8daab78c16f2d514c722d441042419470b3"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/owned-process.json",
+            "bytes": 957,
+            "sha256": "1c99e6c2d76e5267badaa512cdd4482237db727030d4bf44f8e23978529b8c9c"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-mutant-exp/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "69ebd468d918e13edf9ffe75c6a8f432993db52cbe4087f6dfeb59fdd660f665"
+          }
+        ],
+        "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      },
+      "firstAssertionAndMasking": {
+        "at": "2026-10-16T11:43:23.360949+00:00",
+        "phase": "p207-mutant-exp",
+        "tests": {
+          "total": 150,
+          "passed": 149,
+          "failed": 1,
+          "skipped": 0
+        },
+        "firstFrame": "281:10",
+        "meaning": "Making only absent exp optional admits a genuinely signed token with no exp as ok:true. The independent exact missing-exp refusal assertion fails; malformed present exp and iat checks stay in source.",
+        "masked": "Request-count assertion at282 is not reached after missing-exp refusal fails; no credit assigned to it.",
+        "otherLegacy22Passed": true,
+        "hooksPassed": 26,
+        "publicEvidence": [
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-iVv96K/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "a4b8d0a080e2460a5647f3b137bffa3600ac982d9fa5a97e1962c330340aebe5",
+            "label": "algorithm-RS256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-VP12Zn/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "088a860aed605935f05778a20fd02ac5171048fb8a570755705375003d1b09c3",
+            "label": "algorithm-PS256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-yyrDB8/observations/public-evidence.json",
+            "bytes": 1458,
+            "sha256": "98fd3bea3e010b82a1651e1fb7fde72453ac0e8b42e216eebcb398e539b713a2",
+            "label": "algorithm-ES256",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pHhAPg/observations/public-evidence.json",
+            "bytes": 1938,
+            "sha256": "54c98495551c6969e1362b405b87b15b617eada3f3d9216bfbb8b50014a3d614",
+            "label": "missing-exp",
+            "failed": true
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-0QN3dS/observations/public-evidence.json",
+            "bytes": 1688,
+            "sha256": "aeedf6ae0001a1e0c325de5a45792a1cbfe5a8a913642601b1ea2de96842a8b5",
+            "label": "rotation-real-clock",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-xKOkfa/observations/public-evidence.json",
+            "bytes": 1616,
+            "sha256": "2bd6e1c0f72b8c245276dc28d7bad35734b18c125dff628f604df99728d5c994",
+            "label": "failed-refresh",
+            "failed": false
+          },
+          {
+            "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-o6z5V4/observations/public-evidence.json",
+            "bytes": 1121,
+            "sha256": "da7a5801f8685d9686bd907d17ad41c3cf07e0048afd581c78484897e6e46d29",
+            "label": "real-ten-second-timeout",
+            "failed": false
+          }
+        ],
+        "actualSourceOnlyControl": true,
+        "compilerOrCompiledMutantValidityClaim": false,
+        "formalDone": false
+      },
+      "restore": {
+        "action": "restore",
+        "recipe": "M2-make-exp-optional",
+        "restored": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+        },
+        "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+        "status": "",
+        "compiledOutputsRebuilt": false,
+        "sourceOnlyMutant": true,
+        "at": "2026-10-16T11:43:23.593453+00:00"
+      },
+      "restoredOutcome": {
+        "schema": "p207-closed-runtime/1",
+        "at": "2026-10-16T11:44:08.671165+00:00",
+        "phase": "p207-restored-exp",
+        "command": {
+          "phase": "p207-restored-exp",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-exp.raw.json",
+          "exit": 0,
+          "durationMs": 11088,
+          "startedUtc": "2026-10-16T11:43:23.714540+00:00",
+          "endedUtc": "2026-10-16T11:43:34.816706+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/stdout-stderr.log",
+          "head": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "headAfter": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+          "ownedProcess": {
+            "pid": 45991,
+            "ownedPgid": 45991,
+            "observedPgidAfterLaunch": 45991,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-exp.raw.json"
+            ],
+            "startedUtc": "2026-10-16T11:43:23.714540+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-restored-exp.raw.json",
+              "bytes": 55756,
+              "sha256": "45592823690bcc7022cf5e21770812e40cf193ba8ab5472c45098d5f32d5a3d1"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/raw.json",
+              "bytes": 55756,
+              "sha256": "45592823690bcc7022cf5e21770812e40cf193ba8ab5472c45098d5f32d5a3d1"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/observer.json",
+              "bytes": 72274,
+              "sha256": "db7dc86097828437ef72a426008c4fb536d1df094b5afe3ca672d3828be038e5"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+        "tests": {
+          "total": 150,
+          "passed": 150,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": [],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 26,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/raw.json",
+            "bytes": 55756,
+            "sha256": "45592823690bcc7022cf5e21770812e40cf193ba8ab5472c45098d5f32d5a3d1"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/observer.json",
+            "bytes": 72274,
+            "sha256": "db7dc86097828437ef72a426008c4fb536d1df094b5afe3ca672d3828be038e5"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/stdout-stderr.log",
+            "bytes": 3453,
+            "sha256": "d5752225f475ed0f4dfc45bca23ccead822caa5c2dbf86b45fae93c2db5b68fa"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/command.json",
+            "bytes": 2971,
+            "sha256": "d0d04c156dcc4df486075d0de763820b27b874a7073b307857343f8e9d961896"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/owned-process.json",
+            "bytes": 959,
+            "sha256": "d901fe4d6f35ab4882a6523cb342f1f23ddc23a69729562a2d642a4349020144"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-restored-exp/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "83ed2e1b1063662f92fae77fd13e58291a3325b7facf5536990a46ca272472b4"
+          }
+        ],
+        "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      }
+    }
+  ],
+  "sourceOnly": true,
+  "compiledOutputsRebuilt": false,
+  "compilerOrBuildValidMutantClaim": false,
+  "formalDone": false
+}

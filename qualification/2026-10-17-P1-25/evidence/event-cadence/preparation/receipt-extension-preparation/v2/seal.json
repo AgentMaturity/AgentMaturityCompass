@@ -1,0 +1,91 @@
+{
+  "schema": "p125ec-inert-receipt-helper-v2-author-seal/1",
+  "at": "2026-10-17T01:18:23.985940+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 36929,
+      "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "dev": 16777231,
+      "inode": 543909107,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 1212,
+      "sha256": "b1b8392b336c6c2f2e22109e974c941a2e5242edf03a6c3ae1eb03cc4cbcfc54",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+      "dev": 16777231,
+      "inode": 543909108,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/fields.json",
+      "bytes": 2825,
+      "sha256": "aee3ffeae9d08122f65e30bf1cde837d1898fddaae95ef60b2278ce21aa0ea5e",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/fields.json",
+      "dev": 16777231,
+      "inode": 543909148,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/README.md",
+      "bytes": 1361,
+      "sha256": "48858265afcc8a39c72b4d7e51be4cc973151bcd160d08a86ac0789d9383d64a",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/README.md",
+      "dev": 16777231,
+      "inode": 543909149,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+      "bytes": 3095,
+      "sha256": "0576b9e2f482625c1a6ef24df99c854313f21fb9f5b9c97e7d24f440943f5cbf",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+      "dev": 16777231,
+      "inode": 543909150,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/report.json",
+      "bytes": 1121,
+      "sha256": "6ad292de9a791d611ea9ee5e25afb3811fdde487d74fe8665cfe3dfd145b34de",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/report.json",
+      "dev": 16777231,
+      "inode": 543909151,
+      "nlink": 1
+    }
+  ],
+  "allOutputFilesCompleteAndClosed": true,
+  "priorPreferredSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal-v2.json",
+    "bytes": 4825,
+    "sha256": "f66174340810708671ab8c6bb8a6aedffcc315197ef969b7e4b1de1806a36015",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal-v2.json",
+    "dev": 16777231,
+    "inode": 543908804,
+    "nlink": 1
+  },
+  "unchangedUnreadyTemplate": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/input-template.json",
+    "bytes": 2415,
+    "sha256": "52eb9cd367fc8afd70ede0b2af337e4917d6d5a4b54dfc802e800033f56ea90a",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/input-template.json",
+    "dev": 16777231,
+    "inode": 543906335,
+    "nlink": 1
+  },
+  "allOtherV1CodeByteExact": true,
+  "actualImmutablePinset": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+    "bytes": 404183,
+    "sha256": "60ea0f2802db7defa832a2b5618160a56eb02f285af669de0f243f0347334654",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet-pinset.json",
+    "dev": 16777231,
+    "inode": 543908695,
+    "nlink": 1
+  },
+  "noHelperImportParseCompileOrExecution": true,
+  "noSourceIndexQaPriorArtifactOrPinsetMutation": true
+}

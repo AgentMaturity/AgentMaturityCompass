@@ -1,0 +1,492 @@
+{
+  "capturedUtc": "2026-10-14T22:52:20.015799+00:00",
+  "source": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "workspace": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+  "spec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-18.md",
+    "bytes": 14225,
+    "sha256": "44892a201424c5271c9ebb936608c22d0ddca2f512fa5d840193118fa74590c4"
+  },
+  "sourceRecords": [
+    {
+      "relativePath": "src/ingest/ingest.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+      "matches": [
+        {
+          "line": 84,
+          "text": "          trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 143,
+          "text": " * SELF_REPORTED with `attestation.kind: \"self_attested\"`, because the operator vouching for their own import is not",
+          "patterns": [
+            "self_attested"
+          ]
+        },
+        {
+          "line": 144,
+          "text": " * independent evidence. Only a signature over the bundle hash by a third-party key pinned for independent-attestation",
+          "patterns": [
+            "independent-attestation"
+          ]
+        },
+        {
+          "line": 162,
+          "text": "  trustTier: \"ATTESTED\" | \"SELF_REPORTED\";",
+          "patterns": [
+            "trustTier: \"ATTESTED\""
+          ]
+        },
+        {
+          "line": 197,
+          "text": "      : { kind: \"self_attested\", attestedBy, statement };",
+          "patterns": [
+            "self_attested"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/eval/evalImporters.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+      "matches": [
+        {
+          "line": 3,
+          "text": "import { effectiveTrustTier, readerTrustFor } from \"../claims/evidenceProvenance.js\";",
+          "patterns": [
+            "readerTrustFor",
+            "effectiveTrustTier"
+          ]
+        },
+        {
+          "line": 1888,
+          "text": "    const reader = readerTrustFor(params.workspace);",
+          "patterns": [
+            "readerTrustFor"
+          ]
+        },
+        {
+          "line": 1897,
+          "text": "      const trustTier = effectiveTrustTier(row, reader) ?? \"SELF_REPORTED\";",
+          "patterns": [
+            "effectiveTrustTier"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/eval/evalCli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+      "matches": [
+        {
+          "line": 7,
+          "text": "  \"--trust-tier was removed in 2.0.0: trust tiers are derived from provenance, and imported results are SELF_REPORTED. See docs/EVIDENCE_TRUST.md.\";",
+          "patterns": [
+            "removed in 2.0.0"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/cli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "matches": [
+        {
+          "line": 5303,
+          "text": "  .option(\"--industry-pack-weights\", \"deprecated: has no effect (Industry Pack weighting was removed in 2.0.0)\", false)",
+          "patterns": [
+            "removed in 2.0.0"
+          ]
+        },
+        {
+          "line": 12317,
+          "text": "            trustTier: \"OBSERVED\"",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        },
+        {
+          "line": 12368,
+          "text": "          trustTier: \"OBSERVED\"",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        },
+        {
+          "line": 16333,
+          "text": "          trustTier: \"OBSERVED\"",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/outcomes/outcomeCli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+      "bytes": 5678,
+      "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19",
+      "matches": [
+        {
+          "line": 117,
+          "text": "  trustTier: \"SELF_REPORTED\";",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 145,
+          "text": "      trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 148,
+          "text": "        attestation: { kind: \"self_attested\" },",
+          "patterns": [
+            "self_attested"
+          ]
+        },
+        {
+          "line": 160,
+          "text": "      trustTier: \"SELF_REPORTED\"",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/studio/studioServer.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "matches": [
+        {
+          "line": 1384,
+          "text": "        trustTier: \"OBSERVED\",",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        },
+        {
+          "line": 2141,
+          "text": "            attestationKind: \"self_attested\"",
+          "patterns": [
+            "self_attested"
+          ]
+        },
+        {
+          "line": 2145,
+          "text": "            trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 2160,
+          "text": "          attestationKind: \"external_report\"",
+          "patterns": [
+            "external_report"
+          ]
+        },
+        {
+          "line": 2164,
+          "text": "          trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 2187,
+          "text": "            attestationKind: \"self_attested\",",
+          "patterns": [
+            "self_attested"
+          ]
+        },
+        {
+          "line": 2192,
+          "text": "            trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 2207,
+          "text": "          attestationKind: \"external_report\",",
+          "patterns": [
+            "external_report"
+          ]
+        },
+        {
+          "line": 2212,
+          "text": "          trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 4879,
+          "text": "          json(res, 400, { error: \"attest was removed in 2.0.0: imported value events are SELF_REPORTED (see docs/EVIDENCE_TRUST.md)\" });",
+          "patterns": [
+            "removed in 2.0.0"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/api/evidenceRouter.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/api/evidenceRouter.ts",
+      "bytes": 20759,
+      "sha256": "8ed15b15d56316d322a6e0306ce8f2d7e130229ae26090b67e5e337e57bb6185",
+      "matches": []
+    },
+    {
+      "relativePath": "src/assurance/agentResponder.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+      "bytes": 21889,
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "matches": [
+        {
+          "line": 537,
+          "text": "        trustTier: \"OBSERVED\"",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        },
+        {
+          "line": 590,
+          "text": "      trustTier: \"OBSERVED\"",
+          "patterns": [
+            "trustTier: \"OBSERVED\""
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/ledger/trustTierValidation.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+      "matches": []
+    },
+    {
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "matches": [
+        {
+          "line": 114,
+          "text": " * Whether `attestation` is a signature by a key the operator pinned for independent-attestation in a signed trust",
+          "patterns": [
+            "independent-attestation"
+          ]
+        },
+        {
+          "line": 128,
+          "text": "  const admission = admitKey({ publicKeyPem: entry.publicKeyPem, purpose: \"independent-attestation\",",
+          "patterns": [
+            "independent-attestation"
+          ]
+        },
+        {
+          "line": 153,
+          "text": "export function readerTrustFor(workspace?: string): () => ReaderTrust {",
+          "patterns": [
+            "readerTrustFor"
+          ]
+        },
+        {
+          "line": 193,
+          "text": "export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => ReaderTrust)): TrustTier | null {",
+          "patterns": [
+            "effectiveTrustTier"
+          ]
+        },
+        {
+          "line": 241,
+          "text": "  return new Map(rows.map((row) => [row.id, effectiveTrustTier(row, { trustList: null }) ?? \"SELF_REPORTED\"]));",
+          "patterns": [
+            "effectiveTrustTier"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/compliance/complianceEngine.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "bytes": 14631,
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "matches": [
+        {
+          "line": 24,
+          "text": "import { countAttestedOnce, effectiveTrustTier, evidenceProducer, readerTrustFor } from \"../claims/evidenceProvenance.js\";",
+          "patterns": [
+            "readerTrustFor",
+            "effectiveTrustTier"
+          ]
+        },
+        {
+          "line": 289,
+          "text": "    const reader = readerTrustFor(workspace);",
+          "patterns": [
+            "readerTrustFor"
+          ]
+        },
+        {
+          "line": 317,
+          "text": "    const tiers = new Map(subjectRows.map((row) => [row, source.chainError ? \"SELF_REPORTED\" : effectiveTrustTier(row, reader)]));",
+          "patterns": [
+            "effectiveTrustTier"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/diagnostic/gates.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "matches": [
+        {
+          "line": 1,
+          "text": "import { effectiveTrustTier, producerOfMeta, readerTrustFor, type ReaderTrust } from \"../claims/evidenceProvenance.js\";",
+          "patterns": [
+            "readerTrustFor",
+            "effectiveTrustTier"
+          ]
+        },
+        {
+          "line": 23,
+          "text": "  return parseEvidenceEventWith(event, readerTrustFor());",
+          "patterns": [
+            "readerTrustFor"
+          ]
+        },
+        {
+          "line": 37,
+          "text": "  const baselineTrustTier = effectiveTrustTier(event, reader) ?? \"SELF_REPORTED\";",
+          "patterns": [
+            "effectiveTrustTier"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/dogfood/maturityEvidence.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+      "matches": [
+        {
+          "line": 318,
+          "text": "    trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        },
+        {
+          "line": 410,
+          "text": "    trustTier: \"SELF_REPORTED\",",
+          "patterns": [
+            "trustTier: \"SELF_REPORTED\""
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "src/trust/keyPurposes.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "matches": [
+        {
+          "line": 3,
+          "text": "  \"independent-attestation\", \"trust-list-root\"] as const;",
+          "patterns": [
+            "independent-attestation"
+          ]
+        }
+      ]
+    },
+    {
+      "relativePath": "docs/EVIDENCE_TRUST.md",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+      "bytes": 10946,
+      "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+      "matches": [
+        {
+          "line": 8,
+          "text": "- `ATTESTED`: signed by a third party whose key the operator pinned for `independent-attestation` in a signed trust list.",
+          "patterns": [
+            "independent-attestation"
+          ]
+        },
+        {
+          "line": 26,
+          "text": "**`ATTESTED`.** `amc attest --ingest-session <id> --attested-by <identity> --statement <text>` records who vouched; on its own that is a self-attestation (`attestation.kind: \"self_attested\"`) and the rows stay `SELF_REPORTED`. Add `--attester-signature <file>`, a JSON `{ \"keyId\": \"\u2026\", \"sigB64\": \"\u2026\" }` holding a third party's Ed25519 signature over the bundle hash that `amc attest` prints for the same `--agent`, and the rows become `ATTESTED` only when that key is in a loaded signed trust list with purpose `independent-attestation`, is not distrusted or revoked, is inside its validity window, and the signature verifies. The workspace's own monitor and auditor keys never qualify, even if a trust list names them. The signed bundle lists each source event's id, payload hash and time with the agent and ingest session the attested copies are written to, so the signature covers who the evidence is about. A key attests an event once: `amc attest` refuses a key that already has an `ATTESTED` copy of any event in the session, including under a new bundle hash after evidence was added to the session; attest new evidence in a new ingest session. `POST /api/v1/evidence/attest` takes the same `attesterSignature` field and reads trust lists only from the AMC home. A signature proves who signed a record and that it is unchanged, not that the content is true.",
+          "patterns": [
+            "self_attested",
+            "independent-attestation"
+          ]
+        },
+        {
+          "line": 28,
+          "text": "**Outcomes.** `amc outcomes attest`, Studio's operator `/outcomes/ingest` and `/feedback/ingest`, and their HMAC webhooks record `SELF_REPORTED` signals with `attestation.kind` `self_attested` (operator) or `external_report` (webhook), and return that tier. The outcome ledger refuses `OBSERVED` from any source but ToolHub (AMC's runtime) and `ATTESTED` from every source, and outcome scoring reads webhook, manual and imported rows, including 1.x rows stored as `OBSERVED` or `ATTESTED`, as `SELF_REPORTED`. Studio's `/truthguard/validate` records a person's validation as `SELF_REPORTED`.",
+          "patterns": [
+            "self_attested",
+            "external_report"
+          ]
+        },
+        {
+          "line": 30,
+          "text": "**Value events.** `amc value ingest`, `amc value import`, Studio's `/value/ingest/webhook` and its CSV import record value events as `SELF_REPORTED` with `signatureValid: false`. An operator session or a webhook token proves who sent the events, not that a third party vouches for them. `--attested` was removed in 2.0.0 and now exits 2, and Studio's CSV import refuses a request carrying `attest` with HTTP 400. Value events that AMC's own collector records from its runtime stay `OBSERVED`.",
+          "patterns": [
+            "removed in 2.0.0"
+          ]
+        },
+        {
+          "line": 34,
+          "text": "**Eval imports.** `amc eval import` writes every event as `SELF_REPORTED` whatever the format; `--trust-tier` was removed in 2.0.0 and now exits 2. Each event is recorded at import time and keeps the case's own time as `meta.claimedTs`. An import is refused, naming the cases, when any case is timestamped more than 5 minutes ahead or more than 24 hours ago (proposed defaults, `EVAL_IMPORT_MAX_FUTURE_SKEW_MS` and `EVAL_IMPORT_MAX_AGE_MS`); `--historical` accepts it and marks its events `meta.historical: true`.",
+          "patterns": [
+            "removed in 2.0.0"
+          ]
+        },
+        {
+          "line": 56,
+          "text": "A signature shows who signed a record and that it is unchanged, not that the record is true, and a key shipped inside an artifact cannot vouch for that artifact. `agent-maturity-compass/trust` adds signed trust lists and an admission check that counts a signature only when the verifier operator pinned its key for that purpose. `evidence-authority` and `independent-attestation` are purposes there, and a workspace's own keys are never admitted for them.",
+          "patterns": [
+            "independent-attestation"
+          ]
+        }
+      ]
+    }
+  ],
+  "allSourceLiteralHits": [
+    {
+      "relativePath": "src/ingest/ingest.ts",
+      "line": 162,
+      "text": "  trustTier: \"ATTESTED\" | \"SELF_REPORTED\";"
+    }
+  ],
+  "limits": [
+    "Static literal inventory does not establish every write path or authenticated route behavior.",
+    "The one ATTESTED literal is a return type union in ingest.ts, not a write. Ternary and dynamically composed writes require flow inspection.",
+    "Current independent-attestation purpose and removed-in-2.0.0 message differ from the historical spec. No purpose or release decision is made here.",
+    "Trust-list admission and signature do not establish an attested claim truth or authenticate attestedBy/statement labels.",
+    "P0-51 explicit-pin admission precedence remains unresolved. Full suite, coverage, hosted CI, dependency acceptance, and gate closure remain unqualified."
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-19",
+  "date": "2026-10-16",
+  "commit": "b9ba9a092f491d821c154679473b6f38c75b935d",
+  "branch": "codex/p1-19-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2 (25G83), Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-original-provider-client.producer.json",
+      "exit": 1,
+      "durationMs": 20930
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40770
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-followup-provider-client.producer.json",
+      "exit": 0,
+      "durationMs": 19359
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 360
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 228
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 28561
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3075
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1472
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 222
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 157
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1564
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 464
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2901
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-19-finance-qualification-20261016/detailed-quality-comparison.mjs",
+      "exit": 1,
+      "durationMs": 6093
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40178
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 3402
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs",
+      "exit": 0,
+      "durationMs": 266
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeFixtureService.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-service.producer.json",
+      "exit": 0,
+      "durationMs": 23394
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-extended-client.producer.json",
+      "exit": 0,
+      "durationMs": 7626
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40033
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 350
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 157
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1912
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2983
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 52846
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/vitest.config.ts tests/lighthouse/financeFixtureService.test.ts tests/lighthouse/financeClientAdapter.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-fresh-clone-components.producer.json",
+      "exit": 0,
+      "durationMs": 25898
+    }
+  ],
+  "tests": {
+    "total": 120,
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b25a234319ae2148ec794e27d9db426d6880879aef36ade0e1331cf07d31486e"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "d5083491b84693d0fc1ddc47b5d9108ed82cf913efd32a0b22eda42e3b4bdf46"
+    },
+    {
+      "path": "original-components.raw.json",
+      "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+    },
+    {
+      "path": "fresh-components.raw.json",
+      "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+    },
+    {
+      "path": "fresh-components.observer.json",
+      "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+    }
+  ],
+  "notes": "Bounded provider-component checkpoint only. P1-19 remains ACTIVE for oracle, tools, runner and control continuation; P1-07 is not advanced. Canonical tests count only the fresh 120/120 run (service 31, client 89), rather than adding overlapping runs. The original 110/109/1 run exposed maximum-safe payee-version mutation; one admitted guard returns 409 before mutation and the follow-up passes 110/110. Original and first follow-up runs used helper v2. Later v3 removes four unused test-helper export prefixes; v4 adds only the startup faultsPath option. All 26 exact closed command triples and seven nonzero results are retained. Duplicate findings (1,268) and latest dead-code findings (2,732) remain red and unwaived. Initial 2,736 findings and the exact eight-added/three-removed delta against 2,731 are preserved, without invented debt repairs or baseline adoption. Source and complete test typechecks, lint, freeze counts 1236/1236/41/632, exact count generation from 1,664 to 1,666, docs and architecture checks pass. Actual frozen-clone install, build, doctor, init, keyless native turn and real two-process resume pass. Fresh tests borrow the pinned R runner while source, config and child argv bind to the physical clone. The git-add exit-1 ignore warning for tracked count docs is retained; all 17 index blobs were verified before an ordinary commit, without force or retry. No full F01-F38, full-suite/global coverage, Linux/Node 24/hosted/native 30-second, external-trust/person, PR, push, merge, deploy, release or formal Done claim follows. A public asynchronous approve seam is viable; no blanket API block is asserted. See detailed evidence, raw reports and private audits."
+}

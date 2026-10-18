@@ -1,12 +1,13 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
-const cliPath = resolve(process.cwd(), "dist/cli.js");
+const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-connect-hooks-cli-"));

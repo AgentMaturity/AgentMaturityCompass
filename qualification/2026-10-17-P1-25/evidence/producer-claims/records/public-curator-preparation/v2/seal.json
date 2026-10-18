@@ -1,0 +1,57 @@
+{
+  "schema": "p125pc-actual-input-inert-public-curator-successor-seal/2",
+  "at": "2026-10-17T02:07:13.043864+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+    "bytes": 24233,
+    "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+  },
+  "phaseInputs": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+    "bytes": 4256,
+    "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+      "bytes": 24233,
+      "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+      "bytes": 4256,
+      "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/v1-to-v2.delta.patch.txt",
+      "bytes": 3753,
+      "sha256": "e64ddafc5f59cd5fe469c068583e0612b9f98dea671d04a59cfff1b7680125c9"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/author-review.json",
+      "bytes": 2171,
+      "sha256": "70b3af6ffbe126e72e65ab22b9247b2160b8cae91abe1a4f3eeecf1e352af013"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/README.md",
+      "bytes": 1954,
+      "sha256": "74bc75810fdd06c5c5be4658ad69f01b568e7a1f28b152d1402654e8867593dc"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/input-pins.json",
+      "bytes": 3894,
+      "sha256": "ef81a616885aeae32d02eaa565c270c21f75646f2c8c41c56b4f2d26b86743d0"
+    }
+  ],
+  "preservedV1Seal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/seal.json",
+    "bytes": 2237,
+    "sha256": "9ea64e5173aeeeee33cd128af412e50f679b1137623bb2bf362db2c700deb6eb"
+  },
+  "inputCount": 17,
+  "actualInputDataBound": true,
+  "independentCodeReviewAndRootAdoptionPending": true,
+  "codeParsedImportedCompiledOrExecuted": false,
+  "publicOutputsProduced": false,
+  "blockers": []
+}

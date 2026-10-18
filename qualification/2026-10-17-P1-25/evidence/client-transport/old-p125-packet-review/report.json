@@ -1,0 +1,87 @@
+{
+  "schema": "p125-old-packet-static-metadata-audit/1",
+  "recordedAtUtc": "2026-10-16T21:34:23.481221+00:00",
+  "scope": "Static packet identity and tracked-artifact completeness only. No validator, product, helper, tests, compiler, native, SQL, network or process probe executed. No source/index/QA writes. No new source allocation, ownership release or qualification credit.",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "packetPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25",
+  "actualGitBase": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "headBefore": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "headAfter": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "headUnchangedAtExpectedBase": true,
+  "objectFormat": "sha1",
+  "packetLastChangeCommitAtBase": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "receiptSourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "receiptSourceCommitIsAncestorOfActualBase": true,
+  "expectedOldIdentities": {
+    "receipt.json": {
+      "bytes": 66214,
+      "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496"
+    },
+    "README.md": {
+      "bytes": 9421,
+      "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127"
+    }
+  },
+  "summary": {
+    "declaredArtifacts": 340,
+    "receiptSelfFiles": 1,
+    "activeFiles": 341,
+    "diskFiles": 341,
+    "trackedFilesAtActualBase": 341,
+    "totalActiveBytes": 1618344,
+    "duplicateArtifactPaths": [],
+    "missingDiskPaths": [],
+    "missingTrackedPaths": [],
+    "extraDiskPaths": [],
+    "extraTrackedPaths": [],
+    "identityOrHashIssues": [],
+    "workingTreePacketDiff": "",
+    "allActiveArtifactHashesAndCurrentGitblobsMatch": true,
+    "privateV2PacketMatchesByteForByte": true
+  },
+  "assembly": {
+    "assembler": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7"
+    },
+    "manifest": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/actual-receipt-inputs.json",
+      "bytes": 21102,
+      "sha256": "07c702081c3730c96399c4722a5ea914429d8c373b81cb9d9b307031f205f0d0"
+    },
+    "manifestMatchesPacketAssemblyInputPin": true,
+    "packetAssemblyInputManifest": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 80751,
+      "sha256": "e726c06516d9310170f22dd34ed53b7db02827d80c725875f541ed9ba8dc3df9"
+    },
+    "recordedInputRows": 359,
+    "originalPrivatePacket": "/private/tmp/p1-25-time-qualification-20261016/private-receipt-root/2026-10-17-P1-25",
+    "currentLosslessPrivatePacket": "/private/tmp/p1-25-time-qualification-20261016/private-receipt-root-v2/2026-10-17-P1-25",
+    "privateV2FileCount": 341,
+    "privateV2Missing": [],
+    "privateV2Extras": [],
+    "privateV2DifferentBytes": [],
+    "losslessAdoption": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/evidence-representation-adoption.json",
+      "bytes": 9643,
+      "sha256": "c5b7dca336d73f80a9d6f5c0e5b8473ef8265833151728dade896664260ca353"
+    },
+    "builderRootReview": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-builder-root-review.json",
+      "bytes": 1036,
+      "sha256": "178bcddedcd25297ce3a6a926bfbb1e2b76ad0e861c7b3eb1b43eaf2a50fa192"
+    },
+    "losslessV2Result": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/lossless-receipt-v2-result.json",
+      "bytes": 626,
+      "sha256": "4a0a27e9d75c527db7d37cd4b609932926b9f7ac427e97ba40604aa84ee48407"
+    }
+  },
+  "limitations": [
+    "Original command outcomes and test counts are retained claims, not revalidated by this audit.",
+    "The 359 upstream assembly input rows were counted; this audit binds the assembly manifest and packet, not renewed completeness or validity of every external historical producer.",
+    "Main181-root audit is outside this assignment."
+  ]
+}

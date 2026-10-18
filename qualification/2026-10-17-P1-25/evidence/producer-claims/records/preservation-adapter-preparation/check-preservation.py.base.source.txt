@@ -1,0 +1,40 @@
+from pathlib import Path
+import datetime,hashlib,json,re,stat,subprocess,sys
+C=Path('/private/tmp/p1-25-cadence-qualification-20261017')
+S=Path('/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass')
+R=Path('/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass')
+mode,head,out=sys.argv[1:]
+assert mode in ('before-metadata','after-metadata') and re.fullmatch('[0-9a-f]{40}',head)
+output=Path(out);assert output.is_absolute() and output.parent==C and not output.exists()
+P=json.loads((C/'runtime-protected-inputs.json').read_text())
+F=json.loads((C/'fresh-source-binding.json').read_text())
+def pin(row):
+ p=Path(row['path']);s=p.lstat();assert stat.S_ISREG(s.st_mode) and not p.is_symlink() and str(p.resolve())==row['physicalPath']==str(p)
+ b=p.read_bytes();assert (len(b),hashlib.sha256(b).hexdigest(),s.st_dev,s.st_ino,s.st_nlink)==(row['bytes'],row['sha256'],row['dev'],row['inode'],row['nlink'])
+ return (s.st_dev,s.st_ino)
+def git(root,*args):
+ r=subprocess.run(['git','-C',str(root),*args],capture_output=True);assert r.returncode==0,r.stderr;return r.stdout.decode()
+assert len(P['inputs'])==161 and len(F['boundPaths'])==98 and len(F['compiledPairs'])==21
+meta={str(S/'qualification/2026-10-17-P1-25'/name) for name in ('README.md','receipt.json','assembly-inputs.json')}
+rows=P['inputs']
+if mode=='after-metadata':
+ E=json.loads((C/'private-extension-root/publication-expectations.json').read_text())
+ replacements={r['path']:r for r in E['metadataProtection']['newThreeActivePins']};assert set(replacements)==meta
+ rows=[{**r,**replacements[r['path']]} if r['path'] in meta else r for r in rows]
+for r in rows:pin(r)
+natives=[*P['nativePins'],F['freshNative']];assert len(natives)==12 and len({pin(r) for r in natives})==12
+seen=set()
+for r in F['boundPaths']:
+ for side in ('source','fresh'):
+  identity=pin(r[side]);assert identity not in seen;seen.add(identity)
+ assert (r['source']['bytes'],r['source']['sha256'])==(r['fresh']['bytes'],r['fresh']['sha256'])==(r['bytes'],r['sha256'])
+assert len(seen)==196
+assert git(S,'rev-parse','HEAD').strip()==head and git(S,'branch','--show-current').strip()=='codex/p1-25-cadence-qualification'
+assert git(Path(F['freshRoot']),'rev-parse','HEAD').strip()==F['sourceCommit']
+assert git(Path(F['freshRoot']),'status','--porcelain=v1')==git(Path(F['freshRoot']),'diff','--cached','--name-only')==''
+assert git(R,'rev-parse','HEAD').strip()==P['heldRHead']
+assert git(R,'status','--porcelain=v1')==P['heldRStatus'] and git(R,'diff','--cached','--name-only')==P['heldRStaged']==''
+if mode=='before-metadata':assert git(S,'status','--porcelain=v1')==git(S,'diff','--cached','--name-only')==''
+value={'schema':'p125ec-root-current-preservation/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'mode':mode,'sourceHead':head,'all161ActivePhysicalPinsExact':True,'other158OriginalAndThreeAdmittedMetadataSuccessorsExact':mode=='after-metadata','all98SourceFreshPairs21CompiledPairs196DistinctPhysicalFilesExact':True,'all12DistinctNativesExact':True,'freshCleanIndexEmpty':True,'heldR18RowsHeadIndexExact':True,'sourceCleanIndexEmptyRequired':mode=='before-metadata','noUniversalIsolationClaim':True}
+with output.open('x') as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps(value))

@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 40ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2562ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2522ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 17ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 5ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 11ms
+
+ Test Files  6 passed (6)
+      Tests  37 passed (37)
+   Start at  10:51:05
+   Duration  3.92s (transform 2.30s, setup 74ms, import 649ms, tests 2.64s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/raw.json

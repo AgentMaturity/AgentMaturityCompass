@@ -1,0 +1,53 @@
+{
+  "at": "2026-10-16T19:01:53.491982+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "rows": [
+    {
+      "phase": "p125-q-final-counts",
+      "exit": 0,
+      "durationMs": 395,
+      "pgid": 12772,
+      "groupAbsentByESRCH": true,
+      "logBytes": 255,
+      "logSha256": "96846f163e7e723d135703aede3b508d9f33386668e3a19c94ef69a5d4526865"
+    },
+    {
+      "phase": "p125-q-final-gates",
+      "exit": 0,
+      "durationMs": 508,
+      "pgid": 12788,
+      "groupAbsentByESRCH": true,
+      "logBytes": 837,
+      "logSha256": "f406cf24b28f5336116e9727038aa4cca595f903a7ca3adcf03a70e90db09e76"
+    },
+    {
+      "phase": "p125-q-final-freeze",
+      "exit": 0,
+      "durationMs": 1179,
+      "pgid": 12802,
+      "groupAbsentByESRCH": true,
+      "logBytes": 284,
+      "logSha256": "c953720fae24c14b6e389997f6bb34937d4400d3680f1ce3bc82d269e8dd7714"
+    },
+    {
+      "phase": "p125-node-version",
+      "exit": 0,
+      "durationMs": 23,
+      "pgid": 12847,
+      "groupAbsentByESRCH": true,
+      "logBytes": 9,
+      "logSha256": "33e26f35db6e57ce0c486ddc815fe966867e4f649e418eaf323f75f4720eb8e9"
+    },
+    {
+      "phase": "p125-pnpm-version",
+      "exit": 0,
+      "durationMs": 173,
+      "pgid": 12853,
+      "groupAbsentByESRCH": true,
+      "logBytes": 8,
+      "logSha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf"
+    }
+  ],
+  "guardsUnchanged": true
+}

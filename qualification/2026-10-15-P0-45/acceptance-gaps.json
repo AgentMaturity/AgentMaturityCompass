@@ -1,0 +1,136 @@
+{
+  "formalAcceptanceClosed": false,
+  "currentAcceptanceStaticInventory": {
+    "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "removedCorruptedLiteralGrep": {
+      "phase": "old-delete-message-inventory",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "cmd": "git grep -n 'Removed corrupted' -- src",
+      "exit": 1,
+      "durationMs": 96,
+      "startedUtc": "2026-10-15T05:58:57.519507+00:00",
+      "endedUtc": "2026-10-15T05:58:57.630955+00:00",
+      "log": "/private/tmp/p0-45-qualification-20261015/command-old-delete-message-inventory/stdout-stderr.log",
+      "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+      "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+      "ownedProcess": {
+        "pid": 17902,
+        "ownedPgid": 17902,
+        "observedPgidAfterLaunch": 17902,
+        "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+        "argv": [
+          "git",
+          "grep",
+          "-n",
+          "Removed corrupted",
+          "--",
+          "src"
+        ],
+        "startedUtc": "2026-10-15T05:58:57.519507+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "grepLog": {
+      "path": "/private/tmp/p0-45-qualification-20261015/command-old-delete-message-inventory/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "grepInterpretation": "git grep exits1 with an empty stream: no literal matches, the expected negative inventory result. This is not an original test or a failed guard.",
+    "verifyActionSource": {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    "verifyActionRange": {
+      "startLine": 6222,
+      "endLine": 6279,
+      "directRmSyncCalls": 0,
+      "directUnlinkSyncCalls": 0
+    },
+    "limits": "Direct current action source inventory only, not universal read-only behavior: --sign-config and --relabel-legacy are separate write modes. Repair rollback may unlink its own intent after returning all moved evidence; original tests cover closed-writer fixtures, not active-writer/JSONL/crash-atomic safety.",
+    "formalAcceptanceClosed": false
+  },
+  "adjacentDoctorStaticReview": {
+    "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "purpose": "Read-only response to the P0-45 spec adjacent doctor-fix risk; not repair-path runtime evidence.",
+    "sourcePin": {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/doctor/doctorFix.ts",
+      "bytes": 10366,
+      "sha256": "5599a8acd65ea9d0038d34de8754c47cc6c052515210bb12f84ab48c6c56a7c3"
+    },
+    "observedSource": {
+      "brokenTopLevelSymlinksLines": [
+        103,
+        141
+      ],
+      "branch": "Iterates every top-level .amc entry, and unlinks entries identified as symlinks when the target is missing or link inspection throws. This branch has two unlink calls and no visible deletion gate or evidence-name exclusion.",
+      "staleCacheLines": [
+        145,
+        176
+      ],
+      "cacheBranch": "Unlinks entries beneath .amc/cache through the existing withDeletionGate with kind:caches."
+    },
+    "inference": "The broken-link branch is not confined away from evidence-like top-level names. An evidence.sqlite-named dangling symlink is not excluded by this source. Removing such a link removes its pathname, not a currently existing target body. No execution, deletion or byte loss was observed.",
+    "unapprovedFollowupProposal": {
+      "scope": "Review doctor broken-symlink cleanup for evidence-path exclusions and applicable hold admission; preserve links when their role or hold state is uncertain.",
+      "planLead": "P2-01 is a related global-deletion-executor lead, not approved scope coverage for this observation.",
+      "approved": false,
+      "assignedOwner": null,
+      "externalIssueCreated": false
+    },
+    "scopeBoundary": "doctor-fix is a separate adjacent command. No doctor, hold-policy, fixture or product source was changed; held ownership and normal freeze boundaries remain. This static source gap is retained without turning it into an observed repair failure.",
+    "formalAcceptanceClosed": false
+  },
+  "sourceQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P045"
+  },
+  "limits": [
+    "Bounded qualification is complete pending independent actual review; formalAcceptanceClosed remains false.",
+    "Original12 core,5 built CLI,4 separation and10 readonly verifier are four separate invocations. Six causal phases repeat only the same12 source-mode cases;72 executions add no new unique registrations.",
+    "C1 removes unknown and active legal-hold refusals together under injected callbacks and a stub signer. Shared expectRefused99 can fail before reason/snapshot/quarantine/reachability assertions; retain actual first frames and masking.",
+    "C2 changes only the forward rename to faithful copy then unlink; rollback rename remains unchanged. Byte-reachability checks may survive. A rename-fault-spy assertion failure is mechanism/fault-path sensitivity, not observed byte loss or proof of the spec invariant mutation criterion.",
+    "Actual mutant outcomes, including survivors, are derived from completed raw/observer/process records. Body AssertionErrors await semantic attribution; generic nonzero, setup/hook/native/late/timeout/pending or group uncertainty is not a kill.",
+    "Core12 uses real owned encrypted-blob writer/verifier and SHA256 snapshots, injected hold callbacks and stub SignedDigest signatures. Writers and pools close before repair; this is not active-writer or crash-atomic proof.",
+    "Original builtCLI5 combines a source fixture parent with actual dist/cli.js children, real local REPAIR_RECEIPT signature verification and altered-byte refusal. It is separate from TS-only mutations with all4529 compiled files unchanged; no independently pinned external issuer or separate per-child ABI/transcript is inferred.",
+    "Original CLI environment is inherited with per-call AMC_HOME/passphrase; the causal copy has a seven-key allowlist and borrowed unchanged parent dependencies. Neither proves OS/network, universal descendant or all-cache isolation.",
+    "Only the owned process group was probed with signal zero after exit. The run-end reporter precedes global teardown; complete process exits and known late diagnostics are checked separately. Supervisor420s sends no terminating signal and does not alter original30s tests or CLI60s children.",
+    "Original CLI assertions verify a real local repair receipt and altered-byte refusal, but afterAll deletes the owned fixture. Retained source/raw/observer/outer streams are not a separately retained CLI repair-receipt sample; no sample criterion is closed. Historical origin/main red, PR/merge, full suite and installed P031 remain formal open.",
+    "Full JSONL repair, live writer/WAL race, interactive TTY, genuine active/unknown signed registry, second signing failure, rollback failure, crash/interrupted publication and arbitrary hostile-plan/symlink containment remain unqualified.",
+    "The adjacent doctor static note identifies a dangling top-level .amc symlink deletion branch without the evidence-name exclusion/gate; its cache branch has an existing gate. This is an unapproved adjacent follow-up with no owner assigned, not observed deletion/byte loss or a verify-repair-path defect. No doctor/hold source was changed.",
+    "Required source quality remains failed and unwaived:1269duplicates/2751dead-code findings. Older exact-code type/lint/clean-source/quality evidence retains its original command/source attribution; these are not fresh P045 runs.",
+    "P021 literal20/10-outside-R4 reconciliation, P029 skip, P022 arrays, P023 held API/Studio, P051 issuer/formal, P024 ISO/expert gaps, P019/P020 proposals and P030 held runner/fullbatch/installed-pack gaps remain unresolved.",
+    "Claude/shared CLI/API/Studio/A4 and paused P2-02 reservations and all pending transfers remain intact. Historical Done is not acceptance or ownership clearance.",
+    "Historical original-red requirement, full suite, coverage, Node24, hosted CI, PR/merge, release, formal dependency/G0/Done are not established. P011 remains conditional read-only preparation after this bounded handoff."
+  ],
+  "preserved": [
+    "Current production behavior and all original test/setup/config/assertion/cleanup bytes",
+    "Current OBSERVED L2/audit schema3",
+    "P021 literal20/10-outside-R4 gap",
+    "User P029 skip",
+    "Claude/shared/paused ownership and reservations",
+    "All earlier decisions and pending transfers"
+  ],
+  "nextReadOnlyCandidate": {
+    "key": "P0-11",
+    "readiness": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    "runtimePerformedByThisLane": false,
+    "authority": "Conditional preparation only; no owner transfer or formal dependency closure."
+  }
+}

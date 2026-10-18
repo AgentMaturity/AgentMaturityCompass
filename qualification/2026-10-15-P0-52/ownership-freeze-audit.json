@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only-scope-audit",
+  "issue": "P0-52",
+  "createdAt": "2026-10-14T19:18:16.843126+00:00",
+  "auditDoesNotGrantApproval": true,
+  "source": {
+    "worktree": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+    "head": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+    "branch": "codex/p0-52-current-qualification",
+    "primaryHeldRef": "refs/heads/pending-main-442cd919",
+    "primaryHeldHead": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "durableClaudeClone": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+    "durableClaudeHead": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+  },
+  "ownership": {
+    "status": "unresolved",
+    "reservationPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "genericClaimLines": [
+      1496,
+      1500
+    ],
+    "genericClaim": "Reserved to this session: every Agent-Doable item that is not E17 A4 and not a Codex lane",
+    "explicitP052InListedKeys": false,
+    "explicitCodexLaneKeys": [
+      "P2-01",
+      "P2-02",
+      "P0-29",
+      "P1-34",
+      "P2-18",
+      "P3-12"
+    ],
+    "explicitP052CorePathReleaseRecovered": false,
+    "currentHumanScope": "Continue P0-33 qualification, fix the remaining failures, then move to P0-29 and keep working one by one. Preserve all Claude\u2019s work and don\u2019t bypass the freeze checks.",
+    "assessment": "Trusted human authorizes serial qualification and fixes while preserving Claude. That intent does not explicitly reconcile the generic reservation with the omitted P0-52 list or release federationSync.ts. Existing-source owned qualification is authorized; this read-only audit does not clear production ownership. Do not treat missing exact mentions, no held Sync difference, historical completion, idle state, or tool stdout none as clearance."
+  },
+  "needsSnapshot": {
+    "command": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "--paths",
+      "src/federation/federationSync.ts"
+    ],
+    "cwd": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+    "exitCode": 0,
+    "stdout": "none\n",
+    "stderr": "",
+    "meaning": "No unregistered parity snapshot requirement found by the exact current helper. No ownership grant and no snapshot utility run. Sync has no D-15 row; maintain parity and rerun the path check if repair scope expands."
+  },
+  "D15": {
+    "decision": "Snapshot frozen files on edit before the first change",
+    "spec": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+    "storeRow": {
+      "path": "src/federation/federationStore.ts",
+      "issue": "P0-52",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+      "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+    },
+    "storeArchiveActualSha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+    "storeArchiveMatchesRow": true,
+    "storeArchiveEqualsBaseCommitBytes": true,
+    "storeBaseAncestorOfOwnedHead": true,
+    "frozenStoreOriginals": [
+      {
+        "path": "unused-code/2026-10-02-main/private-store-locators/originals/src/federation/federationStore.ts.original",
+        "sha256": "702a373ecb959cf6b17810af9f7510d6b2847ed8cd57aa10f26f5d3949a65150",
+        "matchesD15Snapshot": false
+      },
+      {
+        "path": "unused-code/2026-10-02-main/private-module-helpers/originals/src/federation/federationStore.ts.original",
+        "sha256": "62e08989ca0b46d5d68fbf759c52458d0d5c4c2a5186b7dadf43a847d473a9b0",
+        "matchesD15Snapshot": false
+      }
+    ],
+    "syncManifestRowPresent": false,
+    "constraints": [
+      "Retain first Store snapshot, manifest row, archive bytes and ordering; do not resnapshot or overwrite registered Store.",
+      "If another frozen path later enters an authorized repair, use approved snapshot-plan-edit utility before its first edit/rebuild; record the issue and actual branch-start base.",
+      "D-15 preservation and ownership are separate gates; neither clears the other."
+    ]
+  },
+  "freeze": {
+    "active": true,
+    "counts": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "P052AllowedException": false,
+    "ownedBaselineSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "primaryHeldCounts": {
+      "cliCommandPaths": 1255,
+      "cliInventoryPaths": 1255,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "primaryHeldAdditionalExceptionKeys": [
+      "P1-65"
+    ],
+    "semantics": "Exact measured CLI/inventory/pack/question counts must equal current baseline. Raised baseline requires a named exception already permitted by the accepted base; a candidate cannot authorize itself. Source-only private repair need not require P0-52 exception if counts remain unchanged. No freeze runtime measurement was executed by this audit.",
+    "constraints": [
+      "Keep freezeActive, baseline, allowed keys, CLI/registry/REPL, counts and 800-line cap unchanged.",
+      "Do not import held 1255-path/A4/P1-65 baseline to clear a 1236-path source candidate.",
+      "Run ordinary freeze check under qualified build in root-owned follow-up; retain every actual refusal."
+    ]
+  },
+  "sourceComparison": [
+    {
+      "path": "src/federation/federationSync.ts",
+      "ownedSha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+      "ownedMatchesHead": true,
+      "heldSha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+      "ownedEqualsPrimaryHeld": true,
+      "durableCloneSha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+      "ownedEqualsDurableClone": true
+    },
+    {
+      "path": "src/federation/federationStore.ts",
+      "ownedSha256": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+      "ownedMatchesHead": true,
+      "heldSha256": "5bc573acabf595028dc4c5ce177cb4a0b3a232e4da4bf8b2993eade3afb363ce",
+      "ownedEqualsPrimaryHeld": false,
+      "durableCloneSha256": "5bc573acabf595028dc4c5ce177cb4a0b3a232e4da4bf8b2993eade3afb363ce",
+      "ownedEqualsDurableClone": false
+    },
+    {
+      "path": "src/federation/federationSchema.ts",
+      "ownedSha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+      "ownedMatchesHead": true,
+      "heldSha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+      "ownedEqualsPrimaryHeld": true,
+      "durableCloneSha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+      "ownedEqualsDurableClone": true
+    },
+    {
+      "path": "src/federation/federationIdentity.ts",
+      "ownedSha256": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3",
+      "ownedMatchesHead": true,
+      "heldSha256": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3",
+      "ownedEqualsPrimaryHeld": true,
+      "durableCloneSha256": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3",
+      "ownedEqualsDurableClone": true
+    },
+    {
+      "path": "src/benchmarks/benchImport.ts",
+      "ownedSha256": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+      "ownedMatchesHead": true,
+      "heldSha256": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+      "ownedEqualsPrimaryHeld": true,
+      "durableCloneSha256": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+      "ownedEqualsDurableClone": true
+    },
+    {
+      "path": "src/utils/pathSafety.ts",
+      "ownedSha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "ownedMatchesHead": true,
+      "heldSha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "ownedEqualsPrimaryHeld": true,
+      "durableCloneSha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "ownedEqualsDurableClone": true
+    }
+  ],
+  "heldSigningPurposeDifference": {
+    "path": "src/federation/federationStore.ts",
+    "owned": "signHexDigest(digest, getPrivateKeyPem(workspace, \"auditor\"))",
+    "primaryHeld": "signHexDigest(digest, getSigningKey(workspace, \"config-signature\"))",
+    "scope": "The only selected federation production difference against primary held is Store signing-key selection. Preserve separately; do not overlay it as part of a Sync destination/history repair."
+  },
+  "reportedWitnesses": {
+    "origin": "Root message, not rerun by this auditor",
+    "linkedDestinationWrites": 3,
+    "aliasHistoryBypasses": 4,
+    "existingSixFilesPassed": "Root-reported original six-file focused run; no whole P0-52/full-suite/coverage claim."
+  },
+  "concreteRepairBoundaryIfTrustedScopeLaterResolved": [
+    "Limit proposed repair to src/federation/federationSync.ts and separately authorized root-owned qualification tests.",
+    "Preserve actual Ed25519 package/member/envelope and benchmark admissions, signed-config/peer semantics, replay/rollback refusal, genuine safe-path positives, generated UUIDs and exact frozen originals.",
+    "Do not change issuer-purpose selection, admission precedence, CLI/API/Studio/registry/freeze, generic filesystem helpers, packages, dependency lockfile, D-15 controls, reserved A4/P2-02/privacy source or Claude candidates.",
+    "Actual witnessed failures remain active; no linked-destination write/history bypass waiver or skip."
+  ],
+  "controlHashes": [
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/tests/helpers/landedSource.ts",
+      "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    }
+  ],
+  "allowedAuditWrites": "Only these private JSON and Markdown receipts in /private/tmp, mode0600.",
+  "notPerformed": [
+    "Source/test edits",
+    "Archive or manifest edits",
+    "Guard mutations",
+    "Builds, tests, install or product CLI/module execution",
+    "Application/thread messages",
+    "Ref changes, staging, commits, pushes, publication or tracker changes"
+  ],
+  "memoryBackground": {
+    "used": [
+      "MEMORY.md:132-140",
+      "skills/amc-bounded-source-slice/SKILL.md:16-36"
+    ],
+    "role": "Prior preservation practice only; all current ownership/freeze conclusions use live controls. The source-only skill does not itself authorize this qualification audit or require approval."
+  }
+}

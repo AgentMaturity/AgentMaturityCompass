@@ -1,0 +1,239 @@
+{
+  "kind": "P0-22 new tests design and actual initial observer phase",
+  "sourceRef": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "scope": [
+    "tests/cliResultCommandRegistry.test.ts",
+    "tests/cliClaimLabels.e2e.test.ts"
+  ],
+  "date": "2026-10-14T16:01:56.546594+00:00",
+  "runtime": "Node22.23.3 explicit /opt/homebrew/opt/node@22/bin/node and scoped PATH",
+  "registry": 173,
+  "testHashes": {
+    "tests/cliResultCommandRegistry.test.ts": "14abd483305604753d06fb83378726ef42185ae6b0abe709735d040f1bfeb956",
+    "tests/cliClaimLabels.e2e.test.ts": "b97c8895ddc35398d174a42433d7dee40f75beff2ca4bfcc5fe600d43681b11e"
+  },
+  "commands": [
+    "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/cliClaimLabels.e2e.test.ts --reporter=json --outputFile=/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.json",
+    "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/cliClaimLabels.e2e.test.ts --reporter=json --outputFile=/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.json",
+    "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/cliClaimLabels.e2e.test.ts --testNamePattern=amc-selected-pattern --reporter=json --outputFile=/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.json"
+  ],
+  "isolation": {
+    "HOME": "owned temp sibling of workspace",
+    "API_credentials": "never inherited",
+    "transport": "native request/connect/fetch denied; no canned results",
+    "signedSeed": "actual amc init, actual configuration signature, actual signed diagnostic run verified against workspace auditor public key",
+    "cleanup": "only own temp root; raw logs retained under own ignored tmp",
+    "concurrency": 1,
+    "reason": "one signed workspace cannot be mutated concurrently by fixture commands"
+  },
+  "phase1": {
+    "json": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.json",
+    "success": false,
+    "tests": 178,
+    "passed": 150,
+    "failed": 28,
+    "pending": 0,
+    "todo": 0,
+    "strictExit70": 0,
+    "notes": "Observer includes legitimate Markdown/stderr format and demonstrated recipe errors, not 28 product defects."
+  },
+  "knownUnresolved": [
+    "passport search successful[] literal acceptance",
+    "leaderboard show successful[] literal acceptance",
+    "persisted CLI-created lab experiment is unavailable to fresh lab-simulate process"
+  ],
+  "authorities": [
+    "docs/CLAIM_KINDS.md:114 markup changes words do not",
+    "docs/CLAIM_KINDS.md:118 pipeable machine formats label stderr",
+    "docs/CLAIM_KINDS.md:122 report Markdown/HTML",
+    "docs/CLAIM_KINDS.md:38 unanswered baseline eligibleLevel is null; no invented zero",
+    "src/cli/claimOutput.ts printed-label hooks do not substitute for inspecting stdout"
+  ],
+  "unqualifiedAttempt": {
+    "command": "PATH=/Users/sid/.nvm/versions/node/v22.23.3/bin:$PATH node --input-type=module ...",
+    "observedRuntime": "Node25.5.0 because that nvm path does not exist",
+    "effect": "CLI import adapted own ignored SQLite native binary ABI141",
+    "qualification": false,
+    "repair": "Root rebuilt owned binary to ABI127 and verified actual SELECT1; subsequent actual tests use explicit qualified node/PATH"
+  },
+  "status": "Two requested CLI test files ready. Lab-only restart repair passes existing38-case source suite. Root rebuild and full current E2E remain pending; literal empty JSON interfaces remain unresolved.",
+  "phases": [
+    {
+      "name": "initial-full",
+      "json": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.json",
+      "jsonSha256": "59db0dd9aca33ecbde989c5fe98357ac81fcf6d0c19468f35349aab8b3ea0300",
+      "log": "/private/tmp/p0-22-cli-claims-e2e-red-node22-20261014.log",
+      "logSha256": "84730a9347b8efe8f47a86c1a0ffd34a769485b1b2163f2ee8c1b5e4a52646fe",
+      "success": false,
+      "tests": 178,
+      "passed": 150,
+      "failed": 28,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 143624.88842773438,
+      "failedNames": [
+        "amc report \u2014 actual result required",
+        "amc verify all \u2014 actual result required",
+        "amc assurance toctou \u2014 actual result required",
+        "amc assurance compound-threats \u2014 actual result required",
+        "amc assurance shutdown-compliance \u2014 actual result required",
+        "amc assurance advanced-threats \u2014 actual result required",
+        "amc assurance scheduler run-now \u2014 fixture refusal permitted: No assurance scheduler policy or live agent adapter is registered.",
+        "amc loop run \u2014 fixture refusal permitted: The fixture has no live execution adapter; no provider may be contacted.",
+        "amc transparency report \u2014 actual result required",
+        "amc audit binder verify \u2014 fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.",
+        "amc passport create \u2014 fixture refusal permitted: The seeded run is signed but has no observed evidence; it cannot create a qualified Passport.",
+        "amc passport badge \u2014 fixture refusal permitted: No qualified Passport exists in this private fixture.",
+        "amc passport search \u2014 actual result required",
+        "amc fleet report \u2014 actual result required",
+        "amc transform attest \u2014 fixture refusal permitted: No matching transformation task exists.",
+        "amc lab-simulate \u2014 actual result required",
+        "amc residency-report \u2014 fixture refusal permitted: No signed data residency policy has been configured for this tenant.",
+        "amc domain conformance \u2014 fixture refusal permitted: No signed active station operating profile or conformance responses exist.",
+        "amc score simulation-lane \u2014 actual result required",
+        "amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "amc executive brief \u2014 actual result required",
+        "amc leaderboard show \u2014 actual result required",
+        "amc leaderboard export \u2014 actual result required",
+        "amc leaderboard public-export \u2014 actual result required",
+        "amc badge \u2014 actual result required",
+        "amc session verify \u2014 actual result required",
+        "domain baseline emits self-reported claim fields and eligibleLevel at most one",
+        "a real stored 1.1.1 run fixture prints the legacy self-reported boundary"
+      ]
+    },
+    {
+      "name": "refined-full",
+      "json": "/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.json",
+      "jsonSha256": "058ec512778f442d27eae8276e901fa8f9965af31f9cecb1e4e72632fc6389f2",
+      "log": "/private/tmp/p0-22-cli-claims-e2e-refined-node22-20261014.log",
+      "logSha256": "9ac7e880f9385efcb1e771fdaeae3f07864e438a0d6afe9b308598182eb7f502",
+      "success": false,
+      "tests": 178,
+      "passed": 173,
+      "failed": 5,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 142680.5087890625,
+      "failedNames": [
+        "amc passport search \u2014 actual result required",
+        "amc lab-simulate \u2014 actual result required",
+        "amc demo run \u2014 fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.",
+        "amc executive brief \u2014 actual result required",
+        "amc leaderboard show \u2014 actual result required"
+      ]
+    },
+    {
+      "name": "focused-recipe-verification",
+      "json": "/private/tmp/p0-22-cli-claims-recipes-node22-20261014.json",
+      "jsonSha256": "b0b05d121d25ec962b56a54d6eee02f400b8839dd744c7b3ff2210a4c07448cd",
+      "log": "/private/tmp/p0-22-cli-claims-recipes-node22-20261014.log",
+      "logSha256": "8592192e77cf75f301895f6ac1261f8cc1b3fcf7dbf30c1b0ad3795d645e9d58",
+      "success": true,
+      "tests": 178,
+      "passed": 3,
+      "failed": 0,
+      "pending": 175,
+      "todo": 0,
+      "durationMs": 7203.86669921875,
+      "failedNames": []
+    },
+    {
+      "name": "focused-final-fixture-reproduction",
+      "json": "/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.json",
+      "jsonSha256": "745e1ef781d0d576982f8f9c2808dfbadfff5ae04256757c8ce06d85d90faeec",
+      "log": "/private/tmp/p0-22-cli-claims-final-fixtures-node22-20261014.log",
+      "logSha256": "119e34969da40b62811d33bf1ea9c7d434fdc51c15b16d3ee1aca9dfb48ad4bf",
+      "success": false,
+      "tests": 178,
+      "passed": 3,
+      "failed": 1,
+      "pending": 174,
+      "todo": 0,
+      "durationMs": 7495.20458984375,
+      "failedNames": [
+        "amc lab-simulate \u2014 actual result required"
+      ]
+    }
+  ],
+  "sourceHashesAtE2EObserver": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+    "src/cli/claimOutput.ts": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+    "src/claims/eligibility/schemas.ts": "693398d39f327b0053d40d79d0bfa26ad78b829a2b8c978113f78cf93a8c0d96",
+    "src/lab/cognitionLab.ts": "1b072a8dd1ee82c0a63a2c69c10119d03fe4c5ebb782900d076b4c15c11dc123",
+    "docs/CLAIM_KINDS.md": "d5450ad102df85cffaec88f925250251b44cf166c0f9b09ed6f085260241bd62",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "observedRefinements": [
+    "Exact valid option values replaced unsupported fleet/executive JSON format, unsupported simulation system type, missing transform agent and conformance options, and mutually exclusive demo aliases.",
+    "Normal CLI verify --sign-config signs actual private fixture config after init profile changes, before signed diagnostic seeding. No level/evidence invented.",
+    "Markdown/stderr machine label channels validated by explicit current docs/source authority, not broad arbitrary substrings.",
+    "Domain unanswered baseline preserves null and requires not_evaluated/incomplete; numeric values must remain <=1.",
+    "Public leaderboard retains the actual default minAgents5; private small-cohort override from initial observer removed and actual default refusal verified.",
+    "Existing signed lab experiment/probes copied from real durable artifact to retained log before cleanup; current fresh-process refusal remains RED."
+  ],
+  "qualificationLimits": [
+    "No whole-green E2E report at latest test bytes; final incremental focused report has174 filtered pending, explicitly not whole acceptance.",
+    "Empty passport and leaderboard JSON contract remains pending user decision; successful[] still fails.",
+    "Lab source repair authorized separately only cognitionLab.ts and cognitionLab.test.ts; full rebuild and E2E rerun remain root-coordinated.",
+    "No full platform suite, global coverage or hosted CI claim from these component checks.",
+    "Final registry helper adds pre-spawn Node22/24 requirement and process.execPath directory in child PATH; root will re-run8contracts on final source."
+  ],
+  "actualPersistedLabWitness": {
+    "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791994029518-45875/persisted-lab-fixture.json",
+    "sha256": "df20729e2812e87aaa4c1b18d5dda12a2b4c8c0f74a9eefc5f3bd9407d18d632",
+    "experimentId": "lab_cb1f99fe-787",
+    "probeCount": 4,
+    "status": "draft",
+    "signatureIsUnsigned": false,
+    "freshProcessOutcome": "exit1, No results \u2014 experiment not found or has no probes."
+  },
+  "completedAt": "2026-10-14T16:10:12.360224+00:00",
+  "labRepair": {
+    "scope": [
+      "src/lab/cognitionLab.ts",
+      "tests/cognitionLab.test.ts"
+    ],
+    "sourceSha256": "2eafc710f1f5719f66e444e99223496aabe27db4d543184e4bdd924cffeac1cf",
+    "testSha256": "dafe961412ac33e2d6d979a3c690516730640d372a21b97432e82e89ccf2ae70",
+    "patch": "/private/tmp/p0-22-cognition-lab-restart-20261014.patch",
+    "patchSha256": "a4845702e95b9d055872ef855c2352e7eef91b2db93f26e3c0aa0e1542a41649",
+    "distRebuilt": false,
+    "actualCliRequalification": "Pending root rebuild; prior actual existing-ID refusal retained.",
+    "phases": [
+      {
+        "report": "/private/tmp/p0-22-cognition-lab-restart-red-node22-20261014.json",
+        "sha256": "b3789b2acb1c5a7cd74c5d52c476072fb9a6bd68d722ad888a9e0e282cf730bb",
+        "success": false,
+        "tests": 38,
+        "passed": 0,
+        "failed": 1,
+        "pending": 37,
+        "todo": 0
+      },
+      {
+        "report": "/private/tmp/p0-22-cognition-lab-restart-final-green-node22-20261014.json",
+        "sha256": "4a1a794890363551c922ebab40e704448bf7c3ca0caf83ae02388be1413d04a7",
+        "success": true,
+        "tests": 38,
+        "passed": 1,
+        "failed": 0,
+        "pending": 37,
+        "todo": 0
+      },
+      {
+        "report": "/private/tmp/p0-22-cognition-lab-whole-file-node22-20261014.json",
+        "sha256": "464fdcd687ec4b84f579b27b44479a8319e2cd3b7886476fb637481fdd870c59",
+        "success": true,
+        "tests": 38,
+        "passed": 38,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    ]
+  }
+}

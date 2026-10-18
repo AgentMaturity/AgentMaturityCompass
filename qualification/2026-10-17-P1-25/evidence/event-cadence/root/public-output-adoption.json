@@ -1,0 +1,25 @@
+{
+  "schema": "p125ec-root-public-curator-adoption/1",
+  "at": "2026-10-17T01:22:04.013462+00:00",
+  "rootFullyRead17505ByteHelperAnd17952ByteDelta": true,
+  "rootReadIndependentReview": true,
+  "helper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/prepare-public-output.py",
+    "bytes": 17505,
+    "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+  },
+  "review": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/review.json",
+    "bytes": 8809,
+    "sha256": "2d18949fc9315618e0edcca939611e18accee69bc2353b7bcda2779745967dd9"
+  },
+  "seal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/seal.json",
+    "bytes": 1124,
+    "sha256": "71d64f7814c00e45d39e3d976034af6a270a8315cd1efff6633ca5971f8bd792"
+  },
+  "oldWindowAndNonWindowGuardsPreserved": true,
+  "unverifiedM1PairGetsNoGrantCredit": true,
+  "explicitNamedPublicPemDerConversionAndBinaryHashingOnly": true,
+  "noSourceAdmissionOrWholeIssueCompletion": true
+}

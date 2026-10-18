@@ -1,0 +1,908 @@
+{
+  "issue": "P0-52",
+  "scope": "Publisher-history follow-up 6 controls and alias-transition RED witnesses; owned new test only",
+  "createdAt": "2026-10-14T19:14:35.919651+00:00",
+  "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/tests/federationPublisherHistoryQualification.test.ts",
+    "sha256": "7954589131acf8be6f9761c2312a76e6adee65af897d482cca0ac496dcb88426",
+    "lines": 243,
+    "cases": 13
+  },
+  "phases": [
+    {
+      "path": "/private/tmp/p0-52-publisher-history-first-20261015.json",
+      "sha256": "485d77f20008df8f180bac47229870527188558d2743dc3c4edaaee0a458c529",
+      "numTotalTests": 13,
+      "numPassedTests": 0,
+      "numFailedTests": 13,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false,
+      "cases": [
+        {
+          "name": "federation publisher history with genuine signed packages same publisher cannot import the exact manifest twice",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-BxfHhx/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "a332dd7a9d6c4c766786ea4d08944b4d4b87c86d4398e2f7979a2d7ec62bba7d"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages distinct manifest at timestamp delta 1000 is accepted without changing previous history",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-hf42Z5/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "70d0577b056da85095933dc6042c1eb9f8a7d25bd732f7e16c673cc4030f0686"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages distinct manifest at timestamp delta 0 is accepted without changing previous history",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-ZZjfYH/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "1be28668652b6842f89831bb9124c64dc7e5cede2bc1e9643d4fa6faaae9374d"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages an older distinct manifest from the same publisher is refused as a rollback",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-9dxqEh/latest/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "a49196cdd07a41dda3ae3b84c00db72606f03a016f6ae635e99432faaed8ab67"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages a different publisher remains independent for older-package",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-jPXUID/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "c22a8048bfaecc3cb8a0892b39309c8b9ba0ef996f8c4a2280f45c4bea78cc7c"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages a different publisher remains independent for same-manifest-id",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-UUZimx/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "1c57b20248ecd740721dd8382ffb43113b81086b5566e4a4b82efb09abc58c26"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages missing prior manifest blocks a later package without changing recipient state",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-ZW4E2s/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "93af0f74109d2e4bd09341730b12fdc9b0217a3ee28c43648865efea6934d62d"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages invalid-json prior manifest blocks a later package without changing recipient state",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-fWmD3N/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "221849674d2d36354d056edc4033e109dd254e50905faafee1cff20a5caf40a7"
+          ]
+        },
+        {
+          "name": "federation publisher history with genuine signed packages invalid-schema prior manifest blocks a later package without changing recipient state",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-9Knelc/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "5955a28a47a5f2b760abf291c81599634382c4913fef999c7e9ed418f5f880ba"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains replay refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-GcSvhH/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "57b9d3d9b0c69b16d438669a1ea7cacdfdf208b841ad6cd5e87330feaeb85273"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains rollback refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-R96uyw/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "d1b0ae8c3c8da3d8a9f8156cf0fb114d082978a1686e230a1ceff3971d54870b"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's replay refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-WBLV3l/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "4832ae0cdb9e76513c9b4ddde9fe78c9be32c1bc5d4438920b4b37f57102713a"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's rollback refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "Error: ENOENT: no such file or directory, open '/private/tmp/amc-p0-52-history-state-USbTcq/first/unpacked/federation/manifest.json'"
+          ],
+          "failureMessageSha256": [
+            "020068e95be03156f61b0705da76ac325bb97772a2b245784ae4c7780242fac8"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/p0-52-publisher-history-flat-export-20261015.json",
+      "sha256": "28801f1db4736c23ca2ee481a207673e54959d7ab734e704fc76ee517eb47e79",
+      "numTotalTests": 13,
+      "numPassedTests": 9,
+      "numFailedTests": 4,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false,
+      "cases": [
+        {
+          "name": "federation publisher history with genuine signed packages same publisher cannot import the exact manifest twice",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages distinct manifest at timestamp delta 1000 is accepted without changing previous history",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages distinct manifest at timestamp delta 0 is accepted without changing previous history",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages an older distinct manifest from the same publisher is refused as a rollback",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages a different publisher remains independent for older-package",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages a different publisher remains independent for same-manifest-id",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages missing prior manifest blocks a later package without changing recipient state",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages invalid-json prior manifest blocks a later package without changing recipient state",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "federation publisher history with genuine signed packages invalid-schema prior manifest blocks a later package without changing recipient state",
+          "status": "passed",
+          "failureSummaries": [],
+          "failureMessageSha256": []
+        },
+        {
+          "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains replay refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "AssertionError: The genuine admitted package must be refused for its history, not accepted: expected null not to be null",
+            "AssertionError: expected '' to match /already imported/",
+            "AssertionError: Recipient names, file contents, history and link/inode metadata must equal the pre-refusal snapshot: expected [ { path: '.', \u2026(4) }, \u2026(145) ] to deeply equal [ { path: '.', \u2026(4) }, \u2026(136) ]"
+          ],
+          "failureMessageSha256": [
+            "06d2ab4a281351c79e493372f0a94ac91602802dd999ac1f595daec8a511be84",
+            "ff73b15364655d11929a550d1bf89629793f5decf39323853b6ee996682ba5e7",
+            "cf30b5d69b7c362935d0027c847557344a5c2ae5f29406668fb4dff548ddf173"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains rollback refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "AssertionError: The genuine admitted package must be refused for its history, not accepted: expected null not to be null",
+            "AssertionError: expected '' to match /refused as a rollback/",
+            "AssertionError: Recipient names, file contents, history and link/inode metadata must equal the pre-refusal snapshot: expected [ { path: '.', \u2026(4) }, \u2026(145) ] to deeply equal [ { path: '.', \u2026(4) }, \u2026(136) ]"
+          ],
+          "failureMessageSha256": [
+            "06d2ab4a281351c79e493372f0a94ac91602802dd999ac1f595daec8a511be84",
+            "3d0b133ccbdb939e2172de3dcc20c99525cf6e974941a31efe33707ad2b82afc",
+            "cf30b5d69b7c362935d0027c847557344a5c2ae5f29406668fb4dff548ddf173"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's replay refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "AssertionError: The genuine admitted package must be refused for its history, not accepted: expected null not to be null",
+            "AssertionError: expected '' to match /already imported/",
+            "AssertionError: Recipient names, file contents, history and link/inode metadata must equal the pre-refusal snapshot: expected [ { path: '.', \u2026(4) }, \u2026(147) ] to deeply equal [ { path: '.', \u2026(4) }, \u2026(138) ]"
+          ],
+          "failureMessageSha256": [
+            "9353a390a069817543cb3a0e550b823d94d1230d301b66f1a974ac242fbbc873",
+            "0e5e885451e56f8280b2ecc42d5a268fffce1461c230279a082f02a85a80f277",
+            "c3107617f74459f9bef45fdf389a0107925e9c829a85cf26a9826b9a8ad6e4b9"
+          ]
+        },
+        {
+          "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's rollback refusal",
+          "status": "failed",
+          "failureSummaries": [
+            "AssertionError: The genuine admitted package must be refused for its history, not accepted: expected null not to be null",
+            "AssertionError: expected '' to match /refused as a rollback/",
+            "AssertionError: Recipient names, file contents, history and link/inode metadata must equal the pre-refusal snapshot: expected [ { path: '.', \u2026(4) }, \u2026(147) ] to deeply equal [ { path: '.', \u2026(4) }, \u2026(138) ]"
+          ],
+          "failureMessageSha256": [
+            "9353a390a069817543cb3a0e550b823d94d1230d301b66f1a974ac242fbbc873",
+            "48a4250c6f3d9b798c9d273c2c09a4da3c5a7da8168ea7f934952e8a7774972f",
+            "c3107617f74459f9bef45fdf389a0107925e9c829a85cf26a9826b9a8ad6e4b9"
+          ]
+        }
+      ]
+    }
+  ],
+  "phaseInterpretation": {
+    "first": "All 13 cases failed in my fixture before admission: real export has a flat archive root, not the nested craftPackage root I assumed. This is retained as a fixture error, not 13 guard failures.",
+    "corrected": "Only the fixture root path changed. Actual 9 pass/4 fail, zero pending/todo, 11.683 s under Node 22.23.3. Nine standard/history/cross-publisher/corrupt-prior controls pass; all four alias-transition replay/rollback refusals fail. No criteria were weakened."
+  },
+  "commands": [
+    {
+      "name": "publisher-history-first",
+      "cmd": "pnpm exec vitest run tests/federationPublisherHistoryQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-52-publisher-history-first-20261015.json",
+      "exit": 1,
+      "durationMs": 11586,
+      "startedUtc": "2026-10-14T19:09:07.429714+00:00",
+      "log": "/private/tmp/p0-52-publisher-history-first-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "logSha256": "25f8c1f13d3e126d322f04b05dd2455d558ca84ac8f4001ef50299787fa1a9d8"
+    },
+    {
+      "name": "publisher-history-flat-export",
+      "cmd": "pnpm exec vitest run tests/federationPublisherHistoryQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-52-publisher-history-flat-export-20261015.json",
+      "exit": 1,
+      "durationMs": 11683,
+      "startedUtc": "2026-10-14T19:10:15.146011+00:00",
+      "log": "/private/tmp/p0-52-publisher-history-flat-export-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "logSha256": "354cc9bdbaa3bf63088233857041f9b11a17f843570ddbecd4a22117ceb69937"
+    },
+    {
+      "name": "publisher-history-test-types",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 37153,
+      "startedUtc": "2026-10-14T19:10:51.720965+00:00",
+      "log": "/private/tmp/p0-52-publisher-history-test-types-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "publisher-history-public-inputs",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-52-history-public-inputs-20261015.mjs /private/tmp/amc-p0-52-publisher-history-rONzhY",
+      "exit": 0,
+      "durationMs": 379,
+      "startedUtc": "2026-10-14T19:13:07.046887+00:00",
+      "log": "/private/tmp/p0-52-publisher-history-public-inputs-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "logSha256": "7828fa0513bec15a42c46166121e06d6b04c3b9d240128694017e62fcf1fbcef"
+    }
+  ],
+  "fixtureEvidence": {
+    "root": "/private/tmp/amc-p0-52-publisher-history-rONzhY",
+    "inputsPath": "/private/tmp/amc-p0-52-publisher-history-rONzhY/inputs.json",
+    "inputsSha256": "150b5ba85b41bf655bd966f057ba3c5f9d0ba826dce9d2b7ceacd9c3a70df67e",
+    "productionPins": [
+      {
+        "path": "src/federation/federationSync.ts",
+        "sha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce"
+      },
+      {
+        "path": "src/federation/federationStore.ts",
+        "sha256": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87"
+      },
+      {
+        "path": "src/federation/federationSchema.ts",
+        "sha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9"
+      },
+      {
+        "path": "src/federation/federationIdentity.ts",
+        "sha256": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3"
+      },
+      {
+        "path": "src/utils/pathSafety.ts",
+        "sha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768"
+      },
+      {
+        "path": "tests/helpers/trustContext.ts",
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      },
+      {
+        "path": "dist/federation/federationSync.js",
+        "sha256": "6ada90a070455c7e0386937885427c833cb9568c0c671658a1375ea5a243e750"
+      }
+    ],
+    "effects": [
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-1-same-publisher-replay.json",
+        "sha256": "6c63c5caea952a143e51d332f6d15cd99c58cc944f273e9c089ae9f7be1e9d3c",
+        "name": "same-publisher-replay",
+        "refusal": "federation package 8aa41db8-f668-429e-b685-85222332aa40 was already imported from this publisher; it is not imported again",
+        "returned": null,
+        "beforeSnapshotSha256": "0dad29f2a5245661831bec580fc000b51f82507052595813724c60b146c6e7cb",
+        "afterSnapshotSha256": "0dad29f2a5245661831bec580fc000b51f82507052595813724c60b146c6e7cb",
+        "unchangedRecipient": true,
+        "incoming": {
+          "publisherKeyId": "a2514c04ec8c9a89bef8d4f15296121ac6a98af4abbcf39f2f2ed91db6685297",
+          "manifestId": "8aa41db8-f668-429e-b685-85222332aa40",
+          "createdTs": 1792004898012,
+          "signedTs": 1792005018597,
+          "sha256": "5ed8df5083968718b55219f361f1fc033e3668270019de410212e83a683898e3"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-15-prior-missing.json",
+        "sha256": "4e213944bd560f68d23066cec079debe567d7b42974ebe920efe3298f6bcafd1",
+        "name": "prior-missing",
+        "refusal": "cannot read the manifest of imported federation package f4da35e4-7d29-4708-8708-79227f4070dd; refusing to import until it is restored or removed",
+        "returned": null,
+        "beforeSnapshotSha256": "7faaf5d1ceb13297f1f05a6c6f8a9c4d85d1423d10025347db3e47ce0f1efa4b",
+        "afterSnapshotSha256": "7faaf5d1ceb13297f1f05a6c6f8a9c4d85d1423d10025347db3e47ce0f1efa4b",
+        "unchangedRecipient": true,
+        "incoming": {
+          "publisherKeyId": "fde42da93b4a4bd6af564a7d9d3884a04a97b1a4a1c6840bc5f2a103e1e7912d",
+          "manifestId": "65bfa8e8-ae88-4047-acde-d72acda8c6f6",
+          "createdTs": 1792004903432,
+          "signedTs": 1792005022968,
+          "sha256": "b593c87b8ccdda62415f04fc65798cd8181779ac34a4f6174b5e33853a81b167"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-18-prior-invalid-json.json",
+        "sha256": "596c863d92e963bebe7077a7d69401b92af3cfabe909aeeaf8b57999b2008203",
+        "name": "prior-invalid-json",
+        "refusal": "cannot read the manifest of imported federation package 707af0a0-6915-4382-8326-4e05df6c01c6; refusing to import until it is restored or removed",
+        "returned": null,
+        "beforeSnapshotSha256": "984671fafc1e5a3ddd79001531057e10608978e93acdf372b55a015605c30b54",
+        "afterSnapshotSha256": "984671fafc1e5a3ddd79001531057e10608978e93acdf372b55a015605c30b54",
+        "unchangedRecipient": true,
+        "incoming": {
+          "publisherKeyId": "966d251e11218c8ef71aa8043fbaad43c118d98b8c642eeec49d682fa0dde45f",
+          "manifestId": "c10206e3-0991-4181-9753-e6b74581e335",
+          "createdTs": 1792004904066,
+          "signedTs": 1792005023607,
+          "sha256": "c5d9bec9cf07052470e1f0a4e388da2fcbe0da6a148cfa1841a08b41dc622018"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-21-prior-invalid-schema.json",
+        "sha256": "692e848eb7c9c88db22de0b7906fa5deaadbbc5e478268d32ab2b40ccac1c796",
+        "name": "prior-invalid-schema",
+        "refusal": "cannot read the manifest of imported federation package b7b542d1-2a16-4170-bab3-2fa21f8678e8; refusing to import until it is restored or removed",
+        "returned": null,
+        "beforeSnapshotSha256": "28f8045a009791071467664de5645c05d24a41da80ed8e22c292212ce373f790",
+        "afterSnapshotSha256": "28f8045a009791071467664de5645c05d24a41da80ed8e22c292212ce373f790",
+        "unchangedRecipient": true,
+        "incoming": {
+          "publisherKeyId": "507bc7d640e47a0a6127c0f2abf51a72ca28424f1815b29157400559bc8577ce",
+          "manifestId": "03f57369-a948-4b16-8190-a2526751c3d3",
+          "createdTs": 1792004904718,
+          "signedTs": 1792005024246,
+          "sha256": "3a2ef6adee341a90b4bec3c16f876760a4b38752458aaae6acb364405cafbd7c"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-24-list-to-peer-replay.json",
+        "sha256": "81ffddfc28f2b00cd34fd4e65f6d6c4b00c000c170ad6c539b3371695ba3d151",
+        "name": "list-to-peer-replay",
+        "refusal": null,
+        "returned": {
+          "sourceOrgId": "e73d73bf-70d3-44b0-99ee-dad691810fa9",
+          "importedPath": "/private/tmp/amc-p0-52-history-state-QIeQng/dest/.amc/federation/inbox/peer-a/5ea28938-cd69-46b9-8e4d-b2989b5b2166",
+          "benchmarkCount": 0,
+          "certCount": 0,
+          "bomCount": 0,
+          "pluginCount": 0
+        },
+        "beforeSnapshotSha256": "47777ecf7258cdff569201524c327283973e7ea67a1b9e7ac79f4b646fda8ab0",
+        "afterSnapshotSha256": "b9ad3063eeff2c61debcef50711ec725c488d15156eb38eece159f84fb644676",
+        "unchangedRecipient": false,
+        "incoming": {
+          "publisherKeyId": "5d3daa8996ee72695623885bf2d1de01db7aacedc039b847658ed1fb95b8d5cb",
+          "manifestId": "5ea28938-cd69-46b9-8e4d-b2989b5b2166",
+          "createdTs": 1792004905338,
+          "signedTs": 1792005024836,
+          "sha256": "1d63c43796651b880d46cf7a25e34d0d8da13e42fd7bb54b51858b8c96a9d5da"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-28-list-to-peer-rollback.json",
+        "sha256": "267c37ae5102b42b3b508908adb10475bc2335f510010aceba718be2ca5e7eaa",
+        "name": "list-to-peer-rollback",
+        "refusal": null,
+        "returned": {
+          "sourceOrgId": "c344e4da-162f-450d-9f65-095111f430b4",
+          "importedPath": "/private/tmp/amc-p0-52-history-state-1dHpKV/dest/.amc/federation/inbox/peer-a/5714633b-53ed-4b0d-97e8-dd47caf112c4",
+          "benchmarkCount": 0,
+          "certCount": 0,
+          "bomCount": 0,
+          "pluginCount": 0
+        },
+        "beforeSnapshotSha256": "0a8a6883217f65541395e7a37a1f366ef5d795613e3ad67f7082d1541c2329af",
+        "afterSnapshotSha256": "8203e47ee18bba0b6fa8fe9d6afd06f718157796feb61cd73235888c0376abe5",
+        "unchangedRecipient": false,
+        "incoming": {
+          "publisherKeyId": "1ccc26ccbf88004d328641443b443e9dfadd497be7f3f25c84422ef3fb4bcc93",
+          "manifestId": "5714633b-53ed-4b0d-97e8-dd47caf112c4",
+          "createdTs": 1792004904941,
+          "signedTs": 1792005025460,
+          "sha256": "06cd458731029d39df3943ac7f0d68aa21ac95e5916686437ade6e643b6e06a5"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-30-earlier-peer-alias-replay.json",
+        "sha256": "f181e57faa873ed0392a05a0b435614f9319e33b4c49777d74dcc83ab87f5241",
+        "name": "earlier-peer-alias-replay",
+        "refusal": null,
+        "returned": {
+          "sourceOrgId": "18ee164f-d69f-4b5b-98d2-7a392e50b7a4",
+          "importedPath": "/private/tmp/amc-p0-52-history-state-76ifFp/dest/.amc/federation/inbox/peer-a/8dbead06-1af5-43c8-ae85-76c3fe1ea623",
+          "benchmarkCount": 0,
+          "certCount": 0,
+          "bomCount": 0,
+          "pluginCount": 0
+        },
+        "beforeSnapshotSha256": "c2ef51e1e3cd22d0780049b4722f48c15942c85f942b661f96ef335e7797f4fe",
+        "afterSnapshotSha256": "0510215ed59be664223625936438d401a903d5dd79b60951d281711e6db20617",
+        "unchangedRecipient": false,
+        "incoming": {
+          "publisherKeyId": "e6e5c72e9cdb43c66d31ee5b4b353f9416e2e35f917f195200d301b5d883ba2f",
+          "manifestId": "8dbead06-1af5-43c8-ae85-76c3fe1ea623",
+          "createdTs": 1792004906560,
+          "signedTs": 1792005026049,
+          "sha256": "629e607ed390cf22da9a1eed3864827e79ab484e37a6bfb6b62cecc83f420d52"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-33-earlier-peer-alias-rollback.json",
+        "sha256": "b8f56630a653f793a44a026f9d2e0fd5770b045ec5e56007a48f87c93c575816",
+        "name": "earlier-peer-alias-rollback",
+        "refusal": null,
+        "returned": {
+          "sourceOrgId": "5f8d8ad2-d1dd-4a2c-80d4-da3b25bb927a",
+          "importedPath": "/private/tmp/amc-p0-52-history-state-o8HLiZ/dest/.amc/federation/inbox/peer-a/2ab5db50-ebaa-4c08-b7eb-012a54cb2741",
+          "benchmarkCount": 0,
+          "certCount": 0,
+          "bomCount": 0,
+          "pluginCount": 0
+        },
+        "beforeSnapshotSha256": "d01469eebe782311c5f2f3dbb9d2cc168632229d835a32e32c5301e6dd6f04f3",
+        "afterSnapshotSha256": "9cd03e9606ab9737db28b5e1af7cc7b265030099ddc22808c8759cda421ea16c",
+        "unchangedRecipient": false,
+        "incoming": {
+          "publisherKeyId": "fe4fe738cc47da63347a7b73cddfc0974c6fdddd348bd2f4cb1c0bab4b2d4e8d",
+          "manifestId": "2ab5db50-ebaa-4c08-b7eb-012a54cb2741",
+          "createdTs": 1792004906148,
+          "signedTs": 1792005026664,
+          "sha256": "dbf6ef6269066d40a7a591e75e4d921db0d27971f35574d50935362c04041f10"
+        }
+      },
+      {
+        "path": "/private/tmp/amc-p0-52-publisher-history-rONzhY/effect-8-same-publisher-rollback.json",
+        "sha256": "f5e016e8b68386c0eea73ae124d988088b453862ea22eee768b8ac2a0b012c78",
+        "name": "same-publisher-rollback",
+        "refusal": "federation package b36b90fc-9ab8-42e3-a16f-931ab45aed09 (created 2026-10-14T19:08:19.989Z) is older than d0be5055-5327-4b09-9813-27019b565e88 (created 2026-10-14T19:08:20.989Z) already imported from this publisher; refused as a rollback",
+        "returned": null,
+        "beforeSnapshotSha256": "a8d7019ce871bcd61c2743fd1ba674fc05e5e48070a05c196907083986c567d2",
+        "afterSnapshotSha256": "a8d7019ce871bcd61c2743fd1ba674fc05e5e48070a05c196907083986c567d2",
+        "unchangedRecipient": true,
+        "incoming": {
+          "publisherKeyId": "4130d7cea4af5645084abd315967149dc006413db6bee6dd379df55f0dad4e14",
+          "manifestId": "b36b90fc-9ab8-42e3-a16f-931ab45aed09",
+          "createdTs": 1792004899989,
+          "signedTs": 1792005020515,
+          "sha256": "4a274c1aae2b92a32572dacbe62d7091543507ece6500b2503d169b2506d2eb4"
+        }
+      }
+    ]
+  },
+  "publicInputVerification": {
+    "path": "/private/tmp/p0-52-history-public-inputs-20261015.json",
+    "sha256": "ced191c673d8a551eaee7f336c4f29e011b1f462d7ba53586b672415be320052",
+    "archives": 23,
+    "method": "Independent Node crypto verified every retained manifest digest/seal with the separately captured operator PEM, matched all sealed member hashes and archive/PEM bytes. No application modules were imported by this audit.",
+    "rows": [
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-0.json",
+        "metadataSha256": "bfaf7675af052f04c3c0f25dbeeea58ebcb515121b398ca1eed6023add92938d",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-0.amcfed",
+        "archiveSha256": "5ed8df5083968718b55219f361f1fc033e3668270019de410212e83a683898e3",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-0-operator.pub",
+        "operatorPinSha256": "a2514c04ec8c9a89bef8d4f15296121ac6a98af4abbcf39f2f2ed91db6685297",
+        "manifestSha256": "6ff693d1b699a5eb118a8c4bc47c869e5326b5a961e63210dab870107a865d99",
+        "publisherKeyId": "a2514c04ec8c9a89bef8d4f15296121ac6a98af4abbcf39f2f2ed91db6685297",
+        "manifestId": "8aa41db8-f668-429e-b685-85222332aa40",
+        "createdTs": 1792004898012,
+        "signedTs": 1792005018597,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-10.json",
+        "metadataSha256": "b701bb4a35e34f173bfd27849a358b8183ef2a3b5f247f1f35b88583a63c205c",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-10.amcfed",
+        "archiveSha256": "92fd08ae74e3da687d979b54a5c05666f4cc425acc56c71ffb3a737a4c51d274",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-10-operator.pub",
+        "operatorPinSha256": "43fe66279baf33dc841d02fb06c3b85cdcb73a68122b8bf8e6427a0ce4d47774",
+        "manifestSha256": "675dac0ca37373c1b0d48118abf45d6dbb6e3c0cd1219c9a752a46f69a1008d9",
+        "publisherKeyId": "43fe66279baf33dc841d02fb06c3b85cdcb73a68122b8bf8e6427a0ce4d47774",
+        "manifestId": "6a3b4594-b06d-44cc-8e46-fb9908f1f635",
+        "createdTs": 1792004900612,
+        "signedTs": 1792005021484,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-11.json",
+        "metadataSha256": "6be73211a9b56a986cb711378f49039fb15998ac931eab4590f747c40832ab24",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-11.amcfed",
+        "archiveSha256": "a47bb74eaa4869e8a01f9157f2e1d77ff8c6fcde9d4be3cdfac22004a8ead10c",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-11-operator.pub",
+        "operatorPinSha256": "297ad599e59978b88f00b4cc6ada05f10209f6cd752c07e14c5578969d00ce34",
+        "manifestSha256": "0fe971af7376f967443417b4531a79fc13e3cd5491da9a66ae23e8cebb008498",
+        "publisherKeyId": "297ad599e59978b88f00b4cc6ada05f10209f6cd752c07e14c5578969d00ce34",
+        "manifestId": "2908cd44-47d5-47bd-8a1f-18beb0874e65",
+        "createdTs": 1792004902575,
+        "signedTs": 1792005022294,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-12.json",
+        "metadataSha256": "a0c19a52d7986c244a2b232a030e7ac8683dc6efdb95d6f46ab51fc5581fab0e",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-12.amcfed",
+        "archiveSha256": "d3e61bb0c0a902dd133bc6173ca1ed07a75c71920dcde8622d0467bfda40dfd6",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-12-operator.pub",
+        "operatorPinSha256": "1dbcd169da745ca892bd8b31412a2b28f467e834f946a6f94bb94f8c80411d4d",
+        "manifestSha256": "008bbff3c8862137527cf40a5eee05b9f63ac661f596f7a1e3b79927b5b3f340",
+        "publisherKeyId": "1dbcd169da745ca892bd8b31412a2b28f467e834f946a6f94bb94f8c80411d4d",
+        "manifestId": "2908cd44-47d5-47bd-8a1f-18beb0874e65",
+        "createdTs": 1792004901575,
+        "signedTs": 1792005022338,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-13.json",
+        "metadataSha256": "4a31734674e7899f1ced019d375410ce3d6caf8cce0ff8feea4c75077c886362",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-13.amcfed",
+        "archiveSha256": "e34c49d7518dd55b039db950e35d61e88618d5620d1412acb77385830c03bb02",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-13-operator.pub",
+        "operatorPinSha256": "fde42da93b4a4bd6af564a7d9d3884a04a97b1a4a1c6840bc5f2a103e1e7912d",
+        "manifestSha256": "e8bc7bc2eadd3499f9735295f3ea862812c286c071d465522aea0b8a00e4083d",
+        "publisherKeyId": "fde42da93b4a4bd6af564a7d9d3884a04a97b1a4a1c6840bc5f2a103e1e7912d",
+        "manifestId": "f4da35e4-7d29-4708-8708-79227f4070dd",
+        "createdTs": 1792004902432,
+        "signedTs": 1792005022925,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-14.json",
+        "metadataSha256": "c0d8b3ba0dfe98b4b09847c762c866d9f6e1f840559b77c2ca99ef96f0196cfb",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-14.amcfed",
+        "archiveSha256": "b593c87b8ccdda62415f04fc65798cd8181779ac34a4f6174b5e33853a81b167",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-14-operator.pub",
+        "operatorPinSha256": "fde42da93b4a4bd6af564a7d9d3884a04a97b1a4a1c6840bc5f2a103e1e7912d",
+        "manifestSha256": "6c59378afa2ebaf361ca27232ff2766c9f851daf3dacf0d97fee2a46d47bb02f",
+        "publisherKeyId": "fde42da93b4a4bd6af564a7d9d3884a04a97b1a4a1c6840bc5f2a103e1e7912d",
+        "manifestId": "65bfa8e8-ae88-4047-acde-d72acda8c6f6",
+        "createdTs": 1792004903432,
+        "signedTs": 1792005022968,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-16.json",
+        "metadataSha256": "1babc01a9d03d8cbcc09e8dde7fc5f0a3e83c2a254840e3098c674b8c6e7e3ec",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-16.amcfed",
+        "archiveSha256": "b2a4eb7037639cbee9be899776acbac6ff98f051b443e5a9eec4937a94c4f315",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-16-operator.pub",
+        "operatorPinSha256": "966d251e11218c8ef71aa8043fbaad43c118d98b8c642eeec49d682fa0dde45f",
+        "manifestSha256": "7877becd146c0898324865f0a27242211b0f6ac8b8ee7b472cd281da20e19025",
+        "publisherKeyId": "966d251e11218c8ef71aa8043fbaad43c118d98b8c642eeec49d682fa0dde45f",
+        "manifestId": "707af0a0-6915-4382-8326-4e05df6c01c6",
+        "createdTs": 1792004903066,
+        "signedTs": 1792005023559,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-17.json",
+        "metadataSha256": "33aaf7f6e100f64909bc8586f56f610003079a99f145944c8a61abb269468e0f",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-17.amcfed",
+        "archiveSha256": "c5d9bec9cf07052470e1f0a4e388da2fcbe0da6a148cfa1841a08b41dc622018",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-17-operator.pub",
+        "operatorPinSha256": "966d251e11218c8ef71aa8043fbaad43c118d98b8c642eeec49d682fa0dde45f",
+        "manifestSha256": "8faa088e331835a6a65c1b3f39dabc44759b637a82d5cf8db25f94d7981c5cf3",
+        "publisherKeyId": "966d251e11218c8ef71aa8043fbaad43c118d98b8c642eeec49d682fa0dde45f",
+        "manifestId": "c10206e3-0991-4181-9753-e6b74581e335",
+        "createdTs": 1792004904066,
+        "signedTs": 1792005023607,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-19.json",
+        "metadataSha256": "930a751cf0df6b6cfe535c52800741a77dfcbd24ce331a9f6ef70947d9456e83",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-19.amcfed",
+        "archiveSha256": "0aea38c21c9d369b1080134bc77f659031ac023c449e5309be659b0fb68dd915",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-19-operator.pub",
+        "operatorPinSha256": "507bc7d640e47a0a6127c0f2abf51a72ca28424f1815b29157400559bc8577ce",
+        "manifestSha256": "9544a6453eede18d1748c63f204ca91f6e41fd42c0b8b99ef7720d40de286f59",
+        "publisherKeyId": "507bc7d640e47a0a6127c0f2abf51a72ca28424f1815b29157400559bc8577ce",
+        "manifestId": "b7b542d1-2a16-4170-bab3-2fa21f8678e8",
+        "createdTs": 1792004903718,
+        "signedTs": 1792005024206,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-2.json",
+        "metadataSha256": "9bb54fe8bedec80458ab02cae4cec66a925c26fb23042b2a9c2c24203f0e51dd",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-2.amcfed",
+        "archiveSha256": "429071937f53079d46aab916a4ba9150f80992264b312c3663f82e6a72251ca8",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-2-operator.pub",
+        "operatorPinSha256": "c88914f36693a73db4152d44047bb4eaf3fa169d940ce801c919ac5b924dbed3",
+        "manifestSha256": "8d9349a9b9e01bc9f052306060c3cc220d6cae7d36db657c3b6a9ca4f2decaf1",
+        "publisherKeyId": "c88914f36693a73db4152d44047bb4eaf3fa169d940ce801c919ac5b924dbed3",
+        "manifestId": "fb49efe7-0a2e-4e06-8f34-0916de7f9970",
+        "createdTs": 1792004898705,
+        "signedTs": 1792005019223,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-20.json",
+        "metadataSha256": "8555a7dbc871f4e900edb28010bca6920407b7a13fcabf42f4d7ad90991ff7b7",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-20.amcfed",
+        "archiveSha256": "3a2ef6adee341a90b4bec3c16f876760a4b38752458aaae6acb364405cafbd7c",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-20-operator.pub",
+        "operatorPinSha256": "507bc7d640e47a0a6127c0f2abf51a72ca28424f1815b29157400559bc8577ce",
+        "manifestSha256": "c22405b429c51427723022706740f53d72aa18c48dd15617cd5db94fbcc6bcdf",
+        "publisherKeyId": "507bc7d640e47a0a6127c0f2abf51a72ca28424f1815b29157400559bc8577ce",
+        "manifestId": "03f57369-a948-4b16-8190-a2526751c3d3",
+        "createdTs": 1792004904718,
+        "signedTs": 1792005024246,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-23.json",
+        "metadataSha256": "2e5e8a4273f50bc0c4c11a6e580d15e7c18c4fffeae1a91de9729e34e070025b",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-23.amcfed",
+        "archiveSha256": "1d63c43796651b880d46cf7a25e34d0d8da13e42fd7bb54b51858b8c96a9d5da",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-23-operator.pub",
+        "operatorPinSha256": "5d3daa8996ee72695623885bf2d1de01db7aacedc039b847658ed1fb95b8d5cb",
+        "manifestSha256": "8d73b0b6bdef1d9831695fd786928cb3c19705efae1f241580c18737ed11d033",
+        "publisherKeyId": "5d3daa8996ee72695623885bf2d1de01db7aacedc039b847658ed1fb95b8d5cb",
+        "manifestId": "5ea28938-cd69-46b9-8e4d-b2989b5b2166",
+        "createdTs": 1792004905338,
+        "signedTs": 1792005024836,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-26.json",
+        "metadataSha256": "5ef4614bd49e4834b1e8ca325d6eb1b9d790aad00d80dff0236fc5da36402deb",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-26.amcfed",
+        "archiveSha256": "bfb919b9796c900c28012f3d080386d915ac56a772158fb8dbbd5ee28d0a18ba",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-26-operator.pub",
+        "operatorPinSha256": "1ccc26ccbf88004d328641443b443e9dfadd497be7f3f25c84422ef3fb4bcc93",
+        "manifestSha256": "64978d3e051ff3db6ccd0e0c75023888b0a51dbeb9786e8b9c370d46066c0ab5",
+        "publisherKeyId": "1ccc26ccbf88004d328641443b443e9dfadd497be7f3f25c84422ef3fb4bcc93",
+        "manifestId": "2833992b-5ac7-4a09-bdc3-93da35631336",
+        "createdTs": 1792004905941,
+        "signedTs": 1792005025419,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-27.json",
+        "metadataSha256": "31d0ba2a12eb13a624f5d615696d8f0a2e14bedada5ec86e0ee1449051a43c5c",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-27.amcfed",
+        "archiveSha256": "06cd458731029d39df3943ac7f0d68aa21ac95e5916686437ade6e643b6e06a5",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-27-operator.pub",
+        "operatorPinSha256": "1ccc26ccbf88004d328641443b443e9dfadd497be7f3f25c84422ef3fb4bcc93",
+        "manifestSha256": "daf95fde22ec886d6505acad72b478e781c702de5ee7430d95a726b3849dacaf",
+        "publisherKeyId": "1ccc26ccbf88004d328641443b443e9dfadd497be7f3f25c84422ef3fb4bcc93",
+        "manifestId": "5714633b-53ed-4b0d-97e8-dd47caf112c4",
+        "createdTs": 1792004904941,
+        "signedTs": 1792005025460,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-29.json",
+        "metadataSha256": "a1eb0c45c9b2f4d9b31ba5d230c7b3cb970dea90f6442e016573bab1de62a562",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-29.amcfed",
+        "archiveSha256": "629e607ed390cf22da9a1eed3864827e79ab484e37a6bfb6b62cecc83f420d52",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-29-operator.pub",
+        "operatorPinSha256": "e6e5c72e9cdb43c66d31ee5b4b353f9416e2e35f917f195200d301b5d883ba2f",
+        "manifestSha256": "b2f63775386a3787e37e791bb2ae15124cc0946497c65db37e6246ee5b1db98f",
+        "publisherKeyId": "e6e5c72e9cdb43c66d31ee5b4b353f9416e2e35f917f195200d301b5d883ba2f",
+        "manifestId": "8dbead06-1af5-43c8-ae85-76c3fe1ea623",
+        "createdTs": 1792004906560,
+        "signedTs": 1792005026049,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-3.json",
+        "metadataSha256": "1e9e025a63fd1e66b2e989ae84573838d32d122fec6c6637d12e5313e5ea893e",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-3.amcfed",
+        "archiveSha256": "5f391c772be275a2cb9296f89d750691661036eccba44358edab16db69a0f860",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-3-operator.pub",
+        "operatorPinSha256": "c88914f36693a73db4152d44047bb4eaf3fa169d940ce801c919ac5b924dbed3",
+        "manifestSha256": "06121a944d57f8c55f9b07a4c5efdfece81227599b561139eb509af9f9eab179",
+        "publisherKeyId": "c88914f36693a73db4152d44047bb4eaf3fa169d940ce801c919ac5b924dbed3",
+        "manifestId": "f80cf4e6-59ed-469e-86e0-0b41659ee938",
+        "createdTs": 1792004899705,
+        "signedTs": 1792005019269,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-31.json",
+        "metadataSha256": "e04e2c6b86e0f82d9a67d5ade09878a1b90b14a790e36b844e6e951ab4094a17",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-31.amcfed",
+        "archiveSha256": "8d60bfc262fbcc981fe5c9eafbe97da9442c96546713811e19300c7e97d4d506",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-31-operator.pub",
+        "operatorPinSha256": "fe4fe738cc47da63347a7b73cddfc0974c6fdddd348bd2f4cb1c0bab4b2d4e8d",
+        "manifestSha256": "b5f3126840b9194099da9e5924feb828302f8c11f1ec831b549d6dd29a471c1c",
+        "publisherKeyId": "fe4fe738cc47da63347a7b73cddfc0974c6fdddd348bd2f4cb1c0bab4b2d4e8d",
+        "manifestId": "0c5da732-1c4c-4668-93b1-a4e9d9c1ff98",
+        "createdTs": 1792004907148,
+        "signedTs": 1792005026623,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-32.json",
+        "metadataSha256": "36dd5c8fe5e6266b07f120efaa3f48d805f121742b34c1068caaca983467a8c0",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-32.amcfed",
+        "archiveSha256": "dbf6ef6269066d40a7a591e75e4d921db0d27971f35574d50935362c04041f10",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-32-operator.pub",
+        "operatorPinSha256": "fe4fe738cc47da63347a7b73cddfc0974c6fdddd348bd2f4cb1c0bab4b2d4e8d",
+        "manifestSha256": "b4bf0b48e0a4a7f1a40f011f13074b67c8be54e51e79cf56ffaa623bb3278b79",
+        "publisherKeyId": "fe4fe738cc47da63347a7b73cddfc0974c6fdddd348bd2f4cb1c0bab4b2d4e8d",
+        "manifestId": "2ab5db50-ebaa-4c08-b7eb-012a54cb2741",
+        "createdTs": 1792004906148,
+        "signedTs": 1792005026664,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-4.json",
+        "metadataSha256": "d13fc0c5a3f2361340d29fcacaba6663292cefd9df0d8eee1c969f81bab4eac1",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-4.amcfed",
+        "archiveSha256": "4c1e30d6fbcc6bc1d9aecf84191d8f8761b1b3b7c7d89cc33f9c5b0fdf60132e",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-4-operator.pub",
+        "operatorPinSha256": "a477d6734a730308bab1149b67ae2c2408d670a6b9df9e3d3ffd01dc2f4675ba",
+        "manifestSha256": "1063aa94817b517f5862b44346031e1cfda34cc8cfbaf65229fc718f751ae8ae",
+        "publisherKeyId": "a477d6734a730308bab1149b67ae2c2408d670a6b9df9e3d3ffd01dc2f4675ba",
+        "manifestId": "019cf591-936b-4382-aa4c-179353e6dce2",
+        "createdTs": 1792004899364,
+        "signedTs": 1792005019861,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-5.json",
+        "metadataSha256": "e0cd3545a046e6e45100acc49b77cef1fe9a7079bf3dac8f88043c74b2779923",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-5.amcfed",
+        "archiveSha256": "8663f27b06c331cb5af66c2975eaae4321f79453d294175a3ab0d3c6f8d79aae",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-5-operator.pub",
+        "operatorPinSha256": "a477d6734a730308bab1149b67ae2c2408d670a6b9df9e3d3ffd01dc2f4675ba",
+        "manifestSha256": "f4978b8b661e6d97bf07fe514ee1d7396dc0b2c36a5f0ac6398e0411ea7b8eb9",
+        "publisherKeyId": "a477d6734a730308bab1149b67ae2c2408d670a6b9df9e3d3ffd01dc2f4675ba",
+        "manifestId": "7d367e65-cca7-43c8-9e7d-c5518bc43616",
+        "createdTs": 1792004899364,
+        "signedTs": 1792005019903,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-6.json",
+        "metadataSha256": "7ad17635432df586d081b8ed432046cbf5f997e85be2f13978218e305b561f11",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-6.amcfed",
+        "archiveSha256": "8ca8f8fb5fe8f3783bd012aed43eafba1c637c4d671cb8a76a8547d4b888d45f",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-6-operator.pub",
+        "operatorPinSha256": "4130d7cea4af5645084abd315967149dc006413db6bee6dd379df55f0dad4e14",
+        "manifestSha256": "199c9bdad0a1c60ce3c9e4f74aa12d1c01dfe10f9a661086f7e32e276ce1a2e2",
+        "publisherKeyId": "4130d7cea4af5645084abd315967149dc006413db6bee6dd379df55f0dad4e14",
+        "manifestId": "d0be5055-5327-4b09-9813-27019b565e88",
+        "createdTs": 1792004900989,
+        "signedTs": 1792005020472,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-7.json",
+        "metadataSha256": "97d541800eb22aa2fae7d45bebe74069af000e7a9c2bde0f3a653a4e679d6ba0",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-7.amcfed",
+        "archiveSha256": "4a274c1aae2b92a32572dacbe62d7091543507ece6500b2503d169b2506d2eb4",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-7-operator.pub",
+        "operatorPinSha256": "4130d7cea4af5645084abd315967149dc006413db6bee6dd379df55f0dad4e14",
+        "manifestSha256": "f7ab1b49ef7b9ad4ba6b85b546088225f6bdc3492ac1c601bdc1c5acee14c4a5",
+        "publisherKeyId": "4130d7cea4af5645084abd315967149dc006413db6bee6dd379df55f0dad4e14",
+        "manifestId": "b36b90fc-9ab8-42e3-a16f-931ab45aed09",
+        "createdTs": 1792004899989,
+        "signedTs": 1792005020515,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      },
+      {
+        "metadata": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-9.json",
+        "metadataSha256": "479ba2fced9bfadce5e049f2f4098bfbdd4679c92058583427b24c6116a1b7fc",
+        "archive": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-9.amcfed",
+        "archiveSha256": "c5e1486c406f8ec68b86e6a42e257ebf406ed8b328f17a1440e3fbce1bc9e843",
+        "operatorPin": "/private/tmp/amc-p0-52-publisher-history-rONzhY/public-package-9-operator.pub",
+        "operatorPinSha256": "590888f905a3f93d99ad95783db32fd2e28bc30350a4f013f7b32affe40b25f0",
+        "manifestSha256": "9d6192751935e6595a27e3bf45af05514b36a2a224398982c2119261c746dba3",
+        "publisherKeyId": "590888f905a3f93d99ad95783db32fd2e28bc30350a4f013f7b32affe40b25f0",
+        "manifestId": "4537518d-09b1-4430-b6e7-7f6c95115b88",
+        "createdTs": 1792004901612,
+        "signedTs": 1792005021442,
+        "sealedMemberCount": 3,
+        "signatureVerifiedByNodeCrypto": true
+      }
+    ]
+  },
+  "rootCause": {
+    "source": "src/federation/federationSync.ts:369-375,391-413,445-447",
+    "finding": "admittedInboxName chooses the currently preferred peerId, otherwise a key-derived bucket. refuseReplayOrRollback scans only that bucket. Creating a peer for a previously list-admitted key, or a lexically earlier alias for an existing peer key, loses sight of same-publisher history.",
+    "actualEffects": "Both transitions accept an exact replay and an older distinct-ID package into peer-a. Returned paths and changed recipient name/content/history/link/inode snapshots are persisted for all four cases."
+  },
+  "boundaries": [
+    "Source 4c8 is the measured predecessor; no production fix, original test edit, dependency/install/build, held work or D-15 change was made by this agent.",
+    "Keys and operator signed-list context were captured before artifact creation. Public archives contain only actual exporter bytes plus controlled claimed history metadata, genuinely resealed via current signFederationDigest. No mock of exporter, importer, verifier or successful handler response was used.",
+    "createdTs is controlled claimed fixture metadata; signedTs records genuine current local signing. No Date mock, independent clock/TSA/freshness guarantee or real-org behavior is claimed.",
+    "Snapshots cover the owned recipient state under serial calls and do not establish a global no-effects, concurrency or race-confinement guarantee.",
+    "Fresh workspace/key stores and operator homes were removed; retained archives, public PEMs, metadata, raw reports and effects remain private. No raw private keys or user secrets are persisted in receipts.",
+    "Final source review/repair, repaired-candidate run, mutation checks, broader qualification, commit and tracker acceptance remain root-owned. Existing P0-22/P0-29/P0-51 debt remains."
+  ]
+}

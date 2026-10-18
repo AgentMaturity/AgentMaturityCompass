@@ -1,0 +1,35 @@
+{
+  "schema": "p125w-launch-correction-independent-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/review.json",
+      "bytes": 7965,
+      "sha256": "3fcd85d9634100b3221212bf82f514c7eace9514cb56a7a3f7c18e04c45c4690",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/review.json",
+      "dev": 16777231,
+      "inode": 543816503,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/README.md",
+      "bytes": 1907,
+      "sha256": "aad37f343fa0d93b45f25d523859b8d0b0ca9b9b21fbd869e6579eaa8a2a52fb",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543816504,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/input-pins.json",
+      "bytes": 7344,
+      "sha256": "16c709b5d37cc74bcd71cfa2d5f34800d5dc0df3bf07c4fc6a1df368f4b69ee2",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/launch-correction-static-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543816505,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 19,
+  "blockers": [],
+  "successorRuntimeCredit": false
+}

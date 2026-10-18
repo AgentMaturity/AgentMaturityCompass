@@ -1,0 +1,134 @@
+{
+  "schema": "p125w-control-root-bindings/1",
+  "at": "2026-10-17T00:15:21.261540+00:00",
+  "sourceParent": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "runtimeProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 78069,
+    "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+    "dev": 16777231,
+    "inode": 543741688,
+    "nlink": 1
+  },
+  "freshSourceBindingPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+    "bytes": 116305,
+    "sha256": "3ded5106edab5d7512418ab2ba1c0021faca650d8e0886b691ea6dbe36d701e1",
+    "dev": 16777231,
+    "inode": 543811246,
+    "nlink": 1
+  },
+  "observedAuditPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+    "bytes": 2195,
+    "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88",
+    "dev": 16777231,
+    "inode": 543750154,
+    "nlink": 1
+  },
+  "sourceSuccessors": [
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "bytes": 24967,
+        "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+        "dev": 16777231,
+        "inode": 543658575,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "bytes": 25255,
+        "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+        "dev": 16777231,
+        "inode": 543658575,
+        "nlink": 1
+      },
+      "originalPreservedPin": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+        "bytes": 24967,
+        "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+        "dev": 16777231,
+        "inode": 543741685,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+        "ac7759702ecbfda304b57e78eb1bd946340adc0f"
+      ]
+    },
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "originalPreservedPin": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+        "dev": 16777231,
+        "inode": 543741686,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+        "ac7759702ecbfda304b57e78eb1bd946340adc0f"
+      ]
+    }
+  ],
+  "phases": {
+    "source": "p125w-source-combined",
+    "fresh": "p125w-fresh-canonical",
+    "mutants": [
+      "p125w-m1-sequential",
+      "p125w-m2"
+    ],
+    "restorations": [
+      "p125w-restore1",
+      "p125w-restore2"
+    ]
+  },
+  "sourceOutcomePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+    "bytes": 6567,
+    "sha256": "3ab58da9f6baa979905fc4772b41199218d4c2572d97d57c85709018986d7580",
+    "dev": 16777231,
+    "inode": 543750164,
+    "nlink": 1
+  },
+  "freshOutcomePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-outcome.json",
+    "bytes": 6599,
+    "sha256": "961f1d0d234fce320cb20584c0c305f86d1a65f2cc177cc609376461449e6130",
+    "dev": 16777231,
+    "inode": 543812554,
+    "nlink": 1
+  },
+  "rootReviewedActualSourceAndFreshOutcomes": true,
+  "rootReviewedActualSourceAndFreshPublicEvidence": true,
+  "noFutureOutcomeHashesAdopted": true
+}

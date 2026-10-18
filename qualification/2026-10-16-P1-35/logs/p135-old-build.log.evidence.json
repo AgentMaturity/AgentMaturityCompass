@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "logs/p135-old-build.log",
+    "bytes": 530,
+    "sha256": "b4f7bb3e5f237927ca3202d533b4141ca8352543a55f6855f544ffc8933fe034"
+  },
+  "dataBase64": "Cj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjEuMSBwcmVidWlsZAo+IG5wbSBydW4gY2xlYW4KCgo+IGFnZW50LW1hdHVyaXR5LWNvbXBhc3NAMS4xLjEgY2xlYW4KPiBybSAtcmYgZGlzdAoKCj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjEuMSBidWlsZAo+IHRzYyAtcCB0c2NvbmZpZy5qc29uICYmIGNobW9kICt4IGRpc3QvY2xpLmpzICYmIG5wbSBydW4gY29weS1hc3NldHMKCgo+IGFnZW50LW1hdHVyaXR5LWNvbXBhc3NAMS4xLjEgY29weS1hc3NldHMKPiBybSAtcmYgZGlzdC9jb25zb2xlL3BhZ2VzIGRpc3QvY29uc29sZS9hc3NldHMgZGlzdC9kYXNoYm9hcmQvdGVtcGxhdGVzICYmIG1rZGlyIC1wIGRpc3QvY29uc29sZSBkaXN0L2Rhc2hib2FyZCAmJiBjcCAtciBzcmMvY29uc29sZS9wYWdlcyBkaXN0L2NvbnNvbGUvcGFnZXMgJiYgY3AgLXIgc3JjL2NvbnNvbGUvYXNzZXRzIGRpc3QvY29uc29sZS9hc3NldHMgJiYgY3AgLXIgc3JjL2Rhc2hib2FyZC90ZW1wbGF0ZXMgZGlzdC9kYXNoYm9hcmQvdGVtcGxhdGVzCgo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. This envelope changes no command result or original evidence."
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "p125ec-independent-runtime-adapter-review-seal/1",
+  "at": "2026-10-17T00:58:42.078457+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/README.md",
+      "bytes": 1176,
+      "sha256": "1ad65048a41d6c0e4ac01296ec09f350f3f72a246cdd8a61ef71f4bb66eeca60",
+      "dev": 16777231,
+      "inode": 543830896,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/review.json",
+      "bytes": 2642,
+      "sha256": "54aa8e63247397d5b453092b20028b0e5aa1df9765d2c880a0d6e5745c7b0947",
+      "dev": 16777231,
+      "inode": 543830895,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/input-pins.json",
+      "bytes": 9731,
+      "sha256": "b30918bbaea98ded3cf6bd763a9fe93316ecac42917b939d482321c5aa376cf8",
+      "dev": 16777231,
+      "inode": 543830897,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/observations.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/observations.json",
+      "bytes": 73623,
+      "sha256": "2e99b62c67e2c54edeb9b14814b3ee7d3b9f15a36b20cb2bb957c8486bae3948",
+      "dev": 16777231,
+      "inode": 543830894,
+      "nlink": 1
+    }
+  ],
+  "boundary": "Read/hash/stat and static text comparison only; no execution or source/index/QA mutation."
+}
