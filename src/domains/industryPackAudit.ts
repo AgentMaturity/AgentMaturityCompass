@@ -605,7 +605,9 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
     lines.push(`| ${f.framework} | ${f.controls} |`);
   }
   lines.push("");
-  lines.push(...renderCurrencyMarkdown(audit.currency));
+  // A receipt older than /5 has no currency section; it still renders (P1-42 review).
+  lines.push(...(audit.currency ? renderCurrencyMarkdown(audit.currency)
+    : ["## Regulatory currency", "", "- not recorded: this audit predates the currency section (schema /5)", ""]));
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");

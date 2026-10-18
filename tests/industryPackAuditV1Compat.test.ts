@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import {
-  INDUSTRY_PACK_AUDIT_SCHEMA_VERSION, verifyIndustryPackAuditChecksum, verifyIndustryPackAuditFile, type IndustryPackAudit
+  INDUSTRY_PACK_AUDIT_SCHEMA_VERSION, renderIndustryPackAuditMarkdown, verifyIndustryPackAuditChecksum, verifyIndustryPackAuditFile,
+  type IndustryPackAudit
 } from "../src/domains/industryPackAudit.js";
 import { loadTrustContext } from "../src/trust/index.js";
 
@@ -35,5 +36,20 @@ describe("industry-pack audit /1 receipts (P1-42)", () => {
     expect(result!.signed).toBe(false);
     expect(result!.errors.map((e) => e.code)).toEqual(["UNSIGNED"]);
     expect(result!.ok).toBe(false);
+  });
+});
+
+/** A /4 receipt (P0-20's signed format before S4's currency section), built by int's code at b9866b0f, same inputs. */
+const V4 = join(process.cwd(), "tests", "fixtures", "industry-pack-audit", "v4-receipt.json");
+const v4 = JSON.parse(readFileSync(V4, "utf8")) as IndustryPackAudit;
+
+describe("industry-pack audit /4 receipts (P1-42 review)", () => {
+  test("a /4 receipt verifies its checksum and renders, saying its currency was not recorded", () => {
+    expect(v4.schemaVersion).toBe("amc.industry-pack-audit/4");
+    expect(verifyIndustryPackAuditChecksum(v4)).toBe(true);
+    const md = renderIndustryPackAuditMarkdown(v4);
+    expect(md).toContain("## Regulatory currency");
+    expect(md).toContain("not recorded: this audit predates the currency section");
+    expect(md).toContain("## Controls");
   });
 });
