@@ -1,6 +1,6 @@
 # Codex qualification receipts carried onto the held line (2026-10-18)
 
-This folder is an index, not a receipt. It records where each qualification folder that branch `rtd/codex-full-integration` adds to the held line `8022bec4e` came from. Every carried file is byte-identical to its source commit: no path was rewritten and no file was trimmed or dropped. The absolute `/Users/sid/...` paths and the large files inside these receipts are kept as committed; whether they may go to the public origin is an open question for Sid.
+This file is an index, not a receipt. It records where each qualification folder that branch `rtd/codex-full-integration` adds to the held line `8022bec4e` came from. Every carried file is byte-identical to its source commit: no path was rewritten and no file was trimmed or dropped. The absolute `/Users/sid/...` paths and the large files inside these receipts are kept as committed; whether they may go to the public origin is an open question for Sid.
 
 ## P0-27: two receipts with the same folder name
 
