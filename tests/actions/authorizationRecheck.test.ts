@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import YAML from "yaml";
 import { authorizationIntentFor, bindAuthorization, checkLease, recheckAuthorization, type AuthorizationContext } from "../../src/actions/authorize.js";
 import { authorizationRecordDigest, intentHashFor } from "../../src/actions/authorizationRecord.js";
 import {
@@ -12,6 +13,7 @@ import { listApprovalDecisions, loadApprovalConsumed } from "../../src/approvals
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import { getPublicKeyPem, verifyHexDigest } from "../../src/crypto/keys.js";
+import { initProcessorRegistry, processorRegistryPath, signProcessorRegistry, type ProcessorRegistryV1 } from "../../src/dataflow/processorRegistry.js";
 import { createFreezeIncident, verifyIncidentSignature } from "../../src/drift/freezeEngine.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
@@ -233,6 +235,21 @@ function refused(f: Fixture, outcome: ToolOutcome, code: string): void {
   expect(outcome.ok).toBe(false);
   expect(outcome.denied?.stage).toBe("authorization");
   expect(outcome.denied?.reason).toContain(code);
+}
+
+/** A signed P2-02 processor registry whose run purpose `settlement` allows `allowedTools` (operator data, not legal review). */
+function purposeRegistry(allowedTools: string[]): ProcessorRegistryV1 {
+  return { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+    processors: [{ processorId: "proc-settlement", legalName: "Fixture Settlement Processor",
+      contracts: [{ kind: "DPA", reference: "DPA-SETTLEMENT-1", effective: "2026-01-01", expires: null, dataClasses: ["pii"] }] }],
+    purposes: [{ purposeId: "settlement", allowedDataClasses: ["pii"], allowedTools, allowedProcessors: ["proc-settlement"] }],
+    bindings: [], runPurpose: "settlement" };
+}
+
+function executionFor(f: Fixture, name = TRANSFER): ToolExecution {
+  const callId = `p202-purpose-${randomUUID()}`;
+  return { ...call({ name }), token: `p202-purpose-token-${randomUUID()}`, callId, rootCallId: callId, parentToken: null,
+    workspace: f.workspace, actionClass: "FINANCIAL", effectiveMode: "EXECUTE" };
 }
 
 function transition(f: Fixture, change: () => void): void {
@@ -459,5 +476,53 @@ describe("P1-02 authorization recheck: fourteen specification groups", () => {
     expect(loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id })).toBeNull();
     expect(f.bodies).toHaveLength(0);
     expect(existsSync(f.effectPath)).toBe(false);
+  });
+});
+
+describe("15: purpose", () => {
+  test("15a: binding fills resource from the signed run purpose, never from the arguments", async () => {
+    const f = fixture();
+    initProcessorRegistry(f.workspace, purposeRegistry([TRANSFER]));
+    const args = { ...ARGS, purpose: "marketing", consent: true };
+    const grant = approve(f, { arguments: args });
+    const outcome = await execute(f, { authority: grant.authority, arguments: args });
+    expect(outcome.ok, outcome.output).toBe(true);
+    expect(f.bodies[0].authorization!.record.resource).toEqual({ purpose: "settlement", dataClasses: ["pii"] });
+  });
+
+  test("15b: a tool the run purpose does not allow is refused purpose_violation, at binding and at the intent", async () => {
+    const f = fixture();
+    initProcessorRegistry(f.workspace, purposeRegistry([REFUND]));
+    const intent = authorizationIntentFor({ workspace: f.workspace, name: TRANSFER, actionClass: "FINANCIAL", effectiveMode: "EXECUTE", arguments: { ...ARGS } });
+    expect(intent).toMatchObject({ ok: false, failures: ["purpose_violation"] });
+    expect(bindAuthorization(executionFor(f), { sessionId: f.sessionId })).toMatchObject({ ok: false, failures: ["purpose_violation"],
+      reason: "run purpose settlement does not allow this tool" });
+    refused(f, await execute(f), "purpose_violation");
+  });
+
+  test("15c: a workspace that has not opted in binds { purpose: null, dataClasses: [] }", () => {
+    const f = fixture();
+    const bound = bindAuthorization(executionFor(f), { sessionId: f.sessionId });
+    if (!bound.ok) throw new Error(`Owned not-opted-in binding refused: ${bound.reason}`);
+    expect(bound.record.resource).toEqual({ purpose: null, dataClasses: [] });
+  });
+
+  test("15d: re-signing the registry without the tool between binding and recheck refuses purpose_violation", async () => {
+    const f = fixture();
+    initProcessorRegistry(f.workspace, purposeRegistry([TRANSFER, REFUND]));
+    const grant = approve(f);
+    transition(f, () => {
+      writeFileSync(processorRegistryPath(f.workspace), YAML.stringify(purposeRegistry([REFUND])));
+      signProcessorRegistry(f.workspace);
+    });
+    refused(f, await execute(f, { authority: grant.authority }), "purpose_violation");
+  });
+
+  test("15e: a registry edited after signing refuses authority_store_unavailable", async () => {
+    const f = fixture();
+    initProcessorRegistry(f.workspace, purposeRegistry([TRANSFER]));
+    const grant = approve(f);
+    transition(f, () => { appendFileSync(processorRegistryPath(f.workspace), "# widened after signing\n"); });
+    refused(f, await execute(f, { authority: grant.authority }), "authority_store_unavailable");
   });
 });
