@@ -16,7 +16,7 @@ interface Marking { issuer: string; signature: Buffer }
 const signedMessage = (kind: "image" | "audio", bytes: Buffer): string => canonicalize({ kind, sha256: sha256Hex(bytes) });
 
 /** The authority is pinned by the fixture harness, independently of the marking under inspection. */
-export function verifyMarking(kind: "image" | "audio", bytes: Buffer, marking: Marking | null,
+function verifyMarking(kind: "image" | "audio", bytes: Buffer, marking: Marking | null,
   pinned: ReadonlyMap<string, KeyObject>): boolean {
   if (marking === null) return false;
   const key = pinned.get(marking.issuer);

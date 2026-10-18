@@ -25,7 +25,7 @@ interface EvidenceSetup {
 }
 export interface TechnologyFixture { ref: string; control: ControlRecord; envelope: FixtureEnvelope }
 
-export const catalog = loadCatalog();
+const catalog = loadCatalog();
 export const technologyControls = [...catalog.controls.values()].filter((control) => control.id.startsWith("L1-TECH-"));
 const profile = parseDeploymentProfile(JSON.parse(readFileSync(join(process.cwd(), "docs/catalog/technology/profile.platform-agent.json"), "utf8")));
 export const plan = compilePlan({ profile, catalog, asOf: "2026-10-18T00:00:00Z" });
