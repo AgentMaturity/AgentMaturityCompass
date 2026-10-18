@@ -113,8 +113,8 @@
   },
   {
    "file": "tests/runPrincipalLease.test.ts",
-   "tests": 9,
-   "passed": 9
+   "tests": 15,
+   "passed": 15
   },
   {
    "file": "tests/starterProfiles.test.ts",
@@ -137,8 +137,9 @@
    "passed": 7
   }
  ],
- "total": 774,
- "passed": 774,
+ "total": 780,
+ "passed": 780,
  "failed": 0,
- "skipped": 0
+ "skipped": 0,
+ "note": "A first run at this commit had 778/780: tests/cliDelegateFlag.test.ts failed twice in beforeEach (workspace init) while the machine's one-minute load average reached about 138; the file then passed 35/35 alone and this rerun of the whole set passed."
 }

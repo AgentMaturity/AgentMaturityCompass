@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-10",
   "date": "2026-10-18",
-  "commit": "1e0989624b03fa665b55863a5f2c9dba7f2c8eda",
+  "commit": "8586b7b8732eea7667f16280e4118743ac18f042",
   "branch": "rtd/p1-10f-delegate-visible-tools",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,98 +12,98 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 104418
+      "durationMs": 551764
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 88197
+      "durationMs": 243998
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 128294
+      "durationMs": 8599778
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 5650
+      "durationMs": 8915
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 1990
+      "durationMs": 3364
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 784
+      "durationMs": 1806
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 3942
+      "durationMs": 7090
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 5146
+      "durationMs": 7363
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 624
+      "durationMs": 1708
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 1562
+      "durationMs": 1782
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 462
+      "durationMs": 454
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 486
+      "durationMs": 526
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1405
+      "durationMs": 1837
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 5916
+      "durationMs": 9044
     },
     {
       "cmd": "npm run -s release:notes -- --check",
       "exit": 1,
-      "durationMs": 383
+      "durationMs": 1414
     },
     {
       "cmd": "npx vitest run tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/wealthOverlay.test.ts tests/claims/d03Gates.test.ts tests/delegateTool.test.ts tests/cliDelegateFlag.test.ts tests/amc1469ControlProjection.test.ts tests/toolEvidenceRecording.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/agentToolsetSession.test.ts tests/codeMode.test.ts tests/nativeSignedToolSubset.test.ts tests/industryPacksPaywallSurfaces.test.ts",
       "exit": 0,
-      "durationMs": 150104
+      "durationMs": 282597
     }
   ],
   "tests": {
-    "total": 774,
-    "passed": 774,
+    "total": 780,
+    "passed": 780,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "31d3935bbc7fe23e5c49f804e511b40dfb7e10478a4c0752257a2a04bf29f7e2"
+      "sha256": "38a5484811278e0a4ade1b391185dfd27b80d3f0a8f1ec416cdc8edf6921da8b"
     },
     {
       "path": "focused-tests.json",
-      "sha256": "970871b239df1f0be59f33cf6e424c48770a3c6c8f04ceff2e6c55658b64be3a"
+      "sha256": "278a25b82665917b6e52a3fac81cdcefecb1498a80bc4d551fe8e793477fdfb7"
     },
     {
       "path": "mutations.json",
@@ -111,8 +111,8 @@
     },
     {
       "path": "plan-digests.json",
-      "sha256": "c2a4d1e6e437843a54698b1397edda25a5182bb0137cc537b56cb2cd8f71b95a"
+      "sha256": "4206f5ae620757111c8432eaf867e436858f00463a65a101a7445f26a03959b8"
     }
   ],
-  "notes": "P1-10 follow-up P1-10F. Focused tests only; the full suite was not run. release:notes --check exits 1 on four breaking changesets already on int that docs/releases/2.0.0.md's Migration section does not cite (claude-code-hooks, issuer-admission-at-verification-time, key-lifecycle-p1-08, layer0-enforcement-gaps); P1-10F's compiled-visible-tools-signed is cited. See README.md."
+  "notes": "P1-10 follow-up P1-10F. Focused tests only; the full suite was not run. release:notes --check exits 1 on four breaking changesets already on int that docs/releases/2.0.0.md's Migration section does not cite (claude-code-hooks, issuer-admission-at-verification-time, key-lifecycle-p1-08, layer0-enforcement-gaps); P1-10F's compiled-visible-tools-signed is cited. See README.md. The focused run recorded is a rerun: the first, at load average about 138, timed out twice in tests/cliDelegateFlag.test.ts's workspace setup."
 }
