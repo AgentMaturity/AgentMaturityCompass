@@ -18772,11 +18772,7 @@ program
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const report = lab.generateLabReport(opts.experiment, process.cwd());
-    if (!report) {
-      console.log(chalk.red("Experiment not found."));
-      process.exitCode = 1;
-      return;
-    }
+    if (!report) { console.log(chalk.red("Experiment not found.")); process.exitCode = 1; return; }
     // The CLI records only lab-simulate placeholders, so a stored lab score is never a measurement.
     const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
@@ -18793,11 +18789,7 @@ program
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
-    if (pairs.length === 0) {
-      console.log(chalk.yellow("No matching probes to compare."));
-      process.exitCode = 1;
-      return;
-    }
+    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
     const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
     printClaimResult(exampleEnvelope("lab:simulate"), {});
