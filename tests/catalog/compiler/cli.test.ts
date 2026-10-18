@@ -308,7 +308,9 @@ describe("catalog compiler actual cold CLI with a synthetic disk catalog", () =>
     const out = join(physicalRoot, "forbidden-plan"), before = treePins(signedRoot);
     const result = cli(f, input, out);
     assertExit(result, 1);
-    expect(result.stderr).toContain(".amc/** is reserved for signed configs.");
+    // P1-10F refuses the symlinked signed tree before the reserved-path check; either refusal must name no host path.
+    expect(result.stderr).toMatch(/\.amc\/\*\* is reserved for signed configs\.|TOOLS_CONFIG_UNVERIFIED: \.amc\/tools\.yaml does not verify \(tools config path refused \(symlink\)\)/);
+    expect(result.stderr).not.toContain(f.root);
     expect(existsSync(out)).toBe(false);
     expect(treePins(signedRoot)).toEqual(before);
   });
