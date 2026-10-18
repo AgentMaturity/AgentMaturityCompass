@@ -1,0 +1,9 @@
+---
+"agent-maturity-compass": minor
+---
+
+MCP: `amc mcp serve` adds four read-only industry pack tools, `amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary`, and `amc mcp list-tools` lists 15 tools instead of 11 (20 instead of 16 with `AMC_A4_PREVIEW=1`). The listing and the station summary are public and return the same result with and without an Industry Packs licence; pack questions and scoring need a licence that verifies against a key pinned in the trust list, and refuse with `industry_packs_locked` and the one paywall text otherwise, which now names the two new locked tools. Every result carries a claim label: scoring is self-reported (the regulated self-assessment envelope, never a pass, level 1 at most, no `certified` field), and the catalog tools are not evaluated. `amc_score_industry_pack` lists unanswered questions in `notEvaluatedQuestionIds` and returns `result: null`, with no score or level, until every question is answered. Unknown ids, including `__proto__`, `constructor` and `toString`, are refused as `unknown_pack_id`. See docs/MCP_INDUSTRY_PACKS.md.
+
+Also landed from the regulated-platform candidate: a sourced, experimental assurance scenario corpus for the 17 industry assurance packs (test data only, agent-drafted and not expert-reviewed; stations come from the industry pack manifest, with P1-13's station tags for the five cross-framework packs), typed Python wrappers for the `amc domain` commands in `amc_sdk.industry` (results require `claimKind` and `statusDimensions`; no `certified` field), and three synthetic, keyless regulated-industry CLI examples under `examples/regulated-industries/` that pin the monitor and auditor keys they record after `amc init`.
+
+freeze-exception: P1-44 — four read-only MCP tools (O17); no CLI command path, no pack question
