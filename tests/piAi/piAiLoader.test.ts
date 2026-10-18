@@ -29,6 +29,7 @@ describe("pi-ai loader (P1-38)", () => {
     expect(manifest.peerDependencies?.[PI_AI_PACKAGE]).toBe(PI_AI_VERSION);
     expect(manifest.peerDependenciesMeta?.[PI_AI_PACKAGE]).toEqual({ optional: true });
     expect(manifest.dependencies?.[PI_AI_PACKAGE]).toBeUndefined();
+    expect(manifest.devDependencies?.[PI_AI_PACKAGE]).toBe(PI_AI_VERSION);
     expect(manifest.engines?.node).toBe(">=20");
   });
 

@@ -208,6 +208,7 @@
     "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
+    "@earendil-works/pi-ai": "1.3.0",
     "@fontsource/inter": "5.2.8",
     "@fontsource/space-mono": "5.2.9",
     "@playwright/test": "^1.56.0",

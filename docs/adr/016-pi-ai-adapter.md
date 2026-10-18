@@ -63,7 +63,8 @@ Exit criterion met: AMC captures the exact bytes before dispatch and records the
 6. **Params and limits.** Only `max_tokens` (required, at most the catalog's `maxTokens` and `contextWindow`) and
    `temperature` (0 to 2) map. Anything else is refused before a header exists. Input length against the context
    window is not checked before send, because AMC has no tokenizer for these models.
-7. **Packaging.** An optional peer at exactly `1.3.0`, loaded only with `import()` by `piAiLoader.ts`, after checking
+7. **Packaging.** An optional peer for package users and a devDependency for AMC's tests, both exactly `1.3.0`,
+   loaded only with `import()` by `piAiLoader.ts`, after checking
    Node (`>=22.19.0`) and the installed version. Refusals name the remediation. `engines.node` stays `>=20`.
 8. **Routes.** `pi-ai:<provider>` on `amc agent-loop run` only, listed apart from native routes in `--help`. ACP and
    native schedules keep native routes only.
@@ -75,7 +76,7 @@ Exit criterion met: AMC captures the exact bytes before dispatch and records the
 - pi-ai re-serialises historical tool-call arguments from parsed objects. The replayed arguments are deterministic
   but may differ in whitespace or number spelling from what the model emitted. Arguments that are not a JSON object
   are refused.
-- pnpm's `autoInstallPeers` records the optional peer in `pnpm-lock.yaml` and installs it in every workspace checkout
-  (77 packages). npm consumers of the published package do not get it. This needs Sid's approval.
+- pi-ai is also an exact devDependency, so every AMC checkout and CI run installs it (77 packages) and the contract
+  tests run everywhere. npm consumers of the published package do not get it. This needs Sid's approval.
 - The capability matrix (`docs/providers/CAPABILITY_MATRIX.md`) is generated from contract-test results against local
   fixture servers. No cell was checked against a real provider.
