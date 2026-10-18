@@ -14,6 +14,10 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { piCwdRefusal, piPathLocations } from "../adapters/pi/piPaths.js";
 import { piVersionRefusal } from "../adapters/pi/piVersions.js";
+import { piActionId } from "../adapters/pi/piIdentity.js";
+import { claudeActionId, claudeCodeRefusal, claudeToolRequest } from "../adapters/hookProviders/claudeCode.js";
+import { ClaudePayloadError, openClaudeEnvelope, parseQualifiedPreToolUse } from "../adapters/hookProviders/claudeCodePayloads.js";
+import YAML from "yaml";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
 const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
@@ -29,6 +33,7 @@ export type HookControlErrorCode =
   | "HOOK_CONTROL_INPUT_TOO_LARGE"
   | "HOOK_CONTROL_PROVIDER_UNSUPPORTED"
   | "HOOK_CONTROL_REPLAY_CONFLICT"
+  | "HOOK_CONTROL_RATE_LIMITED"
   | "HOOK_CONTROL_LEDGER_UNAVAILABLE";
 
 export class HookControlError extends Error {
@@ -98,7 +103,7 @@ const piControlContextSchema = z.strictObject({
 export type PiControlContext = z.infer<typeof piControlContextSchema>;
 
 /** The Pi context of a pi request, or null for other providers. A pi request without a valid one is refused. */
-export function piControlContext(provider: HookProvider, input: Record<string, unknown>): PiControlContext | null {
+function piControlContext(provider: HookProvider, input: Record<string, unknown>): PiControlContext | null {
   if (provider !== "pi") return null;
   const parsed = piControlContextSchema.safeParse(input.pi);
   if (!parsed.success) {
@@ -108,15 +113,97 @@ export function piControlContext(provider: HookProvider, input: Record<string, u
 }
 
 /**
- * Only Claude Code carries an ask natively. A Pi tool call has no channel for an AMC approval, and a confirmation in
- * Pi's own UI is not one, so every Pi ask is denied (capability-lossy).
+ * The call a Pi or Claude Code control request names. AMC derives the action id from the session and call id (an id
+ * the payload names is ignored); the request carries a fresh nonce, so one decision answers one request. None of it is
+ * authority. Other providers carry none; a Pi or Claude Code request that does not match its pinned shape is refused.
  */
-function supportsNativeAsk(provider: HookProvider): boolean {
-  return provider === "claude-code";
+export interface HookCall {
+  readonly provider: "pi" | "claude-code";
+  readonly actionId: string;
+  readonly sessionId: string;
+  readonly callId: string;
+  readonly parentActionId: string | null;
+  /** The provider's working directory, against which it resolves relative paths and runs shell commands. */
+  readonly cwd: string;
+  readonly pi: PiControlContext | null;
+  /** Claude Code: the payload, which the session's registered release must accept (claudeRequestRefusal). */
+  readonly request: Record<string, unknown> | null;
+  /** Claude Code: the SHA-256 of the payload bytes exactly as Claude Code sent them, which the decision binds. */
+  readonly payloadSha256: string | null;
+}
+
+/**
+ * AMC's envelope around a Claude Code PreToolUse (claudeCodePayloads.ts): the payload bytes as received, strictly read
+ * (UTF-8, no byte-order mark, no repeated key, no lone surrogate), their SHA-256 and the nonce.
+ */
+export function openHookEnvelope(rawInput: string): ReturnType<typeof openClaudeEnvelope> {
+  try {
+    assertUnambiguousJson(rawInput);
+    return openClaudeEnvelope(JSON.parse(rawInput) as unknown);
+  } catch (error) {
+    if (error instanceof HookControlError) throw error;
+    const ambiguous = error instanceof ClaudePayloadError && error.kind === "ambiguous";
+    throw new HookControlError(ambiguous ? "HOOK_CONTROL_INPUT_AMBIGUOUS" : "HOOK_CONTROL_INPUT_INVALID", 400,
+      `Claude Code hook input refused: ${error instanceof Error ? error.message : "unreadable"}`);
+  }
+}
+
+/** Refuses JSON with a repeated key: the provider and AMC could read different values from it. */
+export function assertUnambiguousJson(rawInput: string): void {
+  if (YAML.parseDocument(rawInput, { uniqueKeys: true }).errors.some((error) => /unique|duplicate/i.test(error.message))) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_AMBIGUOUS", 400, "provider hook input contains duplicate JSON keys");
+  }
+}
+
+export function hookCall(provider: HookProvider, input: Record<string, unknown>, envelope: { payloadSha256: string } | null = null): HookCall | null {
+  const pi = piControlContext(provider, input);
+  if (pi) {
+    return { provider: "pi", actionId: piActionId(pi.sessionId, pi.toolCallId), sessionId: pi.sessionId, callId: pi.toolCallId, cwd: pi.cwd, pi,
+      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), request: null, payloadSha256: null };
+  }
+  if (provider !== "claude-code") return null;
+  const parsed = parseQualifiedPreToolUse(input);
+  if (!parsed || !envelope) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input is not a qualified release's PreToolUse payload in AMC's envelope");
+  }
+  const { session_id: sessionId, tool_use_id: callId, cwd } = parsed;
+  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, request: input,
+    payloadSha256: envelope.payloadSha256 };
+}
+
+/** Why AMC refuses a Pi or Claude Code call before mapping it, or null. */
+export function hookCallRefusal(call: HookCall, workspace: string, toolName: string, toolInput: Record<string, unknown>): string | null {
+  return call.pi ? piRefusal(call.pi, workspace, toolName) : claudeCodeRefusal(call.cwd, workspace, toolName, toolInput);
+}
+
+/**
+ * Whether a recorded outcome mapping is one AMC produces: native, Claude Code's corrective deny for steer, or a
+ * capability-lossy deny for an ask (every provider: a provider-local ask is not AMC approval) or another provider's steer.
+ */
+/** A zod refinement that rejects a stored control row whose provider mapping is inconsistent (controlMappingValid). */
+export function refineControlMapping(value: Parameters<typeof controlMappingValid>[0], ctx: z.RefinementCtx): void {
+  if (!controlMappingValid(value)) {
+    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
+  }
+}
+
+export function controlMappingValid(value: { provider: HookProvider; requestedDecision: HookControlOutcome; decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome; providerMapping: HookControlProviderMapping; capabilityLossy: boolean }): boolean {
+  if (value.providerMapping === "native") {
+    return value.requestedDecision !== "steer" && value.requestedDecision === value.decision && value.effectiveOutcome === value.decision
+      && !value.capabilityLossy;
+  }
+  if (value.providerMapping === "corrective_deny") {
+    return value.provider === "claude-code" && value.requestedDecision === "steer" && value.decision === "deny"
+      && value.effectiveOutcome === "steer" && !value.capabilityLossy;
+  }
+  return (value.requestedDecision === "ask" || (value.requestedDecision === "steer" && value.provider !== "claude-code"))
+    && value.decision === "deny" && value.effectiveOutcome === "deny" && value.capabilityLossy;
 }
 
 /** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
 function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): string {
+  if (provider === "claude-code") return "A Claude Code ask is not AMC approval, and AMC has no approval path for hook calls, so AMC denied the action.";
   if (provider === "pi") {
     return outcome === "ask"
       ? "A Pi tool call cannot carry an AMC approval, so AMC denied the action."
@@ -127,7 +214,9 @@ function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): str
     : "Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.";
 }
 
-const claudeControlResponseSchema = z.object({
+// AMC only restricts Claude Code: an allow is the empty answer (no permission decision), so Claude Code's own permission
+// settings and prompts still apply; a deny blocks the call.
+const claudeControlResponseSchema = z.union([z.object({}).strict(), z.object({
   hookSpecificOutput: z.object({
     hookEventName: z.literal("PreToolUse"),
     permissionDecision: controlDecisionSchema,
@@ -143,7 +232,10 @@ const claudeControlResponseSchema = z.object({
       message: "corrective context requires a blocking deny decision",
     });
   }
-});
+  if (value.hookSpecificOutput.permissionDecision === "allow") {
+    ctx.addIssue({ code: "custom", path: ["hookSpecificOutput", "permissionDecision"], message: "a Claude Code allow carries no permission decision" });
+  }
+})]);
 
 const geminiControlResponseSchema = z.union([
   z.object({ decision: z.literal("allow") }).strict(),
@@ -196,6 +288,7 @@ export function renderProviderControlResponse(
   const provider = parseProvider(providerInput);
   const reason = cleanReason(reasonInput);
   if (provider === "claude-code") {
+    if (decision === "allow") return {};
     const additionalContext = decision === "deny" && extra.additionalContext
       ? cleanReason(extra.additionalContext)
       : null;
@@ -315,7 +408,7 @@ export function materializeProviderDecision(input: {
       reason = cleanReason(`${input.reason} ${lossyOutcomeNote("steer", input.provider)}`);
       providerResponse = renderProviderControlResponse(input.provider, "deny", reason, binding);
     }
-  } else if (input.requestedDecision === "ask" && !supportsNativeAsk(input.provider)) {
+  } else if (input.requestedDecision === "ask") {
     decision = "deny";
     effectiveOutcome = "deny";
     providerMapping = "fail_closed_deny";
@@ -386,9 +479,7 @@ function shellCommandForProviderTool(
   toolName: string,
   toolInput: Record<string, unknown>,
 ): string | null {
-  if (provider === "claude-code" && toolName === "Bash") {
-    return firstString(toolInput, ["command"]) ?? "";
-  }
+  // Claude Code's Bash is mapped only in its pure form (claudeToolRequest), never through a parsed shell plan.
   if (provider === "gemini-cli" && toolName === "run_shell_command") {
     return firstString(toolInput, ["command"]) ?? "";
   }
@@ -403,9 +494,9 @@ export function canonicalToolRequests(
   toolName: string,
   toolInput: Record<string, unknown>,
   workspace: string,
-  pi: Pick<PiControlContext, "cwd"> | null = null,
+  call: Pick<HookCall, "cwd"> | null = null,
 ): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
-  if (provider === "pi" && !pi) return { requests: [], commandPlan: null };
+  if (provider !== "gemini-cli" && !call) return { requests: [], commandPlan: null };
   const command = shellCommandForProviderTool(provider, toolName, toolInput);
   if (command !== null) {
     const commandPlan = parseShellCommandPlan(command);
@@ -420,23 +511,10 @@ export function canonicalToolRequests(
 
   let request: Omit<CanonicalToolRequest, "segment"> | null = null;
   if (provider === "claude-code") {
-    if (["Read", "Glob", "Grep"].includes(toolName)) {
-      request = {
-        name: "fs.read",
-        args: { path: firstString(toolInput, ["file_path", "path"]) ?? workspace },
-        argumentsReviewable: true,
-      };
-    } else if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(toolName)) {
-      const path = firstString(toolInput, ["file_path", "notebook_path", "path"]);
-      request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
-    } else if (toolName === "WebFetch") {
-      const url = firstString(toolInput, ["url"]);
-      request = url
-        ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
-        : null;
-    }
+    const mapped = call ? claudeToolRequest(toolName, toolInput, workspace, call.cwd) : null;
+    request = mapped ? { ...mapped, argumentsReviewable: true } : null;
   } else if (provider === "pi") {
-    request = pi ? piToolRequest(toolName, toolInput, workspace, pi.cwd) : null;
+    request = call ? piToolRequest(toolName, toolInput, workspace, call.cwd) : null;
   } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
     request = {
       name: "fs.read",

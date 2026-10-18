@@ -123,13 +123,8 @@ function appendHookRequest(workspace: string, agentId: string, actionId: string)
 }
 
 function appendHookDecision(workspace: string, agentId: string, actionId: string): string {
-  const providerResponse = {
-    hookSpecificOutput: {
-      hookEventName: "PreToolUse",
-      permissionDecision: "allow",
-      permissionDecisionReason: "verified test decision",
-    },
-  };
+  // P1-23: a Claude Code allow is the empty answer (AMC only restricts; Claude Code's own permissions still apply).
+  const providerResponse = {};
   return appendReceiptEvent({
     workspace,
     agentId,

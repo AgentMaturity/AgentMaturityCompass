@@ -1,0 +1,14 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "transcript_path": "/__HOME__/.claude/projects/__PROJECT_SLUG__/00000000-0000-4000-8000-000000000001.jsonl",
+  "cwd": "/__PROJECT__",
+  "prompt_id": "00000000-0000-4000-9000-000000000001",
+  "permission_mode": "bypassPermissions",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "echo failing on purpose >&2; exit 3",
+    "description": "Fail on purpose"
+  },
+  "tool_use_id": "toolu_01AmcScriptedCall0001"
+}
