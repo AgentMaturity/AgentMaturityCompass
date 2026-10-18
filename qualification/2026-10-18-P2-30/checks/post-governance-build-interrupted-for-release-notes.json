@@ -1,0 +1,37 @@
+{
+  "timeUtc": "2026-10-18T09:33:59.479448+00:00",
+  "signal": "SIGINT",
+  "reason": "Generate the newly required release-notes block before freezing final source. Only the initial build was running; no completed check or full-suite result claimed.",
+  "members": [
+    {
+      "pid": 60390,
+      "ppid": 48635,
+      "pgid": 60390,
+      "args": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/run-post-governance-checks.mjs a564e359cbbe1b0deb0c278124bc7401b5029944"
+    },
+    {
+      "pid": 60430,
+      "ppid": 60390,
+      "pgid": 60390,
+      "args": "caffeinate -i node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/run-post-governance-checks.mjs a564e359cbbe1b0deb0c278124bc7401b5029944"
+    },
+    {
+      "pid": 60451,
+      "ppid": 60390,
+      "pgid": 60390,
+      "args": "npm run build    "
+    },
+    {
+      "pid": 60729,
+      "ppid": 60451,
+      "pgid": 60390,
+      "args": "sh -c tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build && npm run build:verifier"
+    },
+    {
+      "pid": 60730,
+      "ppid": 60729,
+      "pgid": 60390,
+      "args": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/.bin/tsc -p tsconfig.json"
+    }
+  ]
+}

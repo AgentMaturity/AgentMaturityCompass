@@ -16,7 +16,9 @@ useCases:
   - credit_decision
   - employment_decision
 dataClasses: []
-domains: []
+domains:
+  # P2-30 Technology domain from STATION_DOMAINS; own additive block.
+  - technology.platforms-data
 ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
 # atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).

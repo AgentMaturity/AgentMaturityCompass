@@ -1,0 +1,147 @@
+# technology.gpai-integrator-docs. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-06"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "upstream-model-documentation"
+"stations":
+  - "technology"
+"title": "Pin upstream model documentation to each integrated version"
+"statement": "An integrator retains the upstream documentation for each pinned model version and records how
+  its capabilities and limitations inform the agent's risk assessment."
+"riskRationale": "Documentation for a different model release can omit limitations or integration conditions
+  relevant to the deployed agent."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "EU"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "EU"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "eu-ai-act-gpai"
+    "registerId": "eu-ai-act"
+    "instrument": "Artificial Intelligence Act"
+    "clause": "GPAI documentation duties; exact paragraphs unverified"
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "jurisdiction": "EU"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://publications.europa.eu/resource/celex/32024R1689"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
+        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "EU"
+    "legalReview": null
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. Fixture results establish only local exercise
+    behavior; a production result requires admitted evidence and a named human assessor."
+  "parameters": []
+  "manualDuty":
+    "duty": "Identify whether the integrator duties apply and preserve upstream documentation, the exact model
+      version and the associated risk-assessment decision before changing models."
+    "ownerRole": "ciso"
+    "cadence": "Before model integration and each model-version change."
+    "evidenceOfPerformance": "The pinned model release, upstream document references and linked risk-assessment
+      record; document presence alone does not establish adequacy."
+"tests":
+  - "id": "L1-TECH-06-T1"
+    "type": "document_review"
+    "oracle":
+      "kind": "human_assessor"
+      "observes": "The pinned model release, upstream document references and linked risk-assessment record;
+        document presence alone does not establish adequacy."
+    "fixtures":
+      "positive":
+        - "L1-TECH-06/positive/evidence-valid.json"
+      "negative":
+        - "L1-TECH-06/negative/evidence-stale.json"
+        - "L1-TECH-06/negative/evidence-replayed.json"
+        - "L1-TECH-06/negative/evidence-contradictory.json"
+        - "L1-TECH-06/negative/evidence-cross-tenant.json"
+        - "L1-TECH-06/negative/evidence-empty.json"
+        - "L1-TECH-06/negative/evidence-violation.json"
+    "passCriteria": "A named human assessor examines version-matched documentation and the integration risk
+      assessment. Self-reported document references remain not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-06-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null

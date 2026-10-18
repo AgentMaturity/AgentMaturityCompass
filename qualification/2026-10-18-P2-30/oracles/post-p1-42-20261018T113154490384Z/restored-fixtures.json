@@ -1,0 +1,17 @@
+{
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "cmd": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1"
+  ],
+  "exit": 0,
+  "durationSeconds": 4.055,
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/restored-fixtures.log",
+  "logSha256": "8ef8d186efe56cbdaaa2883ab12b806255b5b227f3edfc08355a2f12cb6eadea",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30"
+}

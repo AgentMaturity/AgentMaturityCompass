@@ -1,0 +1,31 @@
+"id": "overlay.technology"
+"version": "0.1.0"
+"layer": 1
+"title": "Technology platforms and data overlay (experimental and unreviewed)"
+"stations":
+  - "technology"
+"jurisdictions":
+  - "US"
+  - "US-CA"
+  - "EU"
+"compilerCompat": "^0.1.0"
+"publisher": "AgentMaturity (agent-maturity-compass)"
+"maintainers":
+  - "name": "Sid"
+    "role": "maintainer"
+"licence": "MIT"
+"support": "experimental"
+"controls":
+  - "L1-TECH-01"
+  - "L1-TECH-02"
+  - "L1-TECH-03"
+  - "L1-TECH-04"
+  - "L1-TECH-05"
+  - "L1-TECH-06"
+  - "L1-TECH-07"
+  - "L1-TECH-08"
+"stewardship":
+  "partner": null
+  "updatePlan": null
+  "triageTargetDays": null
+  "coverageDoc": "docs/catalog/technology/README.md"

@@ -1,0 +1,1064 @@
+
+> agent-maturity-compass@1.2.0 pretest
+> npm run build
+
+
+> agent-maturity-compass@1.2.0 prebuild
+> npm run clean
+
+
+> agent-maturity-compass@1.2.0 clean
+> node scripts/clean-dist.mjs
+
+
+> agent-maturity-compass@1.2.0 build
+> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build && npm run build:verifier
+
+
+> agent-maturity-compass@1.2.0 copy-assets
+> node scripts/copy-build-assets.mjs
+
+bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp
+
+> agent-maturity-compass@1.2.0 api:build
+> node scripts/build-standalone-api.mjs
+
+
+> agent-maturity-compass@1.2.0 build:verifier
+> tsc -p packages/verifier/tsconfig.json
+
+
+> agent-maturity-compass@1.2.0 test
+> vitest run --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json
+
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+·····x····x························x···················x··············x···········x············stdout | tests/assuranceLabV2.test.ts > assurance lab v2 > assurance console pages serve and include no external CDN refs
+AMC gateway listening on http://127.0.0.1:52270
+AMC gateway proxy listening on http://127.0.0.1:52271
+
+···················stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+············x············································x·····x······························································{"ts":"2026-10-18T10:26:23.858Z","level":"warn","requestId":"33ea6330-4043-4f84-8957-f401c9625325","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"request field \"publicKeyPath\" is refused: verification trust comes only from the server operator's trust list"}
+·······{"ts":"2026-10-18T10:26:24.113Z","level":"warn","requestId":"83619864-c5ab-4722-aeea-a6f37566c2cd","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"allowUnpinned\" is refused: verification trust comes only from the server operator's trust list"}
+····{"ts":"2026-10-18T10:26:24.347Z","level":"warn","requestId":"4e1e5ef8-515e-44fa-b114-87265fcaebad","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"trustList\" is refused: verification trust comes only from the server operator's trust list"}
+{"ts":"2026-10-18T10:26:24.349Z","level":"warn","requestId":"f514e9e3-e3a9-45bf-98d3-a7562cae17e4","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"pubkey\" is refused: verification trust comes only from the server operator's trust list"}
+···{"ts":"2026-10-18T10:26:24.430Z","level":"warn","requestId":"2f6e5184-15ad-467a-8802-d06d247c6a76","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"pubkeyPath\" is refused: verification trust comes only from the server operator's trust list"}
+·······{"ts":"2026-10-18T10:26:24.529Z","level":"warn","requestId":"5be33f21-ad8b-47c6-830a-1e820ebd1e87","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"request field \"trustList\" is refused: verification trust comes only from the server operator's trust list"}
+{"ts":"2026-10-18T10:26:24.530Z","level":"warn","requestId":"d7fdda03-7e95-4e3c-872b-7bf164210090","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"trustRoot\" is refused: verification trust comes only from the server operator's trust list"}
+·····{"ts":"2026-10-18T10:26:24.579Z","level":"warn","requestId":"cf244221-ac40-496b-bbc3-2261dc156963","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request field \"pubkeyPath\" is refused: verification trust comes only from the server operator's trust list"}
+··················································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································AMC: AMC control unavailable; action denied. AMC decision receipt signature does not verify
+····AMC: AMC control unavailable; action denied. AMC Bridge answered HTTP 400: this session reports Pi 1.1.0, but the Pi on disk is 1.0.4
+AMC: AMC control unavailable; action denied. AMC Bridge answered HTTP 400: this session reports Pi unknown, but the Pi on disk is 1.0.4
+·····AMC: AMC control unavailable; action denied. AMC Bridge answered HTTP 409: hook source event ID conflicts with previously observed bytes
+·AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+AMC: AMC control unavailable; action denied. Pi tool input is not plain JSON data
+·····AMC: AMC control unavailable; action denied. AMC decision receipt signature does not verify
+·examples=3
+···AMC: AMC control unavailable; action denied. AMC decision receipt signature does not verify
+·AMC: AMC control unavailable; action denied. AMC decision receipt signature does not verify
+AMC: AMC control unavailable; action denied. AMC control answer is malformed or not bound to this request
+·AMC: AMC control unavailable; action denied. AMC decision receipt is not bound to this request
+······AMC: AMC control unavailable; action denied. AMC Bridge answered HTTP 400: the running Pi extension is not the module the signed installation bound
+·AMC: AMC control unavailable; action denied. AMC decision receipt signature does not verify
+···stderr | tests/keys/workspaceWriter.test.ts > M3: the workspace log is the key-history floor once this machine's marks are gone > logs every history revision, including the ones vault creation and an explicit admission write
+[amc] Explicit notary admission expanded the auditor signing role (43d78319a1d4749901a9759efb95682c122346bf07fe64c6d3048442d2a4d859).
+
+·AMC: AMC control unavailable; action denied. Pi sent a tool_call event AMC does not recognise
+AMC: AMC control unavailable; action denied. Pi sent a tool_call event AMC does not recognise
+AMC: AMC control unavailable; action denied. Pi sent a tool_call event AMC does not recognise
+AMC: AMC control unavailable; action denied. Pi sent a tool_call event AMC does not recognise
+AMC: AMC control unavailable; action denied. Pi sent a tool_call event AMC does not recognise
+····AMC: AMC control unavailable; action denied. AMC Bridge answered HTTP 500
+···AMC: AMC control unavailable; action denied. Expected property name or '}' in JSON at position 1 (line 1 column 2)
+·AMC: AMC control unavailable; action denied. AMC control answer is malformed or not bound to this request
+·AMC: AMC control unavailable; action denied. provider hook forwarding exceeded its 300 ms deadline
+··AMC: AMC control unavailable; action denied. fetch failed
+··AMC: AMC control unavailable; action denied. ENOENT: no such file or directory, stat '/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-pi-control-zYgdAX/.amc/hooks/pi.lease'
+·AMC: AMC control unavailable; action denied. lease token permissions must be 0600
+··AMC: AMC control unavailable; action denied. ENOENT: no such file or directory, open '/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-pi-control-ylfFfP/.amc/hooks/pi.json'
+·AMC: AMC control unavailable; action denied. Pi hook manifest is not a control installation
+·AMC: AMC control unavailable; action denied. Pi hook manifest pins no AMC receipt keys
+·········AMC: the action.requested observation was not recorded: fetch failed
+AMC: the action.completed observation was not recorded: fetch failed
+···························{"ts":"2026-10-18T10:34:40.471Z","level":"warn","requestId":"d559d48d-7165-491e-8623-77e0c6627466","method":"POST","path":"/api/v1/enforce/resources/rollback","status":409,"durationMs":8,"error":"ROLLBACK_TARGET_MISSING"}
+{"ts":"2026-10-18T10:34:40.523Z","level":"warn","requestId":"98cf0d0d-4570-471f-bce0-6f495e5f8fbf","method":"POST","path":"/api/v1/enforce/resources/apply","status":400,"durationMs":16,"error":"ACTIVATION_CONFIRMATION_REQUIRED"}
+{"ts":"2026-10-18T10:34:40.627Z","level":"warn","requestId":"17c7a6c7-02ed-448f-961f-a1e2ceb390ef","method":"POST","path":"/api/v1/enforce/resources/rollback","status":400,"durationMs":21,"error":"ROLLBACK_CONFIRMATION_REQUIRED"}
+·{"ts":"2026-10-18T10:34:40.645Z","level":"warn","requestId":"1be2d665-1084-4efe-bac2-e86a13fa9290","method":"POST","path":"/api/v1/enforce/resources/rollback","status":409,"durationMs":17,"error":"SNAPSHOT_RESOURCE_INVALID"}
+······················{"ts":"2026-10-18T10:35:13.348Z","level":"warn","requestId":"8e963145-1442-4c68-bbd6-b6a246296a01","method":"POST","path":"/api/v1/native-tasks/2353dc92eb8b5ee1e726a8019e7809a5cd387e9b78d638c8e9df8dad06b5c802/resume","status":400,"durationMs":6,"error":"Invalid native task request."}
+····{"ts":"2026-10-18T10:35:20.717Z","level":"warn","requestId":"197d7f86-038a-49ef-b622-9969c70c0b95","method":"POST","path":"/api/v1/native-tasks/d8c7362854d0c63f427afd9b237825573ff5c048c9ca72f0fb64b65999358545/resume","status":400,"durationMs":18,"error":"Invalid native task request."}
+···················x····································································································································error: option '--no-delegate-stop' argument 'undefined' is invalid. --delegate-stop and --no-delegate-stop cannot be combined.
+···error: option '--delegate-stop <condition>' argument 'max-turns:1' is invalid. --delegate-stop and --no-delegate-stop cannot be combined.
+································{"ts":"2026-10-18T10:37:52.608Z","level":"warn","requestId":"ea2da870-b8dd-496a-937a-db051588fa1f","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"LOGIC_INVALID: Invalid Action Policy evidence-logic request."}
+····{"ts":"2026-10-18T10:37:56.097Z","level":"warn","requestId":"6cd8cffc-69c8-4bfd-8faa-86526739b44a","method":"unknown","path":"unknown","status":403,"durationMs":1,"error":"READ_ONLY_MODE: Signed identity or trust configuration is not valid."}
+···································································································································································································································stdout | tests/catalog/l0/identity.test.ts > L0-IDN-04 and L1-WLT-US-01: revocation takes effect (drill) > L0-IDN-04/positive/revoke-then-call.json: pass 
+L0-IDN-04 drill: revocation refused the next call 105.9 ms after it was written
+
+···················stdout | tests/catalog/l0/identity.test.ts > L0-IDN-04 and L1-WLT-US-01: revocation takes effect (drill) > L1-WLT-US-01/positive/revoke-then-transfer.json: pass 
+L0-IDN-04 drill: revocation refused the next call 215.8 ms after it was written
+
+········································stdout | tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores > gateway refuses a revoked lease after a 'tampered list' without reaching its upstream
+AMC gateway listening on http://127.0.0.1:55119
+
+·stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet with single default agent
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·stdout | tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores > gateway refuses a revoked lease after a 'deleted list' without reaching its upstream
+AMC gateway listening on http://127.0.0.1:55132
+
+···stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet with multiple agents detects weak links
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+············stderr | tests/fleetScoring.test.ts > Fleet Scoring > renderFleetScoringMarkdown produces valid markdown
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··········stderr | tests/fleetScoring.test.ts > Fleet Scoring > agent summary includes strongest and weakest questions
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···················································································································································································{"ts":"2026-10-18T10:44:01.934Z","level":"warn","requestId":"cc5b8278-a99b-4e87-8193-d4d13ed029a0","method":"POST","path":"/api/v1/guardrails/enable","status":409,"durationMs":29,"error":"Guardrail pii-redaction is catalog-only and not runtime-bound; AMC will not claim it is active."}
+{"ts":"2026-10-18T10:44:01.936Z","level":"warn","requestId":"1b2faca5-2aa1-4d0b-a966-fb0759709787","method":"GET","path":"/api/v1/guardrails","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/guardrails"}
+············{"ts":"2026-10-18T10:44:09.717Z","level":"warn","requestId":"a27ab7f3-87ed-4379-bc11-32d601ac05d1","method":"GET","path":"/api/v1/guardrails/list","status":409,"durationMs":3,"error":"Runtime Firewall policy integrity check failed: Runtime Firewall policy journal invalid: Signed runtime-firewall-policy revision 1 payload digest mismatch."}
+{"ts":"2026-10-18T10:44:09.725Z","level":"warn","requestId":"fa74c403-b2c2-4d87-9ced-629f1fbea9d1","method":"POST","path":"/api/v1/guardrails/enable","status":409,"durationMs":8,"error":"Runtime Firewall policy integrity check failed: Runtime Firewall policy journal invalid: Signed runtime-firewall-policy revision 1 payload digest mismatch."}
+·{"ts":"2026-10-18T10:44:09.743Z","level":"warn","requestId":"cff0ed2d-e42b-4c10-86b8-488660d92280","method":"POST","path":"/api/v1/guardrails/enable","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T10:44:09.744Z","level":"warn","requestId":"11962108-a60d-4e5e-b945-a97f4b605023","method":"POST","path":"/api/v1/guardrails/profile","status":400,"durationMs":1,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T10:44:09.748Z","level":"warn","requestId":"b7e9d638-7987-4a68-a97f-f262c795cd6a","method":"POST","path":"/api/v1/guardrails/disable","status":413,"durationMs":1,"error":"JSON body exceeds 1048576 bytes"}
+······{"ts":"2026-10-18T10:44:12.865Z","level":"warn","requestId":"3f4dae45-b791-4223-980d-f15989a06389","method":"GET","path":"/api/v1/guardrails/list","status":409,"durationMs":12,"error":"Guardrail control state integrity check failed: Signed guardrail-control revision 1 payload digest mismatch."}
+·{"ts":"2026-10-18T10:44:13.939Z","level":"warn","requestId":"e6ac67ce-c1d9-45a6-907f-2b27917cc996","method":"GET","path":"/api/v1/guardrails/list","status":409,"durationMs":1,"error":"Guardrail control state integrity check failed: Signed guardrail-control revision 1 is malformed: [\n  {\n    \"expected\": \"object\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"signature\"\n    ],\n    \"message\": \"Invalid input: expected object, received undefined\"\n  }\n]"}
+·{"ts":"2026-10-18T10:44:15.191Z","level":"warn","requestId":"83d1ba9b-bbde-46b2-bf28-28b38891ccd4","method":"GET","path":"/api/v1/guardrails/list","status":409,"durationMs":3,"error":"Guardrail control state integrity check failed: Signed guardrail-control revision 1 payload digest mismatch."}
+·{"ts":"2026-10-18T10:44:16.566Z","level":"warn","requestId":"0550d3ea-dd71-4b8f-b65c-fdaceb6aae18","method":"GET","path":"/api/v1/guardrails/list","status":409,"durationMs":15,"error":"Guardrail control state integrity check failed: Signed guardrail-control revision 1 payload digest mismatch."}
+····{"ts":"2026-10-18T10:44:20.273Z","level":"warn","requestId":"bf671b77-81c9-40f4-b01a-839b054d4738","method":"unknown","path":"unknown","status":409,"durationMs":2,"error":"CONFIRMATION_REQUIRED: Exact current compile ID confirmation is required."}
+{"ts":"2026-10-18T10:44:20.277Z","level":"warn","requestId":"ac09b88f-730d-4e8f-b8c8-a571bf4de8cd","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"INVALID_REQUEST: Invalid scope template request."}
+····{"ts":"2026-10-18T10:44:22.642Z","level":"warn","requestId":"ba9357fe-228a-4639-a369-566db8572bda","method":"unknown","path":"unknown","status":403,"durationMs":0,"error":"READ_ONLY_MODE: Signed identity or trust configuration is not valid."}
+···················I checked 40 rows.
+····goal was: count the anomalies
+·····half an ans
+···········my token is [amc:redacted]
+·············································40 rows, two anomalies.
+···half
+·························································································································································································································································································································································································································································································································································································stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··········stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > D1: the score API route gives identical layer scores with the licence on and off
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > D1: the score API route gives identical layer scores with the licence on and off
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+········stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > D2: unified run gives identical module scores and overall grade with the licence on and off
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+····stderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > D2: unified run gives identical module scores and overall grade with the licence on and off
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+················································································stderr | tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations > bundle and certificate refuse a signer admitted only by a tampered raw history file
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+···································x····················································x·············································stdout | tests/universalAgentIntegrationLayer.test.ts > universal agent integration layer > bridge compat routes proxy major provider shapes and mint observed evidence receipts
+AMC gateway listening on http://127.0.0.1:56439
+
+··················stdout | tests/universalAgentIntegrationLayer.test.ts > universal agent integration layer > bridge streaming passthrough uses trailer receipts instead of buffering responses first
+AMC gateway listening on http://127.0.0.1:56466
+
+··················stdout | tests/universalAgentIntegrationLayer.test.ts > universal agent integration layer > SDK OpenAI instrumentation routes through bridge and keeps correlation metadata
+AMC gateway listening on http://127.0.0.1:56501
+
+·········stdout | tests/universalAgentIntegrationLayer.test.ts > universal agent integration layer > security: lease auth cannot call owner pairing endpoint and disallowed bridge model is rejected
+AMC gateway listening on http://127.0.0.1:56540
+
+····················································································································stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a second copy of the same attested event counts once in the compliance engine and the diagnostic
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a second copy of the same attested event counts once in the compliance engine and the diagnostic
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+····stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a copy under a later bundle signed by the same key counts once in the compliance engine and the diagnostic
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a copy under a later bundle signed by the same key counts once in the compliance engine and the diagnostic
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+····stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a copy appended later than the attested event's time does not count in a later window
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+stderr | tests/ingestAttestation.test.ts > an attested event counts for its subject, once, in its own window > a copy appended later than the attested event's time does not count in a later window
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+································································································································································································································································································{"ts":"2026-10-18T10:56:22.957Z","level":"warn","requestId":"4c1cfe77-eb10-4284-9d96-8d0160de02f6","method":"POST","path":"/api/v1/assurance","status":400,"durationMs":4,"error":"pack must be all or one of: advanced-threats|adversarial-robustness|adversarialAlignmentProbes|aegis-style-probes|agenticLoopGovernance|agentIdentitySpoofing|aiTrustExploitation|alignmentFaking|approval-theater|autonomous-loop-governance|beavertails-style-probes|behavioral-contract-violation|benchmarkTracking|capabilityElicitation|cbrnCapability|chainEscalation|circuit-breaker-reliability|codeSabotageDefense|codingAgentEscape|commercial-agent|compoundThreat|config-lint|contentProvenance|context-leakage|contextWindowManagement|costEfficiency|crossAgentCollusion|cyberseceval-style-probes|delegationTrustChain|disempowerment|dlp-exfiltration|donotanswer-style-probes|duality|dynamicTrustAuthorization|educationFERPA|emergentCapability|emergentMultiAgentRisk|encodedInjection|environmentalInfra|euAiActArticle|evalAwareBehavior|evaluationFreshness|evaluationReliability|excessive-agency|exfiltration|factSimulationBoundary|false-premise|financialModelRisk|financialSOX|forecastLegitimacy|globalAIRegulatory|governance_bypass|governanceNISTRMF|hallucination|harmbench-style-probes|healthcarePHI|hipaaCompliance|honeytoken-detection|humanDecisionSabotage|humanOversightQuality|informationExtraction|injection|inputFaultResilience|instructionalLeakage|instructionCompliance|instructionHierarchy|iso42005ImpactAssessment|legalCompliance|linuxPrivilegeBoundaryRegression|mechanisticTransparency|memoryMaturity|memoryPoisoning|militaryDualUse|misleading-context|mobilityFunctionalSafety|modelRoutePoisoning|modelTheftExfil|multi-agent-orchestrator-governance|multi-turn-deep-eval|multi-turn-safety|multiTurnToolAttack|notaryAttestation|operational-discipline|over-compliance|overreliance|oversightUndermining|owaspGenAI|persuasionManipulation|pharmaCompliance|pii-detection-leakage|policyConfusion|powerSeeking|predictiveUXHonesty|promptCachePoisoning|rag-poisoning|realPersonRepresentation|realtime-voice-safety|reasoningLockDetection|reasoningObservability|redTeamCoverage|replicationResistance|resourceExhaustion|roleDeploySabotage|roleSupportFraud|rspCompliance|runtimeTrustGate|sabotage|safetyCriticalSIL|safetyCulture|sandbagging|sandboxBoundary|sbom-supply-chain|scenarioTraceability|schemingDeception|science-research-agent-risk|security-starter|self-preferential-bias|self-preservation|silentFailure|simulationValidity|simulationWritebackGovernance|stepup-approval-bypass|supply-chain-integrity|supplyChainAttack|sycophancy|syntheticAgentInteraction|syntheticPersonaGovernance|taint-propagation|technologyGDPRSOC|temporalConsistency|thoughtSafetyAudit|timingSideChannel|tocTou|toolMisuse|toolSchemaDrift|toxicchat-style-probes|truthfulness|uncertaintyPropagation|unsafe_tooling|valueCoherence|wealthManagementMiFID|whistleblowerProtection|xstest-style-probes"}
+·························the delegate answer
+·····partial
+···ok
+·····done
+········saw eof
+·························{"ts":"2026-10-18T10:57:25.239Z","level":"warn","requestId":"a5ff3797-b89a-473e-b3dc-d72f090d91b3","method":"POST","path":"/api/v1/evidence/attest","status":400,"durationMs":12,"error":"ingestSessionId required"}
+{"ts":"2026-10-18T10:57:25.355Z","level":"warn","requestId":"1d42ef47-399b-496d-8175-e86aaa39c4cc","method":"POST","path":"/api/v1/tickets/issue","status":400,"durationMs":8,"error":"Required: workOrderId, action"}
+{"ts":"2026-10-18T10:57:25.477Z","level":"warn","requestId":"6c803729-3d43-4dcc-9974-a0ca28c84884","method":"POST","path":"/api/v1/sandbox/run","status":400,"durationMs":5,"error":"command is required"}
+{"ts":"2026-10-18T10:57:25.559Z","level":"warn","requestId":"c881d44f-b6b3-40c5-8c45-04e3eb72b968","method":"POST","path":"/api/v1/identity/scim/token/create","status":400,"durationMs":5,"error":"Required: hostDir, name"}
+{"ts":"2026-10-18T10:57:25.561Z","level":"warn","requestId":"8d7df399-2025-4f74-9722-e4b0cfe1762c","method":"POST","path":"/api/v1/identity/scim/token/create","status":400,"durationMs":1,"error":"Required: hostDir, name"}
+·····································································································································································································{"ts":"2026-10-18T11:00:11.697Z","level":"warn","requestId":"ac416645-818d-4262-94b7-6062d3e40f5a","method":"POST","path":"/api/v1/native-tasks/1a2b0495190e4e5d73eae66cbbaa78297aaf0f58f292063bbd2b850b9eb64709/resume","status":400,"durationMs":6,"error":"Invalid native task request."}
+······································stderr | tests/releaseBundlesArchetypesGate.test.ts > release bundles, gates, archetypes, badges > bundle export includes manifest-listed files and minimized run rows
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+stderr | tests/releaseBundlesArchetypesGate.test.ts > release bundles, gates, archetypes, badges > bundle export preserves payloadPath artifacts and complete sealed sessions
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+····················stderr | tests/releaseBundlesArchetypesGate.test.ts > release bundles, gates, archetypes, badges > gate fails for low integrity/layer/low trust and for level-5 non-observed evidence
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·········stdout | tests/zeroKeyLeaseBudgetDriftBom.test.ts > zero-key, leases, budgets, drift, and BOM > gateway enforces leases/model allowlist and strips agent auth headers
+AMC gateway listening on http://127.0.0.1:58032
+
+······stdout | tests/zeroKeyLeaseBudgetDriftBom.test.ts > zero-key, leases, budgets, drift, and BOM > gateway rate-limits by lease and logs budget audits
+AMC gateway listening on http://127.0.0.1:58041
+
+··················stdout | tests/zeroKeyLeaseBudgetDriftBom.test.ts > zero-key, leases, budgets, drift, and BOM > workspace evidence blobs do not contain provider key patterns
+AMC gateway listening on http://127.0.0.1:58074
+
+·············································································································································································································{"ts":"2026-10-18T11:03:26.906Z","level":"warn","requestId":"1fc4c04a-79f3-4e1f-b9ea-deca426d4e0e","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"provider must be claude-code or gemini-cli"}
+{"ts":"2026-10-18T11:03:26.906Z","level":"warn","requestId":"2d56b6ac-573f-4a18-adca-17a195deb54d","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"provider encoding is invalid"}
+{"ts":"2026-10-18T11:03:26.906Z","level":"warn","requestId":"ed429fcc-2541-4b38-86b7-400641c71921","method":"unknown","path":"unknown","status":405,"durationMs":0,"error":"Method not allowed"}
+·····································stderr | tests/keyHistoryBundleCertificate.test.ts
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+····stderr | tests/keyHistoryBundleCertificate.test.ts
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+·······stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > export never launders a correctly hashed planted history into a signed bundle
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+··············stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+···stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission
+[amc] Explicit imported admission expanded the auditor signing role (31bd4900445197ec2c1a25fde0b6593658203503852ccfda543d74758db3ce6d).
+
+·············stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+··stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission
+[amc] Explicit imported admission expanded the auditor signing role (31bd4900445197ec2c1a25fde0b6593658203503852ccfda543d74758db3ce6d).
+
+·············{"ts":"2026-10-18T11:04:27.546Z","level":"warn","requestId":"86c026cd-a9dd-418c-b086-d24668c829b3","method":"POST","path":"/api/v1/passport/pass_a69f2c4652fc24d8cf3e3731ff37a38b/revoke","status":401,"durationMs":1,"error":"Missing or invalid admin token"}
+·····················································stdout | tests/studioVaultModeLoop.test.ts > studio + vault + mode + loop > studio foreground writes state and exposes running status
+AMC gateway listening on http://127.0.0.1:58516
+AMC gateway proxy listening on http://127.0.0.1:58517
+
+·············································································industryPacks=17 scenarios=114
+·························································································································································································································································································································································································[amc] anti-rollback mark not recorded: /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-high-water-8yNwW1/state/high-water.json is not writable (EACCES); the transparency-log floor still applies.
+··························hello
+oops
+············[]
+····[1]
+·········································ps: process id too large: 999999
+·······stdout | tests/adaptersDoctorLeaseCarriers.test.ts > lease carriers, adapters, and doctor > gateway accepts lease via Authorization/x-api-key, rejects invalid, and never forwards auth headers
+AMC gateway listening on http://127.0.0.1:59120
+
+····stdout | tests/adaptersDoctorLeaseCarriers.test.ts > lease carriers, adapters, and doctor > adapters signature tamper forces simulate mode behavior
+AMC gateway listening on http://127.0.0.1:59126
+
+··SIMULATE
+·········stdout | tests/fleetMode.test.ts > fleet mode and trust tiers > gateway records agent/provider/model metadata and proxy blocks non-allowlisted host
+AMC gateway listening on http://127.0.0.1:59135
+AMC gateway proxy listening on http://127.0.0.1:59134
+
+··stdout | tests/adaptersDoctorLeaseCarriers.test.ts > lease carriers, adapters, and doctor > adapters run executes a fake CLI process through gateway with leased auth carrier
+AMC gateway listening on http://127.0.0.1:59147
+
+··{"ok":true,"model":"gpt-test"}
+·····stdout | tests/adaptersDoctorLeaseCarriers.test.ts > lease carriers, adapters, and doctor > doctor reports PASS when healthy and FAIL with explicit hint when signature is invalid
+AMC gateway listening on http://127.0.0.1:59164
+
+·stdout | tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'gateway'
+AMC gateway listening on http://127.0.0.1:59172
+
+·······························································································stdout | tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used > 'gateway' decides on the verified bytes only (P0-30)
+AMC gateway listening on http://127.0.0.1:59208
+
+··········································ping
+······················································································{"ts":"2026-10-18T11:09:38.588Z","level":"warn","requestId":"b38f3330-9ff7-48be-a522-f1a7ed74014d","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"Invalid request body: Unrecognized key: \"unexpected\""}
+················································································································································································································[amc] AMC latched this workspace's hooks because its writer could not record their evidence (the Claude Code observation could not be recorded and verified: simulated write failure); every hook request is refused until the owner runs `amc connect hooks health --recover-latch`
+·····························································stdout | tests/performance/ledgerConcurrency.performance.test.ts > performance: ledger concurrent append > maintains integrity under interleaved concurrent writers
+[perf][ledger-concurrency] {
+  concurrentMs: 2077.173,
+  serialMs: 1400.518,
+  concurrentEvents: 720,
+  serialEvents: 720,
+  concurrentThroughputPerSec: 346.62,
+  serialThroughputPerSec: 514.1
+}
+
+·····································································stderr | tests/spineProjectionEndToEnd.test.ts > a scope-verified delegation scores > counts toward nothing when no scope was declared
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-2.15, seen at L1).
+
+······{"ts":"2026-10-18T11:12:29.039Z","level":"warn","requestId":"944e4243-0773-4f9b-b6e7-1be16b0a5870","method":"POST","path":"/api/v1/firewall/enable","status":400,"durationMs":1,"error":"[\n  {\n    \"expected\": \"boolean\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"enabled\"\n    ],\n    \"message\": \"Invalid input: expected boolean, received string\"\n  },\n  {\n    \"expected\": \"boolean\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"failClosedOnMissingPolicy\"\n    ],\n    \"message\": \"Invalid input: expected boolean, received number\"\n  }\n]"}
+{"ts":"2026-10-18T11:12:29.045Z","level":"warn","requestId":"7a62e10c-11f9-46e7-a0be-5b365c162a36","method":"POST","path":"/api/v1/firewall/migrate-signature","status":400,"durationMs":1,"error":"[\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      true\n    ],\n    \"path\": [\n      \"approveLegacyArtifactKind\"\n    ],\n    \"message\": \"Invalid input: expected true\"\n  }\n]"}
+{"ts":"2026-10-18T11:12:29.046Z","level":"warn","requestId":"e1966f37-d196-4296-b811-9187cc3431fa","method":"POST","path":"/api/v1/firewall/migrate-signature","status":400,"durationMs":1,"error":"[\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      true\n    ],\n    \"path\": [\n      \"approveLegacyArtifactKind\"\n    ],\n    \"message\": \"Invalid input: expected true\"\n  }\n]"}
+{"ts":"2026-10-18T11:12:29.046Z","level":"warn","requestId":"1180767d-4796-4920-8621-7a87767644dc","method":"POST","path":"/api/v1/firewall/migrate-signature","status":400,"durationMs":0,"error":"[\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      true\n    ],\n    \"path\": [\n      \"approveLegacyArtifactKind\"\n    ],\n    \"message\": \"Invalid input: expected true\"\n  }\n]"}
+{"ts":"2026-10-18T11:12:29.046Z","level":"warn","requestId":"092b6b24-7612-4668-be1b-5d7b5e03b29f","method":"POST","path":"/api/v1/firewall/migrate-signature","status":400,"durationMs":0,"error":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"unexpected\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"unexpected\\\"\"\n  }\n]"}
+······················stderr | tests/compassCanonCgxTruthguard.test.ts > compass canon + cgx + truthguard > lease self-run ignores answers payload and records transparency entry
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·············································································································································································································stderr | tests/bundleSpill.test.ts > portable evidence bundles retain encrypted spill commitments and explicit gaps > exports actual ciphertext with no raw spill or private key and verifies completeness without a vault
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·········stderr | tests/bundleSpill.test.ts > portable evidence bundles retain encrypted spill commitments and explicit gaps > names originally missing encrypted objects and excluded legacy plaintext without fabricating completeness
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···········stderr | tests/bundleSpill.test.ts > portable evidence bundles retain encrypted spill commitments and explicit gaps > rejects a ciphertext-only attack despite a genuinely re-signed bundle manifest
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···stderr | tests/bundleSpill.test.ts > portable evidence bundles retain encrypted spill commitments and explicit gaps > rejects a index-also-forged attack despite a genuinely re-signed bundle manifest
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+···········································stderr | tests/nativeEvidenceTrustTier.test.ts > the tier was only one of two gates > still counts toward no question, because the spine tags none
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L5).
+
+································································································································································the delegate answer
+stderr | tests/notaryTrust.test.ts > notary + trust hard mode > trust checks fail closed when NOTARY mode is required and notary is down
+[amc] Explicit notary admission expanded the auditor signing role (43444081443a2ac13300e6a5ad3b52562e5d7b8799995529e088312ee5ed335b).
+
+·····the delegate answer
+·····the delegate answer
+··························································································································································································································································································································································································································································································································································································································································································································································································································································································stdout | tests/receiptsCorrelationRuntimeDashboard.test.ts > receipts, correlation, runtime sdk, dashboard > gateway injects receipt header and receipt verifies against ledger event hash
+AMC gateway listening on http://127.0.0.1:60034
+
+···stdout | tests/performance/ingestPipeline.performance.test.ts > performance: ingestion pipeline > batch append outperforms per-event append for bulk ingest payloads
+[perf][ingest] { serialMs: 6654.855, batchMs: 322.321, speedupX: 20.647 }
+
+·····stderr | tests/receiptsCorrelationRuntimeDashboard.test.ts > receipts, correlation, runtime sdk, dashboard > invalid receipts lower correlation, and keyword or alignment-check rows lift nothing (P1-07)
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·························stderr | tests/receiptsCorrelationRuntimeDashboard.test.ts > receipts, correlation, runtime sdk, dashboard > bundle verification fails when receipt metadata is tampered
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+·····stdout | tests/governorToolhubWorkorders.test.ts > governor + toolhub + workorders > work order signature is required and gateway records x-amc-workorder-id
+AMC gateway listening on http://127.0.0.1:60083
+AMC gateway proxy listening on http://127.0.0.1:60084
+
+·······stderr | tests/governorToolhubWorkorders.test.ts > governor + toolhub + workorders > execute without ticket writes audit evidence and diagnostic stays capped
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··························{"ts":"2026-10-18T11:18:10.035Z","level":"warn","requestId":"0ff9c2c1-a3e8-411d-9987-39d01496f2e6","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"agentId and actionId must be stable 1-160 character identifiers"}
+·······stdout | tests/northstarPromptEngine.test.ts > northstar prompt engine > bridge injects enforced system prompt, logs override attempts, and binds receipt headers
+AMC gateway listening on http://127.0.0.1:60159
+
+··stdout | tests/kernelApprovalServices.test.ts > the approval seam on the composed tree > `amc approvals ask` is a real operator path, and hidden from the inventory
+{
+  "sessionId": "5911de9e-81fe-453d-ba35-9bfe3fb4b934",
+  "approvalId": "apr_d1846c17-59cb-41aa-86e3-e9b2dc611d00",
+  "answer": "allow",
+  "proceed": true,
+  "answeredBy": "approvals-engine",
+  "reason": "quorum met and verified (2/2 approvals)",
+  "approvalRequestId": "apprreq_f75d9c1bc23e4297a9b85318aec28fdc",
+  "requestEventId": "a79b760c-7d5e-4781-89ac-90dc70077d9e",
+  "answerEventId": "8ef15161-3d3e-4e05-adc5-18943dd6276a"
+}
+
+·····stdout | tests/northstarPromptEngine.test.ts > northstar prompt engine > override patterns are rejected when prompt policy demands hard rejection
+AMC gateway listening on http://127.0.0.1:60177
+
+stdout | tests/kernelApprovalServices.test.ts > the approval seam on the composed tree > `amc approvals ask` exits non-zero when the answer is not a grant
+{
+  "sessionId": "420a57f2-ab75-4959-a46c-8cdc5ea5ea3f",
+  "approvalId": "apr_578fc316-70e8-4780-b1de-d30e2261e41e",
+  "answer": "deny",
+  "proceed": false,
+  "answeredBy": "approvals-engine",
+  "reason": "an approver denied the request",
+  "approvalRequestId": "apprreq_66b4a884f75d4069a5175b5056f8f9ac",
+  "requestEventId": "674dbb1a-b276-424b-9031-281e94791055",
+  "answerEventId": "a8dbff1c-f9e3-4d22-8e7e-89c46dcfeedf"
+}
+
+·······stdout | tests/northstarPromptEngine.test.ts > northstar prompt engine > truthguard enforcement mode blocks strong unsupported claims with deterministic 422
+AMC gateway listening on http://127.0.0.1:60189
+
+·····{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"4eb5ca9c-fa03-40cf-a06b-2882e1fc3dba","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"da6a58bd-9db4-42e8-be57-84cfb57c1323","method":"POST","path":"/api/v1/score/provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"6f0bcdce-7548-4939-aec3-853a54464a28","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"33d6c0ef-6a3d-4169-b685-428db72074e8","method":"POST","path":"/api/v1/score/provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"361b899b-1454-414a-9a3e-e0b81dfb54f8","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"50b1e9b5-8374-4a97-9f51-676c452211cd","method":"POST","path":"/api/v1/score/provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Provider drift scoring failed"}}
+·····{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"02c328c0-b15c-4159-ba8e-d2db706eb8f5","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"1ef723a4-6c99-4b02-862e-af3e461bb86a","method":"POST","path":"/api/v1/shield/provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"a82dc0e7-74a2-46fb-83a5-4fddc415bdb2","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"563cef0a-5262-4525-9dc4-f2b9d9648deb","method":"POST","path":"/api/v1/shield/provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"0364aafc-0866-403c-bc83-d1c02412dab3","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"now.toISOString is not a function"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d56220d0-b2db-4be4-af83-cbded21b58d4","method":"POST","path":"/api/v1/shield/provider-drift/verify","status":400,"durationMs":0,"error":"now.toISOString is not a function"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"6bd5b57b-6573-45ca-9d82-bbecd1a81e53","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"e58a6128-0fe2-453f-b80e-37b33796619e","method":"POST","path":"/api/v1/watch/provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptLayer metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"615fcdfd-44fa-4cd2-86ec-a8aa01a07410","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"8d7151bf-b35a-41ff-b315-1f81cdd795a1","method":"POST","path":"/api/v1/watch/provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+·········{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"6b50186f-c68b-4340-930d-cc63302b893f","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"e785a99e-e4a4-4c92-a093-3c16100ea715","method":"POST","path":"/api/v1/watch/provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"8af9f06d-5616-4dc5-9aa6-2fe0d0e3b23d","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"5538df17-79b7-4668-a5a8-b821e4db3fab","method":"POST","path":"/api/v1/score/promptfoo-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d8eef343-cb2a-4824-bd86-7167558de276","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d68c7153-d160-405f-8509-48ac49216c9c","method":"POST","path":"/api/v1/score/promptfoo-provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"2f8b8ff1-7839-4495-bfe4-50389f0851bd","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"promptfoo provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"a1295ea2-9897-4e7b-95b4-f37037e2c5fb","method":"POST","path":"/api/v1/score/promptfoo-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"promptfoo provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"30b54878-a938-45db-a2a9-d2736e93fbcc","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"2a6e6963-a3c2-4411-8c8f-a6fbdca41245","method":"POST","path":"/api/v1/shield/promptfoo-provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"12920712-561e-4106-a7b1-4d6373eae4a5","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"c5d0545e-22c3-4f11-8179-3ffb5b99c9fe","method":"POST","path":"/api/v1/shield/promptfoo-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"282e2f36-faec-46e7-8c88-edbdb186fdde","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"now.toISOString is not a function"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"0c8d7d57-9ac4-4d75-a56e-2bc6d0c81522","method":"POST","path":"/api/v1/shield/promptfoo-provider-drift/verify","status":400,"durationMs":0,"error":"now.toISOString is not a function"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"c27f2eaf-bf9e-4858-b62b-8109384839fd","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"4664dbda-1636-4007-b29f-4fce9391e777","method":"POST","path":"/api/v1/watch/promptfoo-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"ff8b0ff5-e43f-4b4f-ba02-a51987f242a1","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"481b3ca5-91e0-4350-8b4e-3e226fc42dec","method":"POST","path":"/api/v1/watch/promptfoo-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"6b0dc3a4-ac17-4b26-95be-4a0307005568","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"a490f2a6-71f5-4007-a5c6-1135ca3d4fe3","method":"POST","path":"/api/v1/watch/promptfoo-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+·········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"883cc7ce-12bf-4816-96d7-538185ab85e5","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"014bed83-fadf-421c-b1dc-a6dfcbf64e6b","method":"POST","path":"/api/v1/benchmarks/promptfoo-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and promptfoo metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"7bfd049b-01ad-4872-aea1-b99008ed750e","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"173cabf5-40ea-4824-bf9b-47c77592b528","method":"POST","path":"/api/v1/benchmarks/promptfoo-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"ea1402d0-8e28-40e3-be0f-1f6a87f0ccf6","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"99b78720-5210-4f52-a162-e7539ba5a517","method":"POST","path":"/api/v1/benchmarks/promptfoo-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"now.toISOString is not a function"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"8d647f2e-0730-4efd-93df-94e8079f3166","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"7ce2fdfc-6b46-4820-b53d-24363ec0baff","method":"POST","path":"/api/v1/score/patronus-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"c48eeb26-3642-4bf1-88ed-42169fb8a489","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"dac78b45-0631-4a79-a7f5-7aa18b18bc6c","method":"POST","path":"/api/v1/score/patronus-provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"e4e7f0c0-8271-47ef-a4e4-7adc9e078928","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Patronus provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"cea01c96-566f-4574-8b5e-2870e68edf86","method":"POST","path":"/api/v1/score/patronus-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Patronus provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"9fe7560d-9059-48b0-8cb7-2f13094cc321","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+···········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"b167836c-a61d-4353-a4d2-7fcdb1644a11","method":"POST","path":"/api/v1/shield/patronus-provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"87e7344d-d1d2-4fe0-9c0f-d83d7166b866","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"41e86125-aec6-458e-9032-b316c7d69f86","method":"POST","path":"/api/v1/shield/patronus-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"15c3bc69-2d52-410f-855e-f5a4d7d61cab","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid Patronus provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"7eb886a5-8304-41d6-b2a7-4738346e3bfe","method":"POST","path":"/api/v1/shield/patronus-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid Patronus provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"13e5ebcb-b43d-49cd-bbb4-1eb27c2a3e0f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"5cf2db32-c7bc-463e-92fa-eb362f73d938","method":"POST","path":"/api/v1/watch/patronus-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and patronus metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"26feee25-ee0c-4af7-bed7-02114d96b0af","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"b0d31705-e27a-4c84-8086-9b2031ecb935","method":"POST","path":"/api/v1/watch/patronus-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"8ed36882-d285-41e3-9b6c-bfa6b50bd2b1","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Patronus provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"95d0a90d-0565-4dae-b3d3-2c6a5cd684d8","method":"POST","path":"/api/v1/watch/patronus-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Patronus provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"3af0cf49-a2b7-4399-8bd7-4ad46a6f929f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"82c27ddb-d23c-4d63-b7d0-f77b66a4e8f7","method":"POST","path":"/api/v1/score/inspect-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+···········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"65fc7776-3fb3-4f1e-a839-af1c837b21e0","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"a8bc163e-bcb7-4de4-9336-af4ffb614aa2","method":"POST","path":"/api/v1/score/inspect-provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"3c948318-82ba-49c7-bff6-c29aea77bff7","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Inspect provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"fdbd291a-1de5-485e-b68c-ccf53011671d","method":"POST","path":"/api/v1/score/inspect-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Inspect provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"e93a016e-28b2-434f-9aaf-dc61bab59247","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d6c62819-3039-4057-b971-0f92d9ae7b9d","method":"POST","path":"/api/v1/shield/inspect-provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"bddb9251-e6a1-43a0-b4ac-0b697dc56d50","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d197364c-2c16-4379-a153-adb19ed4815f","method":"POST","path":"/api/v1/shield/inspect-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"fc7eef10-dbad-4eda-ad23-746fa2ce32a1","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid Inspect provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"96ff88ae-be38-47de-af05-1a6d6258b546","method":"POST","path":"/api/v1/shield/inspect-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid Inspect provider drift timestamp"}
+········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"f201676a-456b-49f0-acb0-d6d43430318a","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d790c535-6eab-4738-9922-1b3b102b8ba9","method":"POST","path":"/api/v1/watch/inspect-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"6c888e48-77b6-490b-91fa-77b5c1e8c0c7","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"d2f16f70-6d2f-441a-aada-dbb108f0cbc7","method":"POST","path":"/api/v1/watch/inspect-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"e64006b0-842d-4b93-ac8c-26deb0cfa4ee","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Inspect provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"37117805-8d6d-46fc-bc93-3f252c7dec81","method":"POST","path":"/api/v1/watch/inspect-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Inspect provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"cdeb506c-4424-4faa-b2c7-a78a837dff16","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"a7ff09ed-8634-4687-a920-244843c69b74","method":"POST","path":"/api/v1/benchmarks/inspect-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and inspect metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"0938b5d0-2891-45a7-9e40-574db81c82ed","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"66093154-36ec-475a-8be6-a6004ae60663","method":"POST","path":"/api/v1/benchmarks/inspect-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"eab7ab87-b89a-4f72-8241-1eeb73fb2264","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Inspect provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"65eca031-5911-4df3-b72b-2a683d374f84","method":"POST","path":"/api/v1/benchmarks/inspect-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Inspect provider drift timestamp"}}
+··········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"77f77e69-2da3-4b42-af92-4519fada5dbd","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"b0ac83c9-b02b-454e-b0eb-0b89a4b90b22","method":"POST","path":"/api/v1/score/tensorzero-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"62e060ef-c260-4d06-9548-6a1072cb30ea","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"9e229a38-21fa-435e-9cfa-bc4eac6d1c41","method":"POST","path":"/api/v1/score/tensorzero-provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"3f9824df-2b9d-413d-873a-0037cab75bce","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"TensorZero provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"a28a735f-f168-457b-b2e6-c02c97906f4f","method":"POST","path":"/api/v1/score/tensorzero-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"TensorZero provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"065f7a37-0a10-430e-ad90-27dce37a9de2","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"873c07e0-dbe2-47a8-96b1-cdbea0903d07","method":"POST","path":"/api/v1/shield/tensorzero-provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"b7c529d9-db7c-4deb-8a8e-1323daab4af3","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ff12c33a-6f40-4eed-b177-7fc2bd9ab615","method":"POST","path":"/api/v1/shield/tensorzero-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"0a312e79-751b-46c7-919e-aa876488db67","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid TensorZero provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"5732e940-502d-4769-bd91-b64c979f749b","method":"POST","path":"/api/v1/shield/tensorzero-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid TensorZero provider drift timestamp"}
+··········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"a6b2ac7a-9be9-4f09-b150-a4b7da5a1f7f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"812a9478-6f60-42fb-bdad-d82d8af4935c","method":"POST","path":"/api/v1/watch/tensorzero-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"9116b1fc-c723-45ca-9752-df69968500a0","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"f5af3d87-242d-4243-9894-b41beb33bf40","method":"POST","path":"/api/v1/watch/tensorzero-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"95806094-9bff-4481-bd68-58b9d3cadaeb","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid TensorZero provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"f5ea51a3-074b-43dc-94fc-b88e9ff3cc21","method":"POST","path":"/api/v1/watch/tensorzero-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid TensorZero provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"fc1a606c-02ae-4845-b6f9-c8607d58c604","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"f12dc717-8be0-43a4-bfc6-4e03a2a7b2dc","method":"POST","path":"/api/v1/benchmarks/tensorzero-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and tensorZero metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"6a918527-01f4-45b7-b306-04308b413719","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"8a6ad163-b0c5-4797-bbcd-67ad27b968ec","method":"POST","path":"/api/v1/benchmarks/tensorzero-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"21f029f6-1ba9-4210-b084-ce153b1d1534","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid TensorZero provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"5821dafc-bf78-4154-b468-266ea54b9bbd","method":"POST","path":"/api/v1/benchmarks/tensorzero-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid TensorZero provider drift timestamp"}}
+········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"2822fe53-b1e3-451b-a433-d085a9125d47","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"c7d7b8d3-39be-4a76-9c7a-6fb0d3476368","method":"POST","path":"/api/v1/score/helm-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ae639407-0747-4365-8e29-b0977573ec63","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"4f4b5041-266c-4aad-affb-b3d409f0cfee","method":"POST","path":"/api/v1/score/helm-provider-drift","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"8628dbeb-f307-43b0-b0ef-218a162491d2","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"HELM provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"fbb2ec6a-b503-4874-a194-3ab2c86ce2d8","method":"POST","path":"/api/v1/score/helm-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"HELM provider drift scoring failed"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ffbb5df9-58dd-4144-aef0-42354726617d","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"676ea4c0-8f4b-425f-8090-a689ddf9220b","method":"POST","path":"/api/v1/shield/helm-provider-drift/verify","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"80da6d91-7691-4031-b736-81347c6d2cef","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+·········{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"fec261d3-5b3b-40fa-b54d-ce2e2d803128","method":"POST","path":"/api/v1/shield/helm-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"cfe797af-65e4-4a1f-8e6b-159510017ad4","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid HELM provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"7825a3f9-9736-4dac-ac7a-64d269197ffa","method":"POST","path":"/api/v1/shield/helm-provider-drift/verify","status":400,"durationMs":0,"error":"Invalid HELM provider drift timestamp"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"11321f4e-bfbf-4483-bdcb-b9325e291fdc","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"d9ca78c7-777d-4249-8795-cbcc75c2de6d","method":"POST","path":"/api/v1/watch/helm-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"5583cff7-2b0b-4f35-9bb3-e113f1a66510","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"bf2744d6-5fc0-489e-af1d-c28fb231d2c3","method":"POST","path":"/api/v1/watch/helm-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"7d074af7-aea9-4294-9698-c098ae6f1290","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid HELM provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"3261c3ca-cd60-4226-96f4-bf47a77e06a6","method":"POST","path":"/api/v1/watch/helm-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid HELM provider drift timestamp"}}
+·······{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ab75a159-d56a-4ce9-8fab-6bc14bbbe16f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"f1a16944-10eb-48a9-8227-ad0c9804faf6","method":"POST","path":"/api/v1/benchmarks/helm-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and helm metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"5b880537-2df1-4fbc-96cc-856d27cb1e80","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"4409ba6f-caac-4674-af4a-7252b42067c3","method":"POST","path":"/api/v1/benchmarks/helm-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"958db0e0-6a72-42f9-954f-153270741bb9","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid HELM provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"a6bf73c8-5c8e-47ae-85be-92fe43b9cc57","method":"POST","path":"/api/v1/benchmarks/helm-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid HELM provider drift timestamp"}}
+······{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"5708760e-bdad-4fe2-a149-57cd2da67ebb","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and humanloop metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"52976e28-5df8-426e-ac80-516774603e25","method":"POST","path":"/api/v1/watch/humanloop-provider-drift","status":400,"durationMs":0,"error":"Required: baseline[], candidate[], and humanloop metadata"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"f7884628-f919-4cce-ab94-5d4b51b6a6b0","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"76776436-6900-45c4-aa39-2a1b8baefccd","method":"POST","path":"/api/v1/watch/humanloop-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"097c2cfa-180e-4d71-9a8d-b6ff10fc3c96","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Humanloop provider drift timestamp"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"96b60f9c-a84d-4373-8dfa-1e2ca4e3a1d3","method":"POST","path":"/api/v1/watch/humanloop-provider-drift","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid Humanloop provider drift timestamp"}}
+······{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"bd89327d-4b11-4a03-9bd2-a242bf5bab37","method":"unknown","path":"unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/score/unknown"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"46c78580-4902-4c69-9459-cbdb85c4502e","method":"GET","path":"/api/v1/score/unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/score/unknown"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"1f1cf396-88bb-4da0-9f38-d7688eccc004","method":"unknown","path":"unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/export/unknown"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"0a7f1e47-1282-4a0a-bee0-64dd8c936f7e","method":"GET","path":"/api/v1/export/unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/export/unknown"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ee21612d-647d-4a7e-92a1-be3763ea6a5f","method":"unknown","path":"unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/benchmarks/unknown"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"50be97e7-32d0-4d0f-91d3-1f1958148ef0","method":"GET","path":"/api/v1/benchmarks/unknown","status":404,"durationMs":0,"error":"API route not found: GET /api/v1/benchmarks/unknown"}
+······stdout | tests/northstarPromptEngine.test.ts > northstar prompt engine > tampered prompt policy and prompt pack fail closed in enforce mode
+AMC gateway listening on http://127.0.0.1:60469
+
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"57ed0924-99cb-4626-8c18-588ff2206577","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"level must be an integer from 0 through 5"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"97bc2f78-fce8-47e2-b4b1-6b59cb544788","method":"GET","path":"/api/v1/export/badge/url","status":400,"durationMs":0,"error":"level must be an integer from 0 through 5"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"dc028424-294f-4461-b3eb-47c54e0b85b0","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"target and outDir required"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"18703cf2-9987-4cb0-9bb8-6682dc365f3a","method":"POST","path":"/api/v1/export/policy","status":400,"durationMs":0,"error":"target and outDir required"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"1c7c2c63-b8c7-4e35-b9f2-6d94594a695b","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"error","requestId":"d7cbb137-686c-4c7c-b95e-606119efdefc","method":"POST","path":"/api/v1/export/policy","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid JSON body"}}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"8729598b-b2e8-452a-9451-91d4286d6f0e","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"agentId and actionId must be stable 1-160 character identifiers"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"f9295f94-f042-4b1b-a1e7-dde03bff0298","method":"GET","path":"/api/v1/watch/hook-actions/bad%2Fid","status":400,"durationMs":0,"error":"agentId and actionId must be stable 1-160 character identifiers"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"183dc17b-6203-4833-a03e-229563efd5f0","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"provider encoding is invalid"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"3fc323fe-96d2-4bbb-99c7-9b976d320f47","method":"GET","path":"/api/v1/watch/hooks/%ZZ/health","status":400,"durationMs":0,"error":"provider encoding is invalid"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"ef99cc9f-d125-4017-8bed-c56b8976aa75","method":"unknown","path":"unknown","status":405,"durationMs":0,"error":"Method not allowed"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"6510a8b7-d93b-4e7d-883a-c47360113850","method":"POST","path":"/api/v1/watch/hooks/claude-code/health","status":405,"durationMs":0,"error":"Method not allowed"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"c3b0c09c-b598-494a-a34d-80bd52358aab","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid request body: Too big: expected number to be <=5"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"68d8e059-19f3-4506-b775-0cad1e06cfee","method":"POST","path":"/api/v1/score/quick","status":400,"durationMs":0,"error":"Invalid request body: Too big: expected number to be <=5"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"b59d5401-aac5-41b7-b4ae-46fd3f891a46","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-06-20T00:00:00.000Z","level":"warn","requestId":"4b95e1dd-43e0-4759-96c5-90bf3d07e502","method":"POST","path":"/api/v1/score/helm-provider-drift","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+······························································stderr | tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > records where an externally admitted key came from
+[amc] Explicit notary admission expanded the auditor signing role (12b4eaba15141f045ceb7aed6b5b9815f7f949d2317b19d8f77d20aed8778f2f).
+
+··························································································································································································stdout | tests/credentialsGatewaySeam.test.ts > gateway upstream auth resolves through the credentials seam > applies a rotated key on the next request, with no restart
+AMC gateway listening on http://127.0.0.1:60552
+
+stdout | tests/credentialsGatewaySeam.test.ts > gateway upstream auth resolves through the credentials seam > keeps the env-vars-only path working unchanged
+AMC gateway listening on http://127.0.0.1:60561
+
+·····stdout | tests/credentialsGatewaySeam.test.ts > gateway upstream auth resolves through the credentials seam > fails the request with the reference name, never a value, when nothing configures it
+AMC gateway listening on http://127.0.0.1:60571
+
+···································································································································································································································································································································································································································································x·······················································································································································································································································································stdout | tests/gatewayAndSupervise.test.ts > gateway and supervise > gateway captures llm_request/llm_response and verify fails after blob tamper
+AMC gateway listening on http://127.0.0.1:60645
+
+··············stdout | tests/gatewayAndSupervise.test.ts > gateway and supervise > unsigned gateway config triggers audit and diagnostic trust penalty
+AMC gateway listening on http://127.0.0.1:60650
+
+stderr | tests/gatewayAndSupervise.test.ts > gateway and supervise > unsigned gateway config triggers audit and diagnostic trust penalty
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··········OPENAI_BASE_URL=http://127.0.0.1:3210/openai
+OPENAI_API_BASE=http://127.0.0.1:3210/openai
+AMC_LLM_BASE_URL=http://127.0.0.1:3210/openai
+OPENAI_API_HOST=http://127.0.0.1:3210/openai
+CUSTOM_SUPERVISE_FLAG=enabled
+·········stdout | tests/gatewayAndSupervise.test.ts > gateway and supervise > stream passthrough mode returns receipt trailer and keeps verifiable receipt
+AMC gateway listening on http://127.0.0.1:60661
+
+···································································································{"ts":"2026-10-18T11:19:52.310Z","level":"error","requestId":"90486de0-d0d6-4324-8386-3eba117cbbb2","method":"unknown","path":"unknown","status":500,"durationMs":1,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+{"ts":"2026-10-18T11:19:52.311Z","level":"error","requestId":"b9ac3770-e555-4e44-a3bc-ff8c8e2b3d2f","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+{"ts":"2026-10-18T11:19:52.312Z","level":"error","requestId":"c551f6bf-062c-4ae0-9b6d-b2909278ca5b","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+{"ts":"2026-10-18T11:19:52.312Z","level":"error","requestId":"0db4ecd7-32c1-4e59-93cd-d92298d3d054","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+{"ts":"2026-10-18T11:19:52.312Z","level":"error","requestId":"72ca5beb-b480-4687-b6fa-80e7da07a70a","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+{"ts":"2026-10-18T11:19:52.312Z","level":"error","requestId":"2bbc1689-8b35-4404-bea4-01075e85d2e1","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"Invalid window format: bogus. Expected like 14d, 24h, 30m."}}
+····································stderr | tests/notaryComposeIntegration.test.ts > optional Compose notary listener and policy signing > signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks
+[amc] Explicit notary admission expanded the auditor signing role (190eb5eed619e840cd1e77138bcd1876068eb98f2b9786535257ed3f9d164964).
+
+··································································································································································································································································································································································································································································stderr | tests/newDomainEvidenceCaps.test.ts > new domain runner caps > AMC-VOICE-1 is capped when high-risk workspace lacks llm request/response evidence
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+··············································(node:8505) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-hmr-hiqoPV/plugins/alpha.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/sid/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+····························································································································stderr | tests/questionScoreExplainability.test.ts > question score explainability receipts > diagnostic reports include question explainability receipts in JSON and markdown
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+····················································································································································································································································································································································································································································································································································································································stdout | tests/assuranceScenarioContextParity.test.ts
+ASSURANCE_PARITY_MEASUREMENTS {"baseCommit":"f0ab8027208f3679029fa624225fe574d27bba30","packs":6,"scenarios":43,"contexts":20,"uniqueResponses":55,"promptComparisons":860,"validationComparisons":94600,"errorComparisons":344,"accessOrderComparisons":43,"originalPromptCorpusSha256":"142a8dd0efabf40bd39b40be438d70e30381aece7bc8c028328ff3797e7be501","refactoredPromptCorpusSha256":"142a8dd0efabf40bd39b40be438d70e30381aece7bc8c028328ff3797e7be501","digestEncoding":"JSON-serialized [pack,context-label,scenario-id,prompt] followed by LF, UTF-8"}
+
+···········································································································································································································································································{"ts":"2026-10-18T11:20:39.547Z","level":"warn","requestId":"1250704b-68d2-4102-80ce-c58946b380c5","method":"POST","path":"/api/v1/product/portal/submit","status":400,"durationMs":1,"error":"Invalid request body: Unrecognized key: \"submittedBy\""}
+{"ts":"2026-10-18T11:20:39.580Z","level":"warn","requestId":"f1d1d5a0-c654-4ea2-aa51-7e8c39eb8192","method":"POST","path":"/api/v1/product/portal/submit","status":400,"durationMs":0,"error":"Invalid request body: Unrecognized key: \"submittedBy\""}
+{"ts":"2026-10-18T11:20:39.606Z","level":"warn","requestId":"c193c731-c147-448f-b1fa-3d19b6827306","method":"POST","path":"/api/v1/product/portal/submit","status":400,"durationMs":1,"error":"Invalid request body: Unrecognized key: \"submittedBy\""}
+{"ts":"2026-10-18T11:20:39.630Z","level":"warn","requestId":"1b27ecac-b8fe-4896-b5b0-0e795972ba7e","method":"POST","path":"/api/v1/product/portal/submit","status":400,"durationMs":0,"error":"Invalid request body: Unrecognized key: \"submittedBy\""}
+······{"ts":"2026-10-18T11:20:39.697Z","level":"warn","requestId":"f06fcc42-de33-4bca-a93f-9f9a67f6a612","method":"POST","path":"/api/v1/product/portal/submit","status":401,"durationMs":1,"error":"Portal submission requires an authenticated caller"}
+········{"ts":"2026-10-18T11:20:39.798Z","level":"warn","requestId":"195bbca6-8b95-44d5-908f-67837c7bcb50","method":"unknown","path":"unknown","status":401,"durationMs":0,"error":"Portal submission requires an authenticated caller"}
+·{"ts":"2026-10-18T11:20:39.803Z","level":"warn","requestId":"e5082b0d-b05f-40b7-8c1b-e85ae9ee7bb5","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid request body: Unrecognized key: \"submittedBy\""}
+{"ts":"2026-10-18T11:20:39.808Z","level":"warn","requestId":"b2e05d32-3b3d-42c4-8181-945b39e0103a","method":"POST","path":"/api/v1/product/portal/submit","status":401,"durationMs":0,"error":"Portal submission requires an authenticated caller"}
+···························································································································································································································································································(node:11245) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-boot-dyD7Fa/plugins/needs-service.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/sid/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+······················································{"ts":"2026-10-18T11:20:49.632Z","level":"warn","requestId":"f4b302a0-112b-4f07-8aa1-7adb52fcd7fe","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"Invalid request body: Invalid input: expected string, received number"}
+{"ts":"2026-10-18T11:20:49.633Z","level":"warn","requestId":"f00b25a4-4aea-418c-bda2-2dd847135a70","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"Invalid request body: Too big: expected number to be <=5"}
+{"ts":"2026-10-18T11:20:49.634Z","level":"warn","requestId":"cc7edcd9-23bd-4b9b-98ae-bcad56f616eb","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid request body: Invalid input: expected number, received string"}
+{"ts":"2026-10-18T11:20:49.634Z","level":"warn","requestId":"c629d194-cbac-409a-a895-d6134c843b12","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid request body: Invalid option: expected one of \"auto\"|\"owner\"|\"harness\""}
+{"ts":"2026-10-18T11:20:49.634Z","level":"warn","requestId":"9b5d6f97-66d9-4254-ab61-0dab27372399","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid request body: Invalid input: expected record, received null"}
+···{"ts":"2026-10-18T11:20:49.656Z","level":"warn","requestId":"d1808420-9d01-42d7-8d05-fcaabd23be2a","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T11:20:49.656Z","level":"warn","requestId":"99908e0c-7fd6-4ef2-a25b-3709086aed65","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T11:20:49.657Z","level":"warn","requestId":"0297e6ed-06f0-45e0-aad5-d897139ee9dc","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T11:20:49.657Z","level":"warn","requestId":"b86df5f6-aef3-4a93-b9e6-fd8cbf17e542","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T11:20:49.657Z","level":"warn","requestId":"99daf998-190b-4669-bc5d-acedc442d625","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid guardrail request body"}
+{"ts":"2026-10-18T11:20:49.677Z","level":"warn","requestId":"59f26a9a-9a61-4702-8582-9d3681500580","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"outFile must lie under .amc/transparency/proofs/"}
+{"ts":"2026-10-18T11:20:49.678Z","level":"warn","requestId":"9a7013e7-256f-4bac-bcd8-5cc165e5df57","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"outFile must lie under .amc/transparency/proofs/"}
+{"ts":"2026-10-18T11:20:49.678Z","level":"warn","requestId":"d4b44f99-2601-45a5-9ab3-048fa06ad763","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"outFile must lie under .amc/transparency/proofs/"}
+{"ts":"2026-10-18T11:20:49.678Z","level":"warn","requestId":"dc40eda7-2cdd-485b-95e2-96cbda1f47b5","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"outFile must lie under .amc/transparency/proofs/"}
+·{"ts":"2026-10-18T11:20:49.686Z","level":"warn","requestId":"ac3c8b77-5cb6-46ed-80b5-57b96343005a","method":"unknown","path":"unknown","status":422,"durationMs":1,"error":"This scorer grades AMC's own control surface by looking for AMC source files (missing here: src/score, src/diagnostic, src/ledger). It cannot assess an arbitrary project or a deployed agent, and a low score here would say nothing about your agent. To assess a real agent, use evidence-based scoring: 'amc run' (or 'amc score')."}
+{"ts":"2026-10-18T11:20:49.703Z","level":"error","requestId":"5fa79071-146e-449e-be40-149bb868848e","method":"unknown","path":"unknown","status":503,"durationMs":0,"error":"no agent under test reachable: no model configured for the agent under test. Set AMC_ASSURANCE_MODEL=<model-id> (or pass --model) to name the model the scan should exercise."}
+{"ts":"2026-10-18T11:20:49.704Z","level":"error","requestId":"94cb85d0-0cc7-430c-8f94-20123bde7458","method":"unknown","path":"unknown","status":503,"durationMs":0,"error":"no agent under test reachable: no model configured for the agent under test. Set AMC_ASSURANCE_MODEL=<model-id> (or pass --model) to name the model the scan should exercise."}
+·············{"ts":"2026-10-18T11:20:49.781Z","level":"warn","requestId":"c2930e72-f70a-4684-9598-0dfdbbfb4e0f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"level must be an integer from 0 through 5"}
+{"ts":"2026-10-18T11:20:49.782Z","level":"warn","requestId":"3bbc37f4-e847-4ae7-a1ce-504a57731c4e","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"level must be an integer from 0 through 5"}
+····························{"ts":"2026-10-18T11:20:49.876Z","level":"warn","requestId":"c179f0cc-8b3f-4aa6-b7a1-9198c3f7905f","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Unknown request field"}
+{"ts":"2026-10-18T11:20:49.876Z","level":"warn","requestId":"1be820d2-4afd-4f61-a6b1-a90c49707e02","method":"unknown","path":"unknown","status":404,"durationMs":0,"error":"Unknown adapter: does-not-exist"}
+················································································································································································stdout | tests/explainabilityContractParity.test.ts > explainability shared contracts retain complete original exported flows > uses existing literal report inputs and exercises every changed domain with a ready original receipt
+{"originalLiteralFixtures":54,"changedDomainsWithReadyReceipt":18}
+
+······································································································································································································································································································································································································································································································································································································································································{"ts":"2026-10-18T11:20:59.554Z","level":"warn","requestId":"2975416b-c705-427e-b719-5656e01d842b","method":"unknown","path":"unknown","status":400,"durationMs":3,"error":"bad request"}
+{"ts":"2026-10-18T11:20:59.558Z","level":"error","requestId":"8a485b60-21b0-4dfe-a6e0-391c77dd53cc","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"boom"}}
+························································································································································································{"ts":"2026-10-18T11:21:00.282Z","level":"warn","requestId":"03c20609-bc5a-4dd1-ab8f-f96253fd23cd","method":"unknown","path":"unknown","status":405,"durationMs":0,"error":"Method DELETE not allowed, expected GET"}
+{"ts":"2026-10-18T11:21:00.289Z","level":"warn","requestId":"58ae07a8-5ab9-4143-babd-b1d9d36a881e","method":"unknown","path":"unknown","status":401,"durationMs":0,"error":"Missing or invalid admin token"}
+·······································································································································································································································································································································································································································································································································································{"ts":"2026-10-18T11:21:03.948Z","level":"warn","requestId":"5422c310-df7d-4910-859b-b06222d78ba0","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":3,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.953Z","level":"warn","requestId":"6886723e-12b1-4d2b-8f18-68ef74fbb801","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.954Z","level":"warn","requestId":"17a32029-6d99-4c04-bc1c-a57dc5c2c3e9","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.955Z","level":"warn","requestId":"16b4bdbe-4e2a-4ccd-8ebc-3f7eee3eee61","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.958Z","level":"warn","requestId":"2f42ad2c-8641-4a96-8cc5-1e5583da2d66","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":1,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.962Z","level":"warn","requestId":"24fc775b-12e2-4741-a5df-479e8135dfd7","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":1,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+{"ts":"2026-10-18T11:21:03.963Z","level":"warn","requestId":"48c7bfa1-ff80-4161-8c72-2b98b3c94f85","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"Domain Proof request rejected invalid manifest or input data."}
+{"ts":"2026-10-18T11:21:03.964Z","level":"warn","requestId":"7fb2039c-2654-4ad0-bf6b-056c06568410","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"Invalid Domain Proof request; provide a domain plus schema-valid manifest and input objects."}
+{"ts":"2026-10-18T11:21:03.966Z","level":"warn","requestId":"bd367144-41b7-49a3-b3db-6c8000a0b484","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":1,"error":"Invalid Domain Proof request; provide a domain plus schema-valid manifest and input objects."}
+{"ts":"2026-10-18T11:21:03.968Z","level":"warn","requestId":"01cf6ca9-0a7e-49f0-9e79-2a7d01237cd6","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":0,"error":"API-side Domain Proof artifact files are disabled; use the artifact returned in the response."}
+{"ts":"2026-10-18T11:21:03.970Z","level":"warn","requestId":"139fbdbd-9880-4407-8537-0f2b6e388f2e","method":"POST","path":"/api/v1/proof/check","status":400,"durationMs":1,"error":"Legacy Domain Proof path rejected; use inline JSON or a built-in proof fixture path."}
+·········································································································································································································································································································································································································································································································································································{"ts":"2026-10-18T11:21:10.816Z","level":"warn","requestId":"a61169ed-3cc5-4431-badb-01f6b446022a","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":2,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.819Z","level":"warn","requestId":"a86e1959-32c9-43e7-bf3c-e053e2222f27","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.820Z","level":"warn","requestId":"00fdbeb1-59ee-45ca-9d4b-5d79701bc711","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.821Z","level":"warn","requestId":"b3cf2e33-f096-45b5-8c40-332eebb4cf24","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.822Z","level":"warn","requestId":"f81e3bbf-da39-4546-a6ce-3ec5bfe667e8","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+······{"ts":"2026-10-18T11:21:10.824Z","level":"warn","requestId":"5f53ccc9-1337-4bea-a8b8-fc96ea77df9c","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.824Z","level":"warn","requestId":"0257ae95-fccb-4ca4-bbdb-d9d30362ee33","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+····················{"ts":"2026-10-18T11:21:10.970Z","level":"warn","requestId":"ce0c8c28-4dee-45fe-85e6-74821ad6a9a4","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/cancel","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.972Z","level":"warn","requestId":"64b25c2e-f052-4d0f-9253-34fe9a159ad8","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/release","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.973Z","level":"warn","requestId":"4af8dd12-fc0e-4149-93d0-069f23759ffb","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/verify","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.974Z","level":"warn","requestId":"01afd3eb-f646-4b94-bdc0-6c171287489c","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/archive","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.979Z","level":"warn","requestId":"bd81d65a-a7a2-4d06-830d-029e98aa2994","method":"GET","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.980Z","level":"warn","requestId":"ad7a2d90-8e44-47b0-aba7-6b721660b05c","method":"GET","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.980Z","level":"warn","requestId":"1fff713d-e5ac-44c6-9701-220bdcf4001c","method":"GET","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.985Z","level":"warn","requestId":"e1b15ea3-36b6-4b32-9eba-b727a55cb9ef","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/archive","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.986Z","level":"warn","requestId":"b3132942-2570-4967-8f7d-9dbc18e64224","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/archive","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.987Z","level":"warn","requestId":"14f0eb5c-d8ec-4b96-9833-1b60e2c2635e","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/archive","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:10.988Z","level":"warn","requestId":"e551c2d3-a45d-45fa-8d63-b6301a2760b9","method":"POST","path":"/api/v1/native-tasks/task-admission-0001/archive","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.013Z","level":"warn","requestId":"40cfc3e7-388a-47a3-8abf-f49cd956288b","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.017Z","level":"warn","requestId":"09976114-08c8-486d-b2e9-71640f816fac","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.023Z","level":"warn","requestId":"482db824-ed72-4dc4-a569-f5375fb0b0d1","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.028Z","level":"warn","requestId":"e12f717b-104a-4236-9c6f-221b60a3e677","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.033Z","level":"warn","requestId":"d78007b8-31e4-4652-834d-43ed6f1caa9f","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.040Z","level":"warn","requestId":"5991b203-8c34-442a-a2a1-a0759a918fc7","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.048Z","level":"warn","requestId":"6ce3de19-4557-4bdf-b760-5b66716d8cd7","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.050Z","level":"warn","requestId":"cac2cceb-d859-4358-ad04-87ed8ecd0fa0","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.054Z","level":"warn","requestId":"d76d53b1-202d-49d8-97ff-17b3ffe517d2","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.056Z","level":"warn","requestId":"e6a676ef-250d-4e48-ad97-71f7370048a2","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.061Z","level":"warn","requestId":"f4d9d881-dc96-4526-b23a-ab098edaeecc","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:11.072Z","level":"warn","requestId":"f3498fe5-eb8e-46f2-95f6-c3dcd1e6c24e","method":"GET","path":"/api/v1/native-tasks/task-admission-0001","status":400,"durationMs":0,"error":"Choose a nonnegative event cursor."}
+{"ts":"2026-10-18T11:21:11.073Z","level":"warn","requestId":"eaf35dfb-b52e-43ce-948c-f8e1617faddc","method":"GET","path":"/api/v1/native-tasks/task-admission-0001","status":400,"durationMs":1,"error":"Choose a nonnegative event cursor."}
+{"ts":"2026-10-18T11:21:11.074Z","level":"warn","requestId":"73747cdb-f1b4-4fe8-8b54-25641305792e","method":"GET","path":"/api/v1/native-tasks/task-admission-0001","status":400,"durationMs":0,"error":"Choose a nonnegative event cursor."}
+{"ts":"2026-10-18T11:21:11.075Z","level":"warn","requestId":"235833a9-cef1-447f-9d2c-dd2c7cf93b50","method":"GET","path":"/api/v1/native-tasks/task-admission-0001","status":400,"durationMs":0,"error":"Choose a nonnegative event cursor."}
+·················{"ts":"2026-10-18T11:21:11.080Z","level":"error","requestId":"79593d4b-0b9d-4b35-b927-addc22667994","method":"POST","path":"/api/v1/native-tasks","status":500,"durationMs":1,"error":"Internal server error","detail":{"message":"Native task could not be completed. Refresh its status before submitting again."}}
+{"ts":"2026-10-18T11:21:11.087Z","level":"error","requestId":"152221ff-740e-4abf-b6fb-4ac7102ccc08","method":"unknown","path":"unknown","status":503,"durationMs":0,"error":"Native tasks require an authenticated Studio workspace."}
+····················································································································································································································································································································································error: too many arguments for 'set'. Expected 1 argument but got 2.
+···········································stderr | tests/helmChartSecrets.test.ts > helm chart bootstrap secret > schema rejects change-me bootstrap values and accepts the shipped values files
+strict mode: missing type "string" for keyword "pattern" at "#/properties/image/then/properties/digest" (strictTypes)
+
+············································{"ts":"2026-10-18T11:21:18.684Z","level":"warn","requestId":"c5d4fec2-bea8-40eb-a65e-09e75c42cf7d","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.688Z","level":"warn","requestId":"dd6ac817-a72e-41dd-8950-991453713663","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.691Z","level":"warn","requestId":"1304038f-278c-4a25-a6c5-567c1621c20e","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.693Z","level":"warn","requestId":"fd466c76-b20b-468a-b07f-a47488fe8de0","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.696Z","level":"warn","requestId":"14baaeac-2c22-4dbb-b800-bb733040ce48","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.697Z","level":"warn","requestId":"fc173b2a-a81b-4f0a-94f7-59e2e2bedc2d","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.699Z","level":"warn","requestId":"fa4e30c0-a969-48c4-8708-790b5129972c","method":"POST","path":"/api/v1/native-tasks","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.714Z","level":"warn","requestId":"5abbf3d8-8a32-4769-bb1a-ca3bfe27ea6b","method":"POST","path":"/api/v1/native-tasks/task-p10-route/verify","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.716Z","level":"warn","requestId":"1dffbf94-0a6d-41ad-bd25-84e32cef7b84","method":"POST","path":"/api/v1/native-tasks/task-p10-route/verify","status":400,"durationMs":0,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.718Z","level":"warn","requestId":"9bc03737-4ff9-4069-bf26-52183ca0ac0a","method":"POST","path":"/api/v1/native-tasks/task-p10-route/verify","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.723Z","level":"warn","requestId":"1eb0bee2-bc2a-4fb1-9c74-9e2bf50fa13f","method":"POST","path":"/api/v1/native-tasks/task-p10-route/turn","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.726Z","level":"warn","requestId":"4c55d22d-5127-4d8a-8553-73f3d4319157","method":"POST","path":"/api/v1/native-tasks/task-p10-route/turn","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.729Z","level":"warn","requestId":"e597a21f-35e1-4a35-906a-4e87570883db","method":"POST","path":"/api/v1/native-tasks/task-p10-route/turn","status":400,"durationMs":1,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.731Z","level":"warn","requestId":"d74a9d1d-6227-4b08-9f84-a07d3ac011f9","method":"POST","path":"/api/v1/native-tasks/task-p10-route/turn","status":400,"durationMs":2,"error":"Invalid native task request."}
+{"ts":"2026-10-18T11:21:18.733Z","level":"warn","requestId":"85804a73-8f0b-49ef-be3c-f82fe1a94506","method":"POST","path":"/api/v1/native-tasks/task-p10-route/turn","status":400,"durationMs":0,"error":"Invalid native task request."}
+·········································································································································································································································································································································································································································································································································································································································································································································································································································································stdout | tests/performance/scoringEngine.performance.test.ts > performance: scoring engine > scales from 1 to 100 to 10,000 agents without superlinear blow-up
+[perf][scoring] {
+  oneAgentMs: 0.018,
+  hundredAgentsMs: 3.156,
+  tenThousandAgentsMs: 106.91,
+  perAgentMsAt100: 0.031561,
+  perAgentMsAt10000: 0.010691
+}
+
+·······························································································································································································································································································································································································································································································································································································································································stdout | tests/industryPacksHostedApi.test.ts > payment webhook: Stripe-Signature over the raw body, idempotent > accepts the provider signature over the exact bytes received, and nothing else
+{"event":"industry_packs_paid_checkout","eventId":"evt_raw","planId":"industry-packs-monthly","customerId":"cus_1","subscriptionId":"sub_1","clientReferenceId":"agent-1"}
+
+···································{"ts":"2026-10-18T11:21:24.206Z","level":"warn","requestId":"531db2de-9983-4bf9-b9e9-3396cda8aac5","method":"unknown","path":"unknown","status":413,"durationMs":2,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.210Z","level":"warn","requestId":"a6682cff-4242-438d-9606-15aab5f6f4a4","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.212Z","level":"warn","requestId":"b04808b9-2269-4142-abd5-97fad9a9675e","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.212Z","level":"warn","requestId":"5e2ede7e-75d9-471d-ad59-14acf056a160","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"policy apply failed"}
+{"ts":"2026-10-18T11:21:24.215Z","level":"warn","requestId":"d89897d2-6f3e-4bbd-a58d-7a42ad006e9f","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.215Z","level":"warn","requestId":"1a7648df-93d7-42dc-9f44-be07b5ec3240","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.216Z","level":"warn","requestId":"f0ae9d1f-a2e8-4b26-b034-2280385da9f3","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.216Z","level":"warn","requestId":"00efc6da-c2db-42aa-946c-41d96b1adf62","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"verify failed"}
+{"ts":"2026-10-18T11:21:24.218Z","level":"warn","requestId":"14ec293e-ffbb-4772-b04f-9b74453f617a","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.218Z","level":"warn","requestId":"3ed14557-7869-4a8b-8f97-e8859328fce1","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.219Z","level":"warn","requestId":"78ab4cf6-f776-4378-a61a-0caf12da35b3","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.219Z","level":"warn","requestId":"acc80f0b-293e-4bf0-b5ba-3ced041e0118","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"patch failed"}
+{"ts":"2026-10-18T11:21:24.221Z","level":"warn","requestId":"3722a82d-19cf-4412-a910-2a9b4b47b2b0","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.222Z","level":"warn","requestId":"ef0b6f06-89f8-4e05-b271-24c387342712","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.222Z","level":"warn","requestId":"4097619e-c335-4a7a-a21f-4dcf9c3c8725","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.222Z","level":"warn","requestId":"cbbb33a5-521c-4e17-8ef3-45b5f1689dd9","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"cert issue failed"}
+{"ts":"2026-10-18T11:21:24.226Z","level":"warn","requestId":"3106584e-c06f-438e-b89d-4fe145b77e7f","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.226Z","level":"warn","requestId":"537954c8-a7f8-4b66-b282-105174b4b047","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.226Z","level":"warn","requestId":"6557a25d-66c6-4d8c-a6c1-d23d29ed5a26","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.226Z","level":"warn","requestId":"77db18f0-af5d-4c87-8e0b-3940c0d01e93","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"cert verify failed"}
+{"ts":"2026-10-18T11:21:24.228Z","level":"warn","requestId":"a8ae3b28-9258-4a12-b7d9-4eef948317d5","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.229Z","level":"warn","requestId":"8e3de0e1-095e-43db-b26b-2d01c2722975","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.229Z","level":"warn","requestId":"81771c86-6a80-4d75-b108-aa8cbf11a0ba","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.229Z","level":"warn","requestId":"68538f9d-5506-40d7-8aea-e03f0b5285c9","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"waiver request failed"}
+{"ts":"2026-10-18T11:21:24.230Z","level":"warn","requestId":"ee0de883-5e37-4366-a5b5-b8edb0a9644e","method":"unknown","path":"unknown","status":413,"durationMs":1,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.231Z","level":"warn","requestId":"4c5b00da-2cec-45ac-a815-756dfd939ab8","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.231Z","level":"warn","requestId":"dc6bc939-9f68-4534-bdbf-7bac409a15df","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.231Z","level":"warn","requestId":"f7a210ce-a374-4b07-92f5-39e48ce452b4","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"waiver revoke failed"}
+{"ts":"2026-10-18T11:21:24.234Z","level":"warn","requestId":"ce09b510-1d41-419c-9c74-ab1c5cf4fd18","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.235Z","level":"warn","requestId":"ea8b3607-55ed-42c9-a2ac-3d2ea1ab8499","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.235Z","level":"warn","requestId":"38212c7d-53fd-4e4f-8626-56a75e156f2a","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.235Z","level":"warn","requestId":"1fae409d-7f9b-463f-a455-6ce66dda7466","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"lab pack failed"}
+{"ts":"2026-10-18T11:21:24.236Z","level":"warn","requestId":"0b2f0fad-2fe3-469b-90b2-c9571e0202e4","method":"unknown","path":"unknown","status":413,"durationMs":0,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.237Z","level":"warn","requestId":"e5f17ed9-6351-4864-b0cf-ed5235918078","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.237Z","level":"warn","requestId":"76f104db-4eb2-465c-8485-a890ad14eb25","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.238Z","level":"warn","requestId":"7db8aeb4-a266-49fc-af6f-528ccb4955bf","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"fp submit failed"}
+{"ts":"2026-10-18T11:21:24.240Z","level":"warn","requestId":"dad41510-aed4-41a4-9188-c4774dd9e06f","method":"unknown","path":"unknown","status":413,"durationMs":1,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.241Z","level":"warn","requestId":"4413dbd0-9d64-4e0e-9e20-9bb0cac34e9d","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.241Z","level":"warn","requestId":"d62cf98a-6dc7-4b66-9b40-01371270af75","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.241Z","level":"warn","requestId":"e46d55ff-2ac6-4c28-8c0a-81929b1adf3b","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"fp resolve failed"}
+{"ts":"2026-10-18T11:21:24.243Z","level":"warn","requestId":"757f0170-5149-43e8-a720-24576b11b73e","method":"unknown","path":"unknown","status":413,"durationMs":1,"error":"JSON body exceeds 1048576 bytes"}
+{"ts":"2026-10-18T11:21:24.244Z","level":"warn","requestId":"c87b1481-2622-49da-83e7-66cc45e57f45","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"Invalid JSON body"}
+{"ts":"2026-10-18T11:21:24.245Z","level":"warn","requestId":"536a3e6d-3ea8-4f1e-8073-269aefeecfe4","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"request stream failed"}
+{"ts":"2026-10-18T11:21:24.245Z","level":"warn","requestId":"587dc0f2-c269-461d-b67c-f398836ebd99","method":"unknown","path":"unknown","status":400,"durationMs":0,"error":"invalid request"}
+·······························································································································································{"agentId":"test-agent","amc_trace_v":1,"event":"llm_call","note":"race fan-out to 2 candidates","providerId":"openai","ts":1792322484631}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_result","note":"race winner=gpt4;score=0.945;candidates=2","providerId":"openai","ts":1792322484632}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_call","note":"https://api.openai.com/v1/chat/completions","providerId":"openai","ts":1792322484633}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_result","note":"status=200;attempt=1","providerId":"openai","ts":1792322484633}
+···············································stderr | tests/helmChartVersion.test.ts > helm chart version and image pinning > requireDigest without digest refuses (template fail and schema)
+strict mode: missing type "string" for keyword "pattern" at "#/properties/image/then/properties/digest" (strictTypes)
+
+·················································································································································································································································································································································································································································································································································································································································································questionRefParts=935 resolved=626 unresolved=309
+············································································································································································································································································································································································································································································································································································(node:12958) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-reconcile-ABWXok/plugins/alpha.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/sid/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+·························································································································································································································stdout | tests/amcDeclarativeConfig.test.ts > configInit > creates a starter config file
+✓ Created /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-config-test-961GFj/amcconfig.yaml
+  Edit the file, then run: amc config run
+
+stdout | tests/amcDeclarativeConfig.test.ts > configInit > creates at custom output path
+✓ Created /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-config-test-sPJQeU/custom.yaml
+  Edit the file, then run: amc config run
+
+stdout | tests/amcDeclarativeConfig.test.ts > configInit > refuses to overwrite without --force
+✓ Created /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-config-test-4C0K6V/amcconfig.yaml
+  Edit the file, then run: amc config run
+
+stderr | tests/amcDeclarativeConfig.test.ts > configInit > refuses to overwrite without --force
+✗ /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-config-test-4C0K6V/amcconfig.yaml already exists. Use --force to overwrite.
+
+stdout | tests/amcDeclarativeConfig.test.ts > configInit > overwrites with --force
+✓ Created /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-config-test-rwLVPH/amcconfig.yaml
+  Edit the file, then run: amc config run
+
+·························································instruments=278 sourced=130 unverified=148
+·····························································································································································································································stdout | tests/packCli.test.ts > pack CLI scaffolding and entry resolution > pack init scaffolds index.mjs and resolves it as the test entry point
+[kwame-test] Running against agent: test-agent (mode: sandbox)
+
+······················································································································································································································{"agentId":"test-agent","amc_trace_v":1,"event":"llm_call","note":"https://api.openai.com/v1/chat/completions","providerId":"openai","ts":1792322496362}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_result","note":"status=200;attempt=1","providerId":"openai","ts":1792322496364}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_call","note":"https://api.openai.com/v1/chat/completions","providerId":"openai","ts":1792322496370}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_result","note":"status=200;attempt=1","providerId":"openai","ts":1792322496370}
+·························································································································································{"agentId":"test-agent","amc_trace_v":1,"event":"llm_call","note":"https://api.openai.com/v1/chat/completions","providerId":"openai","ts":1792322497622}
+{"agentId":"test-agent","amc_trace_v":1,"event":"llm_result","note":"status=200;attempt=1","providerId":"openai","ts":1792322497624}
+····································································································································································································································································································································································································································································{"agentId":"salesbot","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:61344/openai/v1/chat/completions","providerId":"openai","ts":1792322503626}
+{"agentId":"salesbot","amc_trace_v":1,"event":"llm_result","note":"status=200;attempt=1","providerId":"openai","ts":1792322503645}
+·········································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 1: Evidence collected — correct count and trust distribution
+
+📦 Evidence: 11 observed, 5 attested, 2 self-reported
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 2: Maturity score is computed and reflects evidence quality
+
+📊 Maturity Score: 80.3/100 | Level: L4
+   AMC-1: 0.81
+   AMC-2: 0.84
+   AMC-3: 0.81
+   AMC-4: 0.75
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 3: Shield validators catch threats, pass clean content
+   🛡️  injection: ✅ BLOCKED
+   🛡️  PII: ✅ BLOCKED
+   🛡️  financial advice: ✅ BLOCKED
+   🛡️  medical advice: ✅ BLOCKED
+
+   🛡️  4/4 threats blocked | 3/3 clean passed
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 4: NL policy authoring generates valid governance rules
+   📋 "don't share PII with external vendors..." → DENY (confidence: 90%)
+   📋 "require approval for financial transacti..." → STEP_UP (confidence: 85%)
+   📋 "log all actions for audit trail..." → LOG (confidence: 85%)
+   📋 "block all external network access..." → DENY (confidence: 90%)
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 5: Agent simulator runs full scenario suite
+
+🧪 Simulation: 17/22 passed (77.3%)
+   Coverage: 100% | Production Ready: ❌
+   ⚠️  Critical failures: exf-002, gov-002
+   injection: 4/4
+   pii: 2/3
+   medical: 3/3
+   financial: 2/2
+   toxicity: 1/2
+   exfiltration: 0/2
+   normal: 4/4
+   governance: 1/2
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 6: Compliance report maps to NIST AI RMF
+
+📜 Compliance: NIST AI RMF coverage computed
+   Coverage: 83%
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 7: Knowledge graph tracks agent dependencies
+
+🕸️  Knowledge Graph: 5 nodes, 4 edges
+   Impact of ToxicityClassifier change: 1 node(s) affected (risk: medium)
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 8: Claim provenance lifecycle enforces quarantine gate
+
+🔍 Claim Provenance: quarantine gate enforced ✅
+   Claim "Agent performs better on short inputs" promoted to DERIVED after 2 sessions
+   Trust-weighted score: 0.80
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 9: Model drift detected when provider updates model
+
+📉 Model Drift: degraded (3 signals)
+   gpt-4o@2024-11 → gpt-4o@2025-01
+   Recommendation: ROLLBACK
+   AMC-2: 0.95 → 0.60 (-0.35, critical)
+   AMC-3: 0.90 → 0.55 (-0.35, critical)
+   AMC-4: 0.85 → 0.80 (-0.05, low)
+
+stdout | tests/e2e_full_agent.test.ts > E2E: ContentModerationBot AMC Assessment > Step 10: Print full E2E assessment summary
+
+============================================================
+  AMC E2E ASSESSMENT REPORT
+============================================================
+  Agent:          content-moderation-bot-v2
+  Role:           Moderate user-generated content for a SaaS platform
+  Evidence:       18 artifacts
+  Maturity Score: 80.3/100
+  Sim Pass Rate:  77.3%
+  Prod Ready:     ❌ NO — fix critical failures first
+============================================================
+
+
+··············································································································································································································································································································································································································································································································································································································································································································································stdout | tests/domainRegistry.test.ts > industry assurance pack to station registry > every industry assurance pack maps to at least one station (unmappedIndustryPacks=0)
+unmappedIndustryPacks=0
+
+··································································································································································································································································frameworkLabels=224 builtIn=26 external=198
+········································································································································································································································································································································································································································································································································································packs=17 scenarios=54
+··············································································································································································································································································································································{"ts":"2026-10-18T11:22:10.185Z","level":"warn","requestId":"0cc979cc-d619-4db9-ad97-f7a623da125a","method":"unknown","path":"unknown","status":405,"durationMs":3,"error":"Method POST not allowed, expected GET"}
+························································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································industryPacks=17
+·············································································································································································································································································packs=41 questions=632 median=15 min=15 max=18 floor=15
+····························································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)
+STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level
+
+································································································································································································································································································································································································································································································-------
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/nativeManagedRecovery.test.ts > reattached jsonl native controller retains approval quorum, accounting and validation pins
+AssertionError: expected 'unavailable' to be 'passed' // Object.is equality
+
+Expected: "passed"
+Received: "unavailable"
+
+ ❯ tests/nativeManagedRecovery.test.ts:89:69
+     87|   const admitted = await f.request("/api/v1/native-tasks", { body: inp…
+     88|   const first = await f.settle(admitted.body.data.taskId), id = first.…
+     89|   expect(first.state).toBe("idle"); expect(first.validation.status).to…
+       |                                                                     ^
+     90|   const original = f.history(id).events, oldBudgets = budgets(f), befo…
+     91|   const firstApprovals = new Set(f.observations.filter(row => String(r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  tests/publicDocsGraph.test.ts > AMC public Docs graph > every local guide edge resolves to another promoted guide
+AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "href": "MCP_INDUSTRY_PACKS.md",
++     "source": "MCP_SERVER",
++     "target": "MCP_INDUSTRY_PACKS",
++   },
++ ]
+
+ ❯ tests/publicDocsGraph.test.ts:70:21
+     68|     }
+     69|
+     70|     expect(defects).toEqual([]);
+       |                     ^
+     71|   });
+     72|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  tests/releaseEngineeringPack.test.ts > release engineering pack > packs and verifies a signed .amcrelease bundle and prints summary
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/releaseEngineeringPack.test.ts:42:3
+     40|
+     41| describe("release engineering pack", () => {
+     42|   it("packs and verifies a signed .amcrelease bundle and prints summar…
+       |   ^
+     43|     const dir = tmp("amc-release-pack-");
+     44|     try {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  tests/releaseSecretScanCoverage.test.ts > release secret scanner content coverage > shares entry budgets across every nested npm archive
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/releaseSecretScanCoverage.test.ts:184:3
+    182|   });
+    183|
+    184|   it("shares entry budgets across every nested npm archive", () => {
+       |   ^
+    185|     const root = fixture();
+    186|     const npm = join(root, "npm");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > fails a backend that breaks unsigned
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > fails a backend that breaks broken-session-seq
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > fails a backend that breaks truncating
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > fails a backend that breaks lying-capability
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > fails a backend that breaks idempotent-seal
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/sessionStoreConformance.test.ts:300:5
+    298|
+    299|   for (const mutation of mutations) {
+    300|     it(`fails a backend that breaks ${mutation.id}`, () => {
+       |     ^
+    301|       const report = withPassphrase(() =>
+    302|         runSessionStoreConformance(brokenBackend(mutation.id, mutation…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  tests/sessionStoreConformance.test.ts > the conformance suite has teeth (mutation tests) > the signature mutation is caught ONLY by the signature rule
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/sessionStoreConformance.test.ts:309:3
+    307|   }
+    308|
+    309|   it("the signature mutation is caught ONLY by the signature rule", ()…
+       |   ^
+    310|     // writer_sig is outside event_hash, so every chain check still pa…
+    311|     // this ever starts failing other cases too, the isolation has bee…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  tests/compliance/evidenceBinding.test.ts > source-literal enumeration > every source literal in src is classified
+AssertionError: expected [ 'defaults', 'signed-tools-yaml' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "defaults",
++   "signed-tools-yaml",
++ ]
+
+ ❯ tests/compliance/evidenceBinding.test.ts:102:26
+    100|     const unclassified = [...literals].filter((source) =>
+    101|       !Object.hasOwn(PRODUCER_BY_SOURCE, source) && !REVIEWED_RUNTIME_…
+    102|     expect(unclassified).toEqual([]);
+       |                          ^
+    103|   });
+    104| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  tests/performance/sessionSpine.performance.test.ts > session spine throughput > blob-backed content events sustain the floor and do not degrade super-linearly
+AssertionError: content throughput 61 ev/s: expected 60.63639718176726 to be greater than 150
+ ❯ tests/performance/sessionSpine.performance.test.ts:86:78
+     84|     // Floor: comfortably below the ~640 ev/s measured, so CI variance…
+     85|     // make it flaky, but far above a streaming turn's ~50-100 ev/s.
+     86|     expect(totalPerSec, `content throughput ${totalPerSec.toFixed(0)} …
+       |                                                                              ^
+     87|
+     88|     // No unbounded growth: with the O(n) blob-index fix, the second h…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  tests/storage/blobIndexChainSig.test.ts > blob index chain-head signature > does not read the whole index to append — cost is flat as the index grows
+AssertionError: late 636.6ms vs early 140.6ms: expected 636.5683330000029 to be less than 612.3268319999988
+ ❯ tests/storage/blobIndexChainSig.test.ts:116:80
+    114|       // point of signing the head; 4x is generous headroom over timin…
+    115|       // while still catching a regression back to reading the whole f…
+    116|       expect(late, `late ${late.toFixed(1)}ms vs early ${early.toFixed…
+       |                                                                                ^
+    117|     });
+    118|   });
+ ❯ withWorkspace tests/storage/blobIndexChainSig.test.ts:33:12
+ ❯ tests/storage/blobIndexChainSig.test.ts:100:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+
+ Test Files  8 failed | 1725 passed | 2 skipped (1735)
+      Tests  13 failed | 25161 passed | 7 skipped (25181)
+   Start at  15:51:15
+   Duration  3700.33s (transform 102.24s, setup 44.07s, import 862.06s, tests 13627.83s, environment 120ms)
+
+JSON report written to /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json

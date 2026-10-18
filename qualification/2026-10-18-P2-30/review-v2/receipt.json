@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-30",
+  "date": "2026-10-18",
+  "commit": "2ad86a588fa94f5b09acaf5bf9864a94bfabfb00",
+  "branch": "codex/p2-30-technology-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS arm64; not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 133926
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/review-v2/post-install/2ad86a588fa94f5b09acaf5bf9864a94bfabfb00/raw/checks/focused-report.json tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/catalog/admission tests/catalog/compiler/cli.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+      "exit": 1,
+      "durationMs": 303045
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 1486
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 1,
+      "durationMs": 2921
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 7707
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "f684e1dc14cdf337b3aa49e4e2aeea9f81310aea4f2019cf3e82dd8292888fe8"
+    },
+    {
+      "path": "receipt-before.json",
+      "sha256": "21c260c9d28c95042c9817182aae8649bf38b37fd78687a1bcc327c6974ccb57"
+    },
+    {
+      "path": "summary.json",
+      "sha256": "9aa2b6cdf72454fdbd81512f30a9a50e174c88a9fa32fc927b757482f74c8d5f"
+    }
+  ],
+  "notes": "Source 2ad86a588fa94f5b09acaf5bf9864a94bfabfb00, integrated int 7628a2b018ffe6046d8953c81d42c873ac6128d2; local macOS arm64 review-fix supplement, not CI, not a new full qualification round and not promotion. BLOCKED and NOT READY FOR LANDING. Only five synchronized completed commands appear here: build/guides/int changelog passed; focused and admission failed. Focused totals are 934/899/35/0 across 28 files (10 failed/18 passed), with a separate zero-assertion collection error. Fresh oracle evidence binds all 35 assertion failures and the collection failure to CAT_CITATION_STATUS_MISMATCH; no baseline claim or new fixture-oracle result is supplied. Source guards are null and before/after source is clean. Node22/pnpm10.33.0, matching f948 locks and ajv-formats3.0.1 are captured. The install duration is unknown, so no invented install command is added. All 27 pre-install rows remain historical in summary only. No owner answer, waiver or unavailability is inferred; Sid decision on any blocked handoff before P3-15 remains pending. tests is null, full suite NOT_RUN with null exit/duration/totals; Claude owns final merged full qualification at landing. Root b88 receipt/README/artifacts and failed old full remain unchanged historical evidence, not current qualification. Expert/legal/source/partner review and live enforcement evidence remain pending, content experimental/unreviewed and promotion none. Native staging/global validation and installed equality remain pending; schema validation cannot discharge failed checks or authorize landing."
+}

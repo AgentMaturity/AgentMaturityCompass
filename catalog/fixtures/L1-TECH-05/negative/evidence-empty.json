@@ -1,0 +1,32 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-TECH-05",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-08-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "technology-fixture-tenant",
+      "workspaceId": "technology-fixture-workspace",
+      "deploymentId": "technology-fixture-deployment",
+      "agentId": "technology-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

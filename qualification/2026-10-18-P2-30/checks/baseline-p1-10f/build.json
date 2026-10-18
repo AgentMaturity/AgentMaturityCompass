@@ -1,0 +1,10 @@
+{
+  "head": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "node": "v22.23.3",
+  "cmd": "pnpm run build",
+  "exit": 0,
+  "durationMs": 113656,
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/build.log",
+  "rawLogSha256": "6698a6cc505f40abf60175cff84c7eefa6a684bd5ee5d3bfe34a17479ed0a5e0",
+  "statusAfter": ""
+}

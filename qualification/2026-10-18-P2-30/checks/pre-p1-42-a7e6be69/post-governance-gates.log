@@ -1,0 +1,21 @@
+
+Default bank (amc-legacy-240-v1) (244 questions)
+| Level | Reachable | Capped | Not evaluable |
+|---|---:|---:|---:|
+| L1 | 244 | 0 | 0 |
+| L2 | 4 | 0 | 240 |
+| L3 | 0 | 0 | 244 |
+| L4 | 0 | 0 | 244 |
+| L5 | 0 | 0 | 244 |
+
+Lifecycle set (amc-lifecycle-2026-v1) (264 questions)
+| Level | Reachable | Capped | Not evaluable |
+|---|---:|---:|---:|
+| L1 | 264 | 0 | 0 |
+| L2 | 4 | 0 | 260 |
+| L3 | 0 | 0 | 264 |
+| L4 | 0 | 0 | 264 |
+| L5 | 0 | 0 | 264 |
+
+11 registered emitters, 4 evidence maps, 281 literal audit emissions classified, 9 evaluated gate requirements checked.
+check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.

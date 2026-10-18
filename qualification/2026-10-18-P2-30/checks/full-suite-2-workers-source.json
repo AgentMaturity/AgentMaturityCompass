@@ -1,0 +1,7 @@
+{
+  "head": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+  "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "node": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "cmd": "npm test -- --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json"
+}
