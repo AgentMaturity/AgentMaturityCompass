@@ -1,4 +1,5 @@
 /** Catalog content governance (P1-34; docs/catalog/GOVERNANCE.md): review records, effective support, currency, the changelog guard. */
+import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { z } from "zod";
@@ -46,6 +47,19 @@ export function readGovernance(root: string): { reverify: ReverifyItem[]; f5Conf
     f5Confirmations: read("governance/f5-confirmations.yaml", f5ConfirmationsFileSchema)?.confirmations ?? [],
     reviews, issues
   };
+}
+
+/**
+ * Every name and email that ever authored `path` in the git repository at `repoRoot`, across renames (`git log --follow`).
+ * Git authors are unsigned claims, so effectiveSupport also checks a reviewer's roster identities and declared name
+ * against them. Throws when git fails or the file has no history: independence cannot be judged without authors.
+ */
+export function gitAuthorsOf(repoRoot: string, path: string): string[] {
+  const log = spawnSync("git", ["log", "--follow", "--format=%an%n%ae", "--", path], { cwd: repoRoot, encoding: "utf8" });
+  if (log.status !== 0) throw new Error(`cannot read the git authors of ${path}: ${(log.stderr || String(log.error)).trim()}`);
+  const authors = [...new Set(log.stdout.split("\n").filter(Boolean))];
+  if (authors.length === 0) throw new Error(`${path} has no git history; refusing to judge reviewer independence without its authors`);
+  return authors;
 }
 
 export interface GovernanceFinding { code: string; severity: "error" | "warning"; controlId: string | null; message: string }

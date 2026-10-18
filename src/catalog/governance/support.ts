@@ -20,13 +20,16 @@ import type { RegulatoryRegister } from "../../compliance/regulatory/index.js";
 import { verifyHexDigest } from "../../crypto/keys.js";
 import { checkSignature } from "../../trust/signatureCheck.js";
 import { loadTrustContext, type TrustContext } from "../../trust/trustContext.js";
-import { controlDigest } from "../digest.js";
+import { controlDigest, digestOf } from "../digest.js";
 import type { Citation, ControlRecord, SupportLevel } from "../types.js";
 import { nextReviewDue } from "./currency.js";
 import { reviewRecordDigest, reviewRecordSchema, type F5Confirmation, type ReviewRecord } from "./reviewRecord.js";
 import { reverifyOpenItems, type ReverifyItem } from "./reverify.js";
 
-/** A D-08 roster entry, keyed by the reviewer's trust-list subject: credentialed domains ("legal" too) and git identities. */
+/**
+ * A D-08 roster entry, keyed by the reviewer's trust-list subject: credentialed domains ("legal" too) and the git
+ * identities (names, emails) the person commits under. At least one identity, or the reviewer never counts.
+ */
 export interface RosterEntry { domains: readonly string[]; identities: readonly string[] }
 
 export interface ReviewAuthority {
@@ -45,11 +48,18 @@ export interface ReviewAuthority {
   register: RegulatoryRegister;
 }
 
-/** What effectiveSupport decided for one control's current content; compilePlan binds it into the plan. */
+/**
+ * What effectiveSupport decided for one control's current content; compilePlan binds it, with the digest of every review
+ * record it counted, into the plan. Only effectiveSupport mints one (frozen); supportStanding refuses any other object.
+ */
 export interface Promotion {
-  controlId: string; controlVersion: string; controlDigest: string;
-  reviewers: string[]; recordIds: string[]; reviewedAt: string; nextReviewDue: string;
+  readonly controlId: string; readonly controlVersion: string; readonly controlDigest: string;
+  readonly reviewers: readonly string[]; readonly recordIds: readonly string[];
+  /** digestOf each counted record, signature included, in recordIds order. */
+  readonly recordDigests: readonly string[];
+  readonly reviewedAt: string; readonly nextReviewDue: string;
 }
+const minted = new WeakSet<Promotion>();
 export interface SupportResult {
   support: SupportLevel;
   /** Why declared support did not stand; empty when it did or nothing stronger than experimental was declared. */
@@ -61,10 +71,18 @@ export interface SupportResult {
 }
 
 type Verified = { record: ReviewRecord; reviewer: string; identities: Set<string>; nextReviewDue: string };
-const norm = (value: string): string => value.trim().toLowerCase();
+/** NFKC, every run of whitespace (NBSP and other Unicode spaces too) as one space, trimmed, then case-folded. */
+const norm = (value: string): string => value.normalize("NFKC").replace(/\s+/gu, " ").trim().toUpperCase().toLowerCase();
+/** An email without a +tag on its local part or trailing dots on its domain. */
+const mailbox = (email: string): string => {
+  const at = email.lastIndexOf("@");
+  return `${email.slice(0, at).replace(/\+.*$/u, "")}@${email.slice(at + 1).replace(/\.+$/u, "")}`;
+};
 /** A principal's identifiers: the whole string, its name part before "<", and any email in it. */
-const ids = (principal: string): string[] =>
-  [norm(principal), norm(principal.split("<")[0] ?? ""), ...(principal.match(/[^\s<>]+@[^\s<>]+/g) ?? []).map(norm)].filter(Boolean);
+const ids = (principal: string): string[] => {
+  const p = norm(principal);
+  return [p, norm(p.split("<")[0] ?? ""), ...(p.match(/[^\s<>()]+@[^\s<>()]+/gu) ?? []).map(mailbox)].filter(Boolean);
+};
 const stronger = (support: SupportLevel): boolean => support === "reviewed" || support === "qualified";
 const dateOf = (at: Date): string => at.toISOString().slice(0, 10);
 
@@ -89,6 +107,7 @@ function verifyRecord(raw: unknown, control: ControlRecord, digest: string, trus
   if (record.reviewer.identity.userId !== reviewer) return "GOV_REVIEW_REVIEWER_UNKNOWN";
   const person = authority.experts.get(reviewer);
   if (!person) return "GOV_REVIEW_NOT_ON_ROSTER";
+  if (!person.identities.some((identity) => ids(identity).length > 0)) return "GOV_REVIEW_ROSTER_NO_IDENTITY";
   // Git authors are unsigned claims, so independence is judged on every identity the reviewer has, the declared name included.
   const identities = new Set([reviewer, ...person.identities, record.reviewer.name].flatMap(ids));
   if (authority.authorsOf(control.id).flatMap(ids).some((id) => identities.has(id))) return "GOV_REVIEW_SELF_REVIEW";
@@ -133,16 +152,22 @@ const stays = (reasons: string[], rejected: SupportResult["rejected"] = []): Sup
   ({ support: "experimental", reasons: ["GOV_REVIEW_UNVERIFIED", ...reasons], promotion: null, rejected });
 
 /**
- * Pure: the support a control's declaration may have, given a promotion (or none) and the date (YYYY-MM-DD) it is judged
- * at. Reviewed or qualified support stands only with a promotion for this control's id, version and current digest
- * whose next review has not passed; experimental and retired declarations are returned as they are.
+ * Pure (a date comparison, no clock): the support a control's declaration may have, given a promotion (or none) and
+ * the date (YYYY-MM-DD) it is judged at. Reviewed or qualified support stands only with a promotion effectiveSupport
+ * minted, naming reviewers and records, for this control's id, version and current digest, reviewed on or before
+ * `asOf` and not yet due; experimental and retired declarations are returned as they are.
  */
 export function supportStanding(control: ControlRecord, promotion: Promotion | undefined, asOf: string): SupportResult {
   if (!stronger(control.support)) return { support: control.support, reasons: [], promotion: null, rejected: [] };
   if (!promotion) return stays([]);
+  if (promotion.reviewers.length === 0 || promotion.recordIds.length === 0 || promotion.recordDigests.length !== promotion.recordIds.length) {
+    return stays(["GOV_REVIEW_PROMOTION_EMPTY"]);
+  }
+  if (!minted.has(promotion)) return stays(["GOV_REVIEW_PROMOTION_UNVERIFIED"]);
   if (promotion.controlId !== control.id || promotion.controlVersion !== control.version || promotion.controlDigest !== controlDigest(control)) {
     return stays(["GOV_REVIEW_SUBJECT_CHANGED"]);
   }
+  if (promotion.reviewedAt > asOf) return stays(["GOV_REVIEW_IN_FUTURE"]);
   if (promotion.nextReviewDue < asOf) return stays(["GOV_REVIEW_OVERDUE"]);
   return { support: control.support, reasons: [], promotion, rejected: [] };
 }
@@ -168,9 +193,11 @@ export function effectiveSupport(control: ControlRecord, authority?: ReviewAutho
   const missing = quorum(control, digest, valid, authority.experts);
   if (missing.length > 0) return stays(missing, rejected);
   const approvals = valid.filter(({ record }) => record.decision === "approve");
-  const promotion: Promotion = { controlId: control.id, controlVersion: control.version, controlDigest: digest,
-    reviewers: [...new Set(approvals.map(({ reviewer }) => reviewer))].sort(), recordIds: approvals.map(({ record }) => record.id),
-    reviewedAt: approvals.map(({ record }) => record.decidedAt).sort()[0] as string, nextReviewDue: approvals.map((a) => a.nextReviewDue).sort()[0] as string };
+  const promotion: Promotion = Object.freeze({ controlId: control.id, controlVersion: control.version, controlDigest: digest,
+    reviewers: Object.freeze([...new Set(approvals.map(({ reviewer }) => reviewer))].sort()),
+    recordIds: Object.freeze(approvals.map(({ record }) => record.id)), recordDigests: Object.freeze(approvals.map(({ record }) => digestOf(record))),
+    reviewedAt: approvals.map(({ record }) => record.decidedAt).sort()[0] as string, nextReviewDue: approvals.map((a) => a.nextReviewDue).sort()[0] as string });
+  minted.add(promotion);
   return { ...supportStanding(control, promotion, dueAsOf), rejected };
 }
 
@@ -179,10 +206,14 @@ export function shownReviewStatus(control: ControlRecord, effective: SupportLeve
   return control.review.status === "approved" && !stronger(effective) ? "pending" : control.review.status;
 }
 
-/** A control's review and provenance blocks as an export may show them: the approval and approver only where support stood. */
+/**
+ * A control's review and provenance blocks as an export may show them: where support did not stand, no named review
+ * (expert, credential and dates null, status through shownReviewStatus) and no approver.
+ */
 export function shownReviewBlocks(control: ControlRecord, effective: SupportLevel): Pick<ControlRecord, "review" | "provenance"> {
   if (stronger(effective)) return { review: control.review, provenance: control.provenance };
-  return { review: { ...control.review, status: shownReviewStatus(control, effective) }, provenance: { ...control.provenance, approvedBy: null } };
+  return { review: { status: shownReviewStatus(control, effective), expert: null, credential: null, reviewedAt: null, nextReview: null },
+    provenance: { ...control.provenance, approvedBy: null } };
 }
 
 /** The only values a view shows for a citation's legal review; views render them as given. */

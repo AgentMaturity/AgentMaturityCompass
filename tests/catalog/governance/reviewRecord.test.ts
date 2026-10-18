@@ -6,9 +6,13 @@
 import { describe, expect, it } from "vitest";
 import type { ReviewRecord } from "../../../src/catalog/governance/reviewRecord.js";
 import { effectiveSupport, type ReviewAuthority } from "../../../src/catalog/governance/support.js";
+import { digestOf } from "../../../src/catalog/digest.js";
 import { loadCatalog } from "../../../src/catalog/loader.js";
 import { admitKey, ed25519KeyId, loadTrustContext } from "../../../src/trust/index.js";
-import { AUTHOR, NOW, PINS, ROSTER, author, authority, keyA, keyB, keyC, keyLegal, keypair, operatorHome, reviewedControl, sign } from "./reviewers.js";
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import type { KeyPurpose } from "../../../src/trust/index.js";
+import { AUTHOR, NOW, PINS, ROSTER, author, authority, keyA, keyB, keyC, keyLegal, keypair, operatorHome, reviewedControl, sign, signedList } from "./reviewers.js";
 
 const catalog = loadCatalog();
 const control = reviewedControl(catalog.controls.get("L0-ADV-01")!); // all seven stations, AI-drafted, no citations
@@ -23,7 +27,7 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
     const result = effectiveSupport(control, authority(HOME, [a, b, elsewhere]));
     expect(result).toMatchObject({ support: "reviewed", reasons: [], rejected: [] });
     expect(result.promotion).toEqual({ controlId: control.id, controlVersion: control.version, controlDigest: a.subject.digest,
-      reviewers: ["fixture-reviewer-a", "fixture-reviewer-b"], recordIds: [a.id, b.id], reviewedAt: "2026-10-15", nextReviewDue: "2027-01-13" });
+      reviewers: ["fixture-reviewer-a", "fixture-reviewer-b"], recordIds: [a.id, b.id], recordDigests: [digestOf(a), digestOf(b)], reviewedAt: "2026-10-15", nextReviewDue: "2027-01-13" });
   });
 
   const older = { ...control, statement: `${control.statement} (before an edit)` };
@@ -77,9 +81,41 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
     const as = (name: string) => sign(control, alice, "asmith", { reviewer: { ...a.reviewer, name, identity: { userId: "asmith", kind: "human" } } });
     expect(effectiveSupport(control, authority(home, [as("A. S."), b], { ...authored, experts: roster(["alice@corp"]) })).rejected)
       .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
-    expect(effectiveSupport(control, authority(home, [as("Alice Smith"), b], { ...authored, experts: roster([]) })).rejected)
+    expect(effectiveSupport(control, authority(home, [as("Alice Smith"), b], { ...authored, experts: roster(["unrelated@fixture.test"]) })).rejected)
       .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
     expect(effectiveSupport(control, authority(home, [as("A. S."), b], authored)).rejected).toEqual([{ index: 0, reason: "GOV_REVIEW_NOT_ON_ROSTER" }]);
+  });
+
+  it("identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping", () => {
+    const alice = keypair();
+    const home = operatorHome([...PINS, { key: alice, subject: "asmith" }]);
+    const experts = new Map([...ROSTER, ["asmith", { domains: ["wealth"], identities: ["Alice Smith", "alice@corp.example", "HANS STRAUSS"] }]]);
+    const as = sign(control, alice, "asmith", { reviewer: { ...a.reviewer, name: "A. S.", identity: { userId: "asmith", kind: "human" } } });
+    const variants = [["ALICE SMITH ", " Alice@Corp.Example"], ["Alice  Smith"], ["alice+cat@corp.example"], ["Alice\u00a0Smith"], ["x <alice@corp.example.>"],
+      ["\uff21lice \uff33mith"], ["Hans Strau\u00df"]];
+    for (const authors of variants) {
+      expect(effectiveSupport(control, authority(home, [as, b], { experts, authorsOf: () => authors })).rejected, JSON.stringify(authors))
+        .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
+    }
+  });
+
+  it("a roster entry without a git identity cannot vouch for independence, so its reviewer never counts", () => {
+    const experts = new Map([...ROSTER, ["fixture-reviewer-b", { domains: [], identities: [" \u00a0"] }]]);
+    expect(effectiveSupport(control, authority(HOME, [a, b], { experts })).rejected).toEqual([{ index: 1, reason: "GOV_REVIEW_ROSTER_NO_IDENTITY" }]);
+  });
+
+  it("a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry", () => {
+    const dir = operatorHome();
+    const list = (listId: string, purposes: KeyPurpose[]) => {
+      const path = join(dir, "trust", `${listId}.json`);
+      writeFileSync(path, JSON.stringify(signedList([...PINS.filter((p) => p.key !== keyB), { key: keyB, subject: "fixture-reviewer-b", purposes }], listId)), { mode: 0o600 });
+      return path;
+    };
+    const trustLists = [list("reviewers", ["catalog-review"]), list("receipts", ["receipt"])];
+    expect(effectiveSupport(control, authority(dir, [a, b], { trust: { amcHome: dir, trustLists } })).rejected).toEqual([{ index: 1, reason: "GOV_REVIEW_SIGNER_UNPINNED" }]);
+    const context = loadTrustContext({ amcHome: dir, trustLists, now: NOW });
+    expect(admitKey({ publicKeyPem: keyB.publicKeyPem, purpose: "catalog-review", signature: "fixture", context }).status).toBe("wrong-purpose");
+    expect(admitKey({ publicKeyPem: keyA.publicKeyPem, purpose: "catalog-review", signature: "fixture", context }).status).toBe("admitted");
   });
 
   it("trust and signatures are judged at the server's clock; asOf only looks ahead for due dates", () => {
@@ -126,7 +162,8 @@ describe("the quorum (P1-34 step 4)", () => {
   it("reviewers who share any normalized identifier (subject or roster git identity) are one person", () => {
     const [k1, k2] = [keypair(), keypair()];
     const home = operatorHome([...PINS, { key: k1, subject: "bob@corp.example" }, { key: k2, subject: "Bob <bob@corp.example>" }]);
-    const roster = new Map([...ROSTER, ["bob@corp.example", { domains: ["wealth"], identities: [] }], ["Bob <bob@corp.example>", { domains: ["wealth"], identities: [] }]]);
+    const roster = new Map([...ROSTER, ["bob@corp.example", { domains: ["wealth"], identities: ["bob-work@corp.example"] }],
+      ["Bob <bob@corp.example>", { domains: ["wealth"], identities: ["bob-home@corp.example"] }]]);
     const bob = [sign(control, k1, "bob@corp.example"), sign(control, k2, "Bob <bob@corp.example>")];
     expect(effectiveSupport(control, authority(home, bob, { experts: roster })).reasons).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_TWO_HUMANS"]);
     const sameGit = new Map([...ROSTER, ["fixture-reviewer-b", { domains: [], identities: ["Reviewer A <a@fixture.test>"] }]]);

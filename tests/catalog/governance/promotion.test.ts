@@ -72,6 +72,9 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     const doc = JSON.stringify(toOscalCatalog({ ...catalog, controls: new Map([...catalog.controls, [claimed.id, claimed]]) }).document);
     expect(doc).not.toContain('\\"approved\\"');
     expect(doc).not.toContain("fixture-approver");
+    expect(doc).not.toContain("fixture-expert");
+    expect(doc).not.toContain("fixture credential");
+    expect(doc).not.toContain('\\"reviewedAt\\":\\"2026-10-15\\"');
     expect(doc).not.toContain('\\"recorded\\"');
     expect(doc).toContain('\\"legalReview\\":\\"unverified\\"');
     expect(doc).toContain('\\"status\\":\\"pending\\"');
@@ -123,7 +126,7 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     // reads (r.review, control.provenance) and whole-object spreads (...c, ...record) count too. A new read changes a count
     // and fails here: route it through effectiveSupport, supportStanding or a shown* helper instead, or add it with its reason.
     const allowed: Record<string, [number, string]> = {
-      "src/catalog/governance/support.ts": [12, "supportStanding, effectiveSupport and the shown* helpers"],
+      "src/catalog/governance/support.ts": [11, "supportStanding, effectiveSupport and the shown* helpers"],
       "src/catalog/governance/index.ts": [4, "the report compares the declaration with effectiveSupport's result"],
       "src/catalog/governance/changelogGuard.ts": [2, "declared reviewed content needs review ids: stricter only"],
       "src/catalog/compiler/compile.ts": [2, "writes supportStanding's verdict into each row"],

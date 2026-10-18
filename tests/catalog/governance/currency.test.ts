@@ -157,8 +157,27 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
     const at = (plan: ReturnType<typeof compile>) => plan.requirements.find((r) => r.controlId === control.id)!;
     expect(at(compile("2027-02-01T00:00:00Z", promotions))).toMatchObject({ support: "experimental" });
     expect(at(compile("2027-02-01T00:00:00Z", promotions)).reasons.join()).toMatch(/GOV_REVIEW_OVERDUE/);
-    const older = { [control.id]: { ...promotions[control.id]!, controlDigest: `sha256:${"0".repeat(64)}` } };
-    expect(at(compile("2026-10-18T12:00:00Z", older)).reasons.join()).toMatch(/GOV_REVIEW_SUBJECT_CHANGED/);
+    const edited = { ...control, statement: `${control.statement} (edited after the review)` };
+    const changed = compilePlan({ profile, catalog: { ...catalog, controls: new Map([...catalog.controls, [control.id, edited]]) }, asOf: "2026-10-18T12:00:00Z", promotions });
+    expect(changed.requirements.find((r) => r.controlId === control.id)!.reasons.join()).toMatch(/GOV_REVIEW_SUBJECT_CHANGED/);
+  });
+
+  it("only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound", () => {
+    const records = pair("2026-10-15");
+    const promotions = promotionsOf(records);
+    const minted = promotions[control.id]!;
+    expect(minted.recordDigests).toEqual(records.map((r) => digestOf(r)));
+    const plan = compile("2026-10-18T12:00:00Z", promotions);
+    expect(plan.promotions?.[control.id]?.recordDigests).toEqual(minted.recordDigests);
+    const at = (asOf: string, p: Record<string, typeof minted>) => compile(asOf, p).requirements.find((r) => r.controlId === control.id)!;
+    expect(at("2026-10-18T12:00:00Z", promotions).support).toBe("reviewed");
+    const handBuilt = at("2026-10-18T12:00:00Z", { [control.id]: { ...minted } });
+    expect([handBuilt.support, handBuilt.reasons.join()]).toEqual(["experimental", expect.stringMatching(/GOV_REVIEW_PROMOTION_UNVERIFIED/)]);
+    const empty = at("2026-10-18T12:00:00Z", { [control.id]: { ...minted, reviewers: [], recordIds: [], recordDigests: [] } });
+    expect([empty.support, empty.reasons.join()]).toEqual(["experimental", expect.stringMatching(/GOV_REVIEW_PROMOTION_EMPTY/)]);
+    const early = at("2026-10-14T00:00:00Z", promotions); // the records say 2026-10-15
+    expect([early.support, early.reasons.join()]).toEqual(["experimental", expect.stringMatching(/GOV_REVIEW_IN_FUTURE/)]);
+    expect(Object.isFrozen(minted) && Object.isFrozen(minted.recordDigests)).toBe(true);
   });
 
   it("without promotions every row is experimental; a current verified quorum keeps reviewed", () => {

@@ -57,6 +57,13 @@ export function listsAt<E extends RuleEntry>(lists: ReadonlyArray<{ listId: stri
     const compromised = list.entries.find(entry => sameId(entry.keyId, keyId) && entry.revocationReason === "key-compromise");
     if (compromised) return { status: "revoked", listId: list.listId, entry: compromised };
   }
+  // A catalog-review key is a named expert's own (P1-34): one any loaded list pins for another purpose is never one.
+  if (purpose === "catalog-review") {
+    for (const list of lists) {
+      const shared = list.entries.find(entry => sameId(entry.keyId, keyId) && entry.purposes.some(p => p !== "catalog-review"));
+      if (shared) return { status: "wrong-purpose", listId: list.listId, entry: shared };
+    }
+  }
   const verdicts = lists.flatMap(list => list.entries.filter(entry => sameId(entry.keyId, keyId))
     .map(entry => ({ status: entryAt(entry, purpose, at), listId: list.listId, entry })));
   return verdicts.find(verdict => verdict.status === "admitted")

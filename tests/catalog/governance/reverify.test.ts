@@ -2,8 +2,12 @@
  * P1-34 governance files and the currency report: the tracked re-verify checklist (15 facts from the strategy), the F5
  * confirmations, and GOV_REVERIFY_OPEN for reviewed content citing an instrument tied to an open item.
  */
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { catalogCurrencyFindings, readGovernance, reverifyChecklistSchema, reverifyOpenItems, type ReverifyItem } from "../../../src/catalog/governance/index.js";
+import { catalogCurrencyFindings, gitAuthorsOf, readGovernance, reverifyChecklistSchema, reverifyOpenItems, type ReverifyItem } from "../../../src/catalog/governance/index.js";
 import { defaultCatalogRoot, loadCatalog } from "../../../src/catalog/loader.js";
 import type { ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER } from "../../../src/compliance/regulatory/index.js";
@@ -30,6 +34,23 @@ describe("governance files (P1-34 steps 9-10)", () => {
     expect(parse([item])).toBe(false);
     expect(parse([{ ...item, checkedAt: "2026-10-18", reviewRecordId: "rr-fixture" }])).toBe(true);
     expect(parse([governance.reverify[0], governance.reverify[0]])).toBe(false);
+  });
+
+  it("a control's git authors follow renames (git log --follow), and no history is refused", () => {
+    const repo = mkdtempSync(join(tmpdir(), "amc-gov-git-"));
+    try {
+      const git = (...args: string[]) => execFileSync("git", ["-c", "commit.gpgsign=false", ...args], { cwd: repo, env: { ...process.env, HOME: repo, GIT_CONFIG_NOSYSTEM: "1" } });
+      git("init", "-q");
+      writeFileSync(join(repo, "first.yaml"), "x: 1\n");
+      git("add", "first.yaml");
+      git("-c", "user.name=First Author", "-c", "user.email=first@fixture.test", "commit", "-q", "-m", "add");
+      git("mv", "first.yaml", "renamed.yaml");
+      git("-c", "user.name=Second Author", "-c", "user.email=second@fixture.test", "commit", "-q", "-m", "rename");
+      expect(gitAuthorsOf(repo, "renamed.yaml").sort()).toEqual(["First Author", "Second Author", "first@fixture.test", "second@fixture.test"].sort());
+      expect(() => gitAuthorsOf(repo, "never-committed.yaml")).toThrow(/no git history/);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
   });
 
   it("every register id an item affects exists in the S5 register", () => {

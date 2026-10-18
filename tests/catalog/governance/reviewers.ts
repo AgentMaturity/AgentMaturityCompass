@@ -13,7 +13,7 @@ import type { ReviewAuthority, RosterEntry } from "../../../src/catalog/governan
 import { controlDigest } from "../../../src/catalog/digest.js";
 import type { ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER } from "../../../src/compliance/regulatory/index.js";
-import { ed25519KeyId, signTrustList, type DistrustEntry, type KeyPurpose } from "../../../src/trust/index.js";
+import { ed25519KeyId, signTrustList, type DistrustEntry, type KeyPurpose, type SignedTrustList } from "../../../src/trust/index.js";
 
 export const NOW = new Date("2026-10-18T12:00:00Z");
 export type Key = { privateKeyPem: string; publicKeyPem: string };
@@ -37,16 +37,21 @@ afterAll(() => {
   for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true });
 });
 
-/** An operator AMC home: a trust list signed by the fixture root pinning `pins`, and trust-roots.json pinning the root. */
-export function operatorHome(pins: Pin[] = PINS, opts: { distrust?: DistrustEntry[]; threshold?: number; tamper?: boolean } = {}): string {
-  const home = mkdtempSync(join(tmpdir(), "amc-gov-home-"));
-  homes.push(home);
-  const signed = signTrustList({ type: "amc.trust-list", version: 1, listId: "fixture-reviewers", sequence: 1,
-    issuedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2099-01-01T00:00:00.000Z", distrust: opts.distrust ?? [],
+/** A trust list signed by the fixture root pinning `pins`. */
+export function signedList(pins: Pin[], listId = "fixture-reviewers", distrust: DistrustEntry[] = []): SignedTrustList {
+  return signTrustList({ type: "amc.trust-list", version: 1, listId, sequence: 1,
+    issuedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2099-01-01T00:00:00.000Z", distrust,
     entries: pins.map((p) => ({ keyId: ed25519KeyId(p.key.publicKeyPem)!, algorithm: "ed25519" as const, publicKeyPem: p.key.publicKeyPem,
       purposes: p.purposes ?? ["catalog-review"], subject: p.subject, validFrom: p.validFrom ?? "2026-01-01T00:00:00.000Z", validTo: null, source: "operator",
       ...(p.revoked ? { revokedAt: "2026-06-01T00:00:00.000Z", revocationReason: "key-compromise" as const } : {}),
       ...(p.supersededAt ? { revokedAt: p.supersededAt, revocationReason: "superseded" as const } : {}) })) }, root.privateKeyPem);
+}
+
+/** An operator AMC home: a trust list signed by the fixture root pinning `pins`, and trust-roots.json pinning the root. */
+export function operatorHome(pins: Pin[] = PINS, opts: { distrust?: DistrustEntry[]; threshold?: number; tamper?: boolean } = {}): string {
+  const home = mkdtempSync(join(tmpdir(), "amc-gov-home-"));
+  homes.push(home);
+  const signed = signedList(pins, "fixture-reviewers", opts.distrust);
   if (opts.tamper) signed.list.entries[0]!.subject = "someone-else";
   const roots = [ed25519KeyId(root.publicKeyPem)!, ...(opts.threshold && opts.threshold > 1 ? [ed25519KeyId(keyC.publicKeyPem)!] : [])];
   mkdirSync(join(home, "trust"), { recursive: true, mode: 0o700 });

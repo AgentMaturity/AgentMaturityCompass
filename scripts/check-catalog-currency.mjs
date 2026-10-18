@@ -10,7 +10,6 @@
  *
  * Usage: node scripts/check-catalog-currency.mjs [--as-of YYYY-MM-DD] [--json]
  */
-import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -27,7 +26,7 @@ async function main(argv) {
   const dist = (rel) => join(root, "dist", rel);
   if (!existsSync(dist("catalog/governance/index.js"))) throw new Error("Build first: dist/catalog/governance/index.js not found (pnpm run build).");
   const { loadCatalog } = await import(pathToFileURL(dist("catalog/loader.js")).href);
-  const { catalogCurrencyFindings, readGovernance } = await import(pathToFileURL(dist("catalog/governance/index.js")).href);
+  const { catalogCurrencyFindings, gitAuthorsOf, readGovernance } = await import(pathToFileURL(dist("catalog/governance/index.js")).href);
   const { REGULATORY_REGISTER } = await import(pathToFileURL(dist("compliance/regulatory/index.js")).href);
 
   const catalogRoot = join(root, "catalog");
@@ -35,11 +34,8 @@ async function main(argv) {
   const governance = readGovernance(catalogRoot);
   const authorsOf = (controlId) => {
     const file = cat.controlFiles.get(controlId);
-    // Every name and email that ever authored the file, across renames. Unsigned, so effectiveSupport also checks the
-    // reviewer's roster identities and declared name against them.
-    const log = file ? spawnSync("git", ["log", "--follow", "--format=%an%n%ae", "--", join("catalog", file)], { cwd: root, encoding: "utf8" }) : null;
-    if (!log || log.status !== 0) throw new Error(`cannot read the git authors of ${controlId}; refusing to judge reviewer independence without them`);
-    return [...new Set(log.stdout.split("\n").filter(Boolean))];
+    if (!file) throw new Error(`${controlId} has no file; refusing to judge reviewer independence without its authors`);
+    return gitAuthorsOf(root, join("catalog", file));
   };
   // Trust and signatures are checked at the server's clock inside effectiveSupport; asOf only moves due dates ahead.
   // The D-08 roster (subject -> { domains, identities }) does not exist yet, so no reviewer can count.
