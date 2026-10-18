@@ -1,0 +1,51 @@
+50 of the 77 questions kept pending Sid miss a round-2 content rule:
+round-2 merge proposal into ENV-WW-2 ENV-WW-13: unresolved: EU Regulation 2024/1781 Arts. 5 & 8
+F5 drop proposal ENV-SS-5: unresolved: IPBES NCP Framework — Habitat Connectivity Assessment
+F5 drop proposal ENV-SS-14: unresolved: EU Biodiversity Strategy 2030 — Target 4
+round-2 merge proposal into ENV-UU-9 ENV-UU-15: unresolved: FERC Order No. 901
+round-2 merge proposal into HLT-DHR-2 HLT-DHR-13: 2 instruments cited; unresolved: 45 CFR Part 171 (exceptions)
+F5 drop proposal HLT-WM-17: weight 6 outside 8-15
+F5 drop proposal HLT-PL-17: weight 6 outside 8-15; unresolved: Joint Commission NPSG crosswalk expectations
+round-2 merge proposal into HLT-PP-12 HLT-PP-7: 2 instruments cited; unresolved: HHS Breach Notification Rule 45 CFR §164.404-408
+round-2 merge proposal into HLT-PP-4 HLT-PP-11: 2 instruments cited; unresolved: FCA 31 U.S.C. §3729 / AKS 42 U.S.C. §1320a-7b
+round-2 merge proposal into HLT-DD-1 HLT-DD-15: unresolved: FDA 21 CFR §211.68
+round-2 merge proposal into HLT-SM-1 HLT-SM-11: 2 instruments cited; unresolved: 21 U.S.C. §360eee-1
+F5 drop proposal WLT-FW-6: 2 instruments cited; unresolved: ILO Centenary Declaration (2019)
+F5 drop proposal WLT-FW-14: weight 6 outside 8-15; unresolved: Jurisdictional scope gating for employment AI laws
+round-2 merge proposal into WLT-DP-7 WLT-DP-14: 2 instruments cited
+F5 drop proposal WLT-NP-6: 2 instruments cited; unresolved: World Bank Poverty Measurement
+F5 drop proposal WLT-NP-11: unresolved: Community Reinvestment Act (CRA) — community reinvestment and LMI outcomes
+round-2 merge proposal into WLT-NP-1 WLT-NP-12: unresolved: World Bank GPFI (2020) — responsible DFS / consumer protection
+F5 drop proposal WLT-NP-14: weight 6 outside 8-15
+round-2 merge proposal into WLT-CE-9 WLT-CE-11: 2 instruments cited; unresolved: ESRS E1 (Scope 3/value-chain)
+F5 drop proposal WLT-CE-15: weight 6 outside 8-15; 2 instruments cited; unresolved: ESRS scope governance
+round-2 merge proposal into WLT-BC-12 WLT-BC-9: 2 instruments cited
+round-2 merge proposal into WLT-BC-4 WLT-BC-14: 2 instruments cited; unresolved: SEC v. Ripple Labs / Howey test application in token distributions
+F5 drop proposal WLT-BC-15: weight 6 outside 8-15
+F5 drop proposal EDU-HE-3: 2 instruments cited; unresolved: Regional Accreditation Standards
+F5 drop proposal EDU-SE-15: weight 6 outside 8-15; unresolved: Accessibility scope gating
+F5 drop proposal MOB-SC-14: weight 6 outside 8-15
+F5 drop proposal MOB-RE-15: weight 6 outside 8-15
+F5 drop proposal MOB-VI-14: weight 6 outside 8-15; unresolved: Regulatory mapping governance
+F5 drop proposal MOB-F3W-8: 2 instruments cited
+round-2 merge proposal into TECH-CI-10 TECH-CI-9: 2 instruments cited
+round-2 merge proposal into TECH-NE-9 TECH-NE-8: 2 instruments cited
+round-2 merge proposal into TECH-NE-3 TECH-NE-11: unresolved: EU DGA 2022/868 Art. 12
+F5 drop proposal TECH-OS-4: 2 instruments cited
+F5 drop proposal TECH-OS-15: weight 6 outside 8-15; unresolved: Citation mapping governance
+F5 drop proposal TECH-INF-15: weight 6 outside 8-15
+F5 drop proposal TECH-PP-7: 2 instruments cited; unresolved: GRI 203
+round-2 merge proposal into TECH-PP-6 TECH-PP-9: 2 instruments cited; unresolved: WIPO WCT Art. 11
+F5 drop proposal TECH-PP-13: unresolved: WTO SPS Agreement Art. 5.7
+F5 drop proposal TECH-PP-14: weight 6 outside 8-15; unresolved: WIPO WCT/WPPT (mapping governance)
+round-2 merge proposal into GOV-DCR-10 GOV-DCR-1: weight 20 outside 8-15
+F5 drop proposal GOV-DCR-14: weight 6 outside 8-15
+round-2 merge proposal into GOV-DD-11 GOV-DD-2: weight 20 outside 8-15; 2 instruments cited
+round-2 merge proposal into GOV-DD-12 GOV-DD-5: weight 25 outside 8-15; 2 instruments cited; unresolved: OSCE/ODIHR Handbook on Electoral Technology / OSCE Commitments §7
+round-2 merge proposal into GOV-DD-7 GOV-DD-9: 2 instruments cited; unresolved: EU Political Advertising Reg 2024
+F5 drop proposal GOV-DD-15: weight 6 outside 8-15; unresolved: Citation mapping governance
+round-2 merge proposal into GOV-PL-13 GOV-PL-2: 2 instruments cited; unresolved: OECD OG Rec Art. 2
+round-2 merge proposal into GOV-PL-10 GOV-PL-3: 2 instruments cited
+F5 drop proposal GOV-PL-14: weight 6 outside 8-15; unresolved: Citation mapping governance; cites repealed Directive 2003/98/EC
+round-2 merge proposal into TECH-PP-3 GOV-PPC-5: 2 instruments cited
+F5 drop proposal GOV-PPC-15: weight 6 outside 8-15; unresolved: Citation mapping governance

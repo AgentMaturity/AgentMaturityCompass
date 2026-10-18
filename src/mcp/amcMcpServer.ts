@@ -31,6 +31,7 @@ import {
 import { claimFields, claimKindFromTrustTier, claimKindLabel, type ClaimKind } from "../claims/eligibility/index.js";
 import { effectiveTrustTier } from "../claims/evidenceProvenance.js";
 import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/industryPacks.js";
+import { QUESTIONNAIRE_NOTICE } from "../domains/questionnaireLabel.js";
 import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
 import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -423,6 +424,7 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
             `## AMC Sector Pack Score: ${result.packName}`,
             ``,
             `**Station:** ${result.stationId}`,
+            `**Content:** ${result.contentStatus}. ${QUESTIONNAIRE_NOTICE}`,
             result.percentage === null // unanswered questions are not evaluated (packSelfAssessment.ts)
               ? `**Score:** not evaluated: ${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered`
               : `**Score:** ${result.percentage}% · **Maturity Level:** L${result.level}`,

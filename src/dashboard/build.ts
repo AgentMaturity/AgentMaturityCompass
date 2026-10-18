@@ -22,7 +22,7 @@ import { listApprovalInbox } from "../approvals/approvalInbox.js";
 import { benchmarkStats } from "../benchmarks/benchStats.js";
 import { latestOutcomeReport, outcomeTrend, topValueGaps } from "../outcomes/outcomeDashboard.js";
 import { listDomainMetadata } from "../domains/domainRegistry.js";
-import { listIndustryPacks } from "../domains/industryPacks.js";
+import { listIndustryPacks, type IndustryPack } from "../domains/industryPacks.js";
 import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { listGuardrailsWithRuntimeStatus } from "../enforce/guardrailRuntimeBindings.js";
 
@@ -226,6 +226,7 @@ function getPackSummaries(locked: boolean): Array<{
   description: string;
   regulatoryBasis: string[];
   locked: boolean;
+  contentStatus: IndustryPack["contentStatus"];
 }> {
   return listIndustryPacks().map((pack) => ({
     id: pack.id,
@@ -235,7 +236,8 @@ function getPackSummaries(locked: boolean): Array<{
     questionCount: pack.questions.length,
     description: pack.description,
     regulatoryBasis: pack.regulatoryBasis,
-    locked
+    locked,
+    contentStatus: pack.contentStatus
   }));
 }
 
