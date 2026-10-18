@@ -332,7 +332,7 @@ export function registerLateStageCliCommands({
           workspaceId: wsId,
           agentId: DEMO_AGENT_ID, claimKind: "synthetic_example",
           ttl: "15m",
-          scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
+          scopes: "gateway:llm,receipt:verify", // proxy, toolhub and governor ignore claimKind: a synthetic lease never reaches them
           routes: "/local",
           models: "*",
           rpm: 60,
