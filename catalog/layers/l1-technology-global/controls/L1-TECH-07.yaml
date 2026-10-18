@@ -83,11 +83,13 @@
     "type": "drill"
     "oracle":
       "kind": "ledger_state"
-      "observes": "The existing NIS2 clock's awareness event and draft warning record; this content-only extension
-        does not send a notification or establish national applicability."
+      "observes": "Synthetic awareness and draft warning records checked against the existing NIS2 early-warning
+        clock; no notification is sent and no national applicability is established."
     "fixtures":
       "positive":
         - "L1-TECH-07/positive/evidence-valid.json"
+        - "L1-TECH-07/positive/oracle-nis2-on-time.json"
+        - "L1-TECH-07/positive/oracle-nis2-at-deadline.json"
       "negative":
         - "L1-TECH-07/negative/evidence-stale.json"
         - "L1-TECH-07/negative/evidence-replayed.json"
@@ -95,8 +97,14 @@
         - "L1-TECH-07/negative/evidence-cross-tenant.json"
         - "L1-TECH-07/negative/evidence-empty.json"
         - "L1-TECH-07/negative/evidence-violation.json"
-    "passCriteria": "The existing clock is identified, but no completed Technology notification drill is asserted
-      by self-reported records. Missing or unbound evidence remains not evaluated."
+        - "L1-TECH-07/negative/oracle-nis2-late.json"
+        - "L1-TECH-07/negative/oracle-nis2-incomplete.json"
+        - "L1-TECH-07/negative/oracle-nis2-no-clock.json"
+        - "L1-TECH-07/negative/oracle-nis2-no-awareness.json"
+    "passCriteria": "The synthetic warning packet identifies the same incident, includes the local draft fields and
+      is timestamped no later than the awareness time plus the actual NIS2 clock deadline. Late or incomplete
+      packets fail locally; a missing clock or awareness record is not evaluated. Local drill success never fills
+      missing production evidence, which remains not evaluated with enforcement none."
     "attempts": 1
 "evidence":
   - "id": "L1-TECH-07-E1"

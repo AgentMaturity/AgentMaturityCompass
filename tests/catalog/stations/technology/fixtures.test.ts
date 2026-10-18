@@ -33,6 +33,21 @@ describe("Technology draft fixtures through the actual compiled platform-agent p
     }
   });
 
+  it("executes the supporting NIS2 warning drill with positive, negative and missing-evidence cases", () => {
+    const fixtures = oracleCases.filter((fixture) => fixture.control.id === "L1-TECH-07");
+    expect(fixtures.map((fixture) => fixture.ref).sort()).toEqual([
+      "L1-TECH-07/positive/oracle-nis2-on-time.json",
+      "L1-TECH-07/positive/oracle-nis2-at-deadline.json",
+      "L1-TECH-07/negative/oracle-nis2-late.json",
+      "L1-TECH-07/negative/oracle-nis2-incomplete.json",
+      "L1-TECH-07/negative/oracle-nis2-no-clock.json",
+      "L1-TECH-07/negative/oracle-nis2-no-awareness.json"
+    ].sort());
+    for (const fixture of fixtures) {
+      expect((fixture.envelope.setup.technologyOracle as { kind: string }).kind).toBe("nis2");
+    }
+  });
+
   for (const fixture of technologyFixtures) {
     it(`${fixture.ref}: real evidence admission gives ${fixture.envelope.expected.result}`, () => {
       const result = evaluateFixture(fixture);
@@ -100,6 +115,34 @@ describe("Technology draft fixtures through the actual compiled platform-agent p
       delete packet[field];
       expect(runTechnologyOracle({ ...spec, input: { ...spec.input, packet } }).reasonCode, field).toBe("packet_incomplete");
     }
+  });
+
+  it("binds the NIS2 local warning to its own clock, incident, UTC awareness and typed draft fields", () => {
+    const spec = oracleCases.map((fixture) => fixture.envelope.setup.technologyOracle as TechnologyOracleSpec)
+      .find((candidate) => candidate.kind === "nis2" && candidate.expected.result === "pass");
+    if (!spec || spec.kind !== "nis2" || !spec.input.awareness || !spec.input.packet) throw new Error("no positive NIS2 fixture");
+    expect(runTechnologyOracle({ ...spec, input: { ...spec.input, clockId: "eu-cra-early-warning-24h" } }).reasonCode)
+      .toBe("nis2_clock_missing");
+    for (const awareAt of ["0", "2026-02-30T00:00:00Z", "2026-10-18T00:00:00"]) {
+      expect(runTechnologyOracle({ ...spec, input: { ...spec.input,
+        awareness: { ...spec.input.awareness, awareAt } } }).reasonCode, awareAt).toBe("awareness_missing");
+    }
+    for (const field of ["incidentId", "createdAt", "summary", "contact", "maliciousActSuspected", "crossBorderImpact"] as const) {
+      const packet = { ...spec.input.packet };
+      delete packet[field];
+      expect(runTechnologyOracle({ ...spec, input: { ...spec.input, packet } }).reasonCode, field).toBe("warning_incomplete");
+    }
+    for (const field of ["maliciousActSuspected", "crossBorderImpact"] as const) {
+      const packet = { ...spec.input.packet, [field]: "false" as unknown as boolean };
+      expect(runTechnologyOracle({ ...spec, input: { ...spec.input, packet } }).reasonCode, field).toBe("warning_incomplete");
+    }
+    const beforeAwareness = new Date(Date.parse(spec.input.awareness.awareAt) - 1).toISOString();
+    expect(runTechnologyOracle({ ...spec, input: { ...spec.input,
+      packet: { ...spec.input.packet, createdAt: beforeAwareness } } }).reasonCode).toBe("warning_before_awareness");
+    expect(runTechnologyOracle({ ...spec, input: { ...spec.input,
+      packet: { ...spec.input.packet, incidentId: "another-incident" } } }).reasonCode).toBe("warning_incomplete");
+    expect(runTechnologyOracle({ ...spec, input: { ...spec.input,
+      packet: { ...spec.input.packet, maliciousActSuspected: false, crossBorderImpact: false } } }).result).toBe("pass");
   });
 
   it("rejects malformed and unzoned CRA timestamps and nonboolean exploitation flags", () => {

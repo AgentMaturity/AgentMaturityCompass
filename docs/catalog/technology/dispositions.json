@@ -351,7 +351,7 @@
       "id": "TECH-INF-13",
       "disposition": "test",
       "target": "L1-TECH-04",
-      "reason": "The COPPA control covers a consent-related effect only; the actual question concerns notices, which remain self-reported until separately evidenced."
+      "reason": "Mapped to the draft COPPA consent duty; no consent or egress effect executes. Live consent-aware binding is pending. The actual notice question remains self-reported, and missing production evidence is not evaluated."
     },
     {
       "id": "TECH-INF-14",

@@ -11,11 +11,13 @@ import { canonicalize } from "../../../../src/utils/json.js";
 import { runCraDrill, type CraInput } from "./craDrill.js";
 import { runDeviceSimulator, type DeviceInput, type OracleRunResult } from "./deviceSimulator.js";
 import { runMarkingVerifier, type MarkingInput } from "./markingVerifier.js";
+import { runNis2Drill, type Nis2Input } from "./nis2Drill.js";
 
 export type TechnologyOracleSpec = (
   | { kind: "marking"; input: MarkingInput }
   | { kind: "cra"; input: CraInput }
   | { kind: "iot"; input: DeviceInput }
+  | { kind: "nis2"; input: Nis2Input }
 ) & { expected: { result: OracleRunResult["result"]; reasonCode: string } };
 interface EvidenceSetup {
   window: EvaluationContext["window"];
@@ -68,5 +70,6 @@ export function evaluateProduction(control: ControlRecord) {
 export function runTechnologyOracle(spec: TechnologyOracleSpec): OracleRunResult {
   if (spec.kind === "marking") return runMarkingVerifier(spec.input);
   if (spec.kind === "cra") return runCraDrill(spec.input);
+  if (spec.kind === "nis2") return runNis2Drill(spec.input);
   return runDeviceSimulator(spec.input);
 }
