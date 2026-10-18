@@ -70,9 +70,10 @@ export function readPiHookConfig(workspace: string, mode: "observe" | "control")
 }
 
 /**
- * POST `body` to the Bridge within `timeoutMs`; refuses redirects and any non-2xx answer. Resolves to the JSON body.
- * An observation's id is fixed per action, so for observations a 409 means AMC already recorded that event (a restarted
- * Pi re-sends it with a new time) and resolves to null. A control 409 is a conflict and throws.
+ * POST `body` to the Bridge within `timeoutMs`; refuses redirects and throws on any non-2xx answer, with the Bridge's
+ * reason (a latched workspace says so). Resolves to the JSON body. A 409 never counts as recorded: the Bridge answers
+ * the same observation, bound to the same decision, sent again as recorded (an idempotent replay, 2xx), and keeps,
+ * flags and refuses a conflicting one.
  */
 export async function postToBridge(config: PiHookConfig, path: string, body: string, timeoutMs: number,
   headers: Record<string, string> = {}): Promise<unknown> {
@@ -84,10 +85,18 @@ export async function postToBridge(config: PiHookConfig, path: string, body: str
       headers: { ...headers, authorization: `Bearer ${config.token}`, "content-type": "application/json" },
       body,
     });
-    if (response.status === 409 && path === PI_OBSERVE_PATH) return null;
-    if (!response.ok) throw new Error(`AMC Bridge answered HTTP ${response.status}`);
+    if (!response.ok) {
+      const reason = await response.json().then((answer) => (answer as { error?: unknown } | null)?.error, () => null);
+      throw new Error(`AMC Bridge answered HTTP ${response.status}${typeof reason === "string" ? `: ${reason.slice(0, 512)}` : ""}`);
+    }
     return await response.json() as unknown;
   });
+}
+
+/** Record one observation at the Bridge's observed ingress; anything but an answer that AMC recorded it throws. */
+export async function postObservation(config: PiHookConfig, body: string, timeoutMs: number): Promise<void> {
+  const answer = await postToBridge(config, PI_OBSERVE_PATH, body, timeoutMs) as { observed?: unknown } | null;
+  if (answer?.observed !== true) throw new Error("AMC's answer does not say it recorded the observation");
 }
 
 function nonEmpty(value: unknown): value is string {
