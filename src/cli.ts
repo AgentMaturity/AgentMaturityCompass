@@ -18770,7 +18770,7 @@ program
   .requiredOption("--candidate <id>", "candidate experiment ID")
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
+    const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
     if (pairs.length === 0) {
       console.log(chalk.yellow("No matching probes to compare."));
       process.exitCode = 1;

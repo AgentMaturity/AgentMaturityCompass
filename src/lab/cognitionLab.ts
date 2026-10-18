@@ -485,14 +485,20 @@ export function simulateExperiment(experimentId: string, workspace?: string): La
 // ---------------------------------------------------------------------------
 
 /**
- * Compare two experiments' probe results.
+ * Compare two experiments' probe results. With a workspace, both sides are read from its store
+ * (the CLI passes its working directory); without one, the call stays memory-only.
  */
 export function compareExperiments(
   baselineId: string,
   candidateId: string,
+  workspace?: string,
 ): LabComparisonPair[] {
-  const baselineResults = probeResults.filter((r) => r.experimentId === baselineId);
-  const candidateResults = probeResults.filter((r) => r.experimentId === candidateId);
+  const resolvedWorkspace = experimentWorkspace(workspace);
+  const resultsFor = (experimentId: string): LabProbeResult[] => resolvedWorkspace
+    ? storedProbeResults(resolvedWorkspace, experimentId)
+    : probeResults.filter((r) => r.experimentId === experimentId);
+  const baselineResults = resultsFor(baselineId);
+  const candidateResults = resultsFor(candidateId);
 
   const baselineMap = new Map(baselineResults.map((r) => [r.probeId, r]));
   const pairs: LabComparisonPair[] = [];

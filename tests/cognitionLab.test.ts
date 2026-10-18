@@ -316,6 +316,27 @@ describe("experiment comparison", () => {
     }
   });
 
+  test("compares two experiments from the workspace store after a cold restart; without a workspace it stays memory-only", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-compare-"));
+    workspaces.push(workspace);
+    const exp1 = createLabExperiment({ kind: "typed_attention", name: "Baseline", description: "D", modelId: "m1" }, workspace);
+    const exp2 = createLabExperiment({ kind: "typed_attention", name: "Candidate", description: "D", modelId: "m2" }, workspace);
+    simulateExperiment(exp1.experimentId, workspace);
+    simulateExperiment(exp2.experimentId, workspace);
+    resetLabState();
+
+    expect(compareExperiments(exp1.experimentId, exp2.experimentId)).toEqual([]);
+    const pairs = compareExperiments(exp1.experimentId, exp2.experimentId, workspace);
+    expect(pairs.map((p) => p.probeId).sort()).toEqual(exp1.probes.map((p) => p.probeId).sort());
+    for (const p of pairs) {
+      expect(p.baselineExperimentId).toBe(exp1.experimentId);
+      expect(p.candidateExperimentId).toBe(exp2.experimentId);
+    }
+    const other = createLabExperiment({ kind: "trace_memory", name: "Other", description: "D", modelId: "m1" }, workspace);
+    simulateExperiment(other.experimentId, workspace);
+    expect(compareExperiments(exp1.experimentId, other.experimentId, workspace)).toEqual([]);
+  });
+
   test("comparison handles no matching probes", () => {
     const exp1 = createLabExperiment({
       kind: "custom", name: "A", description: "D", modelId: "m1",

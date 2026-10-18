@@ -107,7 +107,7 @@ const recipes: Recipe[] = [
   {"path": "a4 deploy verify", "args": ["a4p_00000000000000000000000000000000", "a4r_00000000000000000000000000000000", "--session-token-file", "@MISSING@", "--expect-head-seq", "1", "--environment", "staging", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
   {"path": "a4 export", "args": ["a4p_00000000000000000000000000000000", "--run", "@RUN@", "--out", "@OUT@", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
   {"path": "lab-report", "args": ["--experiment", "@EXPERIMENT@"]},
-  {"path": "lab-compare", "args": ["--baseline", "@EXPERIMENT@", "--candidate", "@EXPERIMENT@"], "refusal": {"reason": "lab-compare reads in-process probe results; a separate CLI process has none to compare.", "pattern": "No matching probes to compare"}},
+  {"path": "lab-compare", "args": ["--baseline", "@LAB_BASELINE@", "--candidate", "@LAB_CANDIDATE@"]},
   {"path": "insider-risk-scores", "args": []},
   {"path": "attestation-export", "args": ["--tenant", "fixture-tenant"]},
   {"path": "residency-report", "args": ["--tenant", "fixture-tenant"], "refusal": {"reason": "No signed data residency policy has been configured for this tenant.", "pattern": "residency|policy|ENOENT|not found"}, "output": "markdown"},
@@ -210,6 +210,8 @@ const logs = resolve(process.cwd(), "tmp", `p0-22-claim-labels-${Date.now()}-${p
 const guard = join(root, "offline.mjs");
 let runId = "";
 let experimentId = "";
+let labBaselineId = "";
+let labCandidateId = "";
 let environment: NodeJS.ProcessEnv;
 const records: Array<Record<string, unknown>> = [];
 
@@ -227,7 +229,7 @@ async function withWorkspacePermit<T>(body: () => Promise<T>): Promise<T> {
 function hash(text: string): string { return createHash("sha256").update(text).digest("hex"); }
 function materialize(value: string, path: string): string {
   const tag = path.replaceAll(" ", "-");
-  return ({ "@RUN@": runId, "@EXPERIMENT@": experimentId, "@WORKSPACE@": workspace,
+  return ({ "@RUN@": runId, "@EXPERIMENT@": experimentId, "@LAB_BASELINE@": labBaselineId, "@LAB_CANDIDATE@": labCandidateId, "@WORKSPACE@": workspace,
     "@NOTARY@": join(root, "uninitialized-notary"), "@SCENARIO@": join(root, "scenario.yaml"),
     "@MISSING@": join(root, "deliberately-absent-fixture.json"), "@OUT@": join(root, "outputs", `${tag}.json`) } as Record<string, string>)[value] ?? value;
 }
@@ -346,7 +348,21 @@ syncBuiltinESMExports();\n`);
   expect(labRecord.probes.length, "the persisted experiment is not an absent or probe-less fixture").toBeGreaterThan(0);
   expect(labRecord.signature).not.toBe("unsigned");
   writeFileSync(join(logs, "persisted-lab-fixture.json"), labBytes);
+  // lab-compare reads both sides from the workspace store: two same-kind experiments, each simulated in its own process.
+  labBaselineId = await createSimulatedLab("seed-lab-baseline", "typed_attention");
+  labCandidateId = await createSimulatedLab("seed-lab-candidate", "typed_attention");
 }, 120_000);
+
+/** lab-create then lab-simulate, each a separate CLI process; returns the experiment id. */
+async function createSimulatedLab(name: string, kind: string): Promise<string> {
+  const created = await invoke(`${name}-create`, ["lab-create", "--kind", kind, "--name", name, "--model", "offline-fixture"]);
+  completed(created); expect(created.status, created.stderr).toBe(0);
+  const id = /Experiment created: ([^\s]+)/.exec(created.stdout)?.[1] ?? "";
+  expect(id.length, created.stdout).toBeGreaterThan(0);
+  const simulated = await invoke(`${name}-simulate`, ["lab-simulate", "--experiment", id]);
+  completed(simulated); expect(simulated.status, simulated.stderr).toBe(0);
+  return id;
+}
 
 afterAll(() => {
   if (existsSync(logs)) writeFileSync(join(logs, "qualification-summary.json"), JSON.stringify({ registryPaths: RESULT_COMMANDS.map(({ path }) => path),
@@ -404,6 +420,18 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
     expect(report.stdout).toMatch(/^Claim: Synthetic example/m);
     expect(report.stdout).toContain("Scores are deterministic placeholders derived from ids, not measurements.");
     expect(report.stdout).toMatch(/Average scores|Aggregate Scores/i);
+  }), 600_000);
+
+  test("a cold lab-compare of two simulated same-kind experiments labels its deltas synthetic; no overlap exits 1", async () => withWorkspacePermit(async () => {
+    const compared = await invoke("exact-lab-compare", ["lab-compare", "--baseline", labBaselineId, "--candidate", labCandidateId]);
+    completed(compared); expect(compared.status, compared.stderr).toBe(0);
+    expect(compared.stdout).toMatch(/^Claim: Synthetic example/m);
+    expect(compared.stdout).toContain(`Comparison: ${labBaselineId} vs ${labCandidateId}`);
+    expect(compared.stdout).toContain("ta-policy-focus:");
+    const otherKind = await createSimulatedLab("exact-lab-other-kind", "trace_memory");
+    const disjoint = await invoke("exact-lab-compare-disjoint", ["lab-compare", "--baseline", labBaselineId, "--candidate", otherKind]);
+    completed(disjoint); expect(disjoint.status, disjoint.stderr).toBe(1);
+    expect(disjoint.stdout).toContain("No matching probes to compare.");
   }), 600_000);
 
   test("domain --example emits synthetic claim fields on actual stdout", async () => withWorkspacePermit(async () => {
