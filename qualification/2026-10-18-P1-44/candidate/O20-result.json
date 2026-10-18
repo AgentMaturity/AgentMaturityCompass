@@ -1,0 +1,77 @@
+{
+  "track": "O20",
+  "title": "Runnable regulated-industry examples (health, wealth, governance)",
+  "status": "COMPLETE",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "exampleCommit": "43fdbcf1af66ea1a456c6a2a936dc61e5419bc78",
+  "branch": "worktree-wf_3cbab9c8-0f5-20",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cbab9c8-0f5-20",
+  "environment": { "os": "macOS 26.6.2 (darwin)", "arch": "arm64", "node": "v25.5.0", "pnpm": "10.33.0", "measuredOn": "2026-10-04" },
+  "boundary": "Source qualification only: built dist/ from the worktree and from a fresh clone. Not package, platform or deployed-release qualification.",
+  "filesChanged": [
+    "examples/regulated-industries/README.md",
+    "examples/regulated-industries/lib/runStation.mjs",
+    "examples/regulated-industries/lib/denyNetwork.mjs",
+    "examples/regulated-industries/{health,wealth,governance}/run.mjs",
+    "examples/regulated-industries/{health,wealth,governance}/fixture.json",
+    "tests/regulatedExamples.test.ts"
+  ],
+  "testsRun": [
+    { "where": "worktree", "command": "pnpm vitest run tests/regulatedExamples.test.ts", "result": "5 passed, examples=3, 60.71s" },
+    { "where": "fresh clone /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/o20-clone-43fdbcf1 at 43fdbcf1 after pnpm install --frozen-lockfile --prefer-offline and pnpm build", "command": "pnpm vitest run tests/regulatedExamples.test.ts", "result": "5 passed, examples=3, 36.30s" },
+    { "where": "worktree", "command": "pnpm vitest run tests/exampleCommandsResolve.test.ts", "result": "3 passed (new README commands resolve against amc commands --json)" },
+    { "where": "worktree", "command": "pnpm typecheck", "result": "exit 0" },
+    { "where": "worktree", "command": "pnpm typecheck:tests", "result": "exit 0" }
+  ],
+  "measured": {
+    "source": "node scratchpad/o20/measure.mjs, 2026-10-04T05:31:21Z, each example run with --deny-network and a parent env of PATH only",
+    "rows": [
+      { "station": "health", "wallMs": 13412, "riskTier": "HIGH", "stationPacks": 9, "assuranceScenarios": 5, "evidenceRecords": 3, "chainInvalidCount": 0, "agentVerifyOk": true, "networkAttempts": 0 },
+      { "station": "wealth", "wallMs": 15892, "riskTier": "HIGH", "stationPacks": 5, "assuranceScenarios": 4, "evidenceRecords": 3, "chainInvalidCount": 0, "agentVerifyOk": true, "networkAttempts": 0 },
+      { "station": "governance", "wallMs": 13061, "riskTier": "HIGH", "stationPacks": 5, "assuranceScenarios": 5, "evidenceRecords": 3, "chainInvalidCount": 0, "agentVerifyOk": true, "networkAttempts": 0 }
+    ],
+    "stepExitCodes": "init:0,domain-modules:0,pack-catalog:0,pack-run-gate:1,risk-classify:0,assurance-pack:0,agent-run:0,agent-verify:0,evidence-export:0,binder-create:0,binder-verify:0,assurance-gate:2 (all three stations)",
+    "cliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c (worktree dist/cli.js)"
+  },
+  "mutationChecks": [
+    { "guard": "no-network (preload log + runner throw + test network.attempts == [])", "mutation": "append net.connect(8080,'127.0.0.1') to lib/denyNetwork.mjs", "red": "12 network attempt(s) recorded", "restoredGreen": "yes" },
+    { "guard": "artifact digests in summary.json", "mutation": "record sha256('') for every artifact", "red": "out/domain-modules.json digest mismatch", "restoredGreen": "yes" },
+    { "guard": "evidence export carries hash chain", "mutation": "drop --include-chain from evidence-export step", "red": "expected false to be true (includeChain)", "restoredGreen": "yes" },
+    { "guard": "README citation resolves", "mutation": "C22 line 230 -> 231", "red": "C22 src/cli-domain-product-commands.ts:231 does not contain quoted text", "restoredGreen": "yes" },
+    { "guard": "every body citation has an appendix row and vice versa", "mutation": "remove [C5] from README body", "red": "cited/appendix id sets differ", "restoredGreen": "yes" },
+    { "guard": "pack-run-gate is the license lock, not any exit 1", "mutation": "fixture industryPack -> no-such-pack, with the catalog assertion removed", "red": "pack-run-gate.json is not JSON ('List avail...')", "restoredGreen": "yes" }
+  ],
+  "notExercised": [
+    "Industry pack scoring, amc domain apply, amc domain assess, domain pack describe: every one calls assertIndustryPackAccess (src/cli-domain-product-commands.ts:230, src/domains/domainApply.ts:195) and no license is held. The task text named 'industry pack scoring with a fixture assessment'; it is shown only as the locked gate.",
+    "An assurance scan that produces a score: there is no stub responder for assurance at 8f57ce63 (src/assurance/agentResponder.ts:9 'There is deliberately NO synthetic implementation here'); the stub provider exists only for agent-loop. The example shows the fail-closed exit 2.",
+    "Linux/Windows, packed install (npm pack), Docker.",
+    "No regulation text is asserted; no primary-source citation was needed or made."
+  ],
+  "findings": [
+    {
+      "id": "O20-F1",
+      "summary": "An aborted assurance run leaves a ledger session without a seal; afterwards amc agent-loop verify reports ok:false for any later session.",
+      "repro": "amc init --skip-vault; AMC_AGENT_BASE_URL=http://127.0.0.1:1 amc assurance run --agent default --pack healthcarePHI --model amc-stub-1 (exit 2); amc --agent default agent-loop run '...' --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512 --json; amc agent-loop verify <id> --json -> ledgerOk:false, ledgerErrors ['Session <assurance session> missing seal']",
+      "owner": "src/assurance/** (another track); not fixed here",
+      "workaround": "runner orders assurance-gate last (examples/regulated-industries/lib/runStation.mjs:52-56)"
+    },
+    {
+      "id": "O20-F2",
+      "summary": "An aborted assurance run with --no-sign makes the next stub agent-loop turn fail before dispatch with 'Budget evidence signature or hash is invalid' (classified QUOTA).",
+      "repro": "as O20-F1 but with --no-sign on the assurance run; the agent-loop run exits 1, diagnostics[0].guidance.code=QUOTA, request/failure.failure.message='Budget evidence signature or hash is invalid'",
+      "owner": "src/assurance/** and budget evidence verification; not fixed here",
+      "workaround": "examples do not pass --no-sign"
+    },
+    {
+      "id": "O20-F3",
+      "summary": "amc firewall enable in a workspace whose HOME is a sibling temp dir failed with 'Control checkpoint root must be outside the governed workspace.' Not investigated; the examples do not need the firewall (the echo tool is outside it, src/doctor/firstRunPlan.ts:47).",
+      "owner": "unknown"
+    },
+    {
+      "id": "O20-F4",
+      "summary": "amc evidence export --agent default exported 3 records while the stub session recorded 24 events (agent-run.json events). Whether the agent filter should include session events was not investigated.",
+      "owner": "unknown"
+    }
+  ],
+  "cleanup": "Temp workspaces under os.tmpdir are removed by the test's finally block; scratch runs live only under the session scratchpad. No servers or long-lived processes were started."
+}

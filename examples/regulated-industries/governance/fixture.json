@@ -1,0 +1,8 @@
+{
+  "station": "governance",
+  "note": "Synthetic fixture. No citizen data. Capability flags describe a hypothetical agent for the CLI's risk classifier.",
+  "industryPack": "petition-to-law",
+  "assurancePack": "governanceNISTRMF",
+  "capabilities": { "chatbot": true, "humanInteraction": true, "justiceAdministration": true },
+  "prompt": "List the review steps a synthetic test petition should pass before publication."
+}
