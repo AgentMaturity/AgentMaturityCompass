@@ -88,6 +88,7 @@ Start: `PLATFORM_ENGINEER_QUICKSTART`, then `PLATFORM_PATH`.
 | HUMAN_FIRST_USE_STUDY, _CAPTURE, _OBSERVER, _MODEL_REVISION, _CREDENTIAL_TRANSITIONS, AMC_1512_HUMAN_FIRST_USE_PROTOCOL, AMC_1512_EVIDENCE_PROTOCOL | The measurement protocols behind any usability or provider claim (brief §7 measurement protocol). |
 | REGISTRY, FLEET, MULTI_AGENT_TRUST, ENTERPRISE | Multi-agent and org surfaces. |
 | DOMAIN_PACKS, DOMAIN_PROOF_LANE, SECTOR_PACKS | Industry packs. |
+| [industries/README](industries/README.md) and the seven station guides | Per-station deployment guides generated from source (`npm run gen-industry-guides`): sector packs, frameworks named, assurance packs, controls and evidence outputs. Experimental, AI-drafted, not legal advice. |
 | PRODUCT_EDITIONS, PRICING, BUYER_PACKAGES, EXECUTIVE_OVERVIEW, BOARD_RISK_L3_MEMO, RELEASE_HIGHLIGHTS | Buyer-facing; their pack counts are generated (`npm run gen-counts`). |
 | SUPPORT_POLICY, COMMUNITY | Support terms and community. |
 
@@ -107,6 +108,7 @@ Start: `SECURITY_COMPLIANCE_QUICKSTART`, then `SECURITY_PATH`.
 | TRANSPARENCY, TRANSPARENCY_MERKLE, TRANSPARENCY_REPORT, EXTERNAL_EVIDENCE_PROFILE, AGENT_PASSPORT | Tamper-evidence, portable proof and identity carried between environments. |
 | AUDIT_BINDER, COMPLIANCE, COMPLIANCE_MAPS, COMPLIANCE_FRAMEWORKS | Binder and maps. |
 | EU_AI_ACT_COMPLIANCE, ISO_42001_ALIGNMENT, GDPR_ARTICLE_COMPLIANCE, MITRE_ATLAS_MAPPING, STANDARDS_MAPPING | Framework mappings, one each. |
+| [REGULATORY_CALENDAR](REGULATORY_CALENDAR.md), [industries/README](industries/README.md) | Dated regulatory milestones generated from the registers (each date flagged verified or not; re-verify before relying on one) and the station deployment guides. Experimental, AI-drafted, not legal advice. |
 | compliance/eu-ai-act-checklist, compliance/iso-42001-aims-manual, compliance/nist-rmf-profile, compliance/SOC2_TYPE_II_CONTROLS_MAPPING | The promoted checklists and manuals. |
 | catalog/CONTROL_RECORD | The Regulated Control Catalog record, loader, support gates, digests and lockfile (P1-09; experimental content, evidence of conformity only). |
 

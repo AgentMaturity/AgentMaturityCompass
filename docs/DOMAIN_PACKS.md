@@ -34,14 +34,16 @@ Industry sector packs (`src/domains/industryPacks.ts`) per station. The Question
 
 | Station | Packs | Questions |
 |---|---:|---:|
-| `environment` | 6 | 91 |
+| `environment` | 6 | 99 |
 | `health` | 9 | 151 |
-| `wealth` | 5 | 75 |
-| `education` | 5 | 75 |
-| `mobility` | 6 | 90 |
-| `technology` | 5 | 75 |
-| `governance` | 5 | 75 |
-| **Total** | **41** | **632** |
+| `wealth` | 5 | 83 |
+| `education` | 5 | 87 |
+| `mobility` | 6 | 94 |
+| `technology` | 5 | 83 |
+| `governance` | 5 | 79 |
+| **Total** | **41** | **676** |
+
+Pack content is experimental: AI-drafted, not reviewed by a qualified expert, and not legal advice; answers are self-reported. The station guides in [industries/README](industries/README.md) are generated from the same registry (`npm run gen-industry-guides`; `npm run check:industry-guides` fails on drift).
 
 ## Stations
 

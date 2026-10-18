@@ -13,6 +13,8 @@ The counts on this page are derived from the source, not maintained by hand. Re-
 ./node_modules/.bin/tsx -e 'import { listIndustryPacks } from "./src/domains/industryPacks.ts"; const p = listIndustryPacks(); console.log(p.length, p.reduce((n, x) => n + x.questions.length, 0))' < /dev/null
 ```
 
+**Status: experimental, self-reported questionnaires.** Pack questions, the deep questions in `src/domains/deep/` and their citations are AI-drafted and have not been reviewed by a qualified expert; they are not legal advice. Every pack in the registry carries `contentStatus: "experimental"`, and answers to it are self-reported (claim kind `self_reported`, capped at L1); an unanswered question is not evaluated. The October 2026 round-2 rewrites, merges and additions are listed for expert review in `qualification/2026-10-18-P1-42/content-diff.json`. The 30 questions F5 proposed to drop stay in their packs until Sid confirms each drop (`docs/program/f5/decisions.json`). Per-station deployment guides are in [industries/README](industries/README.md), and dated milestones in the [regulatory calendar](REGULATORY_CALENDAR.md).
+
 The base count above spans 5 layers. Sector pack and question totals are not restated on this page: the second command (or `amc sector pack list`) reports them for the commit you are on. `tests/sectorPacksDocDerived.test.ts` fails if this page drifts from those sources or restates a total.
 
 ---
