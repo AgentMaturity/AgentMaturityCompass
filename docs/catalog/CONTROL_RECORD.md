@@ -26,7 +26,12 @@ catalog/
   layers/<pack>/controls/<id>.yaml   one control record; the file name is the control id
   fixtures/<id>/positive/*.json  fixture envelopes a test must allow or pass
   fixtures/<id>/negative/*.json  fixture envelopes it must deny, fail or leave not evaluated
+  CHANGELOG.md                   append-only catalog changelog (P1-34, GOVERNANCE.md)
+  governance/                    f5-confirmations.yaml, reverify-before-publishing.yaml, standards-licences.md (P1-34)
+  reviews/<subject>/<version>/<record>.json   review records (P1-34)
 ```
+
+The P1-34 governance files are read by `src/catalog/governance/`, never as catalog content, so they change no digest.
 
 `package.json` ships `catalog/**`, and `loadCatalog()` finds it from `src/catalog/` and `dist/catalog/` alike
 (`new URL("../../catalog/", import.meta.url)`). `npm run check:packed-install` loads and validates the installed copy.

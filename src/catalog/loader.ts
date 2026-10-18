@@ -48,7 +48,12 @@ export interface LoadedCatalog {
   jurisdictionProfiles?: Map<string, JurisdictionProfile[]>;
 }
 
-const TOP_FILES = new Set(["README.md", "LICENSE.md", "catalog.yaml", "vocabulary.yaml", "producers.yaml", "publisher-hosts.yaml"]);
+const TOP_FILES = new Set(["README.md", "LICENSE.md", "CHANGELOG.md", "catalog.yaml", "vocabulary.yaml", "producers.yaml", "publisher-hosts.yaml"]);
+/**
+ * Governance records (P1-34, docs/catalog/GOVERNANCE.md): read by src/catalog/governance, never catalog content, so they
+ * stay out of every digest and a changelog or review record never changes the catalog it describes.
+ */
+const GOVERNANCE = /^(governance\/(f5-confirmations\.yaml|reverify-before-publishing\.yaml|standards-licences\.md)|reviews\/[^/]+\/[^/]+\/[^/]+\.json)$/;
 const DECIMAL_INT = /^-?(0|[1-9][0-9]*)$/;
 const DATE_LIKE = /^\d{4}-\d{2}-\d{2}/;
 
@@ -75,7 +80,7 @@ function listFiles(root: string, dir: string, issues: CatalogIssue[]): string[] 
 }
 
 /** YAML as plain data, or undefined with issues. */
-function parseYaml(text: string, file: string, issues: CatalogIssue[]): unknown {
+export function parseYaml(text: string, file: string, issues: CatalogIssue[]): unknown {
   const doc = YAML.parseDocument(text, { uniqueKeys: true });
   const found: CatalogIssue[] = [...doc.errors, ...doc.warnings].map((e) => issue("CAT_YAML", file, e.message));
   YAML.visit(doc, {
@@ -96,7 +101,7 @@ function parseYaml(text: string, file: string, issues: CatalogIssue[]): unknown 
   return found.length ? undefined : doc.toJS();
 }
 
-function parseWith<S extends z.ZodType>(schema: S, value: unknown, file: string, issues: CatalogIssue[], controlId: string | null = null): z.output<S> | null {
+export function parseWith<S extends z.ZodType>(schema: S, value: unknown, file: string, issues: CatalogIssue[], controlId: string | null = null): z.output<S> | null {
   if (value === undefined) return null;
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
@@ -171,6 +176,8 @@ export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
       else if (rel === "vocabulary.yaml") cat.vocabulary = parseWith(vocabularySchema, read(rel), rel, issues);
       else if (rel === "producers.yaml") cat.producers = parseWith(producersFileSchema, read(rel), rel, issues)?.producers ?? [];
       else if (rel === "publisher-hosts.yaml") cat.publisherHosts = parseWith(publisherHostsSchema, read(rel), rel, issues)?.hosts.map((h) => h.host) ?? [];
+    } else if (GOVERNANCE.test(rel)) {
+      continue;
     } else if (rel === "profiles/cross-station.json") {
       cat.crossStationProfiles = readJson(root, rel, crossStationProfilesSchema, issues) ?? [];
     } else if (parts.length === 2 && parts[0] === "registers" && rel.endsWith(".json")) {
