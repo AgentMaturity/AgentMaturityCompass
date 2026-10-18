@@ -83,6 +83,8 @@
     "check:threat-model": "node scripts/check-threat-model.mjs",
     "check:qualification": "node scripts/check-qualification-receipts.mjs",
     "check:regulatory-currency": "node scripts/check-regulatory-currency.mjs",
+    "check:catalog-currency": "node scripts/check-catalog-currency.mjs",
+    "check:catalog-changelog": "node scripts/check-catalog-changelog.mjs",
     "check:citations": "node scripts/check-citations.mjs",
     "trust-list": "node scripts/trust-list.mjs",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",

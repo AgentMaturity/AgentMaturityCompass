@@ -111,6 +111,7 @@ Start: `SECURITY_COMPLIANCE_QUICKSTART`, then `SECURITY_PATH`.
 | [REGULATORY_CALENDAR](REGULATORY_CALENDAR.md), [industries/README](industries/README.md) | Dated regulatory milestones generated from the registers (each date flagged verified or not; re-verify before relying on one) and the station deployment guides. Experimental, AI-drafted, not legal advice. |
 | compliance/eu-ai-act-checklist, compliance/iso-42001-aims-manual, compliance/nist-rmf-profile, compliance/SOC2_TYPE_II_CONTROLS_MAPPING | The promoted checklists and manuals. |
 | catalog/CONTROL_RECORD | The Regulated Control Catalog record, loader, support gates, digests and lockfile (P1-09; experimental content, evidence of conformity only). |
+| catalog/GOVERNANCE | Catalog content governance: review records and the two-person rule, currency reviews, the changelog, F5 and re-verify lists (P1-34; draft awaiting Sid's approval). |
 
 ### 5. Contributors and maintainers (not promoted; keep in the repo, not in the public collection)
 
