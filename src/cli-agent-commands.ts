@@ -74,7 +74,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
+  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -373,7 +373,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const compaction = compactionOption(io, opts);
       if (compaction === null) return;
-      const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
+      const piRoute = await piAiRouteSelection(io, providerId, opts, opts.model ?? preset?.model);
+      if (piRoute === null) return;
+      const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
       let images: ReturnType<typeof loadNativeImageFiles>;
       let audioParts: readonly NativeAudioPart[] | undefined;
@@ -691,6 +693,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(audioParts === undefined ? {} : { audioParts }),
           route: { providerId, model, params: requestParams },
           routes: [route],
+          ...(piRoute === undefined ? {} : { encoders: piRoute.encoders }),
           ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }),
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }

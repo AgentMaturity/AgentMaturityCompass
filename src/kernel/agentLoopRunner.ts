@@ -49,6 +49,7 @@ import { projectNativeValidation } from "../agent/nativeValidationProjection.js"
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
+import type { RequestEncoderRegistry } from "../llm/request/requestEncoder.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import {
   agentPromptProfile,
@@ -202,6 +203,8 @@ export interface ComposedTurnOptions {
   readonly routes: readonly LlmRouteConfig[];
   /** Replaces the platform `fetch` — the stub provider answers in-process. */
   readonly transport?: HttpTransport;
+  /** Encoders beyond the built-ins, for a route whose encoder is loaded at selection (P1-38 pi-ai). */
+  readonly encoders?: RequestEncoderRegistry;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
@@ -471,7 +474,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       credentials: serviceOn<CredentialsSeamService>(ctx, CREDENTIALS_SEAM.name),
       routes: options.routes,
       ...(options.onLiveText === undefined ? {} : { onLiveText: options.onLiveText }),
-      ...(options.transport !== undefined ? { transport: options.transport } : {})
+      ...(options.transport !== undefined ? { transport: options.transport } : {}),
+      ...(options.encoders !== undefined ? { encoders: options.encoders } : {})
     });
     await llmFiber.await();
     fibers.push(llmFiber);
