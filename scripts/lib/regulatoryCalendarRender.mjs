@@ -27,7 +27,7 @@ export const MILESTONES_PATH = "docs/industries/_data/regulatory-milestones.json
 export const REGISTER_JSON = "src/compliance/regulatory/register.json";
 
 /** Hosts whose pages may be cited as the source of a curated milestone. A subdomain of a listed host is accepted. */
-export const OFFICIAL_HOSTS = Object.freeze([
+const OFFICIAL_HOSTS = Object.freeze([
   "europa.eu", "govinfo.gov", "federalregister.gov", "nist.gov", "leg.colorado.gov", "parl.ca",
   "pib.gov.in", "meity.gov.in", "iso.org", "ecfr.gov", "legislation.gov.uk"
 ]);
@@ -48,7 +48,7 @@ function validateFrameworks(frameworks) {
   });
 }
 
-export function isOfficialHost(url) {
+function isOfficialHost(url) {
   let parsed;
   try {
     parsed = new URL(String(url));

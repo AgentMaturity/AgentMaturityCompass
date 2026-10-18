@@ -22,8 +22,7 @@ import { DEEP_ENVIRONMENT_QUESTIONS } from "./deep/environment.js";
 import { DEEP_MOBILITY_QUESTIONS } from "./deep/mobility.js";
 import { DEEP_TECHNOLOGY_QUESTIONS } from "./deep/technology.js";
 
-export type { DeepIndustryQuestion, RegulationSource } from "./deep/shared.js";
-export { DEEP_EDUCATION_QUESTIONS, DEEP_ENVIRONMENT_QUESTIONS, DEEP_MOBILITY_QUESTIONS, DEEP_TECHNOLOGY_QUESTIONS };
+export type { DeepIndustryQuestion } from "./deep/shared.js";
 
 export const DEEP_HEALTHCARE_QUESTIONS: DeepIndustryQuestion[] = [
   ...HEALTHCARE_HAND_WRITTEN,

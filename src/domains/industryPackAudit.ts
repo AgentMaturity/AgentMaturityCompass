@@ -87,7 +87,7 @@ export interface AuditControl {
  * fields a pack MAY carry. They are declared structurally here (not imported)
  * and read defensively, so packs without them compile and audit as "undated".
  */
-export interface PackRegulatoryReference {
+interface PackRegulatoryReference {
   citation: string;
   jurisdiction?: string;
   url?: string;
@@ -102,7 +102,7 @@ export interface PackCurrencyFields {
   regulatoryReferences?: readonly PackRegulatoryReference[];
 }
 
-export type CurrencyStatus = "current" | "stale" | "undated" | "unverified";
+type CurrencyStatus = "current" | "stale" | "undated" | "unverified";
 
 export interface AuditCurrency {
   /** Worst finding wins: undated > stale > unverified > current. */
@@ -119,7 +119,7 @@ export interface AuditCurrency {
   unverifiedReferences: string[];
 }
 
-export const DEFAULT_STALE_AFTER_DAYS = 365;
+const DEFAULT_STALE_AFTER_DAYS = 365;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Whole days from an ISO date to `now`; null when unparseable or in the future. */

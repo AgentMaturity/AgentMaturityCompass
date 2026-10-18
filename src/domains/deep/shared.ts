@@ -31,7 +31,7 @@ export interface DeepIndustryQuestion {
   contentStatus?: "experimental";
 }
 
-export const RETRIEVED_AT = "2026-10-03";
+const RETRIEVED_AT = "2026-10-03";
 /** Date the provisions behind the questions added in the 2026-10-04 repair round were read. */
 export const REPAIR_RETRIEVED_AT = "2026-10-04";
 
