@@ -1,9 +1,9 @@
 {
  "command": "npx vitest run <the 47 files below>",
- "commit": "0d3a322236c9577849cc9172fb31be1affb41875",
+ "commit": "25225533c360c7cc5582bde441e7893bb92dc111",
  "numTotalTests": 513,
- "numPassedTests": 508,
- "numFailedTests": 5,
+ "numPassedTests": 511,
+ "numFailedTests": 2,
  "numPendingTests": 0,
  "files": [
   {
@@ -18,8 +18,8 @@
   },
   {
    "file": "tests/amc1479PolicyFixturesCi.test.ts",
-   "passed": 8,
-   "failed": 1
+   "passed": 9,
+   "failed": 0
   },
   {
    "file": "tests/citationMetadata.test.ts",
@@ -178,8 +178,8 @@
   },
   {
    "file": "tests/noCertificationFromSelfAssessment.test.ts",
-   "passed": 6,
-   "failed": 1
+   "passed": 7,
+   "failed": 0
   },
   {
    "file": "tests/publicBrandSystem.test.ts",
@@ -218,8 +218,8 @@
   },
   {
    "file": "tests/regulatoryClaimsHonesty.test.ts",
-   "passed": 5,
-   "failed": 1
+   "passed": 6,
+   "failed": 0
   },
   {
    "file": "tests/regulatoryCurrencyRegister.test.ts",
@@ -244,16 +244,6 @@
  ],
  "failures": [
   {
-   "file": "tests/amc1479PolicyFixturesCi.test.ts",
-   "test": "exposes JSON/text parity and stable pass, mismatch, fail-closed, and invalid exit codes",
-   "classification": "timed out under machine load (load average ~20-30); the file passes alone: 16/16 with amc1479PolicyFixturesCi"
-  },
-  {
-   "file": "tests/noCertificationFromSelfAssessment.test.ts",
-   "test": "MCP sector-pack and trust-score text say self-assessment and evidence standing",
-   "classification": "timed out under machine load (load average ~20-30); the file passes alone: 16/16 with amc1479PolicyFixturesCi"
-  },
-  {
    "file": "tests/publicDocsArtifact.test.ts",
    "test": "builds a deterministic allowlisted artifact with source, renderer, and font hashes",
    "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
@@ -261,11 +251,6 @@
   {
    "file": "tests/publicDocsGraph.test.ts",
    "test": "every local guide edge resolves to another promoted guide",
-   "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
-  },
-  {
-   "file": "tests/regulatoryClaimsHonesty.test.ts",
-   "test": "is no longer exported from the package root (D-12: unreviewed regulatory content)",
    "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
   }
  ]
