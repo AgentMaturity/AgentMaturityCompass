@@ -6,6 +6,8 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { addUser } from "../src/auth/authApi.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { EXECUTION_SURFACES, EXECUTION_VERBS } from "../src/execution/executionContract.js";
 import * as sdk from "../src/sdk/nativeAgentClient.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
@@ -192,39 +194,53 @@ async function pythonLeg(f: Fixture): Promise<Leg> {
   return JSON.parse(readFileSync(out, "utf8")) as Leg;
 }
 
-async function studioLeg(f: Fixture): Promise<Leg> {
-  const verbs = new Set<string>(), record: Record<string, unknown> = {};
+/** The built Studio server with logged-in owner and reviewer identities, and the native-task calls both scenarios use. */
+async function studio(f: Fixture) {
   for (const [key, value] of Object.entries(f.env)) vi.stubEnv(key, value);
   for (const reviewer of REVIEWERS) addUser({ workspace: f.workspace, username: reviewer, password: `${reviewer}-password`, roles: ["APPROVER"] });
   const built = await import(pathToFileURL(resolve("dist/studio/studioServer.js")).href) as typeof import("../src/studio/studioServer.js");
   const server = await built.startStudioApiServer({ workspace: f.workspace, host: "127.0.0.1", port: 0, token: `parity-${randomUUID()}` });
-  try {
-    const identities: Record<string, { cookie: string; csrf: string }> = {};
-    for (const [name, password] of [[OWNER.username, OWNER.password], ...REVIEWERS.map((r) => [r, `${r}-password`])] as const) {
-      const login = await fetch(`${server.url}/auth/login`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: name, password }) });
-      expect(login.status).toBe(200); await login.arrayBuffer();
-      const cookie = login.headers.getSetCookie().find((value) => value.startsWith("amc_session="))!.split(";")[0]!;
-      const me = await (await fetch(`${server.url}/auth/me`, { headers: { cookie } })).json() as { nativeCsrfToken: string };
-      identities[name] = { cookie, csrf: me.nativeCsrfToken };
-    }
-    const request = async (path: string, body?: unknown, identity: string = OWNER.username) => {
-      const who = identities[identity]!;
-      const response = await fetch(server.url + path, { method: body === undefined ? "GET" : "POST", headers: { cookie: who.cookie, "content-type": "application/json",
-        ...(body === undefined ? {} : { origin: server.url, "x-amc-native-intent": "task-workspace-v1", "x-amc-native-csrf": who.csrf }) },
-        ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
-      return { status: response.status, body: await response.json() as { data?: unknown; code?: string } };
-    };
-    const task = (id: string, action = "") => `/api/v1/native-tasks/${id}${action ? `/${action}` : ""}?agentId=default`;
-    const poll = async (id: string) => (await request(task(id))).body.data as NativeTaskPoll;
-    const settled = (id: string) => until(async () => { const { task: view } = await poll(id); return ["idle", "failed", "released", "closed"].includes(view.state) ? view : undefined; }, "a settled task");
-    const awaiting = (id: string) => until(async () => (await poll(id)).task.approvals.find((a) => a.status === "PENDING")?.approvalRequestId, "a Studio approval");
-    const decide = (id: string, identity: string) => request(`/approvals/requests/${id}/decide?agentId=default`,
-      { decision: "APPROVE_EXECUTE", reason: "parity fixture reviewer, not a human decision" }, identity);
-    const control = async (id: string, action: string, revision: number) => (await request(task(id, action), { expectedRevision: revision })).body.data as NativeTaskView;
+  const identities: Record<string, { cookie: string; csrf: string }> = {};
+  for (const [name, password] of [[OWNER.username, OWNER.password], ...REVIEWERS.map((r) => [r, `${r}-password`])] as const) {
+    const login = await fetch(`${server.url}/auth/login`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: name, password }) });
+    expect(login.status).toBe(200); await login.arrayBuffer();
+    const cookie = login.headers.getSetCookie().find((value) => value.startsWith("amc_session="))!.split(";")[0]!;
+    const me = await (await fetch(`${server.url}/auth/me`, { headers: { cookie } })).json() as { nativeCsrfToken: string };
+    identities[name] = { cookie, csrf: me.nativeCsrfToken };
+  }
+  const request = async (path: string, body?: unknown, identity: string = OWNER.username) => {
+    const who = identities[identity]!;
+    const response = await fetch(server.url + path, { method: body === undefined ? "GET" : "POST", headers: { cookie: who.cookie, "content-type": "application/json",
+      ...(body === undefined ? {} : { origin: server.url, "x-amc-native-intent": "task-workspace-v1", "x-amc-native-csrf": who.csrf }) },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+    return { status: response.status, body: await response.json() as { data?: unknown; code?: string } };
+  };
+  const task = (id: string, action = "") => `/api/v1/native-tasks/${id}${action ? `/${action}` : ""}?agentId=default`;
+  const poll = async (id: string) => (await request(task(id))).body.data as NativeTaskPoll;
+  const settled = (id: string) => until(async () => { const { task: view } = await poll(id); return ["idle", "failed", "released", "closed"].includes(view.state) ? view : undefined; }, "a settled task");
+  const awaiting = (id: string) => until(async () => {
+    const { task: view } = await poll(id);
+    if (view.state === "failed") throw new Error(`the task failed before its approval: ${view.error}`);
+    return view.approvals.find((a) => a.status === "PENDING")?.approvalRequestId;
+  }, "a Studio approval");
+  const decide = (id: string, identity: string) => request(`/approvals/requests/${id}/decide?agentId=default`,
+    { decision: "APPROVE_EXECUTE", reason: "parity fixture reviewer, not a human decision" }, identity);
+  const control = async (id: string, action: string, revision: number) => (await request(task(id, action), { expectedRevision: revision })).body.data as NativeTaskView;
+  const start = async (prompt: string) => {
     const options = (await request("/api/v1/native-tasks/options?agentId=default")).body.data as { scope: { digest: string; ready: boolean } };
     expect(options.scope.ready).toBe(true);
-    const started = await request("/api/v1/native-tasks", { clientRequestId: randomUUID(), agentId: "default", provider: "stub", tools: "workspace",
-      toolsDigest: options.scope.digest, prompt: READ, maxSteps: 3, maxTokens: 128 });
+    return request("/api/v1/native-tasks", { clientRequestId: randomUUID(), agentId: "default", provider: "stub", tools: "workspace",
+      toolsDigest: options.scope.digest, prompt, maxSteps: 3, maxTokens: 128 });
+  };
+  const close = async () => { await server.close(); lockVault(f.workspace); vi.unstubAllEnvs(); };
+  return { request, task, poll, settled, awaiting, decide, control, start, close };
+}
+
+async function studioLeg(f: Fixture): Promise<Leg> {
+  const verbs = new Set<string>(), record: Record<string, unknown> = {};
+  const { request, task, poll, settled, awaiting, decide, control, start, close } = await studio(f);
+  try {
+    const started = await start(READ);
     expect(started.status, JSON.stringify(started.body)).toBe(202);
     const parentTask = (started.body.data as NativeTaskView).taskId;
     verbs.add("start");
@@ -264,10 +280,69 @@ async function studioLeg(f: Fixture): Promise<Leg> {
     const refused = await request(task(parentTask, "fork"), { clientRequestId: randomUUID(), expectedRevision: view.revision });
     record.tamperedParentFork = refused.status === 202 ? "accepted" : refused.body.code?.replace(/^NATIVE_FORK_/, "");
     return { ...record, verbs: [...verbs].sort(), ids: { parent, child: child.sessionId! } };
-  } finally {
-    await server.close(); lockVault(f.workspace); vi.unstubAllEnvs();
-  }
+  } finally { await close(); }
 }
+
+/** P2-02 on every surface: the signed run purpose does not allow web_fetch, so its authorization refuses purpose_violation. */
+const PURPOSE_CALL = JSON.stringify({ tool: "web_fetch", arguments: { url: "https://docs.example.org/" } });
+type StatusRecord = { phases: unknown; receiptStates: readonly string[]; recheckFailures: readonly string[] };
+const statusOf = (execution: StatusRecord): StatusRecord =>
+  ({ phases: execution.phases, receiptStates: execution.receiptStates, recheckFailures: execution.recheckFailures });
+
+function purposeWorkspace(surface: string): Fixture {
+  const f = regulatedWorkspace(`purpose-${surface}`);
+  for (const [key, value] of Object.entries(f.env)) vi.stubEnv(key, value);
+  try {
+    const config = loadToolsConfig(f.workspace);
+    config.tools.allowedTools.push({ name: "web_fetch", actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: ["docs.example.org"] } } as never);
+    initToolsConfig(f.workspace, config);
+    initProcessorRegistry(f.workspace, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+      processors: [{ processorId: "proc-support", legalName: "Fixture Support Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-P213-1", effective: "2026-01-01", expires: null, dataClasses: ["pii"] }] }],
+      purposes: [{ purposeId: "support", allowedDataClasses: ["pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-support"] }],
+      bindings: [], runPurpose: "support" });
+  } finally { lockVault(f.workspace); vi.unstubAllEnvs(); }
+  return f;
+}
+
+const purposeLegs: Record<string, (f: Fixture) => Promise<{ turn: StatusRecord; verified: StatusRecord }>> = {
+  async cli(f) {
+    const run = await cli(f, ["agent-loop", "run", PURPOSE_CALL, "--provider", "stub", "--tools", "workspace", "--json"]).done;
+    expect(run.code, run.stderr).toBe(0);
+    const summary = cliJson(run);
+    const verified = await cli(f, ["agent-loop", "verify", summary.sessionId, "--json"]).done;
+    expect(verified.code, verified.stderr).toBe(0);
+    return { turn: statusOf(summary.execution), verified: statusOf((JSON.parse(verified.stdout) as { execution: StatusRecord }).execution) };
+  },
+  async typescript(f) {
+    const client = await AMCNativeClient.start({ workspace: f.workspace, provider: "stub", tools: "workspace", command: [process.execPath, CLI], env: f.env, timeoutMs: 120_000 });
+    const session = await client.newSession();
+    const turn = statusOf((await session.prompt(PURPOSE_CALL).result).execution!);
+    await client.close();
+    return { turn, verified: statusOf((await client.verifySession(session.sessionId)).execution) };
+  },
+  async python(f) {
+    const out = join(f.root, "python-purpose.json");
+    const run = spawnSync(process.env.AMC_PARITY_PYTHON ?? "python3", ["-B", "sdk/python/tests/test_parity.py"], { encoding: "utf8", timeout: 300_000,
+      env: { ...process.env, ...f.env, AMC_BIN: CLI, AMC_PARITY_WORKSPACE: f.workspace, AMC_PARITY_OUT: out, AMC_PARITY_MODE: "purpose", PYTHONPATH: resolve("sdk/python") } });
+    expect(run.status, `${run.stdout}\n${run.stderr}`).toBe(0);
+    return JSON.parse(readFileSync(out, "utf8")) as { turn: StatusRecord; verified: StatusRecord };
+  },
+  async studio(f) {
+    const { settled, control, start, close } = await studio(f);
+    try {
+      const started = await start(PURPOSE_CALL);
+      expect(started.status, JSON.stringify(started.body)).toBe(202);
+      const taskId = (started.body.data as NativeTaskView).taskId;
+      // Studio gates every workspace tool call on a WRITE_HIGH approval, but the authorization intent refuses the purpose
+      // before any approval request is raised (P2-02), so nobody is asked to approve a call the purpose forbids.
+      const view = await settled(taskId);
+      expect(view.approvals).toEqual([]);
+      const verified = await control(taskId, "verify", view.revision);
+      return { turn: statusOf(view.execution!), verified: statusOf(verified.execution!) };
+    } finally { await close(); }
+  }
+};
 
 describe("one execution API across the CLI, the TypeScript SDK, the Python wrapper and Studio (P2-13)", () => {
   it("names only entry points that exist on the CLI, the TypeScript SDK and the Studio API", () => {
@@ -294,6 +369,14 @@ describe("one execution API across the CLI, the TypeScript SDK, the Python wrapp
 
 
   const legs: Record<string, (f: Fixture) => Promise<Leg>> = { cli: cliLeg, typescript: typescriptLeg, python: pythonLeg, studio: studioLeg };
+
+  it.each(Object.keys(purposeLegs))("the %s surface reports a purpose_violation from the authorization step identically, after the turn and after verify", async (surface) => {
+    const leg = await purposeLegs[surface]!(purposeWorkspace(surface));
+    const refused = { phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "refused" },
+      receiptStates: ["denied"], recheckFailures: ["purpose_violation"] };
+    expect(leg.turn).toMatchObject({ ...refused, phases: { ...refused.phases, "evidence-verification": "pending" } });
+    expect(leg.verified).toMatchObject({ ...refused, phases: { ...refused.phases, "evidence-verification": "succeeded" } });
+  }, 600_000);
 
   it.each(Object.keys(legs))("the %s surface runs the scripted scenario with the contract's verbs, phases and refusals", async (surface) => {
     const f = regulatedWorkspace(surface);

@@ -10,11 +10,13 @@ import { openLedger } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
 import { deriveExecutionStatus, EVIDENCE_INCOMPLETE, INTEGRITY_FAILED, type ExecutionFacts, type ExecutionStatus } from "./executionContract.js";
 
-const RECHECK_FAILED = "recheck_failed:";
+/** The pipeline's authorization denials: the binding at admission and the pre-dispatch recheck (src/tools/toolPipeline.ts). */
+const AUTHORIZATION_DENIALS = ["authorization_denied:", "recheck_failed:"];
 
 /**
- * The verified head state of every execution journaled for `sessionId`, sorted, and the typed recheck failures of the
- * ones the pre-dispatch recheck denied (their `denied` receipt's `recheck_failed:<code>[,<code>]` reason). Executions are found from the index AND
+ * The verified head state of every execution journaled for `sessionId`, sorted, and the typed authorization failures
+ * (`RecheckFailure` codes such as `purpose_violation`) of the ones the authorization step denied: their `denied`
+ * receipt's `authorization_denied:<codes>` (binding) or `recheck_failed:<codes>` (pre-dispatch recheck) reason. Executions are found from the index AND
  * from the signed ACTION_STATE rows, so deleting an index row does not hide one; each chain is then verified (hash,
  * link, signature) and a chain that fails is `integrity_failed`, never skipped. A workspace with no ledger or no journal
  * table has journaled nothing. Signatures are checked against the workspace's own keys: a local audit trail.
@@ -40,7 +42,8 @@ export function sessionReceipts(workspace: string, sessionId: string): { readonl
       const head = chain.receipts.at(-1);
       if (!chain.ok || !head) { states.push(INTEGRITY_FAILED); continue; }
       states.push(head.state === "completed" && !head.evidenceComplete ? EVIDENCE_INCOMPLETE : head.state);
-      if (head.state === "denied" && head.reasonCode.startsWith(RECHECK_FAILED)) recheckFailures.push(...head.reasonCode.slice(RECHECK_FAILED.length).split(","));
+      const prefix = head.state === "denied" ? AUTHORIZATION_DENIALS.find((p) => head.reasonCode.startsWith(p)) : undefined;
+      if (prefix) recheckFailures.push(...head.reasonCode.slice(prefix.length).split(","));
     }
     return { states: states.sort(), recheckFailures };
   } catch {

@@ -134,6 +134,23 @@ def run_scenario(workspace: str, amc_bin: list[str], env: dict[str, str]) -> dic
     return {**record, "verbs": sorted(verbs), "ids": {"parent": session.session_id, "child": child.session_id}}
 
 
+#: A consequential call the signed run purpose does not allow (P2-02): refused at authorization, before any network.
+PURPOSE_CALL = json.dumps({"tool": "web_fetch", "arguments": {"url": "https://docs.example.org/"}})
+
+
+def _status(execution) -> dict:
+    return {"phases": execution.phases, "receiptStates": list(execution.receipt_states), "recheckFailures": list(execution.recheck_failures)}
+
+
+def run_purpose(workspace: str, amc_bin: list[str], env: dict[str, str]) -> dict:
+    """The authorization step's typed failure as this surface reports it, after the turn and after verification."""
+    agent = AmcAgent(workspace, provider="stub", tools="workspace", amc_bin=amc_bin, env=env, timeout=120)
+    session = agent.new_session()
+    turn = _status(session.prompt(PURPOSE_CALL).execution)
+    agent.close()
+    return {"turn": turn, "verified": _status(agent.verify_session(session.session_id).execution)}
+
+
 def _amc_bin() -> list[str] | None:
     explicit = os.environ.get("AMC_BIN")
     if not explicit:
@@ -171,5 +188,6 @@ if __name__ == "__main__":
     amc_bin = _amc_bin()
     if amc_bin is None or not os.environ.get("AMC_PARITY_WORKSPACE") or not os.environ.get("AMC_PARITY_OUT"):
         sys.exit("AMC_BIN, AMC_PARITY_WORKSPACE and AMC_PARITY_OUT are required")
-    result = run_scenario(os.environ["AMC_PARITY_WORKSPACE"], amc_bin, {})
+    run = run_purpose if os.environ.get("AMC_PARITY_MODE") == "purpose" else run_scenario
+    result = run(os.environ["AMC_PARITY_WORKSPACE"], amc_bin, {})
     Path(os.environ["AMC_PARITY_OUT"]).write_text(json.dumps(result), encoding="utf-8")

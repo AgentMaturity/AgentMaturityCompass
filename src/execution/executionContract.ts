@@ -31,8 +31,9 @@ export interface ExecutionStatus {
   /** The verified head state of each journaled action (P1-03 states), plus `evidence_incomplete` and `integrity_failed`. */
   readonly receiptStates: readonly string[];
   /**
-   * The typed recheck failures (`RecheckFailure`, e.g. `binding_changed:amount`, `purpose_violation`) of every journaled
-   * action the pre-dispatch recheck denied, read from the same verified receipts, sorted and deduplicated.
+   * The typed authorization failures (`RecheckFailure` codes, e.g. `purpose_violation`, `binding_changed:amount`) of every
+   * journaled action the authorization step denied, at binding or at the pre-dispatch recheck, read from the same verified
+   * receipts, sorted and deduplicated.
    */
   readonly recheckFailures: readonly string[];
 }
