@@ -148,7 +148,8 @@
       "tracks": [
         "F2"
       ],
-      "buildOrder": 12
+      "buildOrder": 12,
+      "decision": "not landed: folded into the compiler (docs/adr/015-f2-blueprints.md); F2 commits stay record-only and skip-receipt"
     }
   ],
   "tracks": [
