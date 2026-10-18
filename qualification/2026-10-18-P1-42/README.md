@@ -62,7 +62,7 @@ All 30 decisions are `defer` (awaiting Sid). The round-2 apply commits removed a
 
 ## Checks
 
-All run at the code commit in `receipt.json`, local macOS arm64 (`checks.json` has durations and output tails):
+All run at the code commit in `receipt.json`, after merging int (P1-34 included), local macOS arm64 (`checks.json` has durations and output tails):
 
 - `npm run -s build`: exit 0
 - `npm run -s typecheck`: exit 0
@@ -78,12 +78,22 @@ All run at the code commit in `receipt.json`, local macOS arm64 (`checks.json` h
 - `npm run -s check:threat-model`: exit 0
 - `npm run -s check:duplicates`: exit 0
 - `npm run -s check:dead-code`: exit 0
+- `npm run -s check:citations`: exit 0
+- `npm run -s check:catalog-currency`: exit 0
+- `npm run -s check:catalog-changelog`: exit 1
 - `npm run -s check:industry-guides`: exit 0
 - `npm run -s check:regulatory-calendar`: exit 0
 - `npm run -s release:notes -- --check`: exit 0
 - `npm run -s build:pages`: exit 0
+- `npm run -s check:qualification`: exit 0
 
-Focused tests (`focused-tests.json`): 47 files, 513 tests, 510 passed, 3 failed. The 3 failures also fail on int and are outside P1-42's change: `publicDocsGraph` (MCP_SERVER.md links MCP_INDUSTRY_PACKS.md, which is not promoted), `publicDocsArtifact` (typedoc's `/blob/<revision>/` source link) and `regulatoryClaimsHonesty` (the 30 s timeout importing `src/index.ts`); $SP/P0-36f-base-failed.txt and $SP/P1-08-int-tests.txt record them on int. The full `npm test` suite was not run.
+`check:catalog-changelog` fails identically on int: `catalog/` and `catalog/CHANGELOG.md` are byte-identical to int's, and the entry it asks for covers catalog controls other items added. `check:citations` passes after re-baselining CIT004 with a recorded reason (the 57 new catalogue records lack P1-09's record fields; the total falls from 620 to 573).
+
+`npm run release:gate` (run at `2d02681e6`, before the second int merge) exited 1: `citations` (fixed since), `full-test-suite` (killed at the gate's 900 s limit on this loaded machine; no result file) and `install-persona-qa` (10-minute timeout); 16 of 19 executed checks passed, `per-file-coverage` and `live-deploy-health` were skipped.
+
+Focused tests (`focused-tests.json`): 47 files, 513 tests, 508 passed, 5 failed. Three failures also fail on int and lie outside P1-42 (`publicDocsGraph`: MCP_SERVER.md links MCP_INDUSTRY_PACKS.md, which is not promoted; `publicDocsArtifact`: typedoc's `/blob/<revision>/` link; `regulatoryClaimsHonesty`: the 30 s timeout importing `src/index.ts`), recorded on int in $SP/P0-36f-base-failed.txt and $SP/P1-08-int-tests.txt. The other two timed out under load and pass alone.
+
+Full suite (`full-suite.json`, plain `npx vitest run` at `2d02681e6`): 25092 tests, 25026 passed, 59 failed, 7 skipped, in 24 files: pi-ai tests (the devDependency int added is not installed in this worktree), the two docs tests above, two throughput floors, and timeouts in files that import no module P1-42 changes; the industry-pack and assurance files among them pass when run alone.
 
 ## Mutations
 
