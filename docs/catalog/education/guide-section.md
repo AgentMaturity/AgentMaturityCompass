@@ -1,0 +1,13 @@
+## Education overlay draft
+
+This draft is experimental, not reviewed, not legal advice. Promotion is `none`. The actual P1-13 domain is `education.schools-skills`. Incoming int046 contains 87 pack and 16 handwritten deep questions, 103 unique IDs confirmed by root's clean-source Node v22.23.3 runtime inventory. Its hashed evidence reference is in `docs/catalog/education/dispositions.json`; the documentation subagent did not execute that command. `docs/catalog/education/dispositions.json` retains every actual question and the spec's count/label drift.
+
+The four proposed signatures are exact teacher approval before a final-grade write (`L1-EDU-01`), an EU emotion-inference capability gate (`L1-EDU-02`, Art. 5(1)(f)), a P2-27 export-boundary wrapper (`L1-EDU-03`) and automated WCAG 2.1 A/AA checks on generated HTML (`L1-EDU-04`). No fixture has run in this design lane. Local synthetic observations never establish a school's result. Missing production evidence or enforcement leaves `not_evaluated` with enforcement `none`.
+
+P2-27's two-institution fixture, P2-30's COPPA/marking targets and optional guide hook, and P3-14's FRIA activation draft are absent from this base. Reuse remains pending. This fragment must use the existing optional hook after it lands; it adds no generator implementation. The existing cross-station composition is `education-technology`. The fixture profiles currently declare only the Education domain; Technology station membership records intent, not complete composed coverage. Actual Technology domain/control wiring remains pending P2-30 integration. Learner age and institution-specific legal/approval facts are unknown manual prerequisites, not invented native predicate fields.
+
+Automated WCAG 2.1 checks cover only their automatable subset. They do not establish WCAG 2.2 authentication, assistive-technology interoperability, full Section 508 scope, an accessibility statement/feedback workflow or conformance across apps and media. The manual WCAG assessment remains OPEN with an unassigned specialist, criterion-level results and remediation required. No manual criterion passes by default.
+
+All instrument metadata remains unverified and flagged for re-verification. No fresh regulatory text, legal review or new source retrieval is claimed. The privacy counsel and accessibility expert placeholders under D-14/D-10, P1-29 education partner, independent sign-offs, manual assessor and funded stewardship remain open. Support stays experimental until all ten admission criteria and Sid's promotion decision are satisfied.
+
+An A4 catalog-lock change is `scope_changed`, never a fault; capture any applicable FRIA before P3-23 completion. This draft changes no A4 behavior.

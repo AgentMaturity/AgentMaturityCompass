@@ -1,0 +1,397 @@
+{
+  "station": "education",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "sourcePolicy": "New metadata stays unverified and reverify:true. Any URL is copied from the named local S5 entry; inherited dates belong only to that historical record. This task made no network retrieval, source verification or legal review. Missing S5 entries retain null URLs/dates/hashes. The proposed signatures are operator-policy fixtures; this item adds no law-data register rows.",
+  "instruments": [
+    {
+      "id": "us-ferpa",
+      "market": "US",
+      "title": "FERPA",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "School-official direct control, legitimate educational interest and redisclosure candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review.",
+      "discoveryLocator": {
+        "url": "https://studentprivacy.ed.gov/faq/under-ferpa-may-educational-agency-or-institution-disclose-education-records-any-its-employees",
+        "provenancePath": "src/domains/deep/education.ts",
+        "provenanceSha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "provenanceLine": 48,
+        "provenanceQuestionId": "education-deep-04",
+        "purpose": "discovery_only",
+        "readThisTask": false,
+        "note": "The proposed control cites this locally inherited FERPA school-official FAQ locator with no S5 register ID. This metadata records the same discovery candidate; it does not establish a current primary read, lawful exception, or legal interpretation. Primary source verification and P2-27 dependency integration remain open."
+      }
+    },
+    {
+      "id": "us-coppa",
+      "market": "US",
+      "title": "COPPA Rule, including 2025 amendments",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://www.govinfo.gov/content/pkg/FR-2025-04-22/html/2025-05904.htm",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "us-coppa",
+          "sourceIndex": 0,
+          "sourceTitle": "Federal Register 2025-05904, COPPA Rule final amendments (govinfo HTML)",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "in-force"
+        }
+      },
+      "note": "Separate consent, written retention and security-program candidates; reuse target is pending P2-30. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-idea",
+      "market": "US",
+      "title": "IDEA",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Special-education access-record and confidentiality candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-ada-title-ii-web",
+      "market": "US",
+      "title": "ADA Title II web and mobile rule",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://www.ecfr.gov/current/title-28/chapter-I/part-35/subpart-H/section-35.200",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "us-ada-title-ii-web",
+          "sourceIndex": 0,
+          "sourceTitle": "eCFR 28 CFR 35.200 (as amended 91 FR 20912, 2026-04-20)",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "in-force"
+        }
+      },
+      "note": "Generated output and interface accessibility scope; entity applicability and deadlines need review. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-section-508",
+      "market": "US",
+      "title": "Revised Section 508",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://www.ecfr.gov/current/title-36/chapter-XI/part-1194",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "us-section-508",
+          "sourceIndex": 0,
+          "sourceTitle": "eCFR 36 CFR Part 1194 (Revised 508 Standards)",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "in-force"
+        }
+      },
+      "note": "Federal software and electronic-content scope, including WCAG 2.0 and conformance-report evidence. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-section-504",
+      "market": "US",
+      "title": "Section 504",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Exam adjustments and equal-access candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-ppra",
+      "market": "US",
+      "title": "Protection of Pupil Rights Amendment",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://www.ecfr.gov/current/title-34/subtitle-A/part-98",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "us-ppra",
+          "sourceIndex": 0,
+          "sourceTitle": "eCFR 34 CFR Part 98 (PPRA)",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "in-force"
+        }
+      },
+      "note": "Protected-category elicitation and prior-consent candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-title-ix",
+      "market": "US",
+      "title": "Title IX",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Human decision-maker role separation and record-retention candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "us-ca-cppa-admt",
+      "market": "US",
+      "title": "CCPA ADMT regulations",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://cppa.ca.gov/regulations/ccpa_updates.html",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "us-ca-cppa-admt",
+          "sourceIndex": 0,
+          "sourceTitle": "CPPA rulemaking page (CCPA updates, ADMT)",
+          "sourceRetrievedAt": "2026-10-03T17:02:19Z",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "partially-applicable"
+        }
+      },
+      "note": "The spec generic us-ccpa label maps to actual S5 us-ca-cppa-admt and existing law-data us-ca-ccpa-admt-notice. No new duplicate clause. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "eu-ai-act",
+      "market": "EU",
+      "title": "EU AI Act",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "eu-ai-act",
+          "sourceIndex": 4,
+          "sourceTitle": "AI Act Service Desk — Article 5: Prohibited AI practices",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "partially-applicable"
+        }
+      },
+      "note": "Annex III point3 and Art. 5(1)(f) are distinct scope candidates; the emotion-inference prohibition is not Art. 50(3). FRIA/marking reuse is pending. No primary text was read for this draft; source authority, clause scope and interpretation need human review. The inherited URL is the exact Article 5 locator used by the proposed emotion capability citation; that historical S5 source is not a fresh read in this task."
+    },
+    {
+      "id": "eu-gdpr",
+      "market": "EU",
+      "title": "GDPR",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en",
+        "readThisTask": false,
+        "inherited": {
+          "path": "src/compliance/regulatory/register.json",
+          "fileSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "entryId": "eu-gdpr",
+          "sourceIndex": 0,
+          "sourceTitle": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en",
+          "sourceRetrievedAt": "2026-10-03",
+          "sourceFetched": true,
+          "entryVerified": true,
+          "entryStatus": "in-force"
+        }
+      },
+      "note": "Lawful basis, child-consent, sensitive-data and individual-rights candidates. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "crpd",
+      "market": "RoW",
+      "title": "UN CRPD",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Accessible education and inclusion candidates; no matching S5 entry present. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "w3c-wcag-21",
+      "market": "Standard",
+      "title": "WCAG 2.1",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Automated A/AA subset plus manual duties; no matching S5 entry present. No primary text was read for this draft; source authority, clause scope and interpretation need human review.",
+      "discoveryLocator": {
+        "url": "https://www.w3.org/WAI/test-evaluate/",
+        "provenancePath": "scripts/write-accessibility-release-evidence.mjs",
+        "provenanceSha256": "d804246606ac4da0332a18652f1c463f175ef6070f4c6f12bcf8ed488ca8a0e3",
+        "provenanceLine": 143,
+        "purpose": "discovery_only",
+        "readThisTask": false,
+        "note": "This inherited WAI evaluation overview is the discovery locator used by the proposed control citation. It is not the WCAG 2.1 normative text and supplies no new primary-source retrieval or interpretation evidence."
+      }
+    },
+    {
+      "id": "w3c-wcag-22",
+      "market": "Standard",
+      "title": "WCAG 2.2",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Separate additional A/AA and accessible-authentication criteria, not established by a 2.1 checker. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    },
+    {
+      "id": "etsi-en-301-549",
+      "market": "Standard",
+      "title": "ETSI EN 301 549",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "inherited": null
+      },
+      "note": "Assistive-technology interoperability and wider ICT scope; no matching S5 entry present. No primary text was read for this draft; source authority, clause scope and interpretation need human review."
+    }
+  ],
+  "specDrift": {
+    "absentS5Ids": [
+      "us-ferpa",
+      "us-idea",
+      "us-section-504",
+      "us-title-ix",
+      "crpd",
+      "w3c-wcag-21",
+      "w3c-wcag-22",
+      "etsi-en-301-549"
+    ],
+    "ccpaIdentity": {
+      "spec": "us-ccpa",
+      "actualS5": "us-ca-cppa-admt",
+      "existingLawData": "us-ca-ccpa-admt-notice"
+    },
+    "nonSubstitute": {
+      "id": "intl-iso-iec-40500",
+      "title": "Information technology — W3C Web Content Accessibility Guidelines (WCAG) 2.2",
+      "reason": "The actual entry names WCAG 2.2 and is unverified; it does not replace the missing W3C WCAG 2.1 entry or establish either standard as reviewed."
+    },
+    "legacyCatalogueMismatch": {
+      "path": "src/domains/packs/catalogueIntl.ts",
+      "id": "w3c-wcag-21",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "state": "inherited_local_locator_not_read",
+      "note": "The legacy identity and locator disagree on WCAG version. This is not WCAG 2.1 primary-text evidence, and the metadata row retains a null URL."
+    }
+  }
+}
