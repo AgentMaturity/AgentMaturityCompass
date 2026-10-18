@@ -665,7 +665,7 @@ function studioSchemas(): Record<string, unknown> {
       type: "object",
       properties: {
         error: { type: "string" },
-        message: { type: "string" },
+        message: { type: "string" }, requestId: { type: "string" },
       },
       required: ["error"],
     },

@@ -44,7 +44,8 @@ import { handleComplianceRoute } from './complianceRouter.js';
 import { handleMemoryRoute } from './memoryRouter.js';
 import { handleMetricsRoute } from './metricsRouter.js';
 import { handleExportRoute } from './exportRouter.js';
-import { apiError, labelResultsOn } from './apiHelpers.js';
+import { admitRequestBody, apiError, apiInternalError, labelResultsOn } from './apiHelpers.js';
+import { bindRequestContext, requestContextOf, resolveRequestId } from './requestContext.js';
 import { API_RESULT_ROUTES, labelResult, matchResultRoute } from './resultRouteRegistry.js';
 import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
@@ -527,8 +528,13 @@ export async function handleApiRoute(
   nativeTasks?: NativeTaskApiContext
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
+  // Studio binds first (it may trust a forwarder's id); every other caller gets a server-generated one.
+  if (!requestContextOf(res)) {
+    bindRequestContext(res, { requestId: resolveRequestId(req, { trustInbound: false }), method, path: pathname, startedAt: Date.now() });
+  }
 
   try {
+    if (!admitRequestBody(req, res)) return true;
     const route = matchApiRoute(pathname);
     const resultRoute = matchResultRoute(API_RESULT_ROUTES, method.toUpperCase(), pathname);
     if (resultRoute) labelResultsOn(res, (data) => labelResult(resultRoute, data, workspace));
@@ -567,8 +573,8 @@ export async function handleApiRoute(
 
     apiError(res, 404, `API route not found: ${method} ${pathname}`);
     return true;
-  } catch {
-    apiError(res, 500, 'Internal server error');
+  } catch (error) {
+    apiInternalError(res, error);
     return true;
   }
 }

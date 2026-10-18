@@ -315,6 +315,7 @@ import { handleBridgeRequest } from "../bridge/bridgeServer.js";
 import { createBridgePairingCode, redeemBridgePairingCode } from "../bridge/bridgeAuth.js";
 import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
+import { bindRequestContext, resolveRequestId } from "../api/requestContext.js";
 import { canonApplyForApi, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import {
@@ -1742,6 +1743,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       // ── AMC REST API v1 ─────────────────────────────────────────────
       if (pathname.startsWith("/api/v1/")) {
+        bindRequestContext(res, { requestId: resolveRequestId(req, { trustInbound: trustForwarded }), method, path: pathname, startedAt: requestStartedAt });
         const handled = await handleStudioApiDelegation({
           pathname,
           method,

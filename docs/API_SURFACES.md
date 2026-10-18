@@ -34,8 +34,14 @@ Auth and stability:
 
 Response envelope:
 - most `/api/v1` routes return success as `{ "ok": true, "data": ... }`
-- most `/api/v1` routes return errors as `{ "ok": false, "error": "..." }`
+- most `/api/v1` routes return errors as `{ "ok": false, "error": "...", "requestId": "..." }`
 - exception: `GET /api/v1/health` returns the raw health payload
+- every `/api/v1` response from Studio and the dashboard carries an `X-Request-Id` header; an error body's `requestId` is the same value
+- the id is a fresh random UUID. Studio uses an inbound `X-Request-Id` only behind a trusted proxy (`AMC_TRUSTED_PROXY_HOPS` above 0 and an allowed peer) and only when it matches `^[A-Za-z0-9._:-]{8,128}$`; the dashboard and every other caller ignore it. The id is a correlation hint, never an authorization, deduplication or idempotency key
+- each error response writes one JSON line to stderr: `ts`, `level` (`warn` for 4xx, `error` for 5xx), `requestId`, `method`, `path` (the pathname, never the query string), `status`, `durationMs` and `error`. A 500 line adds `detail` (name, message capped at 2,000 characters, stack capped at 10 lines), with secrets redacted by the shared redaction table. Headers, bodies, tokens and cookies are never logged
+- a 500 body is always `{ "ok": false, "error": "Internal server error", "requestId": "..." }`: it never contains exception text, file paths or storage errors. Look the id up in the log line for the detail. Deliberate 503 texts keep their message
+- a request body over 1,048,576 bytes is 413 `JSON body exceeds 1048576 bytes` on every route: a declared `Content-Length` over the limit is refused before the route runs, and a streamed body without a length is cut off at the limit (413) when the route reads it
+- not covered yet: Studio's own 401, 403 and 429 replies inside `/api/v1` carry the header but no `requestId` in the body; A4 routes keep their own error body (header only); Studio's IP-allowlist 403 and write-rate-limit 429, answered before the `/api/v1` branch, and the dashboard's mutation 403 carry neither
 
 Claim labels (P0-23):
 - routes listed in `src/api/resultRouteRegistry.ts` (scores, assurance, compliance and regulatory checks, passports, badges, bundles, attestations, certificates, verifiers, benchmarks, Shield runs and verifiers, CI gates and domain proofs) return a result, and every success on them carries the result's claim from `src/claims/eligibility` (see [CLAIM_KINDS.md](CLAIM_KINDS.md))
