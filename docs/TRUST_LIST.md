@@ -137,7 +137,7 @@ A matching explicit pin admits a key before a trust-list `key-compromise` revoca
 
 An API request cannot supply verification trust: a handler that verifies under the server's trust refuses a request that names any trust field (pins, allow flags, trust roots), with 400, even when its value is `false` or `null`. The Merkle-proof, trust-token and formal-certificate handlers do this; trust comes only from the server operator's trust list.
 
-For portable `domain pack verify`, the verifier finds the licence's Ed25519 signing key among the keys an operator-verified trust list admits for `artifact-seal`. Since P1-51 those are the only keys it tries, as the licence gates and `domain pack activate` do: a distrusted, revoked, expired or wrong-purpose entry is never tried, so with no other key pinned the verdict is "not configured". A licence signed with a shared secret or on the legacy allowlist names no pinned signer and is never trusted.
+For portable `domain pack verify`, the verifier finds the licence's Ed25519 signing key among the keys an operator-verified trust list admits for `artifact-seal`. Since P1-51 only those keys can make a licence valid, as in the licence gates and `domain pack activate`. When none of them signed it but another list entry did, the report names that key with its refusal (distrusted, revoked, expired or wrong purpose) and the licence stays refused; when no listed key signed it, the verdict is "not configured" if the list admits no `artifact-seal` key and "not signed by a pinned key" otherwise. A licence signed with a shared secret or on the legacy allowlist names no pinned signer and is never trusted.
 
 ### Signing times are claims
 

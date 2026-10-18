@@ -81,7 +81,6 @@ function signedLicense(): string {
 }
 
 // P1-51: the verdict uses only keys the trust list admits for artifact-seal; --pubkey and environment keys never count.
-const NOT_CONFIGURED = "Industry Packs licence verification is not configured: no licence signing key is pinned in this machine's AMC trust list (purpose artifact-seal).";
 const NOT_PINNED_SIGNER = "the licence is not signed by a pinned Industry Packs licence key";
 
 function inspect(name: string, key: string, context: TrustContext): LicenseResult {
@@ -133,13 +132,20 @@ describe("Industry Pack portable Ed25519 verification (P0-51, P1-51 gate keys)",
     { name: "wrong-purpose", entry: listEntry(issuer, { purposes: ["release"] }), distrust: [], status: "wrong-purpose" },
   ] as const;
 
-  // A key the list refuses is never tried, so with no other key pinned the verdict is "not configured" (P1-51).
+  // A key the list refuses never makes the licence valid (P1-51), but the report still names it with its refusal (P0-51).
   test.each(refused)("$name remains refused with both allow flags", row => {
     const context = operatorContext([row.entry], row.name, allows[3], [...row.distrust]);
     const key = signedLicense();
     const admission = admitKey({ publicKeyPem: issuer.publicKeyPem, purpose: "artifact-seal", signature: "license signature", context, claimedSignedAt: ISSUED_AT });
     expect(admission.status).toBe(row.status);
-    requireUnsigned(inspect(row.name, key, context), NOT_CONFIGURED);
+    const result = inspect(row.name, key, context);
+    expect(result.report.integrity).toEqual({ status: "pass", errors: [] });
+    expect(result.report.issuerAdmission).toMatchObject({ status: "fail", signatures: [{ keyId: issuer.keyId, status: row.status, purpose: "artifact-seal" }] });
+    expect(result.reason).toMatch(/^the licence signing key is refused by the trust list: /);
+    expect(result.valid).toBe(false);
+    expect(result.report.trusted).toBe(false);
+    expect(result.report.overrides).toEqual([]);
+    expect(verdictExitCode(result.report)).toBe(1);
   });
 
   test.each(allows)("an unknown actual signer stays untrusted with $label allow flags", flags => {

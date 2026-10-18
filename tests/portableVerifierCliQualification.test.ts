@@ -394,9 +394,9 @@ describe("Portable CLI Industry Packs license", () => {
   test("operator distrust beats the matching listed license key and both allow flags", async () => {
     const result = await invoke("license-distrusted", ["domain", "pack", "verify", "--key", license,
       ...listFlags("license-distrusted", licenseIssuer, "artifact-seal", "distrusted"), ...bothAllows]);
-    // A distrusted key is never tried, so no signer verifies and none is named.
-    expect(result.status, result.stderr).toBe(1); expect(result.report.integrity.status).toBe("fail");
-    expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ status: "not-pinned", keyId: null }); expect(result.report.trusted).toBe(false);
+    // A distrusted key never makes the licence valid, but the report names it with its refusal.
+    expect(result.status, result.stderr).toBe(1); expect(result.report.integrity.status).toBe("pass");
+    expect(result.report.issuerAdmission.signatures[0]?.status).toBe("distrusted"); expect(result.report.trusted).toBe(false);
   });
 });
 
