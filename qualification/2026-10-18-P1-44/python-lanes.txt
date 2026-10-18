@@ -1,0 +1,32 @@
+== Python 3.10, locked (no licence)
+python: 3.10.19
+wheel: amc_sdk-0.2.0-py3-none-any.whl sha256=fc372759ddaade92be4d4c5a2c05e30d888a9fc55b1fa7daa871e356855f515c
+amc_sdk.industry from: /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-44-py/lane-fresh-3.10/venv/lib/python3.10/site-packages/amc_sdk/industry.py
+..........................................                               [100%]
+42 passed in 9.74s
+== Python 3.11, locked (no licence)
+python: 3.11.14
+wheel: amc_sdk-0.2.0-py3-none-any.whl sha256=2131969cb740932c5506c43bf6a67b2f0a96773534b0fc44b77da8d6cee5b2d2
+amc_sdk.industry from: /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-44-py/lane-fresh-3.11/venv/lib/python3.11/site-packages/amc_sdk/industry.py
+..........................................                               [100%]
+42 passed in 15.53s
+== Python 3.12, locked (no licence)
+python: 3.12.14
+wheel: amc_sdk-0.2.0-py3-none-any.whl sha256=a4fcae172ca9d07e233d800ffeaccdfbe2a92c5f49e7d67125290104fa52014d
+amc_sdk.industry from: /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-44-py/lane-fresh-3.12/venv/lib/python3.12/site-packages/amc_sdk/industry.py
+..........................................                               [100%]
+42 passed in 19.76s
+== Python 3.14, locked (no licence)
+python: 3.14.7
+wheel: amc_sdk-0.2.0-py3-none-any.whl sha256=aae6652702388af1f774c5b120f194348e3c5f5480649c7385ba6a2a0c217349
+amc_sdk.industry from: /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-44-py/lane-fresh-3.14/venv/lib/python3.14/site-packages/amc_sdk/industry.py
+..........................................                               [100%]
+42 passed in 24.77s
+== Python 3.10, licensed (test licence pinned in a temp AMC_HOME trust list): installed-CLI contract
+1 passed, 41 deselected in 12.86s
+== Python 3.11, licensed (test licence pinned in a temp AMC_HOME trust list): installed-CLI contract
+1 passed, 41 deselected in 10.48s
+== Python 3.12, licensed (test licence pinned in a temp AMC_HOME trust list): installed-CLI contract
+1 passed, 41 deselected in 11.62s
+== Python 3.14, licensed (test licence pinned in a temp AMC_HOME trust list): installed-CLI contract
+1 passed, 41 deselected in 12.72s

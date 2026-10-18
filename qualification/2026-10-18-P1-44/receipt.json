@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-44",
+  "date": "2026-10-18",
+  "commit": "536984caae787d40d904d93f98c52ae5c17f2a6c",
+  "branch": "rtd/p1-44-pack-mcp-scenarios",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 1191191
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 2268555
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 535773
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 6408
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 3005
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1491
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 6081
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 4354
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 535
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1126
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 351
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 403
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1514
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5765
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 589
+    },
+    {
+      "cmd": "npx vitest run tests/claims/claimAdapters.test.ts tests/industryAssuranceFixtures.test.ts tests/industryPackEntitlement.test.ts tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/industryPackWeightingPaymentInvariance.test.ts tests/industryPacksHostedApi.test.ts tests/industryPacksPaywallSurfaces.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/noTierGatingOnTrustStack.test.ts tests/questionSets.test.ts tests/regulatedExamples.test.ts tests/exampleCommandsResolve.test.ts tests/domainRegistry.test.ts tests/releaseNotes.test.ts tests/checkReleaseNotes.test.ts tests/publicDistributionTruth.test.ts --reporter=json --outputFile=qualification/2026-10-18-P1-44/focused-tests.json",
+      "exit": 0,
+      "durationMs": 76000
+    },
+    {
+      "cmd": "fresh clone (git clone --no-local, branch head 536984caa): pnpm install --frozen-lockfile --offline",
+      "exit": 0,
+      "durationMs": 12400
+    },
+    {
+      "cmd": "fresh clone: pnpm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O17: npx vitest run tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts",
+      "exit": 0,
+      "durationMs": 38430
+    },
+    {
+      "cmd": "fresh clone O18: npx vitest run tests/industryAssuranceFixtures.test.ts",
+      "exit": 0,
+      "durationMs": 3024
+    },
+    {
+      "cmd": "fresh clone O20: npx vitest run tests/regulatedExamples.test.ts tests/exampleCommandsResolve.test.ts",
+      "exit": 0,
+      "durationMs": 90502
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.10.19: new venv; pip wheel --no-index sdk/python; pip install --no-index <wheel> pytest; python -I -m pytest sdk/python/tests/test_industry.py",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.10.19, test licence pinned in a temp AMC_HOME: python -I -m pytest sdk/python/tests/test_industry.py -k installed_cli",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.11.14: new venv; pip wheel --no-index sdk/python; pip install --no-index <wheel> pytest; python -I -m pytest sdk/python/tests/test_industry.py",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.11.14, test licence pinned in a temp AMC_HOME: python -I -m pytest sdk/python/tests/test_industry.py -k installed_cli",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.12.14: new venv; pip wheel --no-index sdk/python; pip install --no-index <wheel> pytest; python -I -m pytest sdk/python/tests/test_industry.py",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.12.14, test licence pinned in a temp AMC_HOME: python -I -m pytest sdk/python/tests/test_industry.py -k installed_cli",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.14.7: new venv; pip wheel --no-index sdk/python; pip install --no-index <wheel> pytest; python -I -m pytest sdk/python/tests/test_industry.py",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fresh clone O19, Python 3.14.7, test licence pinned in a temp AMC_HOME: python -I -m pytest sdk/python/tests/test_industry.py -k installed_cli",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node dist/cli.js mcp list-tools --json (and with AMC_A4_PREVIEW=1)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 227,
+    "passed": 227,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "9a8e8f1da0a69c9dfc15dc319a946d046745f231613a31edc7129f2216fc83e8"
+    },
+    {
+      "path": "candidate/O17-result.json",
+      "sha256": "c07ca9eb34c276d55db044eaba065c5bb3ea729e58d9dd38672dd760eee34f9b"
+    },
+    {
+      "path": "candidate/O18-mutations.log",
+      "sha256": "51cab05167ffb61096ebc98ed05df39532504d7bfe330e96df0b1e5af7f731a8"
+    },
+    {
+      "path": "candidate/O18-result.json",
+      "sha256": "ee30fe6273f819ebffdfaf6bf85916c9ca8f1d7471c49d08e0d6aa3775cc6fcb"
+    },
+    {
+      "path": "candidate/O19-result.json",
+      "sha256": "4c47ef4bf52359f71db4196749ebc897df347bfe65e7a6ce5be7181d239ebdfd"
+    },
+    {
+      "path": "candidate/O20-result.json",
+      "sha256": "71ca8926a8ae1d57bc4e7015d587a8f3df3786f075329c2c4e194b080931cb72"
+    },
+    {
+      "path": "equivalence.txt",
+      "sha256": "896231f8629977124bde267823ad39190017f1391c6477686c534be95c494224"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "99409682924faa3e2e05567992a46a3511a3cf09187b425a491d5a20a48340a5"
+    },
+    {
+      "path": "fresh-clone/O17-vitest.json",
+      "sha256": "d70d6a0443d1b2f46c75cdaacfe8cd7bbf3301177ac1812001fd868068450d81"
+    },
+    {
+      "path": "fresh-clone/O18-vitest.json",
+      "sha256": "e753e122a0d658d3aad899ff5f274939d870b8e8c48e2d405690fba1960f0c69"
+    },
+    {
+      "path": "fresh-clone/O20-vitest.json",
+      "sha256": "f6aefec7c4b9b59d3092503aad5aa99292dd51fc35173a96da01ea58bbb5bfcc"
+    },
+    {
+      "path": "mcp-list-tools.txt",
+      "sha256": "e45ce3d3c3bc07ac3c12fc969fd1aebbdcad0a41adcc5975fe383cee59b4098d"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "c132464a76eece0a21aea76022a99cce4006e1c77d6969944b8e398ad8bdf3eb"
+    },
+    {
+      "path": "python-lanes.txt",
+      "sha256": "6f1d062bc830ee1bb1eca4e175f3227ef1fb9742a23f8e73d3416c40c6a7706f"
+    },
+    {
+      "path": "red-claims.log",
+      "sha256": "4371df9e609f0a0e8e59fb5a2ac534688b00f781d34efccae519a0d955388b1f"
+    },
+    {
+      "path": "red-python.log",
+      "sha256": "a4698a5058ac30204533d2c7278580663456d96a817a246f9bc214ba66d3e8e9"
+    }
+  ],
+  "notes": "Totals are the focused vitest run (new and changed tests plus the existing tests covering the changed modules) at the merged head. Fresh-clone per-track totals: O17 51/51, O18 28/28, O20 9/9 (fresh-clone/*.json); O19 42/42 on Python 3.10.19, 3.11.14, 3.12.14 and 3.14.7 from an installed wheel, plus the licensed real-CLI test 1/1 on each (python-lanes.txt). The full suite was not run: a fresh-clone run was stopped after 50 minutes because the shared machine was overloaded. A durationMs of 0 means the command was not timed. Nothing was published and no network was used. See README.md."
+}
