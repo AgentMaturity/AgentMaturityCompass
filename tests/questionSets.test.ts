@@ -1,5 +1,5 @@
-import { generateKeyPairSync } from "node:crypto";
-import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -84,15 +84,11 @@ describe("diagnostic question sets", () => {
       workspace: workspace(),
       applyIndustryPackWeights: true
     });
-    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-    const licenseKey = createIndustryPackLicenseKey({
-      expiresAt: "2099-01-01T00:00:00.000Z",
-      env: {
-        AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString()
-      } as NodeJS.ProcessEnv
-    });
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKey.export({ type: "spki", format: "pem" }).toString());
+    // A licence signed by a key pinned in the operator trust list, so the licence really is active (P1-51).
+    const licence = testIndustryPackLicence();
+    vi.stubEnv("AMC_HOME", licence.amcHome);
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licence.licenseKey);
+    expect(getIndustryPackEntitlement(workspace()).active).toBe(true);
     const unlocked = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
@@ -104,6 +100,7 @@ describe("diagnostic question sets", () => {
     expect(locked.info.domainPackWeighting?.applied).toBe(false);
     expect(locked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
     expect(unlocked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
+    licence.cleanup();
   });
 
   test("an unknown question set name is refused, not silently mapped to a default", () => {
