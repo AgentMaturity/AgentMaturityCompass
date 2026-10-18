@@ -160,9 +160,10 @@ and the publication date. No clause text may be paraphrased from memory, so:
   (`src/compliance/frameworks.ts`).
 - No clause-level control quotes ISO/IEC 42005 (`src/compliance/frameworks/controls.ts`).
 - The three mappings below keep their ids and the category name "ISO 42005
-  Impact Assessment", so evidence already bound to them still resolves. They
-  are AMC impact-assessment signals filed under `ISO_42001`, not ISO/IEC 42005
-  clause mappings, and the `ISO_42001` family prints this flag in every report.
+  Impact Assessment", so evidence already bound to them still resolves. Every
+  report lists them as NOT_EVALUATED, "not evaluated: descoped (licensed text
+  unavailable)". They are never evaluated, and coverage leaves them out. The
+  `ISO_42001` family prints this flag on every compliance surface.
 - A licensed copy of the standard is Sid's to supply; mapping its clauses then
   needs a named expert's review (D-08).
 
