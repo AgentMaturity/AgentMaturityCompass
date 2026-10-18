@@ -1,7 +1,8 @@
 import { appendFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { detectProtectedRequest } from "../../../src/dataflow/detectors.js";
-import { initProcessorRegistry, processorRegistryPath, type ProcessorRegistryV1 } from "../../../src/dataflow/processorRegistry.js";
+import { initProcessorRegistry, processorRegistryPath, processorRegistrySchema, type ProcessorContractV1,
+  type ProcessorRegistryV1 } from "../../../src/dataflow/processorRegistry.js";
 import { admitProtectedModelRequest } from "../../../src/dataflow/purposePolicy.js";
 import type { EncodableRequest } from "../../../src/llm/request/requestSpec.js";
 import { EgressBlocked, checkScopedEgress } from "../../../src/residency/checkEgress.js";
@@ -38,6 +39,50 @@ describe("L0-DAT-01 and L0-DAT-03: protected-data admission of model requests (P
       expect(admission.reason).toBe(f.envelope.expected.reasonCode);
     });
   }
+});
+
+describe("P2-02 step 7: admission when nothing is detected", () => {
+  // Admission alone, on a request whose detection is empty: what the signed run purpose and a declared PHI token decide.
+  const route = { providerId: "care-provider", baseUrl: "https://care.fixture.example/v1" };
+  const empty = () => detectProtectedRequest(request("Summarise the changelog."));
+  const contract = (kind: ProcessorContractV1["kind"], effective: string, expires: string | null): ProcessorContractV1 =>
+    ({ kind, reference: `${kind}-CARE-1`, effective, expires, dataClasses: ["phi", "pii"] });
+  const DPA = contract("DPA", "2026-01-01", null);
+  const BAA = contract("BAA", "2026-01-01", null);
+  const careRegistry = (c: ProcessorContractV1, runPurpose?: string): ProcessorRegistryV1 => ({ schemaVersion: "amc.dataflow-processors/v1",
+    experimental: true, processors: [{ processorId: "proc-care", legalName: "Fixture Care Processor", contracts: [c] }],
+    purposes: [{ purposeId: "care", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-care"] }],
+    bindings: [{ ...route, processorId: "proc-care", purposeId: "care" }], ...(runPurpose === undefined ? {} : { runPurpose }) });
+  const admit = (registry: ProcessorRegistryV1, declared: ("phi" | "pii")[] = []) => {
+    const ws = newWorkspace();
+    initProcessorRegistry(ws, registry);
+    return admitProtectedModelRequest(ws, route.providerId, route.baseUrl, empty(), declared);
+  };
+
+  it("the request carries no detectable class", () => expect(empty().classes).toEqual([]));
+  it("a PHI run purpose routed to a DPA-only processor needs a BAA", () =>
+    expect(admit(careRegistry(DPA, "care"))).toMatchObject({ allowed: false, reason: "baa_required", classes: ["phi"] }));
+  it("an expired BAA is no BAA", () =>
+    expect(admit(careRegistry(contract("BAA", "2025-01-01", "2026-01-01"), "care"))).toMatchObject({ allowed: false, reason: "baa_required" }));
+  it("a BAA in force is allowed, with classes [phi]", () => expect(admit(careRegistry(BAA, "care")))
+    .toMatchObject({ allowed: true, reason: "declared_policy_allows", processorId: "proc-care", purposeId: "care", classes: ["phi"] }));
+  it("a declared PHI token with no run purpose needs a BAA", () =>
+    expect(admit(careRegistry(DPA), ["phi"])).toMatchObject({ allowed: false, reason: "baa_required", classes: ["phi"] }));
+  it("nothing detected, declared or purposed is no_protected_data", () =>
+    expect(admit(careRegistry(DPA))).toMatchObject({ allowed: true, reason: "no_protected_data", classes: [] }));
+  it("a registry edited after signing refuses whatever the request holds", () => {
+    const ws = newWorkspace();
+    initProcessorRegistry(ws, careRegistry(BAA, "care"));
+    appendFileSync(processorRegistryPath(ws), "# widened after signing\n");
+    expect(admitProtectedModelRequest(ws, route.providerId, route.baseUrl, empty())).toMatchObject({ allowed: false, reason: "signature_invalid" });
+  });
+  it("the schema rejects an unknown run purpose and a destination owned by two processors", () => {
+    const owned = (processorId: string) => ({ processorId, legalName: `Fixture ${processorId}`, contracts: [BAA], destinationIds: ["referral-api"] });
+    const base = careRegistry(BAA, "care");
+    expect(processorRegistrySchema.safeParse({ ...base, processors: [owned("proc-care")] }).success).toBe(true);
+    expect(processorRegistrySchema.safeParse({ ...base, runPurpose: "marketing" }).success).toBe(false);
+    expect(processorRegistrySchema.safeParse({ ...base, processors: [owned("proc-care"), owned("proc-other")] }).success).toBe(false);
+  });
 });
 
 describe("L0-DAT-04 residency routing (signed destination registry)", () => {
