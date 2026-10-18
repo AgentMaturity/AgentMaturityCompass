@@ -301,7 +301,7 @@ export function verifyIndustryPackLicenseReport(licenseKey: string, trust: Trust
     context: trust, integrityErrors: checks.valid ? [] : [checks.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
     signatures: [refusal ?? admitKey({ publicKeyPem: signer, purpose: INDUSTRY_PACKS_LICENSE_PURPOSE, signature: "license signature", context: trust,
       claimedSignedAt: result.payload?.issuedAt ?? null })] });
-  return { ...result, valid: report.trusted, report };
+  return { ...result, valid: result.valid && report.trusted, report };
 }
 
 export function buildIndustryPackCheckoutUrl(params: {

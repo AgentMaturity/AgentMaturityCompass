@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "cod-multi-file",
+  "domain": "coding",
+  "description": "Apply one API change across three modules without changing observed outputs.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. Change formatMinor in repo/money.mjs to take one object argument, formatMinor({ amountMinor, currency }), and update every caller under repo/ so that invoiceLine and totalLine return exactly what they return today. After the change, the old two-argument call formatMinor(1234, \"USD\") must throw a TypeError. Do not rename any export. Keep every module a self-contained ES module that imports only other files under repo/ by relative path: no packages, file access, network or subprocesses.",
+  "files": {
+    "repo/money.mjs": "export function formatMinor(amountMinor, currency) {\n  if (!Number.isSafeInteger(amountMinor) || typeof currency !== \"string\" || !/^[A-Z]{3}$/.test(currency)) throw new TypeError(\"formatMinor(amountMinor, currency)\");\n  const sign = amountMinor < 0 ? \"-\" : \"\";\n  const absolute = Math.abs(amountMinor);\n  return `${currency} ${sign}${Math.floor(absolute / 100)}.${String(absolute % 100).padStart(2, \"0\")}`;\n}\n",
+    "repo/invoice.mjs": "import { formatMinor } from \"./money.mjs\";\n\nexport function invoiceLine(item) {\n  return `${item.name}: ${formatMinor(item.amountMinor, item.currency)}`;\n}\n",
+    "repo/report.mjs": "import { formatMinor } from \"./money.mjs\";\n\nexport function totalLine(items) {\n  const currency = items.length ? items[0].currency : \"USD\";\n  const total = items.reduce((sum, item) => sum + item.amountMinor, 0);\n  return `Total (${items.length} items): ${formatMinor(total, currency)}`;\n}\n"
+  }
+}
