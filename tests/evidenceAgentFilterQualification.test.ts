@@ -130,7 +130,8 @@ describe("P0-27 genuine seeded evidence collector", () => {
     const result = collect("owned-and-legacy", matrix, "default");
     expect(matrix.expected).toHaveLength(28); expect(result.records.map(row => row.eventId)).toEqual(matrix.expected);
     expect(result).toMatchObject({ schemaVersion: 2, eventCount: 28, chainInvalidCount: 0,
-      agentFilter: { agentId: "default", mode: "row-meta-or-owned-session", sessionsIncluded: [matrix.ownedSession], rowsExcluded: 12 } });
+      agentFilter: { agentId: "default", mode: "row-meta-or-owned-session", sessionsIncluded: [matrix.ownedSession], rowsExcluded: 12,
+        systemSession: "excluded", insufficientFor: ["requires_no_audit"] } });
     expect(result.records.every(row => row.claimKind === "self_reported" && row.chainValid)).toBe(true);
     expect(result.records.every(row => row.writerSignature !== "unsigned")).toBe(true);
   });
