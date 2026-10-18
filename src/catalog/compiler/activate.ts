@@ -130,7 +130,7 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
   const journal = readJournal(workspace);
   if (journal.integrity === "uninitialized" || !journal.payload) return null;
   const { plan } = journal.payload;
-  const catalog = loadCatalog();
+  const catalog = loadCatalog({ enforceAdmission: true });
   const lock = verifyCatalogLock(plan.lock, catalog);
   if (!lock.ok) {
     const first = lock.mismatches[0];
@@ -167,7 +167,7 @@ export function activateControlPlan(input: ActivateInput): { revision: number; w
   const next: Activation = { schema: "amc.control-plan-activation/v1", plan: input.signed.plan, signature: input.signed.signature,
     compiledAt: input.signed.compiledAt, approvalRequestId: input.approvalRequestId };
   verifiedActivation(workspace, next);
-  const lock = verifyCatalogLock(next.plan.lock, loadCatalog());
+  const lock = verifyCatalogLock(next.plan.lock, loadCatalog({ enforceAdmission: true }));
   if (!lock.ok) throw new Error("the shipped catalog differs from the plan's lockfile; recompile against this catalog");
   return withControlFileLock({ root: root(workspace), name: "activation", operation: () => {
     const previous = readJournal(workspace, true);

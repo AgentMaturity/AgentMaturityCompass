@@ -89,6 +89,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      # P1-33: each pack's declared support against the ten admission criteria; fails a reviewed or qualified
+      # claim the pack does not meet and a malformed catalog/admission/ report, never an experimental draft.
+      - name: Catalog pack admission
+        run: npm run check:catalog-admission
+
       - name: Published schemas match the enforced schemas (P1-01)
         run: npm run check:schemas
 
