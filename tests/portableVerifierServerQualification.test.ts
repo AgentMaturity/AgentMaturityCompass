@@ -46,7 +46,9 @@ function signedList(home: string, issuer: Pick<TestKey, "keyId" | "publicKeyPem"
   distrusted = false): string {
   const now = Date.now();
   const list = trustList([listEntry({ ...issuer, privateKeyPem: "not-used" }, { purposes: [purpose],
-    validFrom: new Date(now - 3_600_000).toISOString(), validTo: null })], { listId: "server-fixture", issuedAt: new Date(now - 60_000).toISOString(),
+    // The distrust list is a newer list: the same listId and sequence with other content is refused FORK_DETECTED (P1-08).
+    validFrom: new Date(now - 3_600_000).toISOString(), validTo: null })], { listId: "server-fixture", sequence: distrusted ? 2 : 1,
+    issuedAt: new Date(now - 60_000).toISOString(),
     expiresAt: new Date(now + 86_400_000).toISOString(), distrust: distrusted ? [distrustEntry(issuer.keyId)] : [] });
   mkdirSync(join(home, "trust"), { recursive: true, mode: 0o700 });
   const file = join(home, "trust", "amc-trust-list.json");
