@@ -4,14 +4,16 @@ import { assessDomain, parseAnnexIIIPoints } from "../src/domains/domainAssessme
 import { buildDomainReport, renderDomainReportMarkdown } from "../src/domains/domainReportBuilder.js";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { DOMAIN_REGISTRY, type Domain } from "../src/domains/domainRegistry.js";
+import type { Level0to5, Likert1to5 } from "../src/score/units.js";
 
 const DOMAINS = Object.keys(DOMAIN_REGISTRY) as Domain[];
 const NOW = Date.UTC(2026, 9, 3, 12, 0, 0);
 
-function uniform(domain: Domain, base: number, domainValue: number, overrides: Record<string, number> = {}) {
-  const baseScores: Record<string, number> = {};
+/** Base answers are diagnostic levels 0-5 and domain answers Likert 1-5 (P0-21 units). */
+function uniform(domain: Domain, base: Level0to5, domainValue: Likert1to5, overrides: Record<string, Likert1to5> = {}) {
+  const baseScores: Record<string, Level0to5> = {};
   for (let i = 1; i <= 42; i += 1) baseScores[`AMC-${i}`] = base;
-  const domainQuestionScores: Record<string, number> = {};
+  const domainQuestionScores: Record<string, Likert1to5> = {};
   for (const q of getDomainPackQuestions(domain)) domainQuestionScores[q.id] = domainValue;
   return assessDomain({ agentId: "agent-s4", domain, baseScores, domainQuestionScores: { ...domainQuestionScores, ...overrides } });
 }
@@ -19,7 +21,7 @@ function uniform(domain: Domain, base: number, domainValue: number, overrides: R
 describe("domain assessment — EU AI Act classification", () => {
   test("carries the station category and every station pack's Annex III classification", () => {
     for (const domain of DOMAINS) {
-      const result = uniform(domain, 80, 80);
+      const result = uniform(domain, 4, 4);
       const packs = getIndustryPacksByStation(domain);
       expect(result.euAIActClassification.domainCategory).toBe(DOMAIN_REGISTRY[domain].euAIActCategory);
       expect(result.euAIActClassification.packs.map((p) => p.packId)).toEqual(packs.map((p) => p.id));
@@ -58,7 +60,7 @@ describe("domain assessment — EU AI Act classification", () => {
   });
 
   test("governance exposes dance-of-democracy under Annex III point 8 with its PROHIBITED flag", () => {
-    const packs = uniform("governance", 80, 80).euAIActClassification.packs;
+    const packs = uniform("governance", 4, 4).euAIActClassification.packs;
     const pack = packs.find((p) => p.packId === "dance-of-democracy");
     expect(pack?.annexIIIPoints).toEqual([8]);
     expect(pack?.prohibitedFlag).toBe(true);
@@ -66,45 +68,14 @@ describe("domain assessment — EU AI Act classification", () => {
   });
 });
 
-describe("domain assessment — certification threshold semantics", () => {
-  test("a composite exactly at the threshold meets it (>=, inclusive)", () => {
-    const result = uniform("technology", 70, 70);
-    expect(result.compositeScore).toBe(70);
-    expect(result.certification).toEqual({
-      threshold: 70,
-      comparison: ">=",
-      compositeScore: 70,
-      meetsThreshold: true,
-      blockingGaps: [],
-      ready: true,
-    });
-    expect(result.certificationReadiness).toBe(true);
-  });
-
-  test("one point below the threshold does not meet it", () => {
-    const result = uniform("technology", 69, 69);
-    expect(result.compositeScore).toBe(69);
-    expect(result.certification.meetsThreshold).toBe(false);
-    expect(result.certificationReadiness).toBe(false);
-  });
-
-  test("a critical control at L1 blocks readiness even above the threshold", () => {
-    const result = uniform("technology", 100, 100, { "TECH-1": 1 });
-    expect(result.certification.meetsThreshold).toBe(true);
-    expect(result.certification.blockingGaps).toEqual(["TECH-1"]);
-    expect(result.certification.ready).toBe(false);
-    expect(result.certificationReadiness).toBe(false);
-  });
-});
-
-function governance(base: number, domainValue: number) {
+function governance(base: Level0to5, domainValue: Likert1to5) {
   return uniform("governance", base, domainValue);
 }
 
-describe("domain report — EU AI Act classification and certification semantics", () => {
+describe("domain report — EU AI Act classification", () => {
   test("renders the station category and each pack's Annex III classification", () => {
-    const result = governance(80, 80);
-    const md = renderDomainReportMarkdown(result, NOW);
+    const result = governance(4, 4);
+    const md = renderDomainReportMarkdown(result, undefined, NOW);
     expect(md).toContain("## EU AI Act Classification");
     const flagged = result.euAIActClassification.packs.filter((p) => p.prohibitedFlag).map((p) => p.packId);
     expect(flagged).toContain("dance-of-democracy");
@@ -115,24 +86,21 @@ describe("domain report — EU AI Act classification and certification semantics
     }
   });
 
-  test("states the certification rule, not just a yes/no", () => {
-    const result = governance(80, 80);
-    const md = renderDomainReportMarkdown(result, NOW);
-    expect(md).toContain(`- Certification Threshold: composite >= ${result.certification.threshold} and no critical control at L1`);
-    expect(md).toContain(`- Threshold Met: ${result.certification.meetsThreshold ? "yes" : "no"} (composite ${result.compositeScore})`);
-    const low = renderDomainReportMarkdown(governance(45, 20), NOW);
-    expect(low).toContain("- Threshold Met: no");
-    expect(low).toMatch(/- Blocking Critical Gaps: GOV-\d+(, GOV-\d+)*/);
+  test("prints no certification verdict: the scores are self-reported (P0-21)", () => {
+    for (const md of [renderDomainReportMarkdown(governance(4, 4), undefined, NOW), renderDomainReportMarkdown(governance(2, 1), undefined, NOW)]) {
+      expect(md).not.toMatch(/certif|Threshold Met|Blocking Critical Gaps/i);
+      expect(md).toContain("**Claim:** Self-reported");
+    }
   });
 
-  test("report object carries the classification and certification blocks and is deterministic for a given now", () => {
-    const result = governance(80, 80);
-    const a = buildDomainReport(result, NOW);
-    const b = buildDomainReport(result, NOW);
+  test("report object carries the classification block and is deterministic for a given now", () => {
+    const result = governance(4, 4);
+    const a = buildDomainReport(result, undefined, NOW);
+    const b = buildDomainReport(result, undefined, NOW);
     expect(a).toEqual(b);
     expect(a.generatedAt).toBe(new Date(NOW).toISOString());
     expect(a.markdown).toContain(`Generated: ${new Date(NOW).toISOString()}`);
     expect(a.euAIActClassification).toEqual(result.euAIActClassification);
-    expect(a.certification).toEqual(result.certification);
+    expect(a).not.toHaveProperty("certification");
   });
 });
