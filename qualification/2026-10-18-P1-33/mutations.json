@@ -1,0 +1,313 @@
+{
+ "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
+ "test": "tests/catalog/admission/checker.test.ts",
+ "method": "one mutation at a time, the named source restored after each run",
+ "killed": 29,
+ "survived": 0,
+ "mutations": [
+  {
+   "mutation": "false-pass count skipped (spec)",
+   "file": "src/catalog/admission/fixtureRunner.ts",
+   "from": "falseMandatoryPasses: outcomes.filter(isFalsePass).length,",
+   "to": "falseMandatoryPasses: 0,",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 56ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 48ms"
+   ]
+  },
+  {
+   "mutation": "false-pass guard dropped",
+   "file": "src/catalog/admission/fixtureRunner.ts",
+   "from": "o.envelope.polarity === \"negative\" && (o.actual === \"pass\" || o.actual === \"allow\")",
+   "to": "false",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a negative fixture that passes: criterion 6, ADM6_FALSE_MANDATORY_PASS 31ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 50ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 61ms"
+   ]
+  },
+  {
+   "mutation": "agent-signer refusal dropped (spec)",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "r.reviewer?.identity?.kind !== \"human\" ? [index] : []",
+   "to": "false ? [index] : []",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a sign-off signed by an agent identity: criterion 9, ADM9_AGENT_SIGNER 19ms"
+   ]
+  },
+  {
+   "mutation": "loader gate off",
+   "file": "src/catalog/loader.ts",
+   "from": "if (opts.enforceAdmission) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 downgrades a pack declaring reviewed with no report to experimental, in memory only 10ms",
+    "\u00d7 keeps reviewed only with a current, intact report that admits it 174ms"
+   ]
+  },
+  {
+   "mutation": "gate ignores a stale report",
+   "file": "src/catalog/admission/report.ts",
+   "from": "if (report.pack.digest !== digest) return",
+   "to": "if (false) return",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 keeps reviewed only with a current, intact report that admits it 333ms"
+   ]
+  },
+  {
+   "mutation": "gate ignores a refusing report",
+   "file": "src/catalog/admission/report.ts",
+   "from": "if (report.decision !== \"admit\" || report.pack.declaredSupport !== manifest.support) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 keeps reviewed only with a current, intact report that admits it 374ms"
+   ]
+  },
+  {
+   "mutation": "report digest not verified",
+   "file": "src/catalog/admission/report.ts",
+   "from": "if (reportDigest(report) !== report.digest) return",
+   "to": "if (false) return",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 keeps reviewed only with a current, intact report that admits it 200ms"
+   ]
+  },
+  {
+   "mutation": "qualified rule dropped",
+   "file": "src/catalog/admission/index.ts",
+   "from": "...(declared === \"qualified\" ? [\"qualification rule not defined\"] : [])",
+   "to": "...([] as string[])",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 21ms"
+   ]
+  },
+  {
+   "mutation": "experimental admitted despite validation errors",
+   "file": "src/catalog/admission/index.ts",
+   "from": "decision: invalid.length === 0 ? \"admit\" as const : \"refuse\" as const,",
+   "to": "decision: \"admit\" as const,",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses an experimental draft that fails P1-09 validation 130ms"
+   ]
+  },
+  {
+   "mutation": "exit code always 0",
+   "file": "src/catalog/admission/index.ts",
+   "from": "exitCode: reports.every(admissible) && !problems.some((p) => p.severity === \"error\") ? 0 : 1",
+   "to": "exitCode: 0",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses an experimental draft that fails P1-09 validation 135ms",
+    "\u00d7 fails a pack that claims reviewed support it does not meet 24ms",
+    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 113ms"
+   ]
+  },
+  {
+   "mutation": "malformed report not reported",
+   "file": "src/catalog/admission/index.ts",
+   "from": "if (\"error\" in parsed) return [{ code: \"ADM_REPORT_MALFORMED\"",
+   "to": "if (\"error\" in parsed) return []; if (false) return [{ code: \"ADM_REPORT_MALFORMED\"",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 80ms"
+   ]
+  },
+  {
+   "mutation": "c1 licence",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (!/^[A-Za-z0-9.+-]+$/.test(m.licence))",
+   "to": "if (false)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a pack without a licence: criterion 1, ADM1_LICENCE_MISSING 44ms"
+   ]
+  },
+  {
+   "mutation": "c1 reproducibility",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (first !== second || (locked !== \"(absent)\" && locked !== first)) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a digest that changes between loads (injected timestamp): criterion 1, ADM1_DIGEST_NOT_REPRODUCIBLE 34ms"
+   ]
+  },
+  {
+   "mutation": "c2 unverified retrieval",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (c.retrieval.state !== \"verified\")",
+   "to": "if (false)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses an unverified citation in a reviewed pack: criterion 2, ADM2_CITATION_UNVERIFIED 44ms"
+   ]
+  },
+  {
+   "mutation": "c2 legal review",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "else if (shown === \"unverified\") {",
+   "to": "else if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 26ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 19ms"
+   ]
+  },
+  {
+   "mutation": "c3 exclusions",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (a.exclusions.length === 0 && !isAlways(a.predicate)) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses empty exclusions with a non-trivial predicate: criterion 3, ADM3_EXCLUSIONS_MISSING 24ms"
+   ]
+  },
+  {
+   "mutation": "c4 manual duty",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (b.kind === \"manual\" && (",
+   "to": "if (false && (",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a manual binding without an owner: criterion 4, ADM4_MANUAL_DUTY_INCOMPLETE 36ms"
+   ]
+  },
+  {
+   "mutation": "c5 oracle table",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (!ORACLES[t.type].includes(t.oracle.kind)) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a runtime_enforced test with a human_assessor oracle: criterion 5, ADM5_ORACLE_MISMATCH 21ms"
+   ]
+  },
+  {
+   "mutation": "c6 negative classes",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (missing.length > 0) add(\"ADM6_NEGATIVE_CLASS_MISSING\"",
+   "to": "if (false) add(\"ADM6_NEGATIVE_CLASS_MISSING\"",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses no cross_tenant fixture: criterion 6, ADM6_NEGATIVE_CLASS_MISSING 20ms"
+   ]
+  },
+  {
+   "mutation": "c6 unrun harness counted as met",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "  if (count > 0) {",
+   "to": "  if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 23ms",
+    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 333ms"
+   ]
+  },
+  {
+   "mutation": "c7 producer status",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "else if (producer.status !== \"available\")",
+   "to": "else if (false)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a planned evidence producer: criterion 7, ADM7_PRODUCER_NOT_AVAILABLE 20ms"
+   ]
+  },
+  {
+   "mutation": "c8 unknown fixture passed",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "own.filter((x) => x.actual !== null && x.actual !== \"deny\" && x.actual !== \"not_evaluated\")",
+   "to": "own.filter(() => false)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses an unknown-authority fixture that passes: criterion 8, ADM8_UNKNOWN_FIXTURE_PASSED 25ms"
+   ]
+  },
+  {
+   "mutation": "c8 unknown facts decided",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (decided.length > 0 && (!row || row.applicability === \"not_applicable\")) {",
+   "to": "if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a control the compiler excludes with every fact unknown: criterion 8, ADM8_UNKNOWN_FACTS_DECIDED 21ms"
+   ]
+  },
+  {
+   "mutation": "c9 control review not required",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "    if (res.promotion === null) {",
+   "to": "    if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 21ms",
+    "\u00d7 refuses an AI-drafted control without a human approval of the draft: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 16ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 15ms",
+    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 327ms"
+   ]
+  },
+  {
+   "mutation": "c9 approvedBy not matched",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "} else if (draftedBy === \"ai\" && (approvedBy === null || !res.promotion.reviewers.includes(approvedBy))) {",
+   "to": "} else if (false) {",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses an AI draft whose approvedBy names no reviewer whose record counted: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 18ms"
+   ]
+  },
+  {
+   "mutation": "c10 heading",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "if (!UNSUPPORTED_HEADING.test(bytes.toString(\"utf8\")))",
+   "to": "if (false)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a coverage document without an Unsupported behaviour section: criterion 10, ADM10_COVERAGE_SECTION_MISSING 19ms"
+   ]
+  },
+  {
+   "mutation": "signoffs: three distinct people",
+   "file": "src/catalog/governance/support.ts",
+   "from": ".find((t) => people(t) === 3);",
+   "to": ".find(() => true);",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a risk owner who is also the domain lead: criterion 9, ADM9_SIGNOFF_NOT_DISTINCT 24ms"
+   ]
+  },
+  {
+   "mutation": "signoffs: domain lead credential",
+   "file": "src/catalog/governance/support.ts",
+   "from": "holders(\"domain_lead\", pack.stations)",
+   "to": "holders(\"domain_lead\", null)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a domain lead not credentialed for the pack's stations: criterion 9, ADM9_SIGNOFF_MISSING 21ms"
+   ]
+  },
+  {
+   "mutation": "signoffs: risk owner role",
+   "file": "src/catalog/governance/support.ts",
+   "from": "holders(\"risk_owner\", null)",
+   "to": "holders(\"domain_lead\", null)",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 admits the complete pack as reviewed, with all ten criteria met and a reproducible digest 183ms",
+    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 17ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 30ms",
+    "\u00d7 keeps reviewed only with a current, intact report that admits it 268ms"
+   ]
+  }
+ ]
+}

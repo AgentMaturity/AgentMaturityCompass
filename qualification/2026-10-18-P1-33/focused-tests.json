@@ -1,0 +1,129 @@
+{
+ "command": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
+ "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
+ "total": 808,
+ "passed": 808,
+ "failed": 0,
+ "files": [
+  {
+   "file": "tests/catalog/admission/checker.test.ts",
+   "passed": 30,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/governance/changelogGuard.test.ts",
+   "passed": 8,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/governance/currency.test.ts",
+   "passed": 16,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/governance/promotion.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/governance/reverify.test.ts",
+   "passed": 8,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/governance/reviewRecord.test.ts",
+   "passed": 35,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/catalogLoads.test.ts",
+   "passed": 11,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/data.test.ts",
+   "passed": 14,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/evidenceFixtures.test.ts",
+   "passed": 449,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/fixtureCoverage.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/identity.test.ts",
+   "passed": 30,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/inventory.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/logging.test.ts",
+   "passed": 14,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/monitoring.test.ts",
+   "passed": 18,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/oversight.test.ts",
+   "passed": 22,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/tools.test.ts",
+   "passed": 16,
+   "failed": 0
+  },
+  {
+   "file": "tests/compiledVisibleTools.test.ts",
+   "passed": 23,
+   "failed": 0
+  },
+  {
+   "file": "tests/compilerStationDefaults.test.ts",
+   "passed": 14,
+   "failed": 0
+  },
+  {
+   "file": "tests/freezeGuard.test.ts",
+   "passed": 16,
+   "failed": 0
+  },
+  {
+   "file": "tests/runPrincipalLease.test.ts",
+   "passed": 15,
+   "failed": 0
+  },
+  {
+   "file": "tests/starterProfiles.test.ts",
+   "passed": 15,
+   "failed": 0
+  },
+  {
+   "file": "tests/studioVaultModeLoop.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/usRegister.test.ts",
+   "passed": 18,
+   "failed": 0
+  },
+  {
+   "file": "tests/wealthOverlay.test.ts",
+   "passed": 7,
+   "failed": 0
+  }
+ ]
+}

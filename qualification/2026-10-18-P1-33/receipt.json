@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-33",
+  "date": "2026-10-18",
+  "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
+  "branch": "rtd/p1-33-catalog-reverify",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 79000
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
+      "exit": 0,
+      "durationMs": 159000
+    },
+    {
+      "cmd": "python3 P1-33-work/mutate.py (29 mutations, tests/catalog/admission/checker.test.ts each)",
+      "exit": 0,
+      "durationMs": 240000
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 45970
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 80768
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 5068
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1654
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 745
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 1,
+      "durationMs": 2795
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref 710840d09",
+      "exit": 0,
+      "durationMs": 1780
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2326
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 402
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 772
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 242
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 312
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 345
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1231
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 4644
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 1186
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 497
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3098
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref origin/main",
+      "exit": 0,
+      "durationMs": 834
+    },
+    {
+      "cmd": "npm run -s check:package",
+      "exit": 0,
+      "durationMs": 6563
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 279395
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1000
+    }
+  ],
+  "tests": {
+    "total": 808,
+    "passed": 808,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "0736aff512afb13b032a3096323a76a617c84becdfead5e80fa5ee7c2b391ee8"
+    },
+    {
+      "path": "amc.l0.baseline-0.1.0.json",
+      "sha256": "2437a2279cdbc2ed76492cb85cf81479ee33307702375f824fc7df6cc1cd9ad0"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "3b22a9d7782da85242177957f34a6927f3a432cdf56a6c335665de90706bf5eb"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "23c143f3bcf418060b6de53b28978320309e395fc8b792535de6bd572079a316"
+    }
+  ],
+  "notes": "Focused tests only; the full suite was not run here. check:freeze -- --base-ref int exits 1 only because P1-33 is not yet in int's allowedExceptionKeys (a branch cannot authorize itself); commit 710840d09 adds the key alone and check:freeze -- --base-ref 710840d09 exits 0. All 29 mutations killed. Durations of the build, vitest, mutation and check:qualification rows are approximate. No pack is promoted: every pack is experimental and no D-08 reviewer exists."
+}
