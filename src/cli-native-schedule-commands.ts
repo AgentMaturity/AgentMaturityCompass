@@ -7,6 +7,7 @@ import { approvalGateFor, integerOption, paramsFor, routeFor, type AgentLoopCliI
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderTransport } from "./agent/stubProvider.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
+import { runLease } from "./leases/runLease.js";
 
 const defaultIo: AgentLoopCliIo = {
   log: line => console.log(line), error: line => console.error(line), fail: () => { process.exitCode = 1; }
@@ -129,7 +130,9 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
           if (!status.schedules.some(schedule => schedule.due)) return { sessionId: null, scheduleResults: [], cancelled: false };
           const runtime = await loadRuntime();
           if (signal.aborted) return { sessionId: null, scheduleResults: [], cancelled: true };
-          const outcome = await runtime.runComposedTurn({ workspace: root, agentId: opts.agent, prompt: "",
+          // P1-79: the pass's lease, which its scheduled children inherit, or PRINCIPAL_UNRESOLVED before any session row.
+          const lease = runLease({ workspace: root, agentId: opts.agent, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, tools: "workspace" });
+          const outcome = await runtime.runComposedTurn({ workspace: root, agentId: opts.agent, prompt: "", ...lease,
             route: { providerId: opts.provider, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, params: requestParams },
             routes: [route], ...(opts.provider === STUB_PROVIDER_ID ? { transport: stubProviderTransport({}) } : {}),
             config: { maxStepsPerTurn: maxSteps },
