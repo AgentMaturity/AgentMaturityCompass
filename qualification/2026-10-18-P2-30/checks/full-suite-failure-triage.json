@@ -1,0 +1,159 @@
+{
+  "sourceHead": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+  "integrationBase": "7bc90f3245e5232c936a3912beb730f0237c5b2d",
+  "currentIntegrationBase": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "run": {
+    "name": "full-suite-2-workers",
+    "cmd": "npm test -- --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json",
+    "exit": 1,
+    "durationMs": 7735694,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers.log",
+    "rawLogSha256": "f420499a79dcaf951951d0cac7bb338d0ec377951a2d0da61df05e80016d45bb",
+    "rawLogBytes": 190278,
+    "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json"
+  },
+  "finalFiles": {
+    "total": 1729,
+    "passed": 1719,
+    "failed": 8,
+    "skipped": 2
+  },
+  "finalTests": {
+    "total": 25064,
+    "passed": 25044,
+    "failed": 13,
+    "skipped": 7
+  },
+  "failedAssertions": [
+    {
+      "file": "tests/compilerStationDefaults.test.ts",
+      "test": "P1-46: the compiled plan holds F2's station-profile rules for every station golden: technology",
+      "category": "overlay expected behavior update",
+      "durationMs": 29.216249999999945,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "test": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "category": "baseline graph defect, isolated reproduction pending",
+      "durationMs": 120.12591699999996,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/releaseSecretScanCoverage.test.ts",
+      "test": "release secret scanner content coverage shares entry budgets across every nested npm archive",
+      "category": "elapsed test budget",
+      "durationMs": 28268.595667,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "session store conformance \u2014 both backends, one suite the JSONL backend passes every case \u2014 signed and chained, not a fast path",
+      "category": "elapsed test budget",
+      "durationMs": 34869.934333,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) fails a backend that breaks unsigned",
+      "category": "elapsed test budget",
+      "durationMs": 43082.22145900001,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) fails a backend that breaks broken-session-seq",
+      "category": "elapsed test budget",
+      "durationMs": 76011.164458,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) fails a backend that breaks truncating",
+      "category": "elapsed test budget",
+      "durationMs": 102077.746667,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) fails a backend that breaks lying-capability",
+      "category": "elapsed test budget",
+      "durationMs": 108055.74641600001,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) fails a backend that breaks idempotent-seal",
+      "category": "elapsed test budget",
+      "durationMs": 112742.12866599998,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "test": "the conformance suite has teeth (mutation tests) the signature mutation is caught ONLY by the signature rule",
+      "category": "elapsed test budget",
+      "durationMs": 109835.26245899999,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/starterProfiles.test.ts",
+      "test": "amc init --regulated (P1-40) compiles and signs a Layer 0 plan, names the facts it waits for and activates nothing",
+      "category": "overlay expected behavior update",
+      "durationMs": 1947.9217079999999,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/keys/atomicRotation.test.ts",
+      "test": "atomic rotation (P1-08) every crash inside a rotation's commit refuses to sign and verify until --resume, and resume completes or rolls back",
+      "category": "elapsed test budget",
+      "durationMs": 814596.392417,
+      "status": "preserved; post-integration targeted disposition pending"
+    },
+    {
+      "file": "tests/performance/sessionSpine.performance.test.ts",
+      "test": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+      "category": "throughput threshold",
+      "durationMs": 49333.972125,
+      "status": "preserved; post-integration targeted disposition pending"
+    }
+  ],
+  "suiteErrors": [
+    {
+      "file": "tests/publicDocsArtifact.test.ts",
+      "message": "Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\"."
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "message": "Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\"."
+    }
+  ],
+  "userInstruction": "Prepare remaining draft handoffs with full-suite checks explicitly pending",
+  "currentFullSuiteStatus": "Pending at post-P1-34 source; completed failing run preserved without reattribution",
+  "limits": "Timeout paths report elapsed budgets, not invariant mismatches. Resource causation is not proven. Throughput threshold failure is real in this run; no threshold or guard is weakened.",
+  "baselineGraph": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "cleanBeforeAndAfter": true,
+    "exit": 1,
+    "tests": {
+      "total": 6,
+      "passed": 5,
+      "failed": 1
+    },
+    "defect": "MCP_SERVER links to MCP_INDUSTRY_PACKS.md, absent from public allowlist",
+    "receipt": "checks/baseline/publicDocsGraph-receipt.json"
+  },
+  "baselinePerformance": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "cleanBeforeAndAfter": true,
+    "exit": 1,
+    "tests": {
+      "total": 2,
+      "passed": 1,
+      "failed": 1
+    },
+    "observedContentEventsPerSecond": 42.63577799888038,
+    "requiredGreaterThan": 150,
+    "receipt": "checks/baseline/sessionSpine-performance-receipt.json",
+    "limit": "Proves the failure exists on the integration baseline in this environment. Does not establish resource causation."
+  }
+}

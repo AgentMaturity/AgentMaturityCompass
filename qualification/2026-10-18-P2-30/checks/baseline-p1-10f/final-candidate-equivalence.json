@@ -1,0 +1,151 @@
+{
+  "recordedAtUtc": "2026-10-18T10:12:16.042Z",
+  "baselineRevision": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "previousCandidateRevision": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "finalCandidateRevision": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "method": "Read-only committed Git blobs for the existing 249-path set; SHA-256 recomputed for current candidate and baseline. No tests, imports, compiler or runtime checks executed.",
+  "d15": {
+    "paths": [
+      "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/final-candidate-equivalence.json"
+    ],
+    "result": "none"
+  },
+  "preservedSourceComparison": {
+    "path": "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/source-comparison.json",
+    "sha256": "d174f50d212c699d7c36c956c52801a10011ab9f6267a7f774253527db132e38",
+    "byteExact": true
+  },
+  "candidateDelta": [
+    {
+      "status": "M",
+      "path": "tests/catalog/stations/technology/fixtures.test.ts"
+    },
+    {
+      "status": "M",
+      "path": "tests/catalog/stations/technology/nis2Drill.ts"
+    }
+  ],
+  "scope": "The two test files, Vitest configuration, package/dependency pins, public Docs graph script and every promoted guide source from either revision, MCP graph defect target, workspace entry, and every src/session file. This bounded byte comparison is not an exhaustive transitive import graph.",
+  "comparedFileCount": 249,
+  "verifiedComparisonSetSha256": "12df76035412ad4824a6f16bf9080a0c1a8e7acfcca11d3f9f027d27e7808e3e",
+  "allBaselineRecordedHashesVerified": true,
+  "allCurrentCandidateInputsMatchPreviousCandidate": true,
+  "identicalToBaselineCount": 248,
+  "documentedBaselineDifferences": [
+    {
+      "path": "docs/sdk/TYPESCRIPT_SDK.md",
+      "baselineSha256": "c2928d862209c77b3b10943574a1e887c428605b45788b4d06041f896ac96e58",
+      "previousCandidateSha256": "c475980697c16c82bb6986f6ba495e2dd23fa5d44df3ded3da24790a5aca53dc",
+      "currentCandidateSha256": "c475980697c16c82bb6986f6ba495e2dd23fa5d44df3ded3da24790a5aca53dc",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": false
+    }
+  ],
+  "criticalInputHashes": [
+    {
+      "path": "package.json",
+      "baselineSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+      "previousCandidateSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+      "currentCandidateSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "baselineSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+      "previousCandidateSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+      "currentCandidateSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+      "previousCandidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+      "currentCandidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "tests/publicDocsGraph.test.ts",
+      "baselineSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "previousCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "currentCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "tests/performance/sessionSpine.performance.test.ts",
+      "baselineSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+      "previousCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+      "currentCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "website/docs/docs.js",
+      "baselineSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+      "previousCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+      "currentCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "docs/MCP_SERVER.md",
+      "baselineSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+      "previousCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+      "currentCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "docs/MCP_INDUSTRY_PACKS.md",
+      "baselineSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+      "previousCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+      "currentCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "baselineSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "previousCandidateSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "currentCandidateSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "src/session/sessionSpine.ts",
+      "baselineSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+      "previousCandidateSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+      "currentCandidateSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    },
+    {
+      "path": "src/session/spill/spillStore.ts",
+      "baselineSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "previousCandidateSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "currentCandidateSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "baselineRecordedHashVerified": true,
+      "currentMatchesPreviousCandidate": true,
+      "identicalToBaseline": true
+    }
+  ],
+  "sessionInputs": {
+    "count": 40,
+    "allIdenticalToBaseline": true
+  },
+  "claim": "The unchanged baseline probe inputs remain linked to final a7e6 through the preserved e4bb comparison. The only documented baseline difference in this set is TYPESCRIPT_SDK.md; this artifact does not make the bounded comparison an exhaustive transitive import graph or establish failure causation."
+}

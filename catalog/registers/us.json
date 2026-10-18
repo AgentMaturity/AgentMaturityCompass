@@ -1064,6 +1064,96 @@
       "s5RegisterId": "us-ecoa-reg-b"
     },
     {
+      "id": "technology-us-ftc-proposed-accuracy",
+      "row": "P2-30 Technology: Policy Statement Concerning the Suppression of Accuracy in Artificial Intelligence Systems",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Separate proposed policy context only; it does not stand in for an FTC Act legal record.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Policy Statement Concerning the Suppression of Accuracy in Artificial Intelligence Systems",
+        "clause": "Proposed AI accuracy policy; distinct from the FTC Act Section 5",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "US",
+        "statusType": "draft",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.federalregister.gov/documents/full_text/text/2026/07/07/2026-13628.txt",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "us-ftc-ai-accuracy-policy"
+    },
+    {
+      "id": "technology-us-tcpa",
+      "row": "P2-30 Technology: TCPA applied to AI-generated voices (Declaratory Ruling) and proposed AI-call disclosure rules",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Questionnaire on AI-voice consent; proposed AI-call disclosure duties are not treated as final.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "TCPA applied to AI-generated voices (Declaratory Ruling) and proposed AI-call disclosure rules",
+        "clause": "FCC 24-17; exact consent scope requires re-verification",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://docs.fcc.gov/public/attachments/FCC-24-17A1.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "us-fcc-tcpa-ai"
+    },
+    {
+      "id": "us-coppa-third-party-consent",
+      "row": "P2-30 Technology: Children's Online Privacy Protection Rule (as amended 2025)",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Separate parental consent before third-party disclosure and a bounded retention policy; applicability and exceptions require human scoping.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Children's Online Privacy Protection Rule (as amended 2025)",
+        "clause": "16 CFR 312.5(a)(2); 312.10 (candidate clause pins, unverified here)",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/FR-2025-04-22/html/2025-05904.htm",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "us-coppa"
+    },
+    {
       "id": "governance-omb-m25-21-human-review",
       "row": "OMB M-25-21 — Human oversight, timely human review and appeal",
       "stations": [

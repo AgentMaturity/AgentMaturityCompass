@@ -1,0 +1,21 @@
+{
+  "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "node": "v22.23.3",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1"
+  ],
+  "exitCode": 0,
+  "testsPassed": 135,
+  "elapsedSeconds": 8.813,
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-governance-20261018T095523263228Z/restored-green.log",
+  "historicalPrimarySha256": "f1d644b44bebfe11f3ab41ddfd2d6d1368e1d52f1653b9f7bd755744618feb50",
+  "previousFreshProofArchive": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/mutation-proof-history/20261018T095523263228Z-b37f2630b74084282abccb777f41f275813e4103-d08e41ac8ffb.json",
+  "previousFreshProofSha256": "d08e41ac8ffbebe6aa336588435d4f41e4067399278e36ff48d4268ba0dedb41",
+  "newFreshProofSha256": "3c3ea8917c3cb0df64d67244ec6d748bf2dd24e267477d728e26c74dd69fe83f",
+  "sourceClean": true
+}

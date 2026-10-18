@@ -127,7 +127,7 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     // and fails here: route it through effectiveSupport, supportStanding or a shown* helper instead, or add it with its reason.
     const allowed: Record<string, [number, string]> = {
       "src/catalog/governance/support.ts": [11, "supportStanding, effectiveSupport and the shown* helpers"],
-      "src/catalog/governance/index.ts": [4, "the report compares the declaration with effectiveSupport's result"],
+      "src/catalog/governance/index.ts": [5, "the report compares the declaration with effectiveSupport's result; the declared support that sets GOV_CITATION_DUE_PASSED severity"],
       "src/catalog/governance/changelogGuard.ts": [2, "declared reviewed content needs review ids: stricter only"],
       "src/catalog/compiler/compile.ts": [2, "writes supportStanding's verdict into each row"],
       "src/catalog/compiler/applicability.ts": [2, "the row's initial value, replaced by compile; retired never promotes"],
@@ -138,7 +138,9 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
       "src/a4/adaptPolicy.ts": [1, "the key of the shownLegalReview result"],
       "src/exports/oscal/oscalCatalog.ts": [5, "the citation spread with legalReview replaced by shownLegalReview; metadata last-modified dates"],
       "src/policy/effectivePolicyReceipt.ts": [1, "ActiveControl.review, which activation sets through shownReviewStatus"],
-      "src/cli.ts": [2, "a marketplace rating's review text, not a catalog record"]
+      "src/cli.ts": [2, "a marketplace rating's review text, not a catalog record"],
+      "src/catalog/admission/index.ts": [2, "the admission report row's own computed support (r.support), not a control record (P1-33)"],
+      "src/catalog/admission/report.ts": [1, "the admission report's own support field in its verdict digest (P1-33)"]
     };
     const pattern = /\breview\.(status|expert|credential|reviewedAt|nextReview)\b|provenance\.approvedBy\b|\b(record|control|r|c|rec)\??\.(review|provenance|support)\b|\blegalReview\b|\.\.\.(c|citation|cite|record|control|r)\b(?!\.)/g;
     const root = join(__dirname, "..", "..", "..");

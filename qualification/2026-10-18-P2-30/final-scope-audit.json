@@ -1,0 +1,2248 @@
+{
+  "recordedAtUtc": "2026-10-18T11:34:40.804Z",
+  "issue": "P2-30",
+  "state": "committed_scoped_verified_full_completed_with_recorded_failures_final_receipt_pending",
+  "observedSourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "nodeVersion": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-content",
+  "method": "Static source audit and reading source-bound scoped execution metadata. This installation writes only qualification metadata and off-tree archives; no tests, compiler, generators, checks or full suite were executed.",
+  "scope": {
+    "changedPathCount": 139,
+    "changedPaths": [
+      {
+        "status": "A",
+        "path": ".changeset/technology-overlay.md",
+        "previousPath": null,
+        "classification": "technology_changeset_and_freeze_exception"
+      },
+      {
+        "status": "M",
+        "path": "catalog/CHANGELOG.md",
+        "previousPath": null,
+        "classification": "required_P1_34_catalog_changelog"
+      },
+      {
+        "status": "M",
+        "path": "catalog/catalog.yaml",
+        "previousPath": null,
+        "classification": "authorized_existing_global_catalog_version_field"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/oracle-marking-absent.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/oracle-marking-receipts-missing.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/oracle-marking-stripped.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/oracle-marking-unknown-key.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/negative/oracle-marking-verifier-down.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-01/positive/oracle-marking-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-component-absent.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-incomplete.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-late.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-no-aibom.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-no-clock.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/negative/oracle-cra-no-packet.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/positive/oracle-cra-at-deadline.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-02/positive/oracle-cra-on-time.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/oracle-iot-firmware-update.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/oracle-iot-no-policy.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/oracle-iot-telemetry-injection.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/negative/oracle-iot-unlock.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/positive/oracle-iot-read-status.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-03/positive/oracle-iot-set-mode.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-04/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-05/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-06/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/oracle-nis2-incomplete.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/oracle-nis2-late.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/oracle-nis2-no-awareness.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/negative/oracle-nis2-no-clock.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/positive/oracle-nis2-at-deadline.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-07/positive/oracle-nis2-on-time.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-contradictory.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-cross-tenant.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-empty.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-replayed.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-stale.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/negative/evidence-violation.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/fixtures/L1-TECH-08/positive/evidence-valid.json",
+        "previousPath": null,
+        "classification": "technology_fixture_content"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-02.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-03.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-05.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-06.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-07.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-08.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/layers/l1-technology-global/pack.yaml",
+        "previousPath": null,
+        "classification": "technology_pack_and_controls"
+      },
+      {
+        "status": "A",
+        "path": "catalog/registers/eu.json",
+        "previousPath": null,
+        "classification": "authorized_law_as_data_registers"
+      },
+      {
+        "status": "M",
+        "path": "catalog/registers/us.json",
+        "previousPath": null,
+        "classification": "authorized_law_as_data_registers"
+      },
+      {
+        "status": "M",
+        "path": "catalog/vocabulary.yaml",
+        "previousPath": null,
+        "classification": "authorized_technology_vocabulary"
+      },
+      {
+        "status": "A",
+        "path": "docs/catalog/technology/README.md",
+        "previousPath": null,
+        "classification": "technology_documentation_and_asserted_fixture_profile"
+      },
+      {
+        "status": "A",
+        "path": "docs/catalog/technology/dispositions.json",
+        "previousPath": null,
+        "classification": "technology_documentation_and_asserted_fixture_profile"
+      },
+      {
+        "status": "A",
+        "path": "docs/catalog/technology/guide-section.md",
+        "previousPath": null,
+        "classification": "technology_generated_guide_section"
+      },
+      {
+        "status": "A",
+        "path": "docs/catalog/technology/instruments.json",
+        "previousPath": null,
+        "classification": "technology_documentation_and_asserted_fixture_profile"
+      },
+      {
+        "status": "A",
+        "path": "docs/catalog/technology/profile.platform-agent.json",
+        "previousPath": null,
+        "classification": "technology_documentation_and_asserted_fixture_profile"
+      },
+      {
+        "status": "M",
+        "path": "docs/industries/technology.md",
+        "previousPath": null,
+        "classification": "technology_documentation_and_asserted_fixture_profile"
+      },
+      {
+        "status": "M",
+        "path": "docs/releases/2.0.0.md",
+        "previousPath": null,
+        "classification": "regenerated_release_notes"
+      },
+      {
+        "status": "M",
+        "path": "docs/sdk/TYPESCRIPT_SDK.md",
+        "previousPath": null,
+        "classification": "compiler_missing_fact_documentation"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/README.md",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/graph-navigation.json",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/install.log",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/integration-blocker-path-diff.txt",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/preflight.json",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/preflight.log",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/preflight.mjs",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/catalog.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/fixtures/technology/L1-TECH-01/positive/valid.json",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/instruments/us-ftc-act.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/producers.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/publisher-hosts.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/stations/technology/overlay.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/stations/technology/profile.platform-agent.json",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/stations/technology/promotion.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/stations/technology/question-dispositions.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/probe-catalog/vocabulary.yaml",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/qualification-check.log",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/receipt.json",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "A",
+        "path": "qualification/2026-10-18-P2-30/setup-build.log",
+        "previousPath": null,
+        "classification": "qualification_evidence_and_historical_probes"
+      },
+      {
+        "status": "M",
+        "path": "scripts/gen-industry-guides.mts",
+        "previousPath": null,
+        "classification": "authorized_technology_guide_generator_and_regression"
+      },
+      {
+        "status": "M",
+        "path": "src/incidents/regulatoryClocksTable.ts",
+        "previousPath": null,
+        "classification": "one_unverified_CRA_clock"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/craDrill.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/deviceSimulator.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/fixtures.test.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/harness.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/markingVerifier.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/nis2Drill.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "A",
+        "path": "tests/catalog/stations/technology/overlay.test.ts",
+        "previousPath": null,
+        "classification": "technology_oracles_and_regressions"
+      },
+      {
+        "status": "M",
+        "path": "tests/compilerStationDefaults.test.ts",
+        "previousPath": null,
+        "classification": "existing_integration_assertions_adjusted_for_new_experimental_content"
+      },
+      {
+        "status": "M",
+        "path": "tests/industryGuidesGenerator.test.ts",
+        "previousPath": null,
+        "classification": "authorized_technology_guide_generator_and_regression"
+      },
+      {
+        "status": "M",
+        "path": "tests/starterProfiles.test.ts",
+        "previousPath": null,
+        "classification": "existing_integration_assertions_adjusted_for_new_experimental_content"
+      },
+      {
+        "status": "M",
+        "path": "tests/usRegister.test.ts",
+        "previousPath": null,
+        "classification": "existing_integration_assertions_adjusted_for_new_experimental_content"
+      },
+      {
+        "status": "M",
+        "path": "tests/wealthOverlay.test.ts",
+        "previousPath": null,
+        "classification": "existing_integration_assertions_adjusted_for_new_experimental_content"
+      }
+    ],
+    "unclassified": [],
+    "protectedPathChanges": [],
+    "deletedPaths": [],
+    "renamedPaths": [],
+    "productSourcePaths": [
+      "src/incidents/regulatoryClocksTable.ts"
+    ],
+    "generatedCountOutputsCommitted": [],
+    "nonQualificationWorkingTreeStatus": ""
+  },
+  "originalUsPrefix": {
+    "intCount": 33,
+    "currentCount": 37,
+    "prefixExact": true,
+    "intArraySha256": "478ec98349486f7478dfaed9c1c593f6a66c6893b161350af045bec81180c5ef",
+    "currentPrefixSha256": "478ec98349486f7478dfaed9c1c593f6a66c6893b161350af045bec81180c5ef",
+    "otherTopLevelFieldsExact": true
+  },
+  "catalogGovernance": {
+    "manifest": {
+      "id": "amc.catalog",
+      "version": "0.1.1"
+    },
+    "intVersion": "0.1.0",
+    "authorizedOnlyVersionLineEdit": true,
+    "authorizationSource": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/RESERVATIONS.md:1896",
+    "packVersion": "0.1.0",
+    "controls": [
+      {
+        "id": "L1-TECH-01",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+        "sha256": "8676a859a1058655f7b8aea9e0e15e10ed5c086de1632525f8a8e3e5c98be789",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-02",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-02.yaml",
+        "sha256": "04fedabf1219137ed191e8f27689eaa81fca8d9b493725f21cd14b9eae75279d",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-03",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-03.yaml",
+        "sha256": "a3b95d49190bb873bbd19d56a5af02fbb035942b0fc32df3d206f328f5a17ff3",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": []
+      },
+      {
+        "id": "L1-TECH-04",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+        "sha256": "4bd9fce707e56a16155dadb9fd54ff05971082eb51124a2769384d060e24255b",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-05",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-05.yaml",
+        "sha256": "3d89b125e3e2e32fa48bd1290fae8d8020a91c417e10ff10aa4d646566c5a9b9",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-06",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-06.yaml",
+        "sha256": "4cb2364b86a36a989297b0d59fd84fbe2888cb6a9eedb7fb424dd867ecd554e7",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-07",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-07.yaml",
+        "sha256": "1ec0251d580269cfa807a1029326bdef766cd3a351589be0331071b42bdba424",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      },
+      {
+        "id": "L1-TECH-08",
+        "path": "catalog/layers/l1-technology-global/controls/L1-TECH-08.yaml",
+        "sha256": "30c013aa9ec1a06fe9d0ec33f472ee1a6bac6baebd566c28f31a823435e25db9",
+        "version": "0.1.0",
+        "support": "experimental",
+        "levels": [
+          "L1"
+        ],
+        "review": {
+          "status": "pending",
+          "expert": null,
+          "credential": null,
+          "reviewedAt": null,
+          "nextReview": null
+        },
+        "reviewRecord": null,
+        "provenanceApprovedBy": null,
+        "legalReviewCount": 0,
+        "citationRetrievalStates": [
+          "unverified"
+        ]
+      }
+    ],
+    "allL1Experimental": true,
+    "humanReviewRecords": [],
+    "intChangelogPrefix": {
+      "bytes": 12756,
+      "intSha256": "df43e1b4021de112c8cfe2fe8974ac9ed074e698ef42f81c0b1dc35c9d226105",
+      "candidatePrefixSha256": "df43e1b4021de112c8cfe2fe8974ac9ed074e698ef42f81c0b1dc35c9d226105",
+      "byteExact": true
+    },
+    "ownAppendedEntries": [
+      {
+        "catalog": {
+          "digest": "sha256:8626c07e015cd4f1ca10dc0b65129a6b623d55148443bfe802815f2f84ec6b52",
+          "id": "amc.catalog",
+          "version": "0.1.1"
+        },
+        "controlCount": 8,
+        "reviewRecordIds": []
+      }
+    ],
+    "guards": [
+      {
+        "path": "src/catalog/governance/changelogGuard.ts",
+        "intSha256": "29decebc02730e985e2a6aff4b53e2670ba8f775be13deba564f05b6faf0fd75",
+        "candidateSha256": "29decebc02730e985e2a6aff4b53e2670ba8f775be13deba564f05b6faf0fd75",
+        "byteIdentical": true
+      },
+      {
+        "path": "tests/catalog/governance/changelogGuard.test.ts",
+        "intSha256": "cdb18940fc9124738fc9f897097c44e04f6b745f23c8d7d9f7bd6756dfceb20e",
+        "candidateSha256": "cdb18940fc9124738fc9f897097c44e04f6b745f23c8d7d9f7bd6756dfceb20e",
+        "byteIdentical": true
+      }
+    ],
+    "guardUnchanged": true
+  },
+  "inventory": {
+    "packQuestions": 97,
+    "deepQuestions": 16,
+    "totalQuestions": 113,
+    "uniqueActualIds": 113,
+    "dispositions": 113,
+    "uniqueDispositionIds": 113,
+    "missingActualIds": [],
+    "extraDispositionIds": [],
+    "absentSpecIds": [],
+    "meaningLimitationCount": 9,
+    "deepDrift": {
+      "specExpected": 16,
+      "actual": 16,
+      "absentIds": []
+    },
+    "packCountDrift": {
+      "specExpected": 77,
+      "actual": 97,
+      "delta": 20
+    },
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/technology.ts",
+        "sha256": "4aa5855f12d22b60b74d8713947e860d19d09428c85e88db0b7e69394212ee8f",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "4aa5855f12d22b60b74d8713947e860d19d09428c85e88db0b7e69394212ee8f",
+        "integrationSha256": "4aa5855f12d22b60b74d8713947e860d19d09428c85e88db0b7e69394212ee8f",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "integrationSha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "integrationSha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/deep/technology.ts",
+        "sha256": "744ad5fcc506262c299bba5cac8265e5332f79c91f47266652ca10a2e4154e76",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "744ad5fcc506262c299bba5cac8265e5332f79c91f47266652ca10a2e4154e76",
+        "integrationSha256": "744ad5fcc506262c299bba5cac8265e5332f79c91f47266652ca10a2e4154e76",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "integrationSha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "integrationSha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "matchesCurrentAndInt": true
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+        "currentSha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "integrationSha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "matchesCurrentAndInt": true
+      }
+    ],
+    "sourceSnapshot": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/p1-42-integration/actual-inventory.json",
+      "sha256": "5b707e30ef57bcb102f33c96a200e645e939aa7735f178d231d72594a48866d2"
+    },
+    "versionedIds": [
+      {
+        "oldId": "TECH-CI-15",
+        "newId": "TECH-CI-15-v2",
+        "oldDimension": "Governance",
+        "newDimension": "Transparency"
+      },
+      {
+        "oldId": "TECH-NE-14",
+        "newId": "TECH-NE-14-v2",
+        "oldDimension": "Data Access by Design",
+        "newDimension": "Resilience"
+      },
+      {
+        "oldId": "TECH-NE-15",
+        "newId": "TECH-NE-15-v2",
+        "oldDimension": "Supply Chain Security",
+        "newDimension": "Compliance"
+      },
+      {
+        "oldId": "TECH-OS-9",
+        "newId": "TECH-OS-9-v2",
+        "oldDimension": "Compliance",
+        "newDimension": "Resilience"
+      },
+      {
+        "oldId": "TECH-INF-9",
+        "newId": "TECH-INF-9-v2",
+        "oldDimension": "Compliance",
+        "newDimension": "Transparency"
+      },
+      {
+        "oldId": "TECH-PP-15",
+        "newId": "TECH-PP-15-v2",
+        "oldDimension": "Fair Contracting",
+        "newDimension": "Transparency"
+      }
+    ],
+    "restoredIds": [
+      {
+        "id": "TECH-OS-4",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      },
+      {
+        "id": "TECH-OS-15",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      },
+      {
+        "id": "TECH-INF-15",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      },
+      {
+        "id": "TECH-PP-7",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      },
+      {
+        "id": "TECH-PP-13",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      },
+      {
+        "id": "TECH-PP-14",
+        "presentInActualInventory": true,
+        "presentInDispositions": true,
+        "required": true
+      }
+    ],
+    "pendingRestorations": []
+  },
+  "evidenceStatus": {
+    "fixtureTableSource": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "currentFixtureProofAvailable": true,
+    "claim": "Scoped fixture and mutation proofs remain source-bound. The post-full supplement records completed Formal24 results (23 PASS and one expected main-relative failure) and the completed measured full suite (exit 1); no all-green, baseline-only or promotion claim is made."
+  },
+  "finalizationRequirements": [
+    "Complete and validate parent-owned final failure comparison/reconciliation and receipt, preserving every unsupported failure as unresolved.",
+    "Perform the final D-15/receipt validation and coordinator handoff; no promotion or landing is supplied by this audit."
+  ],
+  "reportVersion": 6,
+  "preparedAtUtc": "2026-10-18T11:32:21.464Z",
+  "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "expectedSourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "preparedArtifact": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/p1-42-integration/scope-audit-prepared-b88f0fb93.json",
+    "sha256": "51521c829b31d17639d769a1936787529648f95245580a04452384d5749bcfc1",
+    "capturedAtUtc": "2026-10-18T11:32:21.464Z"
+  },
+  "previousAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/scope-audit-history/2026-10-18T11-34-40.804Z-a7e6be69f149bfdeb2845077f3412092443ad6b2-c484a3a43ad1-final-scope-audit.json",
+    "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+    "sha256": "c484a3a43ad1fc64651f262f9046edb7a4317f1bbcf976027dc34c54f2793975",
+    "preservedByteExact": true
+  },
+  "d15": {
+    "paths": [
+      "qualification/2026-10-18-P2-30/final-scope-audit.json",
+      "qualification/2026-10-18-P2-30/inventory-drift.json"
+    ],
+    "result": "none"
+  },
+  "scopedExecutionProof": {
+    "method": "Existing source-bound proof records were read; no execution by this audit.",
+    "fixtureTable": {
+      "path": "qualification/2026-10-18-P2-30/oracles/fixture-results.json",
+      "sha256": "bcce4c1801707142b8b04468e0710bebc92700ce2dab11649e32a3d27b43150d",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "refreshedAtUtc": "2026-10-18T11:32:28.835Z",
+      "catalog": {
+        "id": "amc.catalog",
+        "version": "0.1.1",
+        "digest": "sha256:8626c07e015cd4f1ca10dc0b65129a6b623d55148443bfe802815f2f84ec6b52"
+      },
+      "planDigest": "sha256:1f3bb7ca16997360d043bb47e58bc367eb8f9f327185cded6ea65ecce44ff3ad",
+      "profile": {
+        "profileId": "platform-agent",
+        "sha256": "4f972fca50baeecd23f76831761927532b7ccdd7cd04e4c06a9f32a3ddbf7865",
+        "factProvenance": {
+          "stations": "asserted",
+          "primaryStation": "asserted",
+          "domains": "asserted",
+          "jurisdictions": "asserted",
+          "roles": "asserted",
+          "entityTypes": "unknown",
+          "riskClass": "unknown",
+          "useCases": "asserted",
+          "dataClasses": "unknown"
+        },
+        "deployment": {
+          "tenantId": "tenant-technology-fixture",
+          "deploymentId": "platform-agent-fixture"
+        }
+      },
+      "sourceHashes": [
+        {
+          "path": "tests/catalog/stations/technology/craDrill.ts",
+          "recordedSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+          "currentCommittedSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+          "matches": true
+        },
+        {
+          "path": "tests/catalog/stations/technology/deviceSimulator.ts",
+          "recordedSha256": "1f257a719f7e12613c4cb0d752a03cd9d44fa9a8eb91aa63ffb2f5524027b347",
+          "currentCommittedSha256": "1f257a719f7e12613c4cb0d752a03cd9d44fa9a8eb91aa63ffb2f5524027b347",
+          "matches": true
+        },
+        {
+          "path": "tests/catalog/stations/technology/markingVerifier.ts",
+          "recordedSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+          "currentCommittedSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+          "matches": true
+        },
+        {
+          "path": "tests/catalog/stations/technology/nis2Drill.ts",
+          "recordedSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+          "currentCommittedSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+          "matches": true
+        },
+        {
+          "path": "tests/catalog/stations/technology/fixtures.test.ts",
+          "recordedSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+          "currentCommittedSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+          "matches": true
+        },
+        {
+          "path": "tests/catalog/stations/technology/harness.ts",
+          "recordedSha256": "dfaf53129833ec7faea6e1552e37da3355977e1449fc161619e63046c8f362a2",
+          "currentCommittedSha256": "dfaf53129833ec7faea6e1552e37da3355977e1449fc161619e63046c8f362a2",
+          "matches": true
+        }
+      ],
+      "summary": {
+        "caseCount": 82,
+        "uniqueCases": 82,
+        "controlCount": 8,
+        "localOracleCaseCount": 26,
+        "evidencePassCount": 0,
+        "productionNotEvaluated": 82,
+        "productionEnforcementNone": 82,
+        "localExpectationMismatches": []
+      }
+    },
+    "freshStandardMutationProofs": [
+      {
+        "mutation": "marking-presence-only",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "exitCode": 1,
+        "targetedAssertionVerified": true,
+        "restoredExactly": true,
+        "file": "tests/catalog/stations/technology/markingVerifier.ts",
+        "restoredSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+        "currentCommittedSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/marking-presence-only.log",
+        "logSha256": "47c3780e8536ce40868929839fc5aba2ed7215639d5ada0fe89caed3d7c1ece5",
+        "actualLogSha256": "47c3780e8536ce40868929839fc5aba2ed7215639d5ada0fe89caed3d7c1ece5"
+      },
+      {
+        "mutation": "cra-skip-aibom",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "exitCode": 1,
+        "targetedAssertionVerified": true,
+        "restoredExactly": true,
+        "file": "tests/catalog/stations/technology/craDrill.ts",
+        "restoredSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+        "currentCommittedSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/cra-skip-aibom.log",
+        "logSha256": "e419706ba03abcc76b41899473fb8bda7f96fdedee9df5c67f00c312cf394ed3",
+        "actualLogSha256": "e419706ba03abcc76b41899473fb8bda7f96fdedee9df5c67f00c312cf394ed3"
+      },
+      {
+        "mutation": "nis2-late-bypass",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "exitCode": 1,
+        "targetedAssertionVerified": true,
+        "restoredExactly": true,
+        "file": "tests/catalog/stations/technology/nis2Drill.ts",
+        "restoredSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+        "currentCommittedSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-late-bypass.log",
+        "logSha256": "88c55520c3732412216755f5a703eeb179f165039e9c638ef2a04ee9f19f6cda",
+        "actualLogSha256": "88c55520c3732412216755f5a703eeb179f165039e9c638ef2a04ee9f19f6cda"
+      }
+    ],
+    "precisionMutationProof": {
+      "path": "qualification/2026-10-18-P2-30/oracles/nis2-precision-mutation.json",
+      "sha256": "488120c65d0c6b48e107bd2614eea3a876844a0719ee60433bb21d039056623a",
+      "mutation": "nis2-precision-bypass",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "exitCode": 1,
+      "targetedAssertionVerified": true,
+      "restoredExactly": true,
+      "file": "tests/catalog/stations/technology/nis2Drill.ts",
+      "restoredSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+      "currentCommittedSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-precision-bypass.log",
+      "logSha256": "663dc2b1746e1b0058b5c6508ffc6bd36d4360bd0d1be90813680440f58c80f3",
+      "actualLogSha256": "663dc2b1746e1b0058b5c6508ffc6bd36d4360bd0d1be90813680440f58c80f3"
+    },
+    "restoredGreen": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/restored-fixtures.json",
+      "sha256": "783fb630732ee19f233d74bd8ff24d6c2ee79d13cd94397f69640428101de588",
+      "record": {
+        "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "cmd": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/catalog/stations/technology/fixtures.test.ts",
+          "--maxWorkers=1"
+        ],
+        "exit": 0,
+        "durationSeconds": 4.055,
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/restored-fixtures.log",
+        "logSha256": "8ef8d186efe56cbdaaa2883ab12b806255b5b227f3edfc08355a2f12cb6eadea",
+        "node": "v22.23.3",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30"
+      },
+      "testsPassedFromLog": 135
+    }
+  },
+  "formalChecks": {
+    "state": "completed_23_pass_one_expected_main_failure",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+    "expectedCheckCount": 24,
+    "completedCheckCount": 24,
+    "passed": 23,
+    "expectedFailed": 1,
+    "unresolvedOtherRequiredFailures": 0,
+    "resultsArtifact": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/post-governance-results.json",
+      "sha256": "c37207e085068f75a5ef49d1917189c9394ef66c7fa9249b1ebc6fdba888a77b",
+      "recordedRows": 26
+    },
+    "requiredResults": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 66309,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+        "exit": 0,
+        "durationMs": 155853,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log",
+        "rawLogSha256": "e20f30b9192a5f73a92a6d5e8ee2fff8df8c58669d47f5cc184d975b7b6dfd96",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 32920,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "durationMs": 58247,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "durationMs": 3775,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/lint.log",
+        "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "counts",
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "durationMs": 617,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log",
+        "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "docs-drift",
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "durationMs": 569,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/docs-drift.log",
+        "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "freeze",
+        "cmd": "pnpm check:freeze -- --base-ref int",
+        "exit": 0,
+        "durationMs": 2567,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/freeze.log",
+        "rawLogSha256": "3442543e9e2f7d6d1fb67318859dc1b47ba17b088d5e565aae2be8f55ff83ae8",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "architecture-boundaries",
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "durationMs": 1871,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/architecture-boundaries.log",
+        "rawLogSha256": "f6f6e7d75450b25128ad7e2048e7ceaaa0282fc8b318ed20d3dc71c3a14dbfc1",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "gates",
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "durationMs": 324,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gates.log",
+        "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "schemas",
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "durationMs": 744,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/schemas.log",
+        "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "api-ref",
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "durationMs": 224,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/api-ref.log",
+        "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "threat-model",
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "durationMs": 263,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/threat-model.log",
+        "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "citations",
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "durationMs": 417,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/citations.log",
+        "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "qualification",
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "durationMs": 479,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/qualification.log",
+        "rawLogSha256": "936bfa0dcdc0d073bd3cbd657d72b877df71c8e40b076ddb2f497149299135a5",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "release-notes",
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "durationMs": 226,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/release-notes.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "catalog-currency",
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "durationMs": 426,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-currency.log",
+        "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "catalog-changelog",
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+        "exit": 0,
+        "durationMs": 1756,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog.log",
+        "rawLogSha256": "4c67296e329de17150f3bebfae70062890cec219736829735065ec694167e54e",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "duplicates",
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "durationMs": 786,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/duplicates.log",
+        "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "dead-code",
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "durationMs": 3967,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/dead-code.log",
+        "rawLogSha256": "62eca6905fd2f3ea53a92c2c219301b579da81e38dd504f87565e50cbbef4fea",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "clean-source",
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "durationMs": 134333,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/clean-source.log",
+        "rawLogSha256": "625f105b746407a8a370952e016771ec9cc83f909bff74135947cf94cf7beddc",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "industry-guides",
+        "cmd": "npm run -s check:industry-guides",
+        "exit": 0,
+        "durationMs": 598,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/industry-guides.log",
+        "rawLogSha256": "b16dd6d03fd61ab36e7c740d6f27d2f2f9855baf72d88e8fd66a4a86fa49f5a8",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "regulatory-calendar",
+        "cmd": "npm run -s check:regulatory-calendar",
+        "exit": 0,
+        "durationMs": 256,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/regulatory-calendar.log",
+        "rawLogSha256": "644c707ce37eb5bb9d1e8ba2137c4f249ce306f40e373a10b146c75833e16477",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      },
+      {
+        "name": "catalog-changelog-main",
+        "cmd": "node scripts/check-catalog-changelog.mjs",
+        "exit": 1,
+        "durationMs": 661,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main-authoritative-ref.log",
+        "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+        "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+      }
+    ],
+    "preparatoryRows": [
+      {
+        "name": "counts-before-regeneration",
+        "exit": 1,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log",
+        "rawLogSha256": "51d3d0bdeaec21cfff43bf9c0840f15f1568823ad60e154648b31bc10327dc6a"
+      },
+      {
+        "name": "gen-counts",
+        "exit": 0,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log",
+        "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+      }
+    ],
+    "expectedMainFailure": {
+      "name": "catalog-changelog-main",
+      "exit": 1,
+      "code": "GOV_CHANGELOG_ENTRY_COUNT",
+      "artifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/catalog-changelog-main-blocker.json",
+        "sha256": "3091f4d2a23bbb15957de1841ccdee63d775e5838bd963cbe01c4869be1c179e"
+      },
+      "decisionSectionSha256": "38f9e426834ac75df1fab58ad888e7bb5034d23888c132403dcc6795d85e3b8b",
+      "interpretation": "The int-relative check is required and passed. The main-relative failure is expected until 7fccbbfa consolidates at the final main merge; no entry or guard changed here."
+    },
+    "claim": "Twenty-three required checks passed. The main-relative changelog check recorded exit 1 under the preserved coordinator decision; the required int-relative check passed. This is not an all-green result."
+  },
+  "fullSuiteAtFinalSource": {
+    "state": "completed_measured_failed",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+    "exitCode": 1,
+    "durationMs": 3029397,
+    "command": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+    "runReceipt": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/full-suite-final.json",
+      "sha256": "fa074d172e7798788b8f2256eb005c64f581f00dee606c7a8b5811fe42a132e1"
+    },
+    "startArtifact": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/full-suite-final-start.json",
+      "sha256": "ecad0c30ef564aa10a3bba3d3c17769cb404b431a8e8a5c1b1ca4bb5b87c453b",
+      "node": "v22.23.3",
+      "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+      "startedAtUtc": "2026-10-18T11:43:33.958254+00:00"
+    },
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log",
+      "sha256": "7aa2e52dd9a85581449e69f9cc5921e9e303ad9e9191cc9c034bfb0e192f7ed5"
+    },
+    "jsonReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+      "sha256": "fd9c1133c1fc691c5700322431f22936675eda19e661f983432873eecfeaca23"
+    },
+    "tests": {
+      "total": 25435,
+      "passed": 25418,
+      "failed": 10,
+      "skipped": 7
+    },
+    "files": {
+      "measuredRawCounts": {
+        "passed": 1745,
+        "failed": 7,
+        "skipped": 2,
+        "total": 1754
+      },
+      "reportedJsonStatusCounts": {
+        "total": 1754,
+        "passed": 1747,
+        "failed": 7,
+        "skipped": 0
+      },
+      "normalizedFileCounts": {
+        "total": 1754,
+        "passed": 1745,
+        "failed": 7,
+        "skipped": 2
+      }
+    },
+    "fileCountNormalization": {
+      "artifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/receipt-draft/file-count-normalization-audit.json",
+        "sha256": "4b734cd47be0976da9ac02af3ef748e29f54781294d870ad222f1d9673da5613"
+      },
+      "reviewedFinalizerSha256": "ced6914654820f6e1b50f785dae65da50e795e3cfef425d7f168037b20d81e8b",
+      "adjustments": [
+        {
+          "file": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/claudeCodeHooks.conformance.test.ts",
+          "reportedStatus": "passed",
+          "countedStatus": "skipped",
+          "assertionCount": 7,
+          "assertionStatuses": [
+            "skipped",
+            "skipped",
+            "skipped",
+            "skipped",
+            "skipped",
+            "skipped",
+            "skipped"
+          ],
+          "reason": "All reported assertions are skipped; JSON reporter encodes this nonfailed file as passed.",
+          "sourceEvidence": null
+        },
+        {
+          "file": "tests/conformance/piToolCall.conformance.test.ts",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/piToolCall.conformance.test.ts",
+          "reportedStatus": "passed",
+          "countedStatus": "skipped",
+          "assertionCount": 0,
+          "assertionStatuses": [],
+          "reason": "Empty opt-in suite verified from the source at this run pin; JSON reporter encodes this nonfailed file as passed.",
+          "sourceEvidence": {
+            "file": "tests/conformance/piToolCall.conformance.test.ts",
+            "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+            "sourceSha256": "e56c5e2a0f10e3b36097a872c704ae1da176ae72135e58f24e24597a843a192b",
+            "basis": "Committed source gates the runIf suite and versioned test declaration on enabled. The JSON report contains no assertions, and the raw summary supplies the skipped-file count. The environment flag itself was not captured."
+          }
+        }
+      ],
+      "note": "Raw summary counts and original JSON file statuses are preserved independently. Source inspection does not establish a captured opt-in environment flag."
+    },
+    "generatedOutputsUnchangedByTests": true,
+    "policySource": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/RESERVATIONS.md",
+    "policyLine": 1902,
+    "pendingWaiver": false,
+    "failureClassification": "Parent-owned final comparator/reconciliation and receipt are separate. This supplement assigns no baseline-only classification and claims no all-green result.",
+    "claim": "The required single full run completed at the recorded final source with measured failures. Raw and native JSON file counts are preserved separately, with reviewed source-bound skipped-file reconciliation; no opt-in environment capture is claimed."
+  },
+  "instruments": {
+    "count": 14,
+    "allUnverified": true,
+    "metadataUrlsAndDatesNull": true
+  },
+  "workingTreeAtInstallation": {
+    "nonQualificationStatus": ""
+  },
+  "initialScopedCapture": {
+    "recordedAtUtc": "2026-10-18T11:34:40.804Z",
+    "state": "committed_scoped_verified_formal_and_full_pending",
+    "formalChecks": {
+      "state": "running_parent_owned_not_claimed_complete",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "expectedCheckCount": 24,
+      "runnerId": 47437
+    },
+    "fullSuiteAtFinalSource": {
+      "state": "required_not_run_yet",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "policySource": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/RESERVATIONS.md",
+      "policyLine": 1902,
+      "pendingWaiver": false,
+      "claim": "One final-source full suite with measured totals is required; no current full-suite result is claimed."
+    },
+    "evidenceStatus": {
+      "fixtureTableSource": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "currentFixtureProofAvailable": true,
+      "claim": "Scoped table and four mutation proofs are current at b88. Formal24 and final full-suite qualification remain pending; historical results retain their own source pins."
+    },
+    "finalizationRequirements": [
+      "Complete all24 formal checks and record actual results.",
+      "Complete the required measured full suite at final source.",
+      "Baseline attribution needs source-bound evidence for the applicable integration."
+    ],
+    "note": "Original checkpoint claims are historical capture fields. The later postFullCompletion supplement records completed execution evidence without changing the original capture time or source inputs."
+  },
+  "stateUpdatedAtUtc": "2026-10-18T12:41:21.711Z",
+  "previousCheckpointCopy": {
+    "originalPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/final-scope-audit.json",
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/scope-audit-history/2026-10-18T12-41-21-711Z-post-full-b88-checkpoints/final-scope-audit.json",
+    "sha256": "8c06f454ece79dca1d3a9187f878e25757a31d954b181653bf6d91a7bbdc6fd2",
+    "preservedByteExact": true
+  },
+  "postFullCompletion": {
+    "recordedAtUtc": "2026-10-18T12:41:21.711Z",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+    "method": "Metadata-only closeout by reading and hashing existing source-bound receipts, logs, reports and fixture output. No test, compiler, generator, check, finalizer or baseline probe was executed.",
+    "priorCheckpoint": {
+      "originalPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/final-scope-audit.json",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/scope-audit-history/2026-10-18T12-41-21-711Z-post-full-b88-checkpoints/final-scope-audit.json",
+      "sha256": "8c06f454ece79dca1d3a9187f878e25757a31d954b181653bf6d91a7bbdc6fd2",
+      "preservedByteExact": true
+    },
+    "initialScopedCaptureRecordedAtUtc": "2026-10-18T11:34:40.804Z",
+    "formalChecks": {
+      "state": "completed_23_pass_one_expected_main_failure",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+      "expectedCheckCount": 24,
+      "completedCheckCount": 24,
+      "passed": 23,
+      "expectedFailed": 1,
+      "unresolvedOtherRequiredFailures": 0,
+      "resultsArtifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/post-governance-results.json",
+        "sha256": "c37207e085068f75a5ef49d1917189c9394ef66c7fa9249b1ebc6fdba888a77b",
+        "recordedRows": 26
+      },
+      "requiredResults": [
+        {
+          "name": "build",
+          "cmd": "npm run -s build",
+          "exit": 0,
+          "durationMs": 66309,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log",
+          "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "focused",
+          "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+          "exit": 0,
+          "durationMs": 155853,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log",
+          "rawLogSha256": "e20f30b9192a5f73a92a6d5e8ee2fff8df8c58669d47f5cc184d975b7b6dfd96",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "typecheck",
+          "cmd": "npm run -s typecheck",
+          "exit": 0,
+          "durationMs": 32920,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log",
+          "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "typecheck-tests",
+          "cmd": "npm run -s typecheck:tests",
+          "exit": 0,
+          "durationMs": 58247,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck-tests.log",
+          "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "lint",
+          "cmd": "npm run -s lint",
+          "exit": 0,
+          "durationMs": 3775,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/lint.log",
+          "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "counts",
+          "cmd": "npm run -s check:counts",
+          "exit": 0,
+          "durationMs": 617,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log",
+          "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "docs-drift",
+          "cmd": "npm run -s check:docs-drift",
+          "exit": 0,
+          "durationMs": 569,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/docs-drift.log",
+          "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "freeze",
+          "cmd": "pnpm check:freeze -- --base-ref int",
+          "exit": 0,
+          "durationMs": 2567,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/freeze.log",
+          "rawLogSha256": "3442543e9e2f7d6d1fb67318859dc1b47ba17b088d5e565aae2be8f55ff83ae8",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "architecture-boundaries",
+          "cmd": "npm run -s check:architecture-boundaries",
+          "exit": 0,
+          "durationMs": 1871,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/architecture-boundaries.log",
+          "rawLogSha256": "f6f6e7d75450b25128ad7e2048e7ceaaa0282fc8b318ed20d3dc71c3a14dbfc1",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "gates",
+          "cmd": "npm run -s check:gates",
+          "exit": 0,
+          "durationMs": 324,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gates.log",
+          "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "schemas",
+          "cmd": "npm run -s check:schemas",
+          "exit": 0,
+          "durationMs": 744,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/schemas.log",
+          "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "api-ref",
+          "cmd": "npm run -s check:api-ref",
+          "exit": 0,
+          "durationMs": 224,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/api-ref.log",
+          "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "threat-model",
+          "cmd": "npm run -s check:threat-model",
+          "exit": 0,
+          "durationMs": 263,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/threat-model.log",
+          "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "citations",
+          "cmd": "npm run -s check:citations",
+          "exit": 0,
+          "durationMs": 417,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/citations.log",
+          "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "qualification",
+          "cmd": "npm run -s check:qualification",
+          "exit": 0,
+          "durationMs": 479,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/qualification.log",
+          "rawLogSha256": "936bfa0dcdc0d073bd3cbd657d72b877df71c8e40b076ddb2f497149299135a5",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "release-notes",
+          "cmd": "npm run -s release:notes -- --check",
+          "exit": 0,
+          "durationMs": 226,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/release-notes.log",
+          "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "catalog-currency",
+          "cmd": "npm run -s check:catalog-currency",
+          "exit": 0,
+          "durationMs": 426,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-currency.log",
+          "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "catalog-changelog",
+          "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+          "exit": 0,
+          "durationMs": 1756,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog.log",
+          "rawLogSha256": "4c67296e329de17150f3bebfae70062890cec219736829735065ec694167e54e",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "duplicates",
+          "cmd": "npm run -s check:duplicates",
+          "exit": 0,
+          "durationMs": 786,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/duplicates.log",
+          "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "dead-code",
+          "cmd": "npm run -s check:dead-code",
+          "exit": 0,
+          "durationMs": 3967,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/dead-code.log",
+          "rawLogSha256": "62eca6905fd2f3ea53a92c2c219301b579da81e38dd504f87565e50cbbef4fea",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "clean-source",
+          "cmd": "npm run -s check:clean-source",
+          "exit": 0,
+          "durationMs": 134333,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/clean-source.log",
+          "rawLogSha256": "625f105b746407a8a370952e016771ec9cc83f909bff74135947cf94cf7beddc",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "industry-guides",
+          "cmd": "npm run -s check:industry-guides",
+          "exit": 0,
+          "durationMs": 598,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/industry-guides.log",
+          "rawLogSha256": "b16dd6d03fd61ab36e7c740d6f27d2f2f9855baf72d88e8fd66a4a86fa49f5a8",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "regulatory-calendar",
+          "cmd": "npm run -s check:regulatory-calendar",
+          "exit": 0,
+          "durationMs": 256,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/regulatory-calendar.log",
+          "rawLogSha256": "644c707ce37eb5bb9d1e8ba2137c4f249ce306f40e373a10b146c75833e16477",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        },
+        {
+          "name": "catalog-changelog-main",
+          "cmd": "node scripts/check-catalog-changelog.mjs",
+          "exit": 1,
+          "durationMs": 661,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main-authoritative-ref.log",
+          "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+          "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+        }
+      ],
+      "preparatoryRows": [
+        {
+          "name": "counts-before-regeneration",
+          "exit": 1,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log",
+          "rawLogSha256": "51d3d0bdeaec21cfff43bf9c0840f15f1568823ad60e154648b31bc10327dc6a"
+        },
+        {
+          "name": "gen-counts",
+          "exit": 0,
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log",
+          "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+        }
+      ],
+      "expectedMainFailure": {
+        "name": "catalog-changelog-main",
+        "exit": 1,
+        "code": "GOV_CHANGELOG_ENTRY_COUNT",
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/catalog-changelog-main-blocker.json",
+          "sha256": "3091f4d2a23bbb15957de1841ccdee63d775e5838bd963cbe01c4869be1c179e"
+        },
+        "decisionSectionSha256": "38f9e426834ac75df1fab58ad888e7bb5034d23888c132403dcc6795d85e3b8b",
+        "interpretation": "The int-relative check is required and passed. The main-relative failure is expected until 7fccbbfa consolidates at the final main merge; no entry or guard changed here."
+      },
+      "claim": "Twenty-three required checks passed. The main-relative changelog check recorded exit 1 under the preserved coordinator decision; the required int-relative check passed. This is not an all-green result."
+    },
+    "fullSuite": {
+      "state": "completed_measured_failed",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+      "exitCode": 1,
+      "durationMs": 3029397,
+      "command": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+      "runReceipt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/full-suite-final.json",
+        "sha256": "fa074d172e7798788b8f2256eb005c64f581f00dee606c7a8b5811fe42a132e1"
+      },
+      "startArtifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/full-suite-final-start.json",
+        "sha256": "ecad0c30ef564aa10a3bba3d3c17769cb404b431a8e8a5c1b1ca4bb5b87c453b",
+        "node": "v22.23.3",
+        "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "startedAtUtc": "2026-10-18T11:43:33.958254+00:00"
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log",
+        "sha256": "7aa2e52dd9a85581449e69f9cc5921e9e303ad9e9191cc9c034bfb0e192f7ed5"
+      },
+      "jsonReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+        "sha256": "fd9c1133c1fc691c5700322431f22936675eda19e661f983432873eecfeaca23"
+      },
+      "tests": {
+        "total": 25435,
+        "passed": 25418,
+        "failed": 10,
+        "skipped": 7
+      },
+      "files": {
+        "measuredRawCounts": {
+          "passed": 1745,
+          "failed": 7,
+          "skipped": 2,
+          "total": 1754
+        },
+        "reportedJsonStatusCounts": {
+          "total": 1754,
+          "passed": 1747,
+          "failed": 7,
+          "skipped": 0
+        },
+        "normalizedFileCounts": {
+          "total": 1754,
+          "passed": 1745,
+          "failed": 7,
+          "skipped": 2
+        }
+      },
+      "fileCountNormalization": {
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/receipt-draft/file-count-normalization-audit.json",
+          "sha256": "4b734cd47be0976da9ac02af3ef748e29f54781294d870ad222f1d9673da5613"
+        },
+        "reviewedFinalizerSha256": "ced6914654820f6e1b50f785dae65da50e795e3cfef425d7f168037b20d81e8b",
+        "adjustments": [
+          {
+            "file": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 7,
+            "assertionStatuses": [
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped"
+            ],
+            "reason": "All reported assertions are skipped; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": null
+          },
+          {
+            "file": "tests/conformance/piToolCall.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/piToolCall.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 0,
+            "assertionStatuses": [],
+            "reason": "Empty opt-in suite verified from the source at this run pin; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": {
+              "file": "tests/conformance/piToolCall.conformance.test.ts",
+              "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+              "sourceSha256": "e56c5e2a0f10e3b36097a872c704ae1da176ae72135e58f24e24597a843a192b",
+              "basis": "Committed source gates the runIf suite and versioned test declaration on enabled. The JSON report contains no assertions, and the raw summary supplies the skipped-file count. The environment flag itself was not captured."
+            }
+          }
+        ],
+        "note": "Raw summary counts and original JSON file statuses are preserved independently. Source inspection does not establish a captured opt-in environment flag."
+      },
+      "generatedOutputsUnchangedByTests": true,
+      "policySource": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/RESERVATIONS.md",
+      "policyLine": 1902,
+      "pendingWaiver": false,
+      "failureClassification": "Parent-owned final comparator/reconciliation and receipt are separate. This supplement assigns no baseline-only classification and claims no all-green result.",
+      "claim": "The required single full run completed at the recorded final source with measured failures. Raw and native JSON file counts are preserved separately, with reviewed source-bound skipped-file reconciliation; no opt-in environment capture is claimed."
+    },
+    "currentFixtureProof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/fixture-results.json",
+      "sha256": "bcce4c1801707142b8b04468e0710bebc92700ce2dab11649e32a3d27b43150d",
+      "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "caseCount": 82,
+      "localOracleCaseCount": 26,
+      "productionNotEvaluatedWithNoEnforcement": 82,
+      "evidencePassCount": 0
+    },
+    "d15": {
+      "paths": [
+        "qualification/2026-10-18-P2-30/final-scope-audit.json",
+        "qualification/2026-10-18-P2-30/inventory-drift.json"
+      ],
+      "result": "none",
+      "beforeEdit": true
+    },
+    "limits": [
+      "Ten full-suite test assertions failed across seven files; no all-green claim.",
+      "Raw file counts and native JSON statuses differ only by the explicitly retained two skipped-file adjustments; the opt-in environment flag was not captured.",
+      "Failure attribution and the installed final receipt remain parent-owned and are not completed by this supplement.",
+      "Controls remain experimental and unreviewed, with no human review record or promotion."
+    ]
+  }
+}
