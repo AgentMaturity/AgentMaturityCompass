@@ -7,7 +7,6 @@
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { P024_NOTE, P024_READ, eu, milestones, unverified, verified } from "./catalogueHelpers.js";
-import { eu, milestones, unverified, verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
