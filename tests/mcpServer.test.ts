@@ -34,9 +34,9 @@ function tracked(ws: string): string {
 // ---------------------------------------------------------------------------
 
 describe("MCP_TOOL_METADATA", () => {
-  it("exports 11 tools", () => {
-    // P1-17 added amc_incident_clocks; the count change is intended.
-    expect(MCP_TOOL_METADATA).toHaveLength(11);
+  it("exports 15 tools (20 with AMC_A4_PREVIEW=1)", () => {
+    // P1-17 added amc_incident_clocks and P1-44 the four industry pack tools; both count changes are intended.
+    expect(MCP_TOOL_METADATA).toHaveLength(process.env.AMC_A4_PREVIEW === "1" ? 20 : 15);
     const names = MCP_TOOL_METADATA.map((t) => t.name);
     expect(names).toContain("amc_list_agents");
     expect(names).toContain("amc_quickscore");
@@ -49,6 +49,9 @@ describe("MCP_TOOL_METADATA", () => {
     expect(names).toContain("amc_query_diagnostic");
     expect(names).toContain("amc_get_recommendations");
     expect(names).toContain("amc_incident_clocks");
+    for (const name of ["amc_list_industry_packs", "amc_get_industry_pack", "amc_score_industry_pack", "amc_industry_station_summary"]) {
+      expect(names).toContain(name);
+    }
   });
 
   it("all tool names start with amc_", () => {

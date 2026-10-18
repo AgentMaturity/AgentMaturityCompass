@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 import { MCP_TOOL_METADATA, resetRateLimiter } from "../src/mcp/amcMcpServer.js";
 
 describe("MCP Tool Metadata", () => {
-  test("contains all 11 tools", () => {
-    expect(MCP_TOOL_METADATA.length).toBe(11);
+  test("contains all 15 tools (20 with AMC_A4_PREVIEW=1)", () => {
+    expect(MCP_TOOL_METADATA.length).toBe(process.env.AMC_A4_PREVIEW === "1" ? 20 : 15);
     expect(MCP_TOOL_METADATA.map((t) => t.name)).toContain("amc_incident_clocks");
   });
 
