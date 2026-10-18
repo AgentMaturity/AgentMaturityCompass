@@ -16,7 +16,7 @@ export function fakeKey(kind: FakeKind): FakeKey {
   const pair = kind === "ed25519" ? generateKeyPairSync("ed25519") : generateKeyPairSync("ec", { namedCurve: "P-256" });
   return { kind, privateKey: pair.privateKey, publicKey: pair.publicKey };
 }
-export const spkiDer = (key: FakeKey) => key.publicKey.export({ format: "der", type: "spki" });
+const spkiDer = (key: FakeKey) => key.publicKey.export({ format: "der", type: "spki" });
 export const publicPem = (key: FakeKey) => key.publicKey.export({ format: "pem", type: "spki" }).toString();
 
 // --- ECDSA P-256 over a precomputed digest (Node's sign always hashes), for the providers that sign digests ---
@@ -47,7 +47,7 @@ const big = (bytes: Buffer) => BigInt(`0x${bytes.toString("hex") || "0"}`);
 const hex32 = (value: bigint) => Buffer.from(value.toString(16).padStart(64, "0"), "hex");
 
 /** r||s over `digest` (no further hashing), as a token or Key Vault signs a digest. */
-export function ecdsaSignDigest(privateKey: KeyObject, digest: Buffer): Buffer {
+function ecdsaSignDigest(privateKey: KeyObject, digest: Buffer): Buffer {
   const d = big(Buffer.from(privateKey.export({ format: "jwk" }).d!, "base64url"));
   for (;;) {
     const k = mod(big(randomBytes(40)), N - 1n) + 1n;
@@ -251,5 +251,3 @@ export function pkcs11Fake(opts: { token: string; pin: string; keys: FakeTokenKe
   };
   return { module, calls };
 }
-
-export const sha256 = (data: Uint8Array) => createHash("sha256").update(data).digest();

@@ -175,7 +175,7 @@ For code that builds on providers (P2-09 data-key wrapping, P2-36 A4):
 
 - `src/keys/provider.ts`: `KeyProvider`, `KeyRef`, `KeyDescription`, `KeyProtection`, `SigningAlgorithm`, `KEY_PROVIDER_IDS`, `KeyProviderError`, `KEY_PROVIDER_ERRORS`, `checkedDescription`, `signChecked`.
 - `src/keys/algorithmPolicy.ts`: `SIGNING_ALGORITHMS`, `signingKeyIdentity`, `canonicalSigningKey`, `signingKeyId`, `verifyCanonical`, `verifyWithKey`, `derToP1363`, `lowS`.
-- `src/keys/purposeProviders.ts`: `loadKeyProvider`, `signWithPurposeKey`, `exportPurposePublicKey`, `bindPurposeProviderKey`, `BINDABLE_PURPOSES`.
+- `src/keys/purposeProviders.ts`: `loadKeyProvider`, `signWithPurposeKey`, `exportPurposePublicKey`, `bindPurposeProviderKey`.
 - `src/keys/delegation.ts`: `issueDelegation`, `verifyDelegation`, `admitDelegatedRow`, `encodeDelegation`.
 
 ```ts

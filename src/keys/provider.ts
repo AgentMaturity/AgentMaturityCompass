@@ -15,8 +15,6 @@
  */
 import { canonicalSigningKey, lowS, signingKeyId, verifyCanonical, type SigningAlgorithm } from "./algorithmPolicy.js";
 
-export type { SigningAlgorithm } from "./algorithmPolicy.js";
-
 export const KEY_PROVIDER_IDS = ["file", "aws-kms", "gcp-kms", "azure-kv", "pkcs11"] as const;
 export type KeyProviderId = (typeof KEY_PROVIDER_IDS)[number];
 

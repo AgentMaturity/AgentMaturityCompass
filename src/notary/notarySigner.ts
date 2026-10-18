@@ -19,7 +19,7 @@ import type { NotaryBackendConfig } from "./notaryConfigSchema.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { runExternalSigner } from "./notaryExternalSigner.js";
-import type { NotaryAttestationBasis, NotaryAttestationLevel } from "./notaryApiTypes.js";
+import type { NotaryAttestationBasis, NotaryAttestationLevel, NotarySignResponse } from "./notaryApiTypes.js";
 import { verifyCanonical } from "../keys/algorithmPolicy.js";
 import { callProviderSync } from "../keys/providerBridge.js";
 import { checkedDescription, KeyProviderError } from "../keys/provider.js";
@@ -120,6 +120,14 @@ export interface NotarySignResult {
   /** P2-08: where attestationLevel comes from; an external signer's level is only what it reports. */
   attestationBasis: NotaryAttestationBasis;
   signedTs: number;
+}
+
+/** The `/sign` answer and the `amc notary sign` output for one signature. */
+export function notarySignResponse(kind: string, payloadSha256: string, signed: NotarySignResult): NotarySignResponse {
+  return {
+    v: 1, kind, payloadSha256, signatureB64: signed.signatureB64, pubkeyPem: signed.pubkeyPem, pubkeyFingerprint: signed.pubkeyFingerprint,
+    signedTs: signed.signedTs, backend: signed.backend, attestationLevel: signed.attestationLevel, attestationBasis: signed.attestationBasis, claims: signed.claims
+  };
 }
 
 export interface NotarySigner {

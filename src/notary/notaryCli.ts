@@ -11,7 +11,7 @@ import {
   notaryPublicKeyPath,
   resolveNotaryDir
 } from "./notaryConfigStore.js";
-import { initFileSealedNotaryKey, loadNotarySigner } from "./notarySigner.js";
+import { initFileSealedNotaryKey, loadNotarySigner, notarySignResponse } from "./notarySigner.js";
 import { appendNotaryLogEntry, initNotaryLog, tailNotaryLog, verifyNotaryLog } from "./notaryLog.js";
 import { exportNotaryAttestationBundle, verifyNotaryAttestationBundle } from "./notaryAttestation.js";
 import { resolveNotaryBindHost, startNotaryServer } from "./notaryServer.js";
@@ -223,19 +223,7 @@ export function notarySignCli(params: {
     kind: params.kind,
     payloadSha256
   });
-  const out = {
-    v: 1,
-    kind: params.kind,
-    payloadSha256,
-    signatureB64: signed.signatureB64,
-    pubkeyPem: signed.pubkeyPem,
-    pubkeyFingerprint: signed.pubkeyFingerprint,
-    signedTs: signed.signedTs,
-    backend: signed.backend,
-    attestationLevel: signed.attestationLevel,
-    attestationBasis: signed.attestationBasis,
-    claims: signed.claims
-  };
+  const out = notarySignResponse(params.kind, payloadSha256, signed);
   writeFileAtomic(resolve(params.outFile), `${canonicalize(out)}\n`, 0o600);
   return {
     outFile: resolve(params.outFile),

@@ -5,7 +5,7 @@ import { URL } from "node:url";
 import { randomUUID } from "node:crypto";
 import { isIP, type Socket } from "node:net";
 import { loadNotaryConfig, resolveNotaryDir } from "./notaryConfigStore.js";
-import { loadNotarySigner } from "./notarySigner.js";
+import { loadNotarySigner, notarySignResponse } from "./notarySigner.js";
 import type { NotaryAttestationBasis } from "./notaryApiTypes.js";
 import { createNotaryReplayGuard, verifyNotaryRequestAuth } from "./notaryAuth.js";
 import { notarySignRequestSchema } from "./notaryApiTypes.js";
@@ -254,19 +254,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           return;
         }
         const signed = signer.sign(parsed.kind, payloadBytes);
-        const out = {
-          v: 1 as const,
-          kind: parsed.kind,
-          payloadSha256: payloadSha,
-          signatureB64: signed.signatureB64,
-          pubkeyPem: signed.pubkeyPem,
-          pubkeyFingerprint: signed.pubkeyFingerprint,
-          signedTs: signed.signedTs,
-          backend: signed.backend,
-          attestationLevel: signed.attestationLevel,
-          attestationBasis: signed.attestationBasis,
-          claims: signed.claims
-        };
+        const out = notarySignResponse(parsed.kind, payloadSha, signed);
         const verified = verifyNotarySignResponse(out, payloadBytes);
         if (!verified.ok) {
           json(res, 500, { error: verified.error ?? "sign verification failed" });

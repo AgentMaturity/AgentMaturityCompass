@@ -651,9 +651,9 @@ AMC provides 1,256 public CLI command paths in the live command inventory.
 | 632 | `amc key-custody-modes` | List available key custody modes and their configurations |
 | 633 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys |
 | 634 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list |
-| 635 | `amc keys list` | List each signing purpose's key id, shared keys, history size and rotations (public files only) |
+| 635 | `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) |
 | 636 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list |
-| 637 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change |
+| 637 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change |
 | 638 | `amc lab-compare` | Compare two lab experiments |
 | 639 | `amc lab-create` | Create a new lab experiment |
 | 640 | `amc lab-list` | List all lab experiments |
@@ -6286,7 +6286,7 @@ Print a purpose's public key, key id and proof of possession, for an organisatio
 
 #### `amc keys list`
 
-List each signing purpose's key id, shared keys, history size and rotations (public files only)
+List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only)
 
 
 | Option | Description |
@@ -6306,7 +6306,7 @@ Record a retired key's revocation in the workspace's signed, anchored key revoca
 
 #### `amc keys rotate`
 
-Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change
+Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change
 
 
 | Option | Description |

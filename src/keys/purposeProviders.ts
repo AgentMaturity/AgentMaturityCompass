@@ -37,7 +37,7 @@ import { assertKeyUsableNow, assertLocal, assertSigningKeyUsable, DELEGATION_REL
  * all refuse, among them the transparency log's seal for artifact-seal. Add a purpose once its signers call
  * signWithPurposeKey; keys.refs for any other purpose already refuses its vault key (fail closed).
  */
-export const BINDABLE_PURPOSES: readonly LocalPurpose[] = ["ledger-row"];
+const BINDABLE_PURPOSES: readonly LocalPurpose[] = ["ledger-row"];
 
 // ponytail: one fixed row cap per 24-hour delegation; make it a keys setting when a deployment's event rate needs another.
 const LEDGER_DELEGATION_MAX_EVENTS = 1_000_000;
