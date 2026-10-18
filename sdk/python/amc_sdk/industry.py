@@ -188,12 +188,18 @@ class StatusDimensions(TypedDict):
 
 
 class IndustryPackScoreResult(TypedDict):
-    """``amc domain pack run --pack P --baseline --json``: a self-reported result, never a certification."""
+    """``amc domain pack run --pack P --baseline --json``: a self-reported result, never a certification.
+
+    An unanswered question is not evaluated: it is listed in ``notEvaluatedQuestionIds``, has no
+    ``questionResults`` entry and no gap, and ``percentage``/``level`` are ``None`` until every
+    question is answered.
+    """
     packId: str
     packName: str
     stationId: str
-    percentage: float
-    level: float
+    percentage: float | None
+    level: float | None
+    notEvaluatedQuestionIds: list[str]
     selfAssessment: PackSelfAssessment
     claimKind: str
     eligibleLevel: float | None
@@ -340,9 +346,9 @@ class AmcIndustry:
     def score_pack_baseline(self, pack_id: str) -> IndustryPackScoreResult:
         """``amc domain pack run --pack P --baseline --json``: no question answered.
 
-        The CLI counts each unanswered question as level 1 in ``percentage``,
-        ``level`` and ``complianceGaps``; those numbers are not an assessment.
-        ``selfAssessment`` reports 0 answered, ``eligibleLevel`` is ``None`` and
+        Nothing is evaluated: ``notEvaluatedQuestionIds`` lists every question,
+        ``percentage``, ``level`` and ``eligibleLevel`` are ``None``,
+        ``questionResults`` and ``complianceGaps`` are empty, and
         ``statusDimensions["result"]`` is ``"not_evaluated"``. The CLI takes
         custom responses only interactively, so this is the only scoring it
         offers a non-interactive caller.

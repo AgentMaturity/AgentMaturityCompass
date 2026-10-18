@@ -54,11 +54,14 @@ PACK = {"id": "clinical-trials", "stationId": "health", "name": "Clinical Trials
 STATUS = {"applicability": {"state": "unresolved", "reason": "no applicability decision recorded"},
           "evidence": "incomplete", "result": "not_evaluated", "enforcement": {"state": "none"}, "review": "pending"}
 SCORE = {"packId": "clinical-trials", "packName": "Clinical Trials", "stationId": "health",
-         "percentage": 0, "level": 1, "selfAssessment": {"complete": False, "answered": 0, "total": 1},
-         "claimKind": "self_reported", "eligibleLevel": None,
-         "questionResults": [{"id": "HLT-CT-1", "dimension": "Safety", "score": 0, "weight": 10, "percentage": 0}],
-         "complianceGaps": ["HLT-CT-1 (Safety): L1"], "riskTier": "critical",
-         "statusDimensions": STATUS, "claimLabel": "Claim: Self-reported · Result: not evaluated"}
+         "percentage": None, "level": None, "notEvaluatedQuestionIds": ["HLT-CT-1"],
+         "selfAssessment": {"complete": False, "answered": 0, "total": 1},
+         "claimKind": "self_reported", "eligibleLevel": None, "questionResults": [], "complianceGaps": [],
+         "riskTier": "critical", "statusDimensions": STATUS, "claimLabel": "Claim: Self-reported · Result: not evaluated"}
+ANSWERED = {**SCORE, "percentage": 50, "level": 2, "notEvaluatedQuestionIds": [], "eligibleLevel": 1,
+            "selfAssessment": {"complete": True, "answered": 1, "total": 1},
+            "questionResults": [{"id": "HLT-CT-1", "dimension": "Safety", "score": 5, "weight": 10, "percentage": 50}],
+            "complianceGaps": ["HLT-CT-1 (Safety): L3"]}
 APPLY = {"agentId": "a", "domain": "health", "packsApplied": ["clinical-trials"], "guardrailsGenerated": 3,
          "configFileUpdated": None, "guardrailsProposed": ["clinical-trials:HLT-CT-1"], "guardrailsEnabled": [],
          "complianceFrameworks": ["EU_AI_ACT"], "assessment": {"status": "not_evaluated", "reasons": ["no run"]},
@@ -217,6 +220,8 @@ def test_other_nonzero_exit_carries_the_cli_reason(tmp_path: Path) -> None:
     ("score_pack_baseline", {**SCORE, "statusDimensions": {k: v for k, v in STATUS.items() if k != "result"}}),
     ("score_pack_baseline", {**SCORE, "eligibleLevel": "1"}),
     ("score_pack_baseline", {k: v for k, v in SCORE.items() if k != "selfAssessment"}),
+    ("score_pack_baseline", {k: v for k, v in SCORE.items() if k != "notEvaluatedQuestionIds"}),
+    ("score_pack_baseline", {**SCORE, "percentage": "n/a"}),
     ("apply", {**APPLY, "assessment": {"status": "not_evaluated"}}),
     ("apply", {k: v for k, v in APPLY.items() if k != "guardrailsProposed"}),
     ("apply", {**APPLY, "configFileUpdated": 3}),
@@ -235,13 +240,13 @@ def test_optional_keys_are_accepted(tmp_path: Path) -> None:
     unlocked = {**CATALOG_ITEM, "locked": False}
     runner = Runner(stdout={"entitlement": active, "packs": [unlocked]})
     assert client(tmp_path, runner).list_packs()["packs"][0]["regulatoryBasis"] == ["r"]
-    scored = {**SCORE, "eligibleLevel": 1, "statusDimensions": {**STATUS, "enforcement": {"state": "enforced", "boundary": "b"}}}
+    scored = {**ANSWERED, "statusDimensions": {**STATUS, "enforcement": {"state": "enforced", "boundary": "b"}}}
     assert client(tmp_path, Runner(stdout=scored)).score_pack_baseline("clinical-trials")["eligibleLevel"] == 1
 
 
 def test_score_result_carries_the_claim_and_no_certified_field() -> None:
     hints = industry.IndustryPackScoreResult.__required_keys__
-    assert {"claimKind", "statusDimensions", "claimLabel", "selfAssessment", "eligibleLevel"} <= hints
+    assert {"claimKind", "statusDimensions", "claimLabel", "selfAssessment", "eligibleLevel", "notEvaluatedQuestionIds"} <= hints
     assert "certified" not in industry.IndustryPackScoreResult.__annotations__
 
 
@@ -287,6 +292,8 @@ def test_installed_cli_contract(tmp_path: Path) -> None:
         scored = sdk.score_pack_baseline("clinical-trials")
         assert scored["claimKind"] == "self_reported" and scored["statusDimensions"]["result"] == "not_evaluated"
         assert scored["selfAssessment"]["answered"] == 0 and scored["eligibleLevel"] is None
+        assert scored["percentage"] is None and scored["level"] is None and scored["complianceGaps"] == []
+        assert len(scored["notEvaluatedQuestionIds"]) == scored["selfAssessment"]["total"]
         assert sdk.apply("probe", pack_id="clinical-trials", dry_run=True)["dryRun"] is True
         assert sorted(os.listdir(tmp_path)) == []
         return

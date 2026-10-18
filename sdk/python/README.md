@@ -240,7 +240,8 @@ IndustryPack            {id, stationId, name, description, riskTier, euAIActClas
                          questions: [{id, dimension, text, regulatoryRef, l1, l3, l5: string,
                                       weight: number}]}
 IndustryPackScoreResult {packId, packName, stationId, riskTier, claimKind, claimLabel: string,
-                         percentage, level: number, eligibleLevel: number|null,
+                         percentage, level, eligibleLevel: number|null,
+                         notEvaluatedQuestionIds: string[],
                          selfAssessment: {complete: boolean, answered, total: number},
                          statusDimensions: StatusDimensions, complianceGaps: string[],
                          questionResults: [{id, dimension: string, score, weight, percentage: number}]}
@@ -261,7 +262,7 @@ Refusals and failures:
 - Industry Packs licence: `describe_pack`, `score_pack_baseline` and `apply` need a licence that verifies against a key pinned in the operator's AMC trust list (see `docs/PRICING.md`); nothing passed to this module unlocks them, and a licence changes access, never a result. `list_packs` and `list_domains` need none.
 - `describe_pack` and `score_pack_baseline` without an Industry Packs licence: the CLI prints `{"error": "industry_packs_locked", "message": ...}` and exits 1, raised as `AmcIndustryLockedError`. `apply` reports the same lock as text on stderr, raised as `AmcIndustryCommandError` (as is every other nonzero exit, with the CLI's own reason and `returncode`).
 - Output that is not one JSON document, or does not match its shape, raises `AmcProtocolError`; a CLI timeout raises `AmcTimeoutError`.
-- `score_pack_baseline` answers no question. Its result is self-reported (`claimKind` `self_reported`), `selfAssessment.answered` is 0, `eligibleLevel` is `None` and `statusDimensions["result"]` is `not_evaluated`. The CLI still counts each unanswered question as level 1 in `percentage`, `level` and `complianceGaps`; read those numbers as "nothing answered", not as an assessment. No result is a certification. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
+- `score_pack_baseline` answers no question, so nothing is evaluated: `notEvaluatedQuestionIds` lists every question, `percentage`, `level` and `eligibleLevel` are `None`, `questionResults` and `complianceGaps` are empty, and `statusDimensions["result"]` is `not_evaluated`. An unanswered question never gets a default level. No result is a certification. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
 
 `tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Against the real CLI it checks the locked refusals, or, when the environment carries a licence that verifies against a key pinned in `AMC_HOME`'s trust list, the unlocked describe, score and dry-run apply shapes. Run it against an installed wheel, offline:
 
