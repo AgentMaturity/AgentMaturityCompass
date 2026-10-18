@@ -97,7 +97,7 @@ export function compilePlan(input: CompileInput): CompiledPlan {
     ...(stationMerge.exceptionRejected.length ? { mergeExceptionRejected: stationMerge.exceptionRejected } : {}),
     unsupported: [...retired, ...absentEnforcement(active), ...plannedProducers(active, cat.producers)].sort(order),
     crosswalkLinks: active.flatMap((c) => c.crosswalk.map((x) => ({ controlId: c.id, framework: x.framework, clause: x.clause, relation: x.relation }))),
-    runtimePolicy: buildRuntimePolicy(parameters, profile.deployment.agentIds),
+    runtimePolicy: buildRuntimePolicy(parameters, profile.deployment.agentIds, input.signedTools),
     evidencePlan: buildEvidencePlan(active)
   };
   return { ...body, digest: digestOf(body) };

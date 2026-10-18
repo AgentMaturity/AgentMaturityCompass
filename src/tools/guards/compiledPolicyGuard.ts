@@ -6,6 +6,7 @@ import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
+import { toolsConfigPath } from "../../toolhub/toolhubValidators.js";
 import type { ActionClass } from "../../types.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
@@ -81,6 +82,23 @@ function approvalDenial(workspace: string, actionClass: ActionClass, rule: Appro
 }
 
 /**
+ * P1-10F: a plan compiled from the workspace's signed tools.yaml records the SHA-256 of its bytes. Any other tools.yaml
+ * now (edited, re-signed or removed) denies, as the catalog lock does for the catalog, until the plan is recompiled and
+ * reactivated, so tools.yaml cannot change what an activated plan shows. One read per call; the denial is model-visible,
+ * so it names no host path.
+ */
+function toolsConfigDenial(workspace: string, pinned: string): string | null {
+  let live: string;
+  try {
+    live = sha256Hex(readFileSync(toolsConfigPath(workspace)));
+  } catch (error) {
+    return `the signed tools.yaml this plan was compiled from cannot be read (${(error as NodeJS.ErrnoException).code ?? "unreadable"}); recompile and reactivate the plan`;
+  }
+  return live === pinned ? null
+    : `the signed tools.yaml changed since this plan was compiled (sha256 ${live.slice(0, 12)}, the plan records ${pinned.slice(0, 12)}); recompile and reactivate the plan`;
+}
+
+/**
  * Whether the policy's `toolPipeline.visibleTools` lists this tool. The guard denies what this refuses; native sessions
  * also leave it out of the tools offered to the model. The Code Mode transport dispatches sub-calls, and each one is
  * checked on its own name.
@@ -93,6 +111,8 @@ export function compiledPolicyShows(policy: ActiveCompiledPolicy, name: string):
 export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution): string | undefined {
   const deny = (controlIds: readonly string[], why: string): string => `compiled policy denied this call (control ${named(policy, controlIds)}): ${why}`;
   const pipeline = policy.runtimePolicy.toolPipeline;
+  const toolsWhy = pipeline.toolsConfigSha256 === undefined ? null : toolsConfigDenial(workspace, pipeline.toolsConfigSha256);
+  if (toolsWhy) return `compiled policy denied this call (toolPipeline.toolsConfigSha256): ${toolsWhy}`;
   if (!compiledPolicyShows(policy, execution.name)) {
     return `compiled policy denied this call (toolPipeline.visibleTools): "${execution.name}" is not a visible tool`;
   }

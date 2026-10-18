@@ -45,6 +45,8 @@ export function assertSignedPlan(workspace: string, signed: Pick<SignedPlan, "pl
 
 const RUNTIME_RULES: Rules = [
   [/(^|\.|\])controlIds$/, { kind: "ignore" }],
+  // Names the tools.yaml the plan was compiled from (P1-10F); what it changes is judged by visibleTools and the tools fragment.
+  [/^toolPipeline\.toolsConfigSha256$/, { kind: "ignore" }],
   [/^(toolPipeline\.visibleTools|egress\.allowHosts|egress\.processorAllowlist)$|\.rolesAllowed$/, { kind: "addedIsWeaker" }],
   [/^toolPipeline\.approvalRequiredFor$|^toolPipeline\.guards\[[^\]]+\]$|^approvals\.[A-Z_]+$/, { kind: "removedIsWeaker" }],
   [/\.requiredApprovals$/, { kind: "floor", absent: -Infinity }],
