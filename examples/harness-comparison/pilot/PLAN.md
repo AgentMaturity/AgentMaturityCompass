@@ -96,3 +96,7 @@ Review finding: the coding probe evaluated model-written code with `node:vm` on 
 3. The vm layer stays as defense in depth: dynamic import rejects with an error created inside the context, proxies are refused, and values, arguments and thrown names are read only through own data descriptors.
 4. The 3 existing coding tasks are judged by the pilot oracle with `codingOracle.mjs`'s own cases and immutability rule, through the same contained probe. `codingOracle.mjs` itself, used outside the pilot, is unchanged and still runs its probe on the host; that is a follow-up.
 5. The escape checks also cover the probe container: the payloads above through the contained probe, and a vm-free attempt in the same limits.
+
+### 2026-10-18 (3): the legacy coding oracle and Pi binding are contained too, before any real-model trial
+
+Amendment 2's follow-up is done. `codingOracle.mjs` runs the shared hardened probe only in the pinned container and refuses without it ("not measured: containment unavailable"), never on the host; its contract tests use a test-only seam (`evaluateTrustedFixtureForTests`) on their own trusted fixtures. `codingAdapter.mjs` runs Pi only through `codingPiContainer.mjs` (the pilot's container) or refuses. `codingMaterialize.mjs` requires a `containment` block and passes it to both. The pilot's tasks, oracles and analysis are unchanged.
