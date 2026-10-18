@@ -22,7 +22,7 @@ item's `locked` flag says whether its questions are locked), and a licensed scor
 |---|---|---|---|
 | `amc_list_industry_packs` | `{ station? }` | no | packs grouped by station: name, description, regulatory basis, frameworks, question count and `locked` |
 | `amc_get_industry_pack` | `{ packId }` | yes | the pack as stored: questions, `regulatoryBasis`, `complianceFrameworks`, `euAIActClassification` |
-| `amc_score_industry_pack` | `{ packId, responses }` | yes | `selfAssessment`, `notEvaluatedQuestionIds` and `result` (the `scoreIndustryPack()` result, or `null`) |
+| `amc_score_industry_pack` | `{ packId, responses }` | yes | `result`: the `scoreIndustryPack()` result |
 | `amc_industry_station_summary` | `{ station }` | no | `getStationSummary()`: pack count, question count and frameworks |
 
 `station` is one of the ids from `listDomainIds()` in `src/domains/domainRegistry.ts`.
@@ -42,14 +42,15 @@ line, and `claimKind`, `statusDimensions` and `claimLabel` in `structuredContent
 
 ## Unanswered questions are not evaluated
 
-`responses` maps question ids of the pack to integer levels 1-5. A question without an answer is not
-evaluated and is never given a default level:
+`responses` maps question ids of the pack to integer levels 1-5. The tool returns the shared
+`scoreIndustryPack()` result, the same one `amc_score_sector_pack` and `amc domain pack run` report. A
+question without an answer is not evaluated and is never given a default level:
 
-- When every question is answered, `result` is the `scoreIndustryPack()` result (self-reported score,
-  level and gaps) and `notEvaluatedQuestionIds` is empty.
-- When any question is unanswered, `result` is `null`, `notEvaluatedQuestionIds` lists the unanswered
-  question ids, and no score, level or percentage is computed. `selfAssessment` still reports
-  `answered` and `total`.
+- When every question is answered, `result` carries the self-reported `percentage`, `level` and gaps,
+  and `result.notEvaluatedQuestionIds` is empty.
+- When any question is unanswered, `result.notEvaluatedQuestionIds` lists it, it has no question
+  result and no gap, and `result.percentage`, `result.level` and `result.eligibleLevel` are `null`.
+  `result.selfAssessment` still reports `answered` and `total`.
 
 ## Behaviour
 
@@ -73,13 +74,11 @@ evaluated and is never given a default level:
 
 - The pack content (questions, regulatory references) is served as stored in
   `src/domains/industryPacks.ts`. These tools do not check that content against primary sources.
-- `amc_score_sector_pack` and `amc domain pack run` still count an unanswered question as level 1
-  (`scoreIndustryPack`, owned by P0-21). Only these tools withhold the score until every question is
-  answered.
 
 ## Tests
 
-`tests/industryPackMcpTools.test.ts` and `tests/industryPackMcpClaims.test.ts` run the tools through an
+`tests/industryPackNotEvaluated.test.ts` pins the not-evaluated rule in the shared scorer, the CLI, both MCP scoring
+tools and the pack audit. `tests/industryPackMcpTools.test.ts` and `tests/industryPackMcpClaims.test.ts` run the tools through an
 in-memory MCP client with licences signed by a key pinned in a temporary trust list.
 `tests/industryPackMcpToolsWiring.test.ts` starts the real `startMcpServer()` with its stdio transport
 replaced by an in-memory pair. `tests/mcpServer.test.ts` pins the `amc mcp list-tools` entries: 15

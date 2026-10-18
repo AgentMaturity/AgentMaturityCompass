@@ -212,10 +212,10 @@ Score an agent against an industry-specific Sector Pack.
 
 ```
 Input:  { packId: string, responses: Record<questionId, integer 1-5> }
-Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
+Output: self-reported score and level, or "not evaluated: N of M questions unanswered", "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
 
-Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. An unanswered question is not evaluated: it gets no level and no gap, and no score is printed until every question is answered. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
 
 Example pack IDs (`amc_list_industry_packs` lists every pack):
 
@@ -234,7 +234,7 @@ Example pack IDs (`amc_list_industry_packs` lists every pack):
 ---
 
 ### Industry pack tools
-`amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary` list, show and score the industry packs. Pack questions and scoring need an Industry Packs licence; a licence changes access, never a result. `amc_score_industry_pack` reports unanswered questions in `notEvaluatedQuestionIds` and computes no score until every question is answered. See [MCP_INDUSTRY_PACKS.md](MCP_INDUSTRY_PACKS.md).
+`amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary` list, show and score the industry packs. Pack questions and scoring need an Industry Packs licence; a licence changes access, never a result. `amc_score_industry_pack` returns the same scorer's result: unanswered questions are listed in `notEvaluatedQuestionIds`, and `percentage` and `level` are `null` until every question is answered. See [MCP_INDUSTRY_PACKS.md](MCP_INDUSTRY_PACKS.md).
 
 ```
 amc_list_industry_packs       { station?: string }
