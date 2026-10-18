@@ -182,7 +182,8 @@ framework through a scaffold, connect instructions and a trace import.
   through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
   starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow
   as unsupported (`NATIVE_TASKS_NO_DELEGATION`) and it stays listed until an owner acknowledges it out of scope. Once a
-  compiled plan is active its default `visibleTools` hides the tool, and the plan names that denial
+  compiled plan is active its `visibleTools` hide the tool unless the signed tools.yaml it was compiled from lists it
+  (the built-in default list does not), and the plan names that denial
   (`C6_COMPILED_POLICY_DENIES`, with the plan revision and its tool-pipeline controls); an unreadable plan counts as
   hiding it.
 - **Build** (an owner) signs the agent's preset into `.amc/agents.yaml` (the presets file is verified and parsed from
@@ -261,7 +262,10 @@ the agent's prompt pack.
   stations are carried), excluded uses, data residency, retention and processors, and deployment needs. Understand
   carries `markets` and `stations` from Aspire. An empty or `unknown` fact stays unknown (null) and is never guessed;
   `jurisdictions` left empty uses the carried markets. Every fact is the member's assertion (`provenance: asserted`,
-  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and records the
+  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and the
+  workspace's signed `.amc/tools.yaml` (`signedTools`, read and verified by `verifiedSignedTools`, as `amc catalog
+  compile` reads it: its tools are the plan's visible tools and the plan binds its SHA-256; with no tools.yaml, the
+  built-in default list; one that does not verify is the compile refusal `TOOLS_CONFIG_UNVERIFIED`) and records the
   applicability per requirement with its reasons and missing facts, each citation's `appliesWhen`, the register entries
   of the stations with `verified` as recorded, the reporting-clock candidates (each `NEEDS_CLASSIFICATION`, with
   `CLOCK_REVIEW_STATUS`), the signed configs' states and the active plan's head. The missing facts name the questions
