@@ -185,7 +185,7 @@ function frameworkDetail(sorted) {
 
 /**
  * @param {object[]} frameworks GLOBAL_FRAMEWORKS (or a fixture of the same shape)
- * @param {{euRiskMatrix?: object[], milestones?: object[]}} [extra]
+ * @param {{euRiskMatrix?: object[], milestones?: object[], registerEntries?: object[], labelLines?: string[]}} [extra]
  */
 export function renderCalendar(frameworks, { euRiskMatrix = [], milestones = [], registerEntries = [], labelLines = [] } = {}) {
   validateFrameworks(frameworks);

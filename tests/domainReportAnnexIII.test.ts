@@ -4,18 +4,18 @@ import { assessDomain, parseAnnexIIIPoints } from "../src/domains/domainAssessme
 import { buildDomainReport, renderDomainReportMarkdown } from "../src/domains/domainReportBuilder.js";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { DOMAIN_REGISTRY, type Domain } from "../src/domains/domainRegistry.js";
-import type { Level0to5, Likert1to5 } from "../src/score/units.js";
+import { level, likert, type Level0to5, type Likert1to5 } from "../src/score/units.js";
 
 const DOMAINS = Object.keys(DOMAIN_REGISTRY) as Domain[];
 const NOW = Date.UTC(2026, 9, 3, 12, 0, 0);
 
 /** Base answers are diagnostic levels 0-5 and domain answers Likert 1-5 (P0-21 units). */
-function uniform(domain: Domain, base: Level0to5, domainValue: Likert1to5, overrides: Record<string, Likert1to5> = {}) {
+function uniform(domain: Domain, base: number, domainValue: number) {
   const baseScores: Record<string, Level0to5> = {};
-  for (let i = 1; i <= 42; i += 1) baseScores[`AMC-${i}`] = base;
+  for (let i = 1; i <= 42; i += 1) baseScores[`AMC-${i}`] = level(base);
   const domainQuestionScores: Record<string, Likert1to5> = {};
-  for (const q of getDomainPackQuestions(domain)) domainQuestionScores[q.id] = domainValue;
-  return assessDomain({ agentId: "agent-s4", domain, baseScores, domainQuestionScores: { ...domainQuestionScores, ...overrides } });
+  for (const q of getDomainPackQuestions(domain)) domainQuestionScores[q.id] = likert(domainValue);
+  return assessDomain({ agentId: "agent-s4", domain, baseScores, domainQuestionScores });
 }
 
 describe("domain assessment — EU AI Act classification", () => {
@@ -68,7 +68,7 @@ describe("domain assessment — EU AI Act classification", () => {
   });
 });
 
-function governance(base: Level0to5, domainValue: Likert1to5) {
+function governance(base: number, domainValue: number) {
   return uniform("governance", base, domainValue);
 }
 
