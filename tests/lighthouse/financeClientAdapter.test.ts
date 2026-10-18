@@ -36,6 +36,23 @@ function counts(f: FinanceFixture) {
   const s = f.snapshot();
   return { posts: s.posts.length, commits: s.commits.length };
 }
+/**
+ * The client gave up while the provider may still be appending (log row, then checkpoint rename).
+ * Wait, bounded, for a consistent log that holds the POST; the delayed commit is still a full delay away.
+ */
+async function snapshotAfterAbandonedPost(f: FinanceFixture): Promise<ReturnType<FinanceFixture["snapshot"]>> {
+  const until = performance.now() + 900;
+  for (;;) {
+    try {
+      const s = f.snapshot();
+      if (s.posts.length > 0 || performance.now() > until) return s;
+    } catch (error) {
+      const inFlight = /^Independent oracle: (provider checkpoint mismatch|truncated provider log)$/.test((error as Error).message);
+      if (!inFlight || performance.now() > until) throw error;
+    }
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+}
 async function fault(f: FinanceFixture, mode: string, extra: Record<string, unknown> = {}): Promise<void> {
   const result = await f.admin("POST", "/admin/faults", { schemaVersion: "lighthouse-finance-faults/1",
     faults: [{ id: `client-${mode}`, method: "POST", path: "/v1/payments", nth: 1, mode, ...extra }] });
@@ -407,7 +424,7 @@ describe("P1-19 real child provider through client and adapter, without AMC auth
       await fault(f, "delay_then_commit", { delayMs: 1000 });
       const answer = await realClient(f, "executor-a", 100).createPayment(BODY, KEY); noCredentials(f, answer);
       expect(answer).toEqual({ kind: "unknown", reason: "request_timeout" });
-      const s = f.snapshot(); expect(s.posts).toHaveLength(1); expect(s.commits).toHaveLength(0);
+      const s = await snapshotAfterAbandonedPost(f); expect(s.posts).toHaveLength(1); expect(s.commits).toHaveLength(0);
       f.observe({ kind: "actual-client-100ms-deadline", postsBeforeOwnedShutdown: 1, commitsBeforeOwnedShutdown: 0 });
       // Owned shutdown may cancel this pending delay. This test makes no eventual-commit or 30s reconciliation claim.
     });
@@ -419,7 +436,7 @@ describe("P1-19 real child provider through client and adapter, without AMC auth
       const dispatched = await createPaymentAdapter({ client: realClient(f, "executor-a", 100) }).dispatch(INPUT);
       noCredentials(f, dispatched);
       expect(dispatched).toEqual({ kind: "unknown", reason: "request_timeout" });
-      const before = f.snapshot();
+      const before = await snapshotAfterAbandonedPost(f);
       expect(before.posts).toHaveLength(1); expect(before.commits).toHaveLength(0);
       const reads: string[] = [], client = realClient(f, "executor-a", 750);
       let unexpectedPostCalls = 0;
