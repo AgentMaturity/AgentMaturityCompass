@@ -95,6 +95,12 @@ jobs:
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
 
+      - name: Regulatory calendar matches its sources (P1-42)
+        run: npm run check:regulatory-calendar
+
+      - name: Industry guides match source (P1-42)
+        run: npm run check:industry-guides
+
       - name: Citation lint (P0-25)
         run: npm run check:citations
 

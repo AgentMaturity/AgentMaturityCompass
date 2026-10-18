@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
  * Renders docs/REGULATORY_CALENDAR.md from the regulatory register
- * (GLOBAL_FRAMEWORKS and EU_AI_ACT_RISK_MATRIX in src/compliance/globalRegulatory.ts)
+ * (GLOBAL_FRAMEWORKS and EU_AI_ACT_RISK_MATRIX in src/compliance/globalRegulatory.ts),
+ * the key dates of the sourced register (src/compliance/regulatory/register.json),
+ * the experimental label (src/domains/questionnaireLabel.ts)
  * plus the curated, source-linked milestones in
  * docs/industries/_data/regulatory-milestones.json. The pure renderer lives in
  * scripts/lib/regulatoryCalendarRender.mjs.
@@ -21,11 +23,13 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { MILESTONES_PATH, REGISTER_SRC, renderCalendar } from "./lib/regulatoryCalendarRender.mjs";
+import { MILESTONES_PATH, REGISTER_JSON, REGISTER_SRC, renderCalendar } from "./lib/regulatoryCalendarRender.mjs";
 
 export { renderCalendar };
 
 const REGISTER_DIST = "dist/compliance/globalRegulatory.js";
+const LABEL_SRC = "src/domains/questionnaireLabel.ts";
+const LABEL_DIST = "dist/domains/questionnaireLabel.js";
 const DEFAULT_OUT = "docs/REGULATORY_CALENDAR.md";
 
 /**
@@ -33,18 +37,26 @@ const DEFAULT_OUT = "docs/REGULATORY_CALENDAR.md";
  * src fails to load, that error stands: falling back would let a stale build
  * pass --check while src is broken.
  */
-async function loadRegister(root) {
+async function loadModule(root, src, dist) {
   let tsImport;
   try {
     ({ tsImport } = await import("tsx/esm/api"));
   } catch {
-    const built = join(root, REGISTER_DIST);
-    if (!existsSync(built)) throw new Error(`tsx is not installed and ${REGISTER_DIST} is missing; run pnpm install or pnpm build`);
-    const mod = await import(pathToFileURL(built).href);
-    return { frameworks: mod.GLOBAL_FRAMEWORKS, euRiskMatrix: mod.EU_AI_ACT_RISK_MATRIX };
+    const built = join(root, dist);
+    if (!existsSync(built)) throw new Error(`tsx is not installed and ${dist} is missing; run pnpm install or pnpm build`);
+    return import(pathToFileURL(built).href);
   }
-  const mod = await tsImport(pathToFileURL(join(root, REGISTER_SRC)).href, import.meta.url);
-  return { frameworks: mod.GLOBAL_FRAMEWORKS, euRiskMatrix: mod.EU_AI_ACT_RISK_MATRIX };
+  return tsImport(pathToFileURL(join(root, src)).href, import.meta.url);
+}
+
+async function loadRegister(root) {
+  const mod = await loadModule(root, REGISTER_SRC, REGISTER_DIST);
+  const labels = await loadModule(root, LABEL_SRC, LABEL_DIST);
+  return {
+    frameworks: mod.GLOBAL_FRAMEWORKS, euRiskMatrix: mod.EU_AI_ACT_RISK_MATRIX,
+    registerEntries: readJson(join(root, REGISTER_JSON)).entries,
+    labelLines: labels.questionnaireLabelLines("regulatory-calendar")
+  };
 }
 
 function readJson(path) {
@@ -74,7 +86,8 @@ async function main(args) {
     }
     const milestonesPath = argValue(args, "--milestones");
     if (milestonesPath) milestones = readJson(resolve(root, milestonesPath)).milestones;
-    next = renderCalendar(register.frameworks, { euRiskMatrix: register.euRiskMatrix ?? [], milestones });
+    next = renderCalendar(register.frameworks, { euRiskMatrix: register.euRiskMatrix ?? [], milestones,
+      registerEntries: register.registerEntries ?? [], labelLines: register.labelLines ?? [] });
   } catch (error) {
     console.error(`gen-regulatory-calendar: ${error.message}`);
     return 2;

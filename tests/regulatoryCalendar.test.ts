@@ -5,11 +5,17 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { renderCalendar, validateMilestones } from "../scripts/lib/regulatoryCalendarRender.mjs";
 import { EU_AI_ACT_RISK_MATRIX, GLOBAL_FRAMEWORKS } from "../src/compliance/globalRegulatory.js";
+import { REGULATORY_REGISTER } from "../src/compliance/regulatory/index.js";
+import { questionnaireLabelLines } from "../src/domains/questionnaireLabel.js";
 
 const root = process.cwd();
 const script = join(root, "scripts/gen-regulatory-calendar.mjs");
 const committed = join(root, "docs/REGULATORY_CALENDAR.md");
 const sidecar = JSON.parse(readFileSync(join(root, "docs/industries/_data/regulatory-milestones.json"), "utf8"));
+/** What scripts/gen-regulatory-calendar.mjs renders from source: the register, its key dates, the label and the sidecar. */
+const fresh = () => renderCalendar(GLOBAL_FRAMEWORKS, { euRiskMatrix: EU_AI_ACT_RISK_MATRIX, milestones: sidecar.milestones,
+  registerEntries: REGULATORY_REGISTER.entries, labelLines: questionnaireLabelLines("regulatory-calendar") });
+const keyDateCount = REGULATORY_REGISTER.entries.reduce((n, e) => n + e.keyDates.length, 0);
 
 function run(args: string[]) {
   return spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: "utf8", timeout: 60_000 });
@@ -83,13 +89,24 @@ describe("regulatory calendar renderer", () => {
   });
 
   test("the committed calendar is exactly the render of the source register and the sidecar", () => {
-    const md = renderCalendar(GLOBAL_FRAMEWORKS, { euRiskMatrix: EU_AI_ACT_RISK_MATRIX, milestones: sidecar.milestones });
-    expect(readFileSync(committed, "utf8")).toBe(md);
+    expect(readFileSync(committed, "utf8")).toBe(fresh());
   });
 
   test.each([
     ["the committed calendar", () => readFileSync(committed, "utf8")],
-    ["a fresh render", () => renderCalendar(GLOBAL_FRAMEWORKS, { euRiskMatrix: EU_AI_ACT_RISK_MATRIX, milestones: sidecar.milestones })]
+    ["a fresh render", fresh]
+  ])("%s has one register-section row per key date in the sourced register, with its verified flag", (_name, load) => {
+    const section = load().split("## Sourced register key dates")[1]!.split("\n## ")[0]!;
+    const rows = section.split("\n").filter((l) => /^\| \d{4}(-\d{2}){0,2} \|/.test(l));
+    expect(keyDateCount).toBeGreaterThan(0);
+    expect(rows).toHaveLength(keyDateCount);
+    expect(rows.filter((r) => r.includes("| yes |"))).toHaveLength(REGULATORY_REGISTER.entries.flatMap((e) => e.keyDates).filter((k) => k.verified).length);
+    expect(load()).toContain(`Register key dates: ${keyDateCount} `);
+  });
+
+  test.each([
+    ["the committed calendar", () => readFileSync(committed, "utf8")],
+    ["a fresh render", fresh]
   ])("the header of %s states counts derived from the imported register, not literals", (_name, load) => {
     const md = load();
     const reqs = GLOBAL_FRAMEWORKS.reduce((n, f) => n + f.keyRequirements.length, 0);
@@ -112,6 +129,22 @@ const official = {
 };
 
 describe("curated milestones sidecar", () => {
+  test("no row still marked scheduled is past its date", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const pastDue = sidecar.milestones.filter((m: { status: string; date: string }) => /^scheduled/.test(m.status) && m.date < today);
+    expect(pastDue.map((m: { instrument: string; date: string }) => `${m.date} ${m.instrument}`)).toEqual([]);
+  });
+
+  test("Colorado SB26-189 and the Art. 50(2) grace end are present, each flagged for re-verification", () => {
+    const rows = sidecar.milestones as Array<{ instrument: string; date: string; status: string; source: { url: string; retrievedAt: string } }>;
+    const colorado = rows.find((m) => m.instrument.startsWith("Colorado SB26-189"));
+    expect(colorado).toMatchObject({ date: "2027-01-01", source: { url: "https://leg.colorado.gov/bills/sb26-189" } });
+    const art50 = rows.find((m) => m.date === "2026-12-02" && m.instrument.includes("Art. 111(4)"));
+    expect(art50?.source.url).toBe("https://publications.europa.eu/resource/celex/32026R1744");
+    for (const m of [colorado, art50]) expect(m?.status).toContain("re-verify against the primary source before publishing");
+    expect(rows.some((m) => m.instrument.includes("SB25B-004") && m.date === "2026-06-30")).toBe(false);
+  });
+
   test("every committed milestone has an official-host source and an ISO retrievedAt, and each renders one row", () => {
     expect(() => validateMilestones(sidecar.milestones)).not.toThrow();
     expect(sidecar.milestones.length).toBeGreaterThan(0);

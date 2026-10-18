@@ -24,6 +24,13 @@
       "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
     },
     {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 111(4) as amended by Regulation (EU) 2026/1744",
+      "date": "2026-12-02",
+      "label": "Art. 50(2) marking deadline for systems generating synthetic content that were placed on the market before 2 August 2026",
+      "status": "scheduled; date as recorded by register entry eu-ai-act (Official Journal text, CELEX 32026R1744, read 2026-10-04), not re-read by P1-42; re-verify against the primary source before publishing",
+      "source": { "title": "Regulation (EU) 2026/1744, Official Journal text (Publications Office)", "url": "https://publications.europa.eu/resource/celex/32026R1744", "retrievedAt": "2026-10-04" }
+    },
+    {
       "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
       "date": "2027-12-02",
       "label": "High-risk obligations for Article 6(2) and Annex III systems apply",
@@ -45,11 +52,11 @@
       "source": { "title": "Colorado General Assembly, SB24-205", "url": "https://leg.colorado.gov/bills/sb24-205", "retrievedAt": "2026-10-03" }
     },
     {
-      "instrument": "Colorado SB24-205 as amended by SB25B-004",
-      "date": "2026-06-30",
-      "label": "SB24-205 requirements take effect (SB25B-004, signed 2025-08-28, extends the date to June 30, 2026)",
-      "status": "scheduled",
-      "source": { "title": "Colorado General Assembly, SB25B-004", "url": "https://leg.colorado.gov/bills/sb25b-004", "retrievedAt": "2026-10-03" }
+      "instrument": "Colorado SB26-189, Automated Decision-Making Technology (repeals and reenacts the SB24-205 provisions)",
+      "date": "2027-01-01",
+      "label": "SB26-189 takes effect; the SB24-205 date of 2026-06-30 set by SB25B-004 no longer applies",
+      "status": "scheduled; date as recorded by register entry us-co-sb26-189 (read on leg.colorado.gov 2026-10-03), not re-read by P1-42; re-verify against the primary source before publishing",
+      "source": { "title": "Colorado General Assembly, SB26-189", "url": "https://leg.colorado.gov/bills/sb26-189", "retrievedAt": "2026-10-03" }
     },
     {
       "instrument": "US Executive Order 14148",
