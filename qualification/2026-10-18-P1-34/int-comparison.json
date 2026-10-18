@@ -1,0 +1,20 @@
+{
+  "intCommit": "7bc90f3245e5232c936a3912beb730f0237c5b2d",
+  "identical": true,
+  "loadIssues": 0,
+  "errors": 0,
+  "warnings": 5,
+  "plans": 6,
+  "rowsPerPlan": [
+    62,
+    62,
+    62,
+    62,
+    62,
+    62
+  ],
+  "supports": [
+    "experimental"
+  ],
+  "method": "Load issues, validateCatalog errors and warnings at 2026-12-01, and six compiled fixture plans (support, applicability, reasons, lock digests) computed with tsx from git archive int and from this branch: identical. Also asserted in tests/catalog/governance/currency.test.ts (int's tree) and promotion.test.ts (shown review status for all controls)."
+}
