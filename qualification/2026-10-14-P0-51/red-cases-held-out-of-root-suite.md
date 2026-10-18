@@ -32,3 +32,7 @@ Held out:
 ```
 
 To restore them: decide the precedence (Sid), change `admission.ts` if revocation must win, and put the three cases back in the test file.
+
+## After the held line's P1-51 (merged 18 October 2026)
+
+P1-51 changed what `amc domain pack verify` trusts: the licence verdict now uses only keys an operator-signed trust list admits for artifact-seal, the command no longer takes `--pubkey`, and `AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY` no longer counts. Case 1 passes `--pubkey`, so on the merged tip it stops at an unknown option before any verdict; with the list alone, the revoked key is never tried and the command exits 1 with an integrity failure and a `not-pinned` signature that names no key. Case 1 therefore no longer describes the licence path, and the precedence question applies to cases 2 and 3 only. In the root suite, the licence cases of `tests/portableVerifierCliQualification.test.ts` and `tests/industryPackPortableVerification.test.ts` were changed in the same merge to follow P1-51. The licence results recorded in this receipt describe the source it qualified, not the merged tip.
