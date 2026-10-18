@@ -95,6 +95,13 @@ jobs:
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
 
+      # P1-34: catalog reviews falling due, GOV_REVERIFY_OPEN, and one appended
+      # catalog/CHANGELOG.md entry per catalog digest change (docs/catalog/GOVERNANCE.md).
+      - name: Catalog currency and changelog
+        run: |
+          npm run check:catalog-currency
+          npm run check:catalog-changelog
+
       - name: Citation lint (P0-25)
         run: npm run check:citations
 

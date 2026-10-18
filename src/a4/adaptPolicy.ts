@@ -11,11 +11,13 @@ import { activateControlPlan, activeControlPlan, loadActiveCompiledPolicy } from
 import { compilePlan, parseDeploymentProfile } from "../catalog/compiler/compile.js";
 import { diffPlans } from "../catalog/compiler/diff.js";
 import { evaluatePredicate } from "../catalog/compiler/evaluatePredicate.js";
+import { shownLegalReview, shownReviewStatus } from "../catalog/governance/support.js";
 import { planWeakenings, signPlan } from "../catalog/compiler/sign.js";
 import type { CompiledPlan, DeploymentProfile, PlanDiff, SignedPlan } from "../catalog/compiler/types.js";
 import { digestOf } from "../catalog/digest.js";
 import { loadCatalog, type LoadedCatalog } from "../catalog/loader.js";
 import { buildCatalogLock } from "../catalog/lockfile.js";
+import { compileInputs } from "../catalog/compileInputs.js";
 import { loadApprovalConsumed } from "../approvals/approvalChainStore.js";
 import type { ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -110,16 +112,16 @@ export function activePlanRecord(workspace: string): { revision: number; planDig
  */
 export const activationWeakenings = (workspace: string, plan: CompiledPlan): string[] => planWeakenings(activeControlPlan(workspace), plan);
 
-/** Per requirement: the catalog's own status of the record (verbatim) and each citation's appliesWhen, three-valued. */
+/** Per requirement: the record's status as effectiveSupport lets it show (P1-34) and each citation's appliesWhen, three-valued. */
 function whyView(plan: CompiledPlan, profile: DeploymentProfile, catalog: LoadedCatalog) {
   return plan.requirements.map((row) => {
     const record = catalog.controls.get(row.controlId);
     return { controlId: row.controlId, version: row.controlVersion, applicability: row.applicability, mandatory: row.mandatory, support: row.support,
-      reviewStatus: record?.review.status ?? "unknown", missingFacts: row.missingFacts, pulledInBy: row.pulledInBy,
+      reviewStatus: record ? shownReviewStatus(record, row.support) : "unknown", missingFacts: row.missingFacts, pulledInBy: row.pulledInBy,
       citations: (record?.citations ?? []).map((citation) => {
         const decided = citation.appliesWhen === null ? null : evaluatePredicate(citation.appliesWhen, profile);
         return { key: citation.key, instrument: citation.instrument, clause: citation.clause, jurisdiction: citation.jurisdiction, statusType: citation.statusType,
-          retrieval: citation.retrieval.state, legalReview: citation.legalReview === null ? "none" : "recorded", appliesWhen: decided?.value ?? "true",
+          retrieval: citation.retrieval.state, legalReview: shownLegalReview(citation, row.support), appliesWhen: decided?.value ?? "true",
           missingFacts: decided?.missingFacts ?? [], inScope: row.citationsInScope.includes(citation.key) };
       }) };
   });
@@ -139,7 +141,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
   try {
     profile = parseDeploymentProfile(raw);
     catalog = loadCatalog();
-    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString() });
+    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString(), ...compileInputs(input.workspace) });
   } catch (error) {
     compileError = { code: errorCodeOf(error, "COMPILE_FAILED"), message: (error instanceof Error ? error.message : String(error)).slice(0, 500) };
   }
@@ -208,8 +210,9 @@ export function signAdaptPlan(workspace: string, state: A4ReadinessState, plan: 
   const previous = inForcePlan(state, plan.digest);
   const weaker = planWeakenings(previous?.plan ?? null, plan);
   if (weaker.length > 0) {
-    throw fail(409, "POLICY_WIDENING_REFUSED", "The plan weakens the plan this project put in force; change the answers.",
-      { reasonCodes: ["POLICY_WIDENING_REFUSED"], weakenings: weaker.slice(0, 32) });
+    const tools = toolsBindingWeakened(weaker);
+    throw fail(409, "POLICY_WIDENING_REFUSED", tools ? TOOLS_BINDING_WIDER : "The plan weakens the plan this project put in force; change the answers.",
+      { reasonCodes: ["POLICY_WIDENING_REFUSED", ...(tools ? ["TOOLS_CONFIG_CHANGED"] : [])], weakenings: weaker.slice(0, 32) });
   }
   try {
     const { signed } = signPlan({ workspace, plan, previous, allowWeakening: false });
@@ -231,6 +234,14 @@ export function boundPlanOf(state: A4ReadinessState, gate: Pick<A4GateRow, "revi
   return { plan, build };
 }
 
+/**
+ * P1-10F: a weakening that comes from the tools.yaml a plan binds (its digest dropped, more visible tools, or a wider
+ * tools entry), which re-signing tools.yaml or rebuilding the plan resolves, not changing the answers.
+ */
+const TOOLS_WEAKENING = /^runtimePolicy: toolPipeline\.(toolsConfigSha256|visibleTools) |^tools: /;
+const toolsBindingWeakened = (found: readonly string[]): boolean => found.some((line) => TOOLS_WEAKENING.test(line));
+const TOOLS_BINDING_WIDER = "The plan's tools.yaml binding is missing or wider than the active plan's; re-sign tools.yaml or rebuild the plan.";
+
 /** `activateControlPlan` consumes the review grant under this execution id (src/catalog/compiler/activate.ts). */
 export const activationExecutionId = (plan: Pick<CompiledPlan, "digest">): string => `activate-${hexOf(plan.digest).slice(0, 32)}`;
 
@@ -243,6 +254,20 @@ export const activationExecutionId = (plan: Pick<CompiledPlan, "digest">): strin
 export function openPlanReview(input: { workspace: string; state: A4ReadinessState; gate: A4GateRow; quorumFloor: ApprovalRequestInput["quorumFloor"] }): string {
   const { plan } = boundPlanOf(input.state, input.gate);
   if (plan.status !== "ready") throw fail(409, "PLAN_BLOCKED", "Only a ready plan can be activated; resolve every mandatory requirement first.", { reasonCodes: ["PLAN_BLOCKED"] });
+  // P1-10F: the plan binds the tools.yaml it was compiled from (absent is a value too). One re-signed since Build would
+  // activate a plan that refuses every call, so the review is never filed; from here to activation the approval's tools
+  // hash refuses a change.
+  let live: string | undefined;
+  try {
+    live = compileInputs(input.workspace).signedTools?.sha256;
+  } catch (error) {
+    throw fail(409, errorCodeOf(error, "TOOLS_CONFIG_UNVERIFIED"), "The workspace's tools.yaml does not verify; re-sign it, then build the plan again.",
+      { reasonCodes: [errorCodeOf(error, "TOOLS_CONFIG_UNVERIFIED")] });
+  }
+  if (live !== plan.runtimePolicy.toolPipeline.toolsConfigSha256) {
+    throw fail(409, "TOOLS_CONFIG_CHANGED", "tools.yaml changed since Build, so the plan binds another one; build the plan again.",
+      { reasonCodes: ["TOOLS_CONFIG_CHANGED"] });
+  }
   let weakens: string[];
   try {
     weakens = activationWeakenings(input.workspace, plan);
@@ -250,8 +275,10 @@ export function openPlanReview(input: { workspace: string; state: A4ReadinessSta
     throw fail(409, errorCodeOf(error, "COMPILED_POLICY_UNREADABLE"), "The active compiled plan does not verify, so activation would be refused; restore it first.");
   }
   if (weakens.length > 0) {
-    throw fail(409, "PLAN_WEAKENS_ACTIVE_PLAN", "Activation would weaken the active plan (a workspace has one active plan for every agent); it would be refused.",
-      { reasonCodes: ["PLAN_WEAKENS_ACTIVE_PLAN"], weakenings: weakens.slice(0, 32) });
+    const tools = toolsBindingWeakened(weakens);
+    throw fail(409, "PLAN_WEAKENS_ACTIVE_PLAN", tools ? TOOLS_BINDING_WIDER
+      : "Activation would weaken the active plan (a workspace has one active plan for every agent); it would be refused.",
+      { reasonCodes: ["PLAN_WEAKENS_ACTIVE_PLAN", ...(tools ? ["TOOLS_CONFIG_CHANGED"] : [])], weakenings: weakens.slice(0, 32) });
   }
   const previous = inForcePlan(input.state, plan.digest);
   let id: string | null;

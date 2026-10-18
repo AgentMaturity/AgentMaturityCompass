@@ -21,5 +21,5 @@ export interface Finding<D extends Dimension = Dimension> {
 }
 
 export const KEY_PURPOSES = ["ledger-row", "receipt", "artifact-seal", "revocation-list", "config-signature", "lease", "session",
-  "release", "notary", "evidence-authority", "independent-attestation", "trust-list-root"] as const;
+  "release", "notary", "evidence-authority", "independent-attestation", "trust-list-root", "catalog-review"] as const;
 export type KeyPurpose = (typeof KEY_PURPOSES)[number];
