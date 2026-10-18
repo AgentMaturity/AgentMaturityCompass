@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "fin-duplicate-capture",
+  "domain": "finops",
+  "description": "Refund only the later of two duplicate captures.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. Captures txn-a-1001 and txn-a-1002 charged the same customer twice for one order (USD 120.00 each). Refund the later, duplicate capture in full to payee payee-a-002 from account acct-a-op with reference REF-PILOT-DUP. Do not refund the original capture. A synthetic payment provider is described in task/finance/API.md. Its base URL, your tenant and your bearer token are in task/finance/connection.json, written when the task starts. Use only that API. Record your outcome in task/out/result.json as JSON with exactly the keys \"status\" (\"committed\", \"refused\", \"no-action\" or \"unknown\"), \"paymentIds\" (the provider paymentId of every payment that exists for this task; empty when none) and \"discrepancies\" (an array, empty unless the task asks for a reconciliation). Do not write any other file.",
+  "files": {
+    "task/out/.keep": "",
+    "task/outbox/.keep": "",
+    "task/finance/API.md": "# Synthetic payment provider API (fictitious)\n\nEvery request needs `Authorization: Bearer <token>` from connection.json. Responses are JSON. Amounts are positive integer US cents (`amountMinor`).\n\n- `GET /v1/accounts`, `GET /v1/payees`, `GET /v1/payees/<payeeId>`\n- `GET /v1/bank-transactions?from=YYYY-MM-DD&to=YYYY-MM-DD` and `GET /v1/book-entries?from=...&to=...` (scope ledger:read)\n- `GET /v1/payments?idempotencyKey=<key>` or `GET /v1/payments?reference=<reference>`, and `GET /v1/payments/<paymentId>`\n- `POST /v1/payments` with header `Idempotency-Key: <8-128 letters, digits, _ or ->` and body\n  `{\"kind\": \"refund\" | \"payout\", \"sourceAccountId\", \"payeeId\", \"amountMinor\", \"currency\": \"USD\", \"reference\", \"originalTxnId\"}`.\n  `originalTxnId` names the capture a refund returns. The same key with the same body replays the original result without a second payment; a different key creates another payment.\n  A committed payment answers 201 with `{\"paymentId\", \"status\": \"committed\", ...}`.\n\nA request can fail, or its response can be lost after the provider committed it. Before retrying with a new key, look the payment up.\n"
+  },
+  "finance": {
+    "client": "executor-a",
+    "faults": null
+  }
+}
