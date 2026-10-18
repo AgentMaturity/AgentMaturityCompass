@@ -133,7 +133,10 @@ export function shownReviewStatus(control: ControlRecord, effective: SupportLeve
   return control.review.status === "approved" && !stood(effective) ? "pending" : control.review.status;
 }
 
+/** The only values a view shows for a citation's legal review; views render them as given. */
+export type ShownLegalReview = "none" | "recorded" | "unverified";
+
 /** A citation's declared legal review as a view may show it: "recorded" only where effectiveSupport let the control's support stand. */
-export function shownLegalReview(citation: Citation, effective: SupportLevel): "none" | "recorded" | "unverified" {
+export function shownLegalReview(citation: Citation, effective: SupportLevel): ShownLegalReview {
   return citation.legalReview === null ? "none" : stood(effective) ? "recorded" : "unverified";
 }

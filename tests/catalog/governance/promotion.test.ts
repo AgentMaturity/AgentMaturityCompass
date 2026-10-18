@@ -5,7 +5,7 @@
  */
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 vi.mock("../../../src/catalog/governance/support.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../../src/catalog/governance/support.js")>();
@@ -14,9 +14,10 @@ vi.mock("../../../src/catalog/governance/support.js", async (importOriginal) => 
 
 import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compiler/compile.js";
 import { catalogCurrencyFindings } from "../../../src/catalog/governance/index.js";
-import { effectiveSupport, shownLegalReview, shownReviewStatus, type SupportResult } from "../../../src/catalog/governance/support.js";
+import type { RequirementDecision } from "../../../src/catalog/compiler/types.js";
+import { effectiveSupport, shownLegalReview, shownReviewStatus, type ShownLegalReview, type SupportResult } from "../../../src/catalog/governance/support.js";
 import { loadCatalog, type LoadedCatalog } from "../../../src/catalog/loader.js";
-import type { ControlRecord } from "../../../src/catalog/types.js";
+import type { ControlRecord, SupportLevel } from "../../../src/catalog/types.js";
 import { toOscalCatalog } from "../../../src/exports/oscal/oscalCatalog.js";
 import { author, AUTHOR, authority, keyA, keyB, keypair, operatorHome, reviewedControl, sign } from "./reviewers.js";
 
@@ -72,6 +73,28 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     const cited = catalog.controls.get("L1-WLT-US-01")!.citations[0]!;
     expect([shownLegalReview(cited, "experimental"), shownLegalReview({ ...cited, legalReview: { reviewer: "x", credential: "x", date: "2026-10-01" } }, "experimental"),
       shownLegalReview({ ...cited, legalReview: { reviewer: "x", credential: "x", date: "2026-10-01" } }, "reviewed")]).toEqual(["none", "unverified", "recorded"]);
+  });
+
+  it("A4's sealed conformance rows are unchanged for the shipped catalog: shown status and support equal the record's", () => {
+    // StoredControl {support, reviewStatus} goes into sealed A4 conformance runs; before P1-34 they were record.support and
+    // record.review.status. Any control listed here would change a sealed statement on recompute.
+    const profiles = [...catalog.fixtures.values()].map((f) => (f.envelope?.setup as { profile?: unknown } | undefined)?.profile).filter(Boolean).slice(0, 6);
+    expect(profiles.length).toBe(6);
+    const differ: string[] = [];
+    for (const raw of profiles) {
+      for (const row of compilePlan({ profile: parseDeploymentProfile(raw), catalog, asOf: "2026-10-18T12:00:00Z" }).requirements) {
+        const record = catalog.controls.get(row.controlId)!;
+        if (shownReviewStatus(record, row.support) !== record.review.status || row.support !== record.support) differ.push(row.controlId);
+      }
+    }
+    expect([...new Set(differ)]).toEqual([]);
+    expect(catalog.controls.size).toBeGreaterThan(0);
+  });
+
+  it("row support stays a required SupportLevel, and a citation's legal review shows only none, recorded or unverified", () => {
+    expectTypeOf<RequirementDecision["support"]>().toEqualTypeOf<SupportLevel>();
+    expectTypeOf<ShownLegalReview>().toEqualTypeOf<"none" | "recorded" | "unverified">();
+    expectTypeOf(shownLegalReview).returns.toEqualTypeOf<ShownLegalReview>();
   });
 
   it("no other source reads a control's review status, reviewer, approval or support fields outside the reviewed allowlist", () => {
