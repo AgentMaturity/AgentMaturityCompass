@@ -71,7 +71,7 @@ const WEB_ESCAPE = /(?:%[0-9A-Fa-f]{2})+|(?<=[A-Za-z0-9])\+(?=[A-Za-z0-9])|&(?:#
  * linear pass, as a server or browser reads a URL, a form post or a page: `alice%40example.com`, `4111+1111+1111+1111`,
  * `alice&#64;example.com`. A %-run that is not UTF-8 decodes byte by byte; an unknown reference stays as it is.
  */
-export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
+const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
   (match: string, decimal: string | undefined, hex: string | undefined, name: string | undefined) => {
     if (match === "+") return " ";
     if (match.startsWith("%")) {
@@ -89,7 +89,7 @@ const STRICT_UTF8 = new TextDecoder("utf-8", { fatal: true });
  * most one control character in ten (an encoded mail body, a text resource blob, a Secret's `data`); other runs (hashes,
  * random tokens, binary) stay as they are.
  */
-export const decodeBase64Runs = (text: string) => text.replace(BASE64_RUN, (run) => {
+const decodeBase64Runs = (text: string) => text.replace(BASE64_RUN, (run) => {
   const body = run.replace(/=+$/, "");
   if (body.length % 4 === 1) return run;
   let decoded: string;
@@ -164,7 +164,7 @@ const sharedSecret = (type: string): RegExp => {
 const SECRET_MEMBER_NAMES = ["password", "passwd", "pwd", "secret", "client_secret", "api_key", "apikey", "access_token",
   "refresh_token", "private_key", "aws_secret_access_key"];
 /** A member whose whole non-empty value is a credential (`secretMember`). */
-export const SECRET_MEMBER = new RegExp(`^(?:${SECRET_MEMBER_NAMES.join("|")})$`, "i");
+const SECRET_MEMBER = new RegExp(`^(?:${SECRET_MEMBER_NAMES.join("|")})$`, "i");
 /** A member name, as `memberWords` spells it, whose value of eight characters or more is a credential (`secretMember`). */
 const SECRET_MEMBER_NAME = /(?:^|_)(?:passwd|password|passphrase|pwd|secret|secret_key|private_key|access_key|authorization)$|._token$|api_?(?:key|secret)s?$|apikey$/;
 /** A `_token` name that is a cursor through results, not a credential: `nextPageToken`, `NextToken`, `continuation_token`. */
