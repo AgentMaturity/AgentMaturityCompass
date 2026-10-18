@@ -476,6 +476,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
       let foreignRunnerDescription = "";
+      // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
+      const lease = runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }); // In-process children inherit it.
       if (toolMode === "workspace") {
         let boundSession: ComposedToolSession | null = null;
         const actualSession = (): ComposedToolSession => {
@@ -489,8 +491,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
-          // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
-          ...runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }),
+          ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...shellOptIn
         });
@@ -694,7 +695,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           route: { providerId, model, params: requestParams },
           routes: [route],
           ...(piRoute === undefined ? {} : { encoders: piRoute.encoders }),
-          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }),
+          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }), ...lease,
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
