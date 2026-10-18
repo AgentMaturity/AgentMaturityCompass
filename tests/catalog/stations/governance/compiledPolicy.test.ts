@@ -1,32 +1,60 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { compilePlan, parseDeploymentProfile } from "../../../../src/catalog/compiler/compile.js";
-import { evaluateControl } from "../../../../src/catalog/evidence/evaluate.js";
-import { loadCatalog } from "../../../../src/catalog/loader.js";
-const ids = Array.from({ length: 6 }, (_, i) => `L1-GOV-${String(i + 1).padStart(2, "0")}`);
-const json = (name: string): unknown => JSON.parse(readFileSync(`docs/catalog/governance/${name}`, "utf8"));
+import type { GovernanceFixture } from "./harness.js";
+import { evaluateGovernanceFixture, evaluateGovernanceProduction, governanceHarness, GOVERNANCE_IDS } from "./harness.js";
+
+const harness = governanceHarness();
 describe("Governance actual compiled policy (P3-14)", () => {
-  for (const name of ["benefits-caseworker", "legal-drafting", "defense-analyst"]) {
-    it(`compiles ${name} with the actual policy and withholds credit on empty evidence`, () => {
-      const catalog = loadCatalog();
-      const profile = parseDeploymentProfile(json(`profile.${name}.json`));
-      const plan = compilePlan({ profile, catalog, asOf: "2026-10-18T00:00:00.000Z" });
-      const requirements = plan.requirements.filter((r) => ids.includes(r.controlId) && r.applicability !== "not_applicable");
-      expect(requirements.length, name).toBeGreaterThan(0);
-      for (const requirement of requirements) {
-        const control = catalog.controls.get(requirement.controlId)!;
-        const result = evaluateControl(control, [], {
-          subject: { ...profile.deployment, agentId: profile.deployment.agentIds[0]!, subjectId: null },
-          window: { start: "2026-10-01T00:00:00.000Z", end: "2026-10-18T00:00:00.000Z" },
-          plan: { digest: plan.digest, policyDigest: plan.runtimePolicy.policyDigest,
-            applicability: requirement.applicability === "applicable" ? { state: "applicable" } : { state: "unresolved", reason: requirement.reasons.join("; ") }, mode: "enforce" },
-          invalidations: [], reviews: [], producers: catalog.producers
-        });
-        expect(result.planDigest).toBe(plan.digest);
-        expect(result.dimensions.result, requirement.controlId).toBe("not_evaluated");
-        expect(result.dimensions.enforcement, requirement.controlId).toEqual({ state: "none" });
+  it("selects all six controls across the three actual draft profiles", () => {
+    const intended: Record<string, string[]> = {
+      "governance-benefits-caseworker-draft": ["L1-GOV-01", "L1-GOV-02", "L1-GOV-03", "L1-GOV-05"],
+      "governance-legal-drafting-draft": ["L1-GOV-04", "L1-GOV-05"],
+      "governance-defense-analyst-draft": ["L1-GOV-06"]
+    };
+    for (const { profile, plan } of harness.plans) {
+      expect(intended[profile.profileId], profile.profileId).toBeDefined();
+      for (const id of intended[profile.profileId]!) {
+        expect(plan.requirements.find((r) => r.controlId === id)?.applicability, `${profile.profileId}:${id}`).toBe("applicable");
+      }
+    }
+    const selected = new Set(harness.plans.flatMap(({ plan }) => plan.requirements
+      .filter((r) => GOVERNANCE_IDS.includes(r.controlId) && r.applicability === "applicable").map((r) => r.controlId)));
+    expect([...selected].sort()).toEqual(GOVERNANCE_IDS);
+  });
+  for (const compiled of harness.plans) {
+    it(`${compiled.profile.profileId}: missing production evidence is not evaluated with no enforcement`, () => {
+      const selected = harness.controls.filter((control) => compiled.plan.requirements
+        .some((r) => r.controlId === control.id && r.applicability === "applicable"));
+      expect(selected.length).toBeGreaterThan(0);
+      for (const control of selected) {
+        const result = evaluateGovernanceProduction(harness.catalog, compiled, control);
+        expect(result.planDigest).toBe(compiled.plan.digest);
+        expect(result.dimensions.result, control.id).toBe("not_evaluated");
+        expect(result.dimensions.enforcement, control.id).toEqual({ state: "none" });
         expect(result.admitted).toEqual([]);
       }
     });
   }
+  for (const fixture of harness.fixtures) {
+    it(`${fixture.ref}: actual compiled-policy evidence result is ${fixture.envelope.expected.result}`, () => {
+      const setup = fixture.envelope.setup as { subject: { deploymentId: string } };
+      const compiled = harness.plans.find(({ profile, plan }) => profile.deployment.deploymentId === setup.subject.deploymentId
+        && plan.requirements.some((r) => r.controlId === fixture.control.id && r.applicability === "applicable"));
+      expect(compiled, fixture.ref).toBeDefined();
+      const actual = evaluateGovernanceFixture(harness.catalog, compiled!, fixture);
+      expect(actual.dimensions.result).toBe(fixture.envelope.expected.result);
+      expect(actual.dimensions.result).not.toBe("pass");
+      expect(actual.dimensions.enforcement.state).not.toBe("enforced");
+      const reason = fixture.envelope.expected.reasonCode;
+      if (reason !== null) expect([...actual.rejected.map((r) => r.reason), actual.dimensions.evidence]).toContain(reason);
+    });
+  }
+  it("refuses a fixture subject outside the actual compiled deployment", () => {
+    const original = harness.fixtures.find((f) => f.envelope.setup.governanceOracle !== undefined)!;
+    expect(original).toBeDefined();
+    const fixture: GovernanceFixture = structuredClone(original);
+    const setup = fixture.envelope.setup as { subject: { tenantId: string; deploymentId: string } };
+    const compiled = harness.plans.find(({ profile }) => profile.deployment.deploymentId === setup.subject.deploymentId)!;
+    setup.subject.tenantId = "another-fixture-tenant";
+    expect(() => evaluateGovernanceFixture(harness.catalog, compiled, fixture)).toThrow("Fixture subject is outside compiled");
+  });
 });

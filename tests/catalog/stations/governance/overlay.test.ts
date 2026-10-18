@@ -86,4 +86,8 @@ describe("Governance experimental overlay (P3-14)", () => {
     expect(JSON.stringify(data)).not.toMatch(/M-24-10|14434/i);
   });
 
+  it("includes the owned experimental section in the generated Governance guide", () => {
+    expect(read("docs/industries/governance.md")).toContain(read(`${docs}/guide-section.md`).trimEnd());
+  });
+
 });
