@@ -129,7 +129,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "064493d2d9c1529047ba5aaa0f7ab26076b531a5aa1d1e46f3f995ffc6790c14"
+      "sha256": "fba6f9676fbdb2fecde844f14a233bc79011afff062d0872850979a213cb24d5"
     },
     {
       "path": "checks.json",
