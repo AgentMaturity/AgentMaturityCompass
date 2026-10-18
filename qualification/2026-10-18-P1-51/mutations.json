@@ -1,0 +1,113 @@
+[
+  {
+    "mutation": "M1 gate accepts a client-supplied env public key",
+    "file": "src/domains/industryPackEntitlement.ts",
+    "test": "tests/industryPackEntitlement.test.ts",
+    "filter": "client supplies never unlocks",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 a public key, HMAC secret or legacy allowlist the client supplies never unlocks packs 9ms"
+    ]
+  },
+  {
+    "mutation": "M2 checkout shown without a pinned licence key",
+    "file": "src/domains/industryPackEntitlement.ts",
+    "test": "tests/industryPackEntitlement.test.ts",
+    "filter": "still no purchase step",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 a checkout URL without a pinned licence key is still no purchase step 12ms"
+    ]
+  },
+  {
+    "mutation": "M3 webhook signature over re-serialized JSON, not the raw bytes",
+    "file": "api/index.ts",
+    "test": "tests/industryPacksHostedApi.test.ts",
+    "filter": "exact bytes received",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 accepts the provider signature over the exact bytes received, and nothing else 17ms"
+    ]
+  },
+  {
+    "mutation": "M4 webhook skips the signature check",
+    "file": "api/index.ts",
+    "test": "tests/industryPacksHostedApi.test.ts",
+    "filter": "exact bytes received",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 accepts the provider signature over the exact bytes received, and nothing else 18ms"
+    ]
+  },
+  {
+    "mutation": "M5 webhook records every delivery (no idempotency)",
+    "file": "api/index.ts",
+    "test": "tests/industryPacksHostedApi.test.ts",
+    "filter": "records a paid checkout once",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 records a paid checkout once however often it is delivered, and never issues a licence itself 21ms"
+    ]
+  },
+  {
+    "mutation": "M6 admin token compared with ===",
+    "file": "api/index.ts",
+    "test": "tests/industryPacksHostedApi.test.ts",
+    "filter": "constant time",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 compares the admin token in constant time and issues only to the right token 17ms"
+    ]
+  },
+  {
+    "mutation": "M7 hosted checkout live with a checkout URL alone",
+    "file": "src/domains/industryPackEntitlement.ts",
+    "test": "tests/industryPacksHostedApi.test.ts",
+    "filter": "checkout URL alone",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 a checkout URL alone is no purchase step: no licence could be issued for the payment 17ms"
+    ]
+  },
+  {
+    "mutation": "M8 enterprise licence verified with no pinned key",
+    "file": "src/enterprise/license.ts",
+    "test": "tests/enterprise-tier.test.ts",
+    "filter": "no licence key is pinned",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 status reports not configured, and activate refuses and stores nothing, when no licence key is pinned 14ms"
+    ]
+  },
+  {
+    "mutation": "M9 enterprise activate stores a refused key",
+    "file": "src/enterprise/license.ts",
+    "test": "tests/enterprise-tier.test.ts",
+    "filter": "enterprise licence verification",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 status reports not configured, and activate refuses and stores nothing, when no licence key is pinned 8ms",
+      "\u00d7 a licence from an unpinned key, a tampered licence and malformed claims are refused and not stored 54ms"
+    ]
+  },
+  {
+    "mutation": "M10 locked catalog hides the description again",
+    "file": "src/domains/industryPackEntitlement.ts",
+    "test": "tests/industryPackEntitlement.test.ts",
+    "filter": "own description",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 a locked pack still shows its name, its own description and its regulatory basis 6ms"
+    ]
+  }
+]

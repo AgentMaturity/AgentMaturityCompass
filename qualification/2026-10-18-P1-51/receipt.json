@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-51",
+  "date": "2026-10-18",
+  "commit": "8c9bfa03aac20edb4d1a9098845c8f51b392834e",
+  "branch": "rtd/p1-51-paid-packs-truthful",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 38658
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 33495
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 43802
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3033
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 814
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 427
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 1751
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1867
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 341
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 594
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 197
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 301
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 631
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3014
+    },
+    {
+      "cmd": "npx vitest run tests/industryPackEntitlement.test.ts tests/industryPacksPaywallSurfaces.test.ts tests/industryPacksHostedApi.test.ts tests/enterprise-tier.test.ts tests/industryPackWeightingPaymentInvariance.test.ts tests/standaloneApi.test.ts tests/questionSets.test.ts tests/domainApply.test.ts tests/domainExampleMode.test.ts tests/noFabricatedDomainResults.test.ts tests/noTierGatingOnTrustStack.test.ts tests/publicationTruthfulness.test.ts tests/executiveBoardPath.test.ts tests/mcpServer.test.ts tests/noCertificationFromSelfAssessment.test.ts --reporter=json --outputFile=qualification/2026-10-18-P1-51/focused-tests.json",
+      "exit": 0,
+      "durationMs": 25151
+    }
+  ],
+  "tests": {
+    "total": 173,
+    "passed": 173,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "d8f0978918cf70c5fdc3bcd805fb8c8ffdb8f9584e717bd84e2a3a4f4bcfe9c9"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "82fa0da3db07e69702e6903ad9ed5294acc4ea95ae0dbf5848a9b874612c82d5"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "3cc47d7c5b7fb78af10b72e46eb4b4ba3152b60fec7c483724674e374589d0a5"
+    }
+  ],
+  "notes": "Focused P1-51 tests and the existing tests covering the changed modules; the full suite was not run here. No payment provider was contacted and no real key was used: every key and webhook secret was generated in the test process. See README.md."
+}
