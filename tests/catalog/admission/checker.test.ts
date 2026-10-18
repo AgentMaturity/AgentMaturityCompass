@@ -134,6 +134,8 @@ describe("pack admission checker (P1-33)", () => {
     [9, "ADM9_AI_DRAFT_UNAPPROVED", "an AI-drafted control without a human approval of the draft",
       { records: (cat) => [sign(controlOf(cat), keyA, "fixture-reviewer-a", { aiInputs: [] }),
         sign(controlOf(cat), keyLegal, "fixture-legal", { role: "legal_reviewer", aiInputs: [] }), ...records(cat).slice(2)] }],
+    [9, "ADM9_AI_DRAFT_UNAPPROVED", "an AI draft whose approvedBy names no reviewer whose record counted",
+      { edit: editControl((c) => ({ ...c, provenance: { ...c.provenance, approvedBy: "fixture-reviewer-b" } })) }],
     [10, "ADM10_COVERAGE_SECTION_MISSING", "a coverage document without an Unsupported behaviour section",
       { edit: (cat) => editPack({ stewardship: { ...packOf(cat).stewardship, coverageDoc: "docs/coverage-incomplete.md" } })(cat) }]
   ];
@@ -253,6 +255,15 @@ describe("amc catalog check and check:catalog-admission (P1-33)", () => {
     const text = renderCatalogCheck(result).join("\n");
     expect(text).toContain("experimental, unreviewed");
     expect(text).not.toMatch(/certif|compliant/i);
+  });
+
+  it("refuses an experimental draft that fails P1-09 validation", async () => {
+    const root = draft();
+    writeFileSync(join(root, "fixtures/L1-FIX-01/negative/unreferenced.json"), readFileSync(join(root, "fixtures/L1-FIX-01/negative/evidence-empty.json")));
+    const result = await runCatalogCheck({ catalogRoot: root });
+    expect(result.exitCode).toBe(1);
+    expect(result.reports[0]).toMatchObject({ decision: "refuse", pack: { declaredSupport: "experimental" } });
+    expect(result.reports[0]!.reasons.join("\n")).toContain("P1-09 validation: CAT_STRAY_FILE");
   });
 
   it("fails a pack that claims reviewed support it does not meet", async () => {
