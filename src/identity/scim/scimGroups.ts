@@ -12,6 +12,7 @@ import {
 } from "../../workspaces/hostDb.js";
 import type { IdentityConfig } from "../identityConfig.js";
 import { evaluateRoleMapping } from "../roleMapping.js";
+import { scimOperationPath } from "./scimPatch.js";
 
 interface ScimGroupRecord {
   id: string;
@@ -156,13 +157,7 @@ export function scimPatchGroup(params: {
   }
   // Keep the original path for case-sensitive member IDs; validate before database access.
   const operations = params.operations.map((op) => {
-    if (!op || typeof op !== "object" || Array.isArray(op) || !["add", "remove", "replace"].includes(op.op)) {
-      throw new Error("invalidValue");
-    }
-    if (op.path !== undefined && typeof op.path !== "string") {
-      throw new Error("invalidPath");
-    }
-    const path = op.path ?? "";
+    const path = scimOperationPath(op);
     const member = /^members\s*\[\s*value\s+eq\s+"([^"]+)"\s*\]$/i.exec(path);
     if (member && member[0] === path) {
       if (op.op !== "remove") {

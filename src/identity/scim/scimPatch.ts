@@ -4,6 +4,17 @@ export interface ScimPatchOperation {
   value?: unknown;
 }
 
+/** Checks one received operation before a patch handler opens the host database; returns its path, "" when absent. */
+export function scimOperationPath(op: ScimPatchOperation): string {
+  if (!op || typeof op !== "object" || Array.isArray(op) || !["add", "remove", "replace"].includes(op.op)) {
+    throw new Error("invalidValue");
+  }
+  if (op.path !== undefined && typeof op.path !== "string") {
+    throw new Error("invalidPath");
+  }
+  return op.path ?? "";
+}
+
 export function parseScimPatchOperations(input: unknown): ScimPatchOperation[] {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     throw new Error("invalidValue");

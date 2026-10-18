@@ -7,6 +7,7 @@ import {
   openHostDb,
   upsertIdentityUser
 } from "../../workspaces/hostDb.js";
+import { scimOperationPath } from "./scimPatch.js";
 import { scimListResponse } from "./scimTypes.js";
 
 interface ScimUserRecord {
@@ -259,13 +260,7 @@ export function scimPatchUser(params: {
   let nextDisplayName: string | null | undefined;
   // Validate every received operation before opening the host database.
   for (const op of params.operations) {
-    if (!op || typeof op !== "object" || Array.isArray(op) || !["add", "remove", "replace"].includes(op.op)) {
-      throw new Error("invalidValue");
-    }
-    if (op.path !== undefined && typeof op.path !== "string") {
-      throw new Error("invalidPath");
-    }
-    const path = (op.path ?? "").toLowerCase();
+    const path = scimOperationPath(op).toLowerCase();
     if (path !== "" && ignoredUserAttribute(path)) {
       continue;
     }
