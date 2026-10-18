@@ -1,4 +1,5 @@
 # Synthetic invalid catalog record for validation tests only; no legal or expert approval.
+# Its evidence names amc.delegation.chain, still planned in catalog/producers.yaml (amc.authorizationRecord is available since P1-02).
 "id": "L0-IDN-01"
 "version": "0.1.0"
 "support": "experimental"
@@ -124,7 +125,7 @@
     "attempts": 1
 "evidence":
   - "id": "L0-IDN-01-E1"
-    "producer": "amc.authorizationRecord"
+    "producer": "amc.delegation.chain"
     "bindingFields":
       - "tenantId"
       - "workspaceId"
@@ -146,7 +147,7 @@
     "residency":
       "mode": "inherit_deployment"
   - "id": "L0-IDN-01-E2"
-    "producer": "amc.authorizationRecord"
+    "producer": "amc.delegation.chain"
     "bindingFields":
       - "workspaceId"
       - "agentId"

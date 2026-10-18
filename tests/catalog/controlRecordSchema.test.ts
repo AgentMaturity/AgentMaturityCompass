@@ -67,8 +67,9 @@ describe("catalog control record schema", () => {
     expect(parsed.support).toBe("experimental");
     expect(parsed.review.status).toBe("pending");
     expect(parsed.citations.every((c) => c.legalReview === null)).toBe(true);
-    expect(parsed.tests.flatMap((t) => t.fixtures.positive)).toHaveLength(1);
-    expect(parsed.tests.flatMap((t) => t.fixtures.negative)).toHaveLength(7);
+    // Non-empty, not exact: the shipped baseline gains fixtures as its producers land (P1-14).
+    expect(parsed.tests.flatMap((t) => t.fixtures.positive)).toContain("L0-IDN-01/positive/lease-and-principal.json");
+    expect(parsed.tests.flatMap((t) => t.fixtures.negative).length).toBeGreaterThan(0);
     expect(validateCatalog(loadCatalog(), { asOf }).errors).toEqual([]);
   });
 
@@ -121,9 +122,11 @@ describe("catalog control record schema", () => {
     catalog.producers = catalog.producers.map((p) => ({ ...p, maxClaimKind: "self_reported" as const }));
     const input = record();
     catalog.controls.set(input.id, input);
-    expect(validateCatalog(catalog, { asOf }).errors.map((issue) => issue.code)).toContain("CAT_LEVEL_CAP");
+    // Every other shipped control is capped by the same rewrite; only this record's issues are under test.
+    const issues = () => validateCatalog(catalog, { asOf }).errors.filter((issue) => issue.controlId === input.id);
+    expect(issues().map((issue) => issue.code)).toContain("CAT_LEVEL_CAP");
     input.levels = ["L1"];
-    expect(validateCatalog(catalog, { asOf }).errors).toEqual([]);
+    expect(issues()).toEqual([]);
   });
 
   it("allows planned observed producers at L2 but refuses L3", () => {
@@ -132,9 +135,10 @@ describe("catalog control record schema", () => {
     const input = record();
     input.levels = ["L3"];
     catalog.controls.set(input.id, input);
-    expect(validateCatalog(catalog, { asOf }).errors.map((issue) => issue.code)).toContain("CAT_LEVEL_CAP");
+    const issues = () => validateCatalog(catalog, { asOf }).errors.filter((issue) => issue.controlId === input.id);
+    expect(issues().map((issue) => issue.code)).toContain("CAT_LEVEL_CAP");
     input.levels = ["L2"];
-    expect(validateCatalog(catalog, { asOf }).errors).toEqual([]);
+    expect(issues()).toEqual([]);
   });
 
   it("names an unknown evidence producer instead of treating it as available", () => {
