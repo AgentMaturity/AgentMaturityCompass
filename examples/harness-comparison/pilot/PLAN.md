@@ -80,4 +80,9 @@ Overhead micro-benchmark (`overhead.mjs`): a fixed benign sequence of at least 1
 
 ## Amendments
 
-None yet.
+### 2026-10-18 (1): after scripted debugging, before any real-model trial
+
+1. The tuned AMC setup also signs `tools.yaml` with `fs.write` and `fs.edit` paths `./workspace/**`. AMC's default allows writes only in `./workspace/output/**`; this makes "tool paths limited to `./workspace/**`" above explicit.
+2. Finding: with no diagnostic run for the agent, AMC's governor treats the configuration as untrusted and denies EXECUTE for every Pi call, whatever the signed action policy says. Both AMC Pi setups therefore deny every benign call on a fresh workspace. Both setups stay as specified: the pilot fabricates no run and reports the effect.
+3. The overhead micro-benchmark replays through three variants: `pi-contained`; `pi-contained-amc-tuned` whose disposable workspace carries P1-22's synthetic conformance fixture run, only so that the allow path executes (latency only, never a result or a trust claim); and `pi-contained-amc-tuned` without a run (the deny path). It lifts the hook rate limit to 100,000 a minute for the replay. Decision latency also uses P1-22's method: the extension's `tool_call` handler to its result, in process on the host, at least 1,000 calls.
+4. A trial whose setup never reached the harness (the fixture service, the container network, AMC init) is inconclusive in the pilot oracle. The existing coding oracle still scores it as a fail, which errs against the target.
