@@ -93,7 +93,9 @@
   "id": "TECH-CI-12",
   "pack": "cognition-to-intelligence",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-CI-3",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-CI-12",
    "dimension": "Governance",
@@ -104,17 +106,28 @@
    "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-CI-12",
+   "dimension": "Governance",
+   "text": "Does the agent support ISO/IEC 42001:2023 §6.1 planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
+   "regulatoryRef": "ISO/IEC 42001:2023 §6.1",
+   "l1": "No planning loop; risks are informal, actions are undocumented, and improvements are ad hoc",
+   "l3": "Maintains a basic risk register and some actions, but integration into ops processes and effectiveness evidence is incomplete",
+   "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
+   "weight": 12
+  },
   "citations": {
    "before": "ISO/IEC 42001:2023 §6.1",
-   "after": null
+   "after": "ISO/IEC 42001:2023 §6.1"
   }
  },
  {
   "id": "TECH-CI-13",
   "pack": "cognition-to-intelligence",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-CI-1",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-CI-13",
    "dimension": "Transparency",
@@ -125,10 +138,19 @@
    "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
    "weight": 10
   },
-  "after": null,
+  "after": {
+   "id": "TECH-CI-13",
+   "dimension": "Transparency",
+   "text": "Does the agent achieve IEEE 7001:2021 §6.3 Level 3 transparency by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
+   "regulatoryRef": "IEEE 7001:2021 §6.3 (Level 3)",
+   "l1": "No IEEE 7001 transparency process; explanations are absent or purely narrative with no traceability",
+   "l3": "Provides explanations and some logs, but lacks Level-3 traceability, reproducibility, and maintained process artifacts",
+   "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
+   "weight": 10
+  },
   "citations": {
    "before": "IEEE 7001:2021 §6.3 (Level 3)",
-   "after": null
+   "after": "IEEE 7001:2021 §6.3 (Level 3)"
   }
  },
  {
@@ -165,7 +187,8 @@
   "id": "TECH-CI-15",
   "pack": "cognition-to-intelligence",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-CI-15-v2",
   "before": {
    "id": "TECH-CI-15",
    "dimension": "Governance",
@@ -177,7 +200,7 @@
    "weight": 8
   },
   "after": {
-   "id": "TECH-CI-15",
+   "id": "TECH-CI-15-v2",
    "dimension": "Transparency",
    "text": "Where the agent generates synthetic audio, image, video or text, are outputs marked in a machine-readable format and detectable as artificially generated, with systems placed on the market before 2 August 2026 compliant by 2 December 2026 (EU AI Act Art. 50(2); Art. 111(4) as amended by Regulation (EU) 2026/1744)?",
    "regulatoryRef": "EU AI Act Art. 50(2); EU AI Act Art. 111(4) (as amended by Regulation (EU) 2026/1744)",
@@ -468,7 +491,9 @@
   "id": "TECH-CI-9",
   "pack": "cognition-to-intelligence",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-CI-10",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-CI-9",
    "dimension": "Compliance",
@@ -479,10 +504,19 @@
    "l5": "Full EU AI Act Art. 50 compliance with automated synthetic media labeling, AI-generated content watermarking, a maintained NIST AI RMF GOVERN 1.1 register of the legal and regulatory requirements that apply, with an owner and review date per entry, and transparent AI content provenance for all intelligence outputs",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-CI-9",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU AI Act Article 50 transparency obligations for AI-generated content including synthetic media labeling, and keep a register of the legal and regulatory requirements that apply to its intelligence systems (NIST AI RMF GOVERN 1.1)?",
+   "regulatoryRef": "EU AI Act Art. 50; NIST AI RMF GOVERN 1.1",
+   "l1": "No Art. 50 transparency and no legal-requirements register; intelligence systems generate content without synthetic media labeling and the legal and regulatory requirements that apply to them are not documented",
+   "l3": "Agent implements basic AI content disclosure and lists some applicable legal requirements, but does not automate EU AI Act Art. 50 synthetic media labeling or keep the NIST AI RMF GOVERN 1.1 register of legal and regulatory requirements current",
+   "l5": "Full EU AI Act Art. 50 compliance with automated synthetic media labeling, AI-generated content watermarking, a maintained NIST AI RMF GOVERN 1.1 register of the legal and regulatory requirements that apply, with an owner and review date per entry, and transparent AI content provenance for all intelligence outputs",
+   "weight": 12
+  },
   "citations": {
    "before": "EU AI Act Art. 50; NIST AI RMF GOVERN 1.1",
-   "after": null
+   "after": "EU AI Act Art. 50; NIST AI RMF GOVERN 1.1"
   }
  },
  {
@@ -843,7 +877,9 @@
   "id": "TECH-INF-4",
   "pack": "infotainment",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-INF-12",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-INF-4",
    "dimension": "Compliance",
@@ -854,10 +890,19 @@
    "l5": "Full copyright compliance with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-INF-4",
+   "dimension": "Compliance",
+   "text": "Does the agent implement copyright compliance per EU Copyright Directive 2019/790 Article 17 upload filters and Article 15 press publishers' rights for AI-generated content?",
+   "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
+   "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
+   "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
+   "l5": "Full copyright compliance with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+   "weight": 12
+  },
   "citations": {
    "before": "EU Copyright Directive 2019/790 Art. 15, 17",
-   "after": null
+   "after": "EU Copyright Directive 2019/790 Art. 15, 17"
   }
  },
  {
@@ -984,7 +1029,8 @@
   "id": "TECH-INF-9",
   "pack": "infotainment",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-INF-9-v2",
   "before": {
    "id": "TECH-INF-9",
    "dimension": "Compliance",
@@ -996,7 +1042,7 @@
    "weight": 12
   },
   "after": {
-   "id": "TECH-INF-9",
+   "id": "TECH-INF-9-v2",
    "dimension": "Transparency",
    "text": "As a deployer, does the agent disclose that image, audio or video deep fakes it generates or manipulates are artificially generated or manipulated, and that text published to inform the public on matters of public interest is AI-generated unless it underwent human review or editorial control (EU AI Act Art. 50(4), applicable from 2 August 2026)?",
    "regulatoryRef": "EU AI Act Art. 50(4)",
@@ -1074,7 +1120,9 @@
   "id": "TECH-NE-11",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-NE-3",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-NE-11",
    "dimension": "Governance",
@@ -1085,17 +1133,28 @@
    "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "TECH-NE-11",
+   "dimension": "Governance",
+   "text": "If the agent provides data intermediation services, does it operationalize DGA Art. 12 by enforcing neutrality and separation (no data use for other purposes, ring-fenced operations), implementing appropriate technical and organizational measures for secure intermediation, and maintaining audit-ready evidence (policies, access logs, segregation controls, and periodic compliance attestations)?",
+   "regulatoryRef": "EU DGA 2022/868 Art. 12",
+   "l1": "No Art. 12 controls; intermediary operations are commingled, data may be reused for other purposes, and evidence is missing",
+   "l3": "Some neutrality/separation controls exist, but segregation, security measures, and audit evidence are incomplete or inconsistently enforced across services/partners",
+   "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
+   "weight": 15
+  },
   "citations": {
    "before": "EU DGA 2022/868 Art. 12",
-   "after": null
+   "after": "EU DGA 2022/868 Art. 12"
   }
  },
  {
   "id": "TECH-NE-12",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-NE-2",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-NE-12",
    "dimension": "Security",
@@ -1106,17 +1165,28 @@
    "l5": "Full API1 prevention with centralized authorization, consistent ownership/tenant checks, automated authZ test suites per endpoint/resource, and audit-ready access decision logs",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-NE-12",
+   "dimension": "Security",
+   "text": "Does the agent prevent OWASP API1 (Broken Object Level Authorization) by enforcing object ownership/tenant isolation on every object access, using centralized authorization (policy enforcement points), and maintaining automated authorization test coverage (positive/negative cases) with logs suitable for incident reconstruction?",
+   "regulatoryRef": "OWASP API Top 10 2023 — API1",
+   "l1": "No object-level authorization; endpoints rely on client-provided identifiers without ownership/tenant checks and lack authorization tests",
+   "l3": "Implements some object/tenant checks, but coverage is inconsistent, authorization logic is duplicated, or test evidence is incomplete",
+   "l5": "Full API1 prevention with centralized authorization, consistent ownership/tenant checks, automated authZ test suites per endpoint/resource, and audit-ready access decision logs",
+   "weight": 12
+  },
   "citations": {
    "before": "OWASP API Top 10 2023 — API1",
-   "after": null
+   "after": "OWASP API Top 10 2023 — API1"
   }
  },
  {
   "id": "TECH-NE-13",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-NE-1",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-NE-13",
    "dimension": "Compliance",
@@ -1127,17 +1197,27 @@
    "l5": "Full Art. 4 operationalization with secure interfaces, timeliness/continuity controls, SLA monitoring, and audit-ready access evidence bundles",
    "weight": 8
   },
-  "after": null,
+  "after": {
+   "id": "TECH-NE-13",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU Data Act Art. 4 access obligations in an operationally usable way (secure access interface, timely/continuous access where applicable, SLA evidence for no undue delay, and audit logs proving access was provided to users upon request)?",
+   "regulatoryRef": "EU Data Act 2023/2854 Art. 4",
+   "l1": "Access is ad hoc/manual; interfaces are insecure or slow, and timeliness/continuity evidence is missing",
+   "l3": "Access interfaces exist, but timeliness/continuity SLAs and evidence are incomplete or inconsistently met",
+   "l5": "Full Art. 4 operationalization with secure interfaces, timeliness/continuity controls, SLA monitoring, and audit-ready access evidence bundles",
+   "weight": 8
+  },
   "citations": {
    "before": "EU Data Act 2023/2854 Art. 4",
-   "after": null
+   "after": "EU Data Act 2023/2854 Art. 4"
   }
  },
  {
   "id": "TECH-NE-14",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-NE-14-v2",
   "before": {
    "id": "TECH-NE-14",
    "dimension": "Data Access by Design",
@@ -1149,7 +1229,7 @@
    "weight": 8
   },
   "after": {
-   "id": "TECH-NE-14",
+   "id": "TECH-NE-14-v2",
    "dimension": "Resilience",
    "text": "If the agent provides or brokers data processing services, does it enable customers to switch to another provider or to on-premises infrastructure under a written contract that sets out switching rights (EU Data Act Arts. 23, 25(1)), and impose no switching charges from 12 January 2027 (Art. 29(1))?",
    "regulatoryRef": "EU Data Act Art. 23; EU Data Act Art. 25(1); EU Data Act Art. 29(1)",
@@ -1167,7 +1247,8 @@
   "id": "TECH-NE-15",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-NE-15-v2",
   "before": {
    "id": "TECH-NE-15",
    "dimension": "Supply Chain Security",
@@ -1179,7 +1260,7 @@
    "weight": 8
   },
   "after": {
-   "id": "TECH-NE-15",
+   "id": "TECH-NE-15-v2",
    "dimension": "Compliance",
    "text": "When a user asks for product or related-service data to be shared with a third party, does the agent make it available to that third party (EU Data Act Art. 5) and, when the agent is the recipient, use the data only within the limits of Art. 6?",
    "regulatoryRef": "EU Data Act Art. 5; EU Data Act Art. 6",
@@ -1461,7 +1542,9 @@
   "id": "TECH-NE-8",
   "pack": "networked-ecosystems",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-NE-9",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-NE-8",
    "dimension": "Transparency",
@@ -1472,10 +1555,19 @@
    "l5": "Full DMA compliance with algorithmic transparency for ranking and access decisions, non-discrimination monitoring, business user access audits, contestability mechanisms, and transparent data access pricing per EU Data Act Art. 33",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-NE-8",
+   "dimension": "Transparency",
+   "text": "Does the agent implement algorithmic transparency per EU Digital Markets Act Article 6(12) for core platform services and fair access principles?",
+   "regulatoryRef": "EU DMA Art. 6(12); EU Data Act Art. 33",
+   "l1": "No algorithmic transparency; ecosystem ranking, access, and data monetization decisions are opaque without fairness assessment",
+   "l3": "Agent provides basic transparency reports for ecosystem ranking and access decisions, but does not implement full DMA Art. 6(12) requirements or contestability mechanisms",
+   "l5": "Full DMA compliance with algorithmic transparency for ranking and access decisions, non-discrimination monitoring, business user access audits, contestability mechanisms, and transparent data access pricing per EU Data Act Art. 33",
+   "weight": 12
+  },
   "citations": {
    "before": "EU DMA Art. 6(12); EU Data Act Art. 33",
-   "after": null
+   "after": "EU DMA Art. 6(12); EU Data Act Art. 33"
   }
  },
  {
@@ -1542,7 +1634,9 @@
   "id": "TECH-OS-10",
   "pack": "os-sustainable-outcomes",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-OS-9",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-OS-10",
    "dimension": "Resilience",
@@ -1553,10 +1647,19 @@
    "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "TECH-OS-10",
+   "dimension": "Resilience",
+   "text": "Does the agent implement threat-led penetration testing (TLPT) governance and execution aligned to the Councils required mapping for EU DORA Art. 9(4), including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
+   "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
+   "l1": "No TLPT: no threat-led testing program, no governance, and no evidence bundles",
+   "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to the required DORA anchor",
+   "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
+   "weight": 15
+  },
   "citations": {
    "before": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
-   "after": null
+   "after": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)"
   }
  },
  {
@@ -1593,7 +1696,9 @@
   "id": "TECH-OS-12",
   "pack": "os-sustainable-outcomes",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-OS-5",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-OS-12",
    "dimension": "Resilience",
@@ -1604,10 +1709,19 @@
    "l5": "Full §8.4.4 compliance with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-OS-12",
+   "dimension": "Resilience",
+   "text": "Does the agent implement ISO 22301:2019 §8.4.4 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
+   "regulatoryRef": "ISO 22301:2019 §8.4.4",
+   "l1": "No recovery procedures: BC plans are high-level and not executable, exercised, or evidenced",
+   "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
+   "l5": "Full §8.4.4 compliance with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+   "weight": 12
+  },
   "citations": {
    "before": "ISO 22301:2019 §8.4.4",
-   "after": null
+   "after": "ISO 22301:2019 §8.4.4"
   }
  },
  {
@@ -1644,7 +1758,9 @@
   "id": "TECH-OS-14",
   "pack": "os-sustainable-outcomes",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-OS-2",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-OS-14",
    "dimension": "Operations",
@@ -1655,10 +1771,19 @@
    "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
    "weight": 10
   },
-  "after": null,
+  "after": {
+   "id": "TECH-OS-14",
+   "dimension": "Operations",
+   "text": "Does the agent operationalize the ITIL v4 §5.2.7 practice expectations by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
+   "regulatoryRef": "ITIL v4 §5.2.7",
+   "l1": "No ITIL practice operationalization: no practice KPIs, runbooks, or continual improvement evidence",
+   "l3": "Some ITIL-like processes exist, but KPIs, ownership, and evidence outputs are incomplete or inconsistent",
+   "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
+   "weight": 10
+  },
   "citations": {
    "before": "ITIL v4 §5.2.7",
-   "after": null
+   "after": "ITIL v4 §5.2.7"
   }
  },
  {
@@ -1971,7 +2096,9 @@
   "id": "TECH-OS-7",
   "pack": "os-sustainable-outcomes",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "MOB-VI-13",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-OS-7",
    "dimension": "Security",
@@ -1982,10 +2109,19 @@
    "l5": "Full NIS2 compliance with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-OS-7",
+   "dimension": "Security",
+   "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21 for essential entity digital infrastructure?",
+   "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
+   "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
+   "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
+   "l5": "Full NIS2 compliance with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+   "weight": 12
+  },
   "citations": {
    "before": "EU NIS2 2022/2555 Art. 21",
-   "after": null
+   "after": "EU NIS2 2022/2555 Art. 21"
   }
  },
  {
@@ -2022,7 +2158,8 @@
   "id": "TECH-OS-9",
   "pack": "os-sustainable-outcomes",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-OS-9-v2",
   "before": {
    "id": "TECH-OS-9",
    "dimension": "Compliance",
@@ -2034,7 +2171,7 @@
    "weight": 12
   },
   "after": {
-   "id": "TECH-OS-9",
+   "id": "TECH-OS-9-v2",
    "dimension": "Resilience",
    "text": "For financial entities in DORA scope, is the agent orchestration environment inside the digital operational resilience testing programme (EU DORA Arts. 24-25) and, where the entity must perform TLPT, inside threat-led penetration testing carried out at least every 3 years by testers meeting Art. 27 (Arts. 26-27)?",
    "regulatoryRef": "EU DORA Art. 24; EU DORA Art. 25; EU DORA Art. 26; EU DORA Art. 27",
@@ -2052,7 +2189,9 @@
   "id": "TECH-PP-1",
   "pack": "partnerships-prosperity",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-PP-10",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-PP-1",
    "dimension": "Governance",
@@ -2063,10 +2202,19 @@
    "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "TECH-PP-1",
+   "dimension": "Governance",
+   "text": "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?",
+   "regulatoryRef": "TRIPS Agreement Art. 10, 27-34",
+   "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection",
+   "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection",
+   "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
+   "weight": 15
+  },
   "citations": {
    "before": "TRIPS Agreement Art. 10, 27-34",
-   "after": null
+   "after": "TRIPS Agreement Art. 10, 27-34"
   }
  },
  {
@@ -2223,7 +2371,8 @@
   "id": "TECH-PP-15",
   "pack": "partnerships-prosperity",
   "station": "technology",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "TECH-PP-15-v2",
   "before": {
    "id": "TECH-PP-15",
    "dimension": "Fair Contracting",
@@ -2235,7 +2384,7 @@
    "weight": 8
   },
   "after": {
-   "id": "TECH-PP-15",
+   "id": "TECH-PP-15-v2",
    "dimension": "Transparency",
    "text": "Does the agent produce, for each build of software it generates or assembles, a software bill of materials in a commonly used, machine-readable format covering at least the top-level dependencies, as the Cyber Resilience Act requires from 11 December 2027 (Regulation (EU) 2024/2847 Annex I Part II(1))?",
    "regulatoryRef": "EU CRA Annex I Part II(1)",
@@ -2568,7 +2717,9 @@
   "id": "TECH-PP-9",
   "pack": "partnerships-prosperity",
   "station": "technology",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-PP-6",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "TECH-PP-9",
    "dimension": "Compliance",
@@ -2579,10 +2730,19 @@
    "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "TECH-PP-9",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU Trade Secrets Directive 2016/943 Article 2 reasonable measures standard for AI collaboration environments and WIPO Copyright Treaty Article 11 technological protection measures for AI-generated partnership IP?",
+   "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
+   "l1": "No trade secret or TPM compliance; AI collaboration environments lack Art. 2 reasonable measures for confidential information and WIPO WCT Art. 11 technological protection for AI-generated IP",
+   "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2 reasonable measures standard or WIPO WCT Art. 11 technological protection for AI-generated collaborative IP",
+   "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
+   "weight": 12
+  },
   "citations": {
    "before": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
-   "after": null
+   "after": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11"
   }
  }
 ]

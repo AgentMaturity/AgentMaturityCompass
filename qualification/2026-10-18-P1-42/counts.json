@@ -1,19 +1,19 @@
 {
  "packs": 41,
- "packQuestions": 676,
+ "packQuestions": 723,
  "deepQuestions": 235,
  "perStation": {
   "environment": {
    "packs": 6,
-   "questions": 99
+   "questions": 104
   },
   "health": {
    "packs": 9,
-   "questions": 151
+   "questions": 161
   },
   "wealth": {
    "packs": 5,
-   "questions": 83
+   "questions": 89
   },
   "education": {
    "packs": 5,
@@ -25,11 +25,11 @@
   },
   "technology": {
    "packs": 5,
-   "questions": 83
+   "questions": 97
   },
   "governance": {
    "packs": 5,
-   "questions": 79
+   "questions": 91
   }
  },
  "deepPerStation": {

@@ -93,7 +93,9 @@
   "id": "GOV-CS-12",
   "pack": "citizen-services",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-CS-1",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-CS-12",
    "dimension": "Accessibility",
@@ -104,10 +106,19 @@
    "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "GOV-CS-12",
+   "dimension": "Accessibility",
+   "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
+   "regulatoryRef": "WCAG 2.1 SC 2.4.3",
+   "l1": "No focus-order control: keyboard navigation order is illogical, dynamic steps trap focus, or assistive technology users cannot complete procedures",
+   "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
+   "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
+   "weight": 12
+  },
   "citations": {
    "before": "WCAG 2.1 SC 2.4.3",
-   "after": null
+   "after": "WCAG 2.1 SC 2.4.3"
   }
  },
  {
@@ -285,7 +296,8 @@
   "id": "GOV-CS-4",
   "pack": "citizen-services",
   "station": "governance",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "GOV-CS-4-v2",
   "before": {
    "id": "GOV-CS-4",
    "dimension": "Transparency",
@@ -297,7 +309,7 @@
    "weight": 15
   },
   "after": {
-   "id": "GOV-CS-4",
+   "id": "GOV-CS-4-v2",
    "dimension": "Governance",
    "text": "For high-risk agents in essential public services, has the deploying authority assigned human oversight to named people with the competence, training and authority to do it (EU AI Act Art. 26(2)), and can those people disregard, override or reverse the agent's output and stop it safely (Art. 14(4)(d)-(e))?",
    "regulatoryRef": "EU AI Act Art. 14(4)(d)-(e), Art. 26(2)",
@@ -465,7 +477,9 @@
   "id": "GOV-DCR-1",
   "pack": "digital-citizens-rights",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DCR-10",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DCR-1",
    "dimension": "Compliance",
@@ -476,10 +490,19 @@
    "l5": "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a",
    "weight": 20
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DCR-1",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU eIDAS 2.0 Regulation 2024/1183 Article 6a European Digital Identity Wallet requirements for identity verification assurance levels?",
+   "regulatoryRef": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
+   "l1": "No eIDAS compliance; digital identity verification does not meet eIDAS assurance levels (low/substantial/high) or EU Digital Identity Wallet requirements",
+   "l3": "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 6a wallet-based identity attestation",
+   "l5": "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a",
+   "weight": 20
+  },
   "citations": {
    "before": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
-   "after": null
+   "after": "EU eIDAS 2.0 2024/1183 Art. 6a, 8"
   }
  },
  {
@@ -576,7 +599,9 @@
   "id": "GOV-DCR-13",
   "pack": "digital-citizens-rights",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DCR-7",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DCR-13",
    "dimension": "Security",
@@ -587,10 +612,19 @@
    "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DCR-13",
+   "dimension": "Security",
+   "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
+   "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
+   "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
+   "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
+   "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
+   "weight": 12
+  },
   "citations": {
    "before": "ISO/IEC 29115:2013 §7 (AL3)",
-   "after": null
+   "after": "ISO/IEC 29115:2013 §7 (AL3)"
   }
  },
  {
@@ -1254,7 +1288,9 @@
   "id": "GOV-DD-2",
   "pack": "dance-of-democracy",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DD-11",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DD-2",
    "dimension": "Safety",
@@ -1265,10 +1301,19 @@
    "l5": "Full electoral disinformation governance with DSA Art. 34 risk assessment for elections, Code of Practice Commitment 22 implementation, electoral content labeling per EU AI Act Art. 50, cross-platform coordination detection, and electoral period enhanced monitoring",
    "weight": 20
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DD-2",
+   "dimension": "Safety",
+   "text": "Does the agent implement electoral disinformation prevention per EU Code of Practice on Disinformation 2022 Commitment 22 and DSA Article 34 electoral risk assessment for very large platforms?",
+   "regulatoryRef": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34",
+   "l1": "No disinformation prevention; AI-curated electoral content amplifies false information without detection or correction mechanisms",
+   "l3": "Agent implements fact-checking integration for electoral content and flags suspected disinformation, but does not implement DSA Art. 34 electoral risk assessment or Code of Practice Commitment 22 reporting",
+   "l5": "Full electoral disinformation governance with DSA Art. 34 risk assessment for elections, Code of Practice Commitment 22 implementation, electoral content labeling per EU AI Act Art. 50, cross-platform coordination detection, and electoral period enhanced monitoring",
+   "weight": 20
+  },
   "citations": {
    "before": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34",
-   "after": null
+   "after": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34"
   }
  },
  {
@@ -1296,7 +1341,9 @@
   "id": "GOV-DD-3",
   "pack": "dance-of-democracy",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DD-13",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DD-3",
    "dimension": "Privacy",
@@ -1307,10 +1354,19 @@
    "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DD-3",
+   "dimension": "Privacy",
+   "text": "Does the agent protect political opinion data per GDPR Article 9(d) special category processing exemptions with minimal processing and robust access controls for electoral services?",
+   "regulatoryRef": "GDPR Art. 9(1) and 9(2)(d)",
+   "l1": "No political data protection; electoral AI processes political opinion as regular personal data without Art. 9 special category safeguards",
+   "l3": "Agent applies Art. 9 special category controls for explicit political data, but does not prevent inferential political profiling or implement minimal processing for voter analytics",
+   "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
+   "weight": 15
+  },
   "citations": {
    "before": "GDPR Art. 9(1) and 9(2)(d)",
-   "after": null
+   "after": "GDPR Art. 9(1) and 9(2)(d)"
   }
  },
  {
@@ -1347,7 +1403,9 @@
   "id": "GOV-DD-5",
   "pack": "dance-of-democracy",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DD-12",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DD-5",
    "dimension": "Governance",
@@ -1358,10 +1416,19 @@
    "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
    "weight": 25
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DD-5",
+   "dimension": "Governance",
+   "text": "Does the agent implement OSCE/ODIHR electoral integrity standards for AI-assisted voter registration, information services, and results management systems?",
+   "regulatoryRef": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7",
+   "l1": "No electoral integrity controls; AI-assisted electoral administration lacks OSCE/ODIHR standards alignment or independent verification mechanisms",
+   "l3": "Agent implements basic integrity controls for electoral AI systems, but does not implement OSCE/ODIHR election assessment framework or independent audit support",
+   "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
+   "weight": 25
+  },
   "citations": {
    "before": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7",
-   "after": null
+   "after": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7"
   }
  },
  {
@@ -1458,7 +1525,9 @@
   "id": "GOV-DD-9",
   "pack": "dance-of-democracy",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-DD-7",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-DD-9",
    "dimension": "Compliance",
@@ -1469,10 +1538,19 @@
    "l5": "Full EU Political Advertising Regulation compliance with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "GOV-DD-9",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU Political Advertising Regulation 2024 transparency requirements for AI-generated political content and GDPR Article 22(4) safeguards for automated political profiling decisions?",
+   "regulatoryRef": "EU Political Advertising Reg 2024; GDPR Art. 22(4)",
+   "l1": "No political advertising transparency or automated profiling safeguards; AI-generated political content lacks EU Political Advertising Regulation disclosure and political profiling operates without GDPR Art. 22(4) safeguards",
+   "l3": "Agent implements basic political content labeling and restricts profiling-based targeting, but does not automate EU Political Advertising Regulation transparency requirements or GDPR Art. 22(4) suitable safeguards for political profiling",
+   "l5": "Full EU Political Advertising Regulation compliance with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
+   "weight": 12
+  },
   "citations": {
    "before": "EU Political Advertising Reg 2024; GDPR Art. 22(4)",
-   "after": null
+   "after": "EU Political Advertising Reg 2024; GDPR Art. 22(4)"
   }
  },
  {
@@ -1752,7 +1830,9 @@
   "id": "GOV-PL-2",
   "pack": "petition-to-law",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-PL-13",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-PL-2",
    "dimension": "Compliance",
@@ -1763,17 +1843,28 @@
    "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "GOV-PL-2",
+   "dimension": "Compliance",
+   "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
+   "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
+   "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
+   "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
+   "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+   "weight": 15
+  },
   "citations": {
    "before": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
-   "after": null
+   "after": "UN E-Government Survey 2024; OECD OG Rec Art. 2"
   }
  },
  {
   "id": "GOV-PL-3",
   "pack": "petition-to-law",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-PL-10",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-PL-3",
    "dimension": "Governance",
@@ -1784,10 +1875,19 @@
    "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 compliance, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "GOV-PL-3",
+   "dimension": "Governance",
+   "text": "Does the agent implement open legislative data per EU Open Data Directive 2019/1024 Articles 3-5 and EU INSPIRE Directive for geographic legislative data with open format publication?",
+   "regulatoryRef": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC",
+   "l1": "No open legislative data; bills, petitions, and legislative processes are not published in machine-readable open formats per EU Open Data requirements",
+   "l3": "Agent publishes core legislative documents in open formats, but does not implement full EU Open Data Directive compliance or INSPIRE-compliant geospatial legislative data",
+   "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 compliance, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
+   "weight": 12
+  },
   "citations": {
    "before": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC",
-   "after": null
+   "after": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC"
   }
  },
  {
@@ -2034,7 +2134,9 @@
   "id": "GOV-PPC-12",
   "pack": "public-private-collaboration",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-DP-7",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-PPC-12",
    "dimension": "Compliance",
@@ -2045,10 +2147,19 @@
    "l5": "Full R16 compliance with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "GOV-PPC-12",
+   "dimension": "Compliance",
+   "text": "For PPP-related wire transfers (including cross-border payments), does the agent implement FATF Recommendation 16 by (1) capturing and validating originator and beneficiary information, (2) ensuring required information travels with the transfer through intermediaries, (3) screening against sanctions, PEP, and adverse media where applicable, (4) handling missing or invalid information with exception workflows, and (5) retaining audit evidence linking each payment to contract milestones and beneficial ownership data?",
+   "regulatoryRef": "FATF R16 (Wire transfers)",
+   "l1": "No R16 controls: transfers lack required originator and beneficiary information integrity and cannot be traced end-to-end",
+   "l3": "Captures payment metadata, but travel-rule style propagation, exception handling, screening, and audit linkage to PPP milestones are incomplete",
+   "l5": "Full R16 compliance with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
+   "weight": 15
+  },
   "citations": {
    "before": "FATF R16 (Wire transfers)",
-   "after": null
+   "after": "FATF R16 (Wire transfers)"
   }
  },
  {
@@ -2229,7 +2340,9 @@
   "id": "GOV-PPC-2",
   "pack": "public-private-collaboration",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "GOV-PPC-11",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-PPC-2",
    "dimension": "Governance",
@@ -2240,10 +2353,19 @@
    "l5": "Full OECD PPP compliance with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "GOV-PPC-2",
+   "dimension": "Governance",
+   "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
+   "regulatoryRef": "OECD PPP Governance Principles §5-6",
+   "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
+   "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
+   "l5": "Full OECD PPP compliance with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+   "weight": 15
+  },
   "citations": {
    "before": "OECD PPP Governance Principles §5-6",
-   "after": null
+   "after": "OECD PPP Governance Principles §5-6"
   }
  },
  {
@@ -2310,7 +2432,9 @@
   "id": "GOV-PPC-5",
   "pack": "public-private-collaboration",
   "station": "governance",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "TECH-PP-3",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "GOV-PPC-5",
    "dimension": "Compliance",
@@ -2321,10 +2445,19 @@
    "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "GOV-PPC-5",
+   "dimension": "Compliance",
+   "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
+   "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
+   "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
+   "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
+   "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+   "weight": 15
+  },
   "citations": {
    "before": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
-   "after": null
+   "after": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2"
   }
  },
  {

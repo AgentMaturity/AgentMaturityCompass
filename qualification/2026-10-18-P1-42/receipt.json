@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-42",
   "date": "2026-10-18",
-  "commit": "25225533c360c7cc5582bde441e7893bb92dc111",
+  "commit": "5ef35b7160012416f7336d83b11375b8cadad282",
   "branch": "rtd/p1-42-s4-s10-questionnaires",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,133 +12,128 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 78874
+      "durationMs": 95303
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 40914
+      "durationMs": 53908
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 67368
+      "durationMs": 51518
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 3908
+      "durationMs": 4377
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 971
+      "durationMs": 1260
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 518
+      "durationMs": 623
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 2350
+      "durationMs": 2843
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 2284
+      "durationMs": 3092
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 343
+      "durationMs": 461
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 727
+      "durationMs": 787
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 216
+      "durationMs": 286
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 269
+      "durationMs": 334
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 800
+      "durationMs": 1193
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 3752
+      "durationMs": 5555
     },
     {
       "cmd": "npm run -s check:citations",
       "exit": 0,
-      "durationMs": 390
+      "durationMs": 603
     },
     {
       "cmd": "npm run -s check:catalog-currency",
       "exit": 0,
-      "durationMs": 450
+      "durationMs": 748
     },
     {
       "cmd": "npm run -s check:catalog-changelog",
-      "exit": 1,
-      "durationMs": 607
+      "exit": 0,
+      "durationMs": 848
     },
     {
       "cmd": "npm run -s check:industry-guides",
       "exit": 0,
-      "durationMs": 1065
+      "durationMs": 1063
     },
     {
       "cmd": "npm run -s check:regulatory-calendar",
       "exit": 0,
-      "durationMs": 328
+      "durationMs": 539
     },
     {
       "cmd": "npm run -s release:notes -- --check",
       "exit": 0,
-      "durationMs": 247
+      "durationMs": 306
     },
     {
       "cmd": "npm run -s build:pages",
       "exit": 0,
-      "durationMs": 1395
+      "durationMs": 3471
     },
     {
-      "cmd": "npm run -s check:qualification",
-      "exit": 0,
-      "durationMs": 388
-    },
-    {
-      "cmd": "npx vitest run <the 47 test files listed in focused-tests.json>",
+      "cmd": "npx vitest run <the 64 test files listed in focused-tests.json>",
       "exit": 1,
-      "durationMs": 57896
+      "durationMs": 78073
     }
   ],
   "tests": {
-    "total": 513,
-    "passed": 511,
-    "failed": 2,
+    "total": 670,
+    "passed": 667,
+    "failed": 3,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "a381a24991e039eec875ade15a0dbf79c777bc2fab07a8d753a4dd710c630563"
+      "sha256": "064493d2d9c1529047ba5aaa0f7ab26076b531a5aa1d1e46f3f995ffc6790c14"
     },
     {
       "path": "checks.json",
-      "sha256": "fd57f31abc0e657433aea92339b3deebca0b4e964a07f8f17ae79a01e1f013df"
+      "sha256": "00986b8d660c61919d7d24898f409d55e2ed1f7fbf53b08296c2e7992947a151"
     },
     {
       "path": "content-diff-education.json",
@@ -146,43 +141,43 @@
     },
     {
       "path": "content-diff-environment.json",
-      "sha256": "2907072f4c0f3df336e3d58f3f528ac6bb3734100c1c0ab027a6aab75148b65d"
+      "sha256": "5e144fed21cedd297cb11eff23d19a7865e95f2a64d8f598cefd45c267f4517c"
     },
     {
       "path": "content-diff-governance.json",
-      "sha256": "a43e661180b76ba9a4f7afe5bb0a3beb2722ad68142372dba4aba36b4e5048d3"
+      "sha256": "03fe31d8c1bf8d4e7864d50fc91c802147543dc7ed96247c4f2906a31cd6f538"
     },
     {
       "path": "content-diff-health.json",
-      "sha256": "a5276c35b971ea91eb04b25057bef786c21b81535cdb411714fd97874ad778e0"
+      "sha256": "093270148cb49c7d503517ab55fccf91a6b8cc76f47bca8773a00d156abbe37d"
     },
     {
       "path": "content-diff-mobility.json",
-      "sha256": "6f9bf5dda143c71139e777764ade920097466120c0b3d13ff9bc904eb552f94e"
+      "sha256": "5b043cb6f57e9fd750021664160677e581dadcff40d36e0d31a7e15bc8e454e4"
     },
     {
       "path": "content-diff-technology.json",
-      "sha256": "7018e8a7c2061b8719390738771457f0996e03714940674c424218cfef7de432"
+      "sha256": "a54bf0de24babe427b0fb118aa44ddc90c38a91df0331dc0c7eefd0639dc9e2f"
     },
     {
       "path": "content-diff-wealth.json",
-      "sha256": "84e9703ee56a983bebdaa0d15d5a2e822063419a62abab60ecdd51daf7ec5ca2"
+      "sha256": "ed6ef9495d6e6aa9efab67fcf0fcb94ed762ce546342a24cf1c8709bcbe96fa1"
     },
     {
       "path": "content-diff.json",
-      "sha256": "5052152c8d0ec5c4c5d5bd331ef3032539c9505abfb19825eccb3ccfbe106cd5"
+      "sha256": "3bc5fd0d03aa1ea14aaec7332a141956ddd9213d64ad46a94757fc863de270fa"
     },
     {
       "path": "content-diff.mts",
-      "sha256": "e92c66eee34f95ede819c04a6440f7b4e5cf8cda045b8821c5f979fb1debac57"
+      "sha256": "bcbeae81620e2eaf46938365f56cc9d992122f363263d2c0af3b570f110a9679"
     },
     {
       "path": "counts.json",
-      "sha256": "309185c0963a9cc9239e37f7df41dbbfb22038ff6369838429411d529a62fcf2"
+      "sha256": "a12a7757d3497bbbcae150c658d5d5d8b2ac778a2e7a3026b05a67ecc0b5402c"
     },
     {
       "path": "focused-tests.json",
-      "sha256": "36a74884e0c788ab79d1cf89be23551f3f85b2bf42129e1235ec0f258a36c1a5"
+      "sha256": "244ae265a7b13f5344835ea5dcc2829e00aeefb6199ad871f27039c6fe59412e"
     },
     {
       "path": "full-suite.json",
@@ -190,12 +185,12 @@
     },
     {
       "path": "mutations.json",
-      "sha256": "833f958ab19839f209f88cc117d541973cc7d7b3507ec0dad9d7632abc1af1e2"
+      "sha256": "95fd6e867d7a29494440bed63c963543b05058ff8fbd8d17b5b39ae53324708b"
     },
     {
       "path": "restored-questions-round2-rule-gaps.txt",
-      "sha256": "c791862172bce4958ee8b99b77558b4dd50853d44fdddd191173744e5040c78d"
+      "sha256": "8d880b1d75ec3cec54e283d458d0a335e6d84a49d0d86700a646a17631611c0c"
     }
   ],
-  "notes": "Slice content of the landing map (candidate 37c1466b) landed onto int as experimental, self-reported questionnaires: 676 pack questions (41 packs) and 235 deep questions. All 30 F5 drops are deferred by P0-26 and restored from main. Both focused-test failures also fail on int (README). check:catalog-changelog fails identically on int. Sid must confirm in the PR that round-2 rewrites and merges land as experimental content (step 5); D-08 experts review content-diff*.json. No AMC_OS path is landed or read."
+  "notes": "Slice content of the landing map (candidate 37c1466b) landed onto int as experimental, self-reported questionnaires: 723 pack questions (41 packs) and 235 deep questions. Nothing left a pack before Sid confirms: F5's 30 proposed drops (P0-26 defer) and round 2's 47 proposed merges (docs/program/round2/merge-decisions.json, defer) stay as on main; 18 dimension changes take -v2 ids. Every scored and listed pack surface carries contentStatus experimental. The 3 focused-test failures also fail on int (README). Sid must confirm step 5 in the PR and decide the 77 pending items; D-08 experts review content-diff*.json. No AMC_OS path is landed or read by code."
 }

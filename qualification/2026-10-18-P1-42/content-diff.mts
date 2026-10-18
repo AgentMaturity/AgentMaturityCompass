@@ -24,6 +24,12 @@ const load = async (root: string) => ({
 const before = await load(intRoot);
 const after = await load(process.cwd());
 const drops = new Set((JSON.parse(readFileSync("docs/program/f5/drops.json", "utf8")).items as { id: string }[]).map((d) => d.id));
+// P1-42 review: round 2's unconfirmed merges stay on int's text (pending Sid), and dimension changes take a -v2 id.
+const pendingMerges = new Map((JSON.parse(readFileSync("docs/program/round2/merge-decisions.json", "utf8")).items as
+  Array<{ id: string; proposedInto: string; decision: string }>).filter((d) => d.decision !== "merge").map((d) => [d.id, d.proposedInto]));
+const versions = new Map((JSON.parse(readFileSync("docs/program/round2/question-id-versions.json", "utf8")).items as
+  Array<{ oldId: string; newId: string }>).map((v) => [v.oldId, v.newId]));
+const versioned = new Set(versions.values());
 
 // Per-question dispositions the candidate committed (other stations recorded theirs only in the uncommitted round-2 inputs).
 const mergedInto = new Map<string, string>();
@@ -42,17 +48,22 @@ const index = (packs: Pack[]) => new Map(packs.flatMap((p) => p.questions.map((q
 const b = index(before.packs), a = index(after.packs);
 const same = (x: Q, y: Q) => JSON.stringify(x) === JSON.stringify(y);
 const questions: unknown[] = [];
-const counts: Record<string, number> = { keep: 0, rewrite: 0, add: 0, merge: 0, "removed-unrecorded": 0, "restored-f5-deferred": 0 };
+const counts: Record<string, number> = { keep: 0, rewrite: 0, "rewrite-new-id": 0, add: 0, merge: 0, "removed-unrecorded": 0,
+  "restored-f5-deferred": 0, "kept-pending-sid-merge": 0 };
 for (const id of [...new Set([...b.keys(), ...a.keys()])].sort()) {
-  const was = b.get(id), now = a.get(id);
+  if (versioned.has(id)) continue; // reported on its old id's row
+  const was = b.get(id), now = versions.has(id) ? a.get(versions.get(id)!) : a.get(id);
   let action: string;
-  if (was && now) action = drops.has(id) ? "restored-f5-deferred" : same(was.q, now.q) ? "keep" : "rewrite";
+  if (versions.has(id)) action = "rewrite-new-id";
+  else if (was && now) action = drops.has(id) ? "restored-f5-deferred" : pendingMerges.has(id) ? "kept-pending-sid-merge" : same(was.q, now.q) ? "keep" : "rewrite";
   else if (now) action = "add";
   else action = mergedInto.has(id) ? "merge" : drops.has(id) ? "drop" : "removed-unrecorded";
   counts[action] = (counts[action] ?? 0) + 1;
   if (action === "keep" && !mobilityFlags.has(id)) continue;
   questions.push({
     id, pack: (now ?? was)!.pack, station: (now ?? was)!.station, action,
+    ...(versions.has(id) ? { newId: versions.get(id) } : {}),
+    ...(pendingMerges.has(id) ? { proposedInto: pendingMerges.get(id), decision: "defer (pending Sid)" } : {}),
     ...(mergedInto.has(id) ? { mergedInto: mergedInto.get(id) } : {}),
     ...(mobilityFlags.has(id) ? { flag: mobilityFlags.get(id) } : {}),
     before: was?.q ?? null, after: now?.q ?? null,
@@ -77,7 +88,7 @@ write("content-diff.json", {
   schema: "amc.p1-42.content-diff/1",
   status: "experimental: AI-drafted round-2 content, not reviewed by a qualified expert (D-08); not legal advice",
   base: "int b9866b0fa (pack and deep-question registry before P1-42)",
-  note: "Questions F5 proposed to drop are restored (P0-26 defer) and listed as restored-f5-deferred. A removed id is a merge where the candidate's committed apply records name the target (education, mobility); removed-unrecorded ids are merges whose target the candidate recorded only in its uncommitted round-2 inputs. Keep rows are omitted unless flagged. Pack-question rows (id, pack, station, action, before, after, citations) are in the per-station files.",
+  note: "Questions F5 proposed to drop are restored (P0-26 defer) and listed as restored-f5-deferred. Round 2's 47 merges with no committed target stay as on int and are listed as kept-pending-sid-merge with their proposed target (docs/program/round2/merge-decisions.json). A rewrite that changes the dimension is listed under its old id as rewrite-new-id with its newId (docs/program/round2/question-id-versions.json). A merge row is one whose target the candidate's committed apply records name (education, mobility). Keep rows are omitted unless flagged. Pack-question rows (id, pack, station, action, before, after, citations) are in the per-station files.",
   counts: { packQuestionsBefore: b.size, packQuestionsAfter: a.size, deepQuestionsBefore: db.size, deepQuestionsAfter: da.size, packActions: counts,
     deepActions: deep.reduce<Record<string, number>>((n, q) => ({ ...n, [q.action]: (n[q.action] ?? 0) + 1 }), {}), catalogueAdded: catalogueAdded.length },
   questionFiles: stations.map((station) => `content-diff-${station}.json`),

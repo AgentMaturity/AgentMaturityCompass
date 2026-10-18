@@ -226,7 +226,8 @@
   "id": "MOB-PS-15",
   "pack": "privacy-security-mobility",
   "station": "mobility",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "MOB-PS-15-v2",
   "before": {
    "id": "MOB-PS-15",
    "dimension": "Incident Reporting",
@@ -238,7 +239,7 @@
    "weight": 8
   },
   "after": {
-   "id": "MOB-PS-15",
+   "id": "MOB-PS-15-v2",
    "dimension": "Compliance",
    "text": "For in-scope products with digital elements, does the agent support CRA Art. 14 reporting, which applies from 11 September 2026: an early warning within 24 hours and a notification within 72 hours of becoming aware of an actively exploited vulnerability or a severe incident, sent to the coordinating CSIRT and ENISA, with a final report within 14 days of a corrective measure (vulnerabilities) or one month after the notification (incidents)?",
    "regulatoryRef": "EU CRA Art. 14",

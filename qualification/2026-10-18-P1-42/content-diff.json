@@ -2,19 +2,21 @@
  "schema": "amc.p1-42.content-diff/1",
  "status": "experimental: AI-drafted round-2 content, not reviewed by a qualified expert (D-08); not legal advice",
  "base": "int b9866b0fa (pack and deep-question registry before P1-42)",
- "note": "Questions F5 proposed to drop are restored (P0-26 defer) and listed as restored-f5-deferred. A removed id is a merge where the candidate's committed apply records name the target (education, mobility); removed-unrecorded ids are merges whose target the candidate recorded only in its uncommitted round-2 inputs. Keep rows are omitted unless flagged. Pack-question rows (id, pack, station, action, before, after, citations) are in the per-station files.",
+ "note": "Questions F5 proposed to drop are restored (P0-26 defer) and listed as restored-f5-deferred. Round 2's 47 merges with no committed target stay as on int and are listed as kept-pending-sid-merge with their proposed target (docs/program/round2/merge-decisions.json). A rewrite that changes the dimension is listed under its old id as rewrite-new-id with its newId (docs/program/round2/question-id-versions.json). A merge row is one whose target the candidate's committed apply records name (education, mobility). Keep rows are omitted unless flagged. Pack-question rows (id, pack, station, action, before, after, citations) are in the per-station files.",
  "counts": {
   "packQuestionsBefore": 632,
-  "packQuestionsAfter": 676,
+  "packQuestionsAfter": 723,
   "deepQuestionsBefore": 150,
   "deepQuestionsAfter": 235,
   "packActions": {
    "keep": 180,
-   "rewrite": 357,
+   "rewrite": 339,
+   "rewrite-new-id": 18,
    "add": 109,
    "merge": 18,
-   "removed-unrecorded": 47,
-   "restored-f5-deferred": 30
+   "removed-unrecorded": 0,
+   "restored-f5-deferred": 30,
+   "kept-pending-sid-merge": 47
   },
   "deepActions": {
    "add": 87,

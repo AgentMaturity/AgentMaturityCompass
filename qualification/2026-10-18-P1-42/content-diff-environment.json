@@ -135,7 +135,9 @@
   "id": "ENV-FF-2",
   "pack": "farm-to-fork",
   "station": "environment",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "ENV-FF-10",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "ENV-FF-2",
    "dimension": "Traceability",
@@ -146,10 +148,19 @@
    "l5": "Item-level cryptographic traceability from seed/feed origin through every transformation and logistics step to point of sale, with immutable audit trail and sub-second recall capability",
    "weight": 15
   },
-  "after": null,
+  "after": {
+   "id": "ENV-FF-2",
+   "dimension": "Traceability",
+   "text": "Can the agent provide end-to-end supply chain traceability from farm origin to consumer per EU General Food Law Regulation (EC) 178/2002 Article 18?",
+   "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18",
+   "l1": "No digital traceability; paper-based records with gaps in supply chain visibility beyond immediate supplier",
+   "l3": "Batch-level traceability across major supply chain nodes with digital records, but gaps exist in sub-supplier and smallholder farm-level data",
+   "l5": "Item-level cryptographic traceability from seed/feed origin through every transformation and logistics step to point of sale, with immutable audit trail and sub-second recall capability",
+   "weight": 15
+  },
   "citations": {
    "before": "EU Regulation (EC) 178/2002 Art. 18",
-   "after": null
+   "after": "EU Regulation (EC) 178/2002 Art. 18"
   }
  },
  {
@@ -447,7 +458,8 @@
   "id": "ENV-MM-4",
   "pack": "material-to-machines",
   "station": "environment",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "ENV-MM-4-v2",
   "before": {
    "id": "ENV-MM-4",
    "dimension": "Safety",
@@ -459,7 +471,7 @@
    "weight": 12
   },
   "after": {
-   "id": "ENV-MM-4",
+   "id": "ENV-MM-4-v2",
    "dimension": "Transparency",
    "text": "Does the agent generate energy labels and product information sheets from test results under the applicable delegated regulation and register each model in EPREL before it is placed on the market, per Regulation (EU) 2017/1369?",
    "regulatoryRef": "Regulation (EU) 2017/1369 and applicable delegated regulations",
@@ -657,7 +669,9 @@
   "id": "ENV-SS-15",
   "pack": "source-to-sustenance",
   "station": "environment",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "ENV-SS-1",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "ENV-SS-15",
    "dimension": "Compliance",
@@ -668,10 +682,19 @@
    "l5": "Automated permit validation with authority/registry reconciliation, quota/annotation logic, forgery anomaly detection, and case management for holds/seizures with full audit trails",
    "weight": 8
   },
-  "after": null,
+  "after": {
+   "id": "ENV-SS-15",
+   "dimension": "Compliance",
+   "text": "Does the agent verify the validity of CITES permits/certificates (issuing authority checks, quotas/annotations, re-export certificates, expiry, and tamper/forgery signals) for Appendix I/II trade?",
+   "regulatoryRef": "CITES App. I–II (permit/certificate controls)",
+   "l1": "No permit validation; documents are accepted at face value and forged/expired permits are not detected",
+   "l3": "Performs basic permit field validation and manual authority spot-checks, but does not systematically verify against authority records or detect forgery patterns",
+   "l5": "Automated permit validation with authority/registry reconciliation, quota/annotation logic, forgery anomaly detection, and case management for holds/seizures with full audit trails",
+   "weight": 8
+  },
   "citations": {
    "before": "CITES App. I–II (permit/certificate controls)",
-   "after": null
+   "after": "CITES App. I–II (permit/certificate controls)"
   }
  },
  {
@@ -1074,7 +1097,9 @@
   "id": "ENV-STS-4",
   "pack": "sip-to-sanitation",
   "station": "environment",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "ENV-STS-13",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "ENV-STS-4",
    "dimension": "Governance",
@@ -1085,10 +1110,19 @@
    "l5": "Dynamic water safety plan with continuous hazard identification, real-time risk assessment updated with operational and environmental data, automated control measure verification, incident escalation protocols, and periodic WSP review documentation",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "ENV-STS-4",
+   "dimension": "Governance",
+   "text": "Does the agent implement water safety plan methodology per WHO Guidelines Chapter 4 with hazard identification and risk assessment from catchment to consumer?",
+   "regulatoryRef": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans",
+   "l1": "No water safety plan integration; hazard identification is reactive rather than systematic",
+   "l3": "Agent maintains a digital water safety plan with identified hazards and control measures, but risk assessment is static and not updated with real-time operational data",
+   "l5": "Dynamic water safety plan with continuous hazard identification, real-time risk assessment updated with operational and environmental data, automated control measure verification, incident escalation protocols, and periodic WSP review documentation",
+   "weight": 12
+  },
   "citations": {
    "before": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans",
-   "after": null
+   "after": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans"
   }
  },
  {
@@ -1305,7 +1339,9 @@
   "id": "ENV-UU-15",
   "pack": "ubiquity-to-utility",
   "station": "environment",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "ENV-UU-9",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "ENV-UU-15",
    "dimension": "Safety",
@@ -1316,10 +1352,19 @@
    "l5": "Continuous Order No. 901-aligned model governance with automated drift detection, event-based re-validation triggers, controlled model updates, and evidence exports for planning coordinator/ISO submissions",
    "weight": 8
   },
-  "after": null,
+  "after": {
+   "id": "ENV-UU-15",
+   "dimension": "Safety",
+   "text": "Does the agent continuously monitor inverter-based resource (IBR) model performance and trigger re-validation/updates (e.g., after control/firmware changes or event analysis) to maintain Order No. 901-aligned model accuracy for planning and operations studies?",
+   "regulatoryRef": "FERC Order No. 901",
+   "l1": "No ongoing validation; IBR models are static and not updated after changes/events",
+   "l3": "Performs periodic validation, but triggers and evidence for updates after changes/events are inconsistent",
+   "l5": "Continuous Order No. 901-aligned model governance with automated drift detection, event-based re-validation triggers, controlled model updates, and evidence exports for planning coordinator/ISO submissions",
+   "weight": 8
+  },
   "citations": {
    "before": "FERC Order No. 901",
-   "after": null
+   "after": "FERC Order No. 901"
   }
  },
  {
@@ -1539,7 +1584,8 @@
   "id": "ENV-UU-9",
   "pack": "ubiquity-to-utility",
   "station": "environment",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "ENV-UU-9-v2",
   "before": {
    "id": "ENV-UU-9",
    "dimension": "Security",
@@ -1551,7 +1597,7 @@
    "weight": 12
   },
   "after": {
-   "id": "ENV-UU-9",
+   "id": "ENV-UU-9-v2",
    "dimension": "Safety",
    "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the resource's NERC PRC-029-1 ride-through settings before the change is applied?",
    "regulatoryRef": "NERC PRC-029-1",
@@ -1599,7 +1645,9 @@
   "id": "ENV-WW-13",
   "pack": "weave-to-wear",
   "station": "environment",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "ENV-WW-2",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "ENV-WW-13",
    "dimension": "Compliance",
@@ -1610,10 +1658,19 @@
    "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
    "weight": 8
   },
-  "after": null,
+  "after": {
+   "id": "ENV-WW-13",
+   "dimension": "Compliance",
+   "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
+   "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
+   "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
+   "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
+   "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
+   "weight": 8
+  },
   "citations": {
    "before": "EU Regulation 2024/1781 Arts. 5 & 8",
-   "after": null
+   "after": "EU Regulation 2024/1781 Arts. 5 & 8"
   }
  },
  {

@@ -123,7 +123,9 @@
   "id": "WLT-BC-14",
   "pack": "blockchain",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-BC-4",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-BC-14",
    "dimension": "Compliance",
@@ -134,10 +136,19 @@
    "l5": "Full Ripple-aware control with structured fact intake, risk scoring, communications gating, escalation workflows, and audit-ready evidence bundles supporting the organization securities-law posture",
    "weight": 10
   },
-  "after": null,
+  "after": {
+   "id": "WLT-BC-14",
+   "dimension": "Compliance",
+   "text": "Does the agent perform security-token risk analysis incorporating SEC v. Ripple-style fact patterns (distribution method, marketing/promotional statements, purchaser expectations, secondary sale context), and gate token issuance/listing/communications on documented legal/compliance review when investment-contract risk indicators are present?",
+   "regulatoryRef": "SEC v. Ripple Labs; Howey test application in token distributions",
+   "l1": "No Ripple-aware analysis; token distribution and marketing risks are not assessed",
+   "l3": "Flags some promotional language and distribution risks, but secondary-sale context and evidence retention are inconsistent",
+   "l5": "Full Ripple-aware control with structured fact intake, risk scoring, communications gating, escalation workflows, and audit-ready evidence bundles supporting the organization securities-law posture",
+   "weight": 10
+  },
   "citations": {
    "before": "SEC v. Ripple Labs; Howey test application in token distributions",
-   "after": null
+   "after": "SEC v. Ripple Labs; Howey test application in token distributions"
   }
  },
  {
@@ -447,7 +458,9 @@
   "id": "WLT-BC-9",
   "pack": "blockchain",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-BC-12",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-BC-9",
    "dimension": "Compliance",
@@ -458,10 +471,19 @@
    "l5": "Full EU TFR 2023/1113 compliance with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "WLT-BC-9",
+   "dimension": "Compliance",
+   "text": "Does the agent implement EU Transfer of Funds Regulation 2023/1113 originator/beneficiary data completeness requirements for AI VASP-to-VASP transactions distinct from MiCA obligations?",
+   "regulatoryRef": "EU TFR 2023/1113 Art. 4-7; FATF R16",
+   "l1": "No TFR compliance; AI VASP agents do not distinguish TFR originator/beneficiary data completeness requirements from MiCA obligations, risking non-compliance with travel rule implementation",
+   "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 4-7 specific data completeness thresholds or distinguish TFR requirements from MiCA VASP obligations",
+   "l5": "Full EU TFR 2023/1113 compliance with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
+   "weight": 12
+  },
   "citations": {
    "before": "EU TFR 2023/1113 Art. 4-7; FATF R16",
-   "after": null
+   "after": "EU TFR 2023/1113 Art. 4-7; FATF R16"
   }
  },
  {
@@ -528,7 +550,9 @@
   "id": "WLT-CE-11",
   "pack": "circular-economy",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-CE-9",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-CE-11",
    "dimension": "Compliance",
@@ -539,10 +563,19 @@
    "l5": "Full ESRS E1 Scope 3 governance with category mapping, boundary documentation, estimation controls, data quality scoring, and auditor-ready evidence packs with change history",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "WLT-CE-11",
+   "dimension": "Compliance",
+   "text": "Does the agent implement CSRD-aligned ESRS E1 value-chain (Scope 3) governance, including (1) coverage across relevant Scope 3 categories, (2) boundary and consolidation approach documentation, (3) estimation hierarchy and data quality scoring, and (4) assurance-ready evidence bundles and change logs for reported Scope 3 metrics?",
+   "regulatoryRef": "EU CSRD 2022/2464; ESRS E1 (Scope 3/value-chain)",
+   "l1": "No ESRS E1 Scope 3 governance: categories are not mapped, boundaries are unclear, and reported figures are not reproducible with evidence",
+   "l3": "Maps major categories and produces estimates, but data quality/coverage controls and assurance evidence are incomplete",
+   "l5": "Full ESRS E1 Scope 3 governance with category mapping, boundary documentation, estimation controls, data quality scoring, and auditor-ready evidence packs with change history",
+   "weight": 12
+  },
   "citations": {
    "before": "EU CSRD 2022/2464; ESRS E1 (Scope 3/value-chain)",
-   "after": null
+   "after": "EU CSRD 2022/2464; ESRS E1 (Scope 3/value-chain)"
   }
  },
  {
@@ -972,7 +1005,9 @@
   "id": "WLT-DP-12",
   "pack": "digital-payments",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-DP-4",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-DP-12",
    "dimension": "Compliance",
@@ -983,17 +1018,27 @@
    "l5": "Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "WLT-DP-12",
+   "dimension": "Compliance",
+   "text": "Does the agent implement SCA RTS dynamic linking by cryptographically binding authentication to the specific transaction amount and payee (and ensuring integrity-protected display or confirmation of those elements to the payer), and by preventing post-authentication manipulation of amount or payee in both browser and app flows?",
+   "regulatoryRef": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
+   "l1": "No dynamic linking: MFA may be used but authentication is not bound to amount or payee and transaction details can be manipulated",
+   "l3": "Binds authentication to some transaction details and displays amount and payee, but integrity protections and manipulation detection are incomplete across channels",
+   "l5": "Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation",
+   "weight": 12
+  },
   "citations": {
    "before": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
-   "after": null
+   "after": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)"
   }
  },
  {
   "id": "WLT-DP-13",
   "pack": "digital-payments",
   "station": "wealth",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "WLT-DP-13-v2",
   "before": {
    "id": "WLT-DP-13",
    "dimension": "Payee Verification",
@@ -1005,7 +1050,7 @@
    "weight": 10
   },
   "after": {
-   "id": "WLT-DP-13",
+   "id": "WLT-DP-13-v2",
    "dimension": "Safety",
    "text": "For credit transfers in euro that the agent prepares or initiates, is verification of payee obtained before the payer authorises, is any close match or mismatch shown to the payer, and does the agent refuse to authorise on the payer's behalf after a mismatch?",
    "regulatoryRef": "Regulation (EU) No 260/2012 Art. 5c; Regulation (EU) 2024/886",
@@ -1023,7 +1068,9 @@
   "id": "WLT-DP-14",
   "pack": "digital-payments",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-DP-7",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-DP-14",
    "dimension": "Crypto-Asset Transfer Information",
@@ -1034,17 +1081,27 @@
    "l5": "Originator and beneficiary information is validated for every fiat and crypto-asset transfer, incomplete transfers are held or rejected under a documented policy, and the evidence is retained for supervisory review",
    "weight": 10
   },
-  "after": null,
+  "after": {
+   "id": "WLT-DP-14",
+   "dimension": "Crypto-Asset Transfer Information",
+   "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard revised in June 2025?",
+   "regulatoryRef": "Regulation (EU) 2023/1113; FATF R.16",
+   "l1": "Transfers are sent without complete originator or beneficiary information",
+   "l3": "Required fields are populated for fiat transfers, but crypto-asset transfers and missing-information handling are inconsistent",
+   "l5": "Originator and beneficiary information is validated for every fiat and crypto-asset transfer, incomplete transfers are held or rejected under a documented policy, and the evidence is retained for supervisory review",
+   "weight": 10
+  },
   "citations": {
    "before": "Regulation (EU) 2023/1113; FATF R.16",
-   "after": null
+   "after": "Regulation (EU) 2023/1113; FATF R.16"
   }
  },
  {
   "id": "WLT-DP-15",
   "pack": "digital-payments",
   "station": "wealth",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "WLT-DP-15-v2",
   "before": {
    "id": "WLT-DP-15",
    "dimension": "Resilience",
@@ -1056,7 +1113,7 @@
    "weight": 8
   },
   "after": {
-   "id": "WLT-DP-15",
+   "id": "WLT-DP-15-v2",
    "dimension": "Safety",
    "text": "Are the agent and the ICT systems it relies on covered by the digital operational resilience testing programme required by DORA (EU) 2022/2554 Articles 24 and 25, including vulnerability assessments, scenario-based tests and tracked remediation of findings?",
    "regulatoryRef": "EU DORA (EU) 2022/2554 Arts. 24-25",
@@ -1728,7 +1785,8 @@
   "id": "WLT-NP-10",
   "pack": "no-poverty",
   "station": "wealth",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "WLT-NP-10-v2",
   "before": {
    "id": "WLT-NP-10",
    "dimension": "Fair Lending",
@@ -1740,7 +1798,7 @@
    "weight": 15
   },
   "after": {
-   "id": "WLT-NP-10",
+   "id": "WLT-NP-10-v2",
    "dimension": "Ethics",
    "text": "Before an alternative-data source (mobile, utility, social or transaction data) is used in credit decisions for underserved applicants, is it tested for acting as a proxy for a prohibited basis under 12 CFR 1002.6(b), with the result recorded?",
    "regulatoryRef": "12 CFR 1002.6(b); 15 U.S.C. 1691(a)",
@@ -1788,7 +1846,9 @@
   "id": "WLT-NP-12",
   "pack": "no-poverty",
   "station": "wealth",
-  "action": "removed-unrecorded",
+  "action": "kept-pending-sid-merge",
+  "proposedInto": "WLT-NP-1",
+  "decision": "defer (pending Sid)",
   "before": {
    "id": "WLT-NP-12",
    "dimension": "Consumer Protection",
@@ -1799,17 +1859,27 @@
    "l5": "Full GPFI-aligned DFS consumer outcomes with suitability gating, total-cost transparency, monitored complaint/dispute SLAs, scam resilience patterns, and auditable reporting of consumer harm reduction",
    "weight": 12
   },
-  "after": null,
+  "after": {
+   "id": "WLT-NP-12",
+   "dimension": "Consumer Protection",
+   "text": "Does the agent implement World Bank / GPFI 2020-aligned responsible DFS controls, including product suitability checks for vulnerable users, transparent total cost disclosures, accessible complaints + dispute resolution SLAs, and fraud/scam resilience (social engineering protections) for low-literacy populations?",
+   "regulatoryRef": "World Bank GPFI (2020) — responsible DFS / consumer protection",
+   "l1": "No GPFI-aligned DFS controls; suitability, dispute resolution, and scam resilience are not systematically implemented",
+   "l3": "Implements some disclosures and basic complaints intake, but suitability checks, resolution SLAs, and scam/fraud resilience are incomplete",
+   "l5": "Full GPFI-aligned DFS consumer outcomes with suitability gating, total-cost transparency, monitored complaint/dispute SLAs, scam resilience patterns, and auditable reporting of consumer harm reduction",
+   "weight": 12
+  },
   "citations": {
    "before": "World Bank GPFI (2020) — responsible DFS / consumer protection",
-   "after": null
+   "after": "World Bank GPFI (2020) — responsible DFS / consumer protection"
   }
  },
  {
   "id": "WLT-NP-13",
   "pack": "no-poverty",
   "station": "wealth",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "WLT-NP-13-v2",
   "before": {
    "id": "WLT-NP-13",
    "dimension": "Risk Management",
@@ -1821,7 +1891,7 @@
    "weight": 10
   },
   "after": {
-   "id": "WLT-NP-13",
+   "id": "WLT-NP-13-v2",
    "dimension": "Governance",
    "text": "Does the operator of the agent-run inclusion channel (simplified accounts, agent networks) apply documented proportional risk controls, record incidents from that channel, and report channel risk to the board at a defined cadence?",
    "regulatoryRef": "BCBS Guidance on the application of the Core Principles for Effective Banking Supervision to institutions relevant to financial inclusion (2016)",
@@ -1869,7 +1939,8 @@
   "id": "WLT-NP-15",
   "pack": "no-poverty",
   "station": "wealth",
-  "action": "rewrite",
+  "action": "rewrite-new-id",
+  "newId": "WLT-NP-15-v2",
   "before": {
    "id": "WLT-NP-15",
    "dimension": "Risk Management",
@@ -1881,7 +1952,7 @@
    "weight": 8
   },
   "after": {
-   "id": "WLT-NP-15",
+   "id": "WLT-NP-15-v2",
    "dimension": "Governance",
    "text": "Before launching an agent-driven product, delivery channel or technology for low-income or unbanked customers, does the provider assess and mitigate its money-laundering and terrorist-financing risks as FATF Recommendation 15 requires?",
    "regulatoryRef": "FATF Recommendation 15",
