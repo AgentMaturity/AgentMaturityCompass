@@ -52,3 +52,7 @@ Unlock checks that every private key in the vault matches its public key file in
 - Otherwise restore the vault and the `.amc/keys/` directory together from the same backup. If the vault was created in the interrupted command and nothing was signed with it, you can instead move `.amc/vault.amcvault`, `.amc/vault.amcvault.meta.json` and `.amc/keys/` aside and run `amc init` again.
 
 A vault from before lease and session keys may hold only some of them. Unlock adds the missing keys and keeps the ones the vault has. If a `lease_ed25519.pub` or `session_ed25519.pub` exists for a key the vault does not hold, unlock refuses: AMC cannot check that file, and a new key would replace it. To let AMC create a new key, move that `.pub` file and its `*_history.json` aside; anything signed with the old key will then no longer verify.
+
+## The vault as the default key provider (P2-08)
+
+The vault is the `file` key provider: the default, for development, and the only provider whose keys can leave it (`exportable: true`). With `keys.requireNonExportable: true` in `.amc/amc.config.yaml`, AMC refuses every vault key that no provider key replaces (`KEY_PROVIDER_KEY_REFUSED`). A purpose whose `keys.refs` names a provider key never signs with its vault key, even when the provider is unreachable (`KEY_PROVIDER_HELD`); the one exception is the `ledger-row` delegate, served only under a current provider-signed delegation. A locked vault still reports "Vault locked". See [KEY_PROVIDERS.md](KEY_PROVIDERS.md).

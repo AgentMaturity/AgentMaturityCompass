@@ -638,9 +638,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc key-custody-modes` | List available key custody modes and their configurations | - | - |
 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys | - | - |
 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list | `--purpose <purpose>` | - |
-| `amc keys list` | List each signing purpose's key id, shared keys, history size and rotations (public files only) | `--json` | - |
+| `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) | `--json` | - |
 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list | `--purpose <purpose>`<br>`--key-id <id>`<br>`--reason <reason>` | - |
-| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
+| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
 | `amc lab-compare` | Compare two lab experiments | `--baseline <id>`<br>`--candidate <id>` | - |
 | `amc lab-create` | Create a new lab experiment | `--kind <kind>`<br>`--name <name>`<br>`--model <modelId>`<br>`--description <desc>` | - |
 | `amc lab-list` | List all lab experiments | `--kind <kind>` | - |

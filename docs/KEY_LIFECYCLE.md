@@ -178,4 +178,21 @@ amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|u
 amc keys export-public --purpose <p>
 ```
 
-Not in this release: KMS, HSM and PKCS#11 backends (P2-08), public anchoring of the transparency log (P1-26), RFC 3161 tokens on statements (P1-25) and standalone verification of statements (P1-06).
+## Key providers (P2-08)
+
+A purpose's key can be held by a key provider (AWS KMS, Google Cloud KMS, Azure Key Vault, a PKCS#11 token) instead of the vault; [KEY_PROVIDERS.md](KEY_PROVIDERS.md) has the setup. In terms of this page:
+
+- `keys.refs.<purpose>` in `.amc/amc.config.yaml` names the provider key. From then on `getSigningKey` refuses the purpose (`KEY_PROVIDER_HELD`): the vault never stands in for it.
+- `amc keys rotate --purpose <p>` binds the configured key instead of generating one, reading the ref only from an `amc.config.yaml` whose signature verifies, after the provider proves possession. The binding is one key-set generation: `keyset.json` gains `providers.<purpose>` (provider, ref, key id, algorithm, protection) and pins `keys/<purpose>-provider.pub` in `files`; signing reaches the key by that record, never by the config. It is committed and marked like every other generation, so an older key set from before the binding is `ROLLBACK_DETECTED`, and later generations carry the binding. Only `ledger-row` can be bound in this release; its vault key keeps signing rows as a delegate while a provider-signed delegation (24 hours at most, renewed by the same command) is current, else `KEY_DELEGATION_INVALID`.
+- The bound key is admitted for its purpose next to the vault key, `amc keys export-public` prints the provider's public key with a proof of possession signed by the provider, and `amc keys revoke` refuses it while it is bound.
+- `amc keys list` adds `provider`, `algorithm`, `protection`, `protectionBasis` and `providerKeyId` per purpose (`file`, `ed25519`, `software`, `configured` for the vault).
+- A rotation now refuses before it commits when the transparency log's signer would refuse the log append that follows the commit (an unverifiable trust config, or an `artifact-seal` key held by a provider).
+- One pre-sign gate for every key, the vault's and a provider's alike (`assertSigningKeyUsable`): the key, identified by its own bytes, must be the one the committed, mark-bound key set names for the purpose and holder; the workspace key revocation list must load, verify and not name it (a missing or unverifiable list refuses every key); and the built-in distrust list must not distrust it at the server clock. A provider is never asked whether its own key is fine: AMC decides from its signed state before the provider is called, and the key the provider then presents must be the bound key by its bytes.
+
+Three decisions recorded for this release:
+
+- ECDSA P-256 signatures have one accepted encoding, IEEE P1363 with low S (s ≤ n/2); DER and the high-S twin are refused everywhere. Ed25519 keeps its 64-byte form with S below the group order.
+- Signing consults the built-in distrust list (`src/trust/amc-distrust.json`) only. Distrust entries in operator trust lists under AMC home stay a verification-time check, so an existing workspace signs exactly as before.
+- Purpose keys have no expiry field; the only time limit at signing is the ledger-row delegation window. Expiry of a pinned key (`validTo`) is judged at verification, as in P1-06.
+
+Not in this release: public anchoring of the transparency log (P1-26), RFC 3161 tokens on statements (P1-25) and standalone verification of statements (P1-06).

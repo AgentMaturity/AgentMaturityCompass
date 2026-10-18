@@ -4,7 +4,7 @@ AMC Notary is a separate signing service used to enforce a hardened trust bounda
 
 ## What Notary does
 
-- Signs allowed payload kinds for AMC with Ed25519.
+- Signs allowed payload kinds for AMC with Ed25519, from a sealed key file, an external signer or a key held by a key provider.
 - Provides signed runtime attestations (`.amcattest`).
 - Maintains its own append-only, hash-chained signing log.
 - Authenticates Studio->Notary requests via HMAC headers.
@@ -65,6 +65,31 @@ Notary can delegate signing to an external executable using deterministic CLI pr
 
 AMC includes testable reference script:
 - `/Users/sid/AgentMaturityCompass/scripts/fake-external-signer.mjs`
+
+## 3) Key provider backend (P2-08)
+
+The notary signs with an Ed25519 key held by AWS KMS, Google Cloud KMS or a PKCS#11 token (an HSM, or SoftHSM2 for testing). Set the backend in `notary.yaml`:
+
+```yaml
+notary:
+  backend:
+    type: KEY_PROVIDER
+    ref: { provider: aws-kms, id: "arn:aws:kms:eu-west-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab" }
+```
+
+Credentials, the PKCS#11 library path and PIN come from the notary's environment ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)), never from this file. Each signature runs the provider in a child process and is checked against the provider's public key before the notary returns it. An ECDSA key (Azure Key Vault, HSM-protected Google keys) is refused here: the artifact envelopes the notary signs are Ed25519-only in this release.
+
+## Attestation level and its basis
+
+Every `/readyz`, `/pubkey`, `/sign` answer and attestation carries `attestationLevel` and `attestationBasis`:
+
+| Backend | `attestationLevel` | `attestationBasis` |
+|---|---|---|
+| `FILE_SEALED` | `SOFTWARE` | `configured` |
+| `EXTERNAL_SIGNER` | `HARDWARE` when the signer claims `hardware: true` | `provider-reported`: the signer's own claim, not checked by AMC |
+| `KEY_PROVIDER` | `HARDWARE` only when the provider describes the key as `hsm` | `provider-metadata` (KMS key metadata) or `configured` (a PKCS#11 token's `AMC_PKCS11_PROTECTION`) |
+
+No basis is "attested": AMC does not verify hardware attestations. `trust enable-notary --require HARDWARE` checks the level only, so with an external signer it relies on that signer's own claim.
 
 ## Auth and isolation
 
