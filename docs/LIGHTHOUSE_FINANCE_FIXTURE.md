@@ -1,8 +1,6 @@
-> Current local evidence (16 October 2026): the source-only description below records the original 9 October slice. The service and client now have bounded local qualification; the full normative finance workflow remains open. See the qualification update below.
-
 # Synthetic finance lighthouse fixture
 
-Status: P1-19 partial source implementation; unqualified. The service has not been started and the scenarios have not been run. This is a synthetic provider model, not a real payment integration, compliance claim or proof of universal safety.
+Status: P1-19 partial implementation: a synthetic provider with its client and adapter, an independent oracle and an opt-in finance tool composition. The normative F01–F38 scenarios have not been run. This is a synthetic provider model, not a real payment integration, compliance claim or proof of universal safety. Qualification runs and their results are recorded under `qualification/`, not here.
 
 ## What this slice supplies
 
@@ -46,30 +44,15 @@ The client uses a supplied Unix socket or an HTTP origin at literal `127.0.0.1`,
 
 The data's `executionStatus: "not_run"` records preparation only. Expected decisions, receipt states, counts and control dimensions are planned requirements, never observed results.
 
-This slice adds no finance tools to the default or native toolset. Full tool integration still needs a trusted asynchronous payee/resource refresh before the existing authorization recheck, protected-fact mapping, journaled dispatch and credential separation. The protected approval/pipeline/enforcement modules remain unchanged. The independent oracle, scenario driver, fixture-control evaluator, tests, builds, typechecks, lint, CI, model runs and qualification receipts are deferred under the coding-only instruction. No zero-failure or coverage metric has been measured.
+No finance tool is added to the default or native toolset; the opt-in composition below is the only finance tool path. The example runner for the normative F01–F38 corpus, compliance-engine control evidence and the decisive/example tests remain to be built. An admin destination update that would push a payee version past the maximum safe integer is refused with HTTP 409 `payee_version_exhausted` before the payee or its log changes.
 
-## Local qualification update: 16 October 2026
-
-The local macOS arm64 Node 22 run exercised 110 service and client/adapter cases. The first run passed 109 and exposed a payee-version overflow: a valid maximum-safe seed allowed an admin destination update to publish an unsafe version. A one-line guard now returns HTTP 409 `payee_version_exhausted` before updating the payee or appending a payee-update record. All 110 unchanged tests then passed; test TypeScript checking also passed. Ordinary destination updates still increment the version.
-
-The checks launched real synthetic service children over Unix sockets and loopback TCP, exercised all six fault plans, verified a controlled crash and replay after restart, and required three corrupt histories to refuse startup without repair. Provider log hashes and final checkpoints were checked independently. Every observed child closed naturally with closed streams and an actual PID-absence observation. These finite component checks do not establish an AMC-authorized payment workflow, OS credential isolation, power-loss recovery or any real provider contract.
-
-Subsequent component runs passed 31 service cases and 89 client/adapter cases, for 120 distinct cases. The expanded checks observed two same-key requests before the first commit, restored a CLI-loaded fault counter after restart, and found a delayed commit through 23 GET lookups after a real client timeout without a second POST. Six owned loopback HTTP peers checked malformed JSON, schema refusal, redirect refusal, the response-byte cap and fixed error handling; every peer closed its listener and connections. These results remain component evidence, not F01–F38 outcomes.
-
-The F01–F38 case data remains `not_run`. Full finance tool registration, trusted payee refresh and digest mapping before authorization, the normative oracle and runner, compliance evidence loaders and decisive/example tests remain open. The earlier no-tests restriction has been superseded for this qualification; protected approval, journal, pipeline and enforcement contracts have not been changed for the finance fixture. See `qualification/2026-10-16-P1-19/` for the recorded commands, results and limits.
-
-
-## Independent oracle update: 16 October 2026
-
-The independent oracle and its genuine signed producers now pass ten local Node 22 tests. The positive requires all sixteen checks to pass. The negative cases cover duplicate effects, an actual post-authorization payload mismatch, a provider commit without an AMC receipt, a truncated closed log, forged adapter success text, altered preimages, a corrupted decision signature, a genuinely weaker signed approval policy and an unsupported case expectation. These are finite oracle regression controls, separate from the normative F01–F38 corpus.
+## Independent oracle
 
 The oracle imports no AMC source or built modules. It invokes the pinned cold ledger verifier, holds one read-only SQLite transaction and independently checks action chains, signed approval/configuration artifacts, quorum, durable authorization preimages and the mapping between the distinct generic and provider body digests. Its operator manifest anchors public keys, paths, executable/input hashes and the reviewed default two-approver financial policy before grants. Database, WAL and key/history pins remain exact across verification; initial read-only empty-WAL creation is separately checked before that interval. Driver success text supplies no authority.
 
 The standalone oracle uses four arguments, `<cli> <workspace> <case-file> <provider-run-dir>`, and the harness-comparison JSON input/output contract. It requires an external operator manifest through `AMC_FINANCE_ORACLE_PINS_FILE`; that manifest is a trusted fixture-launcher input. The runnable genuine setup is `tests/lighthouse/financeOracle.test.ts` after building the package. The optional `AMC_P119_ORACLE_CLI_PATH` selects a qualified built CLI for those tests.
 
-The original failed runs are retained: the missing oracle failed only after the real payment producer completed; the first implementation then failed its positive because an empty WAL appeared after the baseline. The corrected reader establishes its transaction before the baseline, verifies preparation and retains exact file checks through cold verification and action reads. No history was restored or deleted to obtain a pass.
-
-This finite profile recognizes the default two-distinct-approver OWNER/AUDITOR policy. The normative corpus instead specifies its own one-APPROVER fixture policy; that profile compatibility remains open. All F01–F38 execution statuses remain `not_run`. Finance tool composition, the example runner, compliance-engine control evidence and decisive/example tests are still being implemented under P1-19. The installed CLI's missing action-state verifier, literal generic/provider digest equality, post-grant cancellation, strict request-timestamp boundary, automatic session-recovery integration and same-user credential isolation remain explicit limits. No full-suite, global-coverage, CI, external-provider, compliance, release or formal completion claim follows.
+It recognizes the default two-distinct-approver OWNER/AUDITOR policy; the normative corpus's own one-APPROVER fixture policy is not supported. The installed CLI's missing action-state verifier, literal generic/provider digest equality, post-grant cancellation, strict request-timestamp boundary, automatic session-recovery integration and same-user credential isolation are explicit limits.
 
 
 ## Opt-in finance tools and durable payment context
@@ -82,4 +65,4 @@ Execute retains the existing authorization classes, bound FINANCIAL approval req
 
 `createFinancePaymentContext` stores bounded 0600 files under `.amc/lighthouse-finance/preimages`. Cold lookup uses the genuine journal's signed receipt/intent verification, checks all six reconciliation query fields and the full record/envelope/digest/bindings, and derives the separate provider body hash. Missing, malformed, unsafe, mismatched or aborted context returns unknown before provider GET. The returned native adapter exposes lookup only; opening the supplied journal can perform writable recovery. Historical lookup does not consume a grant again or reinterpret its original expiry.
 
-These APIs are a finite local composition. Payee refresh is a point-in-time check, and static no-follow filesystem checks are not atomic same-UID confinement. Reader, journal and recorder inputs are trusted. Legitimate signing may decrypt a vault payload; final-body writer retrieval is not a process-wide zero-decryption claim. The complete runner, normative F01–F38, compliance joins, custom one-APPROVER profile, literal generic/provider digest equivalence, granted cancellation, automatic recovery integration, hosted qualification and formal P1-19 acceptance remain open. Qualification evidence must state its actual tested cases and compiler scope.
+These APIs are a finite local composition. Payee refresh is a point-in-time check, and static no-follow filesystem checks are not atomic same-UID confinement. Reader, journal and recorder inputs are trusted. Legitimate signing may decrypt a vault payload; final-body writer retrieval is not a process-wide zero-decryption claim. The complete runner, normative F01–F38, compliance joins, custom one-APPROVER profile, literal generic/provider digest equivalence, granted cancellation and automatic recovery integration are not implemented.

@@ -70,4 +70,4 @@ PATCH operations are validated before resource updates. Malformed operation list
 
 User listing supports `userName eq "VALUE"` and `externalId eq "VALUE"`. An unsupported nonempty filter returns HTTP 400 with detail `invalidFilter`; a supported filter with no match returns a normal empty list. Error responses use the SCIM Error schema, string `status` and fixed `detail`.
 
-This parser and handler candidate is awaiting qualification. It does not change user POST/PUT boolean handling, HTTPS/proxy trust or bearer digest comparison. No recorded Okta or Entra SCIM interoperability result is supplied by this change.
+PATCH validation does not change user POST/PUT boolean handling, HTTPS/proxy trust or bearer digest comparison. No Okta or Entra SCIM interoperability result is recorded.
