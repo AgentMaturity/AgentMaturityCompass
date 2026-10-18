@@ -425,14 +425,15 @@ describe("genuine signed operator resolution", () => {
     checkedChain(f, id); noDispatch(f, before);
   });
 
-  test("a signed stricter WRITE_LOW distinct-user rule rejects an operator's otherwise granted self-approval", () => {
+  test("a signed stricter WRITE_LOW distinct-user rule refuses the operator's self-approval at decision time (P1-78)", () => {
     const f = fixture({ configureTools: config => { config.tools.allowedTools.push({ name: "owned.write-low", actionClass: "WRITE_LOW", effects: { repeatable: false } }); } });
     const policy = loadApprovalPolicy(f.workspace); policy.approvalPolicy.actionClasses.WRITE_LOW!.requireDistinctUsers = true;
     initApprovalPolicy(f.workspace, policy); signedArtifact(join(f.workspace, ".amc", "approval-policy.yaml"), f.auditor);
     const id = stateControl(f, "outcome_unknown", "owned.write-low"), before = snapshot(f), h = resolutionRequest(f, id, { effect: "not_applied", externalRef: null, operatorId: "owned-owner" });
     expect(h.request).toMatchObject({ requiredApprovals: 1, requireDistinctUsers: true });
-    expect(decide(h, "OWNER", "owned-owner").approval.status).toBe("QUORUM_MET");
-    expect(() => resolve(h)).toThrow(/^dual_control:/); unspent(h); noDispatch(f, before);
+    // The resolution request records the operator as its initiator, so their own approval is refused when decided.
+    expect(() => decide(h, "OWNER", "owned-owner")).toThrow(/initiator cannot approve their own request/);
+    expect(() => resolve(h)).toThrow(/resolution_not_approved/); unspent(h); noDispatch(f, before);
   });
 
   test("a grant for another execution cannot settle this execution", () => {

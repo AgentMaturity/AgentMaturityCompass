@@ -36,6 +36,8 @@ export interface P104Fixture {
   recordings: Array<{ execution: ToolExecution; outcome: ToolOutcome }>; beforeEffects: unknown[]; observations: unknown[];
   closeStores(): void;
   run(tool?: FaultTool, args?: Record<string, unknown>): Promise<ToolOutcome>;
+  /** The same call through a second pipeline over the same registry and journal whose recorder does not throw. */
+  runWithWorkingRecorder(tool?: FaultTool, args?: Record<string, unknown>): Promise<ToolOutcome>;
   finish(success: boolean): void;
 }
 
@@ -79,11 +81,12 @@ export function createP104Fixture(options: P104Options = {}): P104Fixture {
       options.faults?.beforeEffect?.();
     } })) registry.define(definition);
     registry.guard("signed tools allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name)));
-    const pipeline = new ToolPipeline({ registry, workspace, journal: () => f.journal,
+    const pipelineWith = (recorderFails: boolean): ToolPipeline => new ToolPipeline({ registry, workspace, journal: () => f.journal,
       authorizationContext: () => ({ sessionId }), record: (execution, outcome) => {
         recordings.push({ execution, outcome });
-        if (options.recorderFails) throw new Error("owned P104 recorder unavailable after effect");
+        if (recorderFails) throw new Error("owned P104 recorder unavailable after effect");
       } });
+    const pipeline = pipelineWith(options.recorderFails === true);
     f = { root, workspace, home, sessionId, monitor, auditor, oracleFile, sor, registry, pipeline, recordings, beforeEffects, observations,
       get journal(): ActionJournal { return journal ??= openActionJournal(workspace); },
       set journal(value: ActionJournal) { journal = value; },
@@ -91,6 +94,8 @@ export function createP104Fixture(options: P104Options = {}): P104Fixture {
       closeStores,
       run: (tool: FaultTool = PAYMENT_TOOL, args: Record<string, unknown> = FAULT_ARGUMENTS[tool]) => pipeline.execute({ name: tool,
         agentId: "default", arguments: { ...args }, requestedMode: "EXECUTE" }),
+      runWithWorkingRecorder: (tool: FaultTool = PAYMENT_TOOL, args: Record<string, unknown> = FAULT_ARGUMENTS[tool]) =>
+        pipelineWith(false).execute({ name: tool, agentId: "default", arguments: { ...args }, requestedMode: "EXECUTE" }),
       finish(success: boolean): void {
         if (finished) return; finished = true;
         const errors: unknown[] = [];

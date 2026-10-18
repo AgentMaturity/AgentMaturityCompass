@@ -35,9 +35,9 @@ function exactEffects(f: P104Fixture, expected: number): void {
   expect(counts.effects).toHaveLength(expected);
   expect(counts.duplicateEffects).toBe(0); expect(counts.effectsWithoutIntent).toBe(0);
 }
-async function blockedWithoutEffect(f: P104Fixture, tool: FaultTool, firstId: string, expected: number) {
+async function blockedWithoutEffect(f: P104Fixture, tool: FaultTool, firstId: string, expected: number, run = f.run) {
   const before = canonicalize(f.sor.effects);
-  const later = await f.run(tool);
+  const later = await run(tool);
   f.observations.push({ kind: "same-intent-later-call", outcome: later });
   expect(later.ok).toBe(false);
   expect(later.denied?.reason).toMatch(/blocked_by_unreconciled|possible_duplicate_of/);
@@ -157,7 +157,15 @@ describe.each(tools)("P1-04 observed fault matrix: %s", tool => {
             reasonCode: "evidence_incomplete:recorder_failed" });
         }
         expect(f.beforeEffects).toHaveLength(1); exactEffects(f, 1);
-        await blockedWithoutEffect(f, tool, executionId, 1);
+        if (fault === "recorder_down_after_effect") {
+          // P1-78: the failed record latches this pipeline; a later call is refused before the journal is asked.
+          const before = canonicalize(f.sor.effects), latched = await f.run(tool); observed.push({ latched });
+          expect(latched.ok).toBe(false); expect(latched.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+          expect(latched.action).toBeUndefined(); expect(canonicalize(f.sor.effects)).toBe(before); exactEffects(f, 1);
+          expect(f.ledger.db.prepare("SELECT COUNT(*) AS n FROM action_executions").get()).toEqual({ n: 1 });
+          // The journal's own unreconciled block still holds for another pipeline over it whose recorder works.
+          await blockedWithoutEffect(f, tool, executionId, 1, f.runWithWorkingRecorder);
+        } else await blockedWithoutEffect(f, tool, executionId, 1);
         await settleWithoutDispatch(f, tool, executionId, 1);
       } else {
         expect(fault).toBe("revocation_during_dispatch");

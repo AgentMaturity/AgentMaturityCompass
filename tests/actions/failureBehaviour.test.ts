@@ -223,7 +223,7 @@ describe("P1-03 failure row 1: admission must be durable before dispatch", () =>
 });
 
 describe("P1-03 failure row 2: the effect stands when local evidence fails", () => {
-  test("a throwing recorder marks completion incomplete and blocks the next financial call while reads run", async () => {
+  test("a throwing recorder marks completion incomplete and latches the pipeline: the next financial call and reads are refused (P1-78)", async () => {
     let recordings = 0;
     const f = fixture({ record: () => { recordings += 1; throw new Error("owned recorder unavailable"); } });
     const result = await execute(f);
@@ -232,12 +232,17 @@ describe("P1-03 failure row 2: the effect stands when local evidence fails", () 
     const receipts = chain(f, result.action!.executionId);
     expect(receipts.map(row => row.state)).toEqual(["requested", "authorized", "started", "completed", "completed"]);
     expect(receipts.at(-1)).toMatchObject({ evidenceComplete: false, reasonCode: "evidence_incomplete:recorder_failed" });
+    // The failed record latches the pipeline before any stage runs; the journal is never asked.
     const next = await execute(f, PAYMENT_TOOL);
-    expect(next.denied?.reason).toContain(`blocked_by_unreconciled:${result.action!.executionId}`);
+    expect(next.denied?.stage).toBe("authorization");
+    expect(next.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+    expect(next.action).toBeUndefined();
     expect(f.sor.effects).toHaveLength(1);
-    expect(chain(f, next.action!.executionId).map(row => row.state)).toEqual(["requested", "denied"]);
-    expect(await execute(f, "fs.read")).toMatchObject({ ok: true, denied: null });
-    expect(f.reads).toBe(1);
+    const read = await execute(f, "fs.read");
+    expect(read).toMatchObject({ ok: false, denied: { stage: "authorization" } });
+    expect(read.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+    expect(read.action).toBeUndefined();
+    expect(f.reads).toBe(0);
     expect(recordings).toBe(3);
   });
 

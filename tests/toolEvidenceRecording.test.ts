@@ -259,7 +259,7 @@ describe("the projection itself", () => {
   });
 });
 
-it("keeps a real journaled effect when recording fails, signs the gap and blocks the next financial call", async () => {
+it("keeps a real journaled effect when recording fails, signs the gap and refuses every later call (P1-78 latch)", async () => {
   // Local journal composition only: these fixture decisions do not authenticate
   // a person, invoke HTTP, or exercise a payment provider.
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-journaled-recorder-")));
@@ -386,22 +386,23 @@ it("keeps a real journaled effect when recording fails, signs the gap and blocks
       }
     } finally { db.close(); }
     expect(activeJournal.blockingExecutions({ workspaceId: activeJournal.workspaceId, agentId: "default" })).toContain(executionId);
-    // A fresh genuine grant rules out replay/missing authority as the reason
-    // this later financial body is refused. It must remain unconsumed.
+    // P1-78: the failed record latches the pipeline, so every later call is refused before any stage runs. A fresh
+    // genuine grant rules out replay or missing authority as the reason; it must remain unconsumed.
     const nextAuthority = approvedAuthority();
     const blocked = await pipeline.execute({ name: financial, agentId: "default", arguments: args, requestedMode: "EXECUTE",
       callId: "owned-effect-blocked", authority: nextAuthority });
     expect(blocked.ok).toBe(false);
     expect(blocked.denied?.stage).toBe("authorization");
-    expect(blocked.denied?.reason).toContain(`blocked_by_unreconciled:${executionId}:`);
-    expect(blocked.action).toMatchObject({ state: "denied", evidenceComplete: true });
+    expect(blocked.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+    expect(blocked.action).toBeUndefined();
     expect(loadApprovalConsumed({ workspace, agentId: "default", approvalRequestId: nextAuthority.approvalRequestIds[0]! })).toBeNull();
     expect(financialCalls).toBe(1);
     expect(readFileSync(effectPath, "utf8")).toBe(effectBytes);
     const read = await pipeline.execute({ name: readOnly, agentId: "default", arguments: {}, requestedMode: "EXECUTE", callId: "owned-read" });
-    expect(read).toMatchObject({ ok: true, denied: null, output: effectBytes });
+    expect(read).toMatchObject({ ok: false, denied: { stage: "authorization" } });
+    expect(read.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
     expect(read.action).toBeUndefined();
-    expect(readCalls).toBe(1);
+    expect(readCalls).toBe(0);
     expect(recorded.map(record => record.name)).toEqual([financial, financial, readOnly]);
     expect(financialCalls).toBe(1);
     expect(readFileSync(effectPath, "utf8")).toBe(effectBytes);
