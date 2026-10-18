@@ -73,10 +73,10 @@ let markers = 0;
 const DECLARATIONS = [ts.isVariableDeclaration, ts.isFunctionLike, ts.isClassLike, ts.isPropertyDeclaration, ts.isParameter,
   ts.isBindingElement, ts.isTypeAliasDeclaration, ts.isInterfaceDeclaration, ts.isEnumDeclaration, ts.isEnumMember,
   ts.isImportSpecifier, ts.isImportClause, ts.isNamespaceImport, ts.isImportEqualsDeclaration];
-const report = (file, line, rule, message) => findings.push({ file, line, rule, message });
+const report = (file, line, rule, message, text = "") => findings.push({ file, line, rule, message, text });
 function checkWording(file, line, text) {
   const match = CERTIFICATION_WORDING.exec(text);
-  if (match) report(file, line, "R4", `certification wording "${match[0]}"; AMC output is evidence of conformity`);
+  if (match) report(file, line, "R4", `certification wording "${match[0]}"; AMC output is evidence of conformity`, text);
 }
 
 function scanLines(file, lines) {
@@ -188,9 +188,13 @@ const entries = [
   ...pathPresence.map((file) => ({ file, rule: "R3", list: "pathPresence", reason: "control-surface scorer retired by P1-53" }))
 ];
 for (const entry of entries) {
-  const where = `${entry.file} ${entry.rule} (${entry.list})`;
+  // An optional phrase narrows an entry to the literals (or scanned lines) that contain it (P1-42 review).
+  const where = `${entry.file} ${entry.rule} (${entry.list})${entry.phrase === undefined ? "" : ` ${JSON.stringify(entry.phrase)}`}`;
   if (!RULES.includes(entry.rule)) failures.push(`scripts/no-fabrication-allowlist.json: ${where}: unknown rule`);
   if (!entry.reason?.trim()) failures.push(`scripts/no-fabrication-allowlist.json: ${where}: every entry needs a reason`);
+  if (entry.phrase !== undefined && !(typeof entry.phrase === "string" && entry.phrase.trim())) {
+    failures.push(`scripts/no-fabrication-allowlist.json: ${where}: a phrase must be non-empty text`);
+  }
   if (entry.list === "pending" && !ISSUE_KEY.test(entry.owner ?? "")) {
     failures.push(`scripts/no-fabrication-allowlist.json: ${where}: owner must be an issue key such as P0-21`);
   }
@@ -211,7 +215,8 @@ if (pathPresence.length > baseline || !Number.isInteger(baseline)) {
 
 const counts = Object.fromEntries(RULES.map((rule) => [rule, { found: 0, allowlisted: 0, failing: 0 }]));
 for (const finding of findings) {
-  const entry = entries.find((candidate) => candidate.file === finding.file && candidate.rule === finding.rule);
+  const entry = entries.find((candidate) => candidate.file === finding.file && candidate.rule === finding.rule
+    && (candidate.phrase === undefined || finding.text.includes(candidate.phrase)));
   counts[finding.rule].found += 1;
   if (entry) {
     entry.used = true;
@@ -222,7 +227,8 @@ for (const finding of findings) {
   }
 }
 for (const entry of entries.filter((candidate) => !candidate.used)) {
-  failures.push(`scripts/no-fabrication-allowlist.json: stale allowlist entry ${entry.file} ${entry.rule} (${entry.list}) matches nothing; remove it`);
+  const phrase = entry.phrase === undefined ? "" : ` ${JSON.stringify(entry.phrase)}`;
+  failures.push(`scripts/no-fabrication-allowlist.json: stale allowlist entry ${entry.file} ${entry.rule} (${entry.list})${phrase} matches nothing; remove it`);
 }
 const strict = args.includes("--strict");
 if (strict) {

@@ -45,7 +45,7 @@ const CATEGORIES = [
   {
     name: 'Compliance & Regulatory',
     icon: '07',
-    docs: ['EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS', 'CERTIFICATION', 'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING', 'ASSURANCE_CERTS', 'ASSURANCE_LAB', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist', 'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING']
+    docs: ['EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS', 'CERTIFICATION', 'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING', 'ASSURANCE_CERTS', 'ASSURANCE_LAB', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist', 'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING', 'REGULATORY_CALENDAR', 'industries/README', 'industries/education', 'industries/environment', 'industries/governance', 'industries/health', 'industries/mobility', 'industries/technology', 'industries/wealth']
   },
   {
     name: 'Security',
@@ -149,6 +149,7 @@ const ALL_DOCS = [
   'adapters/LANDING_CLAUDE_CODE','adapters/LANDING_GENERIC_CLI',
   'compliance/eu-ai-act-checklist','compliance/iso-42001-aims-manual',
   'compliance/nist-rmf-profile','compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
+  'REGULATORY_CALENDAR','industries/README','industries/education','industries/environment','industries/governance','industries/health','industries/mobility','industries/technology','industries/wealth',
   'integrations/ci-cd',
   'runbooks/amc-service-down','runbooks/evidence-corruption','runbooks/score-dispute'
 ];
@@ -210,6 +211,8 @@ const PUBLIC_DOC_IDS = new Set([
   'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING',
   'ASSURANCE_LAB', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist',
   'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
+  // Station deployment guides and the regulatory calendar: experimental, AI-drafted (P1-42)
+  'REGULATORY_CALENDAR', 'industries/README', 'industries/education', 'industries/environment', 'industries/governance', 'industries/health', 'industries/mobility', 'industries/technology', 'industries/wealth',
 
   // Security, runtime policy, and identity
   'SECURITY', 'SECURITY_ARCHITECTURE_OVERVIEW', 'SECURITY_DEPLOYMENT', 'THREAT_MODEL',

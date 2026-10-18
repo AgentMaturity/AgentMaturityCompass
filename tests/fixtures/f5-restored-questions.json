@@ -1,0 +1,395 @@
+{
+  "source": "The 30 questions F5 proposed to drop, read from the registry on int b9866b0fa (main plus the P0-24 citation corrections). P1-42 restores every kept or deferred one byte for byte.",
+  "items": [
+    {
+      "packId": "higher-education",
+      "question": {
+        "id": "EDU-HE-3",
+        "dimension": "Compliance",
+        "text": "Does the agent maintain accreditation compliance per regional accreditation standards and Bologna Process QF-EHEA learning outcome frameworks?",
+        "regulatoryRef": "Regional Accreditation Standards; Bologna Process QF-EHEA",
+        "l1": "No accreditation tracking; AI-driven curriculum changes are not assessed for accreditation impact",
+        "l3": "Agent tracks accreditation requirements and flags potential compliance issues from AI integration, but does not automate evidence collection or self-study preparation",
+        "l5": "Full accreditation compliance with automated evidence collection, learning outcome assessment tracking, AI integration impact documentation, self-study preparation support, and continuous improvement monitoring per accreditation standards and QF-EHEA",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "specialized-education",
+      "question": {
+        "id": "EDU-SE-11",
+        "dimension": "Governance",
+        "text": "Does the agent support UNESCO Seoul Agenda 2010 Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
+        "regulatoryRef": "UNESCO Seoul Agenda (2010) - Goal 2",
+        "l1": "No Goal 2 support; arts education capacity-building is not planned or evidenced, and programs depend on ad-hoc tooling rather than sustainable capability",
+        "l3": "Supports some professional development resources and partnership suggestions, but capacity-building is not measurable, resourcing is not tracked, and equity outcomes are not monitored",
+        "l5": "Full Goal 2 operationalization with professional development pathways, partnership MoU templates, resource/capability maturity tracking, equitable access monitoring, and audit-ready governance outputs showing capacity growth over time",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "specialized-education",
+      "question": {
+        "id": "EDU-SE-13",
+        "dimension": "Transparency",
+        "text": "Does the agent operationalize ISTE Standards 2023 1b by supporting educator learning and networked practice (e.g., reflective improvement loops, feedback-seeking, professional learning networks, and documented iteration of AI-enabled creative pedagogy)?",
+        "regulatoryRef": "ISTE Standards (2023) - 1b",
+        "l1": "No 1b support; educators lack structured learning/feedback loops and professional learning network support for AI creative pedagogy",
+        "l3": "Provides some guidance and resources, but feedback loops and evidence of professional learning/network participation are inconsistent or manual",
+        "l5": "Full 1b support with structured reflective practice, feedback collection, professional learning network participation workflows, measurable professional development outcomes, and evidence exports for instructional leadership",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "specialized-education",
+      "question": {
+        "id": "EDU-SE-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain a jurisdictional accessibility compliance matrix (e.g., U.S. Revised Section 508 Standards/VPAT vs EU accessibility directives), and gate rollout/procurement on completion of the correct evidence bundle for each deployment context?",
+        "regulatoryRef": "Accessibility scope gating",
+        "l1": "No scope gating; accessibility claims are generic and evidence artifacts are missing or mismatched by jurisdiction",
+        "l3": "Maintains a manual matrix, but rollout gating and evidence retention are inconsistent across products and regions",
+        "l5": "Automated scope gating with jurisdiction mapping, VPAT/evidence bundle generation, and release checks that block deployment until locale-appropriate accessibility obligations are met",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "source-to-sustenance",
+      "question": {
+        "id": "ENV-SS-5",
+        "dimension": "Ethics",
+        "text": "Does the agent assess ecological connectivity and wildlife corridor integrity per IPBES Nature's Contributions to People (NCP) framework?",
+        "regulatoryRef": "IPBES NCP Framework — Habitat Connectivity Assessment",
+        "l1": "No ecological connectivity assessment; conservation decisions are made without landscape-level habitat analysis",
+        "l3": "Agent maps habitat patches and identifies potential corridors using GIS data, but does not model species-specific connectivity or assess corridor functionality",
+        "l5": "Landscape-level ecological connectivity modeling with species-specific dispersal analysis, corridor functionality assessment, climate change adaptation pathways, and integration with spatial planning systems per IPBES NCP framework",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "source-to-sustenance",
+      "question": {
+        "id": "ENV-SS-14",
+        "dimension": "Transparency",
+        "text": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
+        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
+        "l1": "No Target 4 tracking; the agent does not maintain indicators/baselines or a plan tied to the target",
+        "l3": "Tracks some relevant indicators and interventions, but baselines are incomplete and reporting is not standardized and independently verifiable",
+        "l5": "Full Target 4 alignment with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "digital-citizens-rights",
+      "question": {
+        "id": "GOV-DCR-14",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned eIDAS 2.0 control-to-article mapping for the EUDI Wallet (ensuring Art. 5a anchors are used where required), with review on regulatory updates and automated checks for citation consistency across questions and outputs?",
+        "regulatoryRef": "eIDAS 2.0 (control mapping governance)",
+        "l1": "No mapping governance: citations drift and requested anchors (e.g., Art. 5a) are not consistently used",
+        "l3": "Mapping exists but updates are manual and inconsistently applied",
+        "l5": "Versioned, reviewed control mapping with automated citation-consistency checks and audit-defensible references",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "dance-of-democracy",
+      "question": {
+        "id": "GOV-DD-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned, Council-anchor-aligned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), OSCE/ODIHR §3.2, CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
+        "regulatoryRef": "Citation mapping governance",
+        "l1": "No mapping governance: citations drift and requested anchors are inconsistently used",
+        "l3": "Mapping exists but updates are manual and inconsistently applied",
+        "l5": "Versioned control mapping with review workflow and automated checks for citation consistency across questions and outputs",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "petition-to-law",
+      "question": {
+        "id": "GOV-PL-14",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned control-to-citation map for PSI/Open Data and access-to-information obligations (e.g., mapping any legacy 2003/98 references to 2019/1024 where required), with periodic review and automated checks to keep statutory anchors consistent across questions, datasets, and evidence exports?",
+        "regulatoryRef": "Citation mapping governance",
+        "l1": "No citation governance: references drift and anchors are inconsistent across artifacts",
+        "l3": "Some mapping exists but is manual and inconsistently applied",
+        "l5": "Versioned mapping with periodic review and automated consistency checks ensuring audit-defensible statutory anchors",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "public-private-collaboration",
+      "question": {
+        "id": "GOV-PPC-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000, G20), ensuring Council-required anchors (UNCAC Art. 9(1)(c), OECD §5.1, FATF R16, ISO 26000 §6.6.7, G20 §3) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
+        "regulatoryRef": "Citation mapping governance",
+        "l1": "No mapping governance: citations drift and Council-required anchors are inconsistently applied",
+        "l3": "A mapping exists but updates are manual and inconsistently enforced",
+        "l5": "Versioned, reviewed mapping with automated consistency checks and audit-defensible clause anchors",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "wellness-management",
+      "question": {
+        "id": "HLT-WM-17",
+        "dimension": "Governance",
+        "text": "Does the program explicitly scope ADA obligations across both workplace wellness (Title I) and consumer/public-accommodation delivery (Title III §12182), with controls and evidence mapped to each deployment context?",
+        "regulatoryRef": "ADA Title III §12182 (scope clarity) + ADA Title I context",
+        "l1": "No scope mapping; ADA controls are assumed to be satisfied by workplace-only privacy separation",
+        "l3": "Documents deployment contexts and some mapped controls, but evidence is incomplete and gaps are handled reactively",
+        "l5": "Explicit context-based control mapping with evidence for each deployment model (employer-sponsored vs direct-to-consumer), periodic reviews, and documented accountability for accommodations/accessibility",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "patient-lifecycle",
+      "question": {
+        "id": "HLT-PL-17",
+        "dimension": "Governance",
+        "text": "Does the agent maintain an accreditor crosswalk mapping JCI standards to Joint Commission NPSG controls (including NPSG.06.01.01) with evidence pointers and responsibility assignments?",
+        "regulatoryRef": "Joint Commission NPSG crosswalk expectations",
+        "l1": "No crosswalk; teams cannot map implemented controls to NPSGs or JCI requirements",
+        "l3": "Maintains a partial mapping spreadsheet, but it is not kept current with changes and lacks evidence pointers",
+        "l5": "Automated control crosswalk with versioned mappings, evidence pointers (policies, logs, test reports), and change alerts when accreditor standards update",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "sustainable-communities",
+      "question": {
+        "id": "MOB-SC-14",
+        "dimension": "Governance",
+        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
+        "regulatoryRef": "EU Urban Agenda §3",
+        "l1": "No partnership delivery workflow; engagement does not translate into managed action plans and outcomes",
+        "l3": "Tracks action plans and stakeholders, but coordination cadence and outcome evidence are inconsistent",
+        "l5": "End-to-end partnership governance with action plan tracking, coordination workflows, outcome KPIs, and transparent dissemination of results and learnings",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "sustainable-real-estate",
+      "question": {
+        "id": "MOB-RE-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain an EPBD control-to-article mapping (including SRI) that is reviewed on regulatory updates, so citations and evidence expectations remain audit-defensible over time?",
+        "regulatoryRef": "EU EPBD 2024 (control mapping governance)",
+        "l1": "No mapping governance: EPBD and SRI references drift and are not reviewed",
+        "l3": "Mapping exists but updates are manual and can lag regulatory changes",
+        "l5": "Versioned EPBD mapping with review workflow and automated checks for citation consistency across the pack",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "virtual-infrastructure",
+      "question": {
+        "id": "MOB-VI-14",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001:2022, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
+        "regulatoryRef": "Regulatory mapping governance",
+        "l1": "No mapping governance: citations drift and evidence cannot be reliably mapped to specific controls/articles",
+        "l3": "Mapping exists but updates are manual and can lag regulatory changes",
+        "l5": "Versioned regulatory mapping with review workflow and automated checks for citation consistency and evidence linkage across the pack",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "freight-3pl-warehouse",
+      "question": {
+        "id": "MOB-F3W-8",
+        "dimension": "Operational KPI Mapping",
+        "text": "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?",
+        "regulatoryRef": "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation",
+        "l1": "KPIs exist outside AMC and do not affect maturity, routing, or remediation",
+        "l3": "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations",
+        "l5": "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-4",
+        "dimension": "Transparency",
+        "text": "Does the agent implement outcome accountability per GRI Standards 201-207 economic performance reporting and UN SDG impact measurement framework?",
+        "regulatoryRef": "GRI Standards 201-207; UN SDG Impact Standards",
+        "l1": "No outcome accountability; orchestration system optimizes for efficiency without measuring or reporting social and economic outcomes",
+        "l3": "Agent tracks economic performance metrics and generates basic GRI-aligned reports, but does not implement full SDG impact measurement or stakeholder outcome reporting",
+        "l5": "Full outcome accountability with GRI 201-207 economic reporting, UN SDG impact measurement per SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact Council-required article/section and evidence expectations remain audit-defensible over time?",
+        "regulatoryRef": "Citation mapping governance",
+        "l1": "No mapping governance: citations drift and controls are not traceably anchored",
+        "l3": "Mapping exists but review/versioning is manual and can lag updates",
+        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the Council-required anchors consistently",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "infotainment",
+      "question": {
+        "id": "TECH-INF-15",
+        "dimension": "Governance",
+        "text": "Does the pack maintain an article-precise DSA control map that separates (a) Art. 14 ToS transparency, (b) Art. 17 statement-of-reasons artifacts, and (c) downstream user redress pathways, with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
+        "regulatoryRef": "EU DSA 2022/2065 Art. 14, 17",
+        "l1": "No control map; requirements are mixed and evidence is inconsistent across features",
+        "l3": "Mapping exists but is manually maintained and may drift over time",
+        "l5": "Versioned DSA control-to-evidence mapping with review workflow and automated checks for citation consistency and evidence completeness across the pack",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "question": {
+        "id": "TECH-PP-7",
+        "dimension": "Governance",
+        "text": "Does the agent implement partnership impact measurement per UN SDG 17 indicator 17.16.1 multi-stakeholder monitoring frameworks and GRI 203 Indirect Economic Impacts?",
+        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI 203",
+        "l1": "No partnership impact measurement; collaborative outcomes are not systematically measured against SDG targets or GRI economic impact standards",
+        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not implement UN SDG 17 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
+        "l5": "Full impact measurement with SDG 17 indicator 17.16.1 tracking, GRI 203 indirect economic impact reporting, prosperity distribution analysis across partners, and transparent partnership impact disclosure for stakeholders",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "question": {
+        "id": "TECH-PP-13",
+        "dimension": "Governance",
+        "text": "Where partnership outputs implicate sanitary/phytosanitary (SPS) measures, does the agent apply WTO SPS Agreement Article 5.7 by (1) identifying when scientific evidence is insufficient, (2) implementing provisional measures with documented rationale, (3) actively seeking additional information for a more objective risk assessment, and (4) reviewing/updating measures within a reasonable period with recorded decision trails?",
+        "regulatoryRef": "WTO SPS Agreement Art. 5.7",
+        "l1": "No SPS 5.7 discipline: measures are recommended/implemented without evidencing insufficiency, provisional status, information-gathering, or review timelines",
+        "l3": "Uses a precautionary approach informally, but does not document provisional status, evidence-gathering plans, and review timelines in a trade-dispute-resilient way",
+        "l5": "Full SPS Art. 5.7 governance with structured triggers for insufficiency, provisional-measure templates, evidence acquisition plans, periodic review SLAs, and audit-ready decision records supporting proportionality and WTO defensibility",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "question": {
+        "id": "TECH-PP-14",
+        "dimension": "Governance",
+        "text": "Does the program maintain a WIPO treaty-to-right mapping (WCT vs WPPT) for partnership outputs (authors rights vs performers neighboring rights), ensuring each content workflow (capture, reproduction, distribution, TPM/DRM) is mapped to the correct treaty article(s) and reviewed periodically by legal/compliance?",
+        "regulatoryRef": "WIPO WCT/WPPT (mapping governance)",
+        "l1": "No mapping governance: WIPO treaty references are generic, WPPT-specific rights are missed, and citations are not reviewed",
+        "l3": "Maintains a mapping in documentation, but it is not kept current with workflow changes or used to gate AI content operations",
+        "l5": "Robust mapping governance with versioning, legal review, and workflow gating so that WCT/WPPT obligations are correctly applied and evidence is produced per right/article",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "future-of-work",
+      "question": {
+        "id": "WLT-FW-6",
+        "dimension": "Ethics",
+        "text": "Does the agent assess automation impact on workforce and support reskilling per WEF Future of Jobs Framework and ILO Centenary Declaration?",
+        "regulatoryRef": "WEF Future of Jobs Framework; ILO Centenary Declaration (2019)",
+        "l1": "No automation impact assessment; AI deployment decisions do not consider workforce displacement or reskilling needs",
+        "l3": "Agent tracks roles affected by automation and identifies reskilling opportunities, but does not implement systematic transition support or measure reskilling effectiveness",
+        "l5": "Comprehensive automation impact management with displacement forecasting, personalized reskilling pathway generation, transition support coordination, skills gap analysis, reskilling effectiveness measurement, and just transition planning per ILO Centenary Declaration",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "future-of-work",
+      "question": {
+        "id": "WLT-FW-14",
+        "dimension": "Governance",
+        "text": "Does the program maintain a jurisdictional applicability matrix for employment AI features (e.g., AEDT use in NYC; AI video interview analysis in Illinois), and gate feature rollout on completion of location-specific notice/audit/consent requirements with evidence retention?",
+        "regulatoryRef": "Jurisdictional scope gating for employment AI laws",
+        "l1": "No applicability matrix; feature rollout does not account for jurisdiction-specific compliance triggers",
+        "l3": "Maintains a manual policy memo, but gating and evidence retention are inconsistent across teams and releases",
+        "l5": "Automated scope gating with jurisdiction/role mapping, rollout checks, and evidence bundles demonstrating completion of all location-specific duties prior to deployment",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "no-poverty",
+      "question": {
+        "id": "WLT-NP-6",
+        "dimension": "Governance",
+        "text": "Does the agent measure poverty reduction impact per UN SDG 1 indicators and World Bank poverty measurement methodology?",
+        "regulatoryRef": "UN SDG 1 Indicators 1.1.1, 1.2.1; World Bank Poverty Measurement",
+        "l1": "No impact measurement; financial inclusion activities are not assessed for actual poverty reduction outcomes",
+        "l3": "Agent tracks basic financial access metrics (accounts opened, loans disbursed) but does not measure poverty reduction outcomes or economic empowerment indicators",
+        "l5": "Comprehensive impact measurement with SDG 1 indicator tracking, income improvement measurement, economic resilience assessment, multidimensional poverty index integration, longitudinal outcome tracking, and transparent impact reporting",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "no-poverty",
+      "question": {
+        "id": "WLT-NP-11",
+        "dimension": "Governance",
+        "text": "If the provider is subject to the Community Reinvestment Act (CRA), does the agent support CRA-aligned community reinvestment by (1) mapping products and outreach to assessment areas, (2) measuring lending/service outcomes to low- and moderate-income (LMI) communities, and (3) producing examination-ready evidence of qualifying activities and impact?",
+        "regulatoryRef": "Community Reinvestment Act (CRA) — community reinvestment and LMI outcomes",
+        "l1": "No CRA support; no assessment area mapping, LMI outcome measurement, or exam-ready evidence of qualifying activities",
+        "l3": "Tracks some LMI outreach and lending metrics, but assessment area alignment and evidence packaging for CRA exams are incomplete",
+        "l5": "Full CRA readiness with assessment-area mapping, LMI outcome dashboards, qualifying activity tagging, exam-ready evidence bundles, and governance reporting aligned to CRA performance context",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "no-poverty",
+      "question": {
+        "id": "WLT-NP-14",
+        "dimension": "Compliance",
+        "text": "For EU microfinance programs, does the agent comply with EU Microfinance Reg §3 requirements (eligibility / conduct obligations as applicable), including customer protections, reporting evidence, and audit-ready documentation for program administrators/supervisors?",
+        "regulatoryRef": "EU Microfinance Reg §3",
+        "l1": "No EU microfinance compliance support; obligations are not recognized or documented",
+        "l3": "Recognizes EU microfinance obligations at a policy level, but implementation controls and evidence outputs are incomplete",
+        "l5": "Full EU microfinance compliance with obligation mapping, controlled workflows, reporting outputs, and audit-ready evidence for §3 requirements",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "circular-economy",
+      "question": {
+        "id": "WLT-CE-14",
+        "dimension": "Governance",
+        "text": "Does the agent support programmatic circular economy governance aligned to Ellen MacArthur Foundation CE100 practices, including defined circular targets/KPIs, periodic progress reporting, evidence of participation/benchmarking (or equivalent peer learning), and decision gates that tie investment choices to verified circular outcomes?",
+        "regulatoryRef": "Ellen MacArthur Foundation CE100",
+        "l1": "No programmatic circular governance: circular targets are absent or not linked to decisions and progress is not evidenced",
+        "l3": "Has circular targets and reports progress, but benchmarking/learning loops and decision gating are incomplete",
+        "l5": "Full CE100-style governance with targets/KPIs, periodic reporting, benchmarking/peer-learning evidence, and investment decision gates tied to verified circular outcomes",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "circular-economy",
+      "question": {
+        "id": "WLT-CE-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain an explicit ESRS scope map for CSRD reporting (which ESRS standards/data points are in scope for the entity/product), and gate reporting outputs on completion of the required ESRS set (including explicit treatment of Scope 3/value-chain disclosures)?",
+        "regulatoryRef": "EU CSRD 2022/2464; ESRS scope governance",
+        "l1": "No ESRS scope map: reporting scope is implicit and outputs vary across teams and periods",
+        "l3": "Maintains a policy memo describing scope, but gating and evidence retention are inconsistent across teams and releases",
+        "l5": "Formal ESRS scope map with reporting gates, evidence checklists, and change control so scope changes are documented and audit-ready",
+        "weight": 6
+      }
+    },
+    {
+      "packId": "blockchain",
+      "question": {
+        "id": "WLT-BC-15",
+        "dimension": "Governance",
+        "text": "Does the program maintain a MiCA article-to-control mapping that is internally consistent (e.g., ensuring Art. 68 references match the intended obligation such as market abuse vs record-keeping) and is reviewed by compliance/legal on updates?",
+        "regulatoryRef": "MiCA 2023/1114 (internal control mapping governance)",
+        "l1": "No control mapping governance; citations drift and are not reviewed",
+        "l3": "Citations are reviewed periodically, but drift can persist across pack updates",
+        "l5": "Strong mapping governance with compliance/legal review, versioning, and automated checks for citation consistency across all controls",
+        "weight": 6
+      }
+    }
+  ]
+}
