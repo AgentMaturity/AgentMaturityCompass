@@ -251,6 +251,8 @@ export async function decideApprovalInStudio(params: {
     if (/approval request (?:is not pending|context is untrusted):|approval request changed after review/i.test(message)) {
       throw new ApprovalStudioError(409, message);
     }
+    // P1-78 through Studio (P2-13): the initiator's own approval is a refusal, not a server error.
+    if (/^initiator cannot approve their own request/.test(message)) throw new ApprovalStudioError(403, message);
     throw error;
   }
 
