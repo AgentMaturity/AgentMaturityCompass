@@ -144,9 +144,25 @@ describe("4b. a Bash word that names AMC's files anywhere inside it is denied", 
       "'/bin/cat' '@.Claude/Settings.json'", "'/bin/cp' '/tmp/stolen/claude-code.lease' 'x'"]) {
       const decision = call(workspace, "Bash", { command, description: "x" });
       expect(decision.decision, command).toBe("deny");
-      expect(decision.reason, command).toContain(PROTECTED);
+      // A non-ASCII word (the zero-width space) is not classified at all: the pure-form refusal.
+      expect(decision.reason, command).toMatch(/AMC protects its hook configuration\.|pure form/);
     }
     for (const command of ["'/bin/echo' 'release.amcrelease'", "'/bin/echo' 'hello'"]) expect(call(workspace, "Bash", { command, description: "x" }).reason).not.toContain(PROTECTED);
+  });
+});
+
+describe("4c. Bash words are checked as bash passes them, and only plain words are classified", () => {
+  test("quoting tricks, escapes, globs, braces, ANSI-C quoting and non-ASCII lookalikes are denied", () => {
+    const workspace = claudeWorkspace();
+    const words = ["'.am''c/hooks/x'", "'.\\amc/hooks/x'", "$'\\x2eamc'/hooks/x", "'\uff0eamc/hooks/x'", "'.AMC/hooks/x'", "'.a\\mc/hooks/x'",
+      "'{.amc,x}'", "'.am?/hooks/claude-code.lease'", "'x/*'", "'a$b'", "'a`id`'", "'x~y'", "'[ab]'"];
+    for (const word of words) {
+      const command = `'/bin/cat' ${word}`;
+      const decision = call(workspace, "Bash", { command, description: "x" });
+      expect(decision.decision, command).toBe("deny");
+      expect(decision.reason, command).toMatch(/pure form|AMC protects its hook configuration/);
+    }
+    expect(call(workspace, "Bash", { command: "'/bin/echo' 'plain-words_1.2' '~/notes' 'a b'", description: "x" }).reason).not.toMatch(/pure form|AMC protects/);
   });
 });
 

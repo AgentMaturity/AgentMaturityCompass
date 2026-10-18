@@ -237,7 +237,8 @@ under `/usr/local/lib/node_modules/agent-maturity-compass`). Each handler runs i
 
 What is mapped: `Read`, `Glob`, `Grep` (`fs.read`), `Write`, `Edit` (`fs.write`), `WebFetch` (`http.fetch`, canonical
 URLs only) and `Bash` in its pure form only: single-quoted words, the first the absolute path of the binary, no shell
-syntax (`'/bin/echo' 'hello'`). MCP tools and every other tool are denied as unmapped (mapping MCP tools is a follow-up).
+syntax (`'/bin/echo' 'hello'`), each word printable ASCII without `\ $ \` * ? [ ] { }` and with `~` only first, since a
+program can expand escapes, patterns or braces itself and a non-ASCII character can be a lookalike. MCP tools and every other tool are denied as unmapped (mapping MCP tools is a follow-up).
 
 AMC refuses the calls that name or search its own files ("AMC protects its hook configuration."): `Write` or `Edit` of
 any `.claude/settings*.json` or of `.amc/**`; `Read` of `.amc/**`; a `Grep` or `Glob` whose search root is in, or holds,

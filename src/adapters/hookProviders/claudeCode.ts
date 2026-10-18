@@ -92,11 +92,21 @@ function containedGlob(value: unknown): boolean {
  */
 const PURE_BASH = /^'\/[^'\u0000-\u001f\u007f]*'(?: '[^'\u0000-\u001f\u007f]*')*$/;
 
+/**
+ * A word AMC classifies, as bash passes it to the program (single quotes removed; inside them bash changes nothing):
+ * printable ASCII with none of `\\ $ \` * ? [ ] { }`, and `~` only first. A program can read escapes, patterns, braces
+ * or a tilde itself; a non-ASCII character can be a lookalike. Any other word is not classified, so the command is denied.
+ */
+const PLAIN_WORD = /^~?[\x20-\x7e]*$/;
+const NOT_PLAIN = /[\\$`*?[\]{}]|.~/;
+
 /** The binary (where it really opens) and argv of a pure-form Bash command, or null. */
 function claudePureBash(command: unknown, workspace: string): { binary: string; argv: string[] } | null {
   // One spelling: a command that is not NFC could name a binary or argument other than the one AMC evaluates.
   if (typeof command !== "string" || command.normalize("NFC") !== command || !PURE_BASH.test(command)) return null;
+  // The one tokenizer: the words exactly as bash passes them; every later check (AMC's files included) reads these.
   const [first, ...argv] = command.slice(1, -1).split("' '");
+  if (![first!, ...argv].every((word) => PLAIN_WORD.test(word) && !NOT_PLAIN.test(word))) return null;
   const binary = claudeFileLocation(first, workspace);
   return binary ? { binary, argv } : null;
 }

@@ -96,7 +96,8 @@ describe("2. every protected-path check resolves paths the way Read and Write do
         ["Bash", { command: `'/bin/ls' '${form}'`, description: "x" }]] as const) {
         const decision = call(workspace, tool, input);
         expect(decision.decision, `${tool} ${form}`).toBe("deny");
-        expect(decision.reason, `${tool} ${form}`).toContain("AMC protects its hook configuration.");
+        // A Bash word that is not plain ASCII is not classified at all (pure-form refusal); either way it is denied.
+        expect(decision.reason, `${tool} ${form}`).toMatch(tool === "Bash" ? /AMC protects its hook configuration\.|pure form/ : /AMC protects its hook configuration\./);
       }
     }
   });
