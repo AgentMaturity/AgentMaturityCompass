@@ -427,7 +427,8 @@ export function formatIndustryPackPaywallMessage(
         : LICENSE_VERIFICATION_NOT_CONFIGURED];
   return [
     "Industry Packs are locked: pack questions and pack runs need an Industry Packs licence (CLI: amc domain pack describe|run and"
-      + " amc domain assess|gaps|report|assurance|roadmap|apply; Studio: GET /industry-packs/<id>; MCP: amc_score_sector_pack).",
+      + " amc domain assess|gaps|report|assurance|roadmap|apply; Studio: GET /industry-packs/<id>; MCP: amc_score_sector_pack,"
+      + " amc_get_industry_pack, amc_score_industry_pack).",
     "Pack names and descriptions stay visible. A licence unlocks access only; it never changes a score, gap, report or other result.",
     `Price: US$${entitlement.priceUsdMonthly}/month (plan ${entitlement.planId}).`,
     ...access
