@@ -228,7 +228,10 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   example("mirofish run", "mirofish:run"),
   example("mirofish compare", "mirofish:compare"),
   example("mirofish stress", "mirofish:stress"),
-  example("lab-simulate", "lab:simulate")
+  example("lab-simulate", "lab:simulate"),
+  // The CLI stores only lab-simulate placeholders, so a lab report or comparison is never a measurement.
+  example("lab-report", "lab:simulate"),
+  example("lab-compare", "lab:simulate")
 ];
 
 const GROUP = "command group: lists its subcommands";

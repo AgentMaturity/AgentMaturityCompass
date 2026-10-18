@@ -97,6 +97,8 @@ const recipes: Recipe[] = [
   {"path": "benchmark provider-drift", "args": ["--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "benchmark replay-corpus", "args": ["--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "lab-simulate", "args": ["--experiment", "@EXPERIMENT@"]},
+  {"path": "lab-report", "args": ["--experiment", "@EXPERIMENT@"]},
+  {"path": "lab-compare", "args": ["--baseline", "@EXPERIMENT@", "--candidate", "@EXPERIMENT@"], "refusal": {"reason": "lab-compare reads in-process probe results; a separate CLI process has none to compare.", "pattern": "No matching probes to compare"}},
   {"path": "insider-risk-scores", "args": []},
   {"path": "attestation-export", "args": ["--tenant", "fixture-tenant"]},
   {"path": "residency-report", "args": ["--tenant", "fixture-tenant"], "refusal": {"reason": "No signed data residency policy has been configured for this tenant.", "pattern": "residency|policy|ENOENT|not found"}, "output": "markdown"},
@@ -379,6 +381,16 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
       });
     }, 600_000);
   }
+
+  test("a cold lab-report after lab-simulate labels the stored placeholder scores synthetic", async () => withWorkspacePermit(async () => {
+    const simulated = await invoke("exact-lab-simulate", ["lab-simulate", "--experiment", experimentId]);
+    completed(simulated); expect(simulated.status, simulated.stderr).toBe(0);
+    const report = await invoke("exact-lab-report", ["lab-report", "--experiment", experimentId]);
+    completed(report); expect(report.status, report.stderr).toBe(0);
+    expect(report.stdout).toMatch(/^Claim: Synthetic example/m);
+    expect(report.stdout).toContain("Scores are deterministic placeholders derived from ids, not measurements.");
+    expect(report.stdout).toMatch(/Average scores|Aggregate Scores/i);
+  }), 600_000);
 
   test("domain --example emits synthetic claim fields on actual stdout", async () => withWorkspacePermit(async () => {
     const result = await invoke("exact-domain-example", ["domain", "assess", "--agent", "default", "--domain", "health", "--example", "--json"]);

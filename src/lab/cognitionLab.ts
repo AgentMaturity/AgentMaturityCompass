@@ -362,10 +362,9 @@ export function listLabExperiments(kind?: LabExperimentKind, workspace?: string)
   return kind ? all.filter((e) => e.kind === kind) : all;
 }
 
-/** Old cached callers remain memory-only; a cold CLI invocation reads its workspace's durable experiment. */
-function experimentWorkspace(experimentId: string, workspace?: string): string | undefined {
-  if (workspace) return resolve(workspace);
-  return experiments.some((experiment) => experiment.experimentId === experimentId) ? undefined : process.cwd();
+/** A library call without a workspace stays memory-only and writes nothing; the CLI passes its working directory. */
+function experimentWorkspace(workspace?: string): string | undefined {
+  return workspace ? resolve(workspace) : undefined;
 }
 
 /** Applies a status transition in memory and in the store. */
@@ -444,7 +443,7 @@ export function cancelLabExperiment(experimentId: string, workspace?: string): L
  * evaluate a model.
  */
 export function simulateExperiment(experimentId: string, workspace?: string): LabProbeResult[] {
-  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
+  const resolvedWorkspace = experimentWorkspace(workspace);
   const experiment = getLabExperiment(experimentId, resolvedWorkspace);
   if (!experiment) return [];
 
@@ -602,7 +601,7 @@ function storedProbeResults(workspace: string, experimentId: string): LabProbeRe
  * Generate a lab experiment report.
  */
 export function generateLabReport(experimentId: string, workspace?: string): LabExperimentReport | null {
-  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
+  const resolvedWorkspace = experimentWorkspace(workspace);
   const experiment = getLabExperiment(experimentId, resolvedWorkspace);
   if (!experiment) return null;
 

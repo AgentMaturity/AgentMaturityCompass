@@ -18725,7 +18725,7 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const results = lab.simulateExperiment(opts.experiment);
+    const results = lab.simulateExperiment(opts.experiment, process.cwd());
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
       process.exitCode = 1;
@@ -18750,11 +18750,17 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const report = lab.generateLabReport(opts.experiment);
+    const report = lab.generateLabReport(opts.experiment, process.cwd());
     if (!report) {
       console.log(chalk.red("Experiment not found."));
+      process.exitCode = 1;
       return;
     }
+    // The CLI records only lab-simulate placeholders, so a stored lab score is never a measurement.
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
+    if (report.probeResults.length > 0) console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(lab.renderLabReportMarkdown(report));
   });
 
@@ -18768,8 +18774,12 @@ program
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
     if (pairs.length === 0) {
       console.log(chalk.yellow("No matching probes to compare."));
+      process.exitCode = 1;
       return;
     }
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
     for (const p of pairs) {
       console.log(`  ${p.probeId}:`);

@@ -194,10 +194,10 @@ describe("experiment simulation", () => {
       kind: "typed_attention", name: "Cold restart", description: "Durable lab fixture", modelId: "fixture-model"
     }, workspace);
     resetLabState();
-    vi.spyOn(process, "cwd").mockReturnValue(workspace);
     const fetch = vi.spyOn(globalThis, "fetch");
 
-    const results = simulateExperiment(experiment.experimentId);
+    // The CLI passes its working directory explicitly; a library call never falls back to it.
+    const results = simulateExperiment(experiment.experimentId, workspace);
     expect(results).toHaveLength(experiment.probes.length);
     expect(results.length).toBeGreaterThan(0);
     expect(fetch).not.toHaveBeenCalled();
@@ -220,7 +220,7 @@ describe("experiment simulation", () => {
 
     resetLabState();
     expect(getLabExperiment(experiment.experimentId, workspace)?.status).toBe("completed");
-    const report = generateLabReport(experiment.experimentId);
+    const report = generateLabReport(experiment.experimentId, workspace);
     expect(report?.probeResults).toHaveLength(results.length);
     for (const result of results) {
       expect(report?.probeResults.find((storedResult) => storedResult.probeId === result.probeId)).toMatchObject(result);
@@ -238,6 +238,18 @@ describe("experiment simulation", () => {
     expect(getLabExperiment(experiment.experimentId)?.status).toBe("completed");
     expect(generateLabReport(experiment.experimentId)?.probeResults).toHaveLength(experiment.probes.length);
     expect(existsSync(join(workspace, ".amc"))).toBe(false);
+  });
+
+  test("a library call without a workspace never reads or writes the working directory, even after a cold restart", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-cwd-"));
+    workspaces.push(workspace);
+    const experiment = createLabExperiment({ kind: "trace_memory", name: "Durable", description: "cwd fallback", modelId: "fixture-model" }, workspace);
+    resetLabState();
+    vi.spyOn(process, "cwd").mockReturnValue(workspace);
+    const before = readdirSync(join(workspace, ".amc", "lab"), { recursive: true }).sort();
+    expect(simulateExperiment(experiment.experimentId)).toEqual([]);
+    expect(generateLabReport(experiment.experimentId)).toBeNull();
+    expect(readdirSync(join(workspace, ".amc", "lab"), { recursive: true }).sort()).toEqual(before);
   });
 
   test("simulates all probes for experiment", () => {
