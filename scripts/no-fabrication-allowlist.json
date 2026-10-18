@@ -9,37 +9,98 @@
     {
       "file": "src/domains/packs/stations/environment.ts",
       "rule": "R4",
-      "reason": "Pack data naming third-party certification schemes (for example 'ISO 22000 certified traceability'); not an AMC result. Moved from industryPacks.ts by the per-station split (P1-42)."
+      "phrase": "ISO 22000 certified traceability",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/environment.ts",
+      "rule": "R4",
+      "phrase": "ISO 50001 certified energy management",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/packs/stations/health.ts",
       "rule": "R4",
-      "reason": "Pack data naming certified health IT and its certified FHIR API (45 CFR 170.315(g)(10)), a regulatory term; not an AMC result (P1-42)."
+      "phrase": "surfaced through certified health IT",
+      "reason": "Question naming certified health IT, the ONC Health IT Certification Program term (45 CFR Part 170); not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/health.ts",
+      "rule": "R4",
+      "phrase": "the certified standardized FHIR API",
+      "reason": "Question naming the certified API of 45 CFR 170.315(g)(10); not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/health.ts",
+      "rule": "R4",
+      "phrase": "The certified API is used",
+      "reason": "Level text for the same certified API (45 CFR 170.315(g)(10)); not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/packs/stations/mobility.ts",
       "rule": "R4",
-      "reason": "Pack data naming third-party certification schemes (ISO 27001, ISO 27701, ISO 50001) and certified eFTI platforms (Regulation (EU) 2020/1056); not an AMC result (P1-42)."
+      "phrase": "ISO 50001 certified energy management",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/mobility.ts",
+      "rule": "R4",
+      "phrase": "ISO 27001 certified operations",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/mobility.ts",
+      "rule": "R4",
+      "phrase": "ISO 27701 certified privacy management",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/mobility.ts",
+      "rule": "R4",
+      "phrase": "a certified eFTI platform",
+      "reason": "Question naming a certified eFTI platform, a term of Regulation (EU) 2020/1056 Art. 4(2); not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/mobility.ts",
+      "rule": "R4",
+      "phrase": "the platform is not certified",
+      "reason": "Level text for the same eFTI platform certification (Regulation (EU) 2020/1056); not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/mobility.ts",
+      "rule": "R4",
+      "phrase": "A certified platform is used",
+      "reason": "Level text for the same eFTI platform certification (Regulation (EU) 2020/1056); not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/packs/stations/technology.ts",
       "rule": "R4",
-      "reason": "Pack data naming third-party certification schemes (ISO 42001, ISO 27001) in certification paths; not an AMC result. Moved from industryPacks.ts by the per-station split (P1-42)."
+      "phrase": "ISO 42001 AI management certified",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
+    },
+    {
+      "file": "src/domains/packs/stations/technology.ts",
+      "rule": "R4",
+      "phrase": "SOC 2 + ISO 27001 certified",
+      "reason": "Pack certification path naming a third-party certification scheme; not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/deep/health.ts",
       "rule": "R4",
-      "reason": "Deep-question text naming certified health IT, a regulatory term (45 CFR Part 170); not an AMC result (P1-42)."
+      "phrase": "surfaced through certified health IT",
+      "reason": "Deep question naming certified health IT, the ONC Health IT Certification Program term (45 CFR Part 170); not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/deep/mobility.ts",
       "rule": "R4",
-      "reason": "Deep-question text naming a manufacturer's certified Cyber Security Management System (UN R155), a regulatory term; not an AMC result (P1-42)."
+      "phrase": "the manufacturer's certified Cyber Security Management System",
+      "reason": "Deep question naming the CSMS certificate of UN Regulation No. 155; not an AMC result (P1-42)."
     },
     {
       "file": "src/domains/packs/catalogueEu.ts",
       "rule": "R4",
-      "reason": "Catalogue note quoting Regulation (EU) 2020/1056 on certified eFTI platforms; not an AMC result (P1-42)."
+      "phrase": "made available through certified eFTI platforms",
+      "reason": "Catalogue note quoting Regulation (EU) 2020/1056 Art. 5(1) on certified eFTI platforms; not an AMC result (P1-42)."
     },
     {
       "file": "src/passport/adapterCapabilityReceipt.ts",
