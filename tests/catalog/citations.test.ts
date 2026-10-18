@@ -65,6 +65,16 @@ describe("catalog citation rules", () => {
       .map((issue) => issue.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
   });
 
+  it("accepts binding-future for a future clause of a partially-applicable binding instrument (P2-30 ADMT)", () => {
+    expect(getRegisterEntry("us-ca-cppa-admt")).toMatchObject({ status: "partially-applicable", bindingForce: "binding" });
+    const input: Citation = { ...citation(), registerId: "us-ca-cppa-admt", statusType: "binding-future", instrument: "Synthetic future-clause fixture",
+      clause: "11 CCR §7220", effectiveDate: "2026-01-01", complianceDueDate: "2027-01-01" };
+    expect(validateCitation(input, context())).toEqual([]);
+    // A due date at or before asOf, or none, is not a future clause: the instrument's own status decides.
+    expect(validateCitation({ ...input, complianceDueDate: null }, context()).map((i) => i.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
+    expect(validateCitation({ ...input, complianceDueDate: asOf }, context()).map((i) => i.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
+  });
+
   it("refuses an unknown register ID", () => {
     expect(validateCitation({ ...citation(), registerId: "qualification-unknown-register" }, context()).map((issue) => issue.code)).toContain("CAT_CITATION_REGISTER");
   });
