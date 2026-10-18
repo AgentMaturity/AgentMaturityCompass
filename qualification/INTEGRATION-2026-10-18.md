@@ -1,13 +1,13 @@
 # Codex qualification receipts carried onto the held line (2026-10-18)
 
-This file is an index, not a receipt. It records where each qualification folder that branch `rtd/codex-full-integration` adds to the held line `8022bec4e` came from. Every carried file is byte-identical to its source commit: no path was rewritten and no file was trimmed or dropped. The absolute `/Users/sid/...` paths and the large files inside these receipts are kept as committed; whether they may go to the public origin is an open question for Sid.
+This file is an index, not a receipt. It records where each qualification folder that branch `rtd/codex-full-integration` adds to the held line `8022bec4e` came from. Every carried file is byte-identical to its source commit: no path was rewritten and no file was trimmed or dropped. That covers the carried files only; seven folders also hold one integration note each, added on this branch and listed under "Integration notes" below. The absolute `/Users/sid/...` paths and the large files inside these receipts are kept as committed; whether they may go to the public origin is an open question for Sid.
 
 ## P0-27: two receipts with the same folder name
 
 `codex/p0-27-current-qualification` (c89c5a6e6) and `codex/p0-27-node-runtime-compatibility` (add3b6f59) both wrote `qualification/2026-10-15-P0-27/`, 66 files each, 11 of them with the same path and different bytes. To keep both byte-identical:
 
 - `qualification/2026-10-15-P0-27/` is the copy from `codex/p0-27-current-qualification` at c89c5a6e6.
-- `qualification/2026-10-15-P0-27-node-runtime/` is the copy from `codex/p0-27-node-runtime-compatibility` at add3b6f59. Its files still name `qualification/2026-10-15-P0-27/` internally, because they are unchanged.
+- `qualification/2026-10-15-P0-27-node-runtime/` is the copy from `codex/p0-27-node-runtime-compatibility` at add3b6f59. Its files are unchanged and refer to the receipt only as P0-27 in prose.
 
 ## Map
 
@@ -15,21 +15,21 @@ This file is an index, not a receipt. It records where each qualification folder
 
 | Folder | Files | Source branch | Commit | Carried by |
 | --- | ---: | --- | --- | --- |
-| 2026-10-14-P0-22 | 44 | codex/p0-22-current-qualification | 00fd18043 | path checkout |
+| 2026-10-14-P0-22 | 44 + 1 integration note | codex/p0-22-current-qualification | 00fd18043 | path checkout |
 | 2026-10-14-P0-23 | 57 | codex/p0-23-current-qualification | 874e1131d | path checkout |
-| 2026-10-14-P0-29 | 45 | codex/p0-29-current-qualification | 8b8f480ce | path checkout (9923f7d30) |
+| 2026-10-14-P0-29 | 45 + 1 integration note | codex/p0-29-current-qualification | 8b8f480ce | path checkout (9923f7d30) |
 | 2026-10-14-P0-33 | 26 | codex/p0-33-current-qualification | 7d5d8335b | merge 94aaaf855 |
 | 2026-10-14-P0-47 | 89 | codex/p0-47-current-qualification | 13bb8f543 | path checkout |
 | 2026-10-14-P0-48 | 37 | codex/p0-48-current-qualification | 22bd7f35f | path checkout |
 | 2026-10-14-P0-49 | 14 | codex/p0-49-current-qualification | ab475ec81 | path checkout |
 | 2026-10-14-P0-50 | 35 | codex/p0-50-current-qualification | 941f5d243 | path checkout |
-| 2026-10-14-P0-51 | 55 | codex/p0-51-current-qualification | d11fcfc66 | path checkout |
+| 2026-10-14-P0-51 | 55 + 1 integration note | codex/p0-51-current-qualification | d11fcfc66 | path checkout |
 | 2026-10-15-P0-11 | 212 | codex/p0-11-current-qualification (in the leaves) | 33a8e20bf | leaf merges |
 | 2026-10-15-P0-18 | 63 | codex/p0-18-current-qualification | ba7726c79 | path checkout |
 | 2026-10-15-P0-19 | 85 | codex/p0-19-current-qualification | 6e50f7673 | path checkout |
 | 2026-10-15-P0-20 | 70 | codex/p0-20-current-qualification | e901e9816 | path checkout |
 | 2026-10-15-P0-21 | 260 | codex/p0-21-current-qualification (in the leaves) | 2024f25c7 | leaf merges |
-| 2026-10-15-P0-24 | 71 | codex/p0-24-current-qualification | dc1270271 | path checkout |
+| 2026-10-15-P0-24 | 71 + 1 integration note | codex/p0-24-current-qualification | dc1270271 | path checkout |
 | 2026-10-15-P0-25 | 57 | codex/p0-25-current-qualification (in the leaves) | f58d88d80 | leaf merges |
 | 2026-10-15-P0-27 | 66 | codex/p0-27-current-qualification | c89c5a6e6 | path checkout |
 | 2026-10-15-P0-27-node-runtime | 66 | codex/p0-27-node-runtime-compatibility, from its `2026-10-15-P0-27/` | add3b6f59 | renamed path checkout |
@@ -40,7 +40,7 @@ This file is an index, not a receipt. It records where each qualification folder
 | 2026-10-15-P0-52 | 48 | codex/p0-52-current-qualification | 06217dd2b | path checkout |
 | 2026-10-15-P0-54 | 43 | codex/p0-54-current-qualification | 4b6756224 | path checkout |
 | 2026-10-15-P1-01 | 198 | codex/p1-01-current-qualification (in the leaves) | 7293e9596 | leaf merges |
-| 2026-10-16-P1-04 | 4 | codex/p1-04-qualification (in the leaves) | 3a15c654d | leaf merges |
+| 2026-10-16-P1-04 | 4 + 1 integration note | codex/p1-04-qualification (in the leaves) | 3a15c654d | leaf merges |
 | 2026-10-16-P1-05 | 3 | codex/p1-05-qualification (in the leaves) | 94d71adc2 | leaf merges |
 | 2026-10-16-P1-07 | 319 | codex/p1-07-gate-qualification (in the leaves) | 4f53ff7e5 | leaf merges |
 | 2026-10-16-P1-10 | 3 | codex/p1-10-qualification 91c92891e, rewritten on the leaves | 25cd228fe | leaf merges |
@@ -49,10 +49,10 @@ This file is an index, not a receipt. It records where each qualification folder
 | 2026-10-16-P1-24 | 34 | codex/p1-24-qualification (in the leaves) | bce7bbbb2 | leaf merges |
 | 2026-10-16-P1-35 | 160 | codex/p1-35-legacy-qualification (in the leaves) | bf8836cd3 | leaf merges |
 | 2026-10-16-P1-37 | 49 | codex/p1-37-qualification (in the leaves) | 67c4fc34f | leaf merges |
-| 2026-10-16-P1-39 | 104 | codex/p1-39-mcp-qualification (in the leaves) | 721e60d75 | leaf merges |
+| 2026-10-16-P1-39 | 104 + 1 integration note | codex/p1-39-mcp-qualification (in the leaves) | 721e60d75 | leaf merges |
 | 2026-10-16-P2-07 | 74 | codex/p2-07-scim-handler-qualification (in the leaves) | 81758acea | leaf merges |
 | 2026-10-17-P0-09 | 3 | leaves only | 03be82012 | leaf merges |
-| 2026-10-17-P0-15 | 3 | leaves only | b2d5feb05 | leaf merges |
+| 2026-10-17-P0-15 | 3 + 1 integration note | leaves only | b2d5feb05 | leaf merges |
 | 2026-10-17-P0-42 | 3 | leaves only | 213ec0f4e | leaf merges |
 | 2026-10-17-P0-49 | 3 | leaves only (separate from 2026-10-14-P0-49) | 84f3ada9d | leaf merges |
 | 2026-10-17-P0-50 | 3 | leaves only (separate from 2026-10-14-P0-50) | b8b2d9958 | leaf merges |
@@ -62,6 +62,22 @@ This file is an index, not a receipt. It records where each qualification folder
 | 2026-10-17-P1-26 | 381 | codex/p1-26-tree-qualification (in the leaves) | e2cbdb909 | leaf merges |
 | 2026-10-17-P1-28 | 3 | codex/p1-28-qualification | 076e4c794 | leaf merges |
 | 2026-10-17-P1-54 | 3 | codex/p1-54-qualification (in the leaves) | 0c9f5beb8 | leaf merges |
+
+## Integration notes
+
+These seven files are not Codex's. Review commits on this branch added them to the carried folders; the Files column above counts them separately.
+
+| Note | Commit |
+| --- | --- |
+| `2026-10-14-P0-22/red-cases-held-out-of-root-suite.md` | 01a292c65 |
+| `2026-10-14-P0-29/red-case-held-out-of-root-suite.md` | 2670e315c |
+| `2026-10-14-P0-51/red-cases-held-out-of-root-suite.md` | 66372bc69 |
+| `2026-10-15-P0-24/red-case-held-out-of-root-suite.md` | 37b55040c |
+| `2026-10-16-P1-04/NOTE.md` | 6b8843fce |
+| `2026-10-16-P1-39/red-cases-held-out-of-root-suite.md` | f70425c12 |
+| `2026-10-17-P0-15/NOTE.md` | f8010107a |
+
+## Other folders
 
 Three more folders arrived with merge 94aaaf855 because `codex/p0-33-current-qualification` is based on session 7fccbbfa's int at 990cb586f. They are that session's receipts, not Codex's: 2026-10-12-P1-06 (11 files, 448d8b3ed), 2026-10-12-P1-27 (12 files, 9429437a7) and 2026-10-12-P1-48 (2 files, b4677a5fb).
 
