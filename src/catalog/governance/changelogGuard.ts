@@ -1,11 +1,17 @@
-/** Pure P1-34 structural guard. Declared review references never authenticate an approval. */
+/**
+ * Catalog changelog guard (P1-34): when the catalog digest changes, catalog/CHANGELOG.md gains exactly one appended
+ * entry naming the new catalog id, version and digest and every added, changed or retired control, with a reason and,
+ * for reviewed or qualified content, review record ids. History is append-only. Pure: the caller supplies both locks,
+ * both control snapshots and both texts (scripts/check-catalog-changelog.mjs reads them from git). Review ids are
+ * declared references here; verifyReviewRecord is what authenticates a review.
+ */
 import { z } from "zod";
 import { canonicalize } from "../../utils/json.js";
 import { controlDigest } from "../digest.js";
 import type { CatalogLockfile } from "../lockfile.js";
 import type { ControlRecord } from "../types.js";
 
-export type CatalogChangelogIssueCode =
+type CatalogChangelogIssueCode =
   | "GOV_CHANGELOG_INPUT_INVALID" | "GOV_CHANGELOG_TEXT_INVALID" | "GOV_CHANGELOG_HISTORY_CHANGED"
   | "GOV_CHANGELOG_LOCK_INVALID" | "GOV_CHANGELOG_LOCK_CONTROL_DUPLICATE"
   | "GOV_CHANGELOG_SNAPSHOT_INVALID" | "GOV_CHANGELOG_SNAPSHOT_DUPLICATE" | "GOV_CHANGELOG_SNAPSHOT_MISMATCH"
@@ -13,9 +19,9 @@ export type CatalogChangelogIssueCode =
   | "GOV_CHANGELOG_ENTRY_DUPLICATE" | "GOV_CHANGELOG_ENTRY_CONTROL_DUPLICATE" | "GOV_CHANGELOG_REVIEW_REF_DUPLICATE"
   | "GOV_CHANGELOG_REMOVAL_UNRESOLVED" | "GOV_CHANGELOG_DIGEST_CONFLICT"
   | "GOV_CHANGELOG_ENTRY_COUNT" | "GOV_CHANGELOG_CATALOG_MISMATCH" | "GOV_CHANGELOG_CONTROL_COVERAGE"
-  | "GOV_CHANGELOG_CONTROL_VERSION_MISMATCH" | "GOV_CHANGELOG_CONTROL_CHANGE_MISMATCH";
+  | "GOV_CHANGELOG_CONTROL_VERSION_MISMATCH" | "GOV_CHANGELOG_CONTROL_CHANGE_MISMATCH" | "GOV_CHANGELOG_REVIEW_REFS_MISSING";
 
-export interface CatalogChangelogIssue {
+interface CatalogChangelogIssue {
   code: CatalogChangelogIssueCode;
   side?: "previous" | "current";
 }
@@ -23,6 +29,8 @@ export interface CatalogChangelogResult {
   /** Structural append-only/change coverage only, never approval or full lock verification. */
   ok: boolean;
   issues: CatalogChangelogIssue[];
+  /** The entry the bound locks call for (reasons and review ids aside), once both locks and snapshots bind. */
+  expected?: { catalog: CatalogChangeEntry["catalog"]; controls: Array<Pick<CatalogChangeEntry["controls"][number], "id" | "version" | "change">> };
 }
 export interface CatalogChangelogInput {
   previousLock: CatalogLockfile;
@@ -46,7 +54,7 @@ const entrySchema = z.strictObject({
   catalog: catalogSchema,
   controls: z.array(z.strictObject({
     id: controlId, version: text, change: z.enum(["added", "changed", "retired"]),
-    reason: text, reviewRecordIds: z.array(text).min(1)
+    reason: text, reviewRecordIds: z.array(text)
   }))
 });
 export type CatalogChangeEntry = z.infer<typeof entrySchema>;
@@ -165,19 +173,26 @@ export function checkCatalogChangelog(input: CatalogChangelogInput): CatalogChan
     }
   }
 
+  const delta = { catalog: current.data.catalog, controls: [...expected].map(([id, e]) => ({ id, ...e })) };
+  const done = (code?: CatalogChangelogIssueCode): CatalogChangelogResult => ({ ...(code ? fail(code) : { ok: true, issues: [] }), expected: delta });
   const changed = previous.data.catalog.digest !== current.data.catalog.digest;
   if (!changed && (expected.size > 0 || previous.data.catalog.id !== current.data.catalog.id
-    || previous.data.catalog.version !== current.data.catalog.version)) return fail("GOV_CHANGELOG_DIGEST_CONFLICT");
-  if (appended.length > 1 || (changed && appended.length !== 1)) return fail("GOV_CHANGELOG_ENTRY_COUNT");
-  if (appended.length === 0) return { ok: true, issues: [] };
+    || previous.data.catalog.version !== current.data.catalog.version)) return done("GOV_CHANGELOG_DIGEST_CONFLICT");
+  if (appended.length > 1 || (changed && appended.length !== 1)) return done("GOV_CHANGELOG_ENTRY_COUNT");
+  if (appended.length === 0) return done();
   const entry = appended[0]!.entry; // Only after count and duplicate validation.
-  if (canonicalize(entry.catalog) !== canonicalize(current.data.catalog)) return fail("GOV_CHANGELOG_CATALOG_MISMATCH");
-  if (entry.controls.length !== expected.size) return fail("GOV_CHANGELOG_CONTROL_COVERAGE");
+  if (canonicalize(entry.catalog) !== canonicalize(current.data.catalog)) return done("GOV_CHANGELOG_CATALOG_MISMATCH");
+  if (entry.controls.length !== expected.size) return done("GOV_CHANGELOG_CONTROL_COVERAGE");
+  const stronger = (record: ControlRecord | undefined) => record?.support === "reviewed" || record?.support === "qualified";
   for (const control of entry.controls) {
     const actual = expected.get(control.id);
-    if (!actual) return fail("GOV_CHANGELOG_CONTROL_COVERAGE");
-    if (control.version !== actual.version) return fail("GOV_CHANGELOG_CONTROL_VERSION_MISMATCH");
-    if (control.change !== actual.change) return fail("GOV_CHANGELOG_CONTROL_CHANGE_MISMATCH");
+    if (!actual) return done("GOV_CHANGELOG_CONTROL_COVERAGE");
+    if (control.version !== actual.version) return done("GOV_CHANGELOG_CONTROL_VERSION_MISMATCH");
+    if (control.change !== actual.change) return done("GOV_CHANGELOG_CONTROL_CHANGE_MISMATCH");
+    // Experimental content changes without review; reviewed or qualified content (before or after) names its reviews.
+    if (control.reviewRecordIds.length === 0 && (stronger(before.get(control.id)) || stronger(after.get(control.id)))) {
+      return done("GOV_CHANGELOG_REVIEW_REFS_MISSING");
+    }
   }
-  return { ok: true, issues: [] };
+  return done();
 }
