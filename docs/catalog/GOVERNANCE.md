@@ -30,10 +30,15 @@ operator pinned for `catalog-review`, and a record declaring any other identity 
 ## The two-person rule
 
 `reviewed` support needs verified approvals from at least two distinct pinned reviewers, one of them credentialed for
-one of the subject's domains (stations). A citation also needs an approval from a credentialed legal reviewer. Content an AI
-drafted needs a human approval that names the draft in its `aiInputs` (kind `draft`, confirmed). Any verified objection
-(`reject` or `request_changes`) blocks the quorum until it is resolved by new records. `meetsReviewQuorum(subject,
-records, ctx)` encodes this; P1-33 calls it for admission criteria 2 and 9.
+one of the control's domains (stations). A control that cites law also needs an approval from a credentialed legal
+reviewer. Content an AI drafted needs a human approval that names the draft in its `aiInputs` (kind `draft`,
+confirmed). Any verified objection (`reject` or `request_changes`) blocks the quorum until new records resolve it.
+
+`effectiveSupport(control, authority)` (src/catalog/governance/support.ts) is the only function that lets a control's
+support stand above `experimental`; P1-33 calls it for admission criteria 2 and 9. `compilePlan`, activation and its
+policy receipts, the A4 conformance and why-view rows, the OSCAL export and `check:catalog-currency` read a control's
+support and shown review status only through its result, and a test scans the source for any other read. It never
+raises support above what the YAML declares.
 
 "Credentialed" means listed in the D-08 expert roster for that domain (or for `legal`), keyed by the reviewer's
 trust-list subject. The roster is an input to the quorum check, not a field a record can declare. Until D-08 supplies
@@ -65,23 +70,27 @@ data, not catalog content: they never change a digest. The format (`reviewRecord
 | `decidedAt`, `nextReviewDue` | `YYYY-MM-DD`. `decidedAt` is the signing time the record claims. |
 | `signature` | `{ publicKeyPem, value }`: Ed25519 over sha256 of `amc.catalog-review/v1`, a zero byte and the canonical record without `signature`. |
 
-A record is a declaration until `verifyReviewRecord(record, ctx)` checks it against the operator's trust
-(`loadTrustContext`, read with the server's clock). It is valid only when:
+A record is a declaration. effectiveSupport loads the operator's trust itself (`loadTrustContext`: the AMC home's
+signed trust lists, verified against the pinned roots with the operator's m-of-n policy and anti-rollback, plus
+distrust, at the authority's clock, which is the server's); a list that does not verify stops everything
+(`GOV_REVIEW_TRUST_INVALID`). A record counts only when, in order:
 
-1. it parses (human identity, non-blank credential and conflicts);
-2. its signature verifies under the key it names, and a signed trust list pins that key for `catalog-review` at the
-   verification time (the operator's m-of-n root policy applies to the list). A `--pubkey` pin, workspace keys,
-   `--allow-unpinned`, another purpose, a revoked or distrusted key, or a `decidedAt` after the verification time or
-   before the key's validity admits nothing;
-3. `reviewer.identity.userId` equals that trust-list entry's `subject`: the reviewer comes from the signature, never
-   from a field;
-4. the reviewer authored neither the subject nor the change;
-5. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record.
+1. it parses (human identity, non-blank credential and conflicts, a signature) (`GOV_REVIEW_RECORD_INVALID`);
+2. its subject is this control at its version and current content digest; a review of older content counts for nothing
+   (`GOV_REVIEW_SUBJECT_CHANGED`), and records for other subjects are ignored;
+3. its `decidedAt` is not after the clock (`GOV_REVIEW_IN_FUTURE`);
+4. its signature verifies under the key it names (`GOV_REVIEW_SIGNATURE_INVALID`), and a signed trust-list entry pins
+   that key for `catalog-review` at the clock: a `--pubkey` pin, workspace keys, `--allow-unpinned`, another purpose, a
+   revoked, distrusted or expired key, or a `decidedAt` before the key's validity admits nothing
+   (`GOV_REVIEW_SIGNER_UNPINNED`);
+5. `reviewer.identity.userId` equals that entry's `subject`: the reviewer principal comes from the key, never from a
+   field (`GOV_REVIEW_REVIEWER_UNKNOWN`);
+6. that principal (its name or email) is not one of the control's authors (`GOV_REVIEW_SELF_REVIEW`);
+7. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record
+   (`GOV_REVIEW_F5_UNCONFIRMED`);
+8. its next review, counted from its `decidedAt`, has not passed (`GOV_REVIEW_OVERDUE`).
 
-Anything else is `unverified` (`GOV_REVIEW_SIGNATURE_INVALID`, `GOV_REVIEW_SIGNER_UNPINNED`,
-`GOV_REVIEW_REVIEWER_UNKNOWN`, `GOV_REVIEW_SELF_REVIEW`, `GOV_REVIEW_F5_UNCONFIRMED`, `GOV_REVIEW_RECORD_INVALID`) and
-moves nothing. A valid record whose subject digest has moved since is `expired`: any edit to the subject needs a new
-review.
+A record that fails moves nothing; effectiveSupport lists it with its reason.
 
 ### How to record a decision
 
@@ -99,15 +108,15 @@ There is no review UI or signing command yet (P2-22).
 
 ## Currency reviews
 
-Every reviewed control has a next review date (`nextReviewDue(subject, register)`), counted from its recorded
-`review.reviewedAt`:
+A verified review falls due (`nextReviewDue(control, register, decidedAt)`) counted from its own signed `decidedAt`,
+never from the control's YAML review fields; a promotion's next review is the earliest of its approvals':
 
 - **Monthly (30 days)** when any citation is a US state's (jurisdiction starting `US-`), is EU guidance (its S5 register
   entry is EU with `bindingForce: voluntary`; an EU citation with no register entry counts too, since nothing shows it
   is binding), or is an Indian draft (jurisdiction `IN`, `statusType: draft`). This is where the law is moving.
 - **Quarterly (90 days)** otherwise, which equals the S5 register's `policy.reviewWindowDays`; a shorter window wins.
-- **Never later** than any cited S5 register entry's own next review (`lastReviewed + reviewWindowDays`) or an earlier
-  `review.nextReview` the record carries.
+- **Never later** than any cited S5 register entry's own next review (`lastReviewed + reviewWindowDays`). Anything that
+  cannot be established (an unknown register entry, an unusable window) leaves the review uncounted, never a default.
 
 Monthly review of every US state citation is real expert load; budget expert hours for it.
 
@@ -117,17 +126,17 @@ Monthly review of every US state citation is real expert load; budget expert hou
 
 | Code | Severity | When |
 |---|---|---|
-| `GOV_REVIEW_DUE_SOON` | warning | The next review is within 14 days (the due day included). |
-| `GOV_REVIEW_OVERDUE` | error for reviewed and qualified, warning otherwise | The next review has passed. |
-| `GOV_REVIEW_STALE` | error for reviewed and qualified, warning for any other recorded review | The review date is missing, unparsable or in the future, or the next review cannot be scheduled (an unknown register entry). Stale is never current. |
-| `GOV_REVIEW_UNVERIFIED` | error | Reviewed or qualified content without a valid quorum of review records signed by pinned reviewers. |
+| `GOV_REVIEW_DUE_SOON` | warning | Support stands and the next review is within 14 days (the due day included). |
+| `GOV_REVIEW_OVERDUE` | error | Declared reviewed or qualified support does not stand because a review lapsed. |
+| `GOV_REVIEW_UNVERIFIED` | error, or warning | Declared reviewed or qualified support does not stand (no valid quorum of pinned reviewers); as a warning, the YAML declares an approved review no verified record supports. |
+| `GOV_REVIEW_TRUST_INVALID` | error | The operator's trust lists do not verify, so no review can count. |
 | `GOV_REVERIFY_OPEN` | error | Reviewed or qualified content cites an instrument an open re-verify item affects. |
 | `GOV_REGISTER_STATUS_REVIEW` | warning | A register entry's stated status should have changed by now (P1-18). |
 
-Currency only ever makes support stricter, and its clock is the server's date, never a record field. Expiry routes
-content to review and never rewrites anything. A compilation (`compilePlan`) treats reviewed or qualified content as
-`experimental` in that plan's requirement row, with the reason, when its review is overdue or stale or when it has no
-verified quorum (no caller passes review authority yet, so today every row is experimental). The YAML is not
+Currency only ever makes support stricter, and its clock is the server's (`--as-of` may only look ahead). Expiry
+routes content to review and never rewrites anything. A compilation (`compilePlan`) takes each row's support from
+effectiveSupport, so reviewed or qualified content is `experimental` in that plan, with the reason, whenever its
+support does not stand (no caller passes review authority yet, so today every row is experimental). The YAML is not
 edited, and the control's digest, the lock and every stored `ControlResult` (which pin `controlVersion` and
 `controlDigest`) stay byte-identical.
 
@@ -158,7 +167,7 @@ as `canonicalize` writes it):
 
 The guard's codes (`GOV_CHANGELOG_*`) name the first failure: history changed, a malformed block or entry, a missing or
 extra entry, a catalog or control mismatch, missing review ids or an unresolved removal. Review ids in an entry are
-references; the records behind them are what `verifyReviewRecord` checks.
+references; the records behind them are what effectiveSupport checks.
 
 ## F5 verdicts
 
@@ -186,7 +195,7 @@ ISO and CEN clauses by number and never reproduces their text (P1-09 enforces).
 
 - D-08: no expert is named, so there is no roster, no review record and no reviewed content.
 - Sid approves this document and the cadence.
-- P1-33 wires `meetsReviewQuorum` into admission; P2-22 adds a review UI.
+- P1-33 wires `effectiveSupport` into admission and passes review authority to compilation; P2-22 adds a review UI.
 - The re-verify items, F5 confirmations and standards costs need people, not code.
 
 Initial implementation by Codex (currency, changelog guard and review-record schema slices); completed and reconciled
