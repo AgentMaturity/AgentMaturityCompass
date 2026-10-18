@@ -9,7 +9,7 @@ import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { amcVersion } from "../../version.js";
 import { digestOf } from "../digest.js";
-import { evaluateReviewCurrency } from "../governance/currency.js";
+import { effectiveSupport } from "../governance/support.js";
 import { buildCatalogLock } from "../lockfile.js";
 import { FACT_NAMES } from "../schema.js";
 import type { FactName } from "../types.js";
@@ -65,15 +65,15 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   checkParameters(cat);
   checkExceptions(profile, cat);
   const { requirements, retired } = decideApplicability(profile, cat, asOfMs);
-  // P1-34: overdue or unschedulable reviewed content compiles as experimental. Only this plan's copy changes; the record,
-  // its digest (so the lock and past results) and the YAML stay as they are.
+  // P1-34: reviewed or qualified support stands only with a current review and a verified quorum of pinned reviewers;
+  // otherwise this plan's row is experimental. The record, its digest (so the lock and past results) and the YAML stay.
   for (const r of requirements) {
     const control = cat.controls.get(r.controlId);
-    if (!control || (control.support !== "reviewed" && control.support !== "qualified")) continue;
-    const currency = evaluateReviewCurrency(control, REGULATORY_REGISTER, new Date(asOfMs).toISOString().slice(0, 10));
-    if (currency.support === r.support) continue;
-    r.support = currency.support;
-    r.reasons.push(`${currency.reasons.join(", ")}: review ${currency.nextReviewDue ? `was due ${currency.nextReviewDue}` : "cannot be scheduled"}; compiled as ${currency.support} until re-reviewed`);
+    if (!control) continue;
+    const effective = effectiveSupport(control, REGULATORY_REGISTER, new Date(asOfMs).toISOString().slice(0, 10), input.reviewAuthority);
+    if (effective.support === r.support) continue;
+    r.support = effective.support;
+    r.reasons.push(`${effective.reasons.join(", ")}: compiled as ${effective.support} until a current, verified review (docs/catalog/GOVERNANCE.md)`);
   }
   const candidates = requirements.filter((r) => r.applicability !== "not_applicable").flatMap((r) => cat.controls.get(r.controlId) ?? []);
   const scope = profile.primaryStation.value !== null && profile.stations.value !== null

@@ -1,18 +1,20 @@
 /**
- * Catalog review records (P1-34), stored as catalog/reviews/<subject-id>/<version>/<record-id>.json. A record is a
- * declaration; it counts only through verifyReviewRecord, which binds it to a signed approval-engine decision by the
- * same user over the subject digest. Those signatures use the workspace's keys: a local audit trail, not portable trust.
- * A verified record proves who approved what and when, never that the content is right.
+ * Catalog review records (P1-34), stored as catalog/reviews/<subject-id>/<version>/<record-id>.json. A record counts
+ * only when its reviewer signed it with a key a signed trust list pins for `catalog-review` (m-of-n roots where the
+ * operator configured them). The reviewer is that trust-list entry's subject, never a field of the record; a record that
+ * names anyone else, an unpinned or forged signature, or a self-review moves nothing. A verified record proves who
+ * approved what and when, never that the content is right.
  */
 import { z } from "zod";
-import {
-  approvalRequestBindingDigest, inspectApprovalChainIntegrity, listApprovalDecisions, loadApprovalRequestRecord
-} from "../../approvals/approvalChainStore.js";
+import { signHexDigest, verifyHexDigest } from "../../crypto/keys.js";
+import { checkSignature } from "../../trust/signatureCheck.js";
+import type { TrustContext } from "../../trust/trustContext.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 
 const nonblank = z.string().regex(/\S/, "must contain a non-whitespace character");
 const isoDate = z.iso.date();
+const DOMAIN = "amc.catalog-review/v1";
 
 const reviewRecordSchema = z.strictObject({
   recordVersion: z.literal(1),
@@ -29,7 +31,7 @@ const reviewRecordSchema = z.strictObject({
     credential: nonblank,
     affiliation: z.string(),
     conflictsDeclared: nonblank,
-    // AI agents draft and refute; they never approve (truth rule 8).
+    // AI agents draft and refute; they never approve (truth rule 8). userId must equal the signing key's trust-list subject.
     identity: z.strictObject({ userId: z.string(), kind: z.literal("human") })
   }),
   decision: z.enum(["approve", "reject", "request_changes"]),
@@ -42,7 +44,8 @@ const reviewRecordSchema = z.strictObject({
   notes: z.string(),
   decidedAt: isoDate,
   nextReviewDue: isoDate,
-  approvalRequestId: z.string()
+  /** Ed25519 over sha256(DOMAIN, 0x00, canonical record without `signature`). The key only names a candidate signer. */
+  signature: z.strictObject({ publicKeyPem: z.string().min(1), value: z.string().min(1) })
 });
 export type ReviewRecord = z.infer<typeof reviewRecordSchema>;
 
@@ -56,25 +59,21 @@ export const f5ConfirmationsFileSchema = z.strictObject({
 });
 export type F5Confirmation = z.infer<typeof f5ConfirmationsFileSchema>["confirmations"][number];
 
-const CATALOG_REVIEW_TOOL = "catalog.review.decide";
+const recordDigest = (unsigned: Omit<ReviewRecord, "signature">): string =>
+  sha256Hex(Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(unsigned), "utf8")]));
 
-/** The approval intent a review decision is bound to: its hash covers the subject digest. */
-export function catalogReviewIntent({ kind, id, version, digest }: ReviewRecord["subject"]) {
-  const subject = { kind, id, version, digest };
-  const intentPayload = { schema: "amc.catalog-review/v1", subject };
-  return { intentId: `catalog-review-${sha256Hex(canonicalize(subject)).slice(0, 32)}`, toolName: CATALOG_REVIEW_TOOL,
-    actionClass: "SECURITY" as const, intentPayload };
+/** What a reviewer runs with their own key; AMC never holds it (getSigningKey refuses `catalog-review`). */
+export function signReviewRecord(unsigned: Omit<ReviewRecord, "signature">, key: { privateKeyPem: string; publicKeyPem: string }): ReviewRecord {
+  return { ...unsigned, signature: { publicKeyPem: key.publicKeyPem, value: signHexDigest(recordDigest(unsigned), key.privateKeyPem) } };
 }
 
-type ReviewReason = "GOV_REVIEW_RECORD_INVALID" | "GOV_REVIEW_SELF_REVIEW" | "GOV_REVIEW_F5_UNCONFIRMED"
-  | "GOV_REVIEW_APPROVAL_UNVERIFIED" | "GOV_REVIEW_APPROVAL_UNBOUND" | "GOV_REVIEW_DECISION_MISSING"
-  | "GOV_REVIEW_DECISION_UNBOUND" | "GOV_REVIEW_DECISION_MISMATCH" | "GOV_REVIEW_AGENT_IDENTITY" | "GOV_REVIEW_SUBJECT_CHANGED";
+type ReviewReason = "GOV_REVIEW_RECORD_INVALID" | "GOV_REVIEW_SIGNATURE_INVALID" | "GOV_REVIEW_SIGNER_UNPINNED"
+  | "GOV_REVIEW_REVIEWER_UNKNOWN" | "GOV_REVIEW_SELF_REVIEW" | "GOV_REVIEW_F5_UNCONFIRMED" | "GOV_REVIEW_SUBJECT_CHANGED";
 
 export interface ReviewContext {
-  /** The workspace whose signed approval chain holds the decisions, and the agent id the requests were filed under. */
-  workspace: string;
-  agentId: string;
-  /** The subject's digest now. A record bound to any other digest is expired. */
+  /** The operator's trust (loadTrustContext, server clock): only its signed lists can pin a reviewer key. */
+  trust: TrustContext;
+  /** The subject's digest now. A record over any other digest is expired. */
   currentDigest: string;
   /** Who authored the subject and the change under review (git authors, names or emails); none may review it. */
   authors: readonly string[];
@@ -82,55 +81,52 @@ export interface ReviewContext {
 }
 
 export interface ReviewVerification {
-  status: "valid" | "expired" | "refused";
+  /** Only "valid" counts; "unverified" and "expired" records move nothing. */
+  status: "valid" | "expired" | "unverified";
   reason: ReviewReason | null;
   record: ReviewRecord | null;
+  /** The signing key's trust-list subject: the reviewer, when the signature is pinned. */
+  reviewer: string | null;
 }
 
 const norm = (value: string): string => value.trim().toLowerCase();
 
-/** The signed decision this record stands on, or the reason there is none. Errors reading the chain are integrity failures. */
-function boundDecision(record: ReviewRecord, ctx: ReviewContext): ReviewReason | null {
-  const { workspace, agentId } = ctx;
-  const approvalRequestId = record.approvalRequestId;
-  try {
-    const request = loadApprovalRequestRecord({ workspace, agentId, approvalRequestId, requireValidSignature: true });
-    if (!inspectApprovalChainIntegrity({ workspace, agentId, approvalRequestId }).valid) return "GOV_REVIEW_APPROVAL_UNVERIFIED";
-    const intent = catalogReviewIntent(record.subject);
-    if (request.intentId !== intent.intentId || request.toolName !== intent.toolName
-      || request.boundHashes.intentHash !== sha256Hex(canonicalize(intent.intentPayload))) return "GOV_REVIEW_APPROVAL_UNBOUND";
-    const mine = listApprovalDecisions({ workspace, agentId, approvalRequestId }).filter((d) => d.userId === record.reviewer.identity.userId);
-    if (mine.length === 0) return "GOV_REVIEW_DECISION_MISSING";
-    if (mine.some((d) => d.roles.includes("AGENT"))) return "GOV_REVIEW_AGENT_IDENTITY";
-    if (mine.some((d) => d.requestDigestSha256 !== approvalRequestBindingDigest(request))) return "GOV_REVIEW_DECISION_UNBOUND";
-    const approved = record.decision === "approve";
-    if (mine.some((d) => (d.decision !== "DENY") !== approved)) return "GOV_REVIEW_DECISION_MISMATCH";
-    return null;
-  } catch {
-    return "GOV_REVIEW_APPROVAL_UNVERIFIED";
-  }
+/** The trust-list subject of the key that signed `record`, or the reason no pinned reviewer signed it. */
+function signer(record: ReviewRecord, trust: TrustContext): { reviewer: string } | { reason: ReviewReason } {
+  const { signature, ...unsigned } = record;
+  const digest = recordDigest(unsigned);
+  const check = checkSignature({ signature: "catalog review record", purpose: "catalog-review", context: trust,
+    verify: (pem) => verifyHexDigest(digest, signature.value, pem), candidates: [signature.publicKeyPem], claimedSignedAt: record.decidedAt });
+  if (!check.verified) return { reason: "GOV_REVIEW_SIGNATURE_INVALID" };
+  // Only a signed trust list's entry pins reviewer authority: an admission through --pubkey, workspace-self keys or
+  // --allow-unpinned has no entry, and a wrong-purpose, revoked or not-yet-valid entry is not admitted.
+  const { status, listId, keyId } = check.admission;
+  const entry = status === "admitted" ? trust.lists.find((l) => l.listId === listId)?.entries.find((e) => e.keyId === keyId) : undefined;
+  return entry ? { reviewer: entry.subject } : { reason: "GOV_REVIEW_SIGNER_UNPINNED" };
 }
 
 /**
- * Valid when the record parses (human identity, non-blank credential and conflicts), its reviewer authored neither the
- * subject nor the change, every confirmed F5 verdict has a confirmation row naming it, and the reviewer's own signed,
- * request-bound decision on a request whose intent hash covers the record's subject agrees with it. Expired when the
- * subject's digest has moved since. The first failure is the reason.
+ * Valid when the record parses (human identity, non-blank credential and conflicts), a key pinned for catalog-review
+ * signed exactly these bytes, the record names that key's trust-list subject as its reviewer, the reviewer authored
+ * neither the subject nor the change, and every confirmed F5 verdict has a confirmation row naming the record. Expired
+ * when the subject's digest has moved since. The first failure is the reason.
  */
 export function verifyReviewRecord(raw: unknown, ctx: ReviewContext): ReviewVerification {
   const parsed = reviewRecordSchema.safeParse(raw);
-  if (!parsed.success) return { status: "refused", reason: "GOV_REVIEW_RECORD_INVALID", record: null };
+  if (!parsed.success) return { status: "unverified", reason: "GOV_REVIEW_RECORD_INVALID", record: null, reviewer: null };
   const record = parsed.data;
-  const refuse = (reason: ReviewReason): ReviewVerification => ({ status: "refused", reason, record });
+  const signed = signer(record, ctx.trust);
+  if ("reason" in signed) return { status: "unverified", reason: signed.reason, record, reviewer: null };
+  const { reviewer } = signed;
+  const refuse = (reason: ReviewReason): ReviewVerification => ({ status: "unverified", reason, record, reviewer });
+  if (record.reviewer.identity.userId !== reviewer) return refuse("GOV_REVIEW_REVIEWER_UNKNOWN");
   const authors = new Set(ctx.authors.map(norm));
-  if (authors.has(norm(record.reviewer.identity.userId)) || authors.has(norm(record.reviewer.name))) return refuse("GOV_REVIEW_SELF_REVIEW");
+  if (authors.has(norm(reviewer)) || authors.has(norm(record.reviewer.name))) return refuse("GOV_REVIEW_SELF_REVIEW");
   const confirmedF5 = record.aiInputs.filter((a) => a.kind === "f5_verdict" && a.confirmed);
   if (confirmedF5.some((a) => !ctx.f5Confirmations.some((row) => row.reviewRecordId === record.id
     && a.ref === `${row.station}/${row.packId}/${row.questionId}`))) return refuse("GOV_REVIEW_F5_UNCONFIRMED");
-  const decision = boundDecision(record, ctx);
-  if (decision) return refuse(decision);
-  if (record.subject.digest !== ctx.currentDigest) return { status: "expired", reason: "GOV_REVIEW_SUBJECT_CHANGED", record };
-  return { status: "valid", reason: null, record };
+  if (record.subject.digest !== ctx.currentDigest) return { status: "expired", reason: "GOV_REVIEW_SUBJECT_CHANGED", record, reviewer };
+  return { status: "valid", reason: null, record, reviewer };
 }
 
 export interface ReviewSubject extends Readonly<ReviewRecord["subject"]> {
@@ -142,8 +138,8 @@ export interface ReviewSubject extends Readonly<ReviewRecord["subject"]> {
 
 export interface QuorumContext extends Omit<ReviewContext, "currentDigest"> {
   /**
-   * The D-08 expert roster: user id to credentialed domains ("legal" for legal review). Empty until D-08 names the
-   * experts, so no quorum can be met before then. A declared record field never stands in for it.
+   * The D-08 expert roster: reviewer (trust-list subject) to credentialed domains ("legal" for legal review). Empty
+   * until D-08 names the experts, so no quorum can be met before then. A record field never stands in for it.
    */
   experts: ReadonlyMap<string, readonly string[]>;
 }
@@ -152,22 +148,23 @@ export type QuorumReason = "GOV_QUORUM_TWO_HUMANS" | "GOV_QUORUM_DOMAIN_EXPERT" 
   | "GOV_QUORUM_AI_DRAFT" | "GOV_QUORUM_OBJECTION";
 
 /**
- * Whether `reviewed` support has its quorum (P1-33 criteria 2 and 9 call this): verified approvals from at least two
- * distinct humans, one credentialed for the subject's domain; a citation also needs a credentialed legal reviewer;
- * AI-drafted content needs an approval confirming the draft; any verified objection blocks. Records are verified here.
+ * Whether `reviewed` support has its quorum (P1-33 criteria 2 and 9 call this): valid approvals from at least two
+ * distinct pinned reviewers, one credentialed for the subject's domain; a citation also needs a credentialed legal
+ * reviewer; AI-drafted content needs an approval confirming the draft; any valid objection blocks. Records are verified
+ * here, so unverified or expired ones never count.
  */
 export function meetsReviewQuorum(subject: ReviewSubject, records: readonly unknown[], ctx: QuorumContext): { met: boolean; reasons: QuorumReason[]; approvers: string[] } {
-  const verified = records.map((raw) => verifyReviewRecord(raw, { ...ctx, currentDigest: subject.digest }))
-    .flatMap(({ status, record: r }) => (status === "valid" && r && r.subject.kind === subject.kind && r.subject.id === subject.id
-      && r.subject.version === subject.version ? [r] : []));
-  const approvals = verified.filter((r) => r.decision === "approve");
-  const credentialed = (r: ReviewRecord, domains: readonly string[]) => (ctx.experts.get(r.reviewer.identity.userId) ?? []).some((d) => domains.includes(d));
-  const approvers = [...new Set(approvals.map((r) => r.reviewer.identity.userId))];
+  const valid = records.map((raw) => verifyReviewRecord(raw, { ...ctx, currentDigest: subject.digest }))
+    .flatMap(({ status, record: r, reviewer }) => (status === "valid" && r && reviewer && r.subject.kind === subject.kind && r.subject.id === subject.id
+      && r.subject.version === subject.version ? [{ r, reviewer }] : []));
+  const approvals = valid.filter(({ r }) => r.decision === "approve");
+  const credentialed = (reviewer: string, domains: readonly string[]) => (ctx.experts.get(reviewer) ?? []).some((d) => domains.includes(d));
+  const approvers = [...new Set(approvals.map(({ reviewer }) => reviewer))];
   const reasons: QuorumReason[] = [];
   if (approvers.length < 2) reasons.push("GOV_QUORUM_TWO_HUMANS");
-  if (!approvals.some((r) => credentialed(r, subject.domains))) reasons.push("GOV_QUORUM_DOMAIN_EXPERT");
-  if (subject.kind === "citation" && !approvals.some((r) => r.role === "legal_reviewer" && credentialed(r, ["legal"]))) reasons.push("GOV_QUORUM_LEGAL_REVIEWER");
-  if (subject.aiDrafted && !approvals.some((r) => r.aiInputs.some((a) => a.kind === "draft" && a.confirmed))) reasons.push("GOV_QUORUM_AI_DRAFT");
-  if (verified.some((r) => r.decision !== "approve")) reasons.push("GOV_QUORUM_OBJECTION");
+  if (!approvals.some(({ reviewer }) => credentialed(reviewer, subject.domains))) reasons.push("GOV_QUORUM_DOMAIN_EXPERT");
+  if (subject.kind === "citation" && !approvals.some(({ r, reviewer }) => r.role === "legal_reviewer" && credentialed(reviewer, ["legal"]))) reasons.push("GOV_QUORUM_LEGAL_REVIEWER");
+  if (subject.aiDrafted && !approvals.some(({ r }) => r.aiInputs.some((a) => a.kind === "draft" && a.confirmed))) reasons.push("GOV_QUORUM_AI_DRAFT");
+  if (valid.some(({ r }) => r.decision !== "approve")) reasons.push("GOV_QUORUM_OBJECTION");
   return { met: reasons.length === 0, reasons, approvers };
 }

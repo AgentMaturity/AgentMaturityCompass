@@ -52,7 +52,7 @@ describe("GOV_REVERIFY_OPEN (P1-34 step 10)", () => {
     const reviewed = new Map(catalog.controls).set(wealth.id, asReviewed(wealth));
     const errors = catalogCurrencyFindings({ ...catalog, controls: reviewed }, REGULATORY_REGISTER, governance.reverify, "2026-10-18")
       .filter((f) => f.severity === "error");
-    expect(errors.map((f) => [f.code, f.controlId])).toEqual([["GOV_REVERIFY_OPEN", wealth.id]]);
+    expect(errors.map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_UNVERIFIED", wealth.id], ["GOV_REVERIFY_OPEN", wealth.id]]);
     expect(catalogCurrencyFindings(catalog, REGULATORY_REGISTER, governance.reverify, "2026-10-18").filter((f) => f.severity === "error")).toEqual([]);
   });
 
@@ -61,5 +61,14 @@ describe("GOV_REVERIFY_OPEN (P1-34 step 10)", () => {
     const findings = catalogCurrencyFindings({ ...catalog, controls: new Map(catalog.controls).set(control.id, control) }, REGULATORY_REGISTER, [], "2027-01-15");
     expect(findings.filter((f) => f.severity === "error").map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_OVERDUE", control.id]]);
     expect(findings.some((f) => f.code === "GOV_REGISTER_STATUS_REVIEW" && f.severity === "warning")).toBe(true);
+  });
+
+  it("a stale recorded review is never hidden: an error for reviewed content, a warning for experimental content", () => {
+    const stale = { ...catalog.controls.get("L0-ADV-01")!, review: { status: "approved" as const, expert: "x", credential: "x", reviewedAt: "2027-03-01", nextReview: null } };
+    const run = (control: ControlRecord) => catalogCurrencyFindings({ ...catalog, controls: new Map([[control.id, control]]) }, REGULATORY_REGISTER, [], "2026-12-01")
+      .filter((f) => f.controlId === control.id).map((f) => [f.code, f.severity]);
+    expect(run(stale)).toEqual([["GOV_REVIEW_STALE", "warning"]]);
+    expect(run({ ...stale, support: "reviewed" })).toEqual([["GOV_REVIEW_STALE", "error"]]);
+    expect(run(catalog.controls.get("L0-ADV-01")!)).toEqual([]);
   });
 });

@@ -9,6 +9,7 @@ import { validateStationScope } from "../../domains/stations.js";
 import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSION } from "../../domains/operatingProfiles/operatingProfileTypes.js";
 import type { ActionClass } from "../../types.js";
 import type { TrustContext } from "../../trust/trustContext.js";
+import type { ReviewAuthority } from "../governance/support.js";
 import type { CatalogLockfile } from "../lockfile.js";
 import type { LoadedCatalog } from "../loader.js";
 import { STATIONS } from "../schema.js";
@@ -97,6 +98,8 @@ export interface CompileInput {
   profile: DeploymentProfile; catalog: LoadedCatalog; asOf: string;
   /** Operator-loaded pins at asOf, never a trust list supplied by the profile. Missing pins reject exceptions. */
   mergeExceptionTrust?: TrustContext;
+  /** P1-34: verified review records that let reviewed or qualified support stand; without them it compiles experimental. */
+  reviewAuthority?: ReviewAuthority;
 }
 
 export type Applicability = "applicable" | "not_applicable" | "unresolved";

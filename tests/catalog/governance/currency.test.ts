@@ -3,7 +3,7 @@
  * next review. Overdue reviewed content compiles as experimental in memory; the YAML, the control digest and stored
  * results are untouched.
  */
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -11,6 +11,10 @@ import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compil
 import { digestOf } from "../../../src/catalog/digest.js";
 import { evaluateControl } from "../../../src/catalog/evidence/evaluate.js";
 import { evaluateReviewCurrency, nextReviewDue } from "../../../src/catalog/governance/currency.js";
+import { effectiveSupport, type ReviewAuthority } from "../../../src/catalog/governance/support.js";
+import { buildCatalogLock } from "../../../src/catalog/lockfile.js";
+import { validateCatalog } from "../../../src/catalog/validate.js";
+import { author, keyA, keyB, keypair, record, REVIEWERS } from "./reviewers.js";
 import { defaultCatalogRoot, loadCatalog } from "../../../src/catalog/loader.js";
 import type { Citation, ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER, type RegulatoryRegister } from "../../../src/compliance/regulatory/index.js";
@@ -80,16 +84,33 @@ describe("evaluateReviewCurrency (P1-34 step 7)", () => {
     expect(evaluateReviewCurrency(control, REGULATORY_REGISTER, "2027-01-09")).toMatchObject({ status: "overdue", support: "experimental", reasons: ["GOV_REVIEW_OVERDUE"] });
   });
 
-  it("unresolved or future-dated reviews of reviewed content fail closed to experimental", () => {
-    expect(evaluateReviewCurrency(reviewed([cite("EU", "no-such-entry")]), REGULATORY_REGISTER, "2026-12-01"))
-      .toMatchObject({ status: "unresolved", support: "experimental", reasons: ["GOV_REVIEW_UNRESOLVED", "GOV_REGISTER_ENTRY_UNRESOLVED"] });
-    expect(evaluateReviewCurrency(reviewed([], "2026-12-20"), REGULATORY_REGISTER, "2026-12-01"))
-      .toMatchObject({ status: "unresolved", support: "experimental", reasons: ["GOV_REVIEW_UNRESOLVED", "GOV_REVIEW_IN_FUTURE"] });
+  it("a missing, unparsable, future-dated or unschedulable review date is stale, never current, and fails closed", () => {
+    const cases: Array<[ControlRecord, string]> = [
+      [{ ...reviewed([]), review: { ...reviewed([]).review, reviewedAt: null } }, "GOV_REVIEW_MISSING"],
+      [reviewed([], "2026-02-30"), "GOV_REVIEW_MISSING"],
+      [reviewed([], "26-10-10"), "GOV_REVIEW_MISSING"],
+      [reviewed([], "2026-10-10", "soon"), "GOV_NEXT_REVIEW_INVALID"],
+      [reviewed([], "2026-12-20"), "GOV_REVIEW_IN_FUTURE"],
+      [reviewed([cite("EU", "no-such-entry")]), "GOV_REGISTER_ENTRY_UNRESOLVED"]
+    ];
+    for (const [control, reason] of cases) {
+      expect(evaluateReviewCurrency(control, REGULATORY_REGISTER, "2026-12-01"), reason)
+        .toMatchObject({ status: "stale", nextReviewDue: null, support: "experimental", reasons: ["GOV_REVIEW_STALE", reason] });
+    }
   });
 
-  it("never promotes experimental and keeps retired retired", () => {
-    expect(evaluateReviewCurrency(base, REGULATORY_REGISTER, "2026-12-01")).toMatchObject({ status: "unresolved", support: "experimental" });
-    expect(evaluateReviewCurrency({ ...reviewed([]), support: "retired" }, REGULATORY_REGISTER, "2030-01-01")).toMatchObject({ support: "retired" });
+  it("only ever makes support stricter, for every support level and currency state", () => {
+    const rank = { retired: 0, experimental: 1, reviewed: 2, qualified: 3 } as const;
+    const controls = [base, reviewed([]), reviewed([], "2026-06-01"), reviewed([], "2026-12-20"), reviewed([], "2026-11-25")];
+    for (const control of controls) {
+      for (const support of ["retired", "experimental", "reviewed", "qualified"] as const) {
+        for (const asOf of ["2026-12-01", "2027-06-01"]) {
+          const result = evaluateReviewCurrency({ ...control, support }, REGULATORY_REGISTER, asOf);
+          expect(rank[result.support], `${support} ${control.review.reviewedAt} ${asOf}`).toBeLessThanOrEqual(rank[support]);
+          if (result.status !== "current" && result.status !== "due_soon" && support !== "retired") expect(result.support).toBe("experimental");
+        }
+      }
+    }
   });
 
   it("refuses an evaluation date that is not a calendar date", () => {
@@ -130,10 +151,68 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
     }
   });
 
-  it("current reviewed content and experimental content compile unchanged", () => {
-    const current = reviewed([], "2026-11-20", "2027-02-01");
-    const plan = compilePlan({ profile, catalog: { ...catalog, controls: new Map([...catalog.controls, [current.id, current]]) }, asOf: "2026-12-01T00:00:00Z" });
-    expect(plan.requirements.find((r) => r.controlId === current.id)?.support).toBe("reviewed");
+  // L0-ADV-01 lists all seven stations and is AI-drafted, so a quorum needs a wealth expert and a draft confirmation.
+  const current = reviewed([], "2026-11-20", "2027-02-01");
+  const subject = { kind: "control" as const, id: current.id, version: current.version, digest: digestOf(current) };
+  const sign = (key: typeof keyA, userId: string) => record(key, userId, { subject, aiInputs: [{ kind: "draft", ref: `${current.id}@${current.version}`, confirmed: true }] });
+  const authority = (records: unknown[]): ReviewAuthority => ({ trust: REVIEWERS, records, experts: new Map([["fixture-reviewer-a", ["wealth"]]]),
+    authorsOf: () => ["fixture-author"], f5Confirmations: [] });
+  const compiled = (auth?: ReviewAuthority) => compilePlan({ profile, catalog: { ...catalog, controls: new Map([...catalog.controls, [current.id, current]]) },
+    asOf: "2026-12-01T00:00:00Z", ...(auth ? { reviewAuthority: auth } : {}) }).requirements.find((r) => r.controlId === current.id)!;
+
+  it("reviewed content without verified review authority compiles as experimental: today every control does", () => {
+    expect(compiled()).toMatchObject({ support: "experimental" });
+    expect(compiled().reasons.some((r) => r.startsWith("GOV_REVIEW_UNVERIFIED"))).toBe(true);
     expect(compilePlan({ profile, catalog, asOf: "2026-12-01T00:00:00Z" }).requirements.every((r) => r.support === "experimental")).toBe(true);
+  });
+
+  it("a forged, unpinned or self-signed record cannot promote a control; two pinned independent reviewers can keep it", () => {
+    const forged = { ...sign(keyB, "fixture-reviewer-b"), notes: "edited after signing" };
+    const unpinned = sign(keypair(), "fixture-reviewer-b");
+    const self = sign(author, "fixture-author");
+    const claimsOther = sign(keyB, "fixture-reviewer-a");
+    for (const fake of [forged, unpinned, self, claimsOther]) {
+      expect(compiled(authority([sign(keyA, "fixture-reviewer-a"), fake])).support).toBe("experimental");
+      expect(effectiveSupport(current, REGULATORY_REGISTER, "2026-12-01", authority([sign(keyA, "fixture-reviewer-a"), fake])).reasons)
+        .toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_TWO_HUMANS"]);
+    }
+    expect(compiled(authority([sign(keyA, "fixture-reviewer-a"), sign(keyB, "fixture-reviewer-b")]))).toMatchObject({ support: "reviewed" });
+    expect(effectiveSupport({ ...current, support: "experimental" }, REGULATORY_REGISTER, "2026-12-01",
+      authority([sign(keyA, "fixture-reviewer-a"), sign(keyB, "fixture-reviewer-b")])).support).toBe("experimental");
+  });
+});
+
+describe("int's catalog behaviour is unchanged by the governance files and hooks (P1-34 regression)", () => {
+  // int's tree is today's catalog without the P1-34 files; under int's code the same comparison gave identical load
+  // issues, warnings and plans (one-off check recorded with the commit).
+  const dir = mkdtempSync(join(tmpdir(), "amc-gov-int-tree-"));
+  const intRoot = join(dir, "catalog");
+  cpSync(defaultCatalogRoot(), intRoot, { recursive: true, filter: (src) => !/[/\\](CHANGELOG\.md|governance)$/.test(src) });
+  const intTree = loadCatalog({ root: intRoot });
+  rmSync(dir, { recursive: true, force: true });
+  const asOf = new Date("2026-12-01T00:00:00Z");
+  const strip = (issues: Array<{ code: string; file: string; controlId: string | null; path: string; message: string }>) =>
+    issues.map((i) => [i.code, i.file, i.controlId, i.path, i.message].join(" | "));
+
+  it("P1-18's missing-register-entry warnings and the load issues are the same as on int's tree", () => {
+    const now = validateCatalog(catalog, { asOf });
+    const then = validateCatalog(intTree, { asOf });
+    expect(strip(now.warnings)).toEqual(strip(then.warnings));
+    expect(now.warnings.length).toBeGreaterThan(0);
+    expect(new Set(now.warnings.map((w) => w.code))).toEqual(new Set(["CAT_NO_REGISTER_ENTRY"]));
+    expect([now.errors, catalog.issues, intTree.issues]).toEqual([[], [], []]);
+  });
+
+  it("P1-14's experimental labels: every plan row carries its record's experimental support, no governance reason, and the same plan", () => {
+    const profiles = [...catalog.fixtures.values()].map((f) => (f.envelope?.setup as { profile?: unknown } | undefined)?.profile).filter(Boolean).slice(0, 6);
+    expect(profiles.length).toBeGreaterThan(0);
+    for (const raw of profiles) {
+      const p = parseDeploymentProfile(raw);
+      const plan = compilePlan({ profile: p, catalog, asOf: asOf.toISOString() });
+      expect(plan.requirements.every((r) => r.support === "experimental" && catalog.controls.get(r.controlId)?.support === "experimental")).toBe(true);
+      expect(plan.requirements.flatMap((r) => r.reasons).filter((r) => r.includes("GOV_"))).toEqual([]);
+      expect(plan.lock.catalog).toEqual(buildCatalogLock(intTree).catalog);
+      expect(plan.digest).toBe(compilePlan({ profile: p, catalog: intTree, asOf: asOf.toISOString() }).digest);
+    }
   });
 });

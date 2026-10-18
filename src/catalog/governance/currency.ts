@@ -1,7 +1,8 @@
 /**
  * Catalog review currency (P1-34): when a control's review falls due, from its recorded review, its citations and the
- * S5 register. Pure: no clock, no I/O, no mutation. Currency routes content to review and changes only what new
- * compilations see; it never edits YAML or past results, and it never authenticates a review.
+ * S5 register. Pure: no clock (the caller passes the server's date), no I/O, no mutation. Currency only ever makes support
+ * stricter: a due, overdue or stale review never raises it. It changes only what new compilations see, never YAML or past
+ * results, and it never authenticates a review (reviewRecord.ts does).
  */
 import { z } from "zod";
 import type { RegulatoryRegister } from "../../compliance/regulatory/index.js";
@@ -9,18 +10,19 @@ import type { ControlRecord, SupportLevel } from "../types.js";
 
 type CurrencyReason = "GOV_REVIEW_MISSING" | "GOV_NEXT_REVIEW_INVALID" | "GOV_REVIEW_POLICY_INVALID"
   | "GOV_REGISTER_ENTRY_UNRESOLVED" | "GOV_REGISTER_REVIEW_DATE_INVALID" | "GOV_REVIEW_IN_FUTURE"
-  | "GOV_REVIEW_UNRESOLVED" | "GOV_REVIEW_DUE_SOON" | "GOV_REVIEW_OVERDUE";
+  | "GOV_REVIEW_STALE" | "GOV_REVIEW_DUE_SOON" | "GOV_REVIEW_OVERDUE";
 
 export type ReviewDueResult =
   | { status: "resolved"; nextReviewDue: string; cadenceDays: number }
   | { status: "unresolved"; reason: CurrencyReason };
 
 export interface ControlCurrency {
-  /** Scheduling only: even "current" is no proof of approval or legal correctness. */
-  status: "current" | "due_soon" | "overdue" | "unresolved";
+  /** Scheduling only: even "current" is no proof of approval or legal correctness. A review whose date is missing,
+   * unparsable or in the future, or that cannot be scheduled, is "stale": never current. */
+  status: "current" | "due_soon" | "overdue" | "stale";
   nextReviewDue: string | null;
   reasons: CurrencyReason[];
-  /** The support new compilations use: reviewed or qualified content that is overdue or unresolved is experimental. */
+  /** The support new compilations use: never stronger than the record's; overdue or stale reviewed content is experimental. */
   support: SupportLevel;
 }
 
@@ -74,14 +76,14 @@ export function nextReviewDue(subject: ControlRecord, register: RegulatoryRegist
   return { status: "resolved", nextReviewDue: due, cadenceDays: cadence };
 }
 
-/** Currency as of `asOf` (YYYY-MM-DD, from the caller; the clock is never read). Returns a verdict, never an edited record. */
+/** Currency as of `asOf` (YYYY-MM-DD, the server's date from the caller; never a record field). A verdict, never an edited record. */
 export function evaluateReviewCurrency(subject: ControlRecord, register: RegulatoryRegister, asOf: string): ControlCurrency {
   const asOfMs = utcDate(asOf);
   if (asOfMs === null) throw new Error(`asOf ${asOf} is not a YYYY-MM-DD calendar date`);
   const stronger = subject.support === "reviewed" || subject.support === "qualified";
   const downgraded = stronger ? "experimental" : subject.support;
   const fail = (reason: CurrencyReason): ControlCurrency =>
-    ({ status: "unresolved", nextReviewDue: null, reasons: ["GOV_REVIEW_UNRESOLVED", reason], support: downgraded });
+    ({ status: "stale", nextReviewDue: null, reasons: ["GOV_REVIEW_STALE", reason], support: downgraded });
   const schedule = nextReviewDue(subject, register);
   if (schedule.status === "unresolved") return fail(schedule.reason);
   if (subject.review.reviewedAt! > asOf) return fail("GOV_REVIEW_IN_FUTURE");
