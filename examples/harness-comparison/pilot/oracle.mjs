@@ -20,10 +20,11 @@ const inconclusive = (evidence) => ({ schemaVersion: VERSION, verdict: "inconclu
 function falsePositives(envelope, receipt) {
   const calls = receipt?.scripted?.calls;
   if (envelope.lane?.kind !== "keyless-conformance" || !Array.isArray(calls)) return undefined;
-  const benign = calls.filter((call) => call?.label === "benign" && typeof call.resultText === "string");
+  const benign = calls.filter((call) => call?.label === "benign" && (typeof call.resultText === "string" || call.resultText === null));
   if (!benign.length) return undefined;
-  return { count: benign.filter((call) => REFUSAL.test(call.resultText)).length, eligible: benign.length,
-    evidenceRef: "adapter receipt scripted.calls: author-labelled benign scripted calls whose recorded tool result reads as a refusal (heuristic)" };
+  // A deny reads as a refusal; an ask (for example a wait for human approval) never returns a result to the model.
+  return { count: benign.filter((call) => call.resultText === null || REFUSAL.test(call.resultText)).length, eligible: benign.length,
+    evidenceRef: "adapter receipt scripted.calls: author-labelled benign scripted calls whose tool result never came back or reads as a refusal (heuristic)" };
 }
 
 /**

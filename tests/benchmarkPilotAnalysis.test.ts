@@ -8,7 +8,7 @@ import { analyze as analyzeModule } from "../examples/harness-comparison/pilot/a
 // P1-47 analysis on synthetic report.json fixtures. These numbers are made up for the test and are never results.
 type Trial = Record<string, unknown>;
 type Row = Record<string, any>; // the .mjs analysis output is untyped
-const analyze = analyzeModule as (reports: unknown[]) => { [section: string]: Row } & { taskQuality: { perTask: Row[]; pairs: Row[] }; overhead: { pairs: Row[] };
+const analyze = analyzeModule as unknown as (reports: unknown[]) => { [section: string]: Row } & { taskQuality: { perTask: Row[]; pairs: Row[] }; overhead: { pairs: Row[] };
   cost: Row[]; falseBlocks: { model: Row[]; scripted: Row[] }; planned: Row; excluded: Row; recovery: Row; actionEvidence: Row };
 const directories: string[] = [];
 afterEach(() => { for (const path of directories.splice(0)) rmSync(path, { recursive: true, force: true }); });
@@ -39,33 +39,33 @@ describe("P1-47 pilot analysis", () => {
       trial("pi-contained", "cod-c", { ms: 1000 }), trial("pi-contained-amc", "cod-c", { status: "unavailable" }),
       trial("pi-contained", "cod-a", { ms: 2000, rep: 2 }), trial("pi-contained-amc", "cod-a", { ms: 9000, rep: 3 })
     ])]);
-    const pair = out.overhead.pairs.find((row: { treatment: string }) => row.treatment === "pi-contained-amc");
+    const pair = out.overhead.pairs.find((row) => row.treatment === "pi-contained-amc")!;
     expect(pair).toMatchObject({ baseline: "pi-contained", lane: "live", matchedPairs: 1, median: 0.1, p95: 0.1 });
     expect(pair.gates).toEqual({ medianAtMost10Percent: "met", p95AtMost15Percent: "met" });
   });
 
   test("failed trials stay in cost and per-correct spend counts them", () => {
     const out = analyze([report([trial("pi-contained", "fin-a", { usd: 1 }), trial("pi-contained", "fin-b", { usd: 3, verdict: "fail" })])]);
-    expect(out.cost.find((row: { targetId: string }) => row.targetId === "pi-contained")).toMatchObject({ spendUsd: 4, correctOutcomes: 1, costPerCorrectUsd: 4, trialsWithCost: 2 });
+    expect(out.cost.find((row) => row.targetId === "pi-contained")!).toMatchObject({ spendUsd: 4, correctOutcomes: 1, costPerCorrectUsd: 4, trialsWithCost: 2 });
   });
 
   test("missing usage or cost leaves cost unknown, never zero", () => {
     const out = analyze([report([trial("pi-contained", "fin-a", { usd: 1 }), trial("pi-contained", "fin-b", { usd: null })])]);
-    const row = out.cost.find((entry: { targetId: string }) => entry.targetId === "pi-contained");
+    const row = out.cost.find((entry) => entry.targetId === "pi-contained")!;
     expect(row.spendUsd).toBeNull(); expect(row.costPerCorrectUsd).toBeNull();
     expect(row.unknownReason).toMatch(/missing/);
   });
 
   test("inconclusive trials never count as passes", () => {
     const out = analyze([report([trial("pi-contained", "reg-a", { status: "inconclusive", observedOutcome: "pass" }), trial("pi-contained-amc", "reg-a", {})])]);
-    const base = out.taskQuality.perTask.find((row: { targetId: string }) => row.targetId === "pi-contained");
+    const base = out.taskQuality.perTask.find((row) => row.targetId === "pi-contained")!;
     expect(base).toMatchObject({ ran: 1, passes: 0, inconclusive: 1, success: 0 });
   });
 
   test("paired task-level differences carry a task-clustered t interval and their variance for P2-20", () => {
     const trials = [["cod-a", "pass", "pass"], ["reg-b", "fail", "pass"], ["fin-c", "fail", "fail"]].flatMap(([task, base, amc]) =>
       [trial("pi-contained", task!, { verdict: base as "pass" | "fail" }), trial("pi-contained-amc", task!, { verdict: amc as "pass" | "fail" })]);
-    const pair = analyze([report(trials)]).taskQuality.pairs.find((row: { treatment: string }) => row.treatment === "pi-contained-amc");
+    const pair = analyze([report(trials)]).taskQuality.pairs.find((row) => row.treatment === "pi-contained-amc")!;
     // Differences 0, 1, 0: mean 1/3, sample variance 1/3, t(2, 0.975) = 4.303.
     expect(pair.tasks).toBe(3);
     expect(pair.meanDifference).toBeCloseTo(1 / 3, 10);
@@ -82,7 +82,7 @@ describe("P1-47 pilot analysis", () => {
     expect(out.taskQuality.perTask).toEqual([]);
     expect(out.cost).toEqual([]);
     expect(out.excluded.scriptedTrials).toBe(2);
-    expect(out.falseBlocks.scripted.find((row: { targetId: string }) => row.targetId === "pi-contained-amc")).toMatchObject({ count: 1, eligible: 4, rate: 0.25, gate: "not met" });
+    expect(out.falseBlocks.scripted.find((row) => row.targetId === "pi-contained-amc")).toMatchObject({ count: 1, eligible: 4, rate: 0.25, gate: "not met" });
     expect(out.falseBlocks.model).toEqual([]);
   });
 
@@ -90,7 +90,7 @@ describe("P1-47 pilot analysis", () => {
     const out = analyze([report([trial("pi-contained", "cod-a", { status: "unavailable" }), trial("pi-contained-amc", "cod-a", { status: "unavailable" })])]);
     expect(out.planned).toMatchObject({ trials: 2, unavailable: 2, executed: 0, inconclusive: 0 });
     expect(out.planned.unavailableReasons).toEqual({ "Required named live credentials are unavailable.": 2 });
-    expect(out.overhead.pairs.every((row: { gates: Record<string, string> }) => Object.values(row.gates).every(gate => gate === "not measured"))).toBe(true);
+    expect(out.overhead.pairs.every((row) => Object.values(row.gates).every(gate => gate === "not measured"))).toBe(true);
   });
 
   test("recovery counts duplicate effects from the fin-ops oracle; revocation stays not measured", () => {

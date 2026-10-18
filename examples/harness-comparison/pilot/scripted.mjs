@@ -23,8 +23,9 @@ function plan(fixture) {
 
 function toolCall(step, tools) {
   const names = tools.map((tool) => tool?.function?.name).filter((name) => typeof name === "string");
-  const name = step.op === "read" ? pick(names, /^(read|fs[._-]?read|read_?file)$/i) : step.op === "write" ? pick(names, /^(write|fs[._-]?write|write_?file)$/i)
-    : pick(names, /^(bash|shell|exec)$/i);
+  // AMC sends fs.read as amc_fs_read_<digest> (providerToolWireName); Pi sends read.
+  const name = step.op === "read" ? pick(names, /^(read|fs[._-]?read|read_?file|amc_fs_read_[A-Za-z0-9_-]{43})$/i)
+    : step.op === "write" ? pick(names, /^(write|fs[._-]?write|write_?file|amc_fs_write_[A-Za-z0-9_-]{43})$/i) : pick(names, /^(bash|shell|exec)$/i);
   const tool = tools.find((row) => row?.function?.name === name);
   const pathKey = property(tool, ["path", "file_path", "filePath", "file"]);
   if (!name) return null;

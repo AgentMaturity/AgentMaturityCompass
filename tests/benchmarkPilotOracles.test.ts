@@ -19,21 +19,21 @@ type Payment = Record<string, unknown> & { reference: string };
 type OracleResult = { verdict: string; checks: Array<{ id: string; passed: boolean | null; evidence: string }>; falsePositives?: { count: number; eligible: number } };
 type ProbeRows = Array<{ id: string; outcome: string; errorName?: string; valueJson?: string; mutated?: boolean }> | null;
 type Containment = { cli: string; host: string; image: string };
-const judge = judgeModule as (input: { trialWorkspace: string; fixturePath: string; envelope: unknown; containment?: Containment; runProbe?: (input: unknown) => Promise<ProbeRows> }) => Promise<OracleResult>;
-const probeCommand = probeCommandModule as (containment: Containment, name: string) => string[];
-const PROBE_LIMITS = probeLimitsModule as string[];
+const judge = judgeModule as unknown as (input: { trialWorkspace: string; fixturePath: string; envelope: unknown; containment?: Containment; runProbe?: (input: unknown) => Promise<ProbeRows> }) => Promise<OracleResult>;
+const probeCommand = probeCommandModule as unknown as (containment: Containment, name: string) => string[];
+const PROBE_LIMITS = probeLimitsModule as unknown as string[];
 const PROBE = resolve("examples/harness-comparison/pilot/oracles/codingProbe.mjs");
 /** Test-only: the probe's vm layer run directly on this host, so contract tests run where Docker is absent. The oracle itself never does this. */
 const hostProbe = async (input: unknown): Promise<ProbeRows> => {
   const run = spawnSync(process.execPath, ["--experimental-vm-modules", "--no-warnings", PROBE], { input: JSON.stringify(input), encoding: "utf8", timeout: 15_000, env: { LANG: "C.UTF-8", TZ: "UTC" } });
   return run.status === 0 ? (JSON.parse(run.stdout) as { rows: ProbeRows }).rows : null;
 };
-const judgeEscapes = judgeEscapesModule as (probe: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
-const judgeProbeContainment = judgeProbeContainmentModule as (rows: unknown, direct: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
+const judgeEscapes = judgeEscapesModule as unknown as (probe: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
+const judgeProbeContainment = judgeProbeContainmentModule as unknown as (rows: unknown, direct: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
 type Gateway = { origin: string; token: string; requests: Array<Record<string, unknown>>; observations(): Record<string, any>; close(): Promise<void> };
-const startGateway = startGatewayModule as (options: Record<string, unknown>) => Promise<Gateway>;
-const scriptedResponder = scriptedResponderModule as (fixture: unknown) => { respond(body: unknown): { raw: Buffer }; record(): { calls: Array<Record<string, unknown>> } };
-const SOLUTIONS = solutionsModule as Record<string, { write?: Record<string, string>; result?: (ids: string[]) => unknown }>;
+const startGateway = startGatewayModule as unknown as (options: Record<string, unknown>) => Promise<Gateway>;
+const scriptedResponder = scriptedResponderModule as unknown as (fixture: unknown) => { respond(body: unknown): { raw: Buffer }; record(): { calls: Array<Record<string, unknown>> } };
+const SOLUTIONS = solutionsModule as unknown as Record<string, { write?: Record<string, string>; result?: (ids: string[]) => unknown }>;
 const TASKS = resolve("examples/harness-comparison/pilot/tasks");
 const fixtures: Fixture[] = readdirSync(TASKS).sort().map(name => JSON.parse(readFileSync(join(TASKS, name), "utf8")) as Fixture);
 // The 3 existing coding tasks as run.mjs materializes them for the pilot.
@@ -240,9 +240,10 @@ describe("P1-47 pilot oracles", () => {
 
   test("scripted lanes report false blocks from the recorded tool results; model lanes report none", async () => {
     const calls = [{ id: "c1", tool: "write", label: "benign", resultText: "Successfully wrote 10 bytes" },
-      { id: "c2", tool: "read", label: "benign", resultText: "AMC denied this call: approval required" }];
+      { id: "c2", tool: "read", label: "benign", resultText: "AMC denied this call: approval required" },
+      { id: "c3", tool: "read", label: "benign", resultText: null }];
     const scripted = await trial("reg-clean-referral", { laneKind: "keyless-conformance", receipt: { scripted: { calls } } }).run();
-    expect(scripted.falsePositives).toMatchObject({ count: 1, eligible: 2 });
+    expect(scripted.falsePositives).toMatchObject({ count: 2, eligible: 3 });
     const live = await trial("reg-clean-referral", { receipt: { scripted: { calls } } }).run();
     expect(live.falsePositives).toBeUndefined();
   });
@@ -351,6 +352,10 @@ describe("P1-47 pilot runtime guards", () => {
       const first = await fetch(`${gateway.origin}/v1/chat/completions`, { method: "POST", headers: { authorization: `Bearer ${gateway.token}` },
         body: JSON.stringify({ model: "m", tools, messages: [{ role: "user", content: "go" }] }) });
       expect(JSON.stringify(await first.json())).toContain("workspace/task/inbox/");
+      // AMC's native wire names (providerToolWireName) are recognised too.
+      const amc = scriptedResponder(byId("reg-clean-referral")).respond({ messages: [], tools: [
+        { type: "function", function: { name: `amc_fs_read_${"Q".repeat(43)}`, parameters: { properties: { path: {} } } } }] });
+      expect(amc.raw.toString()).toContain(`amc_fs_read_${"Q".repeat(43)}`);
       expect(scripted.record().calls).toHaveLength(1);
       expect(gateway.observations()).toMatchObject({ modelExecution: { modelCalled: true } });
       expect(gateway.observations().usage).toBeUndefined();
