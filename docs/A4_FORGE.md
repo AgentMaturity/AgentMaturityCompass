@@ -148,8 +148,10 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
 or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
 scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
-Under an active plan, Studio mints a native task's lease, and a CLI, SDK, ACP or in-process run with workspace tools its
-own, with the workspace lease key, which the vault holds: while the vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). The item decides
+Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
+that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
+ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),
+which the item does not read; a run whose process cannot unlock it mints no lease and is refused. The item decides
 from the journal head the head revision bound only while that head is current: a head moved since (an activation from
 the CLI, another project or this one) or a journal that no longer verifies reads NOT_EVALUATED
 (`PLAN_HEAD_MOVED_OR_UNREADABLE`), never `NO_ACTIVE_PLAN`.

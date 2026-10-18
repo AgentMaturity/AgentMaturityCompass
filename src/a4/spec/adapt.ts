@@ -448,10 +448,11 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
  * user whose username is the OS account, and their delegated children inherit it (DELEGATED_CHILDREN_INHERIT_LEASE); a
  * run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens or a child starts. Tasks
  * started before activation carry none. Studio refuses to start any workspace-tools task when no lease can be minted
- * (LEASE_UNAVAILABLE), and a run's lease needs the same key, so a locked vault keeps the item WAITING (LEASE_NOT_ISSUED)
- * and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound journal head decides only while it
- * is current: a head moved since (an activation from the CLI or another project), a journal that no longer verifies
- * (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
+ * (LEASE_UNAVAILABLE). The item reads Studio's vault only: a locked one keeps the item WAITING (LEASE_NOT_ISSUED) and an
+ * unread vault state is NOT_EVALUATED, never READY; a run's lease is signed in the run's own process, whose vault this
+ * item does not see. The head revision's bound journal head decides only while it is current: a head moved since (an
+ * activation from the CLI or another project), a journal that no longer verifies (every session refused) or an unread
+ * slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated: boolean): A4ReadinessItem {
   const drifted = query.live.driftedSlots;
@@ -474,13 +475,15 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
       kind: vault === null ? "source_unavailable" : "plan_denies_native_session", reasonCodes: [...codes, "LEASE_NOT_ISSUED", "VAULT_LOCKED"],
-      nextAction: { label: "Studio mints a native task's lease, and a CLI, SDK, ACP or in-process run with workspace tools its own, with the workspace lease key, which the "
-        + `vault holds: unlock it, or every native start that needs one is refused; ${denied}` } });
+      nextAction: { label: "Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: unlock it there, or every Studio "
+        + "native start that needs one is refused. A CLI, SDK, ACP or in-process run signs its own lease with its own process's vault (AMC_VAULT_PASSPHRASE), "
+        + `which this item does not read; ${denied}` } });
   }
   return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
     nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67), and CLI agent "
       + "runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active users.yaml user whose "
-      + `username is the OS account, which their delegated children inherit (P1-79); ${denied}` } });
+      + "username is the OS account, which their delegated children inherit (P1-79); a run whose own process cannot unlock the vault fails to mint its "
+      + `lease and is refused; ${denied}` } });
 }
 
 /**
