@@ -125,3 +125,13 @@ export function admitKey(input: AdmitKeyInput): IssuerAdmission {
   if (context.allowUnpinned) return refuse("unpinned-allowed", `key ${keyId} is not pinned for ${purpose}; integrity only (--allow-unpinned)`);
   return refuse("not-pinned", `key ${keyId} is not pinned for ${purpose} by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list`);
 }
+
+/**
+ * The trust-list keys `context` admits for `purpose` at its verification time, for a signature that names no key (a
+ * licence): a verifier tries each in turn. Explicit pins carry no key, so only signed lists supply one (P1-51).
+ */
+export function admittedListKeys(context: TrustContext, purpose: KeyPurpose): string[] {
+  return context.lists.flatMap(list => list.entries)
+    .filter(entry => admitKey({ publicKeyPem: entry.publicKeyPem, purpose, signature: "pinned key lookup", context }).status === "admitted")
+    .map(entry => entry.publicKeyPem);
+}

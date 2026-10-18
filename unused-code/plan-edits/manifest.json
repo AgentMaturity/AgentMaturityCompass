@@ -255,6 +255,13 @@
       "sha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849"
     },
     {
+      "path": "src/enterprise/license.ts",
+      "issue": "P1-51",
+      "baseCommit": "e02503aa756b4ca469a2ff435e04734df211029d",
+      "archivePath": "unused-code/plan-edits/P1-51/src/enterprise/license.ts.landed",
+      "sha256": "627eef85d9f59c55f38d1e18430216bcd65c995ee8a112af95baf223fb756309"
+    },
+    {
       "path": "src/evidence/exporter.ts",
       "issue": "P0-27",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",

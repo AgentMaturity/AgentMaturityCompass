@@ -24,3 +24,4 @@ Industry Packs contain regulatory-grounded assessments (HIPAA, MiFID II, FERPA, 
 
 ## Notes
 - 2026-10-11 (P0-28): the hand-typed assurance-pack count in the Decision had drifted and was removed; `scripts/gen-counts.mjs` reports the registered count. Nothing else in this record changed.
+- 2026-10-18 (P1-51, D-06 = B): the paid Industry Packs gate stays. A licence gates access to pack questions and runs, never a result; pack answers are self-reported questionnaires; licences verify only against a key pinned in the operator's trust list; and checkout is offered only where it is configured. ADR-008 (P1-31) may supersede this record.

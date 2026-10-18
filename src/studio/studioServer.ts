@@ -453,6 +453,13 @@ function json(res: ServerResponse, status: number, payload: unknown): void {
   res.end(JSON.stringify(withClaimBody(res, status, payload)));
 }
 
+/** An Industry Packs licence request: its `licenseKey` (null when none) and whether it also names an `expiresAt`. */
+async function readLicenseRequest(req: IncomingMessage, maxBytes = 1_048_576): Promise<{ licenseKey: string | null; expiresAt: boolean }> {
+  const body = await readBody(req, maxBytes);
+  const parsed = (body ? JSON.parse(body) : {}) as { licenseKey?: unknown; expiresAt?: unknown };
+  return { licenseKey: typeof parsed.licenseKey === "string" && parsed.licenseKey.length > 0 ? parsed.licenseKey : null, expiresAt: "expiresAt" in parsed };
+}
+
 function ipToInt(ip: string): number | null {
   const parts = ip.split(".");
   if (parts.length !== 4) {
@@ -8525,7 +8532,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         if (!entitlement.checkoutAvailable) {
-          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement, entitlementNote: ENTITLEMENT_NOTE });
+          json(res, 503, { error: entitlement.message, entitlement, entitlementNote: ENTITLEMENT_NOTE });
           return;
         }
         const parsed = req.method === "POST"
@@ -8557,18 +8564,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { licenseKey?: string; expiresAt?: string | null }) : {};
-        if (!parsed.licenseKey) {
-          json(res, 400, { error: "licenseKey is required" });
+        const { licenseKey, expiresAt } = await readLicenseRequest(req, options.maxRequestBytes);
+        if (!licenseKey || expiresAt) {
+          json(res, 400, { error: licenseKey ? "expiresAt is not accepted: the expiry is the one the issuer signed into the licence" : "licenseKey is required" });
           return;
         }
-        const { activateIndustryPackAccessOnline } = await import("../domains/industryPackEntitlement.js");
-        const entitlement = await activateIndustryPackAccessOnline({
-          workspace: options.workspace,
-          licenseKey: parsed.licenseKey,
-          expiresAt: parsed.expiresAt ?? null
-        });
+        const { activateIndustryPackAccess } = await import("../domains/industryPackEntitlement.js");
+        let entitlement: ReturnType<typeof activateIndustryPackAccess>;
+        // Not configured, unpinned, expired or forged: the reason goes back to the caller, nothing is stored.
+        try { entitlement = activateIndustryPackAccess({ workspace: options.workspace, licenseKey }); }
+        catch (error) { json(res, 422, { error: error instanceof Error ? error.message : String(error), entitlementNote: ENTITLEMENT_NOTE }); return; }
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "INDUSTRY_PACKS_ACTIVATED",
@@ -8588,14 +8593,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { licenseKey?: string }) : {};
-        if (!parsed.licenseKey) {
-          json(res, 400, { error: "licenseKey is required" });
-          return;
-        }
-        const { verifyIndustryPackLicenseKey } = await import("../domains/industryPackEntitlement.js");
-        const verification = verifyIndustryPackLicenseKey(parsed.licenseKey);
+        const { licenseKey } = await readLicenseRequest(req, options.maxRequestBytes);
+        if (!licenseKey) { json(res, 400, { error: "licenseKey is required" }); return; }
+        const { verifyPinnedIndustryPackLicense } = await import("../domains/industryPackEntitlement.js");
+        const verification = verifyPinnedIndustryPackLicense(licenseKey, loadTrustContext());
         json(res, verification.valid ? 200 : 422, { ...verification, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
@@ -8630,12 +8631,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const { getPackById } = await import("../domains/industryPacks.js");
-        const { getIndustryPackEntitlement, formatIndustryPackPaywallMessage } = await import("../domains/industryPackEntitlement.js");
+        const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         if (!entitlement.active) {
           json(res, 402, {
             error: "industry_packs_locked",
-            message: formatIndustryPackPaywallMessage(entitlement),
+            message: entitlement.message,
             entitlement, entitlementNote: ENTITLEMENT_NOTE
           });
           return;
