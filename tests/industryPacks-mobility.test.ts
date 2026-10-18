@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 import { INDUSTRY_PACKS } from "../src/domains/industryPacks.js";
 import { getDeepQuestionsByStation } from "../src/domains/deepIndustryPacks.js";
 import { PACK_QUESTION_FLOOR, validatePackRegulatoryCurrency } from "../src/domains/packs/regulatorySchema.js";
-import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
+import { PENDING_SID_IDS } from "./helpers/f5Deferred.js";
 
 const packs = Object.values(INDUSTRY_PACKS).filter((p) => p.stationId === "mobility");
 const question = (id: string) => packs.flatMap((p) => p.questions).find((q) => q.id === id);
@@ -28,7 +28,7 @@ describe("mobility station packs", () => {
   test("merged and dropped questions are gone (F5 drops only once Sid confirms them)", () => {
     for (const id of ["MOB-SC-1", "MOB-SC-11", "MOB-SC-14", "MOB-SP-3", "MOB-SP-13", "MOB-RE-9", "MOB-RE-11", "MOB-RE-12",
       "MOB-RE-13", "MOB-RE-14", "MOB-RE-15", "MOB-VI-5", "MOB-VI-14", "MOB-PS-5", "MOB-PS-9", "MOB-PS-13", "MOB-F3W-8"]) {
-      if (F5_KEPT_IDS.has(id)) expect(question(id), id).toBeDefined();
+      if (PENDING_SID_IDS.has(id)) expect(question(id), id).toBeDefined();
       else expect(question(id), id).toBeUndefined();
     }
   });
@@ -46,7 +46,7 @@ describe("mobility station packs", () => {
     expect(question("MOB-F3W-16")?.regulatoryRef).toContain("Regulation (EU) 2020/1056");
     // S3's CRA Art. 14 question and the author's are one obligation: one question, the author's deadlines.
     const cra = packs.flatMap((p) => p.questions).filter((q) => /CRA[^;]*Art\. 14/.test(q.regulatoryRef));
-    expect(cra.map((q) => q.id)).toEqual(["MOB-PS-15"]);
+    expect(cra.map((q) => q.id)).toEqual(["MOB-PS-15-v2"]); // its dimension changed, so its id was versioned (P1-42 review)
     expect(cra[0]!.text).toContain("72 hours");
   });
 

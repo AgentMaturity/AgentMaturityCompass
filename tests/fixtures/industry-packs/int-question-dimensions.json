@@ -1,0 +1,2533 @@
+{
+ "source": "Every pack question id on int b9866b0fa with its pack and dimension (P1-42 review): an id whose dimension changes must take a new id version.",
+ "items": {
+  "EDU-DA-1": {
+   "packId": "differently-abled",
+   "dimension": "Compliance"
+  },
+  "EDU-DA-10": {
+   "packId": "differently-abled",
+   "dimension": "Governance"
+  },
+  "EDU-DA-11": {
+   "packId": "differently-abled",
+   "dimension": "Safety"
+  },
+  "EDU-DA-12": {
+   "packId": "differently-abled",
+   "dimension": "Compliance"
+  },
+  "EDU-DA-13": {
+   "packId": "differently-abled",
+   "dimension": "Governance"
+  },
+  "EDU-DA-14": {
+   "packId": "differently-abled",
+   "dimension": "Accessibility"
+  },
+  "EDU-DA-15": {
+   "packId": "differently-abled",
+   "dimension": "Compliance"
+  },
+  "EDU-DA-2": {
+   "packId": "differently-abled",
+   "dimension": "Safety"
+  },
+  "EDU-DA-3": {
+   "packId": "differently-abled",
+   "dimension": "Ethics"
+  },
+  "EDU-DA-4": {
+   "packId": "differently-abled",
+   "dimension": "Compliance"
+  },
+  "EDU-DA-5": {
+   "packId": "differently-abled",
+   "dimension": "Safety"
+  },
+  "EDU-DA-6": {
+   "packId": "differently-abled",
+   "dimension": "Governance"
+  },
+  "EDU-DA-7": {
+   "packId": "differently-abled",
+   "dimension": "Transparency"
+  },
+  "EDU-DA-8": {
+   "packId": "differently-abled",
+   "dimension": "Ethics"
+  },
+  "EDU-DA-9": {
+   "packId": "differently-abled",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-1": {
+   "packId": "higher-education",
+   "dimension": "Ethics"
+  },
+  "EDU-HE-10": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-11": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-12": {
+   "packId": "higher-education",
+   "dimension": "Governance"
+  },
+  "EDU-HE-13": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-14": {
+   "packId": "higher-education",
+   "dimension": "Governance"
+  },
+  "EDU-HE-15": {
+   "packId": "higher-education",
+   "dimension": "Traceability"
+  },
+  "EDU-HE-2": {
+   "packId": "higher-education",
+   "dimension": "Governance"
+  },
+  "EDU-HE-3": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-4": {
+   "packId": "higher-education",
+   "dimension": "Safety"
+  },
+  "EDU-HE-5": {
+   "packId": "higher-education",
+   "dimension": "Transparency"
+  },
+  "EDU-HE-6": {
+   "packId": "higher-education",
+   "dimension": "Ethics"
+  },
+  "EDU-HE-7": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-HE-8": {
+   "packId": "higher-education",
+   "dimension": "Safety"
+  },
+  "EDU-HE-9": {
+   "packId": "higher-education",
+   "dimension": "Compliance"
+  },
+  "EDU-K12-1": {
+   "packId": "k12-pm3",
+   "dimension": "Safety"
+  },
+  "EDU-K12-10": {
+   "packId": "k12-pm3",
+   "dimension": "Safety"
+  },
+  "EDU-K12-11": {
+   "packId": "k12-pm3",
+   "dimension": "Safety"
+  },
+  "EDU-K12-12": {
+   "packId": "k12-pm3",
+   "dimension": "Compliance"
+  },
+  "EDU-K12-13": {
+   "packId": "k12-pm3",
+   "dimension": "Governance"
+  },
+  "EDU-K12-14": {
+   "packId": "k12-pm3",
+   "dimension": "Compliance"
+  },
+  "EDU-K12-15": {
+   "packId": "k12-pm3",
+   "dimension": "Governance"
+  },
+  "EDU-K12-2": {
+   "packId": "k12-pm3",
+   "dimension": "Compliance"
+  },
+  "EDU-K12-3": {
+   "packId": "k12-pm3",
+   "dimension": "Ethics"
+  },
+  "EDU-K12-4": {
+   "packId": "k12-pm3",
+   "dimension": "Safety"
+  },
+  "EDU-K12-5": {
+   "packId": "k12-pm3",
+   "dimension": "Governance"
+  },
+  "EDU-K12-6": {
+   "packId": "k12-pm3",
+   "dimension": "Transparency"
+  },
+  "EDU-K12-7": {
+   "packId": "k12-pm3",
+   "dimension": "Safety"
+  },
+  "EDU-K12-8": {
+   "packId": "k12-pm3",
+   "dimension": "Compliance"
+  },
+  "EDU-K12-9": {
+   "packId": "k12-pm3",
+   "dimension": "Ethics"
+  },
+  "EDU-SE-1": {
+   "packId": "specialized-education",
+   "dimension": "Ethics"
+  },
+  "EDU-SE-10": {
+   "packId": "specialized-education",
+   "dimension": "Compliance"
+  },
+  "EDU-SE-11": {
+   "packId": "specialized-education",
+   "dimension": "Governance"
+  },
+  "EDU-SE-12": {
+   "packId": "specialized-education",
+   "dimension": "Safety"
+  },
+  "EDU-SE-13": {
+   "packId": "specialized-education",
+   "dimension": "Transparency"
+  },
+  "EDU-SE-14": {
+   "packId": "specialized-education",
+   "dimension": "Compliance"
+  },
+  "EDU-SE-15": {
+   "packId": "specialized-education",
+   "dimension": "Governance"
+  },
+  "EDU-SE-2": {
+   "packId": "specialized-education",
+   "dimension": "Compliance"
+  },
+  "EDU-SE-3": {
+   "packId": "specialized-education",
+   "dimension": "Ethics"
+  },
+  "EDU-SE-4": {
+   "packId": "specialized-education",
+   "dimension": "Governance"
+  },
+  "EDU-SE-5": {
+   "packId": "specialized-education",
+   "dimension": "Safety"
+  },
+  "EDU-SE-6": {
+   "packId": "specialized-education",
+   "dimension": "Transparency"
+  },
+  "EDU-SE-7": {
+   "packId": "specialized-education",
+   "dimension": "Traceability"
+  },
+  "EDU-SE-8": {
+   "packId": "specialized-education",
+   "dimension": "Compliance"
+  },
+  "EDU-SE-9": {
+   "packId": "specialized-education",
+   "dimension": "Compliance"
+  },
+  "EDU-ST-1": {
+   "packId": "skills-training",
+   "dimension": "Compliance"
+  },
+  "EDU-ST-10": {
+   "packId": "skills-training",
+   "dimension": "Compliance"
+  },
+  "EDU-ST-11": {
+   "packId": "skills-training",
+   "dimension": "Governance"
+  },
+  "EDU-ST-12": {
+   "packId": "skills-training",
+   "dimension": "Governance"
+  },
+  "EDU-ST-13": {
+   "packId": "skills-training",
+   "dimension": "Governance"
+  },
+  "EDU-ST-14": {
+   "packId": "skills-training",
+   "dimension": "Transparency"
+  },
+  "EDU-ST-15": {
+   "packId": "skills-training",
+   "dimension": "Transparency"
+  },
+  "EDU-ST-2": {
+   "packId": "skills-training",
+   "dimension": "Safety"
+  },
+  "EDU-ST-3": {
+   "packId": "skills-training",
+   "dimension": "Ethics"
+  },
+  "EDU-ST-4": {
+   "packId": "skills-training",
+   "dimension": "Governance"
+  },
+  "EDU-ST-5": {
+   "packId": "skills-training",
+   "dimension": "Transparency"
+  },
+  "EDU-ST-6": {
+   "packId": "skills-training",
+   "dimension": "Safety"
+  },
+  "EDU-ST-7": {
+   "packId": "skills-training",
+   "dimension": "Traceability"
+  },
+  "EDU-ST-8": {
+   "packId": "skills-training",
+   "dimension": "Ethics"
+  },
+  "EDU-ST-9": {
+   "packId": "skills-training",
+   "dimension": "Compliance"
+  },
+  "ENV-FF-1": {
+   "packId": "farm-to-fork",
+   "dimension": "Safety"
+  },
+  "ENV-FF-10": {
+   "packId": "farm-to-fork",
+   "dimension": "Traceability"
+  },
+  "ENV-FF-11": {
+   "packId": "farm-to-fork",
+   "dimension": "Safety"
+  },
+  "ENV-FF-12": {
+   "packId": "farm-to-fork",
+   "dimension": "Safety"
+  },
+  "ENV-FF-13": {
+   "packId": "farm-to-fork",
+   "dimension": "Compliance"
+  },
+  "ENV-FF-14": {
+   "packId": "farm-to-fork",
+   "dimension": "Ethics"
+  },
+  "ENV-FF-15": {
+   "packId": "farm-to-fork",
+   "dimension": "Compliance"
+  },
+  "ENV-FF-16": {
+   "packId": "farm-to-fork",
+   "dimension": "Governance"
+  },
+  "ENV-FF-2": {
+   "packId": "farm-to-fork",
+   "dimension": "Traceability"
+  },
+  "ENV-FF-3": {
+   "packId": "farm-to-fork",
+   "dimension": "Sustainability"
+  },
+  "ENV-FF-4": {
+   "packId": "farm-to-fork",
+   "dimension": "Compliance"
+  },
+  "ENV-FF-5": {
+   "packId": "farm-to-fork",
+   "dimension": "Safety"
+  },
+  "ENV-FF-6": {
+   "packId": "farm-to-fork",
+   "dimension": "Transparency"
+  },
+  "ENV-FF-7": {
+   "packId": "farm-to-fork",
+   "dimension": "Ethics"
+  },
+  "ENV-FF-8": {
+   "packId": "farm-to-fork",
+   "dimension": "Governance"
+  },
+  "ENV-FF-9": {
+   "packId": "farm-to-fork",
+   "dimension": "Compliance"
+  },
+  "ENV-MM-1": {
+   "packId": "material-to-machines",
+   "dimension": "Compliance"
+  },
+  "ENV-MM-10": {
+   "packId": "material-to-machines",
+   "dimension": "Safety"
+  },
+  "ENV-MM-11": {
+   "packId": "material-to-machines",
+   "dimension": "Security"
+  },
+  "ENV-MM-12": {
+   "packId": "material-to-machines",
+   "dimension": "Safety"
+  },
+  "ENV-MM-13": {
+   "packId": "material-to-machines",
+   "dimension": "Sustainability"
+  },
+  "ENV-MM-14": {
+   "packId": "material-to-machines",
+   "dimension": "Compliance"
+  },
+  "ENV-MM-15": {
+   "packId": "material-to-machines",
+   "dimension": "Traceability"
+  },
+  "ENV-MM-2": {
+   "packId": "material-to-machines",
+   "dimension": "Sustainability"
+  },
+  "ENV-MM-3": {
+   "packId": "material-to-machines",
+   "dimension": "Governance"
+  },
+  "ENV-MM-4": {
+   "packId": "material-to-machines",
+   "dimension": "Safety"
+  },
+  "ENV-MM-5": {
+   "packId": "material-to-machines",
+   "dimension": "Traceability"
+  },
+  "ENV-MM-6": {
+   "packId": "material-to-machines",
+   "dimension": "Transparency"
+  },
+  "ENV-MM-7": {
+   "packId": "material-to-machines",
+   "dimension": "Ethics"
+  },
+  "ENV-MM-8": {
+   "packId": "material-to-machines",
+   "dimension": "Compliance"
+  },
+  "ENV-MM-9": {
+   "packId": "material-to-machines",
+   "dimension": "Security"
+  },
+  "ENV-SS-1": {
+   "packId": "source-to-sustenance",
+   "dimension": "Safety"
+  },
+  "ENV-SS-10": {
+   "packId": "source-to-sustenance",
+   "dimension": "Ethics"
+  },
+  "ENV-SS-11": {
+   "packId": "source-to-sustenance",
+   "dimension": "Traceability"
+  },
+  "ENV-SS-12": {
+   "packId": "source-to-sustenance",
+   "dimension": "Governance"
+  },
+  "ENV-SS-13": {
+   "packId": "source-to-sustenance",
+   "dimension": "Sustainability"
+  },
+  "ENV-SS-14": {
+   "packId": "source-to-sustenance",
+   "dimension": "Transparency"
+  },
+  "ENV-SS-15": {
+   "packId": "source-to-sustenance",
+   "dimension": "Compliance"
+  },
+  "ENV-SS-2": {
+   "packId": "source-to-sustenance",
+   "dimension": "Sustainability"
+  },
+  "ENV-SS-3": {
+   "packId": "source-to-sustenance",
+   "dimension": "Traceability"
+  },
+  "ENV-SS-4": {
+   "packId": "source-to-sustenance",
+   "dimension": "Governance"
+  },
+  "ENV-SS-5": {
+   "packId": "source-to-sustenance",
+   "dimension": "Ethics"
+  },
+  "ENV-SS-6": {
+   "packId": "source-to-sustenance",
+   "dimension": "Compliance"
+  },
+  "ENV-SS-7": {
+   "packId": "source-to-sustenance",
+   "dimension": "Transparency"
+  },
+  "ENV-SS-8": {
+   "packId": "source-to-sustenance",
+   "dimension": "Safety"
+  },
+  "ENV-SS-9": {
+   "packId": "source-to-sustenance",
+   "dimension": "Compliance"
+  },
+  "ENV-STS-1": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Safety"
+  },
+  "ENV-STS-10": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Compliance"
+  },
+  "ENV-STS-11": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Governance"
+  },
+  "ENV-STS-12": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Sustainability"
+  },
+  "ENV-STS-13": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Governance"
+  },
+  "ENV-STS-14": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Compliance"
+  },
+  "ENV-STS-15": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Traceability"
+  },
+  "ENV-STS-2": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Compliance"
+  },
+  "ENV-STS-3": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Sustainability"
+  },
+  "ENV-STS-4": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Governance"
+  },
+  "ENV-STS-5": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Traceability"
+  },
+  "ENV-STS-6": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Ethics"
+  },
+  "ENV-STS-7": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Transparency"
+  },
+  "ENV-STS-8": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Safety"
+  },
+  "ENV-STS-9": {
+   "packId": "sip-to-sanitation",
+   "dimension": "Governance"
+  },
+  "ENV-UU-1": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Safety"
+  },
+  "ENV-UU-10": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Security"
+  },
+  "ENV-UU-11": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Security"
+  },
+  "ENV-UU-12": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Safety"
+  },
+  "ENV-UU-13": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Compliance"
+  },
+  "ENV-UU-14": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Governance"
+  },
+  "ENV-UU-15": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Safety"
+  },
+  "ENV-UU-2": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Sustainability"
+  },
+  "ENV-UU-3": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Compliance"
+  },
+  "ENV-UU-4": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Governance"
+  },
+  "ENV-UU-5": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Safety"
+  },
+  "ENV-UU-6": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Ethics"
+  },
+  "ENV-UU-7": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Transparency"
+  },
+  "ENV-UU-8": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Traceability"
+  },
+  "ENV-UU-9": {
+   "packId": "ubiquity-to-utility",
+   "dimension": "Security"
+  },
+  "ENV-WW-1": {
+   "packId": "weave-to-wear",
+   "dimension": "Safety"
+  },
+  "ENV-WW-10": {
+   "packId": "weave-to-wear",
+   "dimension": "Ethics"
+  },
+  "ENV-WW-11": {
+   "packId": "weave-to-wear",
+   "dimension": "Governance"
+  },
+  "ENV-WW-12": {
+   "packId": "weave-to-wear",
+   "dimension": "Safety"
+  },
+  "ENV-WW-13": {
+   "packId": "weave-to-wear",
+   "dimension": "Compliance"
+  },
+  "ENV-WW-14": {
+   "packId": "weave-to-wear",
+   "dimension": "Transparency"
+  },
+  "ENV-WW-15": {
+   "packId": "weave-to-wear",
+   "dimension": "Sustainability"
+  },
+  "ENV-WW-2": {
+   "packId": "weave-to-wear",
+   "dimension": "Traceability"
+  },
+  "ENV-WW-3": {
+   "packId": "weave-to-wear",
+   "dimension": "Sustainability"
+  },
+  "ENV-WW-4": {
+   "packId": "weave-to-wear",
+   "dimension": "Ethics"
+  },
+  "ENV-WW-5": {
+   "packId": "weave-to-wear",
+   "dimension": "Transparency"
+  },
+  "ENV-WW-6": {
+   "packId": "weave-to-wear",
+   "dimension": "Compliance"
+  },
+  "ENV-WW-7": {
+   "packId": "weave-to-wear",
+   "dimension": "Governance"
+  },
+  "ENV-WW-8": {
+   "packId": "weave-to-wear",
+   "dimension": "Safety"
+  },
+  "ENV-WW-9": {
+   "packId": "weave-to-wear",
+   "dimension": "Compliance"
+  },
+  "GOV-CS-1": {
+   "packId": "citizen-services",
+   "dimension": "Accessibility"
+  },
+  "GOV-CS-10": {
+   "packId": "citizen-services",
+   "dimension": "Compliance"
+  },
+  "GOV-CS-11": {
+   "packId": "citizen-services",
+   "dimension": "Interoperability"
+  },
+  "GOV-CS-12": {
+   "packId": "citizen-services",
+   "dimension": "Accessibility"
+  },
+  "GOV-CS-13": {
+   "packId": "citizen-services",
+   "dimension": "Accessibility"
+  },
+  "GOV-CS-14": {
+   "packId": "citizen-services",
+   "dimension": "Interoperability"
+  },
+  "GOV-CS-15": {
+   "packId": "citizen-services",
+   "dimension": "Transparency"
+  },
+  "GOV-CS-2": {
+   "packId": "citizen-services",
+   "dimension": "Compliance"
+  },
+  "GOV-CS-3": {
+   "packId": "citizen-services",
+   "dimension": "Ethics"
+  },
+  "GOV-CS-4": {
+   "packId": "citizen-services",
+   "dimension": "Transparency"
+  },
+  "GOV-CS-5": {
+   "packId": "citizen-services",
+   "dimension": "Privacy"
+  },
+  "GOV-CS-6": {
+   "packId": "citizen-services",
+   "dimension": "Governance"
+  },
+  "GOV-CS-7": {
+   "packId": "citizen-services",
+   "dimension": "Security"
+  },
+  "GOV-CS-8": {
+   "packId": "citizen-services",
+   "dimension": "Ethics"
+  },
+  "GOV-CS-9": {
+   "packId": "citizen-services",
+   "dimension": "Compliance"
+  },
+  "GOV-DCR-1": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Compliance"
+  },
+  "GOV-DCR-10": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Compliance"
+  },
+  "GOV-DCR-11": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Governance"
+  },
+  "GOV-DCR-12": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Privacy"
+  },
+  "GOV-DCR-13": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Security"
+  },
+  "GOV-DCR-14": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Governance"
+  },
+  "GOV-DCR-15": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Rights"
+  },
+  "GOV-DCR-2": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Privacy"
+  },
+  "GOV-DCR-3": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Ethics"
+  },
+  "GOV-DCR-4": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Governance"
+  },
+  "GOV-DCR-5": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Transparency"
+  },
+  "GOV-DCR-6": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Safety"
+  },
+  "GOV-DCR-7": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Security"
+  },
+  "GOV-DCR-8": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Governance"
+  },
+  "GOV-DCR-9": {
+   "packId": "digital-citizens-rights",
+   "dimension": "Compliance"
+  },
+  "GOV-DD-1": {
+   "packId": "dance-of-democracy",
+   "dimension": "Compliance"
+  },
+  "GOV-DD-10": {
+   "packId": "dance-of-democracy",
+   "dimension": "Compliance"
+  },
+  "GOV-DD-11": {
+   "packId": "dance-of-democracy",
+   "dimension": "Safety"
+  },
+  "GOV-DD-12": {
+   "packId": "dance-of-democracy",
+   "dimension": "Governance"
+  },
+  "GOV-DD-13": {
+   "packId": "dance-of-democracy",
+   "dimension": "Privacy"
+  },
+  "GOV-DD-14": {
+   "packId": "dance-of-democracy",
+   "dimension": "Governance"
+  },
+  "GOV-DD-15": {
+   "packId": "dance-of-democracy",
+   "dimension": "Governance"
+  },
+  "GOV-DD-2": {
+   "packId": "dance-of-democracy",
+   "dimension": "Safety"
+  },
+  "GOV-DD-3": {
+   "packId": "dance-of-democracy",
+   "dimension": "Privacy"
+  },
+  "GOV-DD-4": {
+   "packId": "dance-of-democracy",
+   "dimension": "Transparency"
+  },
+  "GOV-DD-5": {
+   "packId": "dance-of-democracy",
+   "dimension": "Governance"
+  },
+  "GOV-DD-6": {
+   "packId": "dance-of-democracy",
+   "dimension": "Security"
+  },
+  "GOV-DD-7": {
+   "packId": "dance-of-democracy",
+   "dimension": "Transparency"
+  },
+  "GOV-DD-8": {
+   "packId": "dance-of-democracy",
+   "dimension": "Ethics"
+  },
+  "GOV-DD-9": {
+   "packId": "dance-of-democracy",
+   "dimension": "Compliance"
+  },
+  "GOV-PL-1": {
+   "packId": "petition-to-law",
+   "dimension": "Transparency"
+  },
+  "GOV-PL-10": {
+   "packId": "petition-to-law",
+   "dimension": "Open Data"
+  },
+  "GOV-PL-11": {
+   "packId": "petition-to-law",
+   "dimension": "Interoperability"
+  },
+  "GOV-PL-12": {
+   "packId": "petition-to-law",
+   "dimension": "Quality"
+  },
+  "GOV-PL-13": {
+   "packId": "petition-to-law",
+   "dimension": "Participation"
+  },
+  "GOV-PL-14": {
+   "packId": "petition-to-law",
+   "dimension": "Governance"
+  },
+  "GOV-PL-15": {
+   "packId": "petition-to-law",
+   "dimension": "Transparency"
+  },
+  "GOV-PL-2": {
+   "packId": "petition-to-law",
+   "dimension": "Compliance"
+  },
+  "GOV-PL-3": {
+   "packId": "petition-to-law",
+   "dimension": "Governance"
+  },
+  "GOV-PL-4": {
+   "packId": "petition-to-law",
+   "dimension": "Privacy"
+  },
+  "GOV-PL-5": {
+   "packId": "petition-to-law",
+   "dimension": "Safety"
+  },
+  "GOV-PL-6": {
+   "packId": "petition-to-law",
+   "dimension": "Traceability"
+  },
+  "GOV-PL-7": {
+   "packId": "petition-to-law",
+   "dimension": "Governance"
+  },
+  "GOV-PL-8": {
+   "packId": "petition-to-law",
+   "dimension": "Ethics"
+  },
+  "GOV-PL-9": {
+   "packId": "petition-to-law",
+   "dimension": "Compliance"
+  },
+  "GOV-PPC-1": {
+   "packId": "public-private-collaboration",
+   "dimension": "Ethics"
+  },
+  "GOV-PPC-10": {
+   "packId": "public-private-collaboration",
+   "dimension": "Transparency"
+  },
+  "GOV-PPC-11": {
+   "packId": "public-private-collaboration",
+   "dimension": "Governance"
+  },
+  "GOV-PPC-12": {
+   "packId": "public-private-collaboration",
+   "dimension": "Compliance"
+  },
+  "GOV-PPC-13": {
+   "packId": "public-private-collaboration",
+   "dimension": "Ethics"
+  },
+  "GOV-PPC-14": {
+   "packId": "public-private-collaboration",
+   "dimension": "Accountability"
+  },
+  "GOV-PPC-15": {
+   "packId": "public-private-collaboration",
+   "dimension": "Governance"
+  },
+  "GOV-PPC-2": {
+   "packId": "public-private-collaboration",
+   "dimension": "Governance"
+  },
+  "GOV-PPC-3": {
+   "packId": "public-private-collaboration",
+   "dimension": "Ethics"
+  },
+  "GOV-PPC-4": {
+   "packId": "public-private-collaboration",
+   "dimension": "Transparency"
+  },
+  "GOV-PPC-5": {
+   "packId": "public-private-collaboration",
+   "dimension": "Compliance"
+  },
+  "GOV-PPC-6": {
+   "packId": "public-private-collaboration",
+   "dimension": "Security"
+  },
+  "GOV-PPC-7": {
+   "packId": "public-private-collaboration",
+   "dimension": "Governance"
+  },
+  "GOV-PPC-8": {
+   "packId": "public-private-collaboration",
+   "dimension": "Compliance"
+  },
+  "GOV-PPC-9": {
+   "packId": "public-private-collaboration",
+   "dimension": "Compliance"
+  },
+  "HLT-CL-1": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-CL-10": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-CL-11": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-CL-12": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Traceability"
+  },
+  "HLT-CL-13": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-CL-14": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-CL-15": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Traceability"
+  },
+  "HLT-CL-16": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-CL-2": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-CL-3": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-CL-4": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-CL-5": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Ethics"
+  },
+  "HLT-CL-6": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Traceability"
+  },
+  "HLT-CL-7": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-CL-8": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-CL-9": {
+   "packId": "clinical-lifecycle",
+   "dimension": "Transparency"
+  },
+  "HLT-CT-1": {
+   "packId": "clinical-trials",
+   "dimension": "Safety"
+  },
+  "HLT-CT-10": {
+   "packId": "clinical-trials",
+   "dimension": "Ethics"
+  },
+  "HLT-CT-11": {
+   "packId": "clinical-trials",
+   "dimension": "Compliance"
+  },
+  "HLT-CT-12": {
+   "packId": "clinical-trials",
+   "dimension": "Governance"
+  },
+  "HLT-CT-13": {
+   "packId": "clinical-trials",
+   "dimension": "Safety"
+  },
+  "HLT-CT-14": {
+   "packId": "clinical-trials",
+   "dimension": "Compliance"
+  },
+  "HLT-CT-15": {
+   "packId": "clinical-trials",
+   "dimension": "Ethics"
+  },
+  "HLT-CT-16": {
+   "packId": "clinical-trials",
+   "dimension": "Compliance"
+  },
+  "HLT-CT-2": {
+   "packId": "clinical-trials",
+   "dimension": "Compliance"
+  },
+  "HLT-CT-3": {
+   "packId": "clinical-trials",
+   "dimension": "Traceability"
+  },
+  "HLT-CT-4": {
+   "packId": "clinical-trials",
+   "dimension": "Governance"
+  },
+  "HLT-CT-5": {
+   "packId": "clinical-trials",
+   "dimension": "Ethics"
+  },
+  "HLT-CT-6": {
+   "packId": "clinical-trials",
+   "dimension": "Safety"
+  },
+  "HLT-CT-7": {
+   "packId": "clinical-trials",
+   "dimension": "Compliance"
+  },
+  "HLT-CT-8": {
+   "packId": "clinical-trials",
+   "dimension": "Transparency"
+  },
+  "HLT-CT-9": {
+   "packId": "clinical-trials",
+   "dimension": "Governance"
+  },
+  "HLT-DD-1": {
+   "packId": "drug-discovery",
+   "dimension": "Safety"
+  },
+  "HLT-DD-10": {
+   "packId": "drug-discovery",
+   "dimension": "Safety"
+  },
+  "HLT-DD-11": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-12": {
+   "packId": "drug-discovery",
+   "dimension": "Governance"
+  },
+  "HLT-DD-13": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-14": {
+   "packId": "drug-discovery",
+   "dimension": "Safety"
+  },
+  "HLT-DD-15": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-16": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-2": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-3": {
+   "packId": "drug-discovery",
+   "dimension": "Traceability"
+  },
+  "HLT-DD-4": {
+   "packId": "drug-discovery",
+   "dimension": "Safety"
+  },
+  "HLT-DD-5": {
+   "packId": "drug-discovery",
+   "dimension": "Governance"
+  },
+  "HLT-DD-6": {
+   "packId": "drug-discovery",
+   "dimension": "Compliance"
+  },
+  "HLT-DD-7": {
+   "packId": "drug-discovery",
+   "dimension": "Transparency"
+  },
+  "HLT-DD-8": {
+   "packId": "drug-discovery",
+   "dimension": "Ethics"
+  },
+  "HLT-DD-9": {
+   "packId": "drug-discovery",
+   "dimension": "Traceability"
+  },
+  "HLT-DHR-1": {
+   "packId": "digital-health-record",
+   "dimension": "Safety"
+  },
+  "HLT-DHR-10": {
+   "packId": "digital-health-record",
+   "dimension": "Governance"
+  },
+  "HLT-DHR-11": {
+   "packId": "digital-health-record",
+   "dimension": "Safety"
+  },
+  "HLT-DHR-12": {
+   "packId": "digital-health-record",
+   "dimension": "Compliance"
+  },
+  "HLT-DHR-13": {
+   "packId": "digital-health-record",
+   "dimension": "Compliance"
+  },
+  "HLT-DHR-14": {
+   "packId": "digital-health-record",
+   "dimension": "Safety"
+  },
+  "HLT-DHR-15": {
+   "packId": "digital-health-record",
+   "dimension": "Traceability"
+  },
+  "HLT-DHR-16": {
+   "packId": "digital-health-record",
+   "dimension": "Governance"
+  },
+  "HLT-DHR-17": {
+   "packId": "digital-health-record",
+   "dimension": "Traceability"
+  },
+  "HLT-DHR-18": {
+   "packId": "digital-health-record",
+   "dimension": "Traceability"
+  },
+  "HLT-DHR-2": {
+   "packId": "digital-health-record",
+   "dimension": "Compliance"
+  },
+  "HLT-DHR-3": {
+   "packId": "digital-health-record",
+   "dimension": "Traceability"
+  },
+  "HLT-DHR-4": {
+   "packId": "digital-health-record",
+   "dimension": "Governance"
+  },
+  "HLT-DHR-5": {
+   "packId": "digital-health-record",
+   "dimension": "Safety"
+  },
+  "HLT-DHR-6": {
+   "packId": "digital-health-record",
+   "dimension": "Transparency"
+  },
+  "HLT-DHR-7": {
+   "packId": "digital-health-record",
+   "dimension": "Ethics"
+  },
+  "HLT-DHR-8": {
+   "packId": "digital-health-record",
+   "dimension": "Compliance"
+  },
+  "HLT-DHR-9": {
+   "packId": "digital-health-record",
+   "dimension": "Traceability"
+  },
+  "HLT-LT-1": {
+   "packId": "life-technology",
+   "dimension": "Safety"
+  },
+  "HLT-LT-10": {
+   "packId": "life-technology",
+   "dimension": "Governance"
+  },
+  "HLT-LT-11": {
+   "packId": "life-technology",
+   "dimension": "Compliance"
+  },
+  "HLT-LT-12": {
+   "packId": "life-technology",
+   "dimension": "Compliance"
+  },
+  "HLT-LT-13": {
+   "packId": "life-technology",
+   "dimension": "Traceability"
+  },
+  "HLT-LT-14": {
+   "packId": "life-technology",
+   "dimension": "Safety"
+  },
+  "HLT-LT-15": {
+   "packId": "life-technology",
+   "dimension": "Safety"
+  },
+  "HLT-LT-16": {
+   "packId": "life-technology",
+   "dimension": "Traceability"
+  },
+  "HLT-LT-2": {
+   "packId": "life-technology",
+   "dimension": "Compliance"
+  },
+  "HLT-LT-3": {
+   "packId": "life-technology",
+   "dimension": "Safety"
+  },
+  "HLT-LT-4": {
+   "packId": "life-technology",
+   "dimension": "Ethics"
+  },
+  "HLT-LT-5": {
+   "packId": "life-technology",
+   "dimension": "Governance"
+  },
+  "HLT-LT-6": {
+   "packId": "life-technology",
+   "dimension": "Compliance"
+  },
+  "HLT-LT-7": {
+   "packId": "life-technology",
+   "dimension": "Transparency"
+  },
+  "HLT-LT-8": {
+   "packId": "life-technology",
+   "dimension": "Safety"
+  },
+  "HLT-LT-9": {
+   "packId": "life-technology",
+   "dimension": "Traceability"
+  },
+  "HLT-PL-1": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-10": {
+   "packId": "patient-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-PL-11": {
+   "packId": "patient-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-PL-12": {
+   "packId": "patient-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-PL-13": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-14": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-15": {
+   "packId": "patient-lifecycle",
+   "dimension": "Traceability"
+  },
+  "HLT-PL-16": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-17": {
+   "packId": "patient-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-PL-2": {
+   "packId": "patient-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-PL-3": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-4": {
+   "packId": "patient-lifecycle",
+   "dimension": "Traceability"
+  },
+  "HLT-PL-5": {
+   "packId": "patient-lifecycle",
+   "dimension": "Governance"
+  },
+  "HLT-PL-6": {
+   "packId": "patient-lifecycle",
+   "dimension": "Ethics"
+  },
+  "HLT-PL-7": {
+   "packId": "patient-lifecycle",
+   "dimension": "Compliance"
+  },
+  "HLT-PL-8": {
+   "packId": "patient-lifecycle",
+   "dimension": "Safety"
+  },
+  "HLT-PL-9": {
+   "packId": "patient-lifecycle",
+   "dimension": "Transparency"
+  },
+  "HLT-PP-1": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-10": {
+   "packId": "professional-practice",
+   "dimension": "Governance"
+  },
+  "HLT-PP-11": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-12": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-13": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-14": {
+   "packId": "professional-practice",
+   "dimension": "Ethics"
+  },
+  "HLT-PP-15": {
+   "packId": "professional-practice",
+   "dimension": "Governance"
+  },
+  "HLT-PP-16": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-17": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-2": {
+   "packId": "professional-practice",
+   "dimension": "Safety"
+  },
+  "HLT-PP-3": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-4": {
+   "packId": "professional-practice",
+   "dimension": "Governance"
+  },
+  "HLT-PP-5": {
+   "packId": "professional-practice",
+   "dimension": "Safety"
+  },
+  "HLT-PP-6": {
+   "packId": "professional-practice",
+   "dimension": "Ethics"
+  },
+  "HLT-PP-7": {
+   "packId": "professional-practice",
+   "dimension": "Traceability"
+  },
+  "HLT-PP-8": {
+   "packId": "professional-practice",
+   "dimension": "Compliance"
+  },
+  "HLT-PP-9": {
+   "packId": "professional-practice",
+   "dimension": "Transparency"
+  },
+  "HLT-SM-1": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-10": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-11": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-12": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-13": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-14": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-15": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-16": {
+   "packId": "specialized-medicine",
+   "dimension": "Governance"
+  },
+  "HLT-SM-17": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-18": {
+   "packId": "specialized-medicine",
+   "dimension": "Ethics"
+  },
+  "HLT-SM-2": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-3": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-4": {
+   "packId": "specialized-medicine",
+   "dimension": "Safety"
+  },
+  "HLT-SM-5": {
+   "packId": "specialized-medicine",
+   "dimension": "Governance"
+  },
+  "HLT-SM-6": {
+   "packId": "specialized-medicine",
+   "dimension": "Ethics"
+  },
+  "HLT-SM-7": {
+   "packId": "specialized-medicine",
+   "dimension": "Traceability"
+  },
+  "HLT-SM-8": {
+   "packId": "specialized-medicine",
+   "dimension": "Compliance"
+  },
+  "HLT-SM-9": {
+   "packId": "specialized-medicine",
+   "dimension": "Transparency"
+  },
+  "HLT-WM-1": {
+   "packId": "wellness-management",
+   "dimension": "Safety"
+  },
+  "HLT-WM-10": {
+   "packId": "wellness-management",
+   "dimension": "Governance"
+  },
+  "HLT-WM-11": {
+   "packId": "wellness-management",
+   "dimension": "Compliance"
+  },
+  "HLT-WM-12": {
+   "packId": "wellness-management",
+   "dimension": "Compliance"
+  },
+  "HLT-WM-13": {
+   "packId": "wellness-management",
+   "dimension": "Compliance"
+  },
+  "HLT-WM-14": {
+   "packId": "wellness-management",
+   "dimension": "Ethics"
+  },
+  "HLT-WM-15": {
+   "packId": "wellness-management",
+   "dimension": "Governance"
+  },
+  "HLT-WM-16": {
+   "packId": "wellness-management",
+   "dimension": "Safety"
+  },
+  "HLT-WM-17": {
+   "packId": "wellness-management",
+   "dimension": "Governance"
+  },
+  "HLT-WM-2": {
+   "packId": "wellness-management",
+   "dimension": "Compliance"
+  },
+  "HLT-WM-3": {
+   "packId": "wellness-management",
+   "dimension": "Ethics"
+  },
+  "HLT-WM-4": {
+   "packId": "wellness-management",
+   "dimension": "Governance"
+  },
+  "HLT-WM-5": {
+   "packId": "wellness-management",
+   "dimension": "Safety"
+  },
+  "HLT-WM-6": {
+   "packId": "wellness-management",
+   "dimension": "Transparency"
+  },
+  "HLT-WM-7": {
+   "packId": "wellness-management",
+   "dimension": "Compliance"
+  },
+  "HLT-WM-8": {
+   "packId": "wellness-management",
+   "dimension": "Ethics"
+  },
+  "HLT-WM-9": {
+   "packId": "wellness-management",
+   "dimension": "Traceability"
+  },
+  "MOB-F3W-1": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Carrier Reliability"
+  },
+  "MOB-F3W-10": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Dangerous Goods"
+  },
+  "MOB-F3W-11": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Workforce Algorithmic Management"
+  },
+  "MOB-F3W-12": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Incident Reporting"
+  },
+  "MOB-F3W-13": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Autonomous Warehouse Machinery"
+  },
+  "MOB-F3W-14": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Forced-Labour Screening"
+  },
+  "MOB-F3W-15": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Data Protection"
+  },
+  "MOB-F3W-2": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Exception Management"
+  },
+  "MOB-F3W-3": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Warehouse Integrity"
+  },
+  "MOB-F3W-4": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Traceability"
+  },
+  "MOB-F3W-5": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Cold Chain and Condition Monitoring"
+  },
+  "MOB-F3W-6": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "3PL and Partner Governance"
+  },
+  "MOB-F3W-7": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "EDI/API Resilience"
+  },
+  "MOB-F3W-8": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Operational KPI Mapping"
+  },
+  "MOB-F3W-9": {
+   "packId": "freight-3pl-warehouse",
+   "dimension": "Driver Hours and Dispatch"
+  },
+  "MOB-PS-1": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Privacy"
+  },
+  "MOB-PS-10": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Governance"
+  },
+  "MOB-PS-11": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-12": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Compliance"
+  },
+  "MOB-PS-13": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-14": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-15": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Incident Reporting"
+  },
+  "MOB-PS-2": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-3": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-4": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Compliance"
+  },
+  "MOB-PS-5": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Privacy"
+  },
+  "MOB-PS-6": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Governance"
+  },
+  "MOB-PS-7": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Transparency"
+  },
+  "MOB-PS-8": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Security"
+  },
+  "MOB-PS-9": {
+   "packId": "privacy-security-mobility",
+   "dimension": "Compliance"
+  },
+  "MOB-RE-1": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Sustainability"
+  },
+  "MOB-RE-10": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Compliance"
+  },
+  "MOB-RE-11": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Governance"
+  },
+  "MOB-RE-12": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Transparency"
+  },
+  "MOB-RE-13": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Wellbeing"
+  },
+  "MOB-RE-14": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Transparency"
+  },
+  "MOB-RE-15": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Governance"
+  },
+  "MOB-RE-2": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Compliance"
+  },
+  "MOB-RE-3": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Wellbeing"
+  },
+  "MOB-RE-4": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Governance"
+  },
+  "MOB-RE-5": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Safety"
+  },
+  "MOB-RE-6": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Traceability"
+  },
+  "MOB-RE-7": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Compliance"
+  },
+  "MOB-RE-8": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Transparency"
+  },
+  "MOB-RE-9": {
+   "packId": "sustainable-real-estate",
+   "dimension": "Compliance"
+  },
+  "MOB-SC-1": {
+   "packId": "sustainable-communities",
+   "dimension": "Governance"
+  },
+  "MOB-SC-10": {
+   "packId": "sustainable-communities",
+   "dimension": "Sustainability"
+  },
+  "MOB-SC-11": {
+   "packId": "sustainable-communities",
+   "dimension": "Governance"
+  },
+  "MOB-SC-12": {
+   "packId": "sustainable-communities",
+   "dimension": "Traceability"
+  },
+  "MOB-SC-13": {
+   "packId": "sustainable-communities",
+   "dimension": "Architecture"
+  },
+  "MOB-SC-14": {
+   "packId": "sustainable-communities",
+   "dimension": "Governance"
+  },
+  "MOB-SC-15": {
+   "packId": "sustainable-communities",
+   "dimension": "Privacy"
+  },
+  "MOB-SC-2": {
+   "packId": "sustainable-communities",
+   "dimension": "Ethics"
+  },
+  "MOB-SC-3": {
+   "packId": "sustainable-communities",
+   "dimension": "Ethics"
+  },
+  "MOB-SC-4": {
+   "packId": "sustainable-communities",
+   "dimension": "Transparency"
+  },
+  "MOB-SC-5": {
+   "packId": "sustainable-communities",
+   "dimension": "Compliance"
+  },
+  "MOB-SC-6": {
+   "packId": "sustainable-communities",
+   "dimension": "Safety"
+  },
+  "MOB-SC-7": {
+   "packId": "sustainable-communities",
+   "dimension": "Traceability"
+  },
+  "MOB-SC-8": {
+   "packId": "sustainable-communities",
+   "dimension": "Safety"
+  },
+  "MOB-SC-9": {
+   "packId": "sustainable-communities",
+   "dimension": "Compliance"
+  },
+  "MOB-SP-1": {
+   "packId": "sustainable-ports",
+   "dimension": "Safety"
+  },
+  "MOB-SP-10": {
+   "packId": "sustainable-ports",
+   "dimension": "Compliance"
+  },
+  "MOB-SP-11": {
+   "packId": "sustainable-ports",
+   "dimension": "Security"
+  },
+  "MOB-SP-12": {
+   "packId": "sustainable-ports",
+   "dimension": "Safety"
+  },
+  "MOB-SP-13": {
+   "packId": "sustainable-ports",
+   "dimension": "Governance"
+  },
+  "MOB-SP-14": {
+   "packId": "sustainable-ports",
+   "dimension": "Security"
+  },
+  "MOB-SP-15": {
+   "packId": "sustainable-ports",
+   "dimension": "Transparency"
+  },
+  "MOB-SP-2": {
+   "packId": "sustainable-ports",
+   "dimension": "Compliance"
+  },
+  "MOB-SP-3": {
+   "packId": "sustainable-ports",
+   "dimension": "Sustainability"
+  },
+  "MOB-SP-4": {
+   "packId": "sustainable-ports",
+   "dimension": "Governance"
+  },
+  "MOB-SP-5": {
+   "packId": "sustainable-ports",
+   "dimension": "Transparency"
+  },
+  "MOB-SP-6": {
+   "packId": "sustainable-ports",
+   "dimension": "Safety"
+  },
+  "MOB-SP-7": {
+   "packId": "sustainable-ports",
+   "dimension": "Compliance"
+  },
+  "MOB-SP-8": {
+   "packId": "sustainable-ports",
+   "dimension": "Traceability"
+  },
+  "MOB-SP-9": {
+   "packId": "sustainable-ports",
+   "dimension": "Security"
+  },
+  "MOB-VI-1": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Security"
+  },
+  "MOB-VI-10": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Access Control"
+  },
+  "MOB-VI-11": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Governance"
+  },
+  "MOB-VI-12": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Interoperability"
+  },
+  "MOB-VI-13": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Governance"
+  },
+  "MOB-VI-14": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Governance"
+  },
+  "MOB-VI-15": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Incident Reporting"
+  },
+  "MOB-VI-2": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Resilience"
+  },
+  "MOB-VI-3": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Compliance"
+  },
+  "MOB-VI-4": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Security"
+  },
+  "MOB-VI-5": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Governance"
+  },
+  "MOB-VI-6": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Sustainability"
+  },
+  "MOB-VI-7": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Transparency"
+  },
+  "MOB-VI-8": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Compliance"
+  },
+  "MOB-VI-9": {
+   "packId": "virtual-infrastructure",
+   "dimension": "Compliance"
+  },
+  "TECH-CI-1": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Transparency"
+  },
+  "TECH-CI-10": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Transparency"
+  },
+  "TECH-CI-11": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Rights"
+  },
+  "TECH-CI-12": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Governance"
+  },
+  "TECH-CI-13": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Transparency"
+  },
+  "TECH-CI-14": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Governance"
+  },
+  "TECH-CI-15": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Governance"
+  },
+  "TECH-CI-2": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Ethics"
+  },
+  "TECH-CI-3": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Governance"
+  },
+  "TECH-CI-4": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Compliance"
+  },
+  "TECH-CI-5": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Privacy"
+  },
+  "TECH-CI-6": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Ethics"
+  },
+  "TECH-CI-7": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Transparency"
+  },
+  "TECH-CI-8": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Security"
+  },
+  "TECH-CI-9": {
+   "packId": "cognition-to-intelligence",
+   "dimension": "Compliance"
+  },
+  "TECH-INF-1": {
+   "packId": "infotainment",
+   "dimension": "Compliance"
+  },
+  "TECH-INF-10": {
+   "packId": "infotainment",
+   "dimension": "Transparency"
+  },
+  "TECH-INF-11": {
+   "packId": "infotainment",
+   "dimension": "Competition"
+  },
+  "TECH-INF-12": {
+   "packId": "infotainment",
+   "dimension": "Compliance"
+  },
+  "TECH-INF-13": {
+   "packId": "infotainment",
+   "dimension": "Privacy"
+  },
+  "TECH-INF-14": {
+   "packId": "infotainment",
+   "dimension": "Governance"
+  },
+  "TECH-INF-15": {
+   "packId": "infotainment",
+   "dimension": "Governance"
+  },
+  "TECH-INF-2": {
+   "packId": "infotainment",
+   "dimension": "Safety"
+  },
+  "TECH-INF-3": {
+   "packId": "infotainment",
+   "dimension": "Transparency"
+  },
+  "TECH-INF-4": {
+   "packId": "infotainment",
+   "dimension": "Compliance"
+  },
+  "TECH-INF-5": {
+   "packId": "infotainment",
+   "dimension": "Safety"
+  },
+  "TECH-INF-6": {
+   "packId": "infotainment",
+   "dimension": "Accessibility"
+  },
+  "TECH-INF-7": {
+   "packId": "infotainment",
+   "dimension": "Privacy"
+  },
+  "TECH-INF-8": {
+   "packId": "infotainment",
+   "dimension": "Governance"
+  },
+  "TECH-INF-9": {
+   "packId": "infotainment",
+   "dimension": "Compliance"
+  },
+  "TECH-NE-1": {
+   "packId": "networked-ecosystems",
+   "dimension": "Compliance"
+  },
+  "TECH-NE-10": {
+   "packId": "networked-ecosystems",
+   "dimension": "Security"
+  },
+  "TECH-NE-11": {
+   "packId": "networked-ecosystems",
+   "dimension": "Governance"
+  },
+  "TECH-NE-12": {
+   "packId": "networked-ecosystems",
+   "dimension": "Security"
+  },
+  "TECH-NE-13": {
+   "packId": "networked-ecosystems",
+   "dimension": "Compliance"
+  },
+  "TECH-NE-14": {
+   "packId": "networked-ecosystems",
+   "dimension": "Data Access by Design"
+  },
+  "TECH-NE-15": {
+   "packId": "networked-ecosystems",
+   "dimension": "Supply Chain Security"
+  },
+  "TECH-NE-2": {
+   "packId": "networked-ecosystems",
+   "dimension": "Security"
+  },
+  "TECH-NE-3": {
+   "packId": "networked-ecosystems",
+   "dimension": "Governance"
+  },
+  "TECH-NE-4": {
+   "packId": "networked-ecosystems",
+   "dimension": "Privacy"
+  },
+  "TECH-NE-5": {
+   "packId": "networked-ecosystems",
+   "dimension": "Interoperability"
+  },
+  "TECH-NE-6": {
+   "packId": "networked-ecosystems",
+   "dimension": "Security"
+  },
+  "TECH-NE-7": {
+   "packId": "networked-ecosystems",
+   "dimension": "Governance"
+  },
+  "TECH-NE-8": {
+   "packId": "networked-ecosystems",
+   "dimension": "Transparency"
+  },
+  "TECH-NE-9": {
+   "packId": "networked-ecosystems",
+   "dimension": "Compliance"
+  },
+  "TECH-OS-1": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Resilience"
+  },
+  "TECH-OS-10": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Resilience"
+  },
+  "TECH-OS-11": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Privacy"
+  },
+  "TECH-OS-12": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Resilience"
+  },
+  "TECH-OS-13": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Governance"
+  },
+  "TECH-OS-14": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Operations"
+  },
+  "TECH-OS-15": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Governance"
+  },
+  "TECH-OS-2": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Governance"
+  },
+  "TECH-OS-3": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Security"
+  },
+  "TECH-OS-4": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Transparency"
+  },
+  "TECH-OS-5": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Compliance"
+  },
+  "TECH-OS-6": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Ethics"
+  },
+  "TECH-OS-7": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Security"
+  },
+  "TECH-OS-8": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Governance"
+  },
+  "TECH-OS-9": {
+   "packId": "os-sustainable-outcomes",
+   "dimension": "Compliance"
+  },
+  "TECH-PP-1": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Governance"
+  },
+  "TECH-PP-10": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Compliance"
+  },
+  "TECH-PP-11": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Compliance"
+  },
+  "TECH-PP-12": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Security"
+  },
+  "TECH-PP-13": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Governance"
+  },
+  "TECH-PP-14": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Governance"
+  },
+  "TECH-PP-15": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Fair Contracting"
+  },
+  "TECH-PP-2": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Compliance"
+  },
+  "TECH-PP-3": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Ethics"
+  },
+  "TECH-PP-4": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Transparency"
+  },
+  "TECH-PP-5": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Compliance"
+  },
+  "TECH-PP-6": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Security"
+  },
+  "TECH-PP-7": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Governance"
+  },
+  "TECH-PP-8": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Ethics"
+  },
+  "TECH-PP-9": {
+   "packId": "partnerships-prosperity",
+   "dimension": "Compliance"
+  },
+  "WLT-BC-1": {
+   "packId": "blockchain",
+   "dimension": "Compliance"
+  },
+  "WLT-BC-10": {
+   "packId": "blockchain",
+   "dimension": "Compliance"
+  },
+  "WLT-BC-11": {
+   "packId": "blockchain",
+   "dimension": "Traceability"
+  },
+  "WLT-BC-12": {
+   "packId": "blockchain",
+   "dimension": "Traceability"
+  },
+  "WLT-BC-13": {
+   "packId": "blockchain",
+   "dimension": "Governance"
+  },
+  "WLT-BC-14": {
+   "packId": "blockchain",
+   "dimension": "Compliance"
+  },
+  "WLT-BC-15": {
+   "packId": "blockchain",
+   "dimension": "Governance"
+  },
+  "WLT-BC-2": {
+   "packId": "blockchain",
+   "dimension": "Safety"
+  },
+  "WLT-BC-3": {
+   "packId": "blockchain",
+   "dimension": "Compliance"
+  },
+  "WLT-BC-4": {
+   "packId": "blockchain",
+   "dimension": "Governance"
+  },
+  "WLT-BC-5": {
+   "packId": "blockchain",
+   "dimension": "Safety"
+  },
+  "WLT-BC-6": {
+   "packId": "blockchain",
+   "dimension": "Transparency"
+  },
+  "WLT-BC-7": {
+   "packId": "blockchain",
+   "dimension": "Ethics"
+  },
+  "WLT-BC-8": {
+   "packId": "blockchain",
+   "dimension": "Traceability"
+  },
+  "WLT-BC-9": {
+   "packId": "blockchain",
+   "dimension": "Compliance"
+  },
+  "WLT-CE-1": {
+   "packId": "circular-economy",
+   "dimension": "Compliance"
+  },
+  "WLT-CE-10": {
+   "packId": "circular-economy",
+   "dimension": "Compliance"
+  },
+  "WLT-CE-11": {
+   "packId": "circular-economy",
+   "dimension": "Compliance"
+  },
+  "WLT-CE-12": {
+   "packId": "circular-economy",
+   "dimension": "Transparency"
+  },
+  "WLT-CE-13": {
+   "packId": "circular-economy",
+   "dimension": "Traceability"
+  },
+  "WLT-CE-14": {
+   "packId": "circular-economy",
+   "dimension": "Governance"
+  },
+  "WLT-CE-15": {
+   "packId": "circular-economy",
+   "dimension": "Governance"
+  },
+  "WLT-CE-2": {
+   "packId": "circular-economy",
+   "dimension": "Transparency"
+  },
+  "WLT-CE-3": {
+   "packId": "circular-economy",
+   "dimension": "Governance"
+  },
+  "WLT-CE-4": {
+   "packId": "circular-economy",
+   "dimension": "Ethics"
+  },
+  "WLT-CE-5": {
+   "packId": "circular-economy",
+   "dimension": "Compliance"
+  },
+  "WLT-CE-6": {
+   "packId": "circular-economy",
+   "dimension": "Safety"
+  },
+  "WLT-CE-7": {
+   "packId": "circular-economy",
+   "dimension": "Traceability"
+  },
+  "WLT-CE-8": {
+   "packId": "circular-economy",
+   "dimension": "Governance"
+  },
+  "WLT-CE-9": {
+   "packId": "circular-economy",
+   "dimension": "Compliance"
+  },
+  "WLT-DP-1": {
+   "packId": "digital-payments",
+   "dimension": "Safety"
+  },
+  "WLT-DP-10": {
+   "packId": "digital-payments",
+   "dimension": "Safety"
+  },
+  "WLT-DP-11": {
+   "packId": "digital-payments",
+   "dimension": "Governance"
+  },
+  "WLT-DP-12": {
+   "packId": "digital-payments",
+   "dimension": "Compliance"
+  },
+  "WLT-DP-13": {
+   "packId": "digital-payments",
+   "dimension": "Payee Verification"
+  },
+  "WLT-DP-14": {
+   "packId": "digital-payments",
+   "dimension": "Crypto-Asset Transfer Information"
+  },
+  "WLT-DP-15": {
+   "packId": "digital-payments",
+   "dimension": "Resilience"
+  },
+  "WLT-DP-2": {
+   "packId": "digital-payments",
+   "dimension": "Compliance"
+  },
+  "WLT-DP-3": {
+   "packId": "digital-payments",
+   "dimension": "Ethics"
+  },
+  "WLT-DP-4": {
+   "packId": "digital-payments",
+   "dimension": "Compliance"
+  },
+  "WLT-DP-5": {
+   "packId": "digital-payments",
+   "dimension": "Transparency"
+  },
+  "WLT-DP-6": {
+   "packId": "digital-payments",
+   "dimension": "Safety"
+  },
+  "WLT-DP-7": {
+   "packId": "digital-payments",
+   "dimension": "Governance"
+  },
+  "WLT-DP-8": {
+   "packId": "digital-payments",
+   "dimension": "Traceability"
+  },
+  "WLT-DP-9": {
+   "packId": "digital-payments",
+   "dimension": "Compliance"
+  },
+  "WLT-FW-1": {
+   "packId": "future-of-work",
+   "dimension": "Ethics"
+  },
+  "WLT-FW-10": {
+   "packId": "future-of-work",
+   "dimension": "Compliance"
+  },
+  "WLT-FW-11": {
+   "packId": "future-of-work",
+   "dimension": "Compliance"
+  },
+  "WLT-FW-12": {
+   "packId": "future-of-work",
+   "dimension": "Safety"
+  },
+  "WLT-FW-13": {
+   "packId": "future-of-work",
+   "dimension": "Governance"
+  },
+  "WLT-FW-14": {
+   "packId": "future-of-work",
+   "dimension": "Governance"
+  },
+  "WLT-FW-15": {
+   "packId": "future-of-work",
+   "dimension": "Transparency"
+  },
+  "WLT-FW-2": {
+   "packId": "future-of-work",
+   "dimension": "Compliance"
+  },
+  "WLT-FW-3": {
+   "packId": "future-of-work",
+   "dimension": "Transparency"
+  },
+  "WLT-FW-4": {
+   "packId": "future-of-work",
+   "dimension": "Safety"
+  },
+  "WLT-FW-5": {
+   "packId": "future-of-work",
+   "dimension": "Governance"
+  },
+  "WLT-FW-6": {
+   "packId": "future-of-work",
+   "dimension": "Ethics"
+  },
+  "WLT-FW-7": {
+   "packId": "future-of-work",
+   "dimension": "Compliance"
+  },
+  "WLT-FW-8": {
+   "packId": "future-of-work",
+   "dimension": "Traceability"
+  },
+  "WLT-FW-9": {
+   "packId": "future-of-work",
+   "dimension": "Compliance"
+  },
+  "WLT-NP-1": {
+   "packId": "no-poverty",
+   "dimension": "Ethics"
+  },
+  "WLT-NP-10": {
+   "packId": "no-poverty",
+   "dimension": "Fair Lending"
+  },
+  "WLT-NP-11": {
+   "packId": "no-poverty",
+   "dimension": "Governance"
+  },
+  "WLT-NP-12": {
+   "packId": "no-poverty",
+   "dimension": "Consumer Protection"
+  },
+  "WLT-NP-13": {
+   "packId": "no-poverty",
+   "dimension": "Risk Management"
+  },
+  "WLT-NP-14": {
+   "packId": "no-poverty",
+   "dimension": "Compliance"
+  },
+  "WLT-NP-15": {
+   "packId": "no-poverty",
+   "dimension": "Risk Management"
+  },
+  "WLT-NP-2": {
+   "packId": "no-poverty",
+   "dimension": "Ethics"
+  },
+  "WLT-NP-3": {
+   "packId": "no-poverty",
+   "dimension": "Compliance"
+  },
+  "WLT-NP-4": {
+   "packId": "no-poverty",
+   "dimension": "Safety"
+  },
+  "WLT-NP-5": {
+   "packId": "no-poverty",
+   "dimension": "Transparency"
+  },
+  "WLT-NP-6": {
+   "packId": "no-poverty",
+   "dimension": "Governance"
+  },
+  "WLT-NP-7": {
+   "packId": "no-poverty",
+   "dimension": "Safety"
+  },
+  "WLT-NP-8": {
+   "packId": "no-poverty",
+   "dimension": "Traceability"
+  },
+  "WLT-NP-9": {
+   "packId": "no-poverty",
+   "dimension": "Transparency"
+  }
+ }
+}

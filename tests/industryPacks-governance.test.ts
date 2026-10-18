@@ -7,13 +7,13 @@ import {
   resolveRegulatoryRefParts,
   validatePackRegulatoryCurrency,
 } from "../src/domains/packs/regulatorySchema.js";
-import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
+import { PENDING_SID_IDS } from "./helpers/f5Deferred.js";
 
 /** Governance station, round-2 content (2026-10-04): round2/content/governance + Fable review.json. */
 const packs = getIndustryPacksByStation("governance");
 const allQuestions = packs.flatMap((p) => p.questions.map((q) => ({ pack: p.id, ...q })));
 /** Round-2 rules apply to round-2 content; kept F5 proposed drops carry main's text until Sid decides them (P0-26). */
-const questions = allQuestions.filter((q) => !F5_KEPT_IDS.has(q.id));
+const questions = allQuestions.filter((q) => !PENDING_SID_IDS.has(q.id));
 const AS_OF = new Date("2026-10-04T00:00:00Z");
 
 describe("governance station packs (round 2)", () => {
@@ -33,7 +33,7 @@ describe("governance station packs (round 2)", () => {
       "GOV-PL-2", "GOV-PL-3", "GOV-PL-14", "GOV-CS-12", "GOV-PPC-2", "GOV-PPC-5", "GOV-PPC-12", "GOV-PPC-15",
     ];
     const ids = new Set(allQuestions.map((q) => q.id));
-    expect(gone.filter((id) => ids.has(id) !== F5_KEPT_IDS.has(id))).toEqual([]);
+    expect(gone.filter((id) => ids.has(id) !== PENDING_SID_IDS.has(id))).toEqual([]);
   });
 
   test("known mis-citations are corrected", () => {
