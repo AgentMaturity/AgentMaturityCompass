@@ -49,12 +49,12 @@ Before P1-42 (int `b9866b0f`): 632 pack questions and 150 deep questions. The ca
 - EU amending act: the sourced register now records Regulation (EU) 2026/1744 (CELEX 32026R1744) as read on 2026-10-04; the sidecar's EU AI Act rows still say the OJ citation is unverified (S10 wording), left for the expert to reconcile.
 - The calendar header still names no commit, so `--check` stays deterministic.
 
-## Originals cited (read with `git show 37c1466b:<path>`)
+## Originals cited (git blob ids in candidate `37c1466b`; read with `git cat-file -p <blob>`)
 
-- `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/{health,education,environment,mobility,governance,technology,wealth}/result.json`
-- `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/snapshot.mts` (tracked as `scripts/snapshot-industry-packs.mts`)
-- `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I1/build-guides.mts` (tracked as `scripts/gen-industry-guides.mts`)
-- `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/apply-log.json`, `apply/education/questions-applied.json` (dispositions in `content-diff.json`)
+- The seven station apply results of candidate `37c1466b` (blobs: health `d7b7d84381bc`, education `abd1efdb36f6`, environment `0688e4292564`, mobility `8e6efca95db9`, governance `f3c210ff288e`, technology `b3b7ce4e7792`, wealth `537fb3b384df`)
+- The candidate's split snapshot script, blob `a708068a44af` (tracked as `scripts/snapshot-industry-packs.mts`)
+- The candidate's guide builder, blob `d2b42c33e853` (tracked as `scripts/gen-industry-guides.mts`)
+- The mobility apply log, blob `e7a3b33fd4aa`, and the education applied-questions list, blob `27f80dc8af30` (dispositions in `content-diff.json`)
 - The round-2 inputs (`round2/content/<station>/questions.json`, `review.json`) are in no commit; they exist only in Sid's root checkout. P1-42 read the five stations' `questions.json` there (read only) for the 47 merge targets in `docs/program/round2/merge-decisions.json`.
 
 ## Not done here (needs a human)
