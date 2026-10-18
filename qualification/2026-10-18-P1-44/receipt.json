@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-44",
   "date": "2026-10-18",
-  "commit": "536984caae787d40d904d93f98c52ae5c17f2a6c",
+  "commit": "b237fda5f42d4c364648e7888e61337e50af0778",
   "branch": "rtd/p1-44-pack-mcp-scenarios",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,107 +12,107 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 1191191
+      "durationMs": 135791
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 2268555
+      "durationMs": 45166
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 535773
+      "durationMs": 76356
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 6408
+      "durationMs": 4393
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 3005
+      "durationMs": 1281
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 1491
+      "durationMs": 648
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 6081
+      "durationMs": 2675
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 4354
+      "durationMs": 2288
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 535
+      "durationMs": 459
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 1126
+      "durationMs": 923
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 351
+      "durationMs": 299
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 403
+      "durationMs": 331
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1514
+      "durationMs": 934
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 5765
+      "durationMs": 5072
     },
     {
       "cmd": "npm run -s check:citations",
       "exit": 0,
-      "durationMs": 589
+      "durationMs": 485
     },
     {
-      "cmd": "npx vitest run tests/claims/claimAdapters.test.ts tests/industryAssuranceFixtures.test.ts tests/industryPackEntitlement.test.ts tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/industryPackWeightingPaymentInvariance.test.ts tests/industryPacksHostedApi.test.ts tests/industryPacksPaywallSurfaces.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/noTierGatingOnTrustStack.test.ts tests/questionSets.test.ts tests/regulatedExamples.test.ts tests/exampleCommandsResolve.test.ts tests/domainRegistry.test.ts tests/releaseNotes.test.ts tests/checkReleaseNotes.test.ts tests/publicDistributionTruth.test.ts --reporter=json --outputFile=qualification/2026-10-18-P1-44/focused-tests.json",
+      "cmd": "npx vitest run tests/checkReleaseNotes.test.ts tests/claims/claimAdapters.test.ts tests/domainApply.test.ts tests/domainRegistry.test.ts tests/enterpriseIntegrations.test.ts tests/exampleCommandsResolve.test.ts tests/industryAssuranceFixtures.test.ts tests/industryPackAudit.test.ts tests/industryPackEntitlement.test.ts tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/industryPackNotEvaluated.test.ts tests/industryPackSchema.test.ts tests/industryPackWeightingPaymentInvariance.test.ts tests/industryPacksHostedApi.test.ts tests/industryPacksPaywallSurfaces.test.ts tests/logisticsIndustryPack.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/noTierGatingOnTrustStack.test.ts tests/publicDistributionTruth.test.ts tests/questionSets.test.ts tests/regulatedExamples.test.ts tests/releaseNotes.test.ts tests/releaseReadinessScripts.test.ts tests/score/trustAuthorizationSync.test.ts tests/studioVaultModeLoop.test.ts tests/trust/embeddedKeyForgery.test.ts tests/trust/verifySurfaces.test.ts --reporter=json --outputFile=qualification/2026-10-18-P1-44/focused-tests.json",
       "exit": 0,
-      "durationMs": 76000
+      "durationMs": 166000
     },
     {
-      "cmd": "fresh clone (git clone --no-local, branch head 536984caa): pnpm install --frozen-lockfile --offline",
+      "cmd": "fresh clone (git clone --no-local of the branch at cd3ad85a6, then git pull --ff-only to b237fda5f): pnpm install --frozen-lockfile --offline",
       "exit": 0,
-      "durationMs": 12400
+      "durationMs": 4000
     },
     {
       "cmd": "fresh clone: pnpm run build",
       "exit": 0,
-      "durationMs": 0
+      "durationMs": 52000
     },
     {
-      "cmd": "fresh clone O17: npx vitest run tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts",
+      "cmd": "fresh clone O17: npx vitest run tests/industryPackNotEvaluated.test.ts tests/industryPackMcpClaims.test.ts tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts tests/mcpServer.test.ts tests/mcpTools.test.ts",
       "exit": 0,
-      "durationMs": 38430
+      "durationMs": 13032
     },
     {
       "cmd": "fresh clone O18: npx vitest run tests/industryAssuranceFixtures.test.ts",
       "exit": 0,
-      "durationMs": 3024
+      "durationMs": 1234
     },
     {
       "cmd": "fresh clone O20: npx vitest run tests/regulatedExamples.test.ts tests/exampleCommandsResolve.test.ts",
       "exit": 0,
-      "durationMs": 90502
+      "durationMs": 72960
     },
     {
       "cmd": "fresh clone O19, Python 3.10.19: new venv; pip wheel --no-index sdk/python; pip install --no-index <wheel> pytest; python -I -m pytest sdk/python/tests/test_industry.py",
@@ -161,15 +161,15 @@
     }
   ],
   "tests": {
-    "total": 227,
-    "passed": 227,
+    "total": 404,
+    "passed": 404,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "d05f1de005535bc986fb772b2c8b99acadc41282ede86e899fba11e10e807d41"
+      "sha256": "99ddaa73066e53071cfd37e7644b77538271377fea34615ff624ae85ef85e6d3"
     },
     {
       "path": "candidate/O17-result.json",
@@ -197,40 +197,44 @@
     },
     {
       "path": "focused-tests.json",
-      "sha256": "99409682924faa3e2e05567992a46a3511a3cf09187b425a491d5a20a48340a5"
+      "sha256": "e9b6b769753b5206fd8bc11a20ce28bc430f96673d6c1f913304d0cf709f712b"
     },
     {
       "path": "fresh-clone/O17-vitest.json",
-      "sha256": "d70d6a0443d1b2f46c75cdaacfe8cd7bbf3301177ac1812001fd868068450d81"
+      "sha256": "a7bff4b37f6556b49cd06cb6114f36416859be19285021da464c66ebe7eec45d"
     },
     {
       "path": "fresh-clone/O18-vitest.json",
-      "sha256": "e753e122a0d658d3aad899ff5f274939d870b8e8c48e2d405690fba1960f0c69"
+      "sha256": "86bc8554052c6e6b77ed6710c87518822a4c840e0ff8a275273d1eb998682ee0"
     },
     {
       "path": "fresh-clone/O20-vitest.json",
-      "sha256": "f6aefec7c4b9b59d3092503aad5aa99292dd51fc35173a96da01ea58bbb5bfcc"
+      "sha256": "6aa0c317ea618599532888388ffe14565ecfc8b6408697cccfdc727cb1cd1f63"
     },
     {
       "path": "mcp-list-tools.txt",
-      "sha256": "e45ce3d3c3bc07ac3c12fc969fd1aebbdcad0a41adcc5975fe383cee59b4098d"
+      "sha256": "c44e39d0b5cc13208694fe9234be70730d7b62fff0500707fb87734b2db51703"
     },
     {
       "path": "mutations.json",
-      "sha256": "c132464a76eece0a21aea76022a99cce4006e1c77d6969944b8e398ad8bdf3eb"
+      "sha256": "a5bceeb049b27511a5c8bf90b0aa45e614ace7d0d9d2132e74eeabe8498ad827"
     },
     {
       "path": "python-lanes.txt",
-      "sha256": "6f1d062bc830ee1bb1eca4e175f3227ef1fb9742a23f8e73d3416c40c6a7706f"
+      "sha256": "74d57a88e24fa03363beecb0d0581a9c7e5ff6ec4b0891dd050a7d955675ed5d"
     },
     {
       "path": "red-claims.log",
       "sha256": "4371df9e609f0a0e8e59fb5a2ac534688b00f781d34efccae519a0d955388b1f"
     },
     {
+      "path": "red-not-evaluated.log",
+      "sha256": "4d99d7c09f461eeebf05d630714b2c4fc332af3f7ce5016fde8274d3ab471914"
+    },
+    {
       "path": "red-python.log",
       "sha256": "a4698a5058ac30204533d2c7278580663456d96a817a246f9bc214ba66d3e8e9"
     }
   ],
-  "notes": "Totals are the focused vitest run (new and changed tests plus the existing tests covering the changed modules) at the merged head. Fresh-clone per-track totals: O17 51/51, O18 28/28, O20 9/9 (fresh-clone/*.json); O19 42/42 on Python 3.10.19, 3.11.14, 3.12.14 and 3.14.7 from an installed wheel, plus the licensed real-CLI test 1/1 on each (python-lanes.txt). The full suite was not run: a fresh-clone run was stopped after 50 minutes because the shared machine was overloaded. A durationMs of 0 means the command was not timed. Nothing was published and no network was used. See README.md."
+  "notes": "Totals are the focused vitest run (new and changed tests plus the existing tests covering the changed modules, 31 files) at b237fda5f. Fresh-clone per-track totals: O17 58/58, O18 28/28, O20 9/9 (fresh-clone/*.json); O19 44/44 on Python 3.10.19, 3.11.14, 3.12.14 and 3.14.7 from an installed wheel, plus the licensed real-CLI test 1/1 on each (python-lanes.txt). The full suite was not run (see README.md). A durationMs of 0 means the command was not timed. Nothing was published and no network was used."
 }

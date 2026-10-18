@@ -1,4 +1,4 @@
-# node dist/cli.js mcp list-tools --json at 536984caa (local macOS arm64, not CI)
+# node dist/cli.js mcp list-tools --json at b237fda5f (local macOS arm64, not CI)
 ## without AMC_A4_PREVIEW
 count 15
 amc_list_agents
