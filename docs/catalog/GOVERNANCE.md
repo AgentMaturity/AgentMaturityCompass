@@ -71,7 +71,9 @@ What this cannot close: git authors are unsigned, so an author can commit under 
 list, and one person with two roster entries whose identities never overlap counts as two people. Look-alike characters
 from other scripts (a Cyrillic "А" for a Latin "A"; UTS #39 confusables are not folded) and initials ("A. Smith" for
 "Alice Smith") also pass as different people. Only signed commits and a signed D-08 roster close those gaps; until then
-the roster's identities are the operator's word. Every record
+the roster's identities are the operator's word. The refusal of agent signers rests on the identity kind a record
+declares: an operator who pins an agent's key for `catalog-review` and puts it on the roster under a record declaring
+`human` is not stopped by it. Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 

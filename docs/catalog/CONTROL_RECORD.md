@@ -40,10 +40,10 @@ Admission reports are checker output, outside every digest; only the admission g
 
 ## Loading
 
-`loadCatalog({ root?, enforceAdmission? })` reads the documented tree and nothing else. It never imports or evaluates content.
-With `enforceAdmission` (the compiler and activation pass it), a pack declaring `reviewed` or `qualified` support without a
-current admission report that admits it loads as `experimental` with warning `ADM_SUPPORT_DOWNGRADED`
-([ADMISSION.md](ADMISSION.md)). It refuses:
+`loadCatalog({ root? })` reads the documented tree and nothing else. It never imports or evaluates content. The
+compiler, activation, the OSCAL export and A4 read it through `loadAdmittedCatalog()`, which loads a pack declaring
+`reviewed` or `qualified` support as `experimental` (warning `ADM_SUPPORT_DOWNGRADED`) unless its recomputed admission
+admits it ([ADMISSION.md](ADMISSION.md)). It refuses:
 
 | Refusal | Code |
 | --- | --- |

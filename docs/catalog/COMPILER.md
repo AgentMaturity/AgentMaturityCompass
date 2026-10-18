@@ -315,8 +315,8 @@ and needs `--allow-weakening`.
 deterministic, so the usual flow is `--request-review`, an approver's `amc approvals approve`, then the same compile
 with `--activate <approvalRequestId>`. It cannot be combined with `--request-review`.
 
-It compiles against the shipped catalog, loaded with the P1-33 admission gate (a pack declaring `reviewed` or
-`qualified` without a current admission report that admits it compiles as `experimental`; [ADMISSION.md](ADMISSION.md)),
+It compiles against the shipped catalog, loaded through the P1-33 admission gate (`loadAdmittedCatalog`: a pack declaring
+`reviewed` or `qualified` whose recomputed admission does not admit it compiles as `experimental`; [ADMISSION.md](ADMISSION.md)),
 and writes `plan.json` (the `CompiledPlan`), `plan.sig.json` (`compiledAt`,
 `diff`, `signature`, `review`), `plan.diff.md` and `catalog.lock.json` to `--out`, by default
 `amc-control-plans/<profileId>/<first 12 hex of the digest>/`. An `--out` under `.amc/` is refused. `--previous` reads

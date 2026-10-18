@@ -4,7 +4,7 @@
     "name": "amc-catalog-check",
     "version": "1.2.0"
   },
-  "checkedAt": "2026-10-18T10:41:59.384Z",
+  "checkedAt": "2026-10-18T11:52:19.311Z",
   "catalog": {
     "id": "amc.catalog",
     "version": "0.1.0",
@@ -45,7 +45,7 @@
       "title": "Citations verified and legally reviewed",
       "kind": "mixed",
       "status": "not_met",
-      "checked": 32,
+      "checked": 47,
       "findings": [
         {
           "code": "ADM2_CITATION_UNVERIFIED",
@@ -1153,7 +1153,7 @@
       "title": "Tests with an oracle that observes the effect",
       "kind": "mechanical",
       "status": "not_met",
-      "checked": 55,
+      "checked": 47,
       "findings": [
         {
           "code": "ADM5_ORACLE_MISMATCH",
@@ -1457,7 +1457,7 @@
       "title": "Evidence contracts with an available producer",
       "kind": "mechanical",
       "status": "not_met",
-      "checked": 55,
+      "checked": 47,
       "findings": [
         {
           "code": "ADM7_PRODUCER_NOT_AVAILABLE",
@@ -2422,8 +2422,9 @@
   },
   "maxAdmissibleSupport": "experimental",
   "decision": "admit",
+  "support": "experimental",
   "reasons": [
-    "experimental, unreviewed: admitted as experimental only",
+    "experimental, unreviewed: not admitted as reviewed or qualified",
     "not admissible as reviewed: criterion 1 not met: ADM1_COMPILER_INCOMPATIBLE",
     "not admissible as reviewed: criterion 2 not met: ADM2_CITATION_UNVERIFIED, ADM2_LEGAL_REVIEW_MISSING, ADM2_CITATION_INVALID",
     "not admissible as reviewed: criterion 3 not met: ADM3_EXCLUSIONS_MISSING",
@@ -2434,5 +2435,5 @@
     "not admissible as reviewed: criterion 9 not met: ADM9_SIGNOFF_MISSING, ADM9_CONTROL_UNREVIEWED",
     "not admissible as reviewed: criterion 10 not met: ADM10_COVERAGE_DOC_MISSING, ADM10_PARTNER_MISSING, ADM10_TRIAGE_TARGET_MISSING, ADM10_UPDATE_PLAN_INCOMPLETE"
   ],
-  "digest": "sha256:b5b2470c860279e55bd9e450494ebf8688fe0882505b8d5ca768bf3da4573590"
+  "digest": "sha256:c7ed082e754d60b5bbcf9c9163aa3bc2da7d0bf408962c4cb3f4a4ff9183ba3d"
 }
