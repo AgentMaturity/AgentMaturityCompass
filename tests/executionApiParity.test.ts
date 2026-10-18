@@ -6,7 +6,9 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { addUser } from "../src/auth/authApi.js";
-import { EXECUTION_VERBS } from "../src/execution/executionContract.js";
+import { EXECUTION_SURFACES, EXECUTION_VERBS } from "../src/execution/executionContract.js";
+import * as sdk from "../src/sdk/nativeAgentClient.js";
+import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { AMCNativeClient, AMCNativeRefusedError, type AMCNativeClientOptions, type AMCNativeUpdate } from "../src/sdk/nativeAgentClient.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
@@ -226,6 +228,9 @@ async function studioLeg(f: Fixture): Promise<Leg> {
     const own = await decide(approval, OWNER.username);
     record.initiatorApproval = own.status === 200 ? "accepted" : own.status === 403 ? "refused" : `status ${own.status}`;
     for (const reviewer of REVIEWERS) expect((await decide(approval, reviewer)).status).toBe(200);
+    // A stale approval ID is refused: one no longer pending (409), one that names nothing (404).
+    expect((await decide(approval, REVIEWERS[0])).status).toBe(409);
+    expect((await decide(`apprreq_${"0".repeat(32)}`, REVIEWERS[0])).status).toBe(404);
     verbs.add("approve");
     let view = await settled(parentTask);
     const events = (await poll(parentTask)).events;
@@ -260,6 +265,29 @@ async function studioLeg(f: Fixture): Promise<Leg> {
 }
 
 describe("one execution API across the CLI, the TypeScript SDK, the Python wrapper and Studio (P2-13)", () => {
+  it("names only entry points that exist on the CLI, the TypeScript SDK and the Studio API", () => {
+    for (const name of Object.values(EXECUTION_SURFACES.typescript)) {
+      const [owner, member] = name.split(".") as [keyof typeof sdk, string | undefined];
+      const exported = sdk[owner] as unknown as { prototype: Record<string, unknown> } & Record<string, unknown>;
+      expect(typeof exported, name).toBe("function");
+      if (member) expect(typeof exported[member] === "function" || typeof exported.prototype[member] === "function", name).toBe(true);
+    }
+    const paths = generateFullOpenApiSpec().paths as Record<string, Record<string, unknown>>;
+    const normalized = new Map(Object.entries(paths).map(([path, operations]) => [path.replace(/\{[^}]+\}/g, "{}"), operations]));
+    for (const route of Object.values(EXECUTION_SURFACES.studio)) {
+      const [method, path] = route.split(" ") as [string, string];
+      expect(normalized.get(path.split("?")[0]!.replace(/\{[^}]+\}/g, "{}"))?.[method.toLowerCase()], route).toBeDefined();
+    }
+    for (const command of Object.values(EXECUTION_SURFACES.cli)) {
+      const [, ...words] = command.split(" ");
+      const flags = words.filter((word) => word.startsWith("--")), path = words.filter((word) => !word.startsWith("--"));
+      const help = spawnSync(process.execPath, [CLI, ...path, "--help"], { encoding: "utf8" });
+      expect(help.status, command).toBe(0);
+      for (const flag of flags) expect(help.stdout, command).toContain(flag);
+    }
+  }, 120_000);
+
+
   const legs: Record<string, (f: Fixture) => Promise<Leg>> = { cli: cliLeg, typescript: typescriptLeg, python: pythonLeg, studio: studioLeg };
 
   it.each(Object.keys(legs))("the %s surface runs the scripted scenario with the contract's verbs, phases and refusals", async (surface) => {

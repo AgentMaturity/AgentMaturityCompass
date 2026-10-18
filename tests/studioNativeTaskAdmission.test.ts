@@ -18,7 +18,7 @@ const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewe
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
   validationOutputs: [], validationSelection: null, validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", verificationScope: null, approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true,
-  resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" } };
+  resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" }, execution: null };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
   providers: [{ id: "stub", local: true, model: "fixed", credential: null }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },
@@ -58,7 +58,8 @@ function fakeService() {
     release: vi.fn<NativeTaskService["release"]>(async () => view),
     resume: vi.fn<NativeTaskService["resume"]>(async () => view),
     archive: vi.fn<NativeTaskService["archive"]>(() => ({ ...view, state: "closed", archived: true, canResume: false })),
-    verify: vi.fn<NativeTaskService["verify"]>(async () => view), close: vi.fn<NativeTaskService["close"]>(async () => {})
+    verify: vi.fn<NativeTaskService["verify"]>(async () => view), fork: vi.fn<NativeTaskService["fork"]>(async () => view),
+    close: vi.fn<NativeTaskService["close"]>(async () => {})
   } satisfies NativeTaskService;
 }
 
