@@ -38,8 +38,6 @@ export type NativeTaskPrompt =
 /** Keep the historical text-only NativeTaskStart type available to existing callers. */
 export type NativeTaskStartRequest = Omit<NativeTaskStart, "prompt"> & NativeTaskPrompt;
 export type NativeTaskTurn = NativeTaskPrompt & { readonly clientRequestId: string; readonly expectedRevision: number };
-/** fork (P2-13): the child task's own request ID, and the parent's current revision. */
-export interface NativeTaskFork { readonly clientRequestId: string; readonly expectedRevision: number }
 export interface NativeTaskInputCapabilities {
   readonly formats: readonly ("text" | NativeTaskStructuredInput["format"])[];
   readonly imageMimeTypes: readonly string[]; readonly audioMimeTypes: readonly string[];
@@ -141,7 +139,8 @@ export interface NativeTaskService {
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   verify(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
-  fork(actor: NativeTaskActor, taskId: string, input: NativeTaskFork): Promise<NativeTaskView>;
+  /** fork (P2-13): the child task's own request ID, and the parent's current revision. */
+  fork(actor: NativeTaskActor, taskId: string, input: { readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
   archive(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   close(): Promise<void>;
 }
