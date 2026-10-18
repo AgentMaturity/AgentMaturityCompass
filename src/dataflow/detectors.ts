@@ -32,7 +32,7 @@ const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freez
   api_key_openai: "credential", api_key_github: "credential", api_key_stripe: "credential", api_key_aws: "credential",
   password_json: "credential", anthropic_key: "credential", slack_token: "credential", google_api_key: "credential",
   bearer_token: "credential", jwt: "credential", private_key: "credential", password_in_url: "credential",
-  generic_api_key: "credential", secret_json: "credential", secret_env: "credential"
+  generic_api_key: "credential", secret_json: "credential", secret_field: "credential", secret_env: "credential"
 });
 // ponytail: a bare 10-digit run not preceded by "+" is dropped as noise, so a phone number written that way is not
 // detected; E.164 (+14155552671) and 11-digit (14155552671) runs still are. Add a context-keyed phone rule (e.g. "tel:",
@@ -79,51 +79,92 @@ export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
     const code = decimal !== undefined ? Number.parseInt(decimal, 10) : Number.parseInt(hex!, 16);
     return code <= 0x10ffff ? String.fromCodePoint(code) : match;
   });
-// ponytail: JSON inside a JSON string escapes again at each level, so text is decoded level by level, up to this many
-// times; text still changing after them counts as a finding (replaced or tokenized whole). Raise it if deeper JSON is real.
-const MAX_DECODE_PASSES = 8;
+const BASE64_RUN = /[A-Za-z0-9+/_-]{24,}={0,2}/g;
+const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g;
+const STRICT_UTF8 = new TextDecoder("utf-8", { fatal: true });
 /**
- * Whether `found` holds for `text` with its JSON escapes decoded once, then again, while that changes it, or for the text
- * and each of those levels with its web escapes decoded (`decodeWebEscapes`). Escaped, a value right after \n or \t has
- * no word boundary, in JSON at any depth, after a log prefix, or in JSON that does not parse; percent-encoded, an email
- * has no "@" and a card's groups are joined by "+" or "%20". Callers scan the text as it is first: decoded, an escaped
- * quote ends a password value early and a backslash no longer separates words, so decoded text is only searched, never
- * stored.
+ * Each run of 24 or more base64 or base64url characters replaced by what it decodes to, where that is UTF-8 text with at
+ * most one control character in ten (an encoded mail body, a text resource blob, a Secret's `data`); other runs (hashes,
+ * random tokens, binary) stay as they are.
+ */
+export const decodeBase64Runs = (text: string) => text.replace(BASE64_RUN, (run) => {
+  const body = run.replace(/=+$/, "");
+  if (body.length % 4 === 1) return run;
+  let decoded: string;
+  try { decoded = STRICT_UTF8.decode(Buffer.from(body, "base64")); } catch { return run; }
+  return decoded.length > 0 && (decoded.match(CONTROL_CHARS)?.length ?? 0) * 10 <= decoded.length ? decoded : run;
+});
+// ponytail: JSON inside a JSON string escapes again at each level, and web or base64 encoding can wrap either, so decoded
+// views are searched breadth first, up to this many in all (each is a full scan of its text); text still changing after
+// them counts as a finding (replaced or tokenized whole). Raise it if deeper encodings are real.
+const MAX_DECODE_PASSES = 8;
+const MAX_DECODED_VIEWS = 3 * (MAX_DECODE_PASSES + 1);
+/**
+ * Whether `found` holds for a decoded view of `text`: its JSON escapes decoded (`decodeJsonEscapes`), its web escapes
+ * decoded (`decodeWebEscapes`) or its base64 text runs decoded (`decodeBase64Runs`), and so on for each new view, breadth
+ * first, so a value encoded twice in any order (`%2540`, `&amp;#64;`, JSON percent-encoded in a form field) is found.
+ * Escaped, a value right after \n or \t has no word boundary, in JSON at any depth, after a log prefix, or in JSON that does
+ * not parse; percent-encoded, an email has no "@" and a card's groups are joined by "+" or "%20". Callers scan the text as
+ * it is first: decoded, an escaped quote ends a password value early and a backslash no longer separates words, so decoded
+ * text is only searched, never stored.
  */
 export function decodedFinds(text: string, found: (decoded: string) => boolean): boolean {
-  for (let pass = 1, current = text; ; pass += 1) {
-    const web = decodeWebEscapes(current);
-    if (web !== current && found(web)) return true;
-    if (!current.includes("\\")) return false;
-    const decoded = decodeJsonEscapes(current);
-    if (decoded === current) return false;
-    if (pass > MAX_DECODE_PASSES || found(decoded)) return true;
-    current = decoded;
+  const seen = new Set([text]);
+  const queue = [text];
+  for (let views = 0; queue.length > 0;) {
+    const current = queue.shift()!;
+    for (const next of [decodeWebEscapes(current), current.includes("\\") ? decodeJsonEscapes(current) : current, decodeBase64Runs(current)]) {
+      if (seen.has(next)) continue;
+      if (++views > MAX_DECODED_VIEWS || found(next)) return true;
+      seen.add(next);
+      queue.push(next);
+    }
   }
+  return false;
 }
 const sharedSecret = (type: string): RegExp => {
   const entry = SECRET_PATTERNS.find(candidate => candidate.type === type);
   if (entry === undefined) throw new Error(`Shared secret pattern ${type} is missing`);
   return entry.pattern;
 };
-// JSON members and env/YAML keys that name a secret. A bare "token" is left out: usage counters and AMC's own fields use it.
+// Members whose whole non-empty value is a credential. A bare "token" is left out: usage counters and AMC's own fields use it.
 const SECRET_MEMBER_NAMES = ["password", "passwd", "pwd", "secret", "client_secret", "api_key", "apikey", "access_token",
   "refresh_token", "private_key", "aws_secret_access_key"];
-/** A member whose string value is a credential by the JSON member heuristic (`isPasswordMember`). */
+/** A member whose whole non-empty value is a credential (`secretMember`). */
 export const SECRET_MEMBER = new RegExp(`^(?:${SECRET_MEMBER_NAMES.join("|")})$`, "i");
-const MEMBER_DETECTORS: ReadonlySet<string> = new Set(["password_json", "secret_json"]);
+/** A member name, as `memberWords` spells it, whose value of eight characters or more is a credential (`secretMember`). */
+const SECRET_MEMBER_NAME = /(?:^|_)(?:passwd|password|passphrase|pwd|secret|secret_key|private_key|access_key|authorization)$|._token$|api_?(?:key|secret)|apikey/;
+/** A member name lowercased in words joined by "_": `dbPassword`, `DB-PASSWORD` and `db.password` are all `db_password`. */
+const memberWords = (key: string) => key.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+/**
+ * Whether `value`, under member, field or header `key`, is a credential by its name alone: any non-empty value of an exact
+ * SECRET_MEMBER name (`password`, `client_secret`, `api_key` ...), or a value of eight characters or more under a name that
+ * ends in a secret word or holds an API-key word (`DB_PASSWORD`, `dbPassword`, `GITHUB_TOKEN`, `x-api-key`,
+ * `openaiApiKey`; a bare `token` is not one). Issued tokens in the value do not count toward it.
+ */
+export function secretMember(key: string | undefined, value: string, issued: IssuedToken = NONE_ISSUED): boolean {
+  if (key === undefined) return false;
+  const rest = withoutTokens(value, issued);
+  return SECRET_MEMBER.test(key) ? rest.length > 0 : rest.length >= 8 && SECRET_MEMBER_NAME.test(memberWords(key));
+}
+// A keyword-bound detection starts in the member name and reaches the value within a few dozen characters (`keyedSpan`).
+const KEYED_CONTEXT_CHARS = 256;
+const MEMBER_KEY = String.raw`(?<k>[A-Za-z0-9_.-]{1,64})`;
 /**
  * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts), a PEM
- * private key block whole, a URL's password, and a JSON member or env/YAML line that names a secret. Where a rule has a
- * group, only the value it captures is replaced, so `"secret": "<token>"` stays JSON. None backtracks quadratically.
+ * private key block whole, a URL's password, an env/YAML line that names a secret, and a quoted member (JSON, a Python or
+ * JS literal), a form, query or command-line field or a multipart form part whose key `secretMember` accepts. Where a
+ * rule has a group, only the value it captures (the `v` group, else the first) is replaced, so `"secret": "<token>"`
+ * stays JSON. None backtracks quadratically.
  */
-const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp }[] = Object.freeze([
+const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; readonly member?: true }[] = Object.freeze([
   ...["anthropic_key", "slack_token", "google_api_key", "bearer_token", "jwt"].map(type => ({ type, re: sharedSecret(type) })),
   { type: "private_key", re: /-----BEGIN [A-Z ]{0,20}PRIVATE KEY-----[^-]*(?:-----END [A-Z ]{0,20}PRIVATE KEY-----)?/ },
   { type: "password_in_url", re: /\/\/[^:\s/@]{1,256}:([^@\s/]{1,256})@/ },
   { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
-  // A "password" member is dlp's password_json.
-  { type: "secret_json", re: new RegExp(String.raw`"(?:${SECRET_MEMBER_NAMES.slice(1).join("|")})"\s*:\s*"((?:[^"\\]|\\[\s\S])+)"`, "i") },
+  { type: "secret_json", re: new RegExp(String.raw`(?<q>["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>["'])(?<v>(?:(?!\k<r>)[^\\]|\\[\s\S])*)\k<r>`), member: true },
+  { type: "secret_field", re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`), member: true },
+  { type: "secret_field", re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`), member: true },
   { type: "secret_env", re: /^[ \t]*[A-Z0-9_]*(?:PASSWORD|PASSWD|SECRET|SECRET_KEY|SECRET_ACCESS_KEY|PRIVATE_KEY|API_KEY|TOKEN)[ \t]*[=:][ \t]*(\S{8,})/im }
 ]);
 /** Binds the patterns, mappings, filters, token format and limits below; receipts and admission rows carry it. */
@@ -132,10 +173,11 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   credentialRules: CREDENTIAL_RULES.map(rule => ({ type: rule.type, source: rule.re.source, flags: rule.re.flags })),
-  secretMembers: SECRET_MEMBER.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
-  tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-escapes-decoded-level-by-level-up-to-8-what-only-decoding-shows-replaces-the-text-password-member-key-in-evidence-percent-plus-and-html-references-decoded-with-each-escape-level-credential-rules-secret-member-names-v14",
-  limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
+  secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
+  base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-escapes-decoded-level-by-level-up-to-8-what-only-decoding-shows-replaces-the-text-password-member-key-in-evidence-percent-plus-and-html-references-decoded-with-each-escape-level-credential-rules-secret-member-names-keyed-context-member-words-numbers-and-array-items-keyed-member-field-and-multipart-rules-same-region-once-decoded-views-breadth-first-with-base64-text-runs-v15",
+  limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
+    maxDecodedViews: MAX_DECODED_VIEWS, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
 const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_TYPE, type) ? CLASS_BY_TYPE[type]! : refused();
@@ -169,11 +211,12 @@ function shieldedByToken(text: string, tokens: readonly (readonly [number, numbe
 /** CREDENTIAL_RULES spans: noise and issued tokens are checked on the whole match, then a rule's group narrows it to the value. */
 function credentialSpans(text: string, tokens: readonly (readonly [number, number])[], issued: IssuedToken): PiiSpan[] {
   const spans: PiiSpan[] = [];
-  for (const { type, re } of CREDENTIAL_RULES) {
+  for (const { type, re, member } of CREDENTIAL_RULES) {
     for (const match of text.matchAll(new RegExp(re.source, `${re.flags}gd`))) {
+      if (member && !secretMember(match.groups!.k, match.groups!.v!, issued)) continue;
       const whole: PiiSpan = { type, start: match.index, end: match.index + match[0].length };
       if (isNoise(text, whole) || shieldedByToken(text, tokens, whole, issued, slice => re.test(slice))) continue;
-      const [start, end] = match.indices![1] ?? match.indices![0]!;
+      const [start, end] = match.indices!.groups?.v ?? match.indices![1] ?? match.indices![0]!;
       spans.push({ type, start, end });
     }
   }
@@ -195,9 +238,14 @@ export function detectProtectedText(text: string, issued: IssuedToken = NONE_ISS
   const tokens = tokenRanges(text, issued);
   const spans = [...findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span, issued)),
     ...credentialSpans(text, tokens, issued)].sort((a, b) => a.start - b.start || a.end - b.end);
-  return Object.freeze(spans.map(found => valueOnly(text, found)).map(span => Object.freeze({
-    start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
-  })));
+  // A value two rules find (dlp's password_json and the quoted member rule) is one detection.
+  const seen = new Set<string>();
+  return Object.freeze(spans.map(found => valueOnly(text, found)).flatMap(span => {
+    const region = `${span.start}:${span.end}:${dataClass(span.type)}`;
+    if (seen.has(region)) return [];
+    seen.add(region);
+    return [Object.freeze({ start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type })];
+  }));
 }
 
 /**
@@ -227,8 +275,9 @@ export const isRawJson = (value: unknown): value is { readonly rawJSON: string }
 /**
  * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text, its source literal
  * where the parse kept one (a number with a detection becomes the redacted string), so the result still serializes as
- * JSON. A string leaf's call also gets the member name it sits under (`key`, set by the recursion). Stored gateway and
- * bridge evidence and the session redactor use it.
+ * JSON. A string or number leaf's call also gets the member name it sits under (`key`, set by the recursion; an array's
+ * items keep their member's), for `secretMember` and `keyedSpan`. Stored gateway, ToolHub and bridge evidence and the
+ * session redactor use it.
  * An integer beyond 2^53 with at most 20 digits lost digits when it was parsed (a 17-19 digit card number sent as a JSON
  * number keeps only its leading ones), so its text cannot be checked: with `opaque` it becomes `opaque()` instead.
  */
@@ -238,37 +287,41 @@ export function redactJsonLeaves(value: unknown, redact: (text: string, key?: st
   if (typeof value === "number") {
     if (opaque !== undefined && Number.isInteger(value) && !Number.isSafeInteger(value) && Math.abs(value) < 1e20) return opaque();
     const text = String(value);
-    const redacted = redact(text);
+    const redacted = redact(text, key);
     return redacted === text ? value : redacted;
   }
-  if (isRawJson(value)) { const redacted = redact(value.rawJSON); return redacted === value.rawJSON ? value : redacted; }
-  if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact, opaque));
+  if (isRawJson(value)) { const redacted = redact(value.rawJSON, key); return redacted === value.rawJSON ? value : redacted; }
+  if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact, opaque, key));
   if (value === null || typeof value !== "object") return value;
   return Object.fromEntries(Object.entries(value).map(([name, item]) => [redact(name), redactJsonLeaves(item, redact, opaque, name)]));
 }
 
 /**
- * Whether `value`, under member `key` (a SECRET_MEMBER name: password, client_secret, api_key, access_token ...), is a
- * credential by the JSON member heuristic, which needs the key beside the value: a leaf scanned alone never matches it.
- * `charge` gets the length scanned. A context over the per-leaf limit counts as a credential, so the caller replaces the
- * value whole.
+ * The detection that `value` shows only beside its member, field or header name `key`: the keyword-bound detectors (an
+ * MRN, a passport, national ID or VAT number, env secret lines) need the keyword next to the value, and a leaf scanned
+ * alone never has it. The name is read as words (`medicalRecordNumber` is `medical record number`) and scanned as
+ * `<words>: <value>`, both cut to KEYED_CONTEXT_CHARS; a detection that ends past the name is the value's, and callers
+ * replace or tokenize the whole value under its class and detector. Callers pass the value already redacted, so what a
+ * plain scan finds is not found again. `charge` gets the length scanned.
  */
-export function isPasswordMember(key: string | undefined, value: string, issued: IssuedToken = NONE_ISSUED,
-  charge: (length: number) => void = () => undefined): boolean {
-  if (key === undefined || !SECRET_MEMBER.test(key)) return false;
-  const context = JSON.stringify({ [key]: value });
-  if (context.length > MAX_PROTECTED_TEXT_CHARS) return true;
+export function keyedSpan(key: string | undefined, value: string, issued: IssuedToken = NONE_ISSUED,
+  charge: (length: number) => void = () => undefined): Pick<ProtectedDataSpan, "dataClass" | "detector"> | undefined {
+  const words = key === undefined ? "" : memberWords(key).replace(/_+/g, " ").trim().slice(-KEYED_CONTEXT_CHARS);
+  if (words === "" || value === "") return undefined;
+  const prefix = `${words}: `;
+  const context = prefix + value.slice(0, KEYED_CONTEXT_CHARS);
   charge(context.length);
-  return detectProtectedText(context, issued).some(span => MEMBER_DETECTORS.has(span.detector));
+  const span = detectProtectedText(context, issued).find(found => found.end > prefix.length);
+  return span === undefined ? undefined : { dataClass: span.dataClass, detector: span.detector };
 }
 
 const JSON_TEXT = /^\s*[[{]/;
 /**
- * `redact` for `redactJsonLeaves` over stored evidence (gateway, ToolHub, bridge); `key` is the member a string leaf sits
- * under, for the JSON password heuristic. Text that holds a JSON object or array (an MCP result's text) is walked like the
+ * `redact` for `redactJsonLeaves` over stored evidence (gateway, ToolHub, bridge); `key` is the member a leaf sits under,
+ * for `secretMember` and `keyedSpan`. Text that holds a JSON object or array (an MCP result's text) is walked like the
  * outer value, one level deep, and re-stringified when an inner key or leaf changed. Each text is `redact`ed as it is, so
- * an escaped quote stays inside a password value and a backslash still separates words, and then searched with its
- * escapes decoded (`decodedFinds`): anything only decoding shows replaces the text whole (`opaque()`).
+ * an escaped quote stays inside a password value and a backslash still separates words, and then searched decoded
+ * (`decodedFinds`): anything only decoding shows replaces the text whole (`opaque()`).
  */
 export function nestedJsonRedactor(redact: (text: string, key?: string) => string, opaque: () => string):
   (text: string, key?: string) => string {
@@ -303,18 +356,15 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
       charge(text.length);
       const spans = detectProtectedText(text, issued);
       for (const span of spans) add(span.dataClass);
-      // Keep the JSON member heuristic without rescanning every object or double-counting its credential value.
-      if (key !== undefined && SECRET_MEMBER.test(key) && !spans.some(span => span.dataClass === "credential")) {
-        const context = JSON.stringify({ [key]: text });
-        if (context.length > MAX_PROTECTED_TEXT_CHARS) refused();
-        charge(context.length);
-        if (detectProtectedText(context, issued).some(span => MEMBER_DETECTORS.has(span.detector))) add("credential");
-      }
+      // What the member name shows (`secretMember`, `keyedSpan`), counted only for a class the leaf did not show.
+      if (key === undefined) return;
+      const keyed = secretMember(key, text, issued) ? "credential" : keyedSpan(key, text, issued, charge)?.dataClass;
+      if (keyed !== undefined && !spans.some(span => span.dataClass === keyed)) add(keyed);
     };
     const visit = (value: unknown, depth: number, key?: string): void => {
       if (depth > MAX_DEPTH) refused();
       if (typeof value === "string") { scan(value, key); return; }
-      if (typeof value === "number") { if (!Number.isFinite(value)) refused(); scan(String(value)); return; }
+      if (typeof value === "number") { if (!Number.isFinite(value)) refused(); scan(String(value), key); return; }
       if (value === null || typeof value === "boolean") return;
       if (typeof value !== "object") return refused();
       if (Buffer.isBuffer(value) || value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return;
@@ -328,7 +378,7 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
         const descriptor = Object.getOwnPropertyDescriptor(value, field);
         if (!descriptor || !("value" in descriptor)) refused();
         if (!array) scan(field);
-        visit(descriptor.value, depth + 1, array ? undefined : field);
+        visit(descriptor.value, depth + 1, array ? key : field);
       }
       active.delete(value);
     };

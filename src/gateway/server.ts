@@ -1473,7 +1473,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
 
       const protectedData = protectedDataOptedIn(options.workspace);
-      const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist);
+      const headerRedaction = { textRegexDenylist: config.redaction.textRegexDenylist, protectedData };
+      const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist, headerRedaction);
       const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction, { protectedData });
       const requestTarget = redactRequestTarget(incomingUrl, protectedData);
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
@@ -1494,7 +1495,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: requestInfo.hasToolCalls === true,
         bodyRedacted: requestBodyRedaction.wasRedacted || requestHeaderRedaction.wasRedacted,
-        redactionReasons: requestBodyRedaction.redactionReasons,
+        redactionReasons: [...new Set([...requestBodyRedaction.redactionReasons, ...requestHeaderRedaction.redactionReasons])],
         originalHashOmitted: requestBodyRedaction.originalHashOmitted,
         agentId: attributedAgentId,
         workOrderId: workOrderId ?? null,
@@ -1553,7 +1554,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
-      const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist);
+      const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist, headerRedaction);
       const streamPassthrough = config.streamPassthrough === true;
       let responseBody: Buffer;
 
@@ -1581,7 +1582,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: responseInfo.hasToolCalls === true || requestInfo.hasToolCalls === true,
         bodyRedacted: responseBodyRedaction.wasRedacted || responseHeaderRedaction.wasRedacted,
-        redactionReasons: responseBodyRedaction.redactionReasons,
+        redactionReasons: [...new Set([...responseBodyRedaction.redactionReasons, ...responseHeaderRedaction.redactionReasons])],
         originalHashOmitted: responseBodyRedaction.originalHashOmitted,
         agentId: attributedAgentId,
         workOrderId: workOrderId ?? null,

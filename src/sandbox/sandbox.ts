@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { wrapAny } from "../ledger/monitor.js";
+import { recordedArgv } from "../bridge/bridgeRedaction.js";
 import { resolveAgentId } from "../fleet/paths.js";
 
 export interface SandboxRunOptions {
@@ -14,6 +15,13 @@ export interface SandboxRunOptions {
   gatewayProxyUrl?: string;
   image?: string;
   networkName?: string;
+  /**
+   * Environment for the container. Only the names go into the docker argv (`-e NAME`); docker reads each value from its
+   * own environment, so no value is in argv or in the evidence that records it.
+   */
+  env?: Readonly<Record<string, string>>;
+  /** Values to scrub from the recorded argv and output (a lease in `env`). */
+  scrubValues?: readonly string[];
 }
 
 function dockerAvailable(): { ok: boolean; version: string } {
@@ -66,6 +74,8 @@ export function buildSandboxDockerArgs(opts: SandboxRunOptions): string[] {
   if (useGatewayRoute || useProxy) {
     args.push("--add-host", "host.docker.internal:host-gateway");
   }
+  // First, so the container endpoints below win over a host-side value of the same name.
+  for (const name of Object.keys(opts.env ?? {})) args.push("-e", name);
 
   args.push("-e", `AMC_AGENT_ID=${agentId}`);
   if (containerRoute) {
@@ -95,11 +105,14 @@ function recordSandboxAttestation(params: {
   networkName?: string;
   gatewayRoute?: string;
   gatewayProxyUrl?: string;
+  scrubValues?: readonly string[];
 }): void {
   // P0-55: under AMC_NO_SIGN=1 the attestation shares the unsigned store with the docker session wrapAny records.
   const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = randomUUID();
   try {
+    // Stored like the process_start row wrapAny writes (P2-02).
+    const argv = recordedArgv(params.workspace, params.command, params.args, params.scrubValues);
     const version = spawnSync("docker", ["--version"], { encoding: "utf8" });
     const versionText = `${version.stdout ?? ""}${version.stderr ?? ""}`.trim() || "unknown";
     ledger.startSession({
@@ -129,8 +142,8 @@ function recordSandboxAttestation(params: {
         agentId: params.agentId,
         image: params.image,
         imageHash,
-        command: params.command,
-        args: params.args,
+        command: argv.command,
+        args: argv.args,
         networkMode: params.networkName ? "internal_bridge" : "none",
         networkName: params.networkName ?? null,
         gatewayRoute: params.gatewayRoute ?? null,
@@ -144,8 +157,8 @@ function recordSandboxAttestation(params: {
         agentId: params.agentId,
         image: params.image,
         imageHash,
-        command: params.command,
-        args: params.args,
+        command: argv.command,
+        args: argv.args,
         networkMode: params.networkName ? "internal_bridge" : "none",
         networkName: params.networkName ?? null,
         gatewayRoute: params.gatewayRoute ?? null,
@@ -198,12 +211,15 @@ export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
     args: opts.args,
     networkName,
     gatewayRoute: maybeContainerEndpoint(opts.gatewayRoute),
-    gatewayProxyUrl: maybeContainerEndpoint(opts.gatewayProxyUrl)
+    gatewayProxyUrl: maybeContainerEndpoint(opts.gatewayProxyUrl),
+    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {})
   });
 
     sessionId = await wrapAny("docker", dockerArgs, {
       workspace: opts.workspace,
-      agentId
+      agentId,
+      ...(opts.env ? { envExtras: { ...opts.env } } : {}),
+      ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {})
     });
     return {
       sessionId,

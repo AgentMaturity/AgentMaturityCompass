@@ -16,7 +16,7 @@ import { getAdapterDefinition } from "./catalog.js";
 import { detectAdapter } from "./adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { assembleAdapterEnv, redactSecretsInText } from "./envAssembler.js";
-import { bridgeEvidenceRedactor } from "../bridge/bridgeRedaction.js";
+import { bridgeEvidenceRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
@@ -202,17 +202,16 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   if (mode === "SANDBOX") {
-    const exports = Object.entries(env)
-      .filter((row): row is [string, string] => typeof row[1] === "string")
-      .map(([key, value]) => `export ${key}=${shellQuote(value)}`)
-      .join(";");
+    // The environment (the lease, the vault passphrase, operator secrets) reaches the container by name (`docker run -e
+    // NAME`), never in argv, which the sandbox attestation and the process_start row record.
     const cmd = [shellQuote(executable), ...args.map((arg) => shellQuote(arg))].join(" ");
-    const script = `${exports}; exec ${cmd}`;
       const sandbox = await runSandboxCommand({
         workspace,
         agentId,
         command: "sh",
-        args: ["-lc", script],
+        args: ["-lc", `exec ${cmd}`],
+        env: Object.fromEntries(Object.entries(env).filter((row): row is [string, string] => typeof row[1] === "string")),
+        scrubValues: [lease.token],
         gatewayRoute: routeUrl,
         gatewayProxyUrl: activeProxyBase
       });
@@ -263,8 +262,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       eventType: "agent_process_started",
       payload: JSON.stringify({
         adapterId: adapter.id,
-        command: executable,
-        args: isDsh ? ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] : args,
+        // Stored like the run's output (P2-02); DSH's task is omitted outright.
+        ...(isDsh ? { command: executable, args: ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] }
+          : recordedArgv(workspace, executable, args, [lease.token])),
         ...(isDsh ? {
           taskSha256: createHash("sha256").update(userCommand[0]!).digest("hex"),
           approvedLaunch: profile!.deepseekHarnessLaunch,

@@ -5,7 +5,7 @@ import { openLedger, hashBinaryOrPath } from "./ledger.js";
 import { runProcess } from "../exec/runProcess.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
-import { bridgeEvidenceRedactor } from "../bridge/bridgeRedaction.js";
+import { bridgeEvidenceRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 
 /** How long any single `--version` attempt may take before it is abandoned. */
 const VERSION_PROBE_TIMEOUT_MS = 3_000;
@@ -111,16 +111,17 @@ async function spawnMonitoredProcess(params: {
       binarySha256: binaryHash
     });
 
+    const argv = recordedArgv(params.workspace, params.command, params.args, params.scrubValues);
     ledger.appendEvidence({
       sessionId,
       runtime: params.runtime,
       eventType: "gateway",
-      payload: JSON.stringify({ stage: "process_start", command: params.command, args: params.args, meta: params.meta ?? {} }),
+      payload: JSON.stringify({ stage: "process_start", command: argv.command, args: argv.args, meta: params.meta ?? {} }),
       payloadExt: "json",
       meta: {
         stage: "process_start",
-        command: params.command,
-        args: params.args,
+        command: argv.command,
+        args: argv.args,
         ...(params.meta ?? {})
       }
     });
@@ -308,7 +309,15 @@ export async function wrapRuntime(
 export async function wrapAny(
   command: string,
   args: string[],
-  opts: { workspace: string; agentId?: string; signal?: AbortSignal }
+  opts: {
+    workspace: string;
+    agentId?: string;
+    signal?: AbortSignal;
+    /** Environment the process gets beside AMC's (a sandbox's `docker run -e NAME` values). */
+    envExtras?: Record<string, string>;
+    /** Values to scrub from the recorded argv and output: a lease handed to the process, above all. */
+    scrubValues?: readonly string[];
+  }
 ): Promise<string> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
   return (await spawnMonitoredProcess({
@@ -316,6 +325,8 @@ export async function wrapAny(
     runtime: "any",
     command,
     args,
+    ...(opts.envExtras ? { envExtras: opts.envExtras } : {}),
+    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
     ...(opts.signal ? { signal: opts.signal } : {}),
     meta: {
       mode: "wrap-any",
