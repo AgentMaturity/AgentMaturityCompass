@@ -13,9 +13,12 @@ shape mismatch raises :class:`AmcProtocolError` rather than returning a partial
 result. Pack and domain ids are checked against the CLI's own id sets before
 anything runs; domain aliases (``healthcare``) are refused, pass the canonical id.
 
-Pack details, baseline scoring and apply need an active Industry Packs
-entitlement; without one the CLI refuses and so does this module
-(:class:`AmcIndustryLockedError` or :class:`AmcIndustryCommandError`).
+Pack details, baseline scoring and apply need an Industry Packs licence that
+verifies against a key pinned in the operator's trust list; without one the CLI
+refuses and so does this module (:class:`AmcIndustryLockedError` or
+:class:`AmcIndustryCommandError`). A licence changes access, never a result.
+Scores are self-reported: each carries ``claimKind`` and ``statusDimensions``
+from AMC's claim service, and none is a certification.
 """
 from __future__ import annotations
 
@@ -30,8 +33,9 @@ from .client import DEFAULT_TIMEOUT_SECONDS, AmcError, AmcProtocolError, AmcTime
 
 __all__ = ["AmcIndustry", "AmcIndustryLockedError", "AmcIndustryCommandError", "PACK_IDS", "DOMAIN_IDS",
            "DomainMetadata", "IndustryPackEntitlement", "IndustryPackCatalogItem", "IndustryPackCatalog",
-           "IndustryPackQuestion", "IndustryPack", "IndustryPackQuestionResult", "IndustryPackScoreResult",
-           "DomainAssessmentScore", "DomainApplyResult", "CliRunner"]
+           "IndustryPackQuestion", "IndustryPack", "IndustryPackQuestionResult", "PackSelfAssessment",
+           "StatusDimensions", "IndustryPackScoreResult", "DomainAssessment", "DomainApplyOperatingProfile",
+           "DomainApplyResult", "CliRunner"]
 
 # Mirrors `IndustryPackId` (src/domains/industryPacks.ts) and `Domain`
 # (src/domains/domainRegistry.ts); a test compares both against the source.
@@ -90,7 +94,8 @@ class _Entitlement(TypedDict):
     planId: str
     priceUsdMonthly: str
     checkoutAvailable: bool
-    checkoutUrl: str
+    checkoutUrl: str | None
+    licenseVerificationConfigured: bool
     expiresAt: str | None
     message: str
 
@@ -101,7 +106,8 @@ class IndustryPackEntitlement(_Entitlement, total=False):
     licenseStatus: str
 
 
-class _CatalogItem(TypedDict):
+class IndustryPackCatalogItem(TypedDict):
+    """Public with or without a licence; ``locked`` says whether the pack's questions are locked."""
     packId: str
     name: str
     domain: str
@@ -109,10 +115,6 @@ class _CatalogItem(TypedDict):
     questionCount: float
     locked: bool
     description: str
-
-
-class IndustryPackCatalogItem(_CatalogItem, total=False):
-    """``regulatoryBasis``/``complianceFrameworks`` are present only when unlocked."""
     regulatoryBasis: list[str]
     complianceFrameworks: list[str]
 
@@ -159,23 +161,66 @@ class IndustryPackQuestionResult(TypedDict):
     percentage: float
 
 
+class PackSelfAssessment(TypedDict):
+    complete: bool
+    answered: float
+    total: float
+
+
+class _State(TypedDict):
+    state: str
+
+
+class StateDimension(_State, total=False):
+    """``applicability`` (``reason``/``rationale``) or ``enforcement`` (``boundary``)."""
+    reason: str
+    rationale: str
+    boundary: str
+
+
+class StatusDimensions(TypedDict):
+    """The five status dimensions of AMC's claim service (docs/CLAIM_KINDS.md)."""
+    applicability: StateDimension
+    evidence: str
+    result: str
+    enforcement: StateDimension
+    review: str
+
+
 class IndustryPackScoreResult(TypedDict):
-    """``amc domain pack run --pack P --baseline --json``."""
+    """``amc domain pack run --pack P --baseline --json``: a self-reported result, never a certification."""
     packId: str
     packName: str
     stationId: str
     percentage: float
     level: float
-    certified: bool
+    selfAssessment: PackSelfAssessment
+    claimKind: str
+    eligibleLevel: float | None
+    statusDimensions: StatusDimensions
+    claimLabel: str
     questionResults: list[IndustryPackQuestionResult]
     complianceGaps: list[str]
     riskTier: str
 
 
-class DomainAssessmentScore(TypedDict):
-    composite: float
-    level: str
-    gaps: float
+class DomainAssessment(TypedDict):
+    """Domain assessments are not evaluated without evidence."""
+    status: str
+    reasons: list[str]
+
+
+class _Consistency(TypedDict):
+    ok: bool
+    violations: list[str]
+
+
+class DomainApplyOperatingProfile(TypedDict):
+    station: str
+    riskTier: str
+    path: str
+    written: bool
+    consistency: _Consistency
 
 
 class DomainApplyResult(TypedDict):
@@ -185,10 +230,12 @@ class DomainApplyResult(TypedDict):
     packsApplied: list[str]
     guardrailsGenerated: float
     configFileUpdated: str | None
+    guardrailsProposed: list[str]
     guardrailsEnabled: list[str]
     complianceFrameworks: list[str]
-    assessmentScore: DomainAssessmentScore
+    assessment: DomainAssessment
     dryRun: bool
+    operatingProfile: DomainApplyOperatingProfile
 
 
 #: ``(argv, cwd, timeout) -> object with returncode, stdout, stderr`` (text).
@@ -291,10 +338,14 @@ class AmcIndustry:
         return self._json(["domain", "pack", "describe", "--pack", _known(pack_id, PACK_IDS, "pack id")], IndustryPack)
 
     def score_pack_baseline(self, pack_id: str) -> IndustryPackScoreResult:
-        """``amc domain pack run --pack P --baseline --json``: every question scored at L1.
+        """``amc domain pack run --pack P --baseline --json``: no question answered.
 
-        The CLI takes custom responses only interactively, so this is the only
-        scoring it offers a non-interactive caller.
+        The CLI counts each unanswered question as level 1 in ``percentage``,
+        ``level`` and ``complianceGaps``; those numbers are not an assessment.
+        ``selfAssessment`` reports 0 answered, ``eligibleLevel`` is ``None`` and
+        ``statusDimensions["result"]`` is ``"not_evaluated"``. The CLI takes
+        custom responses only interactively, so this is the only scoring it
+        offers a non-interactive caller.
         """
         args = ["domain", "pack", "run", "--pack", _known(pack_id, PACK_IDS, "pack id"), "--baseline"]
         return self._json(args, IndustryPackScoreResult)

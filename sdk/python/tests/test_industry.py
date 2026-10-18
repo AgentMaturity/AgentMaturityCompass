@@ -2,8 +2,9 @@
 
 Every test except the last uses a stubbed runner, so no CLI is needed. The last
 test runs the real built CLI (``dist/cli.js``) and is skipped when it is absent.
-Unlocked pack shapes are covered only by fixtures here: unlocking needs a signed
-license key, which this suite never creates.
+It checks the locked paths, or the unlocked shapes when the environment carries
+an Industry Packs licence that verifies against a key pinned in ``AMC_HOME``'s
+trust list; this suite never creates a licence itself.
 """
 from __future__ import annotations
 
@@ -33,11 +34,12 @@ BIN = ["amc-test-bin"]
 
 ENTITLEMENT = {
     "planId": "industry-packs-monthly", "priceUsdMonthly": "9.99", "checkoutAvailable": False,
-    "checkoutUrl": "https://example.invalid/checkout", "expiresAt": None, "active": False,
+    "checkoutUrl": None, "licenseVerificationConfigured": False, "expiresAt": None, "active": False,
     "source": "none", "message": "locked",
 }
 CATALOG_ITEM = {"packId": "farm-to-fork", "name": "Farm to Fork", "domain": "environment",
-                "riskLevel": "very-high", "questionCount": 16, "locked": True, "description": "d"}
+                "riskLevel": "very-high", "questionCount": 16, "locked": True, "description": "d",
+                "regulatoryBasis": ["r"], "complianceFrameworks": ["f"]}
 DOMAIN = {"id": "health", "name": "Health", "description": "d", "aliases": ["healthcare"],
           "sectorTags": [], "recommendedIndustryPacks": ["clinical-trials"], "regulatoryBasis": [],
           "riskLevel": "critical", "euAIActCategory": "high-risk", "questionCount": 1,
@@ -48,13 +50,20 @@ PACK = {"id": "clinical-trials", "stationId": "health", "name": "Clinical Trials
         "regulatoryBasis": [], "questions": [QUESTION], "certificationThreshold": 80,
         "complianceFrameworks": [], "riskTier": "critical", "euAIActClassification": "high-risk",
         "sdgAlignment": [], "certificationPath": "p", "keyRisks": []}
+# Shapes as `amc domain pack run --baseline --json` and `amc domain apply --dry-run --json` print them (2026-10-18).
+STATUS = {"applicability": {"state": "unresolved", "reason": "no applicability decision recorded"},
+          "evidence": "incomplete", "result": "not_evaluated", "enforcement": {"state": "none"}, "review": "pending"}
 SCORE = {"packId": "clinical-trials", "packName": "Clinical Trials", "stationId": "health",
-         "percentage": 0, "level": 1, "certified": False,
+         "percentage": 0, "level": 1, "selfAssessment": {"complete": False, "answered": 0, "total": 1},
+         "claimKind": "self_reported", "eligibleLevel": None,
          "questionResults": [{"id": "HLT-CT-1", "dimension": "Safety", "score": 0, "weight": 10, "percentage": 0}],
-         "complianceGaps": ["HLT-CT-1 (Safety): L1"], "riskTier": "critical"}
+         "complianceGaps": ["HLT-CT-1 (Safety): L1"], "riskTier": "critical",
+         "statusDimensions": STATUS, "claimLabel": "Claim: Self-reported · Result: not evaluated"}
 APPLY = {"agentId": "a", "domain": "health", "packsApplied": ["clinical-trials"], "guardrailsGenerated": 3,
-         "configFileUpdated": None, "guardrailsEnabled": ["r1"], "complianceFrameworks": ["EU_AI_ACT"],
-         "assessmentScore": {"composite": 12, "level": "L1", "gaps": 4}, "dryRun": True}
+         "configFileUpdated": None, "guardrailsProposed": ["clinical-trials:HLT-CT-1"], "guardrailsEnabled": [],
+         "complianceFrameworks": ["EU_AI_ACT"], "assessment": {"status": "not_evaluated", "reasons": ["no run"]},
+         "dryRun": True, "operatingProfile": {"station": "health", "riskTier": "critical", "path": "p",
+                                              "written": False, "consistency": {"ok": True, "violations": []}}}
 
 
 class Runner:
@@ -199,10 +208,17 @@ def test_other_nonzero_exit_carries_the_cli_reason(tmp_path: Path) -> None:
     ("list_domains", [{**DOMAIN, "aliases": "healthcare"}]),
     ("list_packs", {"packs": [CATALOG_ITEM]}),
     ("list_packs", {"entitlement": ENTITLEMENT, "packs": [{k: v for k, v in CATALOG_ITEM.items() if k != "locked"}]}),
+    ("list_packs", {"entitlement": {k: v for k, v in ENTITLEMENT.items() if k != "licenseVerificationConfigured"},
+                    "packs": [CATALOG_ITEM]}),
     ("describe_pack", {**PACK, "questions": [{k: v for k, v in QUESTION.items() if k != "weight"}]}),
-    ("score_pack_baseline", {**SCORE, "certified": "yes"}),
     ("score_pack_baseline", {**SCORE, "level": True}),
-    ("apply", {**APPLY, "assessmentScore": {"composite": 1, "level": "L1"}}),
+    ("score_pack_baseline", {k: v for k, v in SCORE.items() if k != "claimKind"}),
+    ("score_pack_baseline", {k: v for k, v in SCORE.items() if k != "statusDimensions"}),
+    ("score_pack_baseline", {**SCORE, "statusDimensions": {k: v for k, v in STATUS.items() if k != "result"}}),
+    ("score_pack_baseline", {**SCORE, "eligibleLevel": "1"}),
+    ("score_pack_baseline", {k: v for k, v in SCORE.items() if k != "selfAssessment"}),
+    ("apply", {**APPLY, "assessment": {"status": "not_evaluated"}}),
+    ("apply", {k: v for k, v in APPLY.items() if k != "guardrailsProposed"}),
     ("apply", {**APPLY, "configFileUpdated": 3}),
 ])
 def test_contract_drift_fails_closed(tmp_path: Path, method: str, stdout: object) -> None:
@@ -216,9 +232,17 @@ def test_contract_drift_fails_closed(tmp_path: Path, method: str, stdout: object
 
 def test_optional_keys_are_accepted(tmp_path: Path) -> None:
     active = {**ENTITLEMENT, "active": True, "source": "env", "licenseStatus": "active", "customerId": "c"}
-    unlocked = {**CATALOG_ITEM, "locked": False, "regulatoryBasis": ["r"], "complianceFrameworks": ["f"]}
+    unlocked = {**CATALOG_ITEM, "locked": False}
     runner = Runner(stdout={"entitlement": active, "packs": [unlocked]})
     assert client(tmp_path, runner).list_packs()["packs"][0]["regulatoryBasis"] == ["r"]
+    scored = {**SCORE, "eligibleLevel": 1, "statusDimensions": {**STATUS, "enforcement": {"state": "enforced", "boundary": "b"}}}
+    assert client(tmp_path, Runner(stdout=scored)).score_pack_baseline("clinical-trials")["eligibleLevel"] == 1
+
+
+def test_score_result_carries_the_claim_and_no_certified_field() -> None:
+    hints = industry.IndustryPackScoreResult.__required_keys__
+    assert {"claimKind", "statusDimensions", "claimLabel", "selfAssessment", "eligibleLevel"} <= hints
+    assert "certified" not in industry.IndustryPackScoreResult.__annotations__
 
 
 def test_constructor_refuses_bad_bin_and_workspace(tmp_path: Path) -> None:
@@ -258,7 +282,14 @@ def test_installed_cli_contract(tmp_path: Path) -> None:
     health = sdk.list_packs(domain="health")
     assert {item["domain"] for item in health["packs"]} == {"health"}
     if catalog["entitlement"]["active"]:
-        pytest.skip("an active Industry Packs entitlement is present; locked-path checks do not apply")
+        # A licence from the environment: the unlocked shapes, against the real CLI.
+        assert sdk.describe_pack("clinical-trials")["id"] == "clinical-trials"
+        scored = sdk.score_pack_baseline("clinical-trials")
+        assert scored["claimKind"] == "self_reported" and scored["statusDimensions"]["result"] == "not_evaluated"
+        assert scored["selfAssessment"]["answered"] == 0 and scored["eligibleLevel"] is None
+        assert sdk.apply("probe", pack_id="clinical-trials", dry_run=True)["dryRun"] is True
+        assert sorted(os.listdir(tmp_path)) == []
+        return
     with pytest.raises(AmcIndustryLockedError):
         sdk.describe_pack("clinical-trials")
     with pytest.raises(AmcIndustryLockedError):

@@ -206,7 +206,8 @@ industry = AmcIndustry(workspace=".")
 for pack in industry.list_packs(domain="health")["packs"]:
     print(pack["packId"], pack["locked"])
 try:
-    print(industry.score_pack_baseline("clinical-trials")["percentage"])
+    scored = industry.score_pack_baseline("clinical-trials")
+    print(scored["claimKind"], scored["statusDimensions"]["result"])  # self_reported not_evaluated
 except AmcIndustryLockedError as locked:
     print(locked.message)
 ```
@@ -227,31 +228,48 @@ DomainMetadata          {id, name, description, riskLevel, euAIActCategory: stri
                          aliases, sectorTags, recommendedIndustryPacks, regulatoryBasis,
                          assurancePacks, primaryModules, complianceFrameworks: string[]}
 IndustryPackCatalog     {entitlement: IndustryPackEntitlement, packs: IndustryPackCatalogItem[]}
-IndustryPackEntitlement {active, checkoutAvailable: boolean, source, planId, priceUsdMonthly,
-                         checkoutUrl, message: string, expiresAt: string|null,
+IndustryPackEntitlement {active, checkoutAvailable, licenseVerificationConfigured: boolean, source,
+                         planId, priceUsdMonthly, message: string, checkoutUrl, expiresAt: string|null,
                          customerId?, subscriptionId?, licenseStatus?: string}
 IndustryPackCatalogItem {packId, name, domain, riskLevel, description: string,
                          questionCount: number, locked: boolean,
-                         regulatoryBasis?, complianceFrameworks?: string[]}   (only when unlocked)
+                         regulatoryBasis, complianceFrameworks: string[]}   (with or without a licence)
 IndustryPack            {id, stationId, name, description, riskTier, euAIActClassification,
                          certificationPath: string, certificationThreshold: number,
                          regulatoryBasis, complianceFrameworks, sdgAlignment, keyRisks: string[],
                          questions: [{id, dimension, text, regulatoryRef, l1, l3, l5: string,
                                       weight: number}]}
-IndustryPackScoreResult {packId, packName, stationId, riskTier: string, percentage, level: number,
-                         certified: boolean, complianceGaps: string[],
+IndustryPackScoreResult {packId, packName, stationId, riskTier, claimKind, claimLabel: string,
+                         percentage, level: number, eligibleLevel: number|null,
+                         selfAssessment: {complete: boolean, answered, total: number},
+                         statusDimensions: StatusDimensions, complianceGaps: string[],
                          questionResults: [{id, dimension: string, score, weight, percentage: number}]}
-DomainApplyResult       {agentId, domain: string, packsApplied, guardrailsEnabled,
+StatusDimensions        {evidence, result, review: string,
+                         applicability: {state: string, reason?, rationale?: string},
+                         enforcement: {state: string, boundary?: string}}
+DomainApplyResult       {agentId, domain: string, packsApplied, guardrailsProposed, guardrailsEnabled,
                          complianceFrameworks: string[], guardrailsGenerated: number,
                          configFileUpdated: string|null, dryRun: boolean,
-                         assessmentScore: {composite: number, level: string, gaps: number}}
+                         assessment: {status: string, reasons: string[]},
+                         operatingProfile: {station, riskTier, path: string, written: boolean,
+                                            consistency: {ok: boolean, violations: string[]}}}
 ```
 
 Refusals and failures:
 
 - Pack ids must be one of `amc_sdk.industry.PACK_IDS` and domains one of `DOMAIN_IDS` (`health`, `education`, `environment`, `mobility`, `governance`, `technology`, `wealth`); anything else raises `ValueError` before the CLI runs. Domain aliases such as `healthcare` are refused here even though the CLI accepts them; read them from `list_domains()` and pass the canonical id. `agent_id`, `compliance` entries and `file` are passed through unchanged (the CLI normalizes agent ids) and are refused only when empty or containing NUL.
-- `describe_pack` and `score_pack_baseline` without an Industry Packs entitlement: the CLI prints `{"error": "industry_packs_locked", "message": ...}` and exits 1, raised as `AmcIndustryLockedError`. `apply` reports the same lock as text on stderr, raised as `AmcIndustryCommandError` (as is every other nonzero exit, with the CLI's own reason and `returncode`).
+- Industry Packs licence: `describe_pack`, `score_pack_baseline` and `apply` need a licence that verifies against a key pinned in the operator's AMC trust list (see `docs/PRICING.md`); nothing passed to this module unlocks them, and a licence changes access, never a result. `list_packs` and `list_domains` need none.
+- `describe_pack` and `score_pack_baseline` without an Industry Packs licence: the CLI prints `{"error": "industry_packs_locked", "message": ...}` and exits 1, raised as `AmcIndustryLockedError`. `apply` reports the same lock as text on stderr, raised as `AmcIndustryCommandError` (as is every other nonzero exit, with the CLI's own reason and `returncode`).
 - Output that is not one JSON document, or does not match its shape, raises `AmcProtocolError`; a CLI timeout raises `AmcTimeoutError`.
-- `score_pack_baseline` scores every question at L1. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
+- `score_pack_baseline` answers no question. Its result is self-reported (`claimKind` `self_reported`), `selfAssessment.answered` is 0, `eligibleLevel` is `None` and `statusDimensions["result"]` is `not_evaluated`. The CLI still counts each unanswered question as level 1 in `percentage`, `level` and `complianceGaps`; read those numbers as "nothing answered", not as an assessment. No result is a certification. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
 
-`tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Unlocked describe/score/apply output is covered by fixtures only.
+`tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Against the real CLI it checks the locked refusals, or, when the environment carries a licence that verifies against a key pinned in `AMC_HOME`'s trust list, the unlocked describe, score and dry-run apply shapes. Run it against an installed wheel, offline:
+
+```bash
+python3 -m venv .venv-py
+.venv-py/bin/python -m pip wheel --no-deps sdk/python -w dist-py   # add --no-index --find-links <wheelhouse> offline
+.venv-py/bin/python -m pip install dist-py/*.whl pytest
+.venv-py/bin/python -I -m pytest sdk/python/tests/test_industry.py
+```
+
+P1-44 ran this lane on Python 3.10 and 3.12 (receipt `qualification/2026-10-18-P1-44/`).
