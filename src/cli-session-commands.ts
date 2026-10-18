@@ -272,7 +272,9 @@ export function registerSessionCommands(program: Command): void {
         );
       }
 
-      const derivations = deriveSessionRequests({ workspace, sessionId: id });
+      // P1-38: pi-ai requests re-derive only through the pinned library, loaded only when this session used it.
+      const piEncoders = await (await import("./llm/providers/piAi/piAiAdapter.js")).piAiDerivationEncoders(workspace, id);
+      const derivations = deriveSessionRequests({ workspace, sessionId: id, ...(piEncoders === null ? {} : { encoders: piEncoders }) });
       if (derivations.length === 0) {
         console.error(chalk.red(`Session ${id} recorded no request/header events.`));
         process.exit(1);
