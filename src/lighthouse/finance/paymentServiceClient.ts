@@ -27,10 +27,6 @@ const ledgerDate = z.union([z.iso.date(), z.iso.datetime().refine(value =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value))]);
 const dateRangeSchema = z.object({ from: ledgerDate.optional(), to: ledgerDate.optional() }).strict();
 
-export type PaymentAccount = z.infer<typeof accountSchema>;
-export type PaymentPayee = z.infer<typeof payeeSchema>;
-export type PaymentBankTransaction = z.infer<typeof bankTransactionSchema>;
-export type PaymentBookEntry = z.infer<typeof bookEntrySchema>;
 export type Payment = z.infer<typeof paymentSchema>;
 export type PaymentCommit = z.infer<typeof commitSchema>;
 export interface PaymentDateRange { readonly from?: string; readonly to?: string }
