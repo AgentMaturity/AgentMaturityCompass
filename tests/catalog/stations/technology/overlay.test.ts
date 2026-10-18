@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { loadCatalog } from "../../../../src/catalog/loader.js";
 import { controlRecordSchema } from "../../../../src/catalog/schema.js";
 import { validateCatalog } from "../../../../src/catalog/validate.js";
+import { getDeepQuestionsByStation } from "../../../../src/domains/deepIndustryPacks.js";
 import { getIndustryPacksByStation } from "../../../../src/domains/industryPacks.js";
 import { domainsForStation } from "../../../../src/domains/stations.js";
 
@@ -23,6 +24,7 @@ describe("Technology experimental catalog overlay (P2-30)", () => {
       expect(control, id).toBeDefined();
       expect(controlRecordSchema.safeParse(control).success, id).toBe(true);
       expect(control).toMatchObject({ support: "experimental", stations: ["technology"], review: { status: "pending", expert: null } });
+      expect(control?.levels, id).toEqual(["L1"]);
       expect(control?.invalidatedBy, id).toEqual(expect.arrayContaining(["model_version", "prompt_version", "tool_version", "policy_version", "deployment_version"]));
       for (const citation of control?.citations ?? []) expect(citation.legalReview, id).toBeNull();
       for (const crosswalk of control?.crosswalk ?? []) {
@@ -35,18 +37,23 @@ describe("Technology experimental catalog overlay (P2-30)", () => {
     }
   });
 
-  it("disposes each actual Technology question once, allowing only the six pending restoration ids", () => {
+  it("disposes all 97 pack and 16 deep Technology questions exactly once, including the six restored ids", () => {
     const path = "docs/catalog/technology/dispositions.json";
     expect(existsSync(path), path).toBe(true);
     const data = JSON.parse(read(path)) as { station: string; domain: string; dispositions: Array<{ id: string; disposition: string; reason: string }> };
     expect(data.station).toBe("technology");
     expect(domainsForStation("technology").map((domain) => domain.id)).toContain(data.domain);
-    const actual = getIndustryPacksByStation("technology").flatMap((pack) => pack.questions.map((question) => question.id));
+    const packIds = getIndustryPacksByStation("technology").flatMap((pack) => pack.questions.map((question) => question.id));
+    const deepIds = getDeepQuestionsByStation("technology").map((question) => question.id);
+    const actual = [...packIds, ...deepIds];
     const named = data.dispositions.map((row) => row.id);
+    expect(packIds).toHaveLength(97);
+    expect(deepIds).toHaveLength(16);
+    expect(actual).toHaveLength(113);
+    expect(new Set(actual).size).toBe(actual.length);
     expect(new Set(named).size).toBe(named.length);
-    for (const id of actual) expect(named, id).toContain(id);
-    for (const id of restored) expect(named, id).toContain(id);
-    expect(named.filter((id) => !actual.includes(id) && !restored.includes(id))).toEqual([]);
+    expect([...named].sort()).toEqual([...actual].sort());
+    for (const id of restored) expect(packIds, id).toContain(id);
     for (const row of data.dispositions) {
       expect(row.disposition.length, row.id).toBeGreaterThan(0);
       expect(row.reason.length, row.id).toBeGreaterThan(0);

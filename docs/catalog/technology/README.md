@@ -16,8 +16,9 @@ integrator on 2026-10-18:
   world and voluntary standards. Metadata for unread sources remains unverified with `reverify: true` and no URL or dates.
   Law-as-data records retain candidate official URLs required by the existing grammar; their content hashes and
   retrieval dates remain null. A locator does not prove the text was read.
-- Question mapping: [dispositions.json](dispositions.json), keyed to the actual questions on the recorded integration
-  base. The embedded drift record names absent spec IDs and label mismatches. No absent question is invented.
+- Question mapping: [dispositions.json](dispositions.json), covering all 97 pack questions and 16 deep questions
+  exactly once on integration `577aa79700479634fa4f16cf44c48192fe57a994`. Its source hashes include both split
+  Technology data files and their registry wrappers. No absent question is invented.
 - Compiler input: [profile.platform-agent.json](profile.platform-agent.json). It is a synthetic fixture with asserted
   scope, no human reviewer, and unknown entity type, risk class and data classes. It is not a live deployment profile.
 - Executable checks: `tests/catalog/stations/technology/`.
@@ -94,10 +95,27 @@ the real partner, all ten criteria met with their evidence, independent human re
 
 The overlay does not enforce content marking in a live publisher, operate a real IoT device, determine CRA or COPPA
 scope, submit incident notices, verify parental authority, decide fair contract terms, or perform a human document
-review. It does not convert assurance packs, merge lighthouse profiles or supply absent deep questions. Legacy
-questionnaire responses remain self-reported and capped at L1 unless separately supported by admitted evidence.
+review. It does not convert assurance packs or merge lighthouse profiles. Legacy questionnaire responses remain
+self-reported and capped at L1 unless separately supported by admitted evidence.
 
-The inventory receipt records the spec's expected pack/deep counts against the actual integration source, each
-absent named spec ID and the CI-15/PP-15 meaning changes. The six P1-42 restoration IDs retain dispositions even
-before an integration landing announcement. Their temporary test tolerance must be tightened when Claude announces
-that landing; it is not permission to invent question text or edit `src/domains/**`.
+## Question inventory and mapping
+
+The current source contains 97 pack questions and 16 deep questions, giving 113 unique dispositions. The five
+pack counts are 18, 19, 21, 19 and 20. The spec's earlier 77-pack-question count is historical; no question is dropped
+to match it. Earlier qualification records remain bound to their recorded source.
+
+P1-42 versions six ids: `TECH-CI-15-v2`, `TECH-NE-14-v2`, `TECH-NE-15-v2`, `TECH-OS-9-v2`, `TECH-INF-9-v2`
+and `TECH-PP-15-v2`. Their old ids are absent from the current mapping; old answers do not satisfy a versioned
+question. CI-15-v2 now asks about machine-readable marking, while CI-16 asks about integrator documentation.
+PP-15-v2 asks about SBOM generation; a synthetic AIBOM input to the CRA drill does not establish that generation.
+
+The six restored ids—`TECH-OS-4`, `TECH-OS-15`, `TECH-INF-15`, `TECH-PP-7`, `TECH-PP-13` and `TECH-PP-14`—are
+required in the actual source inventory and the exact disposition set. No temporary absence allowance remains.
+
+Question-to-control relations are partial. The marking fixture covers image/audio byte signatures, not visible
+deep-fake disclosure or video/text marking; INF-9-v2 and deep-06 therefore remain questionnaires capped at L1.
+INF-13 is a notice question, not a consent test. Deep-16 concerns retention and deletion: its written-policy review
+is related to the draft COPPA duty, but no deletion effect is observed. The CRA and NIS2 drills cover only their
+local 24-hour portions, not 72-hour notifications, final reports or live submissions. Deep-03's model-provider
+obligations are broader than the integrator-documentation control; only the downstream-information relation is
+mapped to that manual review. Missing performance evidence remains not evaluated.
