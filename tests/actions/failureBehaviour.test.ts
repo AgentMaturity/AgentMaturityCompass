@@ -439,6 +439,25 @@ describe("P1-03 bound subcall gates must follow durable admission", () => {
     expect(f.sor.effects).toHaveLength(1); // Only the deliberately staged prior effect.
   });
 
+  test("an authority context that throws while the call enters is diagnosed as such, not journal_unavailable", async () => {
+    const f = fixture(), code = "authority_store_unavailable", text = "the call's authority could not be decided";
+    let contexts = 0;
+    const pipeline = new ToolPipeline({ registry: f.registry, workspace: f.workspace, journal: () => f.journal,
+      authorizationContext: () => {
+        // The first read binds the journal request; the next, as the call enters, fails.
+        if (++contexts > 1) throw new Error("owned authority context unavailable");
+        return { sessionId: f.sessionId };
+      } });
+    pipeline.bindApprovalGate({ gates: name => name === DELETION_TOOL, ask: async () => ({ approvalRequestIds: [] }) });
+    const result = await pipeline.execute({ name: DELETION_TOOL, agentId: "default", requestedMode: "EXECUTE",
+      arguments: { ...FAULT_ARGUMENTS[DELETION_TOOL] }, callId: `p103-diagnosis-${randomUUID()}`, parentToken: "p103-owned-parent" });
+    expect(result.denied?.stage).toBe("authorization");
+    expect(result.denied?.reason).toContain(code); expect(result.denied?.reason).toContain(text);
+    expect(result.denied?.reason).not.toContain("journal_unavailable");
+    expect(chain(f, result.action!.executionId).map(row => row.state)).toEqual(["requested", "denied"]);
+    expect(f.sor.effects).toHaveLength(0);
+  });
+
   test("an unavailable request store refuses the gated subcall without asking", async () => {
     const f = fixture();
     f.journal = failingJournal(f.journal, new Set(["request"]));
@@ -792,13 +811,14 @@ describe("P1-03 genuine granted bound-gate identity and fresh binding", () => {
     if (h.errors.length) throw new AggregateError(h.errors, "Genuine gate setup failed; this is not a context-drift assertion");
     expect(h.grants).toHaveLength(1);
     expect(outcome).toMatchObject({ ok: false, action: { state: "denied", executionId: requested.id } });
-    expect(outcome.denied?.reason).toContain("authority_store_unavailable");
+    // Attribution drift is an intent mismatch, not an unavailable authority store.
+    expect(outcome.denied?.reason).toContain("approval_intent_mismatch");
     expect(outcome.denied?.reason).toContain("the authorization context no longer names the requested session and parent");
     expect(h.bodies).toHaveLength(0);
     expect(h.f.sor.effects).toHaveLength(0);
     const receipts = chain(h.f, requested.id);
     expect(receipts.map(row => row.state)).toEqual(["requested", "denied"]);
-    expect(receipts.at(-1)?.reasonCode).toBe("authorization_denied:authority_store_unavailable");
+    expect(receipts.at(-1)?.reasonCode).toBe("authorization_denied:approval_intent_mismatch");
     expect(receipts.map(row => row.idempotencyKey)).toEqual([requested.key, requested.key]);
     expect(receiptDigest(receipts[0]!)).toBe(requested.receiptDigest);
     expect(h.f.journal.get(requested.id)?.intent).toBeNull();

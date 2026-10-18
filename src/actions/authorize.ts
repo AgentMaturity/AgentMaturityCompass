@@ -216,6 +216,13 @@ function leasePrincipal(workspace: string, payload: LeasePayload):
 /** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
 const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
 
+/** A record re-derived from a bound one (the journal admission's fresh IDs) keeps the principal state its recheck needs. */
+export function carryBoundPrincipal(from: AuthorizationRecordV1, to: AuthorizationRecordV1): AuthorizationRecordV1 {
+  const state = boundPrincipalState.get(from);
+  if (state !== undefined) boundPrincipalState.set(to, state);
+  return to;
+}
+
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
   const facts = actionFacts(execution, ctx.compiledPolicy);

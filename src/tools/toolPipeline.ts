@@ -4,7 +4,7 @@ import { authorizationRecordDigest } from "../actions/authorizationRecord.js";
 import { mintIdempotencyKey } from "../actions/idempotency.js";
 import { assertContract } from "../contracts/index.js";
 import {
-  authorizationIntentFor, bindAuthorization, recheckAuthorization,
+  authorizationIntentFor, bindAuthorization, carryBoundPrincipal, recheckAuthorization,
   type AuthorizationContext, type AuthorizationIntentResult, type BindResult
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
@@ -404,13 +404,14 @@ export class ToolPipeline {
   private bindJournalAdmission(authorization: CallAuthorization, request: ActionRequest): CallAuthorization {
     const bound = authorization.bound;
     if (!bound?.ok) return authorization;
+    // The request's session/parent attribution is immutable too. A changed composition must not silently relabel it.
+    if (bound.record.session.sessionId !== request.sessionId || bound.record.delegation.parentExecutionId !== request.parentExecutionId) {
+      return { ...authorization, bound: { ok: false, failures: ["approval_intent_mismatch"],
+        reason: "the authorization context no longer names the requested session and parent" } };
+    }
     try {
-      // The request's session/parent attribution is immutable too. A changed composition must not silently relabel it.
-      if (bound.record.session.sessionId !== request.sessionId || bound.record.delegation.parentExecutionId !== request.parentExecutionId) {
-        throw new Error("the authorization context no longer names the requested session and parent");
-      }
-      const record = assertContract("authorization-record", { ...bound.record,
-        executionId: request.executionId, idempotencyKey: request.idempotencyKey });
+      const record = carryBoundPrincipal(bound.record, assertContract("authorization-record", { ...bound.record,
+        executionId: request.executionId, idempotencyKey: request.idempotencyKey }));
       return { ...authorization, bound: { ...bound, record, digest: authorizationRecordDigest(record) } };
     } catch (error) {
       return { ...authorization, bound: { ok: false, failures: ["authority_store_unavailable"],
@@ -534,7 +535,9 @@ export class ToolPipeline {
         // No authorization record lives across the bound gate's human wait. All authority, facts and times are fresh.
         authorization = this.bindJournalAdmission(await enter(), request);
       } catch (error) {
-        return deny(unavailable(error), "journal_unavailable");
+        // The journal is fine here: deciding the call's authority threw (its context or gate), so say that.
+        return deny({ stage: "authorization", guardLabel: null, reason: `authority_store_unavailable: the call's authority could not be decided: ${String(error)}` },
+          "authorization_denied:authority_store_unavailable");
       }
       const fresh = authorization.bound;
       if (fresh?.ok) {
