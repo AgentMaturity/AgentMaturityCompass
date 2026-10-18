@@ -130,6 +130,35 @@ describe("amc init --coding (P1-40)", () => {
   });
 });
 
+describe("S8 web tools through the starter profiles (P2-13)", () => {
+  const web = (ws: string) => loadVerifiedToolsConfigSnapshot(ws).config?.tools.allowedTools.filter((tool) => ["web_fetch", "web_search"].includes(tool.name));
+
+  it("--coding grants web_fetch and web_search only the named hosts, in the signed policy; without hosts they stay off", () => {
+    const ws = workspace();
+    applyStarterProfile(ws, "coding", OWNER, ["docs.example.org", "https://registry.example.org:8443"]);
+    expect(loadVerifiedToolsConfigSnapshot(ws).signatureValid).toBe(true);
+    expect(checkToolsetReadiness(ws).ready, checkToolsetReadiness(ws).blockers.join("; ")).toBe(true);
+    expect(web(ws)?.map((tool) => [tool.name, tool.actionClass, tool.allow?.hostAllowlist])).toEqual([
+      ["web_fetch", "NETWORK_EXTERNAL", ["docs.example.org", "https://registry.example.org:8443"]],
+      ["web_search", "NETWORK_EXTERNAL", ["docs.example.org", "https://registry.example.org:8443"]]]);
+    const plain = workspace();
+    applyStarterProfile(plain, "coding", OWNER);
+    expect(web(plain)).toEqual([]);
+    expect(loadVerifiedToolsConfigSnapshot(plain).config?.tools.allowedTools.map((tool) => tool.name)).not.toEqual(expect.arrayContaining(["ask_user", "todo", "plan"]));
+  });
+
+  it("--regulated keeps them off, and a malformed host or a host without --coding is refused before anything is written", () => {
+    const ws = workspace();
+    expect(() => applyStarterProfile(ws, "regulated", OWNER, ["docs.example.org"])).toThrow("--regulated keeps web_fetch and web_search off.");
+    expect(existsSync(join(ws, ".amc", "users.yaml")), "nothing was written").toBe(false);
+    expect(() => starterProfileFlag({ regulated: true, webAllowHost: ["docs.example.org"] })).toThrow("--web-allow-host enables web_fetch and web_search in --coding only");
+    expect(() => starterProfileFlag({ webAllowHost: ["docs.example.org"] })).toThrow("--coding only");
+    for (const bad of ["*.example.org", "https://docs.example.org/path", "user:pass@docs.example.org", "ftp://docs.example.org"]) {
+      expect(() => starterProfileFlag({ coding: true, webAllowHost: [bad] })).toThrow("is not a hostname or an http(s) origin");
+    }
+  });
+});
+
 describe("amc init --regulated (P1-40)", () => {
   it("blocks at the firewall, signs the regulated approval preset, isolates the config and leaves egress denied", () => {
     const ws = workspace();
