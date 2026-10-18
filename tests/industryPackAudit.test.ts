@@ -74,7 +74,7 @@ describe("industry pack audit", () => {
       expect(c.status).toBe("PASS");
       expect(c.remediation).toBeNull();
     }
-    expect(clean.overall.percentage).toBeGreaterThanOrEqual(gaps.overall.percentage);
+    expect(clean.overall.percentage!).toBeGreaterThanOrEqual(gaps.overall.percentage!); // both answer every control
   });
 
   test("status thresholds: L5 PASS, L3 ADEQUATE, L1 GAP", () => {

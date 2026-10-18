@@ -2,7 +2,7 @@
  * Industry Pack Audit — the paid, auditor-ready deliverable for an Industry Pack.
  *
  * For each control in a pack this produces: a level score, a PASS/ADEQUATE/GAP
- * verdict, an indicative multi-framework crosswalk (EU AI Act, NIST AI RMF,
+ * verdict (NOT_EVALUATED, with no level, for an unanswered control), an indicative multi-framework crosswalk (EU AI Act, NIST AI RMF,
  * ISO/IEC 42001, SOC 2) plus the sector regulation, the evidence an auditor
  * would expect, and — for anything short of PASS — a concrete generated
  * remediation (policy / guardrail / evidence recipe). The bundle carries an
@@ -38,16 +38,17 @@ import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js
  * /3 (P0-20): a `signature` field; `receiptHash` now excludes it, so a /2 reader recomputing over
  * everything but `receiptHash` would fail on a /3 file, and a no-answer baseline is `synthetic_example`.
  */
-export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/3";
+export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/4";
 
 export const AUDIT_FRAMEWORKS = ["EU AI Act", "NIST AI RMF", "ISO 42001", "SOC 2", "Sector"] as const;
 export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
 
-export type ControlStatus = "PASS" | "ADEQUATE" | "GAP";
+export type ControlStatus = "PASS" | "ADEQUATE" | "GAP" | "NOT_EVALUATED";
 
 /** Markdown wording for a status computed from a self-declared level: never a bare PASS (truth rule). */
 const CONTROL_STATUS_TEXT: Record<ControlStatus, string> = {
-  PASS: "at target (self-reported)", ADEQUATE: "adequate (self-reported)", GAP: "gap (self-reported)"
+  PASS: "at target (self-reported)", ADEQUATE: "adequate (self-reported)", GAP: "gap (self-reported)",
+  NOT_EVALUATED: "not evaluated (no answer)"
 };
 
 export interface CrosswalkEntry {
@@ -72,7 +73,8 @@ export interface AuditControl {
   text: string;
   regulatoryRef: string;
   weight: number;
-  level: number;
+  /** The self-declared level; null when the question has no answer (not evaluated). */
+  level: number | null;
   status: ControlStatus;
   crosswalk: CrosswalkEntry[];
   evidenceExpected: string[];
@@ -88,9 +90,10 @@ export interface IndustryPackAudit {
   euAIActClassification: string;
   generatedAt: string;
   overall: {
-    /** Self-reported score. */
-    percentage: number;
-    level: number;
+    /** Self-reported score; null until every control is answered. */
+    percentage: number | null;
+    level: number | null;
+    notEvaluatedQuestionIds: string[];
     selfAssessment: PackSelfAssessment;
     claimKind: ClaimKind;
     eligibleLevel: number | null;
@@ -196,7 +199,7 @@ function evidenceForDimension(dimension: string): string[] {
  * policy stub, a guardrail, or an evidence-collection recipe, with the pack's
  * own L3 descriptor as the acceptance criterion the agent must meet.
  */
-function generateRemediation(q: IndustryPackQuestion, level: number, packId: string): AuditRemediation {
+function generateRemediation(q: IndustryPackQuestion, level: number | null, packId: string): AuditRemediation {
   const evidence = evidenceForDimension(q.dimension);
   const targetLevel = 3;
   const acceptance = (q.l3 || "").replace(/\s+/g, " ").trim();
@@ -208,7 +211,7 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
     `# amc industry-pack remediation — ${q.id} (${packId})`,
     `control: "${q.dimension}"`,
     `regulation: "${q.regulatoryRef}"`,
-    `current_level: ${level}`,
+    `current_level: ${level ?? "not_evaluated"}`,
     `target_level: ${targetLevel}`,
     `acceptance_criterion: >`,
     `  ${acceptance || `Meet the L${targetLevel} bar for ${q.dimension}.`}`,
@@ -220,7 +223,9 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
   return {
     title: `Close ${q.dimension} gap for ${q.regulatoryRef}`,
     artifactType,
-    summary: `Raise control ${q.id} from L${level} to L${targetLevel} (${q.regulatoryRef}).`,
+    summary: level === null
+      ? `Answer and evidence control ${q.id} (not evaluated) to reach L${targetLevel} (${q.regulatoryRef}).`
+      : `Raise control ${q.id} from L${level} to L${targetLevel} (${q.regulatoryRef}).`,
     targetLevel,
     acceptanceCriterion: acceptance,
     generatedArtifact,
@@ -229,7 +234,8 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
   };
 }
 
-function levelStatus(level: number): ControlStatus {
+function levelStatus(level: number | null): ControlStatus {
+  if (level === null) return "NOT_EVALUATED";
   if (level >= 4) return "PASS";
   if (level === 3) return "ADEQUATE";
   return "GAP";
@@ -264,11 +270,11 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
   let gapCount = 0;
 
   for (const [index, q] of pack.questions.entries()) {
-    const level: number = answers[index]!;
+    const level = answers[index] ?? null;
     const status = levelStatus(level);
     if (status === "PASS") passCount += 1;
     else if (status === "ADEQUATE") adequateCount += 1;
-    else gapCount += 1;
+    else if (status === "GAP") gapCount += 1;
 
     let crosswalk = crosswalkForQuestion(q);
     if (frameworkFilter) {
@@ -309,7 +315,7 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     generatedAt: new Date(now).toISOString(),
     overall: {
       ...assessed,
-      // No answer at all: every level is the L1 default, an example rather than a self-report (P0-20).
+      // No answer at all: no control is evaluated, so the audit is an example roadmap, not a self-report (P0-20).
       claimKind: assessed.selfAssessment.answered === 0 ? "synthetic_example" as const : assessed.claimKind,
       selfAssessmentTarget: pack.certificationThreshold,
       controlCount: controls.length,
@@ -333,7 +339,7 @@ export function verifyIndustryPackAuditChecksum(audit: IndustryPackAudit): boole
 /** Each control's level is a self-answer about a regulated control: self-reported, never a pass. */
 function controlClaim(audit: IndustryPackAudit, control: AuditControl): ClaimEnvelope {
   return envelopeForSelfAssessment({ producer: `industry-pack:${audit.packId}:${control.id}`, regulated: true,
-    answers: [control.level], now: Date.parse(audit.generatedAt) });
+    answers: control.level === null ? [] : [control.level], now: Date.parse(audit.generatedAt) });
 }
 
 /** The audit as a whole claims no more than its weakest control. */
@@ -478,9 +484,11 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push(`- EU AI Act classification: ${audit.euAIActClassification}`);
   lines.push(`- Generated: ${audit.generatedAt}`);
   const overall = audit.overall;
-  lines.push(`- Overall (self-reported): ${overall.percentage}% · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
-  lines.push(`- Self-reported level L${overall.level}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
-  lines.push(`- Controls (self-reported answers): ${audit.overall.controlCount} — at target ${audit.overall.passCount} · adequate ${audit.overall.adequateCount} · gap ${audit.overall.gapCount}`);
+  const score = overall.percentage === null
+    ? `not evaluated (${overall.notEvaluatedQuestionIds.length} of ${overall.controlCount} controls unanswered)` : `${overall.percentage}%`;
+  lines.push(`- Overall (self-reported): ${score} · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
+  lines.push(`- Self-reported level ${overall.level === null ? "not evaluated" : `L${overall.level}`}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
+  lines.push(`- Controls (self-reported answers): ${audit.overall.controlCount} — at target ${audit.overall.passCount} · adequate ${audit.overall.adequateCount} · gap ${audit.overall.gapCount} · not evaluated ${overall.notEvaluatedQuestionIds.length}`);
   lines.push(audit.signature
     ? `- Signature: auditor key ${audit.signature.keyFingerprint}. Verify with: \`amc audit binder verify <file> --pubkey <recorded-auditor.pub>\``
     : `- Checksum only — not signed (\`sha256:${audit.receiptHash}\`)`);
@@ -496,7 +504,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");
-    lines.push(`### ${c.id} — ${c.dimension} · ${CONTROL_STATUS_TEXT[c.status]} (L${c.level})`);
+    lines.push(`### ${c.id} — ${c.dimension} · ${CONTROL_STATUS_TEXT[c.status]}${c.level === null ? "" : ` (L${c.level})`}`);
     lines.push(formatClaimLabel(renderClaimLabel(controlClaim(audit, c)), "report"));
     lines.push("");
     lines.push(c.text);

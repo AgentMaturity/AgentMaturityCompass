@@ -47,15 +47,18 @@ amc domain apply --agent my-agent --pack digital-health-record --audit
 # Narrow the crosswalk to a single framework
 amc domain apply --agent my-agent --pack digital-payments --audit --framework eu_ai_act
 
-# Score against real responses instead of the L1 baseline
+# Score against real responses instead of the unanswered baseline
 amc domain apply --agent my-agent --pack clinical-trials --audit \
   --responses responses.json
 ```
 
-`--responses` is a JSON object of `{ "<questionId>": <level 1-5> }`. Without it
-the audit runs a **baseline at L1**, which is useful on its own: it produces the
-complete "here is everything you would need to prove, and the fix for each gap"
-roadmap for that sector. The baseline is a `synthetic_example`, so signing it is
+`--responses` is a JSON object of `{ "<questionId>": <level 1-5> }`. A control
+without an answer is not evaluated: status `NOT_EVALUATED`, `level: null`, no
+gap, and the overall percentage and level stay `null` until every control is
+answered (`overall.notEvaluatedQuestionIds` lists the rest). Without
+`--responses` nothing is answered, and the audit is still useful on its own: it
+produces the complete "here is everything you would need to answer and prove,
+and the remediation for each control" roadmap for that sector. The baseline is a `synthetic_example`, so signing it is
 refused: pass `--responses` or `--no-sign`.
 
 Signing needs the unlocked vault (`AMC_VAULT_PASSPHRASE`). If signing fails, the

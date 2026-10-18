@@ -1,0 +1,25 @@
+                refusal = None
+            if (isinstance(refusal, dict) and refusal.get("error") == "industry_packs_locked"
+                    and isinstance(refusal.get("message"), str)):
+                raise AmcIndustryLockedError(refusal["message"])
+            reason = (completed.stderr or completed.stdout or "").strip()
+            raise AmcIndustryCommandError(completed.returncode, reason or f"amc exited {completed.returncode}")
+        try:
+            payload = json.loads(completed.stdout)
+        except ValueError as error:
+            raise AmcProtocolError("the CLI did not print one JSON document") from error
+        if not _conforms(payload, shape):
+>           raise AmcProtocolError(f"CLI output does not match the {getattr(shape, '__name__', shape)} contract")
+E           amc_sdk.client.AmcProtocolError: CLI output does not match the IndustryPackCatalog contract
+
+amc_sdk/industry.py:275: AmcProtocolError
+=========================== short test summary info ============================
+FAILED tests/test_industry.py::test_list_packs_with_and_without_domain - amc_...
+FAILED tests/test_industry.py::test_describe_and_score_argv - amc_sdk.client....
+FAILED tests/test_industry.py::test_apply_argv_composition - amc_sdk.client.A...
+FAILED tests/test_industry.py::test_shell_metacharacters_in_an_id_stay_one_argv_element
+FAILED tests/test_industry.py::test_default_runner_never_uses_a_shell - amc_s...
+FAILED tests/test_industry.py::test_optional_keys_are_accepted - amc_sdk.clie...
+FAILED tests/test_industry.py::test_score_result_carries_the_claim_and_no_certified_field
+FAILED tests/test_industry.py::test_installed_cli_contract - amc_sdk.client.A...
+8 failed, 34 passed in 3.92s

@@ -1,0 +1,8 @@
+{
+  "station": "health",
+  "note": "Synthetic fixture. No patient data. Capability flags describe a hypothetical agent for the CLI's risk classifier.",
+  "industryPack": "digital-health-record",
+  "assurancePack": "healthcarePHI",
+  "capabilities": { "chatbot": true, "humanInteraction": true, "safetyComponent": true },
+  "prompt": "List the fields a discharge checklist for a synthetic test patient should contain."
+}

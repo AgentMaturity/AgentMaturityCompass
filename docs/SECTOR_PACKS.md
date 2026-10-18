@@ -194,7 +194,7 @@ Each pack carries a self-assessment target (the `certificationThreshold` data fi
 Composite Score = (base_score × 0.5) + (domain_score × 0.3) + (sector_score × 0.2)
 ```
 
-Pack scoring uses weighted question responses. Each answer is a self-declared Likert value, an integer 1–5; any other value throws a `RangeError` instead of being clamped. An unanswered question counts as 1.
+Pack scoring uses weighted question responses. Each answer is a self-declared Likert value, an integer 1–5; any other value throws a `RangeError` instead of being clamped. An unanswered question is not evaluated: it gets no level, no question result and no gap, it is listed in `notEvaluatedQuestionIds`, and `percentage`, `level` and `eligibleLevel` are `null` until every question is answered.
 
 ```typescript
 import { scoreIndustryPack } from "agent-maturity-compass";
@@ -205,8 +205,9 @@ const result = scoreIndustryPack("digital-health-record", {
   // ...
 });
 
-console.log(result.percentage);     // 78 (self-reported score)
-console.log(result.level);          // 4 (self-reported level from the one level table)
+console.log(result.percentage);     // 78 (self-reported score); null while any question is unanswered
+console.log(result.level);          // 4 (self-reported level from the one level table); null likewise
+console.log(result.notEvaluatedQuestionIds); // [] here; the unanswered question ids otherwise
 console.log(result.selfAssessment); // { complete, answered, total }: complete when every question is answered
 console.log(result.claimKind);      // "self_reported"
 console.log(result.eligibleLevel);  // 1 (self-reported answers cap at L1)
