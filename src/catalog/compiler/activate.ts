@@ -140,7 +140,8 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
     const record = catalog.controls.get(r.controlId);
     if (!record || record.version !== r.controlVersion) throw new Error(`control ${r.controlId}@${r.controlVersion} is not in the shipped catalog`);
     const compiledPoints = [...new Set(record.binding.parameters.flatMap((p) => PARAMETERS.find((spec) => spec.pattern.test(p.name))?.point ?? []))];
-    return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: shownReviewStatus(record, r.support) };
+    const compiled = r; // the plan row: its support is effectiveSupport's result, compiled into the plan (P1-34)
+    return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: shownReviewStatus(record, compiled.support) };
   });
   return { revision: journal.revision, entrySha256: journal.entrySha256 ?? "", planDigest: plan.digest, profileSha256: plan.profile.sha256,
     lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls, deployment: plan.profile.deployment ?? null };
