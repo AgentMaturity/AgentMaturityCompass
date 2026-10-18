@@ -1,8 +1,13 @@
 # Industry assurance scenario fixtures
 
 A sourced scenario corpus for the 17 industry assurance packs. It is input data for
-later certification runs, not a grade. Nothing in this directory runs an agent or
-scores a response.
+later assurance runs (P1-16 grades agents against it), not a grade. Nothing in this
+directory runs an agent or scores a response.
+
+**Experimental.** The scenarios and regulation anchors were drafted and read by AI agents.
+They are draft content that no named expert has reviewed; they cite law and standards
+but are not legal advice, and no scenario result is evidence of conformity until such a
+review exists.
 
 ## Layout
 
@@ -10,8 +15,8 @@ scores a response.
 - `tests/fixtures/industry-assurance/packs/<packId>.json`: one file per pack, at least 3 scenarios each.
 - `tests/industryAssuranceFixtures.test.ts`: the loader, the schema and the hygiene guard.
 
-Counts measured on 2026-10-04 by `pnpm vitest run tests/industryAssuranceFixtures.test.ts`:
-`packs=17 scenarios=54`. There are 60 anchors: 52 verified and 8 `verified:false`.
+Counts measured on 2026-10-04 and again on 2026-10-18 by
+`npx vitest run tests/industryAssuranceFixtures.test.ts`: `packs=17 scenarios=54`. There are 60 anchors: 52 verified and 8 `verified:false`.
 Expected behaviour across the scenarios: 26 `refuse`, 15 `comply-with-controls`, 13 `escalate`.
 
 ## Scenario shape
@@ -19,13 +24,33 @@ Expected behaviour across the scenarios: 26 `refuse`, 15 `comply-with-controls`,
 | Field | Meaning |
 | --- | --- |
 | `id` | Unique across the corpus (kebab-case). |
-| `station` | Must match the pack's station in the industry pack manifest. |
+| `station` | Must equal the pack's station in the industry pack manifest (see Stations below). |
 | `anchors` | Keys into `anchors.json`. Every key must resolve. |
 | `prompt` | The request put to the agent under test. |
 | `expectedBehaviour` | `refuse`, `comply-with-controls` or `escalate`. |
 | `mustCite` | Control ids the answer has to cite. Each one must equal the `citation` of one of the scenario's anchors, and that anchor must not be `superseded` or `lapsed`. |
 | `mustNot` | Things the answer must not do. |
 | `evidenceRequired` | Artifacts a passing run has to produce. |
+
+## Stations
+
+The test imports `INDUSTRY_PACK_MANIFEST` (`src/assurance/packs/industryPackManifest.ts`) and
+checks each pack's id, source file and station against it, so the corpus restates no station.
+Five packs carry the manifest station `cross-framework`, which is not one of the seven stations:
+the manifest uses it when the station map gives a pack two or more stations. For those packs
+a scenario's stations are P1-13's station tags, `listIndustryAssurancePackStations(packId)` in
+`src/domains/domainRegistry.ts`; the test checks that each has at least two and that every
+scenario's stations are among the seven.
+
+| Pack | Stations (P1-13 tags) |
+| --- | --- |
+| `euAiActArticle` | health, education, environment, mobility, governance, wealth |
+| `globalAIRegulatory` | governance, technology |
+| `iso42005ImpactAssessment` | governance, wealth |
+| `legalCompliance` | governance, wealth |
+| `safetyCriticalSIL` | health, mobility |
+
+The table is read from `INDUSTRY_ASSURANCE_PACK_STATIONS` on 2026-10-18; the code is the source.
 
 ## Anchor shape and sourcing rule
 
@@ -36,7 +61,7 @@ allowlist of official or primary publishers, such as govinfo.gov, sec.gov, fcc.g
 nist.gov, europa.eu, iso.org, iec.ch, cac.gov.cn and camara.leg.br. A law-firm or news
 URL fails the schema. `note` records what a verified read did not cover.
 
-All anchors were read on 2026-10-04. These 8 could not be confirmed and are marked
+All anchors were read by an agent on 2026-10-04 and not re-read since. These 8 could not be confirmed and are marked
 `verified:false`:
 
 | Anchor | Reason |
@@ -67,8 +92,7 @@ not a real person's name, so scenarios refer to people by role only.
 
 ## Boundaries
 
-- Pack ids and stations come from `src/assurance/packs/industryPackManifest.ts` on the
-  S9 track worktree, read on 2026-10-04. That manifest is not on this branch. The test
-  restates the list and checks each id against the pack source files on this branch.
+- Pack ids, source files and stations come from `src/assurance/packs/industryPackManifest.ts`
+  (landed with P0-13); the test imports it.
 - The corpus does not change any pack, and no pack reads the corpus yet.
 - No agent was run against these scenarios.

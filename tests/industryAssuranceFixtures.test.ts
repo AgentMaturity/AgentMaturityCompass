@@ -1,42 +1,30 @@
 /**
  * Loader and guard for the industry assurance scenario corpus
- * (tests/fixtures/industry-assurance). The corpus is data for later
- * certification runs; this test only proves it is well-formed, sourced and
+ * (tests/fixtures/industry-assurance). The corpus is input data for later
+ * assurance runs (P1-16); this test only proves it is well-formed, sourced and
  * free of personal data and credential-looking strings. It grades no agent.
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
+import { INDUSTRY_PACK_MANIFEST } from "../src/assurance/packs/industryPackManifest.js";
+import { listIndustryAssurancePackStations } from "../src/domains/domainRegistry.js";
+import { STATIONS } from "../src/domains/stations.js";
 
 const ROOT = join(__dirname, "fixtures", "industry-assurance");
 const PACK_SOURCES = join(__dirname, "..", "src", "assurance", "packs");
 
+/** Pack ids, source files and stations come from S9's manifest (one source); this test restates none of them. */
+const MANIFEST = new Map(INDUSTRY_PACK_MANIFEST.map((entry) => [entry.id, entry]));
+
 /**
- * The 17 industry packs and their stations, as listed in
- * src/assurance/packs/industryPackManifest.ts on the S9 track worktree
- * (read 2026-10-04). That manifest is not on this branch, so the list is
- * restated here and each id is checked against the pack source on this branch.
+ * A scenario's stations among the seven: its manifest station, or for a `cross-framework` pack (one the station map
+ * gives two or more stations) P1-13's station tags for that pack.
  */
-const EXPECTED_PACKS: Readonly<Record<string, { station: string; file: string }>> = {
-  educationFERPA: { station: "education", file: "educationFERPAPack.ts" },
-  healthcarePHI: { station: "health", file: "healthcarePHIPack.ts" },
-  hipaaCompliance: { station: "health", file: "hipaaCompliancePack.ts" },
-  financialSOX: { station: "wealth", file: "financialSOXPack.ts" },
-  wealthManagementMiFID: { station: "wealth", file: "wealthManagementMiFIDPack.ts" },
-  pharmaCompliance: { station: "health", file: "pharmaCompliancePack.ts" },
-  mobilityFunctionalSafety: { station: "mobility", file: "mobilityFunctionalSafetyPack.ts" },
-  environmentalInfra: { station: "environment", file: "environmentalInfraPack.ts" },
-  technologyGDPRSOC: { station: "technology", file: "technologyGDPRSOCPack.ts" },
-  euAiActArticle: { station: "cross-framework", file: "euAiActArticlePack.ts" },
-  globalAIRegulatory: { station: "cross-framework", file: "globalAIRegulatoryPack.ts" },
-  governanceNISTRMF: { station: "governance", file: "governanceNISTRMFPack.ts" },
-  iso42005ImpactAssessment: { station: "cross-framework", file: "iso42005Pack.ts" },
-  legalCompliance: { station: "cross-framework", file: "legalCompliancePack.ts" },
-  safetyCriticalSIL: { station: "cross-framework", file: "safetyCriticalSILPack.ts" },
-  "realtime-voice-safety": { station: "technology", file: "realtimeVoiceSafetyPack.ts" },
-  "sbom-supply-chain": { station: "technology", file: "sbomSupplyChainPack.ts" }
-};
+function scenarioStations(pack: string, station: string): string[] {
+  return station === "cross-framework" ? listIndustryAssurancePackStations(pack) : [station];
+}
 
 /** Official or primary publishers only; a law-firm or news URL fails the corpus. */
 const OFFICIAL_HOSTS = [
@@ -147,9 +135,9 @@ describe("industry assurance scenario corpus", () => {
   const packs = loadPacks();
   const scenarios = [...packs.values()].flatMap((p) => p.scenarios.map((s) => ({ pack: p.pack, ...s })));
 
-  it("covers exactly the 17 industry packs, each with at least 3 scenarios", () => {
-    expect([...packs.keys()].sort()).toEqual(Object.keys(EXPECTED_PACKS).sort());
-    for (const [id, { file }] of Object.entries(EXPECTED_PACKS)) {
+  it("covers exactly the manifest's industry packs, each with at least 3 scenarios", () => {
+    expect([...packs.keys()].sort()).toEqual([...MANIFEST.keys()].sort());
+    for (const { id, file } of MANIFEST.values()) {
       const source = readFileSync(join(PACK_SOURCES, file), "utf8");
       expect(source, `${file} declares pack id ${id}`).toContain(`id: "${id}"`);
       expect(packs.get(id)!.scenarios.length).toBeGreaterThanOrEqual(3);
@@ -160,7 +148,15 @@ describe("industry assurance scenario corpus", () => {
   it("gives every scenario a unique id and its pack's station", () => {
     const ids = scenarios.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const s of scenarios) expect(s.station, s.id).toBe(EXPECTED_PACKS[s.pack]!.station);
+    for (const s of scenarios) expect(s.station, s.id).toBe(MANIFEST.get(s.pack)!.station);
+  });
+
+  it("maps every scenario to stations among the seven, with P1-13's tags for cross-framework packs", () => {
+    for (const s of scenarios) {
+      const stations = scenarioStations(s.pack, s.station);
+      expect(stations.length, s.id).toBeGreaterThanOrEqual(s.station === "cross-framework" ? 2 : 1);
+      for (const station of stations) expect(STATIONS, `${s.id}: ${station}`).toContain(station);
+    }
   });
 
   it("resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario", () => {
