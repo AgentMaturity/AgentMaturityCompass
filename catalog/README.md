@@ -23,6 +23,14 @@ layers/<pack>/pack.yaml          pack manifest
 layers/<pack>/controls/<id>.yaml one control record per file
 fixtures/<id>/positive/*.json    fixtures a control test must allow or pass
 fixtures/<id>/negative/*.json    fixtures it must deny, fail or leave not evaluated
+CHANGELOG.md                     append-only changelog: one entry per catalog digest change
+governance/f5-confirmations.yaml          F5 verdicts a human review confirmed (none yet)
+governance/reverify-before-publishing.yaml facts to re-check against the primary source
+governance/standards-licences.md          licensed standards the catalog needs
+reviews/<subject>/<version>/<record>.json  review records (none yet; D-08 names the reviewers)
 ```
+
+The governance files follow [docs/catalog/GOVERNANCE.md](../docs/catalog/GOVERNANCE.md); they are not catalog content and
+change no digest.
 
 Load and check it with `loadCatalog()` and `validateCatalog()` from `dist/catalog/index.js`.

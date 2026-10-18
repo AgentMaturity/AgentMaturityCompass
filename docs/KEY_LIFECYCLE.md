@@ -18,7 +18,7 @@ That binding lives in AMC home. Under `trustBoundaryMode: shared`, an agent that
 | `lease` | lease tokens | lease |
 | `session` | session tokens, pairing codes, agent identity claims | session |
 
-Keys for `release`, `notary`, `trust-list-root`, `evidence-authority` and `independent-attestation` never live in a workspace vault; `getSigningKey` refuses them.
+Keys for `release`, `notary`, `trust-list-root`, `evidence-authority`, `independent-attestation` and `catalog-review` never live in a workspace vault; `getSigningKey` refuses them. A `catalog-review` key is a named expert's own key, pinned in a signed trust list, that signs catalog review records (docs/catalog/GOVERNANCE.md).
 
 Every signing call site takes its key from `getSigningKey(workspace, purpose)`. `scripts/architecture-boundaries-check.mjs` fails any file outside `src/keys/`, `src/vault/` and `src/crypto/keys.ts` that calls `getPrivateKeyPem(` or `getVaultPrivateKeyPem(`. Four `src/a4` call sites are listed by name until the A4 lane moves them.
 

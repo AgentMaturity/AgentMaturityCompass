@@ -109,6 +109,7 @@ Start: `SECURITY_COMPLIANCE_QUICKSTART`, then `SECURITY_PATH`.
 | EU_AI_ACT_COMPLIANCE, ISO_42001_ALIGNMENT, GDPR_ARTICLE_COMPLIANCE, MITRE_ATLAS_MAPPING, STANDARDS_MAPPING | Framework mappings, one each. |
 | compliance/eu-ai-act-checklist, compliance/iso-42001-aims-manual, compliance/nist-rmf-profile, compliance/SOC2_TYPE_II_CONTROLS_MAPPING | The promoted checklists and manuals. |
 | catalog/CONTROL_RECORD | The Regulated Control Catalog record, loader, support gates, digests and lockfile (P1-09; experimental content, evidence of conformity only). |
+| catalog/GOVERNANCE | Catalog content governance: review records and the two-person rule, currency reviews, the changelog, F5 and re-verify lists (P1-34; draft awaiting Sid's approval). |
 
 ### 5. Contributors and maintainers (not promoted; keep in the repo, not in the public collection)
 
