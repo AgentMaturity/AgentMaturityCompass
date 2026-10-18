@@ -56,6 +56,7 @@ interface ExecutionStatus {
   readonly phases: Readonly<Record<"admission" | "model-completion" | "side-effect-completion" | "evidence-verification",
     "pending" | "succeeded" | "failed" | "refused" | "unknown">>;
   readonly receiptStates: readonly string[];
+  readonly recheckFailures: readonly string[];
 }
 ```
 
@@ -67,13 +68,21 @@ failed` while the recorded turn still reads `model-completion: succeeded`.
 |---|---|---|
 | admission | the runtime opened the session (lease, signed policy, writer) | `succeeded`; `refused` when Studio refused a start or fork before any session; `pending` before an answer |
 | model-completion | the latest recorded turn ending | `succeeded` only for `complete`; `refused` for a guard's `blocked`; `failed` for `cancelled`, `max_tokens`, `max_steps`, `error` and `interrupted`; `pending` while a turn runs; `unknown` when the rows cannot be read |
-| side-effect-completion | the verified receipt chain of each journaled consequential action (P1-03) | `succeeded` when every action is settled (`completed` with complete evidence, `denied` or `cancelled`), or none was journaled; `unknown` while any action is `outcome_unknown` or its evidence is incomplete, or is still open after its turn ended; `pending` while the turn runs; `failed` when a receipt chain fails verification |
+| side-effect-completion | the verified receipt chain of each journaled consequential action (P1-03) | `succeeded` when every action `completed` with complete evidence, or none was journaled; `refused` when an action was denied (by a guard, or by the authorization step at binding or at the pre-dispatch recheck); `failed` when one was cancelled before dispatch, or a receipt chain fails verification; `unknown` while any action is `outcome_unknown` or its evidence is incomplete, or is still open after its turn ended; `pending` while the turn runs |
 | evidence-verification | `verifyAgentRun` only (`amc agent-loop verify`) | `pending` until verification ran; then `succeeded` or `failed` |
 
 `receiptStates` lists each journaled action's verified head state, plus `evidence_incomplete` for a completed action
 whose evidence is marked incomplete and `integrity_failed` for a chain that failed verification. Actions are found
 through the journal index and the signed `ACTION_STATE` rows, so deleting an index row reports `integrity_failed`
 rather than hiding the action. The model phase reads recorded rows: only the evidence phase says the record is intact.
+
+`recheckFailures` lists the typed authorization failures (`RecheckFailure` codes such as `purpose_violation`,
+`binding_changed:amount` or `approval_expired`) of every action the authorization step denied, from the same verified
+receipts: at binding (`authorization_denied:<codes>`) or at the pre-dispatch recheck (`recheck_failed:<codes>`). A call
+the signed run purpose does not allow (P2-02) is refused before any approval request or network, and every surface
+reports `side-effect-completion: refused` with `recheckFailures: ["purpose_violation"]`, after the turn and again after
+`verify`. The contract adds no path that sends tool arguments out of the process: every surface's tool calls run through
+`ToolPipeline.execute` (src/tools/toolPipeline.ts), and the senders behind it are unchanged.
 
 Where the status appears: the CLI's `agent-loop run --json` and `agent-loop verify --json` (`execution`), every SDK turn
 result and verification receipt (`execution`), every Python `RunResult` and `VerificationReceipt`, and every Studio
