@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { providerSchema, type HookProvider } from "../bridge/hookProviders.js";
+import { refineControlMapping, providerSchema, type HookProvider } from "../bridge/hookProviders.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -19,7 +19,8 @@ export type HookActionLifecycleReasonCode =
   | "REQUEST_MISSING"
   | "TERMINAL_BEFORE_REQUEST"
   | "TERMINAL_CONFLICT"
-  | "TERMINAL_DUPLICATE";
+  | "TERMINAL_DUPLICATE"
+  | "OBSERVATION_RATE_LIMITED";
 
 export interface HookActionLifecycleEvidenceRef {
   eventId: string;
@@ -53,6 +54,15 @@ export interface HookActionLifecycleInspection {
   };
   evidenceEventIds: string[];
   receiptIds: string[];
+  /**
+   * Claude Code control: whether the input the tool ran with differs from the input AMC authorized, from the outcomes
+   * bound to the decision (PostToolUse check; observed, not prevented). Null when no bound outcome is recorded.
+   */
+  authorizationMismatch: boolean | null;
+  /** Claude Code control: an outcome for this call was refused as unmatched, conflicted with another, or failed verification. */
+  observationConflict: boolean;
+  /** Claude Code: an observation of this call was refused by the intake cap and listed in a signed summary row, so the call is not fully evidenced. */
+  observationNotRecorded: "rate-limited" | null;
   rawProviderPayloadStored: false;
   claimBoundary: string;
 }
@@ -109,28 +119,42 @@ const decisionMetaV2Schema = decisionMetaBaseSchema.extend({
   effectiveOutcome: z.enum(["allow", "deny", "ask", "steer"]),
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
-}).passthrough().superRefine((value, ctx) => {
-  const native = value.providerMapping === "native"
-    && value.requestedDecision !== "steer"
-    && value.requestedDecision === value.decision
-    && value.effectiveOutcome === value.decision
-    && !value.capabilityLossy;
-  const corrective = value.providerMapping === "corrective_deny"
-    && value.provider === "claude-code"
-    && value.requestedDecision === "steer"
-    && value.decision === "deny"
-    && value.effectiveOutcome === "steer"
-    && !value.capabilityLossy;
-  const fallback = value.providerMapping === "fail_closed_deny"
-    && value.provider !== "claude-code"
-    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
-    && value.decision === "deny"
-    && value.effectiveOutcome === "deny"
-    && value.capabilityLossy;
-  if (!native && !corrective && !fallback) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
+
+const postExecutionMetaSchema = z.object({
+  postExecutionSchemaVersion: z.literal(1),
+  agentId: z.string().min(1),
+  actionId: z.string().min(1),
+  authorizationMismatch: z.boolean(),
+  bindingRefusal: z.string().nullable(),
+  conflictOf: z.string().optional(),
+}).passthrough();
+
+/**
+ * The post-execution records of one action (claudeCodeObservations.ts), verified. The mismatch comes from outcomes bound
+ * to the decision (a conflicting second one included); an unmatched, conflicting or unverifiable record is a conflict.
+ */
+function postExecution(ledger: ReturnType<typeof openLedger>, events: EvidenceEvent[], agentId: string, actionId: string):
+  { authorizationMismatch: boolean | null; observationConflict: boolean } {
+  const rows = events.filter((event) => event.event_type === "audit").map((event) => ({ event, meta: postExecutionMetaSchema.safeParse(parseMeta(event)) }))
+    .filter((row) => row.meta.success && row.meta.data.agentId === agentId && row.meta.data.actionId === actionId)
+    .map((row) => ({ ...row.meta.data!, intact: verifyEvidenceEventIntegrity({ ledger, eventId: row.event.id, requireReceipt: true, requireSealedSession: true }).ok }));
+  const bound = rows.filter((row) => row.bindingRefusal === null);
+  return {
+    authorizationMismatch: bound.length === 0 ? null : bound.some((row) => row.authorizationMismatch || !row.intact),
+    observationConflict: rows.some((row) => row.bindingRefusal !== null || row.conflictOf !== undefined || !row.intact),
+  };
+}
+
+const intakeSummaryMetaSchema = z.object({ intakeSummarySchemaVersion: z.literal(1), agentId: z.string(), actionIds: z.array(z.string()) }).passthrough();
+
+/** Whether an intake summary row (claudeCodeObservations.ts) lists this action as not recorded. Any such row only lowers the claim. */
+function observationNotRecorded(events: EvidenceEvent[], agentId: string, actionId: string): "rate-limited" | null {
+  return events.some((event) => {
+    const meta = intakeSummaryMetaSchema.safeParse(event.event_type === "audit" ? parseMeta(event) : null);
+    return meta.success && meta.data.agentId === agentId && meta.data.actionIds.includes(actionId);
+  }) ? "rate-limited" : null;
+}
 
 const decisionMetaSchema = z.union([decisionMetaV2Schema, decisionMetaV1Schema]);
 
@@ -165,6 +189,7 @@ const REASON_ORDER: HookActionLifecycleReasonCode[] = [
   "DECISION_BEFORE_REQUEST",
   "TERMINAL_BEFORE_REQUEST",
   "DENIED_THEN_EXECUTED",
+  "OBSERVATION_RATE_LIMITED",
 ];
 
 function parseMeta(event: EvidenceEvent): unknown {
@@ -316,6 +341,8 @@ export function inspectHookActionLifecycle(input: {
     const executedTerminal = terminals.some((row) => row.meta.sourceEventType === "action.completed" || row.meta.sourceEventType === "action.failed");
     if ((deniedByControl || deniedByTerminal) && executedTerminal) reasons.add("DENIED_THEN_EXECUTED");
 
+    const notRecorded = observationNotRecorded(events, input.agentId, input.actionId);
+    if (notRecorded) reasons.add("OBSERVATION_RATE_LIMITED");
     const reasonCodes = REASON_ORDER.filter((reason) => reasons.has(reason));
     let status: HookActionLifecycleStatus;
     if (reasonCodes.length > 0) {
@@ -355,6 +382,8 @@ export function inspectHookActionLifecycle(input: {
       },
       evidenceEventIds: orderedRows.map((row) => row.event.id),
       receiptIds: orderedRows.map((row) => row.meta.receipt_id),
+      ...postExecution(ledger, events, input.agentId, input.actionId),
+      observationNotRecorded: notRecorded,
       rawProviderPayloadStored: false,
       claimBoundary: "Verified AMC evidence lifecycle only; steer proves a blocked corrective signal, not retry execution, success, or protocol conformance beyond signed receipts.",
     };

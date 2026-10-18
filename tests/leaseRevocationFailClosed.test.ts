@@ -4,12 +4,8 @@ import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import {
-  forwardProviderHookControl,
-  forwardProviderHookEvent,
-  getHookIntegrationStatus,
-  installHookIntegration
-} from "../src/adapters/hookIntegration.js";
+import { getHookIntegrationStatus, installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { forwardProviderHookControl, forwardProviderHookEvent } from "../src/adapters/hookForwarder.js";
 import { verifyBridgeLease } from "../src/bridge/bridgeAuth.js";
 import { initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";

@@ -2295,7 +2295,8 @@ async function renderIndustryPacks() {
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
   const locked = !entitlement.active;
-  const checkoutAvailable = entitlement.checkoutAvailable === true;
+  // The server's paywall text (src/domains/industryPackEntitlement.ts) is the one source for price and access steps.
+  const lockedMessage = entitlement.message || "Industry Packs are locked.";
   root.innerHTML = `
     ${card("Industry Packs", `
       <div class="grid">
@@ -2304,25 +2305,20 @@ async function renderIndustryPacks() {
           <div class="tile-value">${locked ? "Locked" : "Active"}</div>
         </div>
         <div>
-          <div class="muted">Plan</div>
-          <div class="tile-value">planned $${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
+          <div class="muted">Price</div>
+          <div class="tile-value">US$${htmlEscape(entitlement.priceUsdMonthly || "")}/mo</div>
         </div>
       </div>
       ${locked ? `
-        <p class="muted">${checkoutAvailable
-          ? `$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month for all 41 Industry Domain Packs.`
-          : "Public checkout and automatic license issuance are not live yet. Do not send payment based on this preview."}</p>
-        <div class="row">
-          ${checkoutAvailable ? `<button id="industryCheckout">Open verified checkout</button>` : ""}
-          <a class="button secondary" href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions" target="_blank" rel="noopener">Launch status</a>
-        </div>
+        <p class="muted" style="white-space:pre-line">${htmlEscape(lockedMessage)}</p>
+        ${entitlement.checkoutAvailable === true ? `<div class="row"><button id="industryCheckout">Open checkout</button></div>` : ""}
+        ${entitlement.licenseVerificationConfigured === true ? `
         <div class="form-row">
-          <label for="industryLicenseKey">License key</label>
+          <label for="industryLicenseKey">Licence key</label>
           <input id="industryLicenseKey" placeholder="AMC-INDUSTRY-PACKS..." autocomplete="off" />
         </div>
-        <button id="industryActivate" class="secondary">Activate access</button>
-        <p class="muted">If an authorized AMC operator has already issued a valid key, paste it here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
-      ` : `<p class="status-ok">All 41 Industry Domain Packs are unlocked.</p>`}
+        <button id="industryActivate" class="secondary">Activate access</button>` : ""}
+      ` : `<p class="status-ok">Industry Packs are unlocked. A licence never changes a result.</p>`}
     `)}
     ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
   `;
@@ -2349,13 +2345,14 @@ async function renderIndustryPacks() {
       cancelUrl: window.location.href,
       clientReferenceId: currentAgent()
     });
-    window.open(payload.checkoutUrl || entitlement.checkoutUrl, "_blank", "noopener");
+    if (payload.checkoutUrl) window.open(payload.checkoutUrl, "_blank", "noopener");
+    else out.textContent = payload.error || lockedMessage;
   });
   document.getElementById("industryActivate")?.addEventListener("click", async () => {
     const input = document.getElementById("industryLicenseKey");
     const licenseKey = input?.value?.trim();
     if (!licenseKey) {
-      out.textContent = "Paste the Industry Packs license key first.";
+      out.textContent = "Paste the Industry Packs licence key first.";
       return;
     }
     const activated = await apiPost("/industry-packs/activate", { licenseKey });
@@ -2366,9 +2363,7 @@ async function renderIndustryPacks() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
       if (locked) {
-        out.textContent = checkoutAvailable
-          ? `Industry Packs are locked. Use the verified checkout for the planned $${entitlement.priceUsdMonthly || "9.99"}/month tier.\n${entitlement.checkoutUrl || ""}`
-          : "Industry Packs are locked. Public checkout and automatic license issuance are not live yet.";
+        out.textContent = lockedMessage;
         return;
       }
       const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);

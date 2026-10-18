@@ -90,7 +90,9 @@ describe("Pi tool_call hook control", () => {
     expect(record).toMatchObject({
       executionId: actionId,
       idempotencyKey: "toolu_allow",
-      principal: { principalId: "lease:lease_pi_fixture", kind: "service", authenticatedVia: "lease" },
+      // P1-78 (applied to hook records by P1-23): a lease's own identity is never a principal; this lease names no user,
+      // so the record names the self-reported OS user, which a plan requiring a principal refuses.
+      principal: expect.objectContaining({ authenticatedVia: "cli-os-user" }),
       delegation: { leaseId: "lease_pi_fixture", depth: 0 },
       action: { toolName: "fs.read", actionClass: "READ_ONLY", adapterId: "hook:pi" },
       session: { callId: actionId, rootCallId: actionId, parentToken: null },

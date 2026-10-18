@@ -81,16 +81,25 @@ What a registration is: registration made with the session lease and matching on
 
 ## How a decision is made and bound
 
-1. On `tool_call` the extension checks the event shape (`toolName`, `toolCallId`, plain-object `input`). It requires the input to be plain JSON data (no getters, proxies, class instances, symbol keys, array holes or non-finite numbers) and freezes it in place, all the way down, before anything is sent. Pi runs that very object (pi-agent-core `prepareToolCall` passes the same `args` to the hook and to `execute`), so no code can change what runs while AMC decides or afterwards: a mutation throws, and Pi blocks a throwing handler. It then posts an `action.requested` observation and `{ hook_event_name: "tool_call", tool_name, tool_input, pi: { version, mode, sessionId, toolCallId, parentToolCallId, nonce, cwd, builtinTool } }` to `/bridge/hooks/control/v1` with the lease, where `cwd` is Pi's working directory and `builtinTool` says whether Pi's registry (`getAllTools()`) names Pi's own built-in for this tool. Its wait is bounded at 5 s.
+1. On `tool_call` the extension checks the event shape (`toolName`, `toolCallId`, plain-object `input`). It requires the input to be plain JSON data (no getters, proxies, class instances, symbol keys, array holes or non-finite numbers) and freezes it in place, all the way down, before anything is sent. Pi runs that very object (pi-agent-core `prepareToolCall` passes the same `args` to the hook and to `execute`), so no code can change what runs while AMC decides or afterwards: a mutation throws, and Pi blocks a throwing handler. It then posts an `action.requested` observation, which AMC must answer as recorded, and `{ hook_event_name: "tool_call", tool_name, tool_input, pi: { version, mode, sessionId, toolCallId, parentToolCallId, nonce, cwd, builtinTool } }` to `/bridge/hooks/control/v1` with the lease, where `cwd` is Pi's working directory and `builtinTool` says whether Pi's registry (`getAllTools()`) names Pi's own built-in for this tool. Its wait is bounded at 5 s.
 2. AMC derives the action id from Pi's session id and call id (an id the payload names is ignored), refuses a Pi version outside the qualified set (an unreadable one included), a working directory other than the workspace and a mapped name that is not Pi's built-in, maps the tool with the table above at the locations Pi opens, and evaluates the signed ToolHub config, Action Policy and Approval Policy.
 3. AMC requires a verified registration of this Pi session for this Pi version (above); without one the call is denied.
 4. An allow binds a P1-02 authorization record: principal and delegation from the hook lease, normalized-argument and policy digests, idempotency key = Pi's call id, execution id = AMC's action id. A record that cannot bind (expired lease, a class the lease does not cover) denies.
 5. Pi's response is `{ block: false, requestSha256 }` or `{ block: true, reason, requestSha256 }`, where `requestSha256` is the digest of the exact request. AMC records a v2 `action_state` receipt (`authorized` or `denied`, with the record digest and `enforcement: { level: "enforced", boundary: "pi:tool_call" }` only for a registered session of a qualified Pi) whose body digest covers that response. Receipts are signed with P1-08's `receipt` purpose key.
 6. The extension allows only if the receipt verifies under a `receipt` purpose key pinned at install and binds this action, call id, request digest and state, and only if the input still serialises to what it sent.
 
-Each request carries a fresh nonce, so a decision is single-use: re-sending the same call (for example from a restarted Pi) is a conflict, never a second decision, and the call is blocked. Any error, timeout, HTTP error, malformed or unbound answer, bad signature, missing or non-`0600` lease, missing or mismatched manifest, unrecognised event, input that is not plain data or Bridge outage blocks the call with `AMC control unavailable; action denied.` Observe mode never blocks.
+Each request carries a fresh nonce, so a decision is single-use: re-sending the same call (for example from a restarted Pi) is a conflict, never a second decision, and the call is blocked. Any error, timeout, HTTP error (a 409 included), a request observation AMC did not record, a latched workspace, malformed or unbound answer, bad signature, missing or non-`0600` lease, missing or mismatched manifest, unrecognised event, input that is not plain data or Bridge outage blocks the call with `AMC control unavailable; action denied.` Observe mode never blocks.
 
-On `tool_result` the extension posts `action.completed` or `action.failed` without arguments, output or error text. These are observations, never enforcement.
+On `tool_result` the extension posts `action.completed` or `action.failed` without arguments, output or error text. In control mode it then posts the outcome to the control route: `{ hook_event_name: "tool_result", pi: { sessionId, toolCallId }, tool_name, tool_input, isError, ingressRecorded, decisionReceiptSha256 }`, where `ingressRecorded` says whether the observed ingress recorded the outcome and `decisionReceiptSha256` is the digest of the decision receipt the extension verified for this call. AMC accepts it as the call's outcome only when it names that decision, comes with the lease that obtained it and its session is still registered; otherwise it records it as unmatched and refuses it (409). It normalizes the input the way it did when deciding and records `amc.pi-post-execution/v1` (decision, authorized and reported argument digests, `authorizationMismatch`), signed and verified as written; the input itself is never stored. An outcome reported with `ingressRecorded: false` is recorded and refused (422). These are observations, never enforcement: the call already ran, so an outcome AMC did not record is reported in Pi, and `hooks lifecycle` shows the mismatch or conflict.
+
+## When AMC cannot record evidence
+
+Pi follows the rules of Claude Code's hooks ([Claude Code hooks](claude-code-hooks.md#when-amc-cannot-record-evidence)), with the same shared latch and intake caps.
+
+- **Audit latch.** If AMC's own writer fails (a disk, signing or chain fault) while recording a Pi session registration, a decision or an outcome for a registered session, the Bridge latches the workspace's hooks: every later hook request of that workspace, any session, event or provider, is refused, so every Pi `tool_call` is blocked and Pi is told the workspace is latched. The latch is kept in `<AMC home>/state/hook-audit-latch/`, so a restart, a new session or a later successful write does not clear it. Only the owner clears it: `amc connect hooks health --provider pi --recover-latch` (owner mode, vault passphrase) records the recovery as verified evidence first. Restart the Bridge afterwards.
+- **Repeats.** AMC records one outcome per call. The same outcome sent again for the same decision is answered as recorded and not written twice; any other repeat is kept beside the first, flagged (`conflictOf`) and refused (409). The extension never counts a 409 as recorded: a request observation that conflicts with one already recorded blocks the call before any decision.
+- **Intake caps.** Outcomes are capped per session (120 a minute), per lease (360) and per workspace (1,200); session registrations per lease (30) and per workspace (60, shared with Claude Code), counted per lease and workspace, so new sessions cannot reset a cap. An outcome over a cap is listed in a signed summary row, its call reads `observationNotRecorded: "rate-limited"` in `hooks lifecycle`, and the capped scope's `tool_call` decisions are denied until its minute passes. Decision rows are never capped.
+- **Input never latches.** A malformed, oversized, unauthenticated, replayed or conflicting outcome, one reported with `ingressRecorded: false`, or one from a session without a verified registration is refused and never trips the latch.
 
 ## Limits
 
@@ -101,6 +110,8 @@ On `tool_result` the extension posts `action.completed` or `action.failed` witho
 - Qualification covers the `pi` CLI, whose bundle embeds its agent runtime. Embedding Pi through its SDK resolves `@earendil-works/pi-agent-core` from `node_modules` (1.1.0 on 2026-10-12) and reports mode `print`; it is not qualified.
 - Receipts and registrations are signed with the workspace's `receipt` purpose key: a local audit trail, not a portable verdict.
 - Decision latency on the qualification machine is above the 50 ms p95 overhead target (see below).
+- An outcome the Bridge never received (it was unreachable) latches nothing; Pi reports it, and the next call is blocked only while the Bridge stays unreachable.
+- Outcomes are authenticated by the lease, not by the session: a lease holder can push another session of the same lease into backpressure for a minute.
 
 ## Confirmed Pi contract
 
@@ -120,14 +131,16 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 
 ## Qualification
 
-`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-12-P1-22/pi-conformance.json`, hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
+`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-18-P1-22/pi-conformance.json` (the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-11T22:49:36.583Z on local macOS arm64 (not CI), AMC commit `d57b730575cc`.
+Run 2026-10-18T01:21:20.265Z on local macOS arm64 (not CI), AMC commit `86da8c341c9c`.
 
 | Case | Pi 1.0.2 | Pi 1.0.4 |
 |---|---|---|
 | Allowed `read` runs; recorded Pi version | yes; 1.0.2 | yes; 1.0.4 |
+| Allowed `read` outcome recorded, bound to its decision | yes | yes |
+| Writer fault on an outcome: next call ran; ran after owner recovery | no; yes | no; yes |
 | Session registered before its first call; claim | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call |
 | `write` needing approval: file created | no | no |
 | Denied `bash`: effect | no | no |
@@ -137,9 +150,9 @@ Run 2026-10-11T22:49:36.583Z on local macOS arm64 (not CI), AMC commit `d57b7305
 | Extension tool under a built-in's name (`find`): effect | no | no |
 | Codemode nested call emits `tool_call` (parent id) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) |
 | Bridge stopped: tool ran | no | no |
-| Decision receipts verified cold | 117 verified, 0 failed | 117 verified, 0 failed |
+| Decision receipts verified cold | 124 verified, 0 failed | 124 verified, 0 failed |
 | Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
-| Decision latency p50 / p95 (ms, n) | 204.7 / 293.1 (100) | 197.5 / 303.2 (100) |
+| Decision latency p50 / p95 (ms, n) | 57.5 / 77.1 (100) | 59.1 / 101.2 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).

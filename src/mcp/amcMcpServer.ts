@@ -32,7 +32,7 @@ import { claimFields, claimKindFromTrustTier, claimKindLabel, type ClaimKind } f
 import { effectiveTrustTier } from "../claims/evidenceProvenance.js";
 import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/industryPacks.js";
 import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
-import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { createIncidentStore } from "../incidents/incidentStore.js";
@@ -388,7 +388,7 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
           content: [
             {
               type: "text",
-              text: formatIndustryPackPaywallMessage(entitlement),
+              text: entitlement.message,
             },
           ],
           isError: true,

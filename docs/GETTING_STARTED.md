@@ -110,7 +110,7 @@ amc up
 amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
-Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code supports `allow`, `deny`, and `ask`; Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied.
+Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code receives `allow` or `deny`; an ask is denied, because a provider-local ask is not AMC approval. Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied. Claude Code control also registers each session (SessionStart) and admits each prompt (UserPromptSubmit); see [adapters/claude-code-hooks.md](adapters/claude-code-hooks.md) for the claim per hook.
 
 For Claude Code, control is enforced at the `PreToolUse` hook only while Claude Code runs it. Claude Code still runs the tool when the hook cannot start, times out, or is switched off by `disableAllHooks` or managed `allowManagedHooksOnly`, so verify it:
 
@@ -118,7 +118,7 @@ For Claude Code, control is enforced at the `PreToolUse` hook only while Claude 
 amc connect hooks status --provider claude-code
 ```
 
-`status` runs the installed hook with a probe payload and prints `Control: verified (probe denied in <n> ms)` only when the hook exits 2 with a deny; otherwise it prints `Control: NOT VERIFIED (<reason>)` and exits 1. The hook runs your Node binary and AMC's `dist/cli.js` by absolute path, so re-install after upgrading AMC or switching Node. See [ADAPTERS.md](ADAPTERS.md#claude-cli-anthropic) for the deadline, exit codes and limits.
+`status` runs the installed hook with a probe payload and prints `Control: verified (probe denied in <n> ms)` only when the hook exits 2 with a deny; otherwise it prints `Control: NOT VERIFIED (<reason>)` and exits 1. The hook runs your Node binary and AMC's `dist/adapters/hookForwarder.js` by absolute path, so re-install after upgrading AMC or Claude Code, or switching Node. See [ADAPTERS.md](ADAPTERS.md#claude-cli-anthropic) for the deadline, exit codes and limits.
 
 ### Verify first-run activation outcomes
 

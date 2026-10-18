@@ -1,11 +1,12 @@
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type RequestListener, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { boundedFetchSignal, forwardDeadlineMs, HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
 import { installHookIntegration, type HookProvider } from "../src/adapters/hookIntegration.js";
+import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { runHookForward } from "../src/adapters/hookIntegrationCli.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
@@ -119,7 +120,7 @@ async function freePort(): Promise<number> {
 }
 
 function installControl(workspace: string, provider: HookProvider, agentId: string, bridgeBase: string): void {
-  installHookIntegration({ workspace, provider, agentId, bridgeBase, mode: "control" });
+  installHookIntegration({ workspace, provider, agentId, bridgeBase, mode: "control", ...(provider === "claude-code" ? { claudeCodeInstall: boundClaudeCode() } : {}) });
 }
 
 /** The installed hook timeout in milliseconds, read from the written provider settings. */
@@ -150,6 +151,8 @@ function forward(input: {
   agentId: string;
   bridgeBase: string;
   stdin: string;
+  env?: Record<string, string>;
+  event?: string;
 }): Promise<ForwardRun> {
   const started = Date.now();
   const child = spawn(process.execPath, [
@@ -159,9 +162,11 @@ function forward(input: {
     "--agent", input.agentId,
     "--bridge-url", input.bridgeBase,
     "--token-file", `.amc/hooks/${input.provider}.lease`,
+    // The hook this handler is installed for, as the installer writes it; a malformed payload goes to the PreToolUse one.
+    "--event", input.event ?? (() => { try { return String(JSON.parse(input.stdin).hook_event_name ?? "PreToolUse"); } catch { return "PreToolUse"; } })(),
   ], {
     cwd: input.workspace,
-    env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE },
+    env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE, ...input.env },
     stdio: ["pipe", "pipe", "pipe"],
   });
   let stdout = "";
@@ -178,14 +183,22 @@ function forward(input: {
   });
 }
 
-function claudeRead(path: string, id: string): string {
+/** A PreToolUse payload in the pinned Claude Code shape (tests/fixtures/harness-hooks/claude-code). */
+function claudeCall(toolName: string, input: Record<string, unknown>, id: string, cwd = "/private/project"): string {
   return JSON.stringify({
     session_id: "private-fail-closed-session",
+    transcript_path: "/private/transcript.jsonl",
+    cwd,
+    permission_mode: "default",
     hook_event_name: "PreToolUse",
-    tool_name: "Read",
+    tool_name: toolName,
+    tool_input: input,
     tool_use_id: id,
-    tool_input: { file_path: path },
   });
+}
+
+function claudeRead(path: string, id: string, cwd?: string): string {
+  return claudeCall("Read", { file_path: path }, id, cwd);
 }
 
 afterEach(async () => {
@@ -241,7 +254,8 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
     expect(run.stderr).toContain("AMC hook control unavailable; action denied.");
   }, 60_000);
 
-  test("a policy deny exits 2 and allow and ask exit 0 with the matching native JSON", async () => {
+  // P1-23: control decides only for a registered session, and answers allow or deny; an ask is denied (exit 2).
+  test("a policy deny and an ask exit 2 and an allow exits 0 with the matching native JSON", async () => {
     const workspace = newWorkspace();
     const agentId = "policy-agent";
     installObservedRun(workspace, agentId);
@@ -254,15 +268,18 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
     const bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
     closers.push(() => bridge.close());
     installControl(workspace, "claude-code", agentId, bridgeBase);
+    const real = realpathSync.native(workspace);
+    const configDir = join(workspace, ".fixture-home", ".claude");
+    mkdirSync(configDir, { recursive: true });
+    const started = await forward({ workspace, provider: "claude-code", agentId, bridgeBase,
+      env: { CLAUDE_PID: String(process.pid), CLAUDE_CONFIG_DIR: configDir },
+      stdin: JSON.stringify({ session_id: "private-fail-closed-session", transcript_path: "/private/transcript.jsonl", cwd: real,
+        hook_event_name: "SessionStart", source: "startup" }) });
+    expect(started).toMatchObject({ status: 0, stdout: "{}\n" });
 
     const denied = await forward({
       workspace, provider: "claude-code", agentId, bridgeBase,
-      stdin: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "UnmappedDangerousTool",
-        tool_use_id: "toolu_policy_deny_01",
-        tool_input: { secret: "DO_NOT_RETAIN_FAIL_CLOSED" },
-      }),
+      stdin: claudeCall("UnmappedDangerousTool", { secret: "DO_NOT_RETAIN_FAIL_CLOSED" }, "toolu_policy_deny_01", real),
     });
     expect(denied.status).toBe(2);
     expect(JSON.parse(denied.stdout)).toEqual({
@@ -273,26 +290,21 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
 
     const allowed = await forward({
       workspace, provider: "claude-code", agentId, bridgeBase,
-      stdin: claudeRead(readable, "toolu_policy_allow_01"),
+      stdin: claudeRead(join(real, "workspace", "public.txt"), "toolu_policy_allow_01", real),
     });
     expect(allowed.status).toBe(0);
-    expect(JSON.parse(allowed.stdout)).toEqual({
-      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "allow" }),
-    });
+    // AMC only restricts: an allow carries no permission decision, so Claude Code's own permissions still apply.
+    expect(JSON.parse(allowed.stdout)).toEqual({});
 
     const asked = await forward({
       workspace, provider: "claude-code", agentId, bridgeBase,
-      stdin: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "Write",
-        tool_use_id: "toolu_policy_ask_01",
-        tool_input: { file_path: join(workspace, "workspace", "output", "draft.txt"), content: "PRIVATE" },
-      }),
+      stdin: claudeCall("Write", { file_path: join(real, "workspace", "output", "draft.txt"), content: "PRIVATE" }, "toolu_policy_ask_01", real),
     });
-    expect(asked.status).toBe(0);
+    expect(asked.status).toBe(2);
     expect(JSON.parse(asked.stdout)).toEqual({
-      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "ask" }),
+      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "deny" }),
     });
+    expect(asked.stderr).toContain("A Claude Code ask is not AMC approval");
   }, 90_000);
 
   test("empty stdin and malformed JSON are denied with exit 2", async () => {
@@ -372,7 +384,8 @@ describe("in-process forwarder deadline", () => {
     const workspace = newWorkspace();
     const bridgeBase = await listen(() => { /* never answers */ });
     installControl(workspace, "claude-code", "slow-start-agent", bridgeBase);
-    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
+      event: "PreToolUse" };
     // A process that already spent 8.7 s starting has 300 ms left before the 10 s timeout minus the 1 s margin.
     vi.spyOn(process, "uptime").mockReturnValue(8.7);
     try {
@@ -389,7 +402,8 @@ describe("in-process forwarder deadline", () => {
     const workspace = newWorkspace();
     const bridgeBase = await listen(() => { /* never answers */ });
     installControl(workspace, "claude-code", "inproc-agent", bridgeBase);
-    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
+      event: "PreToolUse" };
 
     const hung = await runHookForward(claude, async () => claudeRead("/private/inproc.txt", "toolu_inproc_01"), workspace, 300);
     expect(hung).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
@@ -400,7 +414,7 @@ describe("in-process forwarder deadline", () => {
     const empty = await runHookForward(claude, async () => "  ", workspace);
     expect(empty).toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
 
-    const terminal = await runHookForward(claude, async () => JSON.stringify({
+    const terminal = await runHookForward({ ...claude, event: "PostToolUse" }, async () => JSON.stringify({
       hook_event_name: "PostToolUse",
       tool_name: "Read",
       tool_use_id: "toolu_inproc_02",
@@ -409,7 +423,7 @@ describe("in-process forwarder deadline", () => {
     // The tool already ran: no PreToolUse deny and no claim that the action was denied.
     const notRecorded = { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
     expect(terminal).toEqual(notRecorded);
-    const failure = await runHookForward(claude, async () => JSON.stringify({
+    const failure = await runHookForward({ ...claude, event: "PostToolUseFailure" }, async () => JSON.stringify({
       hook_event_name: "PostToolUseFailure",
       tool_name: "Bash",
       tool_use_id: "toolu_inproc_03",

@@ -1,11 +1,15 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import YAML from "yaml";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { builtInAdapterCapabilities } from "../src/adapters/adapterCapabilities.js";
-import { mapProviderHookEvent } from "../src/adapters/hookIntegration.js";
+import { installHookIntegration, mapProviderHookEvent } from "../src/adapters/hookIntegration.js";
+import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
+import { claudeEnvelope } from "../src/adapters/hookProviders/claudeCodePayloads.js";
+import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { evaluateProviderHookControl, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
 import {
   HookControlError,
@@ -38,6 +42,18 @@ function newWorkspace(): string {
   return workspace;
 }
 
+/**
+ * Claude Code control decides only for a session registered under a signed control installation (P1-23): install one
+ * bound to this process's Node and register the session the requests below name.
+ */
+function claudeControlled(workspace: string, agentId: string): void {
+  installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "control", claudeCodeInstall: boundClaudeCode() });
+  const configDir = join(workspace, ".fixture-home", ".claude");
+  mkdirSync(configDir, { recursive: true });
+  handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "claude-code",
+    rawInput: JSON.stringify({ hook_event_name: "SessionStart", session_id: "amc1476-session", amc: { claudePid: process.pid, configDir } }) });
+}
+
 function providerInput(input: {
   workspace: string;
   provider: "claude-code" | "gemini-cli";
@@ -45,10 +61,13 @@ function providerInput(input: {
 }): string {
   return JSON.stringify(input.provider === "claude-code"
     ? {
+        session_id: "amc1476-session",
+        cwd: realpathSync.native(input.workspace),
+        permission_mode: "default",
         hook_event_name: "PreToolUse",
         tool_name: "Read",
         tool_use_id: input.actionId,
-        tool_input: { file_path: join(input.workspace, "outside-policy.txt") },
+        tool_input: { file_path: join(realpathSync.native(input.workspace), "outside-policy.txt") },
       }
     : {
         hook_event_name: "BeforeTool",
@@ -56,6 +75,11 @@ function providerInput(input: {
         tool_call_id: input.actionId,
         tool_input: { file_path: join(input.workspace, "outside-policy.txt") },
       });
+}
+
+/** What reaches the control route: Claude Code's payload in AMC's envelope (raw bytes and a nonce); Gemini's as is. */
+function controlInput(provider: "claude-code" | "gemini-cli", rawInput: string): string {
+  return provider === "claude-code" ? claudeEnvelope(Buffer.from(rawInput, "utf8"), "nonce-amc1476-000000000000") : rawInput;
 }
 
 function observeRequestedAction(input: {
@@ -85,7 +109,8 @@ function appendLegacyV1Allow(input: {
   actionId: string;
   rawInput: string;
 }): void {
-  const provider = "claude-code" as const;
+  // Gemini CLI: a Claude Code request in the pre-P1-23 shape is refused before recovery, so legacy rows replay only for Gemini.
+  const provider = "gemini-cli" as const;
   const eventId = `hook_control_${sha256Hex(canonicalize({
     agentId: input.agentId,
     provider,
@@ -101,14 +126,14 @@ function appendLegacyV1Allow(input: {
   const ledger = openLedger(input.workspace);
   ledger.startSession({
     sessionId,
-    runtime: "claude",
+    runtime: "gemini",
     binaryPath: "amc-bridge-hook-control",
     binarySha256: hashBinaryOrPath("amc-bridge-hook-control", "1"),
   });
   ledger.appendEvidenceWithReceipt({
     id: eventId,
     sessionId,
-    runtime: "claude",
+    runtime: "gemini",
     eventType: "audit",
     payload: `${JSON.stringify({
       kind: "hook_control_decision",
@@ -130,7 +155,7 @@ function appendLegacyV1Allow(input: {
       agentId: input.agentId,
       provider,
       actionId: input.actionId,
-      providerToolName: "Read",
+      providerToolName: "read_file",
       rawInputSha256: sha256Hex(Buffer.from(input.rawInput, "utf8")),
       rawPayloadStored: false,
       canonicalToolName: "fs.read",
@@ -219,9 +244,13 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
   test("blocks the current Claude call, returns bounded correction, and records verified steer", () => {
     const workspace = newWorkspace();
     const agentId = "claude-steer-agent";
-    const actionId = "toolu_amc1476_claude";
-    const rawInput = providerInput({ workspace, provider: "claude-code", actionId });
-    observeRequestedAction({ workspace, agentId, provider: "claude-code", rawInput });
+    claudeControlled(workspace, agentId);
+    const toolUseId = "toolu_amc1476_claude";
+    // AMC derives a Claude Code action id from the session and tool_use_id (P1-23).
+    const actionId = claudeActionId("amc1476-session", toolUseId);
+    const payload = providerInput({ workspace, provider: "claude-code", actionId: toolUseId });
+    observeRequestedAction({ workspace, agentId, provider: "claude-code", rawInput: payload });
+    const rawInput = controlInput("claude-code", payload);
 
     const result = evaluateProviderHookControl({
       workspace,
@@ -276,12 +305,8 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "Read",
-        tool_use_id: actionId,
-        tool_input: { file_path: join(workspace, "workspace", "corrected.txt") },
-      }),
+      rawInput: controlInput("claude-code", JSON.stringify({ ...JSON.parse(payload) as Record<string, unknown>,
+        tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "corrected.txt") } })),
     })).toThrowError(expect.objectContaining<Partial<HookControlError>>({
       code: "HOOK_CONTROL_REPLAY_CONFLICT",
       statusCode: 409,
@@ -332,12 +357,13 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
   test("keeps invalid signed state and unmapped tools as permanent deny", () => {
     const workspace = newWorkspace();
     const toolsPath = toolsConfigPath(workspace);
+    claudeControlled(workspace, "invalid-signature-agent");
     writeFileSync(toolsPath, `${readFileSync(toolsPath, "utf8")}\n# unsigned change\n`, "utf8");
-    const rawInput = providerInput({
+    const rawInput = controlInput("claude-code", providerInput({
       workspace,
       provider: "claude-code",
       actionId: "toolu_amc1476_invalid_signature",
-    });
+    }));
 
     const invalidSignature = evaluateProviderHookControl({
       workspace,
@@ -355,16 +381,13 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
     expect(JSON.stringify(invalidSignature.providerResponse)).not.toContain("additionalContext");
 
     const unmappedWorkspace = newWorkspace();
+    claudeControlled(unmappedWorkspace, "unmapped-agent");
     const unmapped = evaluateProviderHookControl({
       workspace: unmappedWorkspace,
       authenticatedAgentId: "unmapped-agent",
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "UnknownTool",
-        tool_use_id: "toolu_amc1476_unknown",
-        tool_input: {},
-      }),
+      rawInput: controlInput("claude-code", JSON.stringify({ ...JSON.parse(providerInput({ workspace: unmappedWorkspace, provider: "claude-code",
+        actionId: "toolu_amc1476_unknown" })) as Record<string, unknown>, tool_name: "UnknownTool", tool_input: {} })),
     });
     expect(unmapped).toMatchObject({
       requestedDecision: "deny",
@@ -413,8 +436,8 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
   test("fails closed on malformed audit mappings without poisoning unrelated evidence types", () => {
     const workspace = newWorkspace();
     const agentId = "metadata-boundary-agent";
-    const actionId = "toolu_amc1476_metadata";
-    const rawInput = providerInput({ workspace, provider: "claude-code", actionId });
+    const actionId = claudeActionId("amc1476-session", "toolu_amc1476_metadata");
+    const rawInput = providerInput({ workspace, provider: "claude-code", actionId: "toolu_amc1476_metadata" });
     observeRequestedAction({ workspace, agentId, provider: "claude-code", rawInput });
 
     appendDecisionShapedEvent({ workspace, agentId, actionId, eventType: "llm_request" });
@@ -469,17 +492,21 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
     const agentId = "legacy-control-agent";
     const actionId = "toolu_amc1476_legacy";
     const rawInput = JSON.stringify({
-      hook_event_name: "PreToolUse",
-      tool_name: "Read",
-      tool_use_id: actionId,
+      hook_event_name: "BeforeTool",
+      tool_name: "read_file",
+      tool_call_id: actionId,
       tool_input: { file_path: join(workspace, "workspace", "legacy.txt") },
     });
+    // P1-23: a Claude Code request in the pre-P1-23 shape (no session, no AMC envelope) is refused before any recovery.
+    expect(() => evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider: "gemini-cli",
+      rawInput: JSON.stringify({ hook_event_name: "PreToolUse", tool_name: "Read", tool_use_id: actionId, tool_input: { file_path: "x" } }) }))
+      .toThrowError(expect.objectContaining<Partial<HookControlError>>({ statusCode: 400 }));
     appendLegacyV1Allow({ workspace, agentId, actionId, rawInput });
 
     const normalized = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
     });
     expect(normalized).toMatchObject({
@@ -497,7 +524,7 @@ describe("AMC-1476 capability-gated provider steer outcome", () => {
     expect(verifyProviderHookControlResult({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
       result: legacyResult,
     })).toEqual({ ok: true, error: null });

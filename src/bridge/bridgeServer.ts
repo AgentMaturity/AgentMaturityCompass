@@ -36,6 +36,7 @@ import {
   MAX_CONTROL_HOOK_BODY_BYTES,
 } from "./hookControl.js";
 import { handleHookControlRequest } from "./hookControlRoute.js";
+import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -448,11 +449,8 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_OBSERVED_HOOK_BODY_BYTES));
-      const observed = ingestObservedAepHookEvent({
-        workspace: options.workspace,
-        authenticatedAgentId: auth.payload.agentId,
-        rawBody
-      });
+      const observed = guardHookAudit(options.workspace, (message) => new HookIngressError("HOOK_LEDGER_UNAVAILABLE", 503, message),
+        () => ingestObservedAepHookEvent({ workspace: options.workspace, authenticatedAgentId: auth.payload!.agentId, rawBody }));
       writeJson(options.res, observed.idempotentReplay ? 200 : 201, {
         ok: true,
         observed: observed.observed,
@@ -1365,6 +1363,8 @@ export async function startBridgeServer(params: {
     server.once("error", rejectPromise);
     server.listen(params.port, params.host, () => resolvePromise());
   });
+  const latch = hookAuditLatchState(params.workspace); // Startup reports the hook audit latch; it never trips it.
+  if (latch.latched) process.stderr.write(`[amc] ${latchedMessage(latch.reason)}\n`);
   return {
     server,
     close: async () => {
