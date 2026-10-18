@@ -2,7 +2,7 @@ import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   activateIndustryPackAccess,
   buildIndustryPackCheckoutUrl,
@@ -12,8 +12,10 @@ import {
   getIndustryPackEntitlement,
   INDUSTRY_PACKS_MONTHLY_PRICE_USD,
   toIndustryPackCatalogItem,
-  verifyIndustryPackLicenseKey
+  verifyIndustryPackLicenseKey,
+  verifyIndustryPackLicenseReport
 } from "../src/domains/industryPackEntitlement.js";
+import { loadTrustContext } from "../src/trust/index.js";
 import { getIndustryPack, listIndustryPacks } from "../src/domains/industryPacks.js";
 import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
@@ -260,6 +262,30 @@ describe("the paywall tells the truth", () => {
     const workspace = createWorkspace();
     const env = unpinnedEnv();
     expect(() => assertIndustryPackAccess(workspace, env)).toThrow(getIndustryPackEntitlement(workspace, env).message);
+  });
+});
+
+describe("amc domain pack verify uses the same pinned key as the gate", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  test("an environment public key is not a pin: without a trust-list key the verdict is not configured", () => {
+    const keys = operatorEnvKeys();
+    const licenseKey = createIndustryPackLicenseKey({ expiresAt: "2099-01-01T00:00:00.000Z", env: keys as NodeJS.ProcessEnv });
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", keys.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY);
+    const result = verifyIndustryPackLicenseReport(licenseKey, loadTrustContext({ amcHome: createWorkspace() }));
+    expect(result.valid).toBe(false);
+    expect(result.report.trusted).toBe(false);
+    expect(result.reason).toMatch(/licence verification is not configured/i);
+  });
+
+  test("a licence signed by the trust-list key verifies; another key's licence does not", () => {
+    const licence = pinnedLicence();
+    const trust = loadTrustContext({ amcHome: licence.amcHome });
+    const verified = verifyIndustryPackLicenseReport(licence.licenseKey, trust);
+    expect(verified).toMatchObject({ valid: true, payload: { subscriptionId: "sub_test" } });
+    expect(verified.report.trusted).toBe(true);
+    const other = pinnedLicence();
+    expect(verifyIndustryPackLicenseReport(other.licenseKey, trust).valid).toBe(false);
   });
 });
 

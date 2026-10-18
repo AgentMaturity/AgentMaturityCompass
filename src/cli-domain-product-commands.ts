@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type { Command } from "commander";
+import { Option, type Command } from "commander";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
@@ -9,6 +9,8 @@ import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligib
 import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
 import type { Station } from "./domains/stations.js";
 import type { ConformanceStationProfile, PackResponseEvidence } from "./domains/conformance/index.js";
+
+const EXPIRES_AT_REFUSED = "--expires-at is not accepted: a licence's expiry is the one its issuer signed into it, and activation enforces that expiry.";
 
 type DomainProductCliDeps = {
   product: Command;
@@ -82,9 +84,14 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .command("activate")
     .description("Activate Industry Packs with a licence signed by a key pinned in the AMC trust list")
     .requiredOption("--key <licenseKey>", "License key from checkout")
-    .option("--expires-at <isoDate>", "Ignored: the expiry comes from the signed licence")
+    // Kept only to refuse it by name: the expiry is the one the issuer signed into the licence, enforced at verification.
+    .addOption(new Option("--expires-at <isoDate>").hideHelp())
     .option("--json", "Output as JSON")
     .action(async (opts: { key: string; expiresAt?: string; json?: boolean }) => {
+      if (opts.expiresAt !== undefined) {
+        console.error(chalk.red(EXPIRES_AT_REFUSED));
+        process.exit(1); return;
+      }
       try {
         const { activateIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
         const entitlement = activateIndustryPackAccess({ workspace: process.cwd(), licenseKey: opts.key });
@@ -99,13 +106,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   withTrustFlags(sectorPack
     .command("verify")
-    .description("Verify an Industry Packs license key")
+    .description("Verify an Industry Packs license key against the licence key pinned in the AMC trust list")
     .requiredOption("--key <licenseKey>", "License key from checkout"),
-  { pubkey: "pin the Ed25519 license public key (artifact-seal)", json: true })
+  { json: true })
     .action(async (opts: { key: string } & TrustFlags) => {
       const { verifyIndustryPackLicenseReport } = await import("./domains/industryPackEntitlement.js");
-      const result = verifyIndustryPackLicenseReport(opts.key, trustFromFlags(opts, ["artifact-seal"]),
-        opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+      const result = verifyIndustryPackLicenseReport(opts.key, trustFromFlags(opts, ["artifact-seal"]));
       finishVerify("Industry Packs license", result.report, { json: opts.json, result,
         details: result.payload?.expiresAt ? [`Expires: ${result.payload.expiresAt}`] : [] });
     });

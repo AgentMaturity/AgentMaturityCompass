@@ -5,7 +5,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { toErrorMessage } from "../utils/errors.js";
 import type { IndustryPack } from "./industryPacks.js";
 import {
-  admitKey, admittedListKeys, buildVerifierReport, ed25519KeyId, loadTrustContext, withPins, type TrustContext, type VerifierReportV1
+  admitKey, admittedListKeys, buildVerifierReport, loadTrustContext, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
 
 export const INDUSTRY_PACKS_PLAN_ID = "industry-packs-monthly";
@@ -286,27 +286,16 @@ export function verifyIndustryPackLicenseKey(
 }
 
 /**
- * `amc domain pack verify` (P0-51): the license verdict as a VerifierReportV1. Only an Ed25519 signature counts, and only
- * from a key admitted for artifact-seal: --pubkey (pinned by the caller's trust context), a trust list, or the operator's
- * AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY, which this function pins as an operator-held key. An HMAC-signed or legacy
- * allowlisted license names no signer, so it is never trusted here; activation keeps accepting them.
+ * `amc domain pack verify` (P0-51): the licence verdict as a VerifierReportV1, against the same keys the gate uses
+ * (P1-51): only a key the trust list pins for artifact-seal, never --pubkey or an environment key. With none pinned the
+ * verdict is "not configured". An HMAC-signed or legacy allowlisted licence names no signer, so it is never trusted.
  */
-export function verifyIndustryPackLicenseReport(licenseKey: string, trust: TrustContext, pubkeyPem: string | null = null,
-  env: NodeJS.ProcessEnv = process.env, now = Date.now()): ReturnType<typeof verifyIndustryPackLicenseKey> & { report: VerifierReportV1 } {
-  const operatorPem = licensePublicKeyPem(env);
-  const operatorKeyId = operatorPem === null ? null : ed25519KeyId(operatorPem);
-  const context = operatorKeyId === null ? trust
-    : withPins(trust, [{ keyId: operatorKeyId, purposes: ["artifact-seal"], origin: "AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY" }]);
-  const keys = [pubkeyPem, operatorPem].filter((pem): pem is string => typeof pem === "string" && pem.trim().length > 0);
-  const [, payloadPart = "", signaturePart = ""] = licenseKey.trim().split(".");
-  const signer = keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null;
-  // The license's own checks (format, signature, payload, status, expiry) against one Ed25519 key, with no HMAC secret or legacy allowlist.
-  const result = keys.length === 0
-    ? { valid: false, payload: null, reason: "no Ed25519 license public key: pass --pubkey or set AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY" }
-    : verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer ?? keys[0] }, now);
+export function verifyIndustryPackLicenseReport(licenseKey: string, trust: TrustContext, now = Date.now()):
+  ReturnType<typeof verifyIndustryPackLicenseKey> & { report: VerifierReportV1 } {
+  const { signer, result } = pinnedLicenseVerdict(licenseKey, trust, now);
   const report = buildVerifierReport({ artifact: { kind: "industry-pack-license", path: "--key", sha256: sha256Hex(licenseKey.trim()) },
-    context, integrityErrors: result.valid ? [] : [result.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
-    signatures: [admitKey({ publicKeyPem: signer ?? keys[0] ?? null, purpose: "artifact-seal", signature: "license signature", context,
+    context: trust, integrityErrors: result.valid ? [] : [result.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
+    signatures: [admitKey({ publicKeyPem: signer, purpose: INDUSTRY_PACKS_LICENSE_PURPOSE, signature: "license signature", context: trust,
       claimedSignedAt: result.payload?.issuedAt ?? null })] });
   return { ...result, valid: report.trusted, report };
 }
@@ -348,13 +337,20 @@ export function buildIndustryPackCheckoutUrl(params: {
  * artifact-seal. A key, secret or allowlist in the environment is client-supplied, so it never counts here.
  */
 export function verifyPinnedIndustryPackLicense(licenseKey: string, trust: TrustContext, now = Date.now()): ReturnType<typeof verifyIndustryPackLicenseKey> {
+  return pinnedLicenseVerdict(licenseKey, trust, now).result;
+}
+
+function pinnedLicenseVerdict(licenseKey: string, trust: TrustContext, now: number) {
   const keys = admittedListKeys(trust, INDUSTRY_PACKS_LICENSE_PURPOSE);
-  if (keys.length === 0) return { valid: false, payload: null, reason: LICENSE_VERIFICATION_NOT_CONFIGURED };
   const [prefix, payloadPart = "", signaturePart = ""] = licenseKey.trim().split(".");
-  const signer = prefix === INDUSTRY_PACKS_LICENSE_PREFIX ? keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) : undefined;
-  if (!signer) return { valid: false, payload: null, reason: "the licence is not signed by a pinned Industry Packs licence key" };
-  // The licence's own checks (format, payload, status, expiry) against that one key, with no secret or allowlist.
-  return verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer }, now);
+  const signer = prefix === INDUSTRY_PACKS_LICENSE_PREFIX ? keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null : null;
+  const result: ReturnType<typeof verifyIndustryPackLicenseKey> = keys.length === 0
+    ? { valid: false, payload: null, reason: LICENSE_VERIFICATION_NOT_CONFIGURED }
+    : signer === null
+      ? { valid: false, payload: null, reason: "the licence is not signed by a pinned Industry Packs licence key" }
+      // The licence's own checks (format, payload, status, expiry) against that one key, with no secret or allowlist.
+      : verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer }, now);
+  return { signer, result };
 }
 
 function operatorTrust(env: NodeJS.ProcessEnv): { trust: TrustContext | null; error: string | null } {
