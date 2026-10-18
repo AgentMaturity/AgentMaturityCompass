@@ -2,6 +2,7 @@
 import type { EncodableRequest } from "../llm/request/requestSpec.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION, type PiiSpan } from "../vault/dlp.js";
+import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
@@ -28,7 +29,10 @@ const CLASSES: readonly ProtectedDataClass[] = ["phi", "pii", "card_number", "ba
 const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freeze({
   email: "pii", phone: "pii", ssn: "pii", credit_card: "card_number", iban: "bank_account", ip_address: "pii",
   eu_vat: "pii", eu_national_id: "pii", passport_number: "pii", health_record_id: "phi",
-  api_key_openai: "credential", api_key_github: "credential", api_key_aws: "credential", password_json: "credential"
+  api_key_openai: "credential", api_key_github: "credential", api_key_stripe: "credential", api_key_aws: "credential",
+  password_json: "credential", anthropic_key: "credential", slack_token: "credential", google_api_key: "credential",
+  bearer_token: "credential", jwt: "credential", private_key: "credential", password_in_url: "credential",
+  generic_api_key: "credential", secret_json: "credential", secret_env: "credential"
 });
 // ponytail: a bare 10-digit run not preceded by "+" is dropped as noise, so a phone number written that way is not
 // detected; E.164 (+14155552671) and 11-digit (14155552671) runs still are. Add a context-keyed phone rule (e.g. "tel:",
@@ -38,7 +42,8 @@ const NOISE_FILTERS: Readonly<Record<string, RegExp>> = Object.freeze({
   phone: /^\d{10}$/, // bare 10-digit runs: Unix-seconds timestamps, counters, 2147483647
   // Bare 13-digit runs starting with 1: Unix-millisecond timestamps (2001-2033), about 10% Luhn-valid. No card network
   // issues a 13-digit number starting with 1 (13-digit cards are legacy Visa, starting with 4).
-  credit_card: /^1\d{12}$/
+  credit_card: /^1\d{12}$/,
+  bearer_token: /^Bearer\s+[A-Za-z._-]+$/i // "Bearer authentication": a real bearer value has a digit
 });
 // The phone pattern's leading \b cannot sit before "+", so an E.164 span starts after it; keep such a span. A clock-shaped
 // ip_address span right after "::" is the tail of a compressed IPv6 address (2001:db8::10:20:30, fe80::1:23:45); keep it.
@@ -56,31 +61,80 @@ const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", 
 export const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
   (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
     : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
+const NAMED_REFERENCES: Readonly<Record<string, string>> = Object.freeze({ amp: "&", commat: "@", period: ".", plus: "+",
+  num: "#", colon: ":", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " " });
+const WEB_ESCAPE = /(?:%[0-9A-Fa-f]{2})+|(?<=[A-Za-z0-9])\+(?=[A-Za-z0-9])|&(?:#(\d{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,6}));/g;
+/**
+ * Percent-encoding (a form's `+` between letters or digits as a space) and HTML character references, decoded in one
+ * linear pass, as a server or browser reads a URL, a form post or a page: `alice%40example.com`, `4111+1111+1111+1111`,
+ * `alice&#64;example.com`. A %-run that is not UTF-8 decodes byte by byte; an unknown reference stays as it is.
+ */
+export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
+  (match: string, decimal: string | undefined, hex: string | undefined, name: string | undefined) => {
+    if (match === "+") return " ";
+    if (match.startsWith("%")) {
+      try { return decodeURIComponent(match); } catch { return match.replace(/%([0-9A-Fa-f]{2})/g, (_byte, code: string) => String.fromCharCode(Number.parseInt(code, 16))); }
+    }
+    if (name !== undefined) return Object.hasOwn(NAMED_REFERENCES, name.toLowerCase()) ? NAMED_REFERENCES[name.toLowerCase()]! : match;
+    const code = decimal !== undefined ? Number.parseInt(decimal, 10) : Number.parseInt(hex!, 16);
+    return code <= 0x10ffff ? String.fromCodePoint(code) : match;
+  });
 // ponytail: JSON inside a JSON string escapes again at each level, so text is decoded level by level, up to this many
 // times; text still changing after them counts as a finding (replaced or tokenized whole). Raise it if deeper JSON is real.
 const MAX_DECODE_PASSES = 8;
 /**
- * Whether `found` holds for `text` with its JSON escapes decoded once, then again, while that changes it. Escaped, a value
- * right after \n or \t has no word boundary, in JSON at any depth, after a log prefix, or in JSON that does not parse.
- * Callers scan the text as it is first: decoded, an escaped quote ends a password value early and a backslash no longer
- * separates words, so decoded text is only searched, never stored.
+ * Whether `found` holds for `text` with its JSON escapes decoded once, then again, while that changes it, or for the text
+ * and each of those levels with its web escapes decoded (`decodeWebEscapes`). Escaped, a value right after \n or \t has
+ * no word boundary, in JSON at any depth, after a log prefix, or in JSON that does not parse; percent-encoded, an email
+ * has no "@" and a card's groups are joined by "+" or "%20". Callers scan the text as it is first: decoded, an escaped
+ * quote ends a password value early and a backslash no longer separates words, so decoded text is only searched, never
+ * stored.
  */
 export function decodedFinds(text: string, found: (decoded: string) => boolean): boolean {
-  for (let pass = 1, current = text; current.includes("\\"); pass += 1) {
+  for (let pass = 1, current = text; ; pass += 1) {
+    const web = decodeWebEscapes(current);
+    if (web !== current && found(web)) return true;
+    if (!current.includes("\\")) return false;
     const decoded = decodeJsonEscapes(current);
     if (decoded === current) return false;
     if (pass > MAX_DECODE_PASSES || found(decoded)) return true;
     current = decoded;
   }
-  return false;
 }
+const sharedSecret = (type: string): RegExp => {
+  const entry = SECRET_PATTERNS.find(candidate => candidate.type === type);
+  if (entry === undefined) throw new Error(`Shared secret pattern ${type} is missing`);
+  return entry.pattern;
+};
+// JSON members and env/YAML keys that name a secret. A bare "token" is left out: usage counters and AMC's own fields use it.
+const SECRET_MEMBER_NAMES = ["password", "passwd", "pwd", "secret", "client_secret", "api_key", "apikey", "access_token",
+  "refresh_token", "private_key", "aws_secret_access_key"];
+/** A member whose string value is a credential by the JSON member heuristic (`isPasswordMember`). */
+export const SECRET_MEMBER = new RegExp(`^(?:${SECRET_MEMBER_NAMES.join("|")})$`, "i");
+const MEMBER_DETECTORS: ReadonlySet<string> = new Set(["password_json", "secret_json"]);
+/**
+ * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts), a PEM
+ * private key block whole, a URL's password, and a JSON member or env/YAML line that names a secret. Where a rule has a
+ * group, only the value it captures is replaced, so `"secret": "<token>"` stays JSON. None backtracks quadratically.
+ */
+const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp }[] = Object.freeze([
+  ...["anthropic_key", "slack_token", "google_api_key", "bearer_token", "jwt"].map(type => ({ type, re: sharedSecret(type) })),
+  { type: "private_key", re: /-----BEGIN [A-Z ]{0,20}PRIVATE KEY-----[^-]*(?:-----END [A-Z ]{0,20}PRIVATE KEY-----)?/ },
+  { type: "password_in_url", re: /\/\/[^:\s/@]{1,256}:([^@\s/]{1,256})@/ },
+  { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
+  // A "password" member is dlp's password_json.
+  { type: "secret_json", re: new RegExp(String.raw`"(?:${SECRET_MEMBER_NAMES.slice(1).join("|")})"\s*:\s*"((?:[^"\\]|\\[\s\S])+)"`, "i") },
+  { type: "secret_env", re: /^[ \t]*[A-Z0-9_]*(?:PASSWORD|PASSWD|SECRET|SECRET_KEY|SECRET_ACCESS_KEY|PRIVATE_KEY|API_KEY|TOKEN)[ \t]*[=:][ \t]*(\S{8,})/im }
+]);
 /** Binds the patterns, mappings, filters, token format and limits below; receipts and admission rows carry it. */
 export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
+  credentialRules: CREDENTIAL_RULES.map(rule => ({ type: rule.type, source: rule.re.source, flags: rule.re.flags })),
+  secretMembers: SECRET_MEMBER.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-escapes-decoded-level-by-level-up-to-8-what-only-decoding-shows-replaces-the-text-password-member-key-in-evidence-v13",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-escapes-decoded-level-by-level-up-to-8-what-only-decoding-shows-replaces-the-text-password-member-key-in-evidence-percent-plus-and-html-references-decoded-with-each-escape-level-credential-rules-secret-member-names-v14",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -99,7 +153,8 @@ const withoutTokens = (text: string, issued: IssuedToken) => text.replace(tokenP
  * is never hidden by it. Token-shaped text the workspace did not issue is plain text (a raw card number in token
  * brackets is detected). The last token starting before the span's end is the only one the span can lie inside.
  */
-function shieldedByToken(text: string, tokens: readonly (readonly [number, number])[], span: PiiSpan, issued: IssuedToken): boolean {
+function shieldedByToken(text: string, tokens: readonly (readonly [number, number])[], span: PiiSpan, issued: IssuedToken,
+  stillFound = (slice: string) => findPIISpans(slice).some(other => other.type === span.type)): boolean {
   let low = 0, high = tokens.length - 1, last = -1;
   while (low <= high) {
     const mid = (low + high) >> 1;
@@ -108,7 +163,21 @@ function shieldedByToken(text: string, tokens: readonly (readonly [number, numbe
   if (last < 0 || tokens[last]![1] <= span.start) return false;
   const hexEnd = tokens[last]![1] - 2;
   if (span.start >= hexEnd - TOKEN_HEX_CHARS && span.end <= hexEnd) return true;
-  return !findPIISpans(withoutTokens(text.slice(span.start, span.end), issued)).some(other => other.type === span.type);
+  return !stillFound(withoutTokens(text.slice(span.start, span.end), issued));
+}
+
+/** CREDENTIAL_RULES spans: noise and issued tokens are checked on the whole match, then a rule's group narrows it to the value. */
+function credentialSpans(text: string, tokens: readonly (readonly [number, number])[], issued: IssuedToken): PiiSpan[] {
+  const spans: PiiSpan[] = [];
+  for (const { type, re } of CREDENTIAL_RULES) {
+    for (const match of text.matchAll(new RegExp(re.source, `${re.flags}gd`))) {
+      const whole: PiiSpan = { type, start: match.index, end: match.index + match[0].length };
+      if (isNoise(text, whole) || shieldedByToken(text, tokens, whole, issued, slice => re.test(slice))) continue;
+      const [start, end] = match.indices![1] ?? match.indices![0]!;
+      spans.push({ type, start, end });
+    }
+  }
+  return spans;
 }
 
 // A JSON password span covers the key, the colon and the quoted value; only the value is the credential. Narrowed to it,
@@ -124,7 +193,8 @@ export function detectProtectedText(text: string, issued: IssuedToken = NONE_ISS
   // Noise and token hex are rejected inside the scan, so a dropped span cannot hide an overlapping match
   // ("12:34:56.78.90.12").
   const tokens = tokenRanges(text, issued);
-  const spans = findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span, issued));
+  const spans = [...findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span, issued)),
+    ...credentialSpans(text, tokens, issued)].sort((a, b) => a.start - b.start || a.end - b.end);
   return Object.freeze(spans.map(found => valueOnly(text, found)).map(span => Object.freeze({
     start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
   })));
@@ -178,17 +248,18 @@ export function redactJsonLeaves(value: unknown, redact: (text: string, key?: st
 }
 
 /**
- * Whether `value`, under member `key`, is a password by the JSON password heuristic, which needs the key beside the value:
- * a leaf scanned alone never matches it. `charge` gets the length scanned. A context over the per-leaf limit counts as a
- * password, so the caller replaces the value whole.
+ * Whether `value`, under member `key` (a SECRET_MEMBER name: password, client_secret, api_key, access_token ...), is a
+ * credential by the JSON member heuristic, which needs the key beside the value: a leaf scanned alone never matches it.
+ * `charge` gets the length scanned. A context over the per-leaf limit counts as a credential, so the caller replaces the
+ * value whole.
  */
 export function isPasswordMember(key: string | undefined, value: string, issued: IssuedToken = NONE_ISSUED,
   charge: (length: number) => void = () => undefined): boolean {
-  if (key === undefined || !/^password$/i.test(key)) return false;
+  if (key === undefined || !SECRET_MEMBER.test(key)) return false;
   const context = JSON.stringify({ [key]: value });
   if (context.length > MAX_PROTECTED_TEXT_CHARS) return true;
   charge(context.length);
-  return detectProtectedText(context, issued).some(span => span.detector === "password_json");
+  return detectProtectedText(context, issued).some(span => MEMBER_DETECTORS.has(span.detector));
 }
 
 const JSON_TEXT = /^\s*[[{]/;
@@ -232,12 +303,12 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
       charge(text.length);
       const spans = detectProtectedText(text, issued);
       for (const span of spans) add(span.dataClass);
-      // Keep the existing JSON-password heuristic without rescanning every object or double-counting its credential value.
-      if (key?.toLowerCase() === "password" && !spans.some(span => span.dataClass === "credential")) {
+      // Keep the JSON member heuristic without rescanning every object or double-counting its credential value.
+      if (key !== undefined && SECRET_MEMBER.test(key) && !spans.some(span => span.dataClass === "credential")) {
         const context = JSON.stringify({ [key]: text });
         if (context.length > MAX_PROTECTED_TEXT_CHARS) refused();
         charge(context.length);
-        if (detectProtectedText(context, issued).some(span => span.detector === "password_json")) add("credential");
+        if (detectProtectedText(context, issued).some(span => MEMBER_DETECTORS.has(span.detector))) add("credential");
       }
     };
     const visit = (value: unknown, depth: number, key?: string): void => {

@@ -24,7 +24,7 @@ import {
 } from "./config.js";
 import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from "./upstreamAuth.js";
 import type { CredentialsService } from "../credentials/credentialsService.js";
-import { redactBody, redactHeaders } from "./redaction.js";
+import { AGENT_AUTH_HEADER_KEYS, AGENT_AUTH_QUERY_KEYS, redactBody, redactHeaders, redactRequestTarget } from "./redaction.js";
 import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
@@ -361,17 +361,6 @@ function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
   }
   return false;
 }
-
-const AGENT_AUTH_HEADER_KEYS = [
-  "x-amc-lease",
-  "authorization",
-  "x-api-key",
-  "x-goog-api-key",
-  "api-key",
-  "x-openai-key",
-  "x-anthropic-api-key"
-] as const;
-const AGENT_AUTH_QUERY_KEYS = ["key", "api_key", "api-key", "access_token", "amc_lease"] as const;
 
 function stripAgentProvidedCredentials(
   headers: Record<string, string>,
@@ -1483,9 +1472,10 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
+      const protectedData = protectedDataOptedIn(options.workspace);
       const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist);
-      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction,
-        { protectedData: protectedDataOptedIn(options.workspace) });
+      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction, { protectedData });
+      const requestTarget = redactRequestTarget(incomingUrl, protectedData);
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
       const providerId = upstreamConfigured.providerId ?? route.upstream;
       const clientProcess = firstString(req.headers["x-amc-client-process"]);
@@ -1530,8 +1520,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         payload: JSON.stringify({
           request_id: requestId,
           method,
-          path: incomingUrl.pathname,
-          query: incomingUrl.search,
+          path: requestTarget.path,
+          query: requestTarget.query,
           headers: requestHeaderRedaction.headers,
           body: requestBodyRedaction.redactedBytes.toString("utf8")
         }),
@@ -1575,8 +1565,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         responseBody = await readAll(upstreamResponse);
       }
 
-      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction,
-        { protectedData: protectedDataOptedIn(options.workspace) });
+      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction, { protectedData });
       const responseInfo = bestEffortJsonInfo(responseBody, incomingUrl.pathname, route.openaiCompatible);
 
       const llmResponseMeta: Record<string, unknown> = {

@@ -71,8 +71,10 @@ const PII_PATTERNS: PiiPattern[] = [
   { type: "eu_national_id", re: /\b(?:national\s+(?:id|identity|identification)(?:\s+(?:number|card))?|identity\s+card|id\s+card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s+nationale|carta\s+d['’]?identit[aà]|documento\s+nacional\s+de\s+identidad)(?:\s*[:#-])?\s*[A-Z0-9][A-Z0-9 ./-]{5,20}\b/gi, replacement: "[EU_NATIONAL_ID_REDACTED]" },
   { type: "passport_number", re: /\b(?:passport(?:\s+(?:number|no\.?|id))?|passaporte|passeport|pasaporte|reisepass)(?:\s*[:#-])?\s*[A-Z0-9][A-Z0-9< -]{5,14}\b/gi, replacement: "[PASSPORT_REDACTED]" },
   { type: "health_record_id", re: /\b(?:MRN|medical\s+record(?:\s+(?:number|id))?|health\s+record(?:\s+(?:number|id))?|NHS\s+number|EHIC)(?:\s*[:#-])?\s*[A-Z0-9][A-Z0-9 -]{5,24}\b/gi, replacement: "[HEALTH_RECORD_REDACTED]" },
-  { type: "api_key_openai", re: /sk-[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
-  { type: "api_key_github", re: /gho_[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
+  // Legacy keys, and the project, service-account and admin keys whose body also holds "-" and "_".
+  { type: "api_key_openai", re: /sk-[A-Za-z0-9]{20,}|\bsk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{20,}/g, replacement: "[API_KEY_REDACTED]" },
+  { type: "api_key_github", re: /gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{22,}/g, replacement: "[API_KEY_REDACTED]" },
+  { type: "api_key_stripe", re: /\b[rs]k_live_[A-Za-z0-9]{16,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_aws", re: /AKIA[A-Z0-9]{16}/g, replacement: "[AWS_KEY_REDACTED]" },
   // The whole JSON string value, escapes included, so an escaped quote (\") inside a password does not end it early.
   { type: "password_json", re: /"password"\s*:\s*"(?:[^"\\]|\\[\s\S])+"/gi, replacement: "\"password\": \"[REDACTED]\"" },

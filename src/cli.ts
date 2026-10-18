@@ -1085,34 +1085,29 @@ async function wrapWithBridgeToken(params: {
   };
   process.stdin.on("data", stdinHandler);
 
-  child.stdout.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stdout.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stdout",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stderr.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stderr",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
+  // A telemetry row ends at a newline (or past 64 KiB), not at a write, so a value the agent prints over two writes reaches
+  // the bridge's evidence redaction in one row (P2-02). The rest is flushed, and every row settled, before the exit row.
+  const telemetryLines = (eventType: "agent_stdout" | "agent_stderr", out: NodeJS.WriteStream) => {
+    let pending = "";
+    const post = (payload: string) => {
+      if (payload) queueTelemetry(postBridgeTelemetry(base, leaseToken, { sessionId: wrapSessionId, eventType, correlationId, runId, provider: params.provider, payload }));
+    };
+    return {
+      write: (chunk: Buffer) => {
+        const text = redactBridgeText(chunk.toString("utf8"));
+        out.write(text);
+        pending += text;
+        const cut = pending.length > 65_536 ? pending.length : pending.lastIndexOf("\n") + 1;
+        post(pending.slice(0, cut));
+        pending = pending.slice(cut);
+      },
+      flush: () => { post(pending); pending = ""; }
+    };
+  };
+  const stdoutLines = telemetryLines("agent_stdout", process.stdout);
+  const stderrLines = telemetryLines("agent_stderr", process.stderr);
+  child.stdout.on("data", stdoutLines.write);
+  child.stderr.on("data", stderrLines.write);
 
   const exitCode = await new Promise<number>((resolvePromise, rejectPromise) => {
     child.on("error", rejectPromise);
@@ -1120,6 +1115,9 @@ async function wrapWithBridgeToken(params: {
   }).finally(() => {
     process.stdin.off("data", stdinHandler);
   });
+  stdoutLines.flush();
+  stderrLines.flush();
+  await Promise.allSettled(pendingTelemetry);
 
   await postBridgeTelemetry(base, leaseToken, {
     sessionId: wrapSessionId,

@@ -16,6 +16,7 @@ import { getAdapterDefinition } from "./catalog.js";
 import { detectAdapter } from "./adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { assembleAdapterEnv, redactSecretsInText } from "./envAssembler.js";
+import { bridgeEvidenceRedactor } from "../bridge/bridgeRedaction.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
@@ -231,6 +232,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   const ledger = openLedger(workspace);
+  // The stored stdout and stderr rows get what `amc wrap`'s telemetry gets (P2-02): the shared secret table, and where the
+  // workspace opted in the protected-data detectors. The terminal still shows the lease- and denylist-redacted text.
+  const evidence = bridgeEvidenceRedactor(workspace);
   const sessionId = randomUUID();
   let exitCode = 1;
   let dshLaunch: ReturnType<typeof prepareDeepseekHarnessLaunch> | undefined;
@@ -339,7 +343,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stdout",
-          payload: text,
+          payload: evidence.text(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -357,7 +361,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stderr",
-          payload: text,
+          payload: evidence.text(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -379,7 +383,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           const text = stdoutOmitted ? "<DSH stdout omitted: exceeded 1 MiB>" : redactWithGatewayRules(redactSecretsInText(Buffer.concat(stdoutChunks).toString("utf8"), dshSecrets), lease.token, gatewayConfig.redaction.textRegexDenylist);
           process.stdout.write(text);
           for (const [eventType, payload] of [
-            ["agent_stdout", text],
+            ["agent_stdout", evidence.text(text)],
             ["agent_stderr", JSON.stringify({ bytes: stderrBytes, content: "omitted: may contain private reasoning or credentials" })]
           ] as const) ledger.appendEvidence({ sessionId, runtime: "any", eventType, payload, payloadExt: "txt", inline: true, meta: { adapterId: adapter.id, agentId, trustTier: "OBSERVED", evidenceBoundary: "process_only", signal, requestedSignal, spawnObserved } });
         }

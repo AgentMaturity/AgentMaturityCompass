@@ -19,11 +19,25 @@ function buildRegex(pattern: string): RegExp {
   return new RegExp(trimmed, "g");
 }
 
+/** Headers and query keys that carry an agent's credential or lease; the gateway strips them before forwarding. */
+export const AGENT_AUTH_HEADER_KEYS = [
+  "x-amc-lease",
+  "authorization",
+  "x-api-key",
+  "x-goog-api-key",
+  "api-key",
+  "x-openai-key",
+  "x-anthropic-api-key"
+] as const;
+export const AGENT_AUTH_QUERY_KEYS = ["key", "api_key", "api-key", "access_token", "amc_lease"] as const;
+// Never stored, whatever the configured denylist says: the credential carriers, and session cookies.
+const ALWAYS_REDACTED_HEADER_KEYS: readonly string[] = [...AGENT_AUTH_HEADER_KEYS, "cookie", "set-cookie"];
+
 export function redactHeaders(
   headers: Record<string, string | string[] | undefined>,
   denylist: string[]
 ): { headers: Record<string, string>; wasRedacted: boolean } {
-  const deny = new Set(denylist.map((key) => key.toLowerCase()));
+  const deny = new Set([...denylist, ...ALWAYS_REDACTED_HEADER_KEYS].map((key) => key.toLowerCase()));
   const out = Object.create(null) as Record<string, string>;
   let redacted = false;
 
@@ -132,6 +146,55 @@ function unscannedJsonBody(): RedactionResult {
     redactionReasons: ["protectedData:unscanned"], originalPayloadSha256: null, originalHashOmitted: true };
 }
 
+// The string leaves a streamed delta carries: Anthropic's delta.text, .partial_json and .thinking, OpenAI's
+// choices[i].delta.content and tool_calls[j].function.arguments, the Responses API's delta, Gemini's parts[k].text.
+const STREAM_DELTA_LEAVES = new Set(["text", "partial_json", "thinking", "content", "arguments", "delta", "refusal"]);
+/**
+ * Whether a stored event stream still hides protected data across its events. A model streams each value in token-sized
+ * deltas, so an email or a card number is split over `data:` events and no single one shows it. Each event's delta
+ * leaves are joined per stream (the leaf's path and each object's own index) and all together in stream order, and the
+ * joins, made from the stored events (each already redacted), are scanned as they are and with their escapes decoded.
+ * Anything found, or an event whose data is not JSON, means the caller replaces the whole body.
+ */
+function streamHidesProtected(stored: string, redact: (text: string) => string): boolean {
+  const streams = new Map<string, string>();
+  let all = "";
+  const visit = (value: unknown, path: string): void => {
+    if (typeof value === "string") {
+      if (!STREAM_DELTA_LEAVES.has(path.slice(path.lastIndexOf(".") + 1))) return;
+      streams.set(path, (streams.get(path) ?? "") + value);
+      all += value;
+    } else if (value !== null && typeof value === "object") {
+      // An object's own index names its stream (Anthropic's block index, OpenAI's tool_calls[j].index, the Responses API's
+      // output_index and content_index), so parallel tool calls are joined apart.
+      const own = ["index", "output_index", "content_index"].map(name => `#${String((value as Record<string, unknown>)[name])}`).join("");
+      for (const [key, item] of Object.entries(value)) visit(item, `${path}${own}.${key}`);
+    }
+  };
+  for (const line of stored.split(/\r?\n/)) {
+    if (!line.startsWith("data:")) continue;
+    const data = line.slice(5).trim();
+    if (data === "" || data === "[DONE]") continue;
+    visit(JSON.parse(data) as unknown, ""); // a SyntaxError makes the caller replace the body
+  }
+  return [...streams.values(), all].some(text => redact(text) !== text || decodedFinds(text, decoded => redact(decoded) !== decoded));
+}
+
+/**
+ * The request path and query a gateway row stores. The credential query keys are replaced in every workspace. Where the
+ * workspace opted in, each is also scanned like a stored text, percent-decoded too: a detection is replaced in place, and
+ * anything only decoding shows replaces it whole.
+ */
+export function redactRequestTarget(url: URL, protectedData: boolean): { readonly path: string; readonly query: string } {
+  const params = new URLSearchParams(url.search);
+  const carriesAuth = AGENT_AUTH_QUERY_KEYS.some((key) => params.has(key));
+  for (const key of AGENT_AUTH_QUERY_KEYS) if (params.has(key)) params.set(key, "[REDACTED]");
+  const query = carriesAuth ? `?${params.toString()}` : url.search;
+  if (!protectedData) return { path: url.pathname, query };
+  const scan = nestedJsonRedactor(protectedRedactor(new Set()), () => "[REDACTED]");
+  try { return { path: scan(url.pathname), query: scan(query) }; } catch { return { path: "[REDACTED]", query: "[REDACTED]" }; }
+}
+
 export function redactBody(
   body: Buffer,
   contentType: string | undefined,
@@ -193,10 +256,16 @@ export function redactBody(
   let stored = bodyText;
   if (options.protectedData) {
     const redact = protectedRedactor(protectedReasons);
-    stored = redact(bodyText);
-    // Text can carry JSON escapes too (an event stream of JSON chunks, JSON inside them): anything the detectors still find
-    // in the stored text with its escapes decoded, level by level, replaces the whole body.
-    if (decodedFinds(stored, decoded => redact(decoded) !== decoded)) return unscannedJsonBody();
+    try {
+      stored = redact(bodyText);
+      // Text can carry JSON escapes too (an event stream of JSON chunks, JSON inside them) and web escapes (a form post):
+      // anything the detectors still find in the stored text decoded, level by level, replaces the whole body, and so does
+      // a value a stream split across its events. Any failure (the scan budget, an event that is not JSON) does too.
+      if (decodedFinds(stored, decoded => redact(decoded) !== decoded)
+        || (ct.includes("text/event-stream") && streamHidesProtected(stored, redact))) return unscannedJsonBody();
+    } catch {
+      return unscannedJsonBody();
+    }
   }
   const textResult = applyTextRegexRedaction(stored, redaction.textRegexDenylist);
   const wasRedacted = textResult.changed || protectedReasons.size > 0;

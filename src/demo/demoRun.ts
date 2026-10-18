@@ -113,9 +113,9 @@ export function noVaultDemoGatewayConfig(upstreamBaseUrl: string): GatewayConfig
   return {
     listen: { host: "127.0.0.1", port: 0 },
     redaction: {
-      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
+      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key", "x-amc-lease", "x-goog-api-key", "x-anthropic-api-key", "cookie", "set-cookie"],
       jsonPathsDenylist: ["$.api_key", "$.key"],
-      textRegexDenylist: ["(?i)sk-[A-Za-z0-9]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
+      textRegexDenylist: ["(?i)\\bsk-[A-Za-z0-9_-]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
     },
     upstreams: {
       demo_local: {
