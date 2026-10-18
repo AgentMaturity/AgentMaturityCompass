@@ -2,7 +2,8 @@
  * Maps merged catalog parameters onto the four enforcement points (P1-10): tool pipeline, approvals, egress and the
  * deletion executor. Only the parameters in PARAMETERS exist; any other name, a wrong type, a different strictness or a
  * point the binding does not list fails closed. `proposedSignedConfigs` start from the same defaults and zod schemas as
- * F1's operating-profile builders, so their shapes match what the signing commands accept. Nothing here writes a file;
+ * F1's operating-profile builders, so their shapes match what the signing commands accept; the tools fragment starts
+ * from the caller's verified signed tools.yaml when it passes one (P1-10F). Nothing here reads or writes a file;
  * activation is in activate.ts (P1-12).
  */
 import { defaultApprovalPolicy, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
@@ -12,13 +13,13 @@ import { budgetsSchema, defaultBudgets } from "../../budgets/budgets.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { defaultActionPolicy } from "../../governor/actionPolicyEngine.js";
 import { defaultOpsPolicy, opsPolicySchema } from "../../ops/policy.js";
-import { defaultToolsConfig, toolsConfigSchema } from "../../toolhub/toolsSchema.js";
+import { defaultToolsConfig, toolsConfigSchema, type ToolsConfig } from "../../toolhub/toolsSchema.js";
 import type { ActionClass } from "../../types.js";
 import { digestOf } from "../digest.js";
 import type { LoadedCatalog } from "../loader.js";
 import type { ControlRecord, EnforcementPoint, Strictness } from "../types.js";
 import type { MergedParameter } from "./merge.js";
-import { CompileError, type ApprovalRule, type EffectiveRuntimePolicy, type ParamValue, type UnsupportedControl } from "./types.js";
+import { CompileError, type ApprovalRule, type EffectiveRuntimePolicy, type ParamValue, type SignedToolsInput, type UnsupportedControl } from "./types.js";
 
 interface ParamSpec { pattern: RegExp; point: EnforcementPoint; strictness: Strictness; check: (v: ParamValue) => boolean; expects: string }
 
@@ -109,7 +110,7 @@ function approvalRules(params: MergedParameter[]): EffectiveRuntimePolicy["appro
 }
 
 function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visibleTools: string[] | undefined,
-  retention: Record<string, number>, agentIds: string[]): EffectiveRuntimePolicy["proposedSignedConfigs"] {
+  retention: Record<string, number>, agentIds: string[], signedTools: ToolsConfig | undefined): EffectiveRuntimePolicy["proposedSignedConfigs"] {
   const approvalPolicy = defaultApprovalPolicy();
   for (const [ac, rule] of Object.entries(approvals) as Array<[ActionClass, ApprovalRule]>) {
     approvalPolicy.approvalPolicy.actionClasses[ac] = {
@@ -120,8 +121,9 @@ function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visible
       ttlMinutes: rule.ttlMinutes
     };
   }
-  const tools = defaultToolsConfig();
-  if (visibleTools) tools.tools.allowedTools = tools.tools.allowedTools.filter((t) => visibleTools.includes(t.name));
+  // P1-10F: the verified signed tools.yaml the caller passed, else the built-in defaults; the plan's controls narrow either.
+  const base = signedTools ?? defaultToolsConfig();
+  const tools = { tools: { ...base.tools, allowedTools: base.tools.allowedTools.filter((t) => !visibleTools || visibleTools.includes(t.name)) } };
   const ops = defaultOpsPolicy();
   const keep = ops.opsPolicy.retention;
   if (retention.auditLog !== undefined) keep.keepArchiveSegmentsDays = retention.auditLog;
@@ -140,8 +142,11 @@ function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visible
   };
 }
 
-/** The effective runtime policy. An unresolved parameter (value null) is left out; such a plan is blocked anyway. */
-export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, agentIds: string[]): EffectiveRuntimePolicy {
+/**
+ * The effective runtime policy. An unresolved parameter (value null) is left out; such a plan is blocked anyway. With
+ * `signedTools` the visible tools are its tools the plan's controls permit, and the plan records its digest.
+ */
+export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, agentIds: string[], signedTools?: SignedToolsInput): EffectiveRuntimePolicy {
   const all = [...parameters.values()];
   const under = (prefix: string) => all.filter((p) => p.name.startsWith(prefix));
   const value = (name: string): ParamValue | undefined => parameters.get(name)?.value ?? undefined;
@@ -152,7 +157,7 @@ export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, age
     if (guard && p.value !== null) guards.set(guard, [...(guards.get(guard) ?? []), p]);
   }
   const retentionDays = Object.fromEntries(under("deletion.retentionDays.").filter((p) => p.value !== null).map((p) => [last(p.name), p.value as number]));
-  const proposedSignedConfigs = proposedConfigs(approvals, value("toolPipeline.visibleTools") as string[] | undefined, retentionDays, agentIds);
+  const proposedSignedConfigs = proposedConfigs(approvals, value("toolPipeline.visibleTools") as string[] | undefined, retentionDays, agentIds, signedTools?.config);
   const approvalPolicy = approvalPolicySchema.parse(proposedSignedConfigs.approvalPolicy);
   const approvalRequiredFor = new Set([
     ...((value("toolPipeline.approvalRequiredFor") as ActionClass[] | undefined) ?? []),
@@ -163,7 +168,8 @@ export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, age
       visibleTools: toolsConfigSchema.parse(proposedSignedConfigs.tools).tools.allowedTools.map((t) => t.name).sort(),
       approvalRequiredFor: [...approvalRequiredFor].sort(),
       guards: [...guards.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
-        .map(([id, rows]) => ({ id, params: Object.fromEntries(rows.map((r) => [last(r.name), r.value as ParamValue])), controlIds: ids(rows) }))
+        .map(([id, rows]) => ({ id, params: Object.fromEntries(rows.map((r) => [last(r.name), r.value as ParamValue])), controlIds: ids(rows) })),
+      ...(signedTools ? { toolsConfigSha256: signedTools.sha256 } : {})
     },
     approvals,
     egress: { mode: "deny_by_default" as const, allowHosts: (value("egress.allowHosts") as string[] | undefined) ?? [], processorAllowlist: [], controlIds: ids(under("egress.")) },

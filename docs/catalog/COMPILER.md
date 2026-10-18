@@ -128,7 +128,12 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
 
 ## Outputs
 
-`compilePlan({ profile, catalog, asOf })` returns a `CompiledPlan` (types in `src/catalog/compiler/types.ts`):
+`compilePlan({ profile, catalog, asOf, signedTools? })` returns a `CompiledPlan` (types in `src/catalog/compiler/types.ts`).
+`signedTools` is the workspace's signed `.amc/tools.yaml` as `{ config, sha256 }`, which the caller has verified (bytes,
+signature and schema from one read); the compiler reads no file. Without it the plan is exactly what it was before
+P1-10F. Both callers that compile against a workspace, `amc catalog compile` and A4 Adapt's Understand, get it from
+`compileInputs` (`src/catalog/compileInputs.ts`): `{}` when there is no tools.yaml, and `TOOLS_CONFIG_UNVERIFIED`
+when one is present but does not verify, never the wider default list.
 
 - `profile`: id, the SHA-256 of the canonical normalized profile, fact provenance, and the profile's
   `{ tenantId, deploymentId }`, which authorization records under the active plan bind (P1-78; absent from plans
@@ -143,6 +148,10 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
   allowed hosts), deletion (an unknown legal hold denies; retention days), `proposedSignedConfigs` and `policyDigest`.
   `proposedSignedConfigs` start from the defaults and zod schemas F1's operating-profile builders use. The compiler
   writes nothing under `.amc/`; activation is described below.
+  The visible tools (P1-10F) are the tools of `signedTools`, or of the built-in default list (`defaultToolsConfig()`,
+  which has no `delegate` or `workflow`) without it, narrowed by any `toolPipeline.visibleTools` parameter the plan's
+  controls set. The tools fragment of `proposedSignedConfigs` starts from the same list. With `signedTools` the plan
+  also records `toolPipeline.toolsConfigSha256`, the SHA-256 of the tools.yaml bytes it was compiled from.
 - `evidencePlan`: one test entry per control test (run at `activation` and on each `invalidatedBy` trigger; drills
   and document reviews on the manual duty's cadence), one request per evidence contract, the manual duties, and
   release gates for runtime-enforced, configuration-check and adversarial tests, blocking when the control is
@@ -163,7 +172,11 @@ every weakening against it and refuses to sign unless `allowWeakening` is set:
 
 - a requirement that applied or was unresolved and is now absent or not applicable, or whose control version changed;
 - runtime-policy changes by rule: tools, hosts or roles added, approval classes or guards removed, fewer approvals,
-  longer approval TTLs, a true requirement turned false; any change no rule classifies, retention included, counts;
+  longer approval TTLs, a true requirement turned false; any change no rule classifies, retention included, counts.
+  A new `toolPipeline.toolsConfigSha256` is judged by what it changes: a tool a new tools.yaml adds counts through
+  `visibleTools`, and any other change to a visible tool's entry through the tools fragment below, so a digest that
+  only narrows is not a weakening. A plan that drops the digest (one compiled without tools.yaml replacing one that
+  binds it) is a weakening;
 - proposed signed configs by the same rules activation applies to live configs (`fragmentWeakenings`);
 - evidence-plan rows removed, fewer attempts, longer maximum age, a blocking gate made non-blocking, fixtures,
   triggers or binding fields removed, and any other change;
@@ -208,6 +221,12 @@ deleted one, so every load refuses as `ControlCheckpointRootInWorkspaceError` (f
 
 The `compiled-policy` guard runs first in the native pipeline and fails closed:
 
+- when the plan records `toolPipeline.toolsConfigSha256`, every call is denied while the bytes of `.amc/tools.yaml`
+  hash to anything else (edited, re-signed or removed after compiling), until the plan is recompiled and reactivated,
+  as a catalog that no longer matches the lockfile refuses the session (P1-10F). A plan compiled from the default
+  list records no digest and does not read tools.yaml here; the `tool-allowlist` guard still checks its signature.
+  A native session reads and verifies tools.yaml once per call: this check, `network-egress`, `tool-allowlist` and
+  `native-tool-identity` all decide from those bytes;
 - a call whose tool is not in `toolPipeline.visibleTools` is denied (`run_code` is exempt; each sub-call is checked).
   Native sessions also leave those tools out of the tool list offered to the model, using the plan pinned at
   start; the guard stays the enforcement point;
@@ -282,6 +301,16 @@ amc catalog compile --profile <file> [--previous <plan.json>] [--lock <catalog.l
                     [--request-review] [--allow-weakening] [--activate <approvalRequestId>] [--json]
 ```
 
+It reads `.amc/tools.yaml` and passes it as `signedTools` when it verifies against the workspace's auditor keys and
+parses. Without a tools.yaml it compiles with the built-in default list. An unsigned, edited, foreign-signed or invalid
+tools.yaml refuses the compile (`TOOLS_CONFIG_UNVERIFIED`, exit 1) and names the reason (an unreadable file by its error
+class, such as `tools config unreadable (EACCES)`, never its path): re-sign it with
+`amc tools sign`, or remove it to compile with the default list. The output names which list was used
+(`visibleToolsSource` in `--json`). So `delegate` is visible under an
+activated plan only when the signed tools.yaml lists it and no control's `toolPipeline.visibleTools` leaves it out.
+After changing tools.yaml, recompile and reactivate: a plan that shows more tools than the active one is a weakening
+and needs `--allow-weakening`.
+
 `--activate <approvalRequestId>` activates the plan just compiled once that review approved it. Compiling is
 deterministic, so the usual flow is `--request-review`, an approver's `amc approvals approve`, then the same compile
 with `--activate <approvalRequestId>`. It cannot be combined with `--request-review`.
@@ -303,7 +332,8 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 ## Error codes
 
 `PROFILE_INVALID`, `CATALOG_INVALID`, `UNKNOWN_PARAMETER`, `PARAMETER_TYPE`, `PARAMETER_POINT`, `STRICTNESS_MISMATCH`,
-`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`.
+`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`, and `TOOLS_CONFIG_UNVERIFIED` from
+`compileInputs` before compilePlan runs.
 
 ## Not in this step
 

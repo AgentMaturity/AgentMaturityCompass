@@ -1,0 +1,16 @@
+{
+ "station:education": "sha256:70f26ca4b4e65937d425d38873e5ef9009480bcdf6c2e2eebf1571eb88c1b7df sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:environment": "sha256:24ab08bcec740f4004ae9add9ef6c3aadc4f668c624dee07340b79f62830ddb5 sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:governance": "sha256:75232c07a5586cd1f813eaac213a5363d0ed98e42771435aed72c99186701b78 sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:health": "sha256:ef7aae7385ea9c89ecafd64740552e3c4f4cf8f2c7c20b81a2b29d24eee0a44f sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:mobility": "sha256:59507360214ab7dceb296d4dfbb36992b31eb455d57d1cc219e77170fe5c0267 sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:technology": "sha256:5d3b0cad9686a070d3c74567ca32f2bf0121e65b674c2f095a03c0ddda69b73a sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "station:wealth": "sha256:5d5010b3e82349d113fa9c72ed15ac9417df40f8b99b807abc03c2acd6e2999e sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430 bash,fs.edit,fs.read,fs.write,git.commit,git.push,git.status,glob,grep,http.fetch,process.spawn",
+ "L0-IDN-01/negative/expired-lease.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/negative/lease-unregistered-principal.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/negative/lease-without-principal.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/negative/no-lease.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/negative/other-workspace-lease.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/positive/lease-and-principal.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212",
+ "L0-IDN-01/positive/lease-registered-service.json": "sha256:9edf2e41a82e81050f3ed6c15e9fe43f1e4c2dc638bbcbd94e96fd3c02dc1244 sha256:7206f4d11a694a9bac3dcd583967f8dfd9b5f854e1e160a9d6d0e2372635c212"
+}
