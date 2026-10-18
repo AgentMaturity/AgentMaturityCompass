@@ -51,6 +51,13 @@ describe("coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04)", 
     expect(coverageScore([row("SATISFIED"), row("UNKNOWN"), row("UNKNOWN"), row("UNKNOWN")]).score).toBe(0.25);
   });
 
+  test("a self-reported PARTIAL is not an evaluation: the score stays null, not 0", () => {
+    const selfReported = { ...row("PARTIAL"), claimKind: "self_reported" as const };
+    expect(coverageScore([selfReported])).toEqual({ satisfied: 0, partial: 0, missing: 0, unknown: 0, notEvaluated: 1, evaluated: 0, score: null });
+    // An observed PARTIAL (a report from before P1-11) still counts as evaluated and earns 0.
+    expect(coverageScore([row("PARTIAL")])).toMatchObject({ partial: 1, evaluated: 1, score: 0 });
+  });
+
   test.each(["", "   ", "\t"])("a row whose control id is %j throws instead of being scored", (id) => {
     expect(() => coverageScore([row("SATISFIED"), { ...row("SATISFIED"), id }])).toThrow(/has no control id; refusing to score it/);
   });
