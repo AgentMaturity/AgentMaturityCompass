@@ -123,16 +123,26 @@ describe("regulatory calendar renderer", () => {
   });
 });
 
+type Row = { instrument: string; status: string; date: string; source: { retrievedAt: string } };
+/** The sidecar's own as-of date: its latest source read. Deterministic, so the check cannot start failing on a calendar day. */
+const curatedAsOf = (rows: Row[]) => rows.map((m) => m.source.retrievedAt).sort().at(-1)!;
+const pastDue = (rows: Row[], asOf: string) =>
+  rows.filter((m) => /^scheduled/.test(m.status) && m.date < asOf).map((m) => `${m.date} ${m.instrument}`);
+
 const official = {
   instrument: "Test Act", date: "2025-11-14", label: "Rules notified", status: "notified",
   source: { title: "Official page", url: "https://www.pib.gov.in/x", retrievedAt: "2026-10-03" }
 };
 
 describe("curated milestones sidecar", () => {
-  test("no row still marked scheduled is past its date", () => {
-    const today = new Date().toISOString().slice(0, 10);
-    const pastDue = sidecar.milestones.filter((m: { status: string; date: string }) => /^scheduled/.test(m.status) && m.date < today);
-    expect(pastDue.map((m: { instrument: string; date: string }) => `${m.date} ${m.instrument}`)).toEqual([]);
+  test("no row still marked scheduled is past its date as of the sidecar's latest read (never the wall clock)", () => {
+    expect(pastDue(sidecar.milestones, curatedAsOf(sidecar.milestones))).toEqual([]);
+  });
+
+  test("the past-due check flags a scheduled row older than the as-of date, and only that row", () => {
+    const rows = [{ ...official, status: "scheduled", date: "2026-06-30" }, { ...official, status: "scheduled", date: "2027-01-01" },
+      { ...official, status: "enacted", date: "2024-05-17" }];
+    expect(pastDue(rows, "2026-10-04")).toEqual(["2026-06-30 Test Act"]);
   });
 
   test("Colorado SB26-189 and the Art. 50(2) grace end are present, each flagged for re-verification", () => {
