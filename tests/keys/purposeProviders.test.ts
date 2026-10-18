@@ -12,7 +12,7 @@ import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
 import { bindPurposeProviderKey, exportPurposePublicKey, signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, listKeys, revokeKey, rotatePurposeKeys, verifyProofOfPossession } from "../../src/keys/purposeKeys.js";
 import { lockVault, vaultPaths } from "../../src/vault/vault.js";
-import { initWorkspace } from "../../src/workspace.js";
+import { initWorkspace, loadAMCConfig, saveAMCConfig } from "../../src/workspace.js";
 import { AWS_ARN, awsFake, fakeKey } from "./providerFakes.js";
 
 const PASS = process.env.AMC_VAULT_PASSPHRASE!;
@@ -62,6 +62,9 @@ describe("purpose keys held by key providers (P2-08)", () => {
     await expect(signWithPurposeKey(root, "artifact-seal", Buffer.alloc(32), { provider: kms().provider })).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
     // Other purposes keep the vault.
     expect(getSigningKey(root, "receipt")).toContain("PRIVATE KEY");
+    // Saving the workspace config (amc config, setup) keeps the keys section, so the refusal survives it.
+    saveAMCConfig(root, loadAMCConfig(root));
+    expect(() => getSigningKey(root, "artifact-seal")).toThrow(expect.objectContaining({ code: "KEY_PROVIDER_HELD" }));
   });
 
   it("only ledger-row can be bound in this release: other purposes keep refusing their vault key until removed from keys.refs", async () => {

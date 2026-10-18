@@ -43,6 +43,7 @@ export const CK = {
   CKM_ECDSA: 0x1041, CKM_EDDSA: 0x1057, CKM_AES_GCM: 0x1087, CKU_USER: 1, CKF_RW_SESSION: 0x2, CKF_SERIAL_SESSION: 0x4
 } as const;
 const CKR_USER_ALREADY_LOGGED_IN = 0x100;
+const CKR_CRYPTOKI_ALREADY_INITIALIZED = 0x191;
 const P256_PARAMS = Buffer.from("06082a8648ce3d030107", "hex");
 const ED25519_PARAMS = [Buffer.from("06032b6570", "hex"), Buffer.from("130c656477617264733235353139", "hex")];
 const P256_SPKI = Buffer.from("3059301306072a8648ce3d020106082a8648ce3d030107034200", "hex");
@@ -88,7 +89,8 @@ function loadModule(env: NodeJS.ProcessEnv): Pkcs11Module & { gcmParamsType: num
     module.load(path);
     module.C_Initialize();
   } catch (error) {
-    throw mapped(error, "initialize");
+    // Another provider instance in this process initialized the same library already.
+    if ((error as { code?: unknown })?.code !== CKR_CRYPTOKI_ALREADY_INITIALIZED) throw mapped(error, "initialize");
   }
   return Object.assign(module, { gcmParamsType: pkcs11js.CK_PARAMS_AES_GCM ?? 0 });
 }
