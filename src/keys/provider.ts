@@ -13,7 +13,7 @@
  * Failures are KeyProviderError: a code and a fixed message, never the provider's own error text, which can carry
  * endpoints, paths, account ids or PINs.
  */
-import { canonicalSigningKey, signingKeyId, verifyCanonical, type SigningAlgorithm } from "./algorithmPolicy.js";
+import { canonicalSigningKey, lowS, signingKeyId, verifyCanonical, type SigningAlgorithm } from "./algorithmPolicy.js";
 
 export type { SigningAlgorithm } from "./algorithmPolicy.js";
 
@@ -162,11 +162,20 @@ export function checkedDescription(description: KeyDescription, policy: KeyPolic
   return description;
 }
 
-/** Signs through the provider and returns the signature only when it verifies under the described public key. */
+/**
+ * Signs through the provider and returns the signature only when it verifies under the described public key, in the
+ * key's own algorithm (never the provider's word for it) and its one canonical encoding: an ECDSA answer is brought to
+ * low S first, the same signature in canonical form.
+ */
 export async function signChecked(provider: KeyProvider, description: KeyDescription, message: Uint8Array): Promise<Buffer> {
-  const signature = await attempt(provider.id, "sign", () => provider.sign(description.ref, message));
-  if (!verifyCanonical(description.algorithm, message, description.publicKeyPem, signature)) {
+  const algorithm = canonicalSigningKey(description.publicKeyPem)?.algorithm;
+  if (algorithm === undefined || algorithm !== description.algorithm) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the described algorithm is not the algorithm of the described key");
+  }
+  const answer = await attempt(provider.id, "sign", () => provider.sign(description.ref, message));
+  const signature = algorithm === "ecdsa-p256-sha256" ? lowS(answer) : Buffer.from(answer);
+  if (!verifyCanonical(algorithm, message, description.publicKeyPem, signature)) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the provider's signature does not verify under the described public key");
   }
-  return Buffer.from(signature);
+  return signature;
 }

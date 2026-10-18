@@ -57,7 +57,7 @@ export async function issueDelegation(provider: KeyProvider, issuer: KeyDescript
     maxEvents: input.maxEvents, issuerKeyId: issuer.keyId
   });
   const signature = await signChecked(provider, issuer, signedBytes(delegation));
-  return { delegation, algorithm: issuer.algorithm, signature: signature.toString("base64") };
+  return { delegation, algorithm: canonicalSigningKey(issuer.publicKeyPem)!.algorithm, signature: signature.toString("base64") };
 }
 
 export type DelegationVerdict = { valid: true; delegation: KeyDelegationV1 } | { valid: false; reason: string };
@@ -78,7 +78,10 @@ export function verifyDelegation(bytes: Buffer, opts: { issuerPublicKeyPems: rea
   const { delegation } = signed;
   const issuer = opts.issuerPublicKeyPems.find(pem => signingKeyId(pem) === delegation.issuerKeyId);
   if (issuer === undefined) return fail(`issuer ${delegation.issuerKeyId} is not a pinned provider key`);
-  if (!verifyCanonical(signed.algorithm, signedBytes(delegation), issuer, Buffer.from(signed.signature, "base64"))) return fail("the issuer's signature does not verify");
+  // The algorithm is the pinned issuer key's own; the statement's field must agree and never selects one.
+  const algorithm = canonicalSigningKey(issuer)!.algorithm;
+  if (signed.algorithm !== algorithm) return fail(`the statement's algorithm ${signed.algorithm} is not its issuer key's (${algorithm})`);
+  if (!verifyCanonical(algorithm, signedBytes(delegation), issuer, Buffer.from(signed.signature, "base64"))) return fail("the issuer's signature does not verify");
   const delegate = canonicalSigningKey(delegation.delegatePublicKeyPem);
   if (delegate?.algorithm !== "ed25519" || delegate.pem !== delegation.delegatePublicKeyPem || signingKeyId(delegate.pem) !== delegation.delegateKeyId) {
     return fail("the delegate is not the canonical Ed25519 key its key id names");

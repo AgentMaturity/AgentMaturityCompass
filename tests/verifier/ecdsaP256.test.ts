@@ -4,6 +4,7 @@ import { describe, expect, test } from "vitest";
 import { verifyArtifact } from "../../packages/verifier/src/index.js";
 import { admitKey, verifySignedTrustList } from "../../src/trust/index.js";
 import { canonicalize } from "../../src/utils/json.js";
+import { lowS } from "../../src/keys/algorithmPolicy.js";
 import { context } from "../trust/trustFixtures.js";
 
 function p256() {
@@ -12,7 +13,8 @@ function p256() {
   return { privateKey: pair.privateKey, publicKeyPem, keyId: createHash("sha256").update(publicKeyPem, "utf8").digest("hex") };
 }
 const tagged = (tag: string, value: unknown) => Buffer.concat([Buffer.from(tag, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(value), "utf8")]);
-const p1363 = (bytes: Buffer, key: KeyObject) => sign("sha256", bytes, { key, dsaEncoding: "ieee-p1363" }).toString("base64");
+// The canonical ECDSA encoding: P1363 with low S.
+const p1363 = (bytes: Buffer, key: KeyObject) => lowS(sign("sha256", bytes, { key, dsaEncoding: "ieee-p1363" })).toString("base64");
 const der = (bytes: Buffer, key: KeyObject) => sign("sha256", bytes, key).toString("base64");
 
 const root = p256();
