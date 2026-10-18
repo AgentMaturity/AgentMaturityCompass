@@ -1,0 +1,60 @@
+{
+ "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'.",
+ "mutations": [
+  {
+   "mutation": "M1 ignore the signed tools.yaml: proposedConfigs always starts from defaultToolsConfig()",
+   "file": "src/catalog/compiler/runtimePolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "with tools.yaml: its tools, its digest, and the caller's config left as it was",
+    "a narrower tools.yaml narrows the default set",
+    "the digest alone is not a weakening; a tool tools.yaml adds is",
+    "a signed tools.yaml with delegate: visible, and the plan records its digest"
+   ]
+  },
+  {
+   "mutation": "M2 drop the intersection with the plan's toolPipeline.visibleTools parameter",
+   "file": "src/catalog/compiler/runtimePolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the plan's controls still narrow: delegate stays hidden when the plan's visibleTools omit it"
+   ]
+  },
+  {
+   "mutation": "M3 compile from an unverified tools.yaml (loadToolsConfig and the raw file hash instead of loadVerifiedToolsConfigSnapshot)",
+   "file": "src/catalog/catalogCli.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "an unsigned tools.yaml with delegate: the built-in default list, byte-identical to a compile without tools.yaml",
+    "an tampered tools.yaml with delegate: the built-in default list, byte-identical to a compile without tools.yaml",
+    "an unsigned tools.yaml at compile: the activated plan keeps the default list, and delegate stays refused once it is signed"
+   ]
+  },
+  {
+   "mutation": "M4 skip the compiled-policy guard's tools.yaml digest check (toolsWhy = null)",
+   "file": "src/tools/guards/compiledPolicyGuard.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "tools.yaml changed after activation: every call refused until the plan is recompiled and reactivated"
+   ]
+  },
+  {
+   "mutation": "M5 drop the weakening rule that ignores toolPipeline.toolsConfigSha256",
+   "file": "src/catalog/compiler/sign.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the digest alone is not a weakening; a tool tools.yaml adds is"
+   ]
+  }
+ ]
+}
