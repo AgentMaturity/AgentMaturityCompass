@@ -16,7 +16,14 @@ webhook tests sign their own bodies with the provider's documented `Stripe-Signa
   without a pinned licence key; M3 checks the webhook signature over re-serialized JSON instead of the raw bytes; M4
   skips the webhook signature check; M5 removes webhook idempotency; M6 compares the admin token with `===`; M7 offers
   hosted checkout with a URL alone; M8 verifies an enterprise licence with no pinned key; M9 stores a refused
-  enterprise key; M10 hides a locked pack's description again. Each mutation fails at least one test.
+  enterprise key; M10 hides a locked pack's description again; M11 lets `domain pack verify` pin the environment public
+key again; M12 ignores `activate --expires-at`; M13 ignores a Studio activation body's `expiresAt`. Each mutation fails
+at least one test.
+
+`amc domain pack verify` now checks the same trust-list key as the gate (no `--pubkey`, no environment key), and
+`--expires-at` is refused rather than ignored: a licence's expiry is the one its issuer signed, enforced at
+verification. The `scripts/egress-call-sites.json` row for the removed online activation call is dropped; no check
+reads that inventory (it is cited only by docs/OPS_HARDENING.md), and it still parses.
 
 ## Payment invariance
 

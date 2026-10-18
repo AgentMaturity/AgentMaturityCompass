@@ -109,5 +109,38 @@
     "failing": [
       "\u00d7 a locked pack still shows its name, its own description and its regulatory basis 6ms"
     ]
+  },
+  {
+    "mutation": "M11 domain pack verify pins the environment public key again",
+    "file": "src/domains/industryPackEntitlement.ts",
+    "test": "tests/industryPackEntitlement.test.ts",
+    "filter": "not a pin",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 an environment public key is not a pin: without a trust-list key the verdict is not configured 16ms"
+    ]
+  },
+  {
+    "mutation": "M12 activate --expires-at silently ignored",
+    "file": "src/cli-domain-product-commands.ts",
+    "test": "tests/industryPacksPaywallSurfaces.test.ts",
+    "filter": "access, list",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 access, list, checkout, describe and run state the lock, the price and no purchase step 5478ms"
+    ]
+  },
+  {
+    "mutation": "M13 Studio activation ignores a body expiresAt",
+    "file": "src/studio/studioServer.ts",
+    "test": "tests/industryPacksPaywallSurfaces.test.ts",
+    "filter": "Studio",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "\u00d7 list shows real descriptions; detail is 402, checkout 503 and activate 422, each with the truthful text 683ms"
+    ]
   }
 ]
