@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { detokenize } from "../../dataflow/detokenizeGate.js";
 import { executeFsRead, executeFsWrite } from "../../toolhub/toolhubExecutors/fs.js";
 import { executeGit } from "../../toolhub/toolhubExecutors/git.js";
 import { executeHttpFetch } from "../../toolhub/toolhubExecutors/http.js";
@@ -111,14 +112,19 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
       description: "Fetch a URL on the signed host allowlist.",
       body: async (execution) => {
         const args = httpArgs.parse(execution.arguments);
-        const response = await executeHttpFetch({ ...args, workspace: execution.workspace, simulate: simulated(execution),
+        const simulate = simulated(execution);
+        // P2-02: the last step before sending; headers and body only, the URL is never restored.
+        const sent = simulate ? null : detokenize({ headers: args.headers, body: args.body },
+          { execution, destination: { channel: "network-tool", url: args.url }, strictText: true });
+        const response = await executeHttpFetch({ ...args, ...(sent?.value ?? {}), workspace: execution.workspace, simulate,
           ...(execution.idempotencyKey && execution.idempotencyHeader ? { idempotency: { header: execution.idempotencyHeader, key: execution.idempotencyKey } } : {}) });
+        const output = sent === null ? response.body : sent.retokenize(response.body);
         return {
-          output: response.body,
+          output,
           // An HTTP status is not an exit code, and mapping it to one would
           // make a 404 read as a process that exited 404.
           exitCode: null,
-          bytes: Buffer.byteLength(response.body, "utf8")
+          bytes: Buffer.byteLength(output, "utf8")
         };
       }
     }),

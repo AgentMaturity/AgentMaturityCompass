@@ -22,7 +22,7 @@ Generated bundle location:
 - `registry.bench.schema.json`
 - `registry.passport.schema.json`
 
-Public record contracts in the same folder: `evidence-event`, `receipt`, `legacy-receipt`, `authorization-record`, `redaction-receipt`, `control-result`, `claim-envelope`, `scoped-attestation`, `trust-list`, `verifier-report` and `signature-envelope` (see [spec/README.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md) for which AMC emits today).
+Public record contracts in the same folder: `evidence-event`, `receipt`, `legacy-receipt`, `authorization-record`, `redaction-receipt`, `detokenization-receipt`, `control-result`, `claim-envelope`, `scoped-attestation`, `trust-list`, `verifier-report` and `signature-envelope` (see [spec/README.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md) for which AMC emits today).
 
 ## What changed in P1-01
 

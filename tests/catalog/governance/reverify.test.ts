@@ -88,6 +88,18 @@ describe("GOV_REVERIFY_OPEN (P1-34 step 10)", () => {
     expect(soon.filter((f) => f.controlId === control.id).map((f) => [f.code, f.severity, f.message])).toEqual([["GOV_REVIEW_DUE_SOON", "warning", "review due 2027-01-13"]]);
   });
 
+  it("a binding-future clause whose complianceDueDate has passed is a currency finding, never a validation error", () => {
+    const base = [...catalog.controls.values()].find((c) => c.citations.some((x) => x.registerId !== null && x.superseded === null))!;
+    const cite = { ...base.citations.find((x) => x.registerId !== null && x.superseded === null)!, statusType: "binding-future" as const, complianceDueDate: "2027-01-01" };
+    const control = { ...base, citations: [cite] };
+    const cat = { ...catalog, controls: new Map(catalog.controls).set(control.id, control) };
+    const at = (asOf: string) => catalogCurrencyFindings(cat, authority(HOME, [], { asOf })).filter((f) => f.controlId === control.id && f.code === "GOV_CITATION_DUE_PASSED");
+    expect(at("2026-12-31")).toEqual([]);
+    expect(at("2027-01-01").map((f) => [f.severity, f.message])).toEqual([["warning", expect.stringContaining("complianceDueDate 2027-01-01 has passed")]]);
+    const reviewed = { ...catalog, controls: new Map(catalog.controls).set(control.id, reviewedControl(control)) };
+    expect(catalogCurrencyFindings(reviewed, authority(HOME, [], { asOf: "2027-01-15" })).filter((f) => f.controlId === control.id && f.code === "GOV_CITATION_DUE_PASSED").map((f) => f.severity)).toEqual(["error"]);
+  });
+
   it("an approved review the YAML declares without a verified record is never hidden: an error when it claims reviewed support, else a warning", () => {
     const declared = { ...catalog.controls.get("L0-ADV-01")!, review: { status: "approved" as const, expert: "x", credential: "x", reviewedAt: "2026-10-01", nextReview: null } };
     const run = (control: ControlRecord) => catalogCurrencyFindings({ ...catalog, controls: new Map([[control.id, control]]) }, authority(HOME, []))

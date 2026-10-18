@@ -1,0 +1,2682 @@
+{
+  "finalSource": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "finalSourceFullSuite": {
+    "status": "completed",
+    "exit": 1,
+    "tests": {
+      "passed": 25418,
+      "failed": 10,
+      "skipped": 7,
+      "total": 25435
+    },
+    "files": {
+      "passed": 1745,
+      "failed": 7,
+      "skipped": 2,
+      "total": 1754
+    },
+    "authorization": "Run the full suite once on final HEAD, record measured totals and baseline-only failures, then hand off; no all-green result is required."
+  },
+  "initialRunnerProvenance": {
+    "initialRunnerStartSource": "3384649cecd2fd2e6b3be04e39dc8bffe579b9b7",
+    "laterObservedSource": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+    "sourceAtExecution": null,
+    "note": "The initial runner captured HEAD only at startup. Two unused test-helper export removals were committed during that runner. No per-command source pin was captured; the later tested-source-state snapshot does not establish every command execution pin."
+  },
+  "cancellation": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/cancel-full-suite.json",
+    "sha256": "91ebfa8579e67c4a62d7a5cc71f6aa7cca6d0f7dc505f52f33da20083ae618f4",
+    "metadata": {
+      "timeUtc": "2026-10-18T06:03:45.374088+00:00",
+      "pid": 21408,
+      "command": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/.bin/vitest run --reporter=dot",
+      "signal": "SIGINT",
+      "reason": "Host load >270 on 12 logical CPUs; own11workers use <1CPU; preserve incomplete attempt and retry2workers",
+      "uptime": "11:33  up 46 days, 10:24, 2 users, load averages: 340.38 284.45 220.39"
+    },
+    "executionSourcePinRecorded": false
+  },
+  "partialPreP110fRun": {
+    "completedCommands": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 58657,
+        "head": "b37f2630b74084282abccb777f41f275813e4103",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log"
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+        "exit": 0,
+        "durationMs": 149379,
+        "head": "b37f2630b74084282abccb777f41f275813e4103",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/focused.log",
+        "rawLogSha256": "cb460d67c96793e9afaf33e389fbe91c154c2f3910dc1cb1f41b5f044c16a972",
+        "rawLogBytes": 255,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log"
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 59375,
+        "head": "b37f2630b74084282abccb777f41f275813e4103",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log"
+      }
+    ],
+    "interruption": {
+      "head": "b37f2630b74084282abccb777f41f275813e4103",
+      "timeUtc": "2026-10-18T09:54:45.167104+00:00",
+      "action": "SIGINT only own verified process group 20224; runner exit130",
+      "reason": "New RESERVATIONS instruction requires merge int83641bceb before next check run; full suite not started. Completed build, focused, typecheck preserved; typecheck:tests interrupted, no result inferred.",
+      "logs": [
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/dead-code.log",
+          "sha256": "1e92ce8a0eedb36cb10f724835a3b90cf276599df56f20cfcb68a7180a6bb2e2"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/threat-model.log",
+          "sha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/docs-drift.log",
+          "sha256": "64447a202778f84dbabec491c625e20c941cfab633b7f92ca1e74766455fcf27"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/duplicates.log",
+          "sha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/catalog-changelog.log",
+          "sha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/lint.log",
+          "sha256": "6dd3b111e2445cdf1c3f7c4bf1c955c29ca50e177b71ffac0437f1509ff9f272"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/counts-before-regeneration.log",
+          "sha256": "ee21ca0eebdedf006412991faf7ca561a96a99abd4013eddb4b3a57680852ce9"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/counts.log",
+          "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/typecheck-tests.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/qualification.log",
+          "sha256": "c5fd2b9e439beddb6fdb2d06d746795b7d84fd5b449d614263877525ab2a9c7b"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/typecheck.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/clean-source.log",
+          "sha256": "b0301ea76d673948bebddb803a3472280642c03296c68d49624fdf389ec2572b"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/schemas.log",
+          "sha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/gen-counts.log",
+          "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/freeze.log",
+          "sha256": "2485e0d16c681a2b211466c309da4d992c57f4a39695c4245b910521d215062e"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/catalog-currency.log",
+          "sha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/citations.log",
+          "sha256": "e33b74b89cbd86f764c98d7575336830660ccaa2fae8b71e86b94b22c777862d"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/gates.log",
+          "sha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/release-notes.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/architecture-boundaries.log",
+          "sha256": "377eaaefaa0777ab243252754cb7bd62ec4c3671dfab12921cd410c23ddd203c"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/api-ref.log",
+          "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/focused.log",
+          "sha256": "cb460d67c96793e9afaf33e389fbe91c154c2f3910dc1cb1f41b5f044c16a972"
+        },
+        {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/build.log",
+          "sha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290"
+        }
+      ]
+    },
+    "note": "Only explicit completed result rows establish command results. Typecheck:tests was interrupted with no inferred result; other archived log names do not establish completion. The full suite had not started."
+  },
+  "prePrecisionFormalChecks": {
+    "completedCommands": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 106328,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log"
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+        "exit": 0,
+        "durationMs": 145769,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-focused.log",
+        "rawLogSha256": "32e784573ae536ab7a8464e72332d7600cbfcdbc2f0e14383a121a3a4cc54f73",
+        "rawLogBytes": 255,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log"
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 44010,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log"
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "durationMs": 55961,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck-tests.log"
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "durationMs": 3895,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-lint.log",
+        "rawLogSha256": "6dd3b111e2445cdf1c3f7c4bf1c955c29ca50e177b71ffac0437f1509ff9f272",
+        "rawLogBytes": 200,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/lint.log"
+      },
+      {
+        "name": "counts-before-regeneration",
+        "cmd": "npm run -s check:counts",
+        "exit": 1,
+        "durationMs": 1155,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-counts-before-regeneration.log",
+        "rawLogSha256": "4b965d065e723cd2a0f56a6628e2a3c2864e11b129a6b165bfddd2f1d4183be0",
+        "rawLogBytes": 1228,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log"
+      },
+      {
+        "name": "gen-counts",
+        "cmd": "node scripts/gen-counts.mjs --write",
+        "exit": 0,
+        "durationMs": 527,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-gen-counts.log",
+        "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+        "rawLogBytes": 20,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log"
+      },
+      {
+        "name": "counts",
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "durationMs": 657,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-counts.log",
+        "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "rawLogBytes": 81,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log"
+      },
+      {
+        "name": "docs-drift",
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "durationMs": 647,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-docs-drift.log",
+        "rawLogSha256": "64447a202778f84dbabec491c625e20c941cfab633b7f92ca1e74766455fcf27",
+        "rawLogBytes": 121,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/docs-drift.log"
+      },
+      {
+        "name": "freeze",
+        "cmd": "pnpm check:freeze -- --base-ref int",
+        "exit": 0,
+        "durationMs": 2754,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-freeze.log",
+        "rawLogSha256": "2485e0d16c681a2b211466c309da4d992c57f4a39695c4245b910521d215062e",
+        "rawLogBytes": 269,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/freeze.log"
+      },
+      {
+        "name": "architecture-boundaries",
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "durationMs": 3206,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-architecture-boundaries.log",
+        "rawLogSha256": "17e5fd8a2d89d41f92cee3b6ca08eae25985843d309dadff0692f45b4833a0e2",
+        "rawLogBytes": 98828,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/architecture-boundaries.log"
+      },
+      {
+        "name": "gates",
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "durationMs": 464,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-gates.log",
+        "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+        "rawLogBytes": 659,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gates.log"
+      },
+      {
+        "name": "schemas",
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "durationMs": 1047,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-schemas.log",
+        "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+        "rawLogBytes": 65,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/schemas.log"
+      },
+      {
+        "name": "api-ref",
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "durationMs": 302,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-api-ref.log",
+        "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "rawLogBytes": 42,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/api-ref.log"
+      },
+      {
+        "name": "threat-model",
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "durationMs": 342,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-threat-model.log",
+        "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+        "rawLogBytes": 113,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/threat-model.log"
+      },
+      {
+        "name": "citations",
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "durationMs": 543,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-citations.log",
+        "rawLogSha256": "e33b74b89cbd86f764c98d7575336830660ccaa2fae8b71e86b94b22c777862d",
+        "rawLogBytes": 373,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/citations.log"
+      },
+      {
+        "name": "qualification",
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "durationMs": 526,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-qualification.log",
+        "rawLogSha256": "f400746b38fcf2240005428b32898bd90885cf3a5ea313caa65b2ff6949091c0",
+        "rawLogBytes": 65,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/qualification.log"
+      },
+      {
+        "name": "release-notes",
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "durationMs": 347,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-release-notes.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/release-notes.log"
+      },
+      {
+        "name": "catalog-currency",
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "durationMs": 652,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-catalog-currency.log",
+        "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+        "rawLogBytes": 161,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-currency.log"
+      },
+      {
+        "name": "catalog-changelog",
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+        "exit": 0,
+        "durationMs": 2120,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-catalog-changelog.log",
+        "rawLogSha256": "e8ad12a619d5de2956d75c84b81ee41a9d57e4a2521697154f8af15f5fca1e7d",
+        "rawLogBytes": 146,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog.log"
+      },
+      {
+        "name": "duplicates",
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "durationMs": 1483,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-duplicates.log",
+        "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+        "rawLogBytes": 193,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/duplicates.log"
+      },
+      {
+        "name": "dead-code",
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "durationMs": 6177,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-dead-code.log",
+        "rawLogSha256": "1e92ce8a0eedb36cb10f724835a3b90cf276599df56f20cfcb68a7180a6bb2e2",
+        "rawLogBytes": 192,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/dead-code.log"
+      },
+      {
+        "name": "clean-source",
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "durationMs": 153599,
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/post-governance-clean-source.log",
+        "rawLogSha256": "50f1993d5f90d9768b33bfbd4db4f7fa5bffc42b5af43eadebf54b29d0b9ed77",
+        "rawLogBytes": 790,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/clean-source.log"
+      }
+    ],
+    "interruption": {
+      "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "timeUtc": "2026-10-18T10:09:02.717619+00:00",
+      "action": "SIGINT only verified own process group86697; outer Python exit2 with recorded KeyboardInterrupt, npm exit not captured",
+      "reason": "Independent review found NIS2 Date.parse truncation can admit submillisecond late packet; this source is no longer final. No full-suite totals were produced.",
+      "tests": null,
+      "generatedInputsPreserved": true
+    },
+    "note": "The completed formal rows belong to the superseded pre-precision source, including its expected stale-count finding. They are historical and not final-source checks."
+  },
+  "preP142FormalChecks": {
+    "completedCommands": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 73694,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log"
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+        "exit": 0,
+        "durationMs": 130581,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-focused.log",
+        "rawLogSha256": "0e6fa210787f552537804ad55f4c3cdd1694d2c7739092a21f25cff33bbc8762",
+        "rawLogBytes": 255,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log"
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 42912,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log"
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "durationMs": 67135,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck-tests.log"
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "durationMs": 3744,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-lint.log",
+        "rawLogSha256": "6dd3b111e2445cdf1c3f7c4bf1c955c29ca50e177b71ffac0437f1509ff9f272",
+        "rawLogBytes": 200,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/lint.log"
+      },
+      {
+        "name": "counts-before-regeneration",
+        "cmd": "npm run -s check:counts",
+        "exit": 1,
+        "durationMs": 1256,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-counts-before-regeneration.log",
+        "rawLogSha256": "4b965d065e723cd2a0f56a6628e2a3c2864e11b129a6b165bfddd2f1d4183be0",
+        "rawLogBytes": 1228,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log"
+      },
+      {
+        "name": "gen-counts",
+        "cmd": "node scripts/gen-counts.mjs --write",
+        "exit": 0,
+        "durationMs": 447,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-gen-counts.log",
+        "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+        "rawLogBytes": 20,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log"
+      },
+      {
+        "name": "counts",
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "durationMs": 556,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-counts.log",
+        "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "rawLogBytes": 81,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log"
+      },
+      {
+        "name": "docs-drift",
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "durationMs": 555,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-docs-drift.log",
+        "rawLogSha256": "64447a202778f84dbabec491c625e20c941cfab633b7f92ca1e74766455fcf27",
+        "rawLogBytes": 121,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/docs-drift.log"
+      },
+      {
+        "name": "freeze",
+        "cmd": "pnpm check:freeze -- --base-ref int",
+        "exit": 0,
+        "durationMs": 2402,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-freeze.log",
+        "rawLogSha256": "2485e0d16c681a2b211466c309da4d992c57f4a39695c4245b910521d215062e",
+        "rawLogBytes": 269,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/freeze.log"
+      },
+      {
+        "name": "architecture-boundaries",
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "durationMs": 2037,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-architecture-boundaries.log",
+        "rawLogSha256": "17e5fd8a2d89d41f92cee3b6ca08eae25985843d309dadff0692f45b4833a0e2",
+        "rawLogBytes": 98828,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/architecture-boundaries.log"
+      },
+      {
+        "name": "gates",
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "durationMs": 348,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-gates.log",
+        "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+        "rawLogBytes": 659,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gates.log"
+      },
+      {
+        "name": "schemas",
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "durationMs": 798,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-schemas.log",
+        "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+        "rawLogBytes": 65,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/schemas.log"
+      },
+      {
+        "name": "api-ref",
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "durationMs": 263,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-api-ref.log",
+        "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "rawLogBytes": 42,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/api-ref.log"
+      },
+      {
+        "name": "threat-model",
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "durationMs": 302,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-threat-model.log",
+        "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+        "rawLogBytes": 113,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/threat-model.log"
+      },
+      {
+        "name": "citations",
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "durationMs": 392,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-citations.log",
+        "rawLogSha256": "e33b74b89cbd86f764c98d7575336830660ccaa2fae8b71e86b94b22c777862d",
+        "rawLogBytes": 373,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/citations.log"
+      },
+      {
+        "name": "qualification",
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "durationMs": 433,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-qualification.log",
+        "rawLogSha256": "f400746b38fcf2240005428b32898bd90885cf3a5ea313caa65b2ff6949091c0",
+        "rawLogBytes": 65,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/qualification.log"
+      },
+      {
+        "name": "release-notes",
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "durationMs": 270,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-release-notes.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/release-notes.log"
+      },
+      {
+        "name": "catalog-currency",
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "durationMs": 482,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-catalog-currency.log",
+        "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+        "rawLogBytes": 161,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-currency.log"
+      },
+      {
+        "name": "catalog-changelog",
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+        "exit": 0,
+        "durationMs": 1493,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-catalog-changelog.log",
+        "rawLogSha256": "e8ad12a619d5de2956d75c84b81ee41a9d57e4a2521697154f8af15f5fca1e7d",
+        "rawLogBytes": 146,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog.log"
+      },
+      {
+        "name": "duplicates",
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "durationMs": 971,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-duplicates.log",
+        "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+        "rawLogBytes": 193,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/duplicates.log"
+      },
+      {
+        "name": "dead-code",
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "durationMs": 4809,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-dead-code.log",
+        "rawLogSha256": "1e92ce8a0eedb36cb10f724835a3b90cf276599df56f20cfcb68a7180a6bb2e2",
+        "rawLogBytes": 192,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/dead-code.log"
+      },
+      {
+        "name": "clean-source",
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "durationMs": 102555,
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/post-governance-clean-source.log",
+        "rawLogSha256": "89c2f03ee96e38625de847f12e8a682d1fe06a9286879fb4e2a830c29f083ad8",
+        "rawLogBytes": 789,
+        "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/clean-source.log"
+      }
+    ],
+    "note": "All completed a7 non-full rows remain historical after required integration; their counts and source pin are preserved."
+  },
+  "historicalBoundedEquivalence": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/checks/baseline-p1-10f/final-candidate-equivalence.json",
+    "sha256": "e60fa8a2eb692d1ac54e3dc9a1cfabc56b93c3c16a2e19a00bc7f77cf6115c1b",
+    "record": {
+      "recordedAtUtc": "2026-10-18T10:12:16.042Z",
+      "baselineRevision": "83641bceb68659737d7678daeff3fbb2728e2301",
+      "previousCandidateRevision": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "finalCandidateRevision": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "method": "Read-only committed Git blobs for the existing 249-path set; SHA-256 recomputed for current candidate and baseline. No tests, imports, compiler or runtime checks executed.",
+      "d15": {
+        "paths": [
+          "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/final-candidate-equivalence.json"
+        ],
+        "result": "none"
+      },
+      "preservedSourceComparison": {
+        "path": "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/source-comparison.json",
+        "sha256": "d174f50d212c699d7c36c956c52801a10011ab9f6267a7f774253527db132e38",
+        "byteExact": true
+      },
+      "candidateDelta": [
+        {
+          "status": "M",
+          "path": "tests/catalog/stations/technology/fixtures.test.ts"
+        },
+        {
+          "status": "M",
+          "path": "tests/catalog/stations/technology/nis2Drill.ts"
+        }
+      ],
+      "scope": "The two test files, Vitest configuration, package/dependency pins, public Docs graph script and every promoted guide source from either revision, MCP graph defect target, workspace entry, and every src/session file. This bounded byte comparison is not an exhaustive transitive import graph.",
+      "comparedFileCount": 249,
+      "verifiedComparisonSetSha256": "12df76035412ad4824a6f16bf9080a0c1a8e7acfcca11d3f9f027d27e7808e3e",
+      "allBaselineRecordedHashesVerified": true,
+      "allCurrentCandidateInputsMatchPreviousCandidate": true,
+      "identicalToBaselineCount": 248,
+      "documentedBaselineDifferences": [
+        {
+          "path": "docs/sdk/TYPESCRIPT_SDK.md",
+          "baselineSha256": "c2928d862209c77b3b10943574a1e887c428605b45788b4d06041f896ac96e58",
+          "previousCandidateSha256": "c475980697c16c82bb6986f6ba495e2dd23fa5d44df3ded3da24790a5aca53dc",
+          "currentCandidateSha256": "c475980697c16c82bb6986f6ba495e2dd23fa5d44df3ded3da24790a5aca53dc",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": false
+        }
+      ],
+      "criticalInputHashes": [
+        {
+          "path": "package.json",
+          "baselineSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+          "previousCandidateSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+          "currentCandidateSha256": "fad6589575f3905d54aa82c8d45f1f9237cb7fcb2d0ce8e6c3edf6b3ea4c8acb",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "baselineSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+          "previousCandidateSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+          "currentCandidateSha256": "648ed2378dbcb4cce661f0729d3f72ee57d5c72f2325ef22cff385bb3bf54028",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "vitest.config.ts",
+          "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "previousCandidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "currentCandidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "tests/publicDocsGraph.test.ts",
+          "baselineSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+          "previousCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+          "currentCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "tests/performance/sessionSpine.performance.test.ts",
+          "baselineSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+          "previousCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+          "currentCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "website/docs/docs.js",
+          "baselineSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+          "previousCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+          "currentCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "docs/MCP_SERVER.md",
+          "baselineSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+          "previousCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+          "currentCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "docs/MCP_INDUSTRY_PACKS.md",
+          "baselineSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+          "previousCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+          "currentCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "src/workspace.ts",
+          "baselineSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+          "previousCandidateSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+          "currentCandidateSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "src/session/sessionSpine.ts",
+          "baselineSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+          "previousCandidateSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+          "currentCandidateSha256": "124ef5427b0935671965c3262ccbf96cd6a14522d1396700affc4b6e5ef0737a",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        },
+        {
+          "path": "src/session/spill/spillStore.ts",
+          "baselineSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+          "previousCandidateSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+          "currentCandidateSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+          "baselineRecordedHashVerified": true,
+          "currentMatchesPreviousCandidate": true,
+          "identicalToBaseline": true
+        }
+      ],
+      "sessionInputs": {
+        "count": 40,
+        "allIdenticalToBaseline": true
+      },
+      "claim": "The unchanged baseline probe inputs remain linked to final a7e6 through the preserved e4bb comparison. The only documented baseline difference in this set is TYPESCRIPT_SDK.md; this artifact does not make the bounded comparison an exhaustive transitive import graph or establish failure causation."
+    },
+    "status": "historical_only",
+    "note": "Older source/integration comparison; no current-source equivalence, validation waiver or final-baseline classification is inferred."
+  },
+  "runs": [
+    {
+      "name": "full-suite",
+      "cmd": "npm test -- --reporter=dot",
+      "exit": 130,
+      "durationMs": 4658565,
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite.log",
+      "rawLogSha256": "7d573fed9a87bee1e967c76a7dccd7992d11cb6f0f0fd493efb86c67b4efbb61",
+      "rawLogBytes": 135620,
+      "sourceHead": null,
+      "sourceAtExecution": null,
+      "initialRunnerStartSource": "3384649cecd2fd2e6b3be04e39dc8bffe579b9b7",
+      "sourcePinStatus": "not_recorded_per_command",
+      "status": "cancelled_incomplete",
+      "tests": null
+    },
+    {
+      "name": "full-suite-2-workers",
+      "cmd": "npm test -- --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json",
+      "exit": 1,
+      "durationMs": 7735694,
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers.log",
+      "rawLogSha256": "f420499a79dcaf951951d0cac7bb338d0ec377951a2d0da61df05e80016d45bb",
+      "rawLogBytes": 190278,
+      "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json",
+      "sourceHead": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+      "sourceAtExecution": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+      "status": "completed_failed",
+      "tests": {
+        "total": 25064,
+        "passed": 25044,
+        "failed": 13,
+        "skipped": 7
+      },
+      "files": {
+        "passed": 1719,
+        "failed": 8,
+        "skipped": 2,
+        "total": 1729
+      },
+      "fileCountReconciliation": {
+        "measuredRawCounts": {
+          "passed": 1719,
+          "failed": 8,
+          "skipped": 2,
+          "total": 1729
+        },
+        "reportedStatusCounts": {
+          "total": 1729,
+          "passed": 1721,
+          "failed": 8,
+          "skipped": 0
+        },
+        "normalizedFileCounts": {
+          "total": 1729,
+          "passed": 1719,
+          "failed": 8,
+          "skipped": 2
+        },
+        "adjustments": [
+          {
+            "file": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 7,
+            "assertionStatuses": [
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped"
+            ],
+            "reason": "All reported assertions are skipped; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": null
+          },
+          {
+            "file": "tests/conformance/piToolCall.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/piToolCall.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 0,
+            "assertionStatuses": [],
+            "reason": "Empty opt-in suite verified from the source at this run pin; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": {
+              "file": "tests/conformance/piToolCall.conformance.test.ts",
+              "sourceHead": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+              "sourceSha256": "e56c5e2a0f10e3b36097a872c704ae1da176ae72135e58f24e24597a843a192b",
+              "basis": "Committed source gates the runIf suite and versioned test declaration on enabled. The JSON report contains no assertions, and the raw summary supplies the skipped-file count. The environment flag itself was not captured."
+            }
+          }
+        ],
+        "note": "Raw summary counts and original JSON file statuses are preserved independently. Source inspection does not establish a captured opt-in environment flag."
+      },
+      "failedFileCount": 8,
+      "assertionFailureCount": 13,
+      "hookFailureCount": 2
+    },
+    {
+      "name": "full-suite-final",
+      "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "headAfter": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+      "exit": null,
+      "durationMs": 201278,
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/full-suite-final.log",
+      "rawLogSha256": "6391617d9afa8e5267549050e8c6adce4bb57eb1fc4a21a88df52a88aaa553c5",
+      "rawLogBytes": 1337,
+      "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/full-suite-final-report.json",
+      "jsonReportSha256": null,
+      "statusAfterTests": null,
+      "generatedOutputsUnchangedByTests": true,
+      "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "exception": "KeyboardInterrupt()",
+      "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log",
+      "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "sourceAtExecution": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+      "status": "cancelled_nonfinal",
+      "tests": null,
+      "start": {
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "int": "83641bceb68659737d7678daeff3fbb2728e2301",
+        "node": "v22.23.3",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+        "timeUtc": "2026-10-18T10:05:25.655459+00:00",
+        "statusBeforeRun": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+        "workingTreeClean": false,
+        "allowedGeneratedOutputPaths": [
+          "CONTRIBUTING.md",
+          "README.md",
+          "docs/content/reddit-launch-drafts.md",
+          "docs/content/show-hn-draft.md",
+          "docs/internal/competitive-landscape.md",
+          "docs/internal/mirofish-simulation-council.md",
+          "website/i18n.js",
+          "website/index.html",
+          "website/lite.html",
+          "whitepaper/AMC_WHITEPAPER_v1.md"
+        ],
+        "generatedOutputInputs": [
+          {
+            "path": "README.md",
+            "sha256": "a1b41be7359d1d84726410f47e8632dd23c8732254837131c5eaf82e9caf3fcc"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "sha256": "45a6c02ec79335592b6117e71b76e821e3b166fbabd3710ea15e311b9a9b1d77"
+          },
+          {
+            "path": "website/i18n.js",
+            "sha256": "01dcac0db3dd03708782c4d0bfa2bf0e8e44404f14047394666b4b2edaffca70"
+          },
+          {
+            "path": "website/index.html",
+            "sha256": "e0b8e8c5c2919f7be5ead60c27195ef0d3c1c7bd0ca2380fd118c5d1defed4e0"
+          },
+          {
+            "path": "website/lite.html",
+            "sha256": "9e0598e7750cbd89a3f1a6836a727ed38718796650cd04cb7f92d19973810e88"
+          },
+          {
+            "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+            "sha256": "1cfcf912c333486a41574df74e28e90fcdb24019d0e1c61e0c6c68b2382c1670"
+          },
+          {
+            "path": "docs/content/show-hn-draft.md",
+            "sha256": "679689be0f6f6a1f43a9f835c1eafc804b80a2609dfd7c59bdbc99ca1e12568e"
+          },
+          {
+            "path": "docs/content/reddit-launch-drafts.md",
+            "sha256": "17fe65eabe76dfc398eae82eeda49cf51c13c626f1a8bc6a4e86f5946f6d6fb9"
+          },
+          {
+            "path": "docs/internal/competitive-landscape.md",
+            "sha256": "53687ea2250eaa1da0578aa7e2688e898ccc74a7c8ecb7dd36e6f2700fe1ed82"
+          },
+          {
+            "path": "docs/internal/mirofish-simulation-council.md",
+            "sha256": "8ccda4c19b0aeaf8f449163733cef65609626452936893fac770b574ca8e21b6"
+          }
+        ],
+        "statusPorcelain": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+        "committedImplementationSourceAtStart": true,
+        "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "generatedOutputPolicy": "Required regenerated count outputs remain uncommitted and hashed. publicStatsDrift.test.ts compares them with the actual test-file inventory; reverting them to old HEAD counts would create artificial failures. No other uncommitted source or test input is admitted.",
+        "policy": "One measured full-suite run on final source; no all-green claim required. Four workers on a 12 logical CPU host; no test budgets or assertions changed."
+      },
+      "interruption": {
+        "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+        "timeUtc": "2026-10-18T10:09:02.717619+00:00",
+        "action": "SIGINT only verified own process group86697; outer Python exit2 with recorded KeyboardInterrupt, npm exit not captured",
+        "reason": "Independent review found NIS2 Date.parse truncation can admit submillisecond late packet; this source is no longer final. No full-suite totals were produced.",
+        "tests": null,
+        "generatedInputsPreserved": true
+      },
+      "receiptCommandEntry": false,
+      "note": "The npm exit was not captured. The outer Python interruption is recorded separately; no npm exit 130 or test totals are inferred. This attempt is history only because no exact outer-command result record is supplied."
+    },
+    {
+      "name": "full-suite-final",
+      "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "headAfter": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+      "exit": 1,
+      "durationMs": 3754276,
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/full-suite-final.log",
+      "rawLogSha256": "ec24919514e8e69d76bef04b8b718c545a47656660a94578490e62e79e51afa9",
+      "rawLogBytes": 188966,
+      "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-42-a7e6be69/full-suite-final-report.json",
+      "jsonReportSha256": "4e436a443ee9c273e8fbaa870954edb890c0cc5ed2e7fc2170b2e1cc435af90e",
+      "statusAfterTests": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+      "generatedOutputsUnchangedByTests": true,
+      "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "exception": null,
+      "reportedTests": {
+        "numTotalTests": 25181,
+        "numPassedTests": 25161,
+        "numFailedTests": 13,
+        "numPendingTests": 7
+      },
+      "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log",
+      "originalJsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+      "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "sourceAtExecution": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+      "status": "completed_historical_before_required_integration",
+      "tests": {
+        "passed": 25161,
+        "failed": 13,
+        "skipped": 7,
+        "total": 25181
+      },
+      "files": {
+        "passed": 1725,
+        "failed": 8,
+        "skipped": 2,
+        "total": 1735
+      },
+      "fileCountReconciliation": {
+        "measuredRawCounts": {
+          "passed": 1725,
+          "failed": 8,
+          "skipped": 2,
+          "total": 1735
+        },
+        "reportedStatusCounts": {
+          "total": 1735,
+          "passed": 1727,
+          "failed": 8,
+          "skipped": 0
+        },
+        "normalizedFileCounts": {
+          "total": 1735,
+          "passed": 1725,
+          "failed": 8,
+          "skipped": 2
+        },
+        "adjustments": [
+          {
+            "file": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/claudeCodeHooks.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 7,
+            "assertionStatuses": [
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped",
+              "skipped"
+            ],
+            "reason": "All reported assertions are skipped; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": null
+          },
+          {
+            "file": "tests/conformance/piToolCall.conformance.test.ts",
+            "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/conformance/piToolCall.conformance.test.ts",
+            "reportedStatus": "passed",
+            "countedStatus": "skipped",
+            "assertionCount": 0,
+            "assertionStatuses": [],
+            "reason": "Empty opt-in suite verified from the source at this run pin; JSON reporter encodes this nonfailed file as passed.",
+            "sourceEvidence": {
+              "file": "tests/conformance/piToolCall.conformance.test.ts",
+              "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+              "sourceSha256": "e56c5e2a0f10e3b36097a872c704ae1da176ae72135e58f24e24597a843a192b",
+              "basis": "Committed source gates the runIf suite and versioned test declaration on enabled. The JSON report contains no assertions, and the raw summary supplies the skipped-file count. The environment flag itself was not captured."
+            }
+          }
+        ],
+        "note": "Raw summary counts and original JSON file statuses are preserved independently. Source inspection does not establish a captured opt-in environment flag."
+      },
+      "start": {
+        "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "int": "83641bceb68659737d7678daeff3fbb2728e2301",
+        "node": "v22.23.3",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+        "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+        "timeUtc": "2026-10-18T10:20:24.051407+00:00",
+        "statusBeforeRun": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+        "workingTreeClean": false,
+        "allowedGeneratedOutputPaths": [
+          "CONTRIBUTING.md",
+          "README.md",
+          "docs/content/reddit-launch-drafts.md",
+          "docs/content/show-hn-draft.md",
+          "docs/internal/competitive-landscape.md",
+          "docs/internal/mirofish-simulation-council.md",
+          "website/i18n.js",
+          "website/index.html",
+          "website/lite.html",
+          "whitepaper/AMC_WHITEPAPER_v1.md"
+        ],
+        "generatedOutputInputs": [
+          {
+            "path": "README.md",
+            "sha256": "a1b41be7359d1d84726410f47e8632dd23c8732254837131c5eaf82e9caf3fcc"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "sha256": "45a6c02ec79335592b6117e71b76e821e3b166fbabd3710ea15e311b9a9b1d77"
+          },
+          {
+            "path": "website/i18n.js",
+            "sha256": "01dcac0db3dd03708782c4d0bfa2bf0e8e44404f14047394666b4b2edaffca70"
+          },
+          {
+            "path": "website/index.html",
+            "sha256": "e0b8e8c5c2919f7be5ead60c27195ef0d3c1c7bd0ca2380fd118c5d1defed4e0"
+          },
+          {
+            "path": "website/lite.html",
+            "sha256": "9e0598e7750cbd89a3f1a6836a727ed38718796650cd04cb7f92d19973810e88"
+          },
+          {
+            "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+            "sha256": "1cfcf912c333486a41574df74e28e90fcdb24019d0e1c61e0c6c68b2382c1670"
+          },
+          {
+            "path": "docs/content/show-hn-draft.md",
+            "sha256": "679689be0f6f6a1f43a9f835c1eafc804b80a2609dfd7c59bdbc99ca1e12568e"
+          },
+          {
+            "path": "docs/content/reddit-launch-drafts.md",
+            "sha256": "17fe65eabe76dfc398eae82eeda49cf51c13c626f1a8bc6a4e86f5946f6d6fb9"
+          },
+          {
+            "path": "docs/internal/competitive-landscape.md",
+            "sha256": "53687ea2250eaa1da0578aa7e2688e898ccc74a7c8ecb7dd36e6f2700fe1ed82"
+          },
+          {
+            "path": "docs/internal/mirofish-simulation-council.md",
+            "sha256": "8ccda4c19b0aeaf8f449163733cef65609626452936893fac770b574ca8e21b6"
+          }
+        ],
+        "statusPorcelain": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+        "committedImplementationSourceAtStart": true,
+        "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-a7e6be69f149bfdeb2845077f3412092443ad6b2",
+        "generatedOutputPolicy": "Required regenerated count outputs remain uncommitted and hashed. publicStatsDrift.test.ts compares them with the actual test-file inventory; reverting them to old HEAD counts would create artificial failures. No other uncommitted source or test input is admitted.",
+        "policy": "One measured full-suite run on final source; no all-green claim required. Four workers on a 12 logical CPU host; no test budgets or assertions changed."
+      },
+      "failures": [
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [],
+              "fullName": "same Studio explicitly reattaches a dead sqlite writer without restarting or replaying",
+              "status": "passed",
+              "title": "same Studio explicitly reattaches a dead sqlite writer without restarting or replaying",
+              "duration": 20346.748291,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [],
+              "fullName": "same Studio explicitly reattaches a dead jsonl writer without restarting or replaying",
+              "status": "passed",
+              "title": "same Studio explicitly reattaches a dead jsonl writer without restarting or replaying",
+              "duration": 7809.654875,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [],
+              "fullName": "reattached sqlite native controller retains approval quorum, accounting and validation pins",
+              "status": "passed",
+              "title": "reattached sqlite native controller retains approval quorum, accounting and validation pins",
+              "duration": 12555.961291999996,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [],
+              "fullName": "reattached jsonl native controller retains approval quorum, accounting and validation pins",
+              "status": "failed",
+              "title": "reattached jsonl native controller retains approval quorum, accounting and validation pins",
+              "duration": 8154.146165999999,
+              "failureMessages": [
+                "AssertionError: expected 'unavailable' to be 'passed' // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/nativeManagedRecovery.test.ts:89:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [],
+              "fullName": "SDK observes actual process closure without equating a live idle child to a released writer",
+              "status": "passed",
+              "title": "SDK observes actual process closure without equating a live idle child to a released writer",
+              "duration": 5770.643209000002,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792319695389,
+          "endTime": 1792319750027.6433,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/nativeManagedRecovery.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph allows the generated API entry without admitting arbitrary non-guide paths",
+              "status": "passed",
+              "title": "allows the generated API entry without admitting arbitrary non-guide paths",
+              "duration": 0.9883749999999907,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph every promoted guide has a repository Markdown source",
+              "status": "passed",
+              "title": "every promoted guide has a repository Markdown source",
+              "duration": 1.7013330000000053,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+              "status": "failed",
+              "title": "every local guide edge resolves to another promoted guide",
+              "duration": 102.61658300000002,
+              "failureMessages": [
+                "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph intentionally internal planning docs have no incoming public edges",
+              "status": "passed",
+              "title": "intentionally internal planning docs have no incoming public edges",
+              "duration": 18.173333999999954,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph linked user workflow guides are promoted instead of becoming dead ends",
+              "status": "passed",
+              "title": "linked user workflow guides are promoted instead of becoming dead ends",
+              "duration": 0.12749999999999773,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "AMC public Docs graph"
+              ],
+              "fullName": "AMC public Docs graph every promoted guide appears in one category and the open category stays bounded",
+              "status": "passed",
+              "title": "every promoted guide appears in one category and the open category stays bounded",
+              "duration": 0.7117910000000052,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792318923315,
+          "endTime": 1792318923439.7117,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsGraph.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "release engineering pack"
+              ],
+              "fullName": "release engineering pack packs and verifies a signed .amcrelease bundle and prints summary",
+              "status": "failed",
+              "title": "packs and verifies a signed .amcrelease bundle and prints summary",
+              "duration": 54842.618542000004,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseEngineeringPack.test.ts:42:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release engineering pack"
+              ],
+              "fullName": "release engineering pack embeds the gated npm tarball, SBOM and licence files byte for byte instead of packing (P0-34)",
+              "status": "passed",
+              "title": "embeds the gated npm tarball, SBOM and licence files byte for byte instead of packing (P0-34)",
+              "duration": 1146.7606250000026,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release engineering pack"
+              ],
+              "fullName": "release engineering pack fails verify on tampered manifest and artifact and wrong pubkey",
+              "status": "passed",
+              "title": "fails verify on tampered manifest and artifact and wrong pubkey",
+              "duration": 1979.6432920000007,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release engineering pack"
+              ],
+              "fullName": "release engineering pack generates deterministic SBOM and sorted license report",
+              "status": "passed",
+              "title": "generates deterministic SBOM and sorted license report",
+              "duration": 621.2302920000002,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release engineering pack"
+              ],
+              "fullName": "release engineering pack secret scan detects fake key patterns inside archive",
+              "status": "passed",
+              "title": "secret scan detects fake key patterns inside archive",
+              "duration": 104.42279199999757,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts trusts an untouched bundle whose signer is pinned for the release purpose",
+              "status": "passed",
+              "title": "trusts an untouched bundle whose signer is pinned for the release purpose",
+              "duration": 149.30366700000013,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts keeps integrity separate from admission: an intact bundle nobody pinned is not trusted, and names the key to pin",
+              "status": "passed",
+              "title": "keeps integrity separate from admission: an intact bundle nobody pinned is not trusted, and names the key to pin",
+              "duration": 165.77308300000004,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts gives --allow-unpinned an integrity-only result: never ok, exit 2, and the override is recorded",
+              "status": "passed",
+              "title": "gives --allow-unpinned an integrity-only result: never ok, exit 2, and the override is recorded",
+              "duration": 372.45650000000023,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts does not admit the signer when its pin is for another purpose",
+              "status": "passed",
+              "title": "does not admit the signer when its pin is for another purpose",
+              "duration": 289.4927499999976,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts refuses a distrusted signer even when it is pinned and --allow-unpinned was used",
+              "status": "passed",
+              "title": "refuses a distrusted signer even when it is pinned and --allow-unpinned was used",
+              "duration": 142.29187500000262,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts uses --pubkey only to find the signer: an unrelated key file does not stop the embedded key being checked and admitted",
+              "status": "passed",
+              "title": "uses --pubkey only to find the signer: an unrelated key file does not stop the embedded key being checked and admitted",
+              "duration": 87.36520899999596,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts verifies a bundle that carries no key when --pubkey names the signer, and refuses it when nothing does",
+              "status": "passed",
+              "title": "verifies a bundle that carries no key when --pubkey names the signer, and refuses it when nothing does",
+              "duration": 384.5347079999992,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifyReleaseBundle verdicts"
+              ],
+              "fullName": "verifyReleaseBundle verdicts fails a bundle whose archive is missing or is not an archive, with a report that records no signature check",
+              "status": "passed",
+              "title": "fails a bundle whose archive is missing or is not an archive, with a report that records no signature check",
+              "duration": 12.994457999993756,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792320534489,
+          "endTime": 1792320596405.9944,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseEngineeringPack.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage detects a token at the end of a 999999-byte file",
+              "status": "passed",
+              "title": "detects a token at the end of a 999999-byte file",
+              "duration": 9.289917000000003,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage detects a token at the end of a 1000000-byte file",
+              "status": "passed",
+              "title": "detects a token at the end of a 1000000-byte file",
+              "duration": 6.918208000000021,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage detects a token at the end of a 1000001-byte file",
+              "status": "passed",
+              "title": "detects a token at the end of a 1000001-byte file",
+              "duration": 6.397666999999984,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage detects a token beyond 1 MB even when it spans a common chunk boundary",
+              "status": "passed",
+              "title": "detects a token beyond 1 MB even when it spans a common chunk boundary",
+              "duration": 14.473333000000025,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage scans large members through the actual npm archive API",
+              "status": "passed",
+              "title": "scans large members through the actual npm archive API",
+              "duration": 78.95104200000003,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage preserves detection through a release bundle's nested npm archive",
+              "status": "passed",
+              "title": "preserves detection through a release bundle's nested npm archive",
+              "duration": 283.523542,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage retains PASS for genuinely empty and fully readable clean inputs",
+              "status": "passed",
+              "title": "retains PASS for genuinely empty and fully readable clean inputs",
+              "duration": 10.765249999999924,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage does not report a nonexistent directory as a successful empty scan",
+              "status": "passed",
+              "title": "does not report a nonexistent directory as a successful empty scan",
+              "duration": 0.8454999999999018,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage does not silently omit content beyond the archive entry-size bound",
+              "status": "passed",
+              "title": "does not silently omit content beyond the archive entry-size bound",
+              "duration": 1.0329580000000078,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage does not silently ignore symlinked content in a directory scan",
+              "status": "passed",
+              "title": "does not silently ignore symlinked content in a directory scan",
+              "duration": 1.0141249999999218,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses a symlink scan root with suffix \"\"",
+              "status": "passed",
+              "title": "refuses a symlink scan root with suffix \"\"",
+              "duration": 0.6931250000000091,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses a symlink scan root with suffix \"/\"",
+              "status": "passed",
+              "title": "refuses a symlink scan root with suffix \"/\"",
+              "duration": 0.4948339999999689,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage fully scans a regular file at the documented per-file limit",
+              "status": "passed",
+              "title": "fully scans a regular file at the documented per-file limit",
+              "duration": 44.43641699999989,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses one byte above the file budget with safe typed context",
+              "status": "passed",
+              "title": "refuses one byte above the file budget with safe typed context",
+              "duration": 7.664165999999909,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses aggregate bytes beyond the budget even when each file is permitted",
+              "status": "passed",
+              "title": "refuses aggregate bytes beyond the budget even when each file is permitted",
+              "duration": 61.43774999999994,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage bounds filesystem entry count independently of content bytes",
+              "status": "passed",
+              "title": "bounds filesystem entry count independently of content bytes",
+              "duration": 4864.664833,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses a file supplied as the scan directory",
+              "status": "passed",
+              "title": "refuses a file supplied as the scan directory",
+              "duration": 1.0568339999999807,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage shares entry budgets across every nested npm archive",
+              "status": "failed",
+              "title": "shares entry budgets across every nested npm archive",
+              "duration": 35257.950791999996,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseSecretScanCoverage.test.ts:184:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage retains a complete report at the finding budget",
+              "status": "passed",
+              "title": "retains a complete report at the finding budget",
+              "duration": 3.469249999994645,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage refuses an incomplete report when another finding exceeds the shared cap",
+              "status": "passed",
+              "title": "refuses an incomplete report when another finding exceeds the shared cap",
+              "duration": 5.935583000005863,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "release secret scanner content coverage"
+              ],
+              "fullName": "release secret scanner content coverage fails explicitly when a discovered file cannot be read",
+              "status": "passed",
+              "title": "fails explicitly when a discovered file cannot be read",
+              "duration": 0.7344589999993332,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792318923363,
+          "endTime": 1792318964026.7344,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseSecretScanCoverage.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite has cases at all (a suite that ran zero cases would pass vacuously)",
+              "status": "passed",
+              "title": "has cases at all (a suite that ran zero cases would pass vacuously)",
+              "duration": 0.8349170000001322,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite the SQLite backend passes every case",
+              "status": "passed",
+              "title": "the SQLite backend passes every case",
+              "duration": 25327.759625000002,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite the JSONL backend passes every case — signed and chained, not a fast path",
+              "status": "passed",
+              "title": "the JSONL backend passes every case — signed and chained, not a fast path",
+              "duration": 27262.189833,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite both backends run the identical case list",
+              "status": "passed",
+              "title": "both backends run the identical case list",
+              "duration": 0.3430420000004233,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite identical control-plane input yields identical event hashes on both backends",
+              "status": "passed",
+              "title": "identical control-plane input yields identical event hashes on both backends",
+              "duration": 3207.719916999995,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session store conformance — both backends, one suite"
+              ],
+              "fullName": "session store conformance — both backends, one suite the two backends declare different capabilities, and say so honestly",
+              "status": "passed",
+              "title": "the two backends declare different capabilities, and say so honestly",
+              "duration": 3117.2189169999983,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) fails a backend that breaks unsigned",
+              "status": "failed",
+              "title": "fails a backend that breaks unsigned",
+              "duration": 33728.843,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) fails a backend that breaks broken-session-seq",
+              "status": "failed",
+              "title": "fails a backend that breaks broken-session-seq",
+              "duration": 39063.10054100001,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) fails a backend that breaks truncating",
+              "status": "failed",
+              "title": "fails a backend that breaks truncating",
+              "duration": 35089.60699999999,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) fails a backend that breaks lying-capability",
+              "status": "failed",
+              "title": "fails a backend that breaks lying-capability",
+              "duration": 40304.976167000015,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) fails a backend that breaks idempotent-seal",
+              "status": "failed",
+              "title": "fails a backend that breaks idempotent-seal",
+              "duration": 43855.90849999999,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "the conformance suite has teeth (mutation tests)"
+              ],
+              "fullName": "the conformance suite has teeth (mutation tests) the signature mutation is caught ONLY by the signature rule",
+              "status": "failed",
+              "title": "the signature mutation is caught ONLY by the signature rule",
+              "duration": 42243.63854199997,
+              "failureMessages": [
+                "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:309:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+              ],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792318881376,
+          "endTime": 1792319174585.6384,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic",
+              "status": "passed",
+              "title": "{\"provenance\":\"dogfood\"} -> synthetic",
+              "duration": 0.9287500000000364,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+              "status": "passed",
+              "title": "{\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+              "duration": 0.12729200000001129,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic",
+              "status": "passed",
+              "title": "{\"source\":\"dogfood-maturity\"} -> synthetic",
+              "duration": 0.06170800000006693,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"eval_import\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"eval_import\"} -> import",
+              "duration": 0.08829199999991033,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"import\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"import\"} -> import",
+              "duration": 0.05737499999997908,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"watch\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"watch\"} -> import",
+              "duration": 0.08587499999998727,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"attested_ingest\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"attested_ingest\"} -> import",
+              "duration": 0.08537499999999909,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"chatgpt\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"chatgpt\"} -> import",
+              "duration": 0.04533300000002782,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"claude_console\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"claude_console\"} -> import",
+              "duration": 0.3387920000000122,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"gemini_ui\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"gemini_ui\"} -> import",
+              "duration": 0.07862499999998818,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"generic_json\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"generic_json\"} -> import",
+              "duration": 0.09579199999996035,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"generic_text\"} -> import",
+              "status": "passed",
+              "title": "{\"source\":\"generic_text\"} -> import",
+              "duration": 0.030666999999994005,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"manual\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"manual\"} -> manual",
+              "duration": 0.024541999999996733,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"operator\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"operator\"} -> manual",
+              "duration": 0.022208999999975276,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"feedback.ingest\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"feedback.ingest\"} -> manual",
+              "duration": 0.022000000000048203,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"user\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"user\"} -> manual",
+              "duration": 0.057249999999953616,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"inferred\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"inferred\"} -> manual",
+              "duration": 0.023709000000053493,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"carried\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"carried\"} -> manual",
+              "duration": 0.02037499999994452,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"numeric_self_answer\"} -> manual",
+              "duration": 0.020250000000032742,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"default\"} -> manual",
+              "status": "passed",
+              "title": "{\"source\":\"default\"} -> manual",
+              "duration": 0.02008299999999963,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"webhook\"} -> external-report",
+              "status": "passed",
+              "title": "{\"source\":\"webhook\"} -> external-report",
+              "duration": 0.020499999999969987,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime",
+              "status": "passed",
+              "title": "{\"source\":\"stdin_pipe\"} -> amc-runtime",
+              "duration": 0.020582999999987805,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {\"source\":\"constructor\"} -> amc-runtime",
+              "status": "passed",
+              "title": "{\"source\":\"constructor\"} -> amc-runtime",
+              "duration": 0.019584000000008928,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer {} -> amc-runtime",
+              "status": "passed",
+              "title": "{} -> amc-runtime",
+              "duration": 0.02112499999998363,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "evidenceProducer"
+              ],
+              "fullName": "evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)",
+              "status": "passed",
+              "title": "unparseable meta is runtime with no claims (it binds to nothing)",
+              "duration": 0.05104200000005221,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "source-literal enumeration"
+              ],
+              "fullName": "source-literal enumeration every source literal in src is classified",
+              "status": "failed",
+              "title": "every source literal in src is classified",
+              "duration": 440.0217500000001,
+              "failureMessages": [
+                "AssertionError: expected [ 'defaults', 'signed-tools-yaml' ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/compliance/evidenceBinding.test.ts:102:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "isBoundToControl"
+              ],
+              "fullName": "isBoundToControl binds through meta.controlIds naming the mapping",
+              "status": "passed",
+              "title": "binds through meta.controlIds naming the mapping",
+              "duration": 0.15937499999995453,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "isBoundToControl"
+              ],
+              "fullName": "isBoundToControl binds an audit event through the requirement's auditTypes only",
+              "status": "passed",
+              "title": "binds an audit event through the requirement's auditTypes only",
+              "duration": 0.10604200000011588,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+              "status": "passed",
+              "title": "meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+              "duration": 0.05266699999992852,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+              "status": "passed",
+              "title": "meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+              "duration": 0.024582999999893218,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {} in session-1 with scope agent -> none",
+              "status": "passed",
+              "title": "meta {} in session-1 with scope agent -> none",
+              "duration": 0.022666999999955806,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {} in session-1 with scope workspace -> none",
+              "status": "passed",
+              "title": "meta {} in session-1 with scope workspace -> none",
+              "duration": 0.022333000000116954,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {} in system with scope agent -> violation-only",
+              "status": "passed",
+              "title": "meta {} in system with scope agent -> violation-only",
+              "duration": 0.02112499999998363,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+              "status": "passed",
+              "title": "meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+              "duration": 0.020791000000144777,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole meta {} in system with scope workspace -> positive",
+              "status": "passed",
+              "title": "meta {} in system with scope workspace -> positive",
+              "duration": 0.020500000000083674,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "subjectRole"
+              ],
+              "fullName": "subjectRole a missing agent id is never credited to default",
+              "status": "passed",
+              "title": "a missing agent id is never credited to default",
+              "duration": 0.027375000000120053,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifiedAssuranceByPack"
+              ],
+              "fullName": "verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+              "status": "passed",
+              "title": "counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+              "duration": 1770.432791,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifiedAssuranceByPack"
+              ],
+              "fullName": "verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+              "status": "passed",
+              "title": "a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+              "duration": 1720.1494169999996,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifiedAssuranceByPack"
+              ],
+              "fullName": "verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+              "status": "passed",
+              "title": "only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+              "duration": 1570.1470829999998,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "verifiedAssuranceByPack"
+              ],
+              "fullName": "verifiedAssuranceByPack an agent without a reports folder has no verified packs",
+              "status": "passed",
+              "title": "an agent without a reports folder has no verified packs",
+              "duration": 1158.6441250000007,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792322369049,
+          "endTime": 1792322375712.644,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/compliance/evidenceBinding.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "session spine throughput"
+              ],
+              "fullName": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+              "status": "failed",
+              "title": "blob-backed content events sustain the floor and do not degrade super-linearly",
+              "duration": 26477.437458,
+              "failureMessages": [
+                "AssertionError: content throughput 61 ev/s: expected 60.63639718176726 to be greater than 150\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/performance/sessionSpine.performance.test.ts:86:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "session spine throughput"
+              ],
+              "fullName": "session spine throughput control-plane events (no blob) sustain the floor and do not degrade super-linearly",
+              "status": "passed",
+              "title": "control-plane events (no blob) sustain the floor and do not degrade super-linearly",
+              "duration": 15033.040417,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792318881501,
+          "endTime": 1792318923012.0405,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/performance/sessionSpine.performance.test.ts"
+        },
+        {
+          "assertionResults": [
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature verifies an honestly written index",
+              "status": "passed",
+              "title": "verifies an honestly written index",
+              "duration": 3457.7370829999995,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature catches truncation — removing the last row moves the head off the signed value",
+              "status": "passed",
+              "title": "catches truncation — removing the last row moves the head off the signed value",
+              "duration": 2900.913875,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature catches an edited row — the chain and head both change",
+              "status": "passed",
+              "title": "catches an edited row — the chain and head both change",
+              "duration": 2380.9283749999995,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature catches an appended forgery — a new head the attacker cannot sign",
+              "status": "passed",
+              "title": "catches an appended forgery — a new head the attacker cannot sign",
+              "duration": 2063.960000000001,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature does not read the whole index to append — cost is flat as the index grows",
+              "status": "failed",
+              "title": "does not read the whole index to append — cost is flat as the index grows",
+              "duration": 9386.052625000002,
+              "failureMessages": [
+                "AssertionError: late 636.6ms vs early 140.6ms: expected 636.5683330000029 to be less than 612.3268319999988\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:116:80\n    at withWorkspace (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:33:12)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:100:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+              ],
+              "meta": {},
+              "tags": []
+            },
+            {
+              "ancestorTitles": [
+                "blob index chain-head signature"
+              ],
+              "fullName": "blob index chain-head signature keeps the signature file small and 0644",
+              "status": "passed",
+              "title": "keeps the signature file small and 0644",
+              "duration": 2271.074458000003,
+              "failureMessages": [],
+              "meta": {},
+              "tags": []
+            }
+          ],
+          "startTime": 1792320605497,
+          "endTime": 1792320627959.0745,
+          "status": "failed",
+          "message": "",
+          "name": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts"
+        }
+      ],
+      "note": "Completed measured run at a7 before required P1-42/int577 integration. Its results are historical and never satisfy final-source qualification."
+    }
+  ],
+  "assertionFailures": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/compilerStationDefaults.test.ts",
+      "title": "P1-46: the compiled plan holds F2's station-profile rules for every station golden: technology",
+      "messages": [
+        "AssertionError: expected { status: 'ready', …(6) } to deeply equal { status: 'ready', …(6) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/compilerStationDefaults.test.ts:68:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsGraph.test.ts",
+      "title": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "messages": [
+        "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseSecretScanCoverage.test.ts",
+      "title": "release secret scanner content coverage shares entry budgets across every nested npm archive",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseSecretScanCoverage.test.ts:184:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "session store conformance — both backends, one suite the JSONL backend passes every case — signed and chained, not a fast path",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:224:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks unsigned",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks broken-session-seq",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks truncating",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks lying-capability",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks idempotent-seal",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "title": "the conformance suite has teeth (mutation tests) the signature mutation is caught ONLY by the signature rule",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:309:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/starterProfiles.test.ts",
+      "title": "amc init --regulated (P1-40) compiles and signs a Layer 0 plan, names the facts it waits for and activates nothing",
+      "messages": [
+        "AssertionError: expected Set{ 'useCases', 'jurisdictions', …(2) } to deeply equal Set{ 'useCases', 'jurisdictions', …(1) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/starterProfiles.test.ts:166:19\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/keys/atomicRotation.test.ts",
+      "title": "atomic rotation (P1-08) every crash inside a rotation's commit refuses to sign and verify until --resume, and resume completes or rolls back",
+      "messages": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/keys/atomicRotation.test.ts:66:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/performance/sessionSpine.performance.test.ts",
+      "title": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+      "messages": [
+        "AssertionError: content throughput 35 ev/s: expected 35.13344026524883 to be greater than 150\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/performance/sessionSpine.performance.test.ts:86:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    }
+  ],
+  "hookFailures": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsArtifact.test.ts",
+      "message": "Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\"."
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts",
+      "message": "Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\"."
+    }
+  ],
+  "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json",
+  "reportSha256": "5ce19787d8cc7a364355fde86082728d65a77a70c245b80a458190baf8951d24",
+  "note": "The completed historical run belongs only to its recorded old source. Its totals and failure disposition are not final-source qualification."
+}

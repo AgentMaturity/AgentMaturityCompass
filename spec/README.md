@@ -24,6 +24,7 @@ true; the acceptance rules cover those checks.
 | `legacy-receipt` | The signed receipt payload AMC mints today (a kind, no state) | Emitted |
 | `authorization-record` | Who authorized which effect, bound at the enforcement point | Contract only; P1-02 emits it |
 | `redaction-receipt` | One redaction of protected data before a native session row was committed (P2-02) | Emitted in workspaces with a processor registry, as the payload of `PROTECTED_DATA_REDACTED` audit rows |
+| `detokenization-receipt` | One release of restored protected values to a processor at egress (P2-02) | Emitted in workspaces with a processor registry, as the `receipt` member of `PROTECTED_DATA_DETOKENIZED` ops audit rows |
 | `control-result` | One control's five status dimensions, claim kind and evidence | Contract only; P1-11 emits it |
 | `claim-envelope` | What a result may claim (docs/CLAIM_KINDS.md) | Emitted |
 | `scoped-attestation` | A signed statement about one deployment, profile and window | Contract only; the registry (P3-04) issues it |

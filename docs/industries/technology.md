@@ -47,9 +47,9 @@ Run one with `amc domain pack run --pack <id>` [C9]. The command requires the in
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C17], resolved by `normalizeFrameworkName` [C18]; an unresolved name is rejected [C19]. Of the 55 framework strings above (station and packs together):
 
-- 21 resolve as written: `GDPR` → `GDPR`, `SOC 2 Type II` → `SOC2`, `ISO 27001` → `ISO_27001`, `EU AI Act` → `EU_AI_ACT`, `EU AI Act 2024/1689` → `EU_AI_ACT`, `GDPR Art. 22` → `GDPR`, `ISO/IEC 42001:2023` → `ISO_42001`, `NIST AI RMF 1.0` → `NIST_AI_RMF`, `GDPR Art. 20 (Data Portability)` → `GDPR`, `ISO/IEC 27001:2022` → `ISO_27001`, `EU NIS2 Directive 2022/2555` → `NIS2`, `OWASP API Security Top 10 2023` → `OWASP_API_TOP10`, `GDPR Art. 20` → `GDPR`, `OWASP API Top 10 2023` → `OWASP_API_TOP10`, `ISO 27001:2022` → `ISO_27001`, `EU DORA Art. 9 ICT risk management` → `DORA`, `GDPR Art. 32` → `GDPR`, `EU DORA Art. 9` → `DORA`, `EU NIS2 2022/2555` → `NIS2`, `GDPR Art. 9 (sensitive data)` → `GDPR`, `GDPR Art. 9` → `GDPR`.
-- None resolves only after replacing spaces and hyphens with `_`.
-- 34 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 1 resolves as written: `GDPR` → `GDPR`.
+- 2 resolve only after spaces and hyphens are replaced with `_`: `ISO 27001` → `ISO_27001`, `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects them.
+- 52 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C20] and the key dates of the sourced register [C21].
 
@@ -110,11 +110,32 @@ No output above was produced for this guide. Each row names the function that pr
 ## Known gaps at this commit
 
 - The registry's `questionCount` for this station is 6; the station has 5 packs and 97 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
-- 34 of 55 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- 52 of 55 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - The packs' 39 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C86]; 0 resolve to no record and 15 to a record marked unverified, so those cannot show whether they are current.
 - `amc domain assurance` invokes no agent, so its result is always not evaluated (see Assurance packs).
 - Pack results from `amc domain pack run` are self-assessments capped at L1 (see Sector packs).
 - Pack questions, deep questions and this guide are AI-drafted and experimental: no qualified expert has reviewed them.
+
+## Experimental catalog overlay
+
+The `technology.platforms-data` domain covers AI platforms, IoT, content and cross-border data. Its draft catalog
+overlay is **experimental, not reviewed, not legal advice**. Promotion is **none — experimental, unreviewed**.
+No expert, legal reviewer or real platform partner has signed this content.
+
+The signature fixtures verify a marking signature against pinned fixture keys before a simulated publication,
+test a candidate CRA early-warning packet against an AIBOM and awareness clock, and record allowed IoT commands
+without executing forbidden commands injected through telemetry. These are synthetic fixture effects. They are
+not results from a real platform or device. Missing evidence is not evaluated; an unavailable enforcement point
+has enforcement `none`.
+
+The catalog uses `catalog/layers/l1-technology-global/`, canonical per-control fixture directories and law-as-data
+register entries. Question dispositions follow the actual integration inventory and name absent spec IDs without
+inventing questions. The CRA clock remains `verified: false` because its article, authority and content were not read.
+
+Promotion requires a real platform or content-safety partner under P1-29, all ten P1-33 admission criteria with
+evidence, independent human sign-offs and Sid's decision. D-14's credentialed Technology reviewer and P1-29's partner
+are not supplied. The source record at `docs/catalog/technology/README.md` describes control boundaries,
+composition profiles, admission status and unsupported behavior.
 
 ## Verification appendix
 
@@ -201,7 +222,7 @@ No output above was produced for this guide. Each row names the function that pr
 | C73 | runAssurance definition | `src/assurance/assuranceRunner.ts` | `export async function runAssurance` |
 | C74 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts` | `await responder.respond(prompt)` |
 | C75 | Domain report builder | `src/domains/domainCliIntegration.ts` | `export function buildDomainReportForAgent` |
-| C76 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(outputPath, reportMarkdown` |
+| C76 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(outputPath, reportMarkdown)` |
 | C77 | compliance command and comply alias | `src/cli.ts` | `program.command("compliance").alias("comply")` |
 | C78 | Compliance report writer | `src/compliance/complianceReport.ts` | `export function writeComplianceReport` |
 | C79 | Not-legal-advice line | `src/compliance/complianceReport.ts` | `This appendix is not legal advice.` |
