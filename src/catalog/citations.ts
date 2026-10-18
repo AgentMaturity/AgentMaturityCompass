@@ -35,11 +35,13 @@ const REGISTER_AGREES: Readonly<Record<CitationStatusType, ((e: RegulatoryRegist
 /**
  * A binding instrument that is in force or partially applicable may carry a clause whose compliance is due later
  * (e.g. 11 CCR §7220 ADMT notices, due 2027-01-01 under regulations effective 2026-01-01). Such a clause is cited
- * `binding-future` with its own `complianceDueDate` after the check date; without that date the instrument's status decides.
+ * `binding-future` with its own `complianceDueDate`; without that date the instrument's status decides. A due date that
+ * has passed is a currency finding (GOV_CITATION_DUE_PASSED, check:catalog-currency), not a validation error: dates
+ * must never turn the shipped catalog invalid on their own.
  */
-const futureClauseOf = (c: Citation, e: RegulatoryRegisterEntry, asOf: string): boolean =>
+const futureClauseOf = (c: Citation, e: RegulatoryRegisterEntry): boolean =>
   c.statusType === "binding-future" && (e.status === "in-force" || e.status === "partially-applicable") && e.bindingForce === "binding"
-  && c.complianceDueDate !== null && c.complianceDueDate > asOf;
+  && c.complianceDueDate !== null;
 
 const DAY_MS = 86_400_000;
 const isReviewedContent = (support: SupportLevel) => support === "reviewed" || support === "qualified";
@@ -75,7 +77,7 @@ export function validateCitation(c: Citation, ctx: CitationContext): CatalogIssu
       add("CAT_CITATION_REGISTER", "registerId", `register entry ${c.registerId} does not exist`);
     } else if (entry.status === "superseded" && c.superseded === null) {
       add("CAT_CITATION_SUPERSEDED", "registerId", `register entry ${c.registerId} is superseded${entry.supersededBy ? ` by ${entry.supersededBy}` : ""}; cite the successor or set superseded`);
-    } else if (c.superseded === null && REGISTER_AGREES[c.statusType]?.(entry) === false && !futureClauseOf(c, entry, ctx.asOf)) {
+    } else if (c.superseded === null && REGISTER_AGREES[c.statusType]?.(entry) === false && !futureClauseOf(c, entry)) {
       add("CAT_CITATION_STATUS_MISMATCH", "statusType", `statusType ${c.statusType} disagrees with register entry ${c.registerId} (${entry.status}, ${entry.bindingForce})`);
     }
   }
