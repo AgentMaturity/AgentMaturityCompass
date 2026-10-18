@@ -1,5 +1,5 @@
 {
- "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'.",
+ "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'. M6-M9 (the independent review's three findings and the A4 Adapt wiring) were run on dbb25fb78's sources the same way.",
  "mutations": [
   {
    "mutation": "M1 ignore the signed tools.yaml: proposedConfigs always starts from defaultToolsConfig()",
@@ -54,6 +54,50 @@
    "killed": true,
    "failing": [
     "the digest alone is not a weakening; a tool tools.yaml adds is"
+   ]
+  },
+  {
+   "mutation": "M6 never flag a plan that drops the tools.yaml binding (remove ...unpinned from planWeakenings)",
+   "file": "src/catalog/compiler/sign.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "binding tools.yaml or narrowing it is not a weakening; widening it or dropping the binding is"
+   ]
+  },
+  {
+   "mutation": "M7 fall back to the default list when tools.yaml is present but does not verify (verifiedSignedTools returns {})",
+   "file": "src/catalog/signedTools.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "a tools.yaml its signature removed: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml edited after signing: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml signed by a key this workspace does not hold: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED"
+   ]
+  },
+  {
+   "mutation": "M8 the native-tool-identity guard reads tools.yaml itself again instead of the pass's one read",
+   "file": "src/agent/agentToolset.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "one verified read of tools.yaml per guard pass decides the plan's pin, the allowlist and the native tool identity"
+   ]
+  },
+  {
+   "mutation": "M9 A4 Adapt compiles without the verified tools.yaml (drop ...verifiedSignedTools at adaptPolicy.ts:143)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED",
+    "tools.yaml changed after Propose: Understand compiles another plan digest, and the revision's tools slot reads drifted"
    ]
   }
  ]

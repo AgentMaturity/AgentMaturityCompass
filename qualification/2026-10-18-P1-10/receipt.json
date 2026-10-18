@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-10",
   "date": "2026-10-18",
-  "commit": "8586b7b8732eea7667f16280e4118743ac18f042",
+  "commit": "5ce0d67844f711f98ae200876c87d11f43465855",
   "branch": "rtd/p1-10f-delegate-visible-tools",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,107 +12,112 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 551764
+      "durationMs": 70305
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 243998
+      "durationMs": 57163
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 8599778
+      "durationMs": 98786
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 8915
+      "durationMs": 5364
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 3364
+      "durationMs": 1521
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 1806
+      "durationMs": 784
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 7090
+      "durationMs": 7600
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 7363
+      "durationMs": 4009
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 1708
+      "durationMs": 632
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 1782
+      "durationMs": 1359
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 454
+      "durationMs": 419
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 526
+      "durationMs": 459
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1837
+      "durationMs": 1521
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 9044
+      "durationMs": 8064
     },
     {
       "cmd": "npm run -s release:notes -- --check",
-      "exit": 1,
-      "durationMs": 1414
+      "exit": 0,
+      "durationMs": 506
     },
     {
-      "cmd": "npx vitest run tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/wealthOverlay.test.ts tests/claims/d03Gates.test.ts tests/delegateTool.test.ts tests/cliDelegateFlag.test.ts tests/amc1469ControlProjection.test.ts tests/toolEvidenceRecording.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/agentToolsetSession.test.ts tests/codeMode.test.ts tests/nativeSignedToolSubset.test.ts tests/industryPacksPaywallSurfaces.test.ts",
+      "cmd": "npx vitest run --maxWorkers=4 tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultM ... (49 files, focused-tests.json)",
+      "exit": 1,
+      "durationMs": 666806
+    },
+    {
+      "cmd": "npx vitest run tests/nativeShellComposition.test.ts --testTimeout 180000",
       "exit": 0,
-      "durationMs": 282597
+      "durationMs": 205754
     }
   ],
   "tests": {
-    "total": 780,
-    "passed": 780,
-    "failed": 0,
+    "total": 1012,
+    "passed": 1011,
+    "failed": 1,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "38a5484811278e0a4ade1b391185dfd27b80d3f0a8f1ec416cdc8edf6921da8b"
+      "sha256": "a2e6c7cc88883864058501bce7d20fd2a759d57e233fbdb222bc976516c76b50"
     },
     {
       "path": "focused-tests.json",
-      "sha256": "278a25b82665917b6e52a3fac81cdcefecb1498a80bc4d551fe8e793477fdfb7"
+      "sha256": "cdf5ed14943bc128b4fdb4e542a455ebe30d268dd942118c8c20409050ee03b3"
     },
     {
       "path": "mutations.json",
-      "sha256": "c1537d830922e1cef2f8fdf121e366b567692bcdb5402a34adad0d0367fe5bdf"
+      "sha256": "a4d346d1022a4bc68f635c70f5de3dfb4197816836d79e67faa32a5a3a61f050"
     },
     {
       "path": "plan-digests.json",
-      "sha256": "4206f5ae620757111c8432eaf867e436858f00463a65a101a7445f26a03959b8"
+      "sha256": "946633d11e44930ba13b724ee75d2a3d9f0f0bc77af71460b9d60762816accea"
     }
   ],
-  "notes": "P1-10 follow-up P1-10F. Focused tests only; the full suite was not run. release:notes --check exits 1 on four breaking changesets already on int that docs/releases/2.0.0.md's Migration section does not cite (claude-code-hooks, issuer-admission-at-verification-time, key-lifecycle-p1-08, layer0-enforcement-gaps); P1-10F's compiled-visible-tools-signed is cited. See README.md. The focused run recorded is a rerun: the first, at load average about 138, timed out twice in tests/cliDelegateFlag.test.ts's workspace setup."
+  "notes": "P1-10 follow-up P1-10F, after the independent review's fixes. Focused tests only; the full suite was not run. The focused vitest row exits 1 on one test, tests/nativeShellComposition.test.ts > Studio's operator-only opt-in, which hit the 30 s timeout under load (it starts five Studio task services with tools: none and reaches no changed code); that file passed 17/17 alone with --testTimeout 180000. See README.md."
 }

@@ -1,10 +1,15 @@
 {
- "command": "npx vitest run tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/wealthOverlay.test.ts tests/claims/d03Gates.test.ts tests/delegateTool.test.ts tests/cliDelegateFlag.test.ts tests/amc1469ControlProjection.test.ts tests/toolEvidenceRecording.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/agentToolsetSession.test.ts tests/codeMode.test.ts tests/nativeSignedToolSubset.test.ts tests/industryPacksPaywallSurfaces.test.ts",
+ "command": "npx vitest run --maxWorkers=4 tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/wealthOverlay.test.ts tests/claims/d03Gates.test.ts tests/delegateTool.test.ts tests/cliDelegateFlag.test.ts tests/amc1469ControlProjection.test.ts tests/toolEvidenceRecording.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/agentToolsetSession.test.ts tests/codeMode.test.ts tests/nativeSignedToolSubset.test.ts tests/industryPacksPaywallSurfaces.test.ts tests/agentToolsetWiring.test.ts tests/codeModeConfinement.test.ts tests/cosProduct03McpRecoveryMount.test.ts tests/delegationScopeBinding.test.ts tests/nativeBudgets.test.ts tests/nativeDelegationInheritance.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/nativePinnedToolSchemas.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/nativeShellComposition.test.ts tests/networkEgressGuard.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/sessionAnchorableWithTools.test.ts tests/studioNativeTaskPolicyPin.test.ts tests/subagentHookInheritance.test.ts tests/telemetryExporterFailure.test.ts tests/toolPolicyGuards.test.ts tests/toolhubPipelineTools.test.ts tests/toolsetConfinementProperty.test.ts tests/workflowTool.test.ts",
  "files": [
   {
    "file": "tests/agentToolsetSession.test.ts",
    "tests": 6,
    "passed": 6
+  },
+  {
+   "file": "tests/agentToolsetWiring.test.ts",
+   "tests": 20,
+   "passed": 20
   },
   {
    "file": "tests/amc1469ControlProjection.test.ts",
@@ -77,9 +82,14 @@
    "passed": 24
   },
   {
+   "file": "tests/codeModeConfinement.test.ts",
+   "tests": 3,
+   "passed": 3
+  },
+  {
    "file": "tests/compiledVisibleTools.test.ts",
-   "tests": 13,
-   "passed": 13
+   "tests": 17,
+   "passed": 17
   },
   {
    "file": "tests/compilerStationDefaults.test.ts",
@@ -87,7 +97,17 @@
    "passed": 14
   },
   {
+   "file": "tests/cosProduct03McpRecoveryMount.test.ts",
+   "tests": 10,
+   "passed": 10
+  },
+  {
    "file": "tests/delegateTool.test.ts",
+   "tests": 12,
+   "passed": 12
+  },
+  {
+   "file": "tests/delegationScopeBinding.test.ts",
    "tests": 12,
    "passed": 12
   },
@@ -107,9 +127,59 @@
    "passed": 1
   },
   {
+   "file": "tests/nativeBudgets.test.ts",
+   "tests": 27,
+   "passed": 27
+  },
+  {
+   "file": "tests/nativeDelegationInheritance.test.ts",
+   "tests": 9,
+   "passed": 9
+  },
+  {
+   "file": "tests/nativeMcpClient.test.ts",
+   "tests": 15,
+   "passed": 15
+  },
+  {
+   "file": "tests/nativeMcpHttp.test.ts",
+   "tests": 15,
+   "passed": 15
+  },
+  {
+   "file": "tests/nativePinnedToolSchemas.test.ts",
+   "tests": 13,
+   "passed": 13
+  },
+  {
+   "file": "tests/nativeSandboxPolicyBinding.test.ts",
+   "tests": 21,
+   "passed": 21
+  },
+  {
+   "file": "tests/nativeShellComposition.test.ts",
+   "tests": 17,
+   "passed": 16
+  },
+  {
    "file": "tests/nativeSignedToolSubset.test.ts",
    "tests": 8,
    "passed": 8
+  },
+  {
+   "file": "tests/networkEgressGuard.test.ts",
+   "tests": 6,
+   "passed": 6
+  },
+  {
+   "file": "tests/reconciliationDefectsMcp.test.ts",
+   "tests": 2,
+   "passed": 2
+  },
+  {
+   "file": "tests/reconciliationDefectsMcpHttp.test.ts",
+   "tests": 2,
+   "passed": 2
   },
   {
    "file": "tests/runPrincipalLease.test.ts",
@@ -117,9 +187,19 @@
    "passed": 15
   },
   {
+   "file": "tests/sessionAnchorableWithTools.test.ts",
+   "tests": 2,
+   "passed": 2
+  },
+  {
    "file": "tests/starterProfiles.test.ts",
    "tests": 15,
    "passed": 15
+  },
+  {
+   "file": "tests/studioNativeTaskPolicyPin.test.ts",
+   "tests": 1,
+   "passed": 1
   },
   {
    "file": "tests/studioVaultModeLoop.test.ts",
@@ -127,19 +207,49 @@
    "passed": 9
   },
   {
+   "file": "tests/subagentHookInheritance.test.ts",
+   "tests": 11,
+   "passed": 11
+  },
+  {
+   "file": "tests/telemetryExporterFailure.test.ts",
+   "tests": 2,
+   "passed": 2
+  },
+  {
    "file": "tests/toolEvidenceRecording.test.ts",
    "tests": 7,
    "passed": 7
   },
   {
+   "file": "tests/toolPolicyGuards.test.ts",
+   "tests": 6,
+   "passed": 6
+  },
+  {
+   "file": "tests/toolhubPipelineTools.test.ts",
+   "tests": 12,
+   "passed": 12
+  },
+  {
+   "file": "tests/toolsetConfinementProperty.test.ts",
+   "tests": 13,
+   "passed": 13
+  },
+  {
    "file": "tests/wealthOverlay.test.ts",
    "tests": 7,
    "passed": 7
+  },
+  {
+   "file": "tests/workflowTool.test.ts",
+   "tests": 9,
+   "passed": 9
   }
  ],
- "total": 780,
- "passed": 780,
- "failed": 0,
+ "total": 1012,
+ "passed": 1011,
+ "failed": 1,
  "skipped": 0,
- "note": "A first run at this commit had 778/780: tests/cliDelegateFlag.test.ts failed twice in beforeEach (workspace init) while the machine's one-minute load average reached about 138; the file then passed 35/35 alone and this rerun of the whole set passed."
+ "note": "The one failure is tests/nativeShellComposition.test.ts > Studio's operator-only opt-in, the 30 s test timeout (52 s under load); `npx vitest run tests/nativeShellComposition.test.ts --testTimeout 180000` passed 17/17 at this commit. An earlier run of the same set with default workers timed out 28 tests in beforeEach (cliDelegateFlag, nativeBudgets) and the same Studio test; cliDelegateFlag and nativeBudgets then passed alone."
 }
