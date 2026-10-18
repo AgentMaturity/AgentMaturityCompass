@@ -134,11 +134,13 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 `tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-18-P1-22/pi-conformance.json` (the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-11T22:49:36.583Z on local macOS arm64 (not CI), AMC commit `d57b730575cc`.
+Run 2026-10-18T01:09:51.514Z on local macOS arm64 (not CI), AMC commit `0edf4a93666c`.
 
 | Case | Pi 1.0.2 | Pi 1.0.4 |
 |---|---|---|
 | Allowed `read` runs; recorded Pi version | yes; 1.0.2 | yes; 1.0.4 |
+| Allowed `read` outcome recorded, bound to its decision | yes | yes |
+| Writer fault on an outcome: next call ran; ran after owner recovery | no; yes | no; yes |
 | Session registered before its first call; claim | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call |
 | `write` needing approval: file created | no | no |
 | Denied `bash`: effect | no | no |
@@ -148,9 +150,9 @@ Run 2026-10-11T22:49:36.583Z on local macOS arm64 (not CI), AMC commit `d57b7305
 | Extension tool under a built-in's name (`find`): effect | no | no |
 | Codemode nested call emits `tool_call` (parent id) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) |
 | Bridge stopped: tool ran | no | no |
-| Decision receipts verified cold | 117 verified, 0 failed | 117 verified, 0 failed |
+| Decision receipts verified cold | 124 verified, 0 failed | 124 verified, 0 failed |
 | Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
-| Decision latency p50 / p95 (ms, n) | 204.7 / 293.1 (100) | 197.5 / 303.2 (100) |
+| Decision latency p50 / p95 (ms, n) | 58.2 / 107.8 (100) | 62.3 / 91.1 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).

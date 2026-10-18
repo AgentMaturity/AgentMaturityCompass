@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-22",
+  "date": "2026-10-18",
+  "commit": "0edf4a93666c4b628c3d09b6a949a41288343095",
+  "branch": "rtd/p1-22f-pi-audit-latch",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.0.2=<prefix>,1.0.4=<prefix> AMC_PI_CONFORMANCE_OUT=<file> npx vitest run tests/conformance/piToolCall.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 32790
+    },
+    {
+      "cmd": "npx vitest run tests/amc1476ProviderSteerOutcome.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/amcPiExtension.test.ts tests/claudeCodeAllowFunnel.test.ts tests/claudeCodeHookSecurity.test.ts tests/claudeCodeIntake.test.ts tests/claudeCodeRecordedHooks.test.ts tests/claudeCodeReviewThree.test.ts tests/claudeHookInstalledConfig.test.ts tests/connectHookIntegration.test.ts tests/helpers/claudeCodeHookFixtures.ts tests/hookActionLifecycle.test.ts tests/hookAdmission.test.ts tests/hookAuditLatch.test.ts tests/hookControl.test.ts tests/hookIntake.test.ts tests/leaseRevocationFailClosed.test.ts tests/piAuditLatch.test.ts tests/piHookControl.test.ts tests/piSessionRegistration.test.ts tests/piToolMapping.test.ts",
+      "exit": 0,
+      "durationMs": 116740
+    }
+  ],
+  "tests": {
+    "total": 274,
+    "passed": 274,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "pi-conformance.json",
+      "sha256": "6c19a1d7ae67789c9cbd42ffcd5fcfe013b998750fa9948ec4814623856ca92d"
+    }
+  ],
+  "notes": "P1-22 follow-up: Pi follows P1-23's evidence rules. Local macOS arm64 run, not CI, Node v22.23.3; other worktrees' test runs were active. Pi 1.0.2 and 1.0.4 from the install recorded in qualification/2026-10-12-P1-22. Conformance per version: an allowed read's tool_result was recorded at the control route bound to its decision; a writer fault on that outcome latched the workspace, the next real Pi call was blocked, and after owner recovery (vault passphrase) a call ran. 7 mutation checks, each killed by tests/piAuditLatch.test.ts. Decision latency p95 107.8 and 91.1 ms, above the 50 ms target. Commands: 24/24, 250/250."
+}
