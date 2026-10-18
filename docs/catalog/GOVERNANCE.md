@@ -29,25 +29,35 @@ operator pinned for `catalog-review`, and a record declaring any other identity 
 
 ## The two-person rule
 
-`reviewed` support needs verified approvals from at least two distinct pinned reviewers, one of them credentialed for
-one of the control's domains (stations). A control that cites law also needs an approval from a credentialed legal
-reviewer. Content an AI drafted needs a human approval that names the draft in its `aiInputs` (kind `draft`,
-confirmed). Any verified objection (`reject` or `request_changes`) blocks the quorum until new records resolve it.
+`reviewed` support needs verified approvals from at least two distinct people, one of them credentialed for one of the
+control's domains (stations). Reviewers who share any identifier (trust-list subject, roster git identity or declared
+name, compared case-insensitively, with names and emails split out of `Name <email>`) are one person. A control that
+cites law also needs an approval from a credentialed legal reviewer. Content an AI drafted needs a human approval whose
+`aiInputs` confirm a `draft` naming this control (`<id>@<version>` or its digest). Any verified objection (`reject` or
+`request_changes`) blocks the quorum until new records resolve it.
 
-`effectiveSupport(control, authority)` (src/catalog/governance/support.ts) is the only function that lets a control's
-support stand above `experimental`; P1-33 calls it for admission criteria 2 and 9. `compilePlan`, activation and its
-policy receipts, the A4 conformance and why-view rows, the OSCAL export and `check:catalog-currency` read a control's
-support and shown review status only through its result, and a test scans the source for any other read. It never
-raises support above what the YAML declares.
+In src/catalog/governance/support.ts, `supportStanding(control, promotion, asOf)` is the only function that lets a
+control's declared reviewed or qualified support stand. It is pure: it needs a promotion for exactly the control's id,
+version and current digest whose next review has not passed at `asOf`. Promotions come only from
+`effectiveSupport(control, authority)`, which verifies the review records (below) at the server's clock; P1-33 calls it
+for admission criteria 2 and 9. `compilePlan` takes the promotions as an input (`promotions`), judges them with
+supportStanding at the plan's `asOf` and records them in the plan, so they are bound into its digest; without them every
+row is experimental, as today. Activation and its policy receipts, the A4 conformance and why-view rows, the OSCAL export
+(support, the review block, the approver and each citation's legal review) and `check:catalog-currency` read a
+control's support and review fields only through these results, and a test scans the source for any other read.
+Nothing raises support above what the YAML declares.
 
-"Credentialed" means listed in the D-08 expert roster for that domain (or for `legal`), keyed by the reviewer's
-trust-list subject. The roster is an input to the quorum check, not a field a record can declare. Until D-08 supplies
-the experts, their pinned keys and the roster, no quorum can be met, so no control can compile as reviewed.
+The D-08 roster is keyed by the reviewer's trust-list subject and lists, for each person, the domains they are
+credentialed for (`legal` for legal review) and every git identity (name and email) they commit under. A reviewer who
+is not on the roster never counts. The roster is an input, not a field a record can declare. Until D-08 supplies the
+experts, their pinned keys and the roster, no quorum can be met, so no control can compile as reviewed.
 
 ### Independence and conflicts of interest
 
-A reviewer may not review a subject they authored or a change they made: the verifier refuses a record whose signing
-reviewer (trust-list subject) or declared name matches the subject's authors (its git authors, names or emails). Every record
+A reviewer may not review a subject they authored or a change they made. Git authors are unsigned (`--author` can
+claim anything), so the check is broad: a record is refused when any of the reviewer's identities (the trust-list
+subject, every roster git identity and the record's declared name) matches any name or email that ever authored the
+control's file (`git log --follow`). Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 
@@ -70,10 +80,11 @@ data, not catalog content: they never change a digest. The format (`reviewRecord
 | `decidedAt`, `nextReviewDue` | `YYYY-MM-DD`. `decidedAt` is the signing time the record claims. |
 | `signature` | `{ publicKeyPem, value }`: Ed25519 over sha256 of `amc.catalog-review/v1`, a zero byte and the canonical record without `signature`. |
 
-A record is a declaration. effectiveSupport loads the operator's trust itself (`loadTrustContext`: the AMC home's
-signed trust lists, verified against the pinned roots with the operator's m-of-n policy and anti-rollback, plus
-distrust, at the authority's clock, which is the server's); a list that does not verify stops everything
-(`GOV_REVIEW_TRUST_INVALID`). A record counts only when, in order:
+A record is a declaration. effectiveSupport reads the server's clock itself and loads the operator's trust at it
+(`loadTrustContext`: the AMC home's signed trust lists, verified against the pinned roots with the operator's m-of-n
+policy and anti-rollback, plus distrust); a list that does not verify stops everything (`GOV_REVIEW_TRUST_INVALID`). An
+entry that pins a key for `catalog-review` and anything else is refused for every purpose. A record counts only when,
+in order:
 
 1. it parses (human identity, non-blank credential and conflicts, a signature) (`GOV_REVIEW_RECORD_INVALID`);
 2. its subject is this control at its version and current content digest; a review of older content counts for nothing
@@ -85,17 +96,19 @@ distrust, at the authority's clock, which is the server's); a list that does not
    (`GOV_REVIEW_SIGNER_UNPINNED`);
 5. `reviewer.identity.userId` equals that entry's `subject`: the reviewer principal comes from the key, never from a
    field (`GOV_REVIEW_REVIEWER_UNKNOWN`);
-6. that principal (its name or email) is not one of the control's authors (`GOV_REVIEW_SELF_REVIEW`);
-7. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record
+6. that subject is on the D-08 roster (`GOV_REVIEW_NOT_ON_ROSTER`);
+7. none of the reviewer's identities matches the control's authors (`GOV_REVIEW_SELF_REVIEW`);
+8. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record
    (`GOV_REVIEW_F5_UNCONFIRMED`);
-8. its next review, counted from its `decidedAt`, has not passed (`GOV_REVIEW_OVERDUE`).
+9. its next review, counted from its `decidedAt`, has not passed (`GOV_REVIEW_OVERDUE`).
 
 A record that fails moves nothing; effectiveSupport lists it with its reason.
 
 ### How to record a decision
 
 1. Sid adds each reviewer's public key to the operator's signed trust list for `catalog-review`, with the reviewer as
-   its `subject`, and the reviewer to the D-08 roster with their domains. AMC never holds a reviewer's private key
+   its `subject` and `catalog-review` as its only purpose, and the reviewer to the D-08 roster with their domains and
+   git identities. AMC never holds a reviewer's private key
    (`getSigningKey` refuses `catalog-review`).
 2. Compute the subject's digest from the catalog lock (`amc catalog compile` writes `catalog.lock.json`; a control's
    digest is its `controls[]` row).
@@ -133,10 +146,12 @@ Monthly review of every US state citation is real expert load; budget expert hou
 | `GOV_REVERIFY_OPEN` | error | Reviewed or qualified content cites an instrument an open re-verify item affects. |
 | `GOV_REGISTER_STATUS_REVIEW` | warning | A register entry's stated status should have changed by now (P1-18). |
 
-Currency only ever makes support stricter, and its clock is the server's (`--as-of` may only look ahead). Expiry
-routes content to review and never rewrites anything. A compilation (`compilePlan`) takes each row's support from
-effectiveSupport, so reviewed or qualified content is `experimental` in that plan, with the reason, whenever its
-support does not stand (no caller passes review authority yet, so today every row is experimental). The YAML is not
+Currency only ever makes support stricter. Trust, signatures and record dates are always judged at the server's clock;
+`--as-of` (and `authority.asOf`) only moves due dates ahead, never back. Expiry routes content to review and never
+rewrites anything. A compilation (`compilePlan`) stays pure: each row's support is supportStanding's verdict at the
+plan's `asOf` on the promotions passed in, so the same profile, catalog, `asOf` and promotions always give the same
+digest, and reviewed or qualified content is `experimental` in that plan, with the reason, whenever its support does
+not stand (no caller passes promotions yet, so today every row is experimental). The YAML is not
 edited, and the control's digest, the lock and every stored `ControlResult` (which pin `controlVersion` and
 `controlDigest`) stay byte-identical.
 
