@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { randomBytes } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
@@ -13,15 +12,13 @@ import {
   type IndustryPackId,
 } from "../src/domains/industryPacks.js";
 import { listDomainIds } from "../src/domains/domainRegistry.js";
-import {
-  createIndustryPackLicenseKey,
-  getIndustryPackEntitlement,
-} from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import {
   INDUSTRY_PACK_TOOL_NAMES,
   registerIndustryPackTools,
   type IndustryPackToolOptions,
 } from "../src/mcp/industryPackTools.js";
+import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const dirs: string[] = [];
 const clients: Client[] = [];
@@ -39,18 +36,19 @@ function workspace(): string {
   return dir;
 }
 
-/** Locked: the real resolver with an empty env and an empty workspace. */
+/** Locked: the real resolver with an empty workspace and an AMC home that pins no licence key. */
 function lockedOptions(): IndustryPackToolOptions {
   const ws = workspace();
-  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, {}) };
+  const home = workspace();
+  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, { AMC_HOME: home } as NodeJS.ProcessEnv) };
 }
 
-/** Active: the real resolver with a license signed by a per-test, in-memory HMAC value. */
+/** Active: the real resolver with a licence signed by a key pinned in a temp AMC home trust list (P1-51). */
 function activeOptions(): IndustryPackToolOptions {
   const ws = workspace();
-  const env: NodeJS.ProcessEnv = { AMC_INDUSTRY_PACKS_LICENSE_SECRET: randomBytes(24).toString("hex") };
-  env.AMC_INDUSTRY_PACKS_LICENSE_KEY = createIndustryPackLicenseKey({ env });
-  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, env) };
+  const licence = testIndustryPackLicence();
+  dirs.push(licence.amcHome);
+  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, { ...licence.env } as NodeJS.ProcessEnv) };
 }
 
 async function connect(options: IndustryPackToolOptions): Promise<Client> {
@@ -131,22 +129,18 @@ describe("amc_list_industry_packs", () => {
     expect(out.body.packCount).toBe(expected);
   });
 
-  it("hides gated fields while locked and shows them when active", async () => {
+  it("shows the same public catalog fields with or without a licence; only locked differs (P1-51)", async () => {
     const locked = await call(await connect(lockedOptions()), LIST, { station: "governance" });
     const lockedPacks = (locked.body.stations as Array<{ packs: Array<Record<string, unknown>> }>)[0]!.packs;
-    expect(locked.body.locked).toBe(true);
     for (const p of lockedPacks) {
       expect(p.locked).toBe(true);
-      expect(p.regulatoryBasis).toBeUndefined();
-      expect(p.complianceFrameworks).toBeUndefined();
+      expect(p.regulatoryBasis).toEqual(INDUSTRY_PACKS[p.packId as IndustryPackId].regulatoryBasis);
+      expect(p.complianceFrameworks).toEqual(INDUSTRY_PACKS[p.packId as IndustryPackId].complianceFrameworks);
     }
     const active = await call(await connect(activeOptions()), LIST, { station: "governance" });
     const activePacks = (active.body.stations as Array<{ packs: Array<Record<string, unknown>> }>)[0]!.packs;
-    expect(active.body.locked).toBe(false);
-    for (const p of activePacks) {
-      expect(p.locked).toBe(false);
-      expect(p.regulatoryBasis).toEqual(INDUSTRY_PACKS[p.packId as IndustryPackId].regulatoryBasis);
-    }
+    expect(activePacks.map((p) => ({ ...p, locked: true }))).toEqual(lockedPacks);
+    for (const p of activePacks) expect(p.locked).toBe(false);
   });
 
   it("rejects an unknown station and unknown arguments at the schema", async () => {
@@ -240,14 +234,19 @@ describe("amc_score_industry_pack", () => {
     }
   });
 
-  it("returns the scoreIndustryPack result and names unanswered questions", async () => {
+  it("returns the scoreIndustryPack result only when every question is answered", async () => {
     const client = await connect(activeOptions());
     const pack = INDUSTRY_PACKS["digital-payments"];
-    const responses = Object.fromEntries(pack.questions.slice(0, 3).map((q) => [q.id, 4]));
-    const out = await call(client, SCORE, { packId: pack.id, responses });
+    const all = Object.fromEntries(pack.questions.map((q) => [q.id, 4]));
+    const full = await call(client, SCORE, { packId: pack.id, responses: all });
+    expect(full.isError).toBe(false);
+    expect(full.body.result).toEqual(scoreIndustryPack(pack.id, all));
+    expect(full.body.notEvaluatedQuestionIds).toEqual([]);
+    const partial = Object.fromEntries(pack.questions.slice(0, 3).map((q) => [q.id, 4]));
+    const out = await call(client, SCORE, { packId: pack.id, responses: partial });
     expect(out.isError).toBe(false);
-    expect(out.body.result).toEqual(scoreIndustryPack(pack.id, responses));
-    expect(out.body.unansweredQuestionIds).toEqual(pack.questions.slice(3).map((q) => q.id));
+    expect(out.body.result).toBeNull();
+    expect(out.body.notEvaluatedQuestionIds).toEqual(pack.questions.slice(3).map((q) => q.id));
   });
 });
 
@@ -261,13 +260,11 @@ describe("amc_industry_station_summary", () => {
     }
   });
 
-  it("withholds frameworks while locked", async () => {
+  it("returns the same summary, frameworks included, without a licence (P1-51)", async () => {
     const client = await connect(lockedOptions());
     const out = await call(client, SUMMARY, { station: "wealth" });
-    const summary = out.body.summary as Record<string, unknown>;
-    expect(summary.packCount).toBe(getStationSummary("wealth").packCount);
-    expect(summary.frameworks).toBeUndefined();
-    expect(out.body.locked).toBe(true);
+    expect(out.isError).toBe(false);
+    expect(out.body.summary).toEqual(getStationSummary("wealth"));
   });
 });
 
