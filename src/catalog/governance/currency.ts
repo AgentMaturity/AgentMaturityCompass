@@ -18,7 +18,7 @@ const DAY_MS = 86_400_000;
 const isoDate = z.iso.date();
 
 /** Midnight UTC of a real YYYY-MM-DD calendar date, or null. */
-export function utcDate(value: unknown): number | null {
+function utcDate(value: unknown): number | null {
   if (!isoDate.safeParse(value).success) return null;
   const ms = Date.parse(`${value as string}T00:00:00Z`);
   return new Date(ms).toISOString().slice(0, 10) === value ? ms : null;

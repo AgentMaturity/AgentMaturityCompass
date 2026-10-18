@@ -37,7 +37,7 @@ export interface ReviewAuthority {
   register: RegulatoryRegister;
 }
 
-export interface Promotion { reviewers: string[]; recordIds: string[]; reviewedAt: string; nextReviewDue: string }
+interface Promotion { reviewers: string[]; recordIds: string[]; reviewedAt: string; nextReviewDue: string }
 export interface SupportResult {
   support: SupportLevel;
   /** Why declared support did not stand; empty when it did or nothing stronger than experimental was declared. */

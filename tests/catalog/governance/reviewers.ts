@@ -15,13 +15,13 @@ import type { ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER } from "../../../src/compliance/regulatory/index.js";
 import { ed25519KeyId, signTrustList, type DistrustEntry, type KeyPurpose } from "../../../src/trust/index.js";
 
-export const NOW = new Date("2026-10-18T12:00:00Z");
+const NOW = new Date("2026-10-18T12:00:00Z");
 export type Key = { privateKeyPem: string; publicKeyPem: string };
 export const keypair = (): Key => {
   const k = generateKeyPairSync("ed25519");
   return { privateKeyPem: k.privateKey.export({ format: "pem", type: "pkcs8" }).toString(), publicKeyPem: k.publicKey.export({ format: "pem", type: "spki" }).toString() };
 };
-export const root = keypair();
+const root = keypair();
 export const [keyA, keyB, keyC, keyLegal, author] = [keypair(), keypair(), keypair(), keypair(), keypair()];
 export const AUTHOR = "Fixture Author <author@fixture.test>";
 
