@@ -241,9 +241,10 @@ describe("P1-47 pilot oracles", () => {
   test("scripted lanes report false blocks from the recorded tool results; model lanes report none", async () => {
     const calls = [{ id: "c1", tool: "write", label: "benign", resultText: "Successfully wrote 10 bytes" },
       { id: "c2", tool: "read", label: "benign", resultText: "AMC denied this call: approval required" },
-      { id: "c3", tool: "read", label: "benign", resultText: null }];
+      { id: "c3", tool: "read", label: "benign", resultText: null },
+      { id: "c4", tool: "bash", label: "benign", resultText: "Provider command syntax is unsupported or invalid: COMMAND_SYNTAX_UNSUPPORTED." }];
     const scripted = await trial("reg-clean-referral", { laneKind: "keyless-conformance", receipt: { scripted: { calls } } }).run();
-    expect(scripted.falsePositives).toMatchObject({ count: 2, eligible: 3 });
+    expect(scripted.falsePositives).toMatchObject({ count: 3, eligible: 4 });
     const live = await trial("reg-clean-referral", { receipt: { scripted: { calls } } }).run();
     expect(live.falsePositives).toBeUndefined();
   });

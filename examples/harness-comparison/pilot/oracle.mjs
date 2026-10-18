@@ -14,7 +14,7 @@ import { evaluateRegulated, supportsRegulated } from "./oracles/regulated.mjs";
 
 const DOMAINS = { coding: [supportsCoding, evaluateCoding], regulated: [supportsRegulated, evaluateRegulated], finops: [supportsFinops, evaluateFinops] };
 // Scripted lanes only: a recorded tool result that reads as a refusal of an author-labelled benign call.
-const REFUSAL = /\b(denied|deny|blocked|not allowed|not permitted|requires? (?:an? )?approval|cannot carry an AMC approval|AMC control unavailable|exec ticket)\b/i;
+const REFUSAL = /\b(denied|deny|blocked|not allowed|not permitted|requires? (?:an? )?approval|cannot carry an AMC approval|AMC control unavailable|exec ticket|unsupported or invalid|COMMAND_SYNTAX_UNSUPPORTED|is not mapped|rejected the current|not governed)\b/i;
 const inconclusive = (evidence) => ({ schemaVersion: VERSION, verdict: "inconclusive", checks: [check("oracle-input", null, evidence)] });
 
 function falsePositives(envelope, receipt) {
