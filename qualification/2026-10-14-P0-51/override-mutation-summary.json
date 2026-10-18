@@ -1,0 +1,25 @@
+{
+  "issue": "P0-51",
+  "kind": "Actual owned compiled report mutation; filtered five-family CLI witness",
+  "fault": "Admit unpinned-allowed signatures as issuer pass, incorrectly promoting integrity-only overrides into trusted verdicts. Real intact signed artifacts and explicit allow flag remain.",
+  "beforeSha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae",
+  "mutantSha256": "dc0d900ff850a2a2a58655b5a2c2d2d26d13c775e621ef1ba5646ab400310a78",
+  "restoredSha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae",
+  "restoredExactly": true,
+  "testSha256": "86f45ab5601d53ae0dc274a52a113d7bb2cbdc9451c74c0e68668f46ce8e286f",
+  "patch": "/private/tmp/p0-51-override-promotion-20261014.patch",
+  "patchSha256": "f83b31709a844d9aea667efcea631a5f982d12d56ea95bc41264b103a55755f2",
+  "raw": "/private/tmp/p0-51-override-promoted-mutant-20261014.json",
+  "rawSha256": "822c8138b3a0371758594608725c3bd860c8e753e14e22b25607c294e579f305",
+  "exit": 1,
+  "counts": {
+    "numTotalTests": 84,
+    "numPassedTests": 0,
+    "numFailedTests": 5,
+    "numPendingTests": 79,
+    "numTodoTests": 0
+  },
+  "executed": 5,
+  "filteredPending": 79,
+  "limits": "Five actual child CLI calls only;79 cases filtered, never claimed full-file pass. No TypeScript/admission/allow/floor/source edits. Module restored byte-for-byte before subsequent qualification."
+}

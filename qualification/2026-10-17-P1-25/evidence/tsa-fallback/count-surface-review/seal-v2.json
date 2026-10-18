@@ -1,0 +1,42 @@
+{
+  "schema": "p125f-count-surface-proposal-seal/2",
+  "at": "2026-10-16T22:16:44.457933+00:00",
+  "preferred": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/README-v2.md",
+      "bytes": 2426,
+      "sha256": "fffbe19b330edd182b2642c50afdf88b9610f9a4416e6d35c87ee09e9a4efafe"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/review-v2.json",
+      "bytes": 3596,
+      "sha256": "694daf12ec5eb37463437375e9adc7a741a60015ce00470141fd5ce6dd74604c"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 21664,
+      "sha256": "66a680c76e57fc50af5e77cc4fd201ca6a547ee514f2a47092cd276211bbae52"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/pins.json",
+      "bytes": 19346,
+      "sha256": "07478f6b7bf5f9574bfd97eae67162ee0fa8ec45532173a4d84468fd3dc747b7"
+    }
+  ],
+  "priorSealPreserved": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/seal.json",
+    "bytes": 1407,
+    "sha256": "fea901c4a5836748e0fd918af36df41bfee8b0b011e21dc10598029f192b5c43"
+  },
+  "inputPinCount": 75,
+  "largePrivateObservation": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/ownership-observations.json",
+    "bytes": 2036915,
+    "sha256": "9ba3511f3a829ac242554659b7c99a9b67826766aebef74b51cc6c2c19244b20"
+  },
+  "privateOriginalsRemainPrivate": true,
+  "generatorOrProductExecution": false,
+  "sourceIndexQaWrites": false,
+  "blockers": []
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "p125w-runtime-protected-inputs-after-two-own-source-successors/1",
+  "at": "2026-10-17T00:11:32.209360+00:00",
+  "initialPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+    "bytes": 73883,
+    "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+    "dev": 16777231,
+    "inode": 543741190,
+    "nlink": 1
+  },
+  "runtimePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 78069,
+    "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+    "dev": 16777231,
+    "inode": 543741688,
+    "nlink": 1
+  },
+  "twoSourceSuccessorsMatchOldAndRuntimeRows": true,
+  "preservedOriginalBytesAndPhysicalPinsExact": true,
+  "onlyOther149MetadataRowsExact": true,
+  "allTenNativeMetadataRowsAndHeldRunnerContextExact": true,
+  "currentReferenced149BodiesOrNativeBodiesRechecked": false,
+  "missingReservationProbe": false,
+  "runtimeModified": false
+}

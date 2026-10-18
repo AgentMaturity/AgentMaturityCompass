@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-16T20:36:30.561874+00:00",
+  "sourceHead": "2aa32d5e436e789037c6a8a161d6cf0424b4f4ac",
+  "branch": "codex/p1-26-tree-qualification",
+  "paths": [
+    {
+      "source": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "relativePath": "tests/transparency/rfc9162.test.ts",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "licence": "Ported vector file preserves upstream copyright/header and provenance."
+    },
+    {
+      "source": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "relativePath": "tests/transparency/legacyAmbiguity.test.ts",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "licence": "Self-authored synthetic legacy inputs."
+    },
+    {
+      "source": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "relativePath": "tests/transparency/LICENSE.transparency-dev-merkle",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "licence": "Byte-exact upstream Apache-2.0 license."
+    }
+  ],
+  "rootFullCandidateAndSourceRead": true,
+  "independentStaticBlockers": [],
+  "all47AuthorInputsExact": true,
+  "all113ProtectedPinsExact": true,
+  "metadataRepair": "metadata-discovery/metadata-repair-commit.json",
+  "unchangedBaseline": "p126-unchanged-transparency-outcome.json",
+  "rootHostedAndD15FreezeReviewed": true,
+  "fullIssueDone": false,
+  "libraryDependencyAdopted": false,
+  "publicLogSubmission": false,
+  "allHoldsRetained": true,
+  "futureCandidateReceiptRepresentation": "Any retained copied test candidate must use an inert filename, never an active .test.ts suffix."
+}

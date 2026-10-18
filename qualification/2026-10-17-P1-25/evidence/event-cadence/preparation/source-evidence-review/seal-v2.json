@@ -1,0 +1,33 @@
+{
+  "schema": "p125ec-source-evidence-independent-review-seal/2",
+  "at": "2026-10-17T01:04:42.772895+00:00",
+  "blockers": [],
+  "onlyChange": "Preferred review and README add spaces around hash prefixes and prose counts; all findings, original V1 outputs and observations remain unchanged.",
+  "originalSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/seal.json",
+    "bytes": 1880,
+    "sha256": "fcce9aa549730f23cf42695d5752f05f4349f2a6632ba1f17acc403319ae56bd"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/review-v2.json",
+      "bytes": 3056,
+      "sha256": "00c481e69752ab26cde6ee8fc969eced0638a5377d2dfb9b733e09e605dd4d5d"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/README-v2.md",
+      "bytes": 1455,
+      "sha256": "5f2c24e8ae5a338272b5f367bbca4d11ff85de4ac389fd0c95243cb33cc8d545"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/observations.json",
+      "bytes": 85338,
+      "sha256": "64aec6f6d4776a6be19f5a7a2a2c10315c4f433eb197de61fbb2fd5bcf04e930"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 104300,
+      "sha256": "f832cff363bf9595e91fd3c94f338ab8f2c343306534d120e0757f9150393f3e"
+    }
+  ]
+}

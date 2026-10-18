@@ -1,0 +1,39 @@
+
+ RUN  v4.1.11 /private/tmp/p0-45-causal-qualification-20261015/closure
+
+ ❯ tests/verifyRepair.test.ts (12 tests | 1 failed) 2773ms
+     ✓ plans nothing for a healthy store and apply moves nothing 279ms
+     ✓ leaves evidence alone when only a signed config failed 228ms
+     ✓ counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature 241ms
+     ✓ counts a missing blob and keeps the ledger in plan mode 222ms
+     ✓ moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone 239ms
+     ✓ refuses when the legal hold state is unknown, and moves nothing 228ms
+     ✓ refuses when the hold check itself throws 222ms
+     ✓ refuses under an active hold and names it 221ms
+     ✓ refuses when the monitor key does not match the expected fingerprint 222ms
+     ✓ refuses before any move when signing fails 223ms
+     ✓ refuses when a planned file changed after the plan 225ms
+     × puts moved files back when a rename fails part way 221ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/verifyRepair.test.ts > applyVerifyRepair > puts moved files back when a rename fails part way
+AssertionError: expected undefined to be an instance of RepairRefused
+ ❯ expectRefused tests/verifyRepair.test.ts:99:18
+     97|     caught = error;
+     98|   }
+     99|   expect(caught).toBeInstanceOf(RepairRefused);
+       |                  ^
+    100|   expect((caught as Error).message).toMatch(message);
+    101| }
+ ❯ tests/verifyRepair.test.ts:268:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 passed (12)
+   Start at  11:44:31
+   Duration  5.19s (transform 1.67s, setup 20ms, import 2.28s, tests 2.77s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json

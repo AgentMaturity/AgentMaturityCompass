@@ -1,0 +1,29 @@
+{
+  "id": "amc.fixture.crosswalk-target",
+  "version": "0.1.0",
+  "compilerCompat": "^1.2.0",
+  "publisher": "Synthetic compiler qualification fixture only",
+  "maintainers": [
+    {
+      "name": "synthetic-fixture-maintainer",
+      "role": "test-fixture"
+    }
+  ],
+  "licence": "MIT",
+  "layer": 3,
+  "title": "Synthetic crosswalk-target compiler fixture",
+  "stations": [
+    "technology"
+  ],
+  "jurisdictions": [],
+  "support": "experimental",
+  "controls": [
+    "L3-FIX-XB-01"
+  ],
+  "stewardship": {
+    "partner": null,
+    "updatePlan": null,
+    "triageTargetDays": null,
+    "coverageDoc": null
+  }
+}

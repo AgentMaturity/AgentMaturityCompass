@@ -1,0 +1,15 @@
+--- a/src/migration/legacy/classify.ts
++++ b/src/migration/legacy/classify.ts
+@@ -112,7 +112,11 @@
+     const line = typeof parsed === "string" ? DOMAIN_READINESS_LINE.exec(parsed) : null;
+     return line ? classification("R3-domain-report", "synthetic_example", { label: line[0].trim() }) : null;
+   }
+-  if (kind === "ledger_session") return classifySession(parsed as LedgerSessionInput);
++  if (kind === "ledger_session") {
++    const found = classifySession(parsed as LedgerSessionInput);
++    if (found?.rule === "R4-operator-tier" && found.original.trustTier === "ATTESTED") Reflect.set(found, "claimKind", "observed");
++    return found;
++  }
+   const value = record(parsed);
+   if (!value || hasClaimEnvelope(value)) return null;
+   switch (kind) {

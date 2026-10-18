@@ -35,6 +35,7 @@ export function issueLeaseForCli(params: {
   workspace: string;
   workspaceId?: string;
   agentId: string;
+  claimKind?: "synthetic_example";
   ttl: string;
   scopes: string;
   routes: string;
@@ -53,6 +54,7 @@ export function issueLeaseForCli(params: {
     workspace: params.workspace,
     workspaceId: params.workspaceId,
     agentId: params.agentId,
+    ...(params.claimKind === undefined ? {} : { claimKind: params.claimKind }),
     ttlMs: parseLeaseTtlToMs(params.ttl),
     scopes: parseLeaseScopes(params.scopes),
     routeAllowlist: parseStringList(params.routes),

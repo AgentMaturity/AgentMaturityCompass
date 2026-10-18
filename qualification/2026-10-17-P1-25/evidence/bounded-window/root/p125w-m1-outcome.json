@@ -1,0 +1,192 @@
+{
+  "phase": "p125w-m1",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout",
+  "tests": {
+    "total": 22,
+    "passed": 21,
+    "failed": 1,
+    "skipped": 0
+  },
+  "hookTaskEntries": 3,
+  "individualHookValues": 4,
+  "orderedIdentities": [
+    [
+      "tests/time/checkpointWindow.test.ts",
+      "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event"
+    ],
+    [
+      "tests/time/checkpointWindow.test.ts",
+      "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint"
+    ],
+    [
+      "tests/time/checkpointWindow.test.ts",
+      "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries"
+    ],
+    [
+      "tests/time/tsaGrant.test.ts",
+      "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA"
+    ],
+    [
+      "tests/time/tsaGrant.test.ts",
+      "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the granted response and returns its exact signed CMS token bytes"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected digest for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected nonce for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the independently located signed-attribute corruption"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the genuine token under a different real root with the same permitted policy"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a policy excluded by the correctly pinned real root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate without an EKU extension"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate with noncritical timestamping EKU"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate expired at the fixed signed genTime"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses explicit rejection status before requiring a timestamp token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a truncated copy of the genuine token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses 65537 bytes at the token size boundary before DER parsing"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps claimed time separate from the genuine attested upper bound"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps an artifact without a timestamp at claimed time"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports an untrusted TSA as a warning while the artifact time stays claimed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports a broken supplied token as an artifact integrity error"
+    ]
+  ],
+  "taskErrors": [
+    {
+      "kind": "test",
+      "name": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+      "errors": [
+        {
+          "message": "expected 'attested-upper-bound' to be 'attested-window' // Object.is equality",
+          "actual": "attested-upper-bound",
+          "expected": "attested-window",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"attested-window\"\nReceived: \"attested-upper-bound\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'attested-upper-bound' to be 'attested-window' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:445:41\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:336:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:335:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 445,
+              "column": 41
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 184,
+              "column": 7
+            },
+            {
+              "method": "withCheckpointWorkspace",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 124,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 336,
+              "column": 7
+            },
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts",
+              "line": 311,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 335,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125w-m1.raw.json",
+    "exit": 1,
+    "durationMs": 3713
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VtzCZh/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-G0yjLo/checkpoint-public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jQdcZs/checkpoint-public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-tjzsgB/checkpoint-public-evidence.json"
+  ],
+  "grantPublicEvidencePaths": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VtzCZh/public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/public-evidence.json"
+  ],
+  "checkpointPublicEvidencePaths": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-G0yjLo/checkpoint-public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jQdcZs/checkpoint-public-evidence.json",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-tjzsgB/checkpoint-public-evidence.json"
+  ],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort and literal public path markers are selected here; no public path is dereferenced. No test execution or evidence rewriting."
+}

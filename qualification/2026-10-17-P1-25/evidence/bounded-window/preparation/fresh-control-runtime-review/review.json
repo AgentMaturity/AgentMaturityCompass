@@ -1,0 +1,487 @@
+{
+  "schema": "p125w-independent-completed-fresh-control-runtime-chain-review/1",
+  "at": "2026-10-17T00:30:10.485677+00:00",
+  "blockers": [],
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout",
+  "acceptedSixPhaseOrder": [
+    "p125w-source-combined",
+    "p125w-fresh-canonical",
+    "p125w-m1-sequential",
+    "p125w-restore1",
+    "p125w-m2",
+    "p125w-restore2"
+  ],
+  "excludedOriginalDiagnosticPhase": "p125w-m1",
+  "records": [
+    {
+      "phase": "p125w-source-combined",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "commandExit": 0,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-fresh-canonical",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "commandExit": 0,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-m1",
+      "accepted": false,
+      "tests": {
+        "total": 22,
+        "passed": 21,
+        "failed": 1,
+        "skipped": 0
+      },
+      "commandExit": 1,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+          "messages": [
+            "AssertionError: expected 'attested-upper-bound' to be 'attested-window' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:445:41\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:336:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:335:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-m1-sequential",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 21,
+        "failed": 1,
+        "skipped": 0
+      },
+      "commandExit": 1,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+          "messages": [
+            "AssertionError: expected 'attested-upper-bound' to be 'attested-window' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:445:41\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:336:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:335:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-restore1",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "commandExit": 0,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-m2",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 20,
+        "failed": 2,
+        "skipped": 0
+      },
+      "commandExit": 1,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "messages": [
+            "AssertionError: expected [ 'POSTDATED_CLAIM' ] to deeply equal []\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:290:35\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:232:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:231:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+          "messages": [
+            "AssertionError: default-lower-inclusive: expected [ 'BACKDATED_CLAIM' ] to deeply equal []\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:452:47\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:336:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:335:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    },
+    {
+      "phase": "p125w-restore2",
+      "accepted": true,
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "commandExit": 0,
+      "resources": {
+        "children": 30,
+        "declaredExplicitStreamHashRecords": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      },
+      "rawFailures": [],
+      "allFourHooksPass": true,
+      "rawObserverOrderedJoin": true,
+      "naturallyClosedByRecordedESRCHNoSignals": true
+    }
+  ],
+  "windowRecordedFacts": [
+    {
+      "phase": "p125w-source-combined",
+      "basis": "attested-window",
+      "exactRecordedWindow": {
+        "notBefore": "2026-10-17T00:06:52.000Z",
+        "notAfter": "2026-10-17T00:06:52.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": false,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-fresh-canonical",
+      "basis": "attested-window",
+      "exactRecordedWindow": {
+        "notBefore": "2026-10-17T00:14:13.000Z",
+        "notAfter": "2026-10-17T00:14:13.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": false,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-m1",
+      "basis": "attested-upper-bound",
+      "exactRecordedWindow": {
+        "notBefore": null,
+        "notAfter": "2026-10-17T00:15:33.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": true,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-m1-sequential",
+      "basis": "attested-upper-bound",
+      "exactRecordedWindow": {
+        "notBefore": null,
+        "notAfter": "2026-10-17T00:16:19.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": true,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-restore1",
+      "basis": "attested-window",
+      "exactRecordedWindow": {
+        "notBefore": "2026-10-17T00:17:24.000Z",
+        "notAfter": "2026-10-17T00:17:24.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": false,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-m2",
+      "basis": "attested-window",
+      "exactRecordedWindow": {
+        "notBefore": "2026-10-17T00:17:49.000Z",
+        "notAfter": "2026-10-17T00:17:49.000Z"
+      },
+      "defaultFindings": [
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": true,
+      "bothGenTimeAccuracyNull": true
+    },
+    {
+      "phase": "p125w-restore2",
+      "basis": "attested-window",
+      "exactRecordedWindow": {
+        "notBefore": "2026-10-17T00:18:55.000Z",
+        "notAfter": "2026-10-17T00:18:55.000Z"
+      },
+      "defaultFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "zeroFindings": [
+        [],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [],
+        [
+          "POSTDATED_CLAIM"
+        ],
+        [
+          "BACKDATED_CLAIM"
+        ],
+        [
+          "POSTDATED_CLAIM"
+        ]
+      ],
+      "computedFactsNotMaskedAssertionCredit": false,
+      "bothGenTimeAccuracyNull": true
+    }
+  ],
+  "same22OrderedIdentitiesNotSummed": true,
+  "same3HookTaskEntries4PassingValues": true,
+  "initialM1ChronologyExcludedAndCorrectedActionEndedUtcUsed": true,
+  "exactRestoresPlusSameCohortGreen22": true,
+  "currentPreservation": {
+    "protectedPhysicalPins": 151,
+    "nativePhysicalPins": 11,
+    "distinctFreshNative": true,
+    "sourceFreshPairs": 94,
+    "compiledPairs": 19,
+    "allFullPinsExact": true,
+    "bothTreesCleanAndIndexEmpty": true,
+    "heldR18RowsHeadAndIndexExact": true
+  },
+  "gitContext": {
+    "source": {
+      "head": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c\n",
+      "status": "",
+      "index": ""
+    },
+    "fresh": {
+      "head": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c\n",
+      "status": "",
+      "index": ""
+    },
+    "heldR": {
+      "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d\n",
+      "status": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+      "index": ""
+    }
+  },
+  "limits": {
+    "existingCompletedEvidenceReadOnly": true,
+    "noProductRuntimeRerun": true,
+    "noPrivateStreamContentOrSigningRootTraversal": true,
+    "streamCountOnlyPublicRecordAndExistingAuditorPinAgreementNoPeerStreamRehash": true,
+    "noNewCryptoVerificationOrLedgerExecution": true,
+    "noNewProcessGroupProbe": true,
+    "sourceOnlySensitivityNoCompiledMutationCredit": true,
+    "maskedPrecomputedObservationsNotAssertedPasses": true,
+    "seedHeadComparisonLacksSeparatePublicSeedHashOperandSourceAssertionAndGreenCohortOnly": true,
+    "nonzeroTsaAccuracyUnqualified": true,
+    "globalQualityRed2712And1268Unwaived": true,
+    "allHoldsAndF37SkipPreserved": true,
+    "noSourceIndexQaOrClaudeMutation": true,
+    "wholeIssuePlanReleaseCredit": false
+  },
+  "readLimitation": "An initial guessed fresh-binding.json metadata path was absent and only ls returned2; actual fresh-source-binding.json was then read. An oversized public-window preview was truncated; bounded programmatic joins and all full raw error messages, hooks and semantic assertions supply this review."
+}

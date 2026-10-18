@@ -1,0 +1,461 @@
+{
+  "schema": "p107-bounded-new-test-static-admission-review/1",
+  "at": "2026-10-16T17:26:58.074433+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "recommendation": "Root may allocate exactly the two proposed new tests and later their normal P1-07 receipt after closing P1-35 metadata and ordinary hosted/D15/freeze admission. Production and existing tests stay read-only. This report grants no execution or source-writing authority.",
+  "scope": [
+    "tests/diagnostic/levelCumulative.test.ts",
+    "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+    "qualification/2026-10-16-P1-07"
+  ],
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "observedCleanHead": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+    "currentBranch": "codex/p1-35-legacy-qualification",
+    "rootWillPreserveBranchBeforeAnyNewBranch": true
+  },
+  "inventory": {
+    "registries": 3,
+    "registeredRoots": 170,
+    "retainedRoots": 6,
+    "physicalRoots": 176,
+    "newQ135": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+    "targetPresenceChecks": 528,
+    "allAbsent": true,
+    "allSelectedStatusesEmpty": true,
+    "allRegistryTargetHistoriesEmpty": true,
+    "noNearbyLevelCumulativeEmitterReachabilityCandidateNames": true,
+    "errors": [],
+    "membershipChanged": false,
+    "onlyRegisteredDrift": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "before": {
+          "worktree": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "HEAD": "721e60d75cb45d116391091d83505a1a276968a3",
+          "branch": "refs/heads/codex/p1-39-mcp-qualification"
+        },
+        "after": {
+          "worktree": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "HEAD": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+          "branch": "refs/heads/codex/p1-35-legacy-qualification"
+        }
+      }
+    ]
+  },
+  "ownership": {
+    "exactReservationMatches": [],
+    "protectedEmitterExcerpts": [
+      {
+        "line": 17,
+        "text": "- src/{auth/userSchema,claims/evidenceProvenance,contracts/index,crypto/signing/signerTypes,diagnostic/evidenceEmitters,ledger/ledgerSchema,ledger/ledgerSchemaA4,ledger/monitor,lifecycle/artifactSignature,mode/mode,release/releaseSecretScan,studio/nativeAdmission,trust/trustConfig,vault/vault}.ts, src/console/assets/api.js"
+      },
+      {
+        "line": 69,
+        "text": "Integrator-owned hook: new `src/toolhub/toolhubJournal.ts` writes existing `APPROVAL_CONSUMED`/`APPROVAL_QUORUM_MET` audit rows extracted from the server. Please classify that module in `NON_MATURITY_AUDIT_MODULES` as part of your owned `src/diagnostic/evidenceEmitters.ts` edit. Root did not touch it or other Wave1 paths. Local ignored role handoff is `AMC_OS/INBOX/REV_OPS_AUTOMATION_ENGINEER.md`; historical notes preserved. Keep the item merged-unqualified, never Done."
+      },
+      {
+        "line": 284,
+        "text": "    - src/diagnostic/evidenceEmitters.ts (P0-54): if checkEgress writes a new audit type, give Claude the module path and Claude classifies it"
+      },
+      {
+        "line": 317,
+        "text": "- **Classification:** when Claude integrates P2-01, it adds `src/residency/checkEgress.ts` (RESIDENCY_ROUTE_BLOCKED; controlResult not_evaluated, no pass claim) to `NON_MATURITY_AUDIT_MODULES` in the integration commit, as for P1-54. Do not edit evidenceEmitters.ts yourself."
+      },
+      {
+        "line": 387,
+        "text": "  - src/diagnostic/evidenceEmitters.ts: Claude classifies DELETION_ALLOWED, DELETION_DENIED_HELD and DELETION_DENIED_HOLD_UNKNOWN at integration; name their module paths in your handoff."
+      }
+    ],
+    "S_R_ClaudeComparisons": [
+      {
+        "path": "src/diagnostic/levelSemantics.ts",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "bytes": 12367,
+            "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+            "dev": 16777231,
+            "inode": 542459746,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/levelSemantics.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "bytes": 12367,
+            "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+            "dev": 16777231,
+            "inode": 539134454,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/levelSemantics.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/levelSemantics.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/levelSemantics.ts",
+            "bytes": 12367,
+            "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+            "dev": 16777231,
+            "inode": 473080799,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/levelSemantics.ts"
+          }
+        ]
+      },
+      {
+        "path": "src/diagnostic/evidenceEmitters.ts",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+            "bytes": 12985,
+            "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+            "dev": 16777231,
+            "inode": 542459736,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceEmitters.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+            "bytes": 12985,
+            "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+            "dev": 16777231,
+            "inode": 539134444,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceEmitters.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceEmitters.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceEmitters.ts",
+            "bytes": 12985,
+            "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+            "dev": 16777231,
+            "inode": 473080789,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceEmitters.ts"
+          }
+        ]
+      },
+      {
+        "path": "src/diagnostic/evidenceMaps/index.ts",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+            "bytes": 3431,
+            "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+            "dev": 16777231,
+            "inode": 542459738,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceMaps/index.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+            "bytes": 3431,
+            "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+            "dev": 16777231,
+            "inode": 539134446,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceMaps/index.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceMaps/index.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceMaps/index.ts",
+            "bytes": 3431,
+            "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+            "dev": 16777231,
+            "inode": 473080791,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/evidenceMaps/index.ts"
+          }
+        ]
+      },
+      {
+        "path": "src/diagnostic/gates.ts",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+            "dev": 16777231,
+            "inode": 542459742,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/gates.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+            "dev": 16777231,
+            "inode": 539134450,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/gates.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/gates.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+            "dev": 16777231,
+            "inode": 473080795,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/diagnostic/gates.ts"
+          }
+        ]
+      },
+      {
+        "path": "scripts/check-gate-reachability.mjs",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+            "bytes": 9077,
+            "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+            "dev": 16777231,
+            "inode": 542458538,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "scripts/check-gate-reachability.mjs"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+            "bytes": 9077,
+            "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+            "dev": 16777231,
+            "inode": 539133249,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "scripts/check-gate-reachability.mjs"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-gate-reachability.mjs",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-gate-reachability.mjs",
+            "bytes": 9077,
+            "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+            "dev": 16777231,
+            "inode": 473079608,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "scripts/check-gate-reachability.mjs"
+          }
+        ]
+      },
+      {
+        "path": "src/types.ts",
+        "S_R_ClaudeByteEqual": false,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+            "bytes": 124482,
+            "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+            "dev": 16777231,
+            "inode": 542461161,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/types.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/types.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/types.ts",
+            "bytes": 124482,
+            "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+            "dev": 16777231,
+            "inode": 539135867,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/types.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/types.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/types.ts",
+            "bytes": 124508,
+            "sha256": "8a3392b07a0bb284fc59802d46fc779d48175ef216e9ebf30570350c76240a5b",
+            "dev": 16777231,
+            "inode": 512506647,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/types.ts"
+          }
+        ]
+      },
+      {
+        "path": "src/claims/evidenceProvenance.ts",
+        "S_R_ClaudeByteEqual": false,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+            "bytes": 12211,
+            "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+            "dev": 16777231,
+            "inode": 542459361,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/claims/evidenceProvenance.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+            "bytes": 12211,
+            "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+            "dev": 16777231,
+            "inode": 539134069,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/claims/evidenceProvenance.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/claims/evidenceProvenance.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/claims/evidenceProvenance.ts",
+            "bytes": 12350,
+            "sha256": "0a11f57f0638db632c31ba58e9c725c9317252d0eaa63f024ab3436edff8b18a",
+            "dev": 16777231,
+            "inode": 492519929,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/claims/evidenceProvenance.ts"
+          }
+        ]
+      },
+      {
+        "path": "src/contracts/v1/evidenceEvent.ts",
+        "S_R_ClaudeByteEqual": true,
+        "pins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+            "bytes": 2639,
+            "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+            "dev": 16777231,
+            "inode": 542459637,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/contracts/v1/evidenceEvent.ts"
+          },
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+            "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+            "bytes": 2639,
+            "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+            "dev": 16777231,
+            "inode": 539134345,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/contracts/v1/evidenceEvent.ts"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/contracts/v1/evidenceEvent.ts",
+            "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/contracts/v1/evidenceEvent.ts",
+            "bytes": 2639,
+            "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+            "dev": 16777231,
+            "inode": 473080690,
+            "nlink": 1,
+            "regular": true,
+            "symlink": false,
+            "relativePath": "src/contracts/v1/evidenceEvent.ts"
+          }
+        ]
+      }
+    ],
+    "allObservedVariantsPreserved": true,
+    "sourceCopiesAreNotOwnerReleases": true,
+    "candidateFilesAreAbsentAcross176NotOnlyS": true,
+    "heldRHeadFromRegistry": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "fullHeldRDirtyStateNotRequalified": "Only exact selected statuses were read. Unrelated held provider/config/archive bytes are neither copied nor changed.",
+    "ClaudeVariants": "types.ts includes pi in Claude; evidenceProvenance mapping comments/order differ. Both variants remain exact. No transplant, normalization, stash, reset, prune, cleanup or merge."
+  },
+  "sourceFit": {
+    "specAuthority": "P1-07.md28\u201337,44\u201350,72\u201380,95\u2013104,112,120",
+    "pureLevels": "levelSemantics.ts159\u2013191 sorts explicit gate.level, rejects duplicate levels, evaluates each gate, and returns highest contiguous passing prefix L1 onward. Direct custom-gate unit fixtures can isolate this algorithm without changing real scoring or registering an emitter.",
+    "meaningfulFirstWitness": "A deliberately synthetic unit question can have a lower gate fail while a higher gate passes; assert that perLevel exposes both outcomes and final level stops at the failed prerequisite. A positive contiguous control and unsorted/missing/duplicate level rows prevent an always-zero implementation from passing. No actual runtime/L3 claim follows.",
+    "registry": "evidenceEmitters.ts124\u2013147 exposes emitterById, emitterAdmits and fromRegisteredEmitter. Pure rows cover exact event/audit/metric shape, required metadata own-property presence, producer class and already-derived effective tier, with admitted positive controls and explicit manual/import/dogfood negatives.",
+    "truthChecks": "Every registry module exists and carries its declared literal; no dogfood registry entry; importers self_reported and L1-only; map IDs refer to registered admissible emitters. Read source paths from import.meta-derived S; never borrowed R cwd. Any whole-source audit-literal census remains an explicit separate coverage assertion, not a claim inferred from a few fixtures.",
+    "criticalBound": "producerOfMeta returns amc-runtime for missing/unknown source, and emitterAdmits consumes pre-derived trustTier. Direct AdmissionRow tests do not prove signature/ledger verification; do not expect unknown sources to be rejected or label synthetic raw metadata cryptographic runtime proof.",
+    "currentMaps": "All four current evidence maps have l3:[] and the registry currently has no L3 levelUse. Keep not_evaluated and map-controlled question binding; do not edit maps/register fake runtime emitters to satisfy spec74 historical wording.",
+    "regressionCohort": "Unchanged antiGaming/evidenceGatingCorrection/questionBank/spineEvidenceProjection/liveEvidenceProjection tests. Existing antiGaming already covers removed opt-out/warning and must not be weakened. Counts remain uncollected; no predicted pass total."
+  },
+  "dependencyBoundaries": {
+    "P101": "Current evidence-event/claim contracts exist and are pinned. Permanent schema/publication/export gaps remain open; these direct source tests do not close them.",
+    "P018": "Existing parser derives effective tier from provenance, and evaluateGate filters synthetic producers. No seeder or generic provenance edit is allocated.",
+    "P135": "Spec112 names relabel notice for1.x scores; current actual migration/canonical85 evidence exercises it. Missing exactL3/committed certificate/current certificate711missing-payload acceptance remains open and is not needed to fabricate these unit tests.",
+    "fullP107": "Still needs meaningful governed runtime proof, source-based complete reachability, methodology/doc parity, source controls, full checks/CI/PR and downstream acceptance. No whole issue Done or gate change is claimed."
+  },
+  "prohibitedExpansion": [
+    "all production source including levelSemantics/evidenceEmitters/maps/gates/runner/types/contracts/provenance",
+    "all methodology docs/manifests",
+    "all existing tests",
+    "scripts/check-gate-reachability.mjs",
+    "guards/deadlines/freeze/quality/coverage configuration",
+    "any held candidate or Claude-authored variant"
+  ],
+  "rootAdmissionRemaining": [
+    "Close root-owned P1-35 metadata/checkpoint first.",
+    "Refresh hosted WIP/full changed-path check; Dependabot excluded only from WIP.",
+    "Ordinary needs-snapshot/freeze/quality and exact source/test allocation.",
+    "Private candidate authoring then independent static review before root materialization/execution.",
+    "Record actual test identities, cleanup, controls and later fresh-source results only after execution."
+  ],
+  "preservedHolds": [
+    "F37 skipped",
+    "P1-01 remaining gaps",
+    "P0-09/P0-22/P0-29 held decisions",
+    "P0-24 citation/expert decisions",
+    "P1-02/P1-03 held diagnoses/cancellation",
+    "P1-06 Claude verifier",
+    "P2-02 pause",
+    "P2-07 provider/config/archive",
+    "P1-35 Knip D15 hold and global quality RED"
+  ],
+  "instructionBoundary": "S has no local AGENTS/ROLEBOOKS files; supplied user AGENTS and primary read-only role standards apply. Explicit root private-only task overrides generic AMC_OS handoff writes; no AMC_OS file changed.",
+  "method": "Read exact source/spec/metadata and compare filesystem hashes. Git --no-optional-locks with GIT_OPTIONAL_LOCKS=0 and GIT_NO_LAZY_FETCH=1; no lazy network fetch or checkout/index mutation.",
+  "writes": "Only new B29 ownership-admission assets. No build/test/Node/product import/parser/compiler/helper/native/SQL/network/process probe, source/index/QA write or Claude/hosted message."
+}

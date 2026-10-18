@@ -1,0 +1,380 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1612,
+    "startedUtc": "2026-10-14T17:46:06.046716+00:00",
+    "log": "/private/tmp/p0-51-frozen-install-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "current-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 29766,
+    "startedUtc": "2026-10-14T17:49:06.109038+00:00",
+    "log": "/private/tmp/p0-51-current-build-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "current-trust-native-baseline",
+    "cmd": "pnpm exec vitest run tests/cliTrustFlags.test.ts tests/trust/verifySurfaces.test.ts tests/trust/admission.test.ts tests/trust/verifierReport.test.ts tests/trust/trustContext.test.ts tests/studioNativeTaskService.test.ts tests/studioNativeTaskAdmission.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-current-trust-native-baseline-20261014.json",
+    "exit": 0,
+    "durationMs": 21372,
+    "startedUtc": "2026-10-14T17:51:16.763026+00:00",
+    "log": "/private/tmp/p0-51-current-trust-native-baseline-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "export-links-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/transparencyProofExportContainment.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-export-links-red-jbn2qtna/vitest.json",
+    "exit": 1,
+    "durationMs": 3305,
+    "startedUtc": "2026-10-14T17:52:12.480913+00:00",
+    "log": "/private/tmp/p0-51-export-links-red-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-license-pure-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackPortableVerification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-portable-license-pure-red-20261014.json",
+    "exit": 1,
+    "durationMs": 1498,
+    "startedUtc": "2026-10-14T17:52:29.147992+00:00",
+    "log": "/private/tmp/p0-51-portable-license-pure-red-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-first",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-first-20261014.raw.json",
+    "exit": 1,
+    "durationMs": 3173,
+    "startedUtc": "2026-10-14T17:58:06.911083+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-first-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-fixtures-corrected",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-fixtures-corrected-20261014.raw.json",
+    "exit": 1,
+    "durationMs": 3123,
+    "startedUtc": "2026-10-14T17:59:01.114490+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-fixtures-corrected-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-license-cli-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-portable-license-cli-witness-20261014.mjs red",
+    "exit": 1,
+    "durationMs": 1872,
+    "startedUtc": "2026-10-14T17:59:58.879928+00:00",
+    "log": "/private/tmp/p0-51-portable-license-cli-red-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-license-pure-green",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackPortableVerification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-portable-license-pure-green-20261014.json",
+    "exit": 0,
+    "durationMs": 1906,
+    "startedUtc": "2026-10-14T18:00:43.288523+00:00",
+    "log": "/private/tmp/p0-51-portable-license-pure-green-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-test-types",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+    "exit": 0,
+    "durationMs": 38141,
+    "startedUtc": "2026-10-14T18:00:11.501950+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-test-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-default-fleet-fixture",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-default-fleet-fixture-20261014.raw.json",
+    "exit": 1,
+    "durationMs": 60971,
+    "startedUtc": "2026-10-14T17:59:53.594762+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-default-fleet-fixture-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-valid-operator-lists",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-valid-operator-lists-20261014.raw.json",
+    "exit": 1,
+    "durationMs": 58707,
+    "startedUtc": "2026-10-14T18:01:30.011990+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-valid-operator-lists-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-final-test-types",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+    "exit": 0,
+    "durationMs": 35585,
+    "startedUtc": "2026-10-14T18:03:48.390691+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-final-test-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-license-legacy-controls",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts -t 'locally valid HMAC|locally allowlisted legacy' --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-license-legacy-controls-20261014.raw.json",
+    "exit": 0,
+    "durationMs": 10018,
+    "startedUtc": "2026-10-14T18:04:30.320132+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-license-legacy-controls-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-expanded-test-types",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+    "exit": 0,
+    "durationMs": 36458,
+    "startedUtc": "2026-10-14T18:04:57.541481+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-expanded-test-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "export-links-green",
+    "cmd": "pnpm exec vitest run tests/transparencyProofExportContainment.test.ts --reporter=json --outputFile=/private/tmp/p0-51-export-links-green-20261014.json",
+    "exit": 0,
+    "durationMs": 4434,
+    "startedUtc": "2026-10-14T18:06:23.665734+00:00",
+    "log": "/private/tmp/p0-51-export-links-green-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "candidate-types",
+    "cmd": "pnpm run typecheck",
+    "exit": 0,
+    "durationMs": 26411,
+    "startedUtc": "2026-10-14T18:08:00.546198+00:00",
+    "log": "/private/tmp/p0-51-candidate-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "candidate-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 30323,
+    "startedUtc": "2026-10-14T18:10:05.749543+00:00",
+    "log": "/private/tmp/p0-51-candidate-build-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "factual-count-update",
+    "cmd": "pnpm run gen-counts",
+    "exit": 0,
+    "durationMs": 634,
+    "startedUtc": "2026-10-14T18:10:56.137668+00:00",
+    "log": "/private/tmp/p0-51-factual-count-update-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-license-cli-green",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-portable-license-cli-witness-20261014.mjs green /private/tmp/p0-51-owned-license-cli-6FtU6j/fixture.json",
+    "exit": 0,
+    "durationMs": 1866,
+    "startedUtc": "2026-10-14T18:11:31.972060+00:00",
+    "log": "/private/tmp/p0-51-portable-license-cli-green-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "export-guard-removed-mutant",
+    "cmd": "pnpm exec vitest run tests/transparencyProofExportContainment.test.ts --reporter=json --outputFile=/private/tmp/p0-51-export-guard-removed-mutant-20261014.json",
+    "exit": 1,
+    "durationMs": 4651,
+    "startedUtc": "2026-10-14T18:11:44.032344+00:00",
+    "log": "/private/tmp/p0-51-export-guard-removed-mutant-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-repaired-candidate",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.raw.json",
+    "exit": 1,
+    "durationMs": 64867,
+    "startedUtc": "2026-10-14T18:11:12.322651+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "portable-cli-canonical-claim-output",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-canonical-claim-output-20261014.mjs /private/tmp/amc-p0-51-portable-cli-PF1gTT/logs",
+    "exit": 0,
+    "durationMs": 302,
+    "startedUtc": "2026-10-14T18:12:49.875183+00:00",
+    "log": "/private/tmp/p0-51-portable-cli-canonical-claim-output-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "override-promoted-mutant",
+    "cmd": "pnpm exec vitest run tests/portableVerifierCliQualification.test.ts -t 'returns exit 2 only when an intact unknown signer uses the explicit override' --reporter=json --outputFile=/private/tmp/p0-51-override-promoted-mutant-20261014.json",
+    "exit": 1,
+    "durationMs": 7632,
+    "startedUtc": "2026-10-14T18:14:18.490687+00:00",
+    "log": "/private/tmp/p0-51-override-promoted-mutant-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "candidate-parity",
+    "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/archiveFilesParity.test.ts tests/signedArtifactVerificationParity.test.ts --reporter=json --outputFile=/private/tmp/p0-51-candidate-parity-20261014.json",
+    "exit": 0,
+    "durationMs": 9844,
+    "startedUtc": "2026-10-14T18:16:44.648770+00:00",
+    "log": "/private/tmp/p0-51-candidate-parity-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "candidate-lint",
+    "cmd": "pnpm run lint",
+    "exit": 0,
+    "durationMs": 4387,
+    "startedUtc": "2026-10-14T18:18:02.648252+00:00",
+    "log": "/private/tmp/p0-51-candidate-lint-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "server-native-qualified",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierServerQualification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-server-native-z8cn4pij/vitest.json",
+    "exit": 1,
+    "durationMs": 5617,
+    "startedUtc": "2026-10-14T18:18:14.556634+00:00",
+    "log": "/private/tmp/p0-51-server-native-qualified-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "factual-count-update-with-server",
+    "cmd": "pnpm run gen-counts",
+    "exit": 0,
+    "durationMs": 464,
+    "startedUtc": "2026-10-14T18:19:54.284957+00:00",
+    "log": "/private/tmp/p0-51-factual-count-update-with-server-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "candidate-test-types-with-server",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 35383,
+    "startedUtc": "2026-10-14T18:21:38.884142+00:00",
+    "log": "/private/tmp/p0-51-candidate-test-types-with-server-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "server-native-checkpoint-aligned",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierServerQualification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-server-native-aligned-fdtpib_a/vitest.json",
+    "exit": 1,
+    "durationMs": 6526,
+    "startedUtc": "2026-10-14T18:22:35.941404+00:00",
+    "log": "/private/tmp/p0-51-server-native-checkpoint-aligned-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 30747,
+    "startedUtc": "2026-10-14T18:25:01.601568+00:00",
+    "log": "/private/tmp/p0-51-final-build-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-docs",
+    "cmd": "pnpm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 786,
+    "startedUtc": "2026-10-14T18:25:52.286997+00:00",
+    "log": "/private/tmp/p0-51-final-docs-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "pnpm run check:counts",
+    "exit": 0,
+    "durationMs": 1319,
+    "startedUtc": "2026-10-14T18:25:52.286487+00:00",
+    "log": "/private/tmp/p0-51-final-counts-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "pnpm run check:duplicates",
+    "exit": 1,
+    "durationMs": 2617,
+    "startedUtc": "2026-10-14T18:25:52.271902+00:00",
+    "log": "/private/tmp/p0-51-final-source-duplicates-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "pnpm run check:freeze",
+    "exit": 0,
+    "durationMs": 3386,
+    "startedUtc": "2026-10-14T18:25:52.286205+00:00",
+    "log": "/private/tmp/p0-51-final-freeze-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "pnpm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 3884,
+    "startedUtc": "2026-10-14T18:25:52.262723+00:00",
+    "log": "/private/tmp/p0-51-final-architecture-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-lint",
+    "cmd": "pnpm run lint",
+    "exit": 0,
+    "durationMs": 6501,
+    "startedUtc": "2026-10-14T18:25:52.302366+00:00",
+    "log": "/private/tmp/p0-51-final-lint-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "pnpm run check:dead-code",
+    "exit": 1,
+    "durationMs": 7780,
+    "startedUtc": "2026-10-14T18:25:52.272402+00:00",
+    "log": "/private/tmp/p0-51-final-source-dead-code-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-types",
+    "cmd": "pnpm run typecheck",
+    "exit": 0,
+    "durationMs": 35321,
+    "startedUtc": "2026-10-14T18:25:52.293775+00:00",
+    "log": "/private/tmp/p0-51-final-types-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 46718,
+    "startedUtc": "2026-10-14T18:25:52.271635+00:00",
+    "log": "/private/tmp/p0-51-final-test-types-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "pnpm run check:clean-source",
+    "exit": 0,
+    "durationMs": 57715,
+    "startedUtc": "2026-10-14T18:25:52.281090+00:00",
+    "log": "/private/tmp/p0-51-final-clean-source-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "pnpm exec vitest run tests/cliTrustFlags.test.ts tests/trust/verifySurfaces.test.ts tests/trust/admission.test.ts tests/trust/verifierReport.test.ts tests/trust/trustContext.test.ts tests/studioNativeTaskService.test.ts tests/studioNativeTaskAdmission.test.ts tests/publicBenchmarkRegistry.test.ts tests/zeroKeyLeaseBudgetDriftBom.test.ts tests/notaryTrust.test.ts tests/federationComplianceIntegrationMerkle.test.ts tests/sessionAnchorOfflineProof.test.ts tests/industryPackEntitlement.test.ts tests/externalEvidenceProfile.test.ts tests/formalVerification.test.ts tests/trustInterchange.test.ts tests/industryPackPortableVerification.test.ts tests/portableVerifierCliQualification.test.ts tests/transparencyProofExportContainment.test.ts tests/portableVerifierServerQualification.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/archiveFilesParity.test.ts tests/signedArtifactVerificationParity.test.ts --reporter=json --outputFile=/private/tmp/p0-51-final-bounded-node22-20261014.json",
+    "exit": 1,
+    "durationMs": 74863,
+    "startedUtc": "2026-10-14T18:27:14.155236+00:00",
+    "log": "/private/tmp/p0-51-final-bounded-node22-20261014.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  }
+]

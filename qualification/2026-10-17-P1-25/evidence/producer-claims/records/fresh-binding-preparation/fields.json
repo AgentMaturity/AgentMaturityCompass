@@ -1,0 +1,88 @@
+{
+  "schema": "p125pc-inert-fresh-binder-fields/1",
+  "inputRoles": {
+    "runtimeProtectedInputs": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "schema": "p125pc-runtime-protected-inputs-after-one-own-test-successor/1",
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "initialField": "initial175Pinset",
+      "successorField": "oneAdmittedOwnSourceSuccessor",
+      "preservedOtherField": "allOther174MustRemainExactAfterSeparateSourceAdmission"
+    },
+    "selection": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "schema": "p125pc-readonly-source-selection/1",
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431"
+    },
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "schema": "p125pc-source-checkpoint/1",
+      "commitField": "sourceCommit",
+      "parentExpected": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+      "branchExpected": "codex/p1-25-producer-qualification",
+      "pathsExpected": [
+        "tests/time/checkpointWindow.test.ts"
+      ],
+      "checksField": "source24AndTwelveChecks",
+      "checksExpectedInteger": 0,
+      "ordinaryCommitExit": 0,
+      "sourceCleanIndexEmpty": true,
+      "sourceRootFieldAbsentAndNotInvented": true
+    },
+    "futureClosedCleanSource": {
+      "command": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-clean-source/command.json",
+      "phase": "p125pc-clean-source",
+      "requiredNaturalExit": 0,
+      "requiredGroupAbsentByESRCH": true,
+      "signalsSent": false,
+      "ownedArgvExact": true,
+      "freshPathFromExactlyOneRetainedKeptLine": true
+    }
+  },
+  "selectionDerivation": {
+    "priorNames": 98,
+    "priorCompiledPairs": 21,
+    "additions": [
+      {
+        "sourceRelativePath": "src/ledger/eventHash.ts",
+        "compiledRelativePath": "dist/ledger/eventHash.js"
+      },
+      {
+        "sourceRelativePath": "src/ledger/sessionVerification.ts",
+        "compiledRelativePath": "dist/ledger/sessionVerification.js"
+      }
+    ],
+    "derivedNames": 102,
+    "derivedCompiledPairs": 23,
+    "futureDerivedPhysicalFilesFormula": "2 * len(expected_names)",
+    "futureNativeFormula": "len(exact twelve retained native pins) + one actual fresh native",
+    "noPrebuildCompiledHashesAdopted": true
+  },
+  "output": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+    "schema": "p125pc-actual-fresh-source-binding/1",
+    "sourceCommit": "Read from actual checkpoint and checked against actual source/fresh HEADs",
+    "freshRoot": null,
+    "actualFutureFields": [
+      "boundPaths",
+      "compiledPairs",
+      "existingNativePins",
+      "freshNative",
+      "helper",
+      "runtimeProtectedInputsPin",
+      "sourceSelectionPin",
+      "selectedPathCount",
+      "compiledPairCount",
+      "selectedPhysicalFileCount"
+    ],
+    "sourceSelectionPinHasPhysicalFieldsFromActualRead": true,
+    "all175ActiveProtectedInputsExact": true,
+    "vitestCreditFromHelper": false,
+    "prospectiveCountOrCompiledHashesAdopted": false,
+    "bothTreesCleanAndIndexesEmpty": true,
+    "heldRHead18RowsIndexExact": true,
+    "allSelectedPhysicalFilesDistinctRegularSingleLink": true,
+    "universalDescendantFilesystemEnvironmentLoaderIsolationClaim": false
+  },
+  "boundary": "Output flags are future helper contract requirements, not observed results. No fresh root, native identity/hash, clean-source outcome or binding is supplied in this preparation."
+}

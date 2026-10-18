@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-16T22:23:22.853918+00:00",
+  "mode": "apply",
+  "operator": "F1-order",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+  "binding": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "bytes": 88422,
+    "sha256": "2d45e6ae6c0632762ca7bc358744d4ba44686f913bc0a696eacb3c079df3d86f",
+    "dev": 16777231,
+    "inode": 543575822,
+    "nlink": 1
+  },
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+    "bytes": 4249,
+    "sha256": "dc9f1e951177a6eb15ba853f65ef35afd94f9b6f9be75b5dceab637543b55cdd",
+    "dev": 16777231,
+    "inode": 543511354,
+    "nlink": 1
+  },
+  "canonicalOutcome": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-fresh-canonical-outcome.json",
+    "bytes": 4281,
+    "sha256": "f8dcd20623c0bb81d00c5b5deb41514a1b8c8f21cc20ab70b06b19cbf475258a",
+    "dev": 16777231,
+    "inode": 543576128,
+    "nlink": 1
+  },
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "regularSingleLinkCheckedBeforeWrite": true,
+  "sourceOnlyMutant": true,
+  "sourceBefore": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+  "mutant": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9",
+  "patchSha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22",
+  "patchCapturedFromLiveMutant": true,
+  "targetBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543530786,
+    "nlink": 1
+  },
+  "targetAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "bytes": 10942,
+    "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9",
+    "dev": 16777231,
+    "inode": 543530786,
+    "nlink": 1
+  }
+}

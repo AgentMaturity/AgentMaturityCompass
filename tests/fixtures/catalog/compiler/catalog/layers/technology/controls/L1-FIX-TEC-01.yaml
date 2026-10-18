@@ -1,0 +1,122 @@
+{
+  "id": "L1-FIX-TEC-01",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "synthetic-compiler-fixture",
+  "stations": [
+    "technology"
+  ],
+  "title": "Synthetic technology control",
+  "statement": "The compiler retains this explicitly synthetic planning requirement when its own predicate matches.",
+  "riskRationale": "Exercise planning branches without depending on unreviewed catalog content or claiming real enforcement.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "always": true
+    },
+    "reasons": [
+      "Synthetic compiler test data only."
+    ],
+    "exclusions": []
+  },
+  "citations": [],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "approvals",
+      "egress"
+    ],
+    "mechanism": "Synthetic planning binding only; no tool body or enforcement has run.",
+    "parameters": [
+      {
+        "name": "approvals.WRITE_HIGH.requiredApprovals",
+        "value": 2,
+        "strictness": "max"
+      },
+      {
+        "name": "approvals.WRITE_HIGH.requireDistinctUsers",
+        "value": true,
+        "strictness": "true_wins"
+      },
+      {
+        "name": "egress.allowHosts",
+        "value": [
+          "technology.example.test"
+        ],
+        "strictness": "union"
+      }
+    ],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L1-FIX-TEC-01-T1",
+      "type": "configuration_check",
+      "oracle": {
+        "kind": "signed_config",
+        "observes": "Synthetic catalog fixture shape only; this entry does not execute a runtime oracle."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-FIX-TEC-01/positive/valid.json"
+        ],
+        "negative": [
+          "L1-FIX-TEC-01/negative/violation.json"
+        ]
+      },
+      "passCriteria": "The compiler schedules this fixture contract without claiming it has executed.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-FIX-TEC-01-E1",
+      "producer": "amc.ledger",
+      "bindingFields": [
+        "workspaceId",
+        "controlId",
+        "controlVersion",
+        "policyDigest"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "fixture_owner"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-16",
+    "approvedBy": null
+  }
+}

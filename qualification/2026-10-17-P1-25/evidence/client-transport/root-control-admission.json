@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-16T21:48:16.286188+00:00",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "helperV2WholeSourceAndPeerRead": true,
+  "sourceAndFreshCanonical28ExactOrderedJoin": true,
+  "actualHookTaskEntries": 2,
+  "actualIndividualHookValues": 3,
+  "rootOwnsExplicitOperations": true,
+  "onlyFreshTargetSourceMutates": true,
+  "separateActualFailureReadAndManualClassificationRequiredBeforeEveryRestore": true,
+  "noCompiledNativeGuardEgressDeadlineMutation": true,
+  "allHoldsRetained": true
+}

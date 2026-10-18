@@ -1,0 +1,579 @@
+{
+  "issue": "P0-20",
+  "kind": "Bounded current /3 genuine signing/admission qualification with private causal copies",
+  "capturedUtc": "2026-10-14T20:02:51.584612+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-20-current-qualification",
+  "sourceDuringRuns": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "headAtReceipt": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/tests/industryPackAuditSigningQualification.test.ts",
+    "bytes": 14300,
+    "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7"
+  },
+  "registeredRun": {
+    "raw": {
+      "path": "/private/tmp/p0-20-signing-first-20261015.json",
+      "bytes": 9108,
+      "sha256": "a3e92cc0b7ce53530c01a6cf1a6b7bc9119ec207faa3c3acd36b9ae59a277b13"
+    },
+    "counts": {
+      "numTotalTests": 21,
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "command": {
+      "name": "signing-first",
+      "cmd": "pnpm exec vitest run tests/industryPackAuditSigningQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signing-first-20261015.json",
+      "exit": 0,
+      "durationMs": 3244,
+      "startedUtc": "2026-10-14T19:58:24.386473+00:00",
+      "log": "/private/tmp/p0-20-signing-first-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    },
+    "sourceWasBaseWithUncommittedNewTest": true
+  },
+  "pinProvenance": {
+    "manifest": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/pins-before-signing.json",
+      "bytes": 2650,
+      "sha256": "85b62b9a5f3046a4e110bd171df4406697cbdc6afeae648da803677ded62294b"
+    },
+    "signedAfterPins": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/signed-after-pins.json",
+      "bytes": 127100,
+      "sha256": "89d551c1595977b84f32d38e46e898327a8022118de7c6ec58176205011564df"
+    },
+    "recordedAt": "2026-10-14T19:58:27.534Z",
+    "signedAfterAt": "2026-10-14T19:58:27.540Z",
+    "recordPrecedesSignatureTimes": true,
+    "auditorKeyId": "207f46d9032e2970da8e184cdc6dfb6967356fe5e2f968f8d6df441b99553c69",
+    "otherAuditorKeyId": "ace69c5261cb1dd9a04f1236bda6dd61ba40e5e024e461ea63ad7a2d1e2a32b2",
+    "pinsReadFromNewWorkspacesBeforeSigningNotFromArtifacts": true,
+    "actualLocalVaultRouteAssertedBeforeSigning": true
+  },
+  "publicEvidence": {
+    "directory": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa",
+    "files": [
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-admitted-control.audit.json",
+        "bytes": 40599,
+        "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-allow-unanchored.audit.json",
+        "bytes": 40599,
+        "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-allow-unpinned.audit.json",
+        "bytes": 40599,
+        "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-both-allows.audit.json",
+        "bytes": 40599,
+        "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-strict.audit.json",
+        "bytes": 40599,
+        "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/claim-cap-3.audit.json",
+        "bytes": 40599,
+        "sha256": "87881fffdd5c3f608f38b3aa03f8059be9f650af825ad7830d5d81f15efbd59e"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/claim-cap-5.audit.json",
+        "bytes": 21321,
+        "sha256": "13a703ebb298d2f128f3e445698aee439df5c83fe452ef44d82557b65173611e"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-admitted-control.audit.json",
+        "bytes": 40599,
+        "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-allow-unanchored.audit.json",
+        "bytes": 40599,
+        "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-allow-unpinned.audit.json",
+        "bytes": 40599,
+        "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-both-allows.audit.json",
+        "bytes": 40599,
+        "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-strict.audit.json",
+        "bytes": 40599,
+        "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/locator-false.audit.json",
+        "bytes": 40599,
+        "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/locator-true.audit.json",
+        "bytes": 40599,
+        "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/pins-before-signing.json",
+        "bytes": 2650,
+        "sha256": "85b62b9a5f3046a4e110bd171df4406697cbdc6afeae648da803677ded62294b"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/signed-after-pins.json",
+        "bytes": 127100,
+        "sha256": "89d551c1595977b84f32d38e46e898327a8022118de7c6ec58176205011564df"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/synthetic-refused.audit.json",
+        "bytes": 39617,
+        "sha256": "62f1936187523ba694a0dae4cd6b635bd5d313899f73b645ca0a885f32e628d6"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/tamper-rechecksum.audit.json",
+        "bytes": 40595,
+        "sha256": "e318b79f0ae7b43fdb8b290e1219aca57a2992824f7a88b25963bc495cf5ec09"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-allow-unanchored.audit.json",
+        "bytes": 39691,
+        "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-allow-unpinned.audit.json",
+        "bytes": 39691,
+        "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-both-allows.audit.json",
+        "bytes": 39691,
+        "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-strict.audit.json",
+        "bytes": 39691,
+        "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/untouched.audit.json",
+        "bytes": 40599,
+        "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996"
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/verification-observations.json",
+        "bytes": 57168,
+        "sha256": "015aabcf48fe86f2e6cd0ab1a8b74ec61f740a0ddc2f37600d1cada86045dcd8"
+      }
+    ],
+    "observationsFile": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/verification-observations.json",
+      "bytes": 57168,
+      "sha256": "015aabcf48fe86f2e6cd0ab1a8b74ec61f740a0ddc2f37600d1cada86045dcd8"
+    },
+    "actualVerifierObservations": 20,
+    "observationCountBasis": "21 registered tests include two no-verification signing-refusal cases and one two-verification foreign/attacker control, so20 actual verify calls are recorded.",
+    "privateKeyMarkersAbsent": true,
+    "privateKeyMarkerFindings": [],
+    "scope": "Only public auditor keys, genuine signed audit answers, typed reports and source pins. Own initialized workspaces/home were removed by paired cleanup. No raw vault/issuer private key is retained."
+  },
+  "actualContracts": [
+    "Untouched /3 audit is genuinely Ed25519-signed through the current binder signer and trusted only under the independently pre-recorded artifact-seal pin; independent node:crypto verification confirms signature bytes.",
+    "A coherent B-workspace signature and B-binder-signed attacker replacement envelope pass actual integrity but remain untrusted under A-only context. Independently recorded B trust positively verifies both exact controls.",
+    "All strict/allow-unpinned/allow-unanchored/both variants preserve trusted:false for foreign and attacker issuers; allow-unpinned returns integrity-only exit2, not trusted or exit0. Other cases return refusal1.",
+    "Explicit public PEM and embedded key alone are locator candidates and do not confer issuer admission.",
+    "Meaningful first control ADEQUATE/L3\u2192PASS/L5 tamper plus recomputed checksum preserves the original signature, passes checksum and fails current digest/signature checks.",
+    "Unsigned bundles are refused1 under all four allow variants. Actual no-answer baseline has overall.claimKind synthetic_example, null eligibleLevel and cannot be signed. Bad checksums are also refused by the signer.",
+    "All20 answered signed/control verifier outputs and signed/unsigned L3/L5 controls remain self_reported/not_evaluated with eligibleLevel1. Markdown canonical labels preserve those caps; verifier trust does not promote answer claims."
+  ],
+  "inputEffects": {
+    "originalAnsweredCanonicalBytesRemainUnchanged": true,
+    "signatureAdditionLeavesReceiptHashStable": true,
+    "sourceInputs": [
+      {
+        "path": "src/domains/industryPackAudit.ts",
+        "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+        "currentSha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+        "unchanged": true
+      },
+      {
+        "path": "src/audit/binderSigner.ts",
+        "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+        "currentSha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+        "unchanged": true
+      },
+      {
+        "path": "src/org/orgSigner.ts",
+        "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+        "currentSha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+        "unchanged": true
+      },
+      {
+        "path": "src/trust/admission.ts",
+        "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "currentSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "unchanged": true
+      },
+      {
+        "path": "src/trust/signatureCheck.ts",
+        "sha256": "460aea518cdf88b219e75696e0e5244008f4739b5cbeaea42a370a2062d2a3b6",
+        "currentSha256": "460aea518cdf88b219e75696e0e5244008f4739b5cbeaea42a370a2062d2a3b6",
+        "unchanged": true
+      },
+      {
+        "path": "tests/helpers/trustContext.ts",
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "currentSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "unchanged": true
+      },
+      {
+        "path": "tests/industryPackAudit.test.ts",
+        "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+        "currentSha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+        "unchanged": true
+      },
+      {
+        "path": "tests/industryPackAuditSigningQualification.test.ts",
+        "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+        "currentSha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+        "unchanged": true
+      }
+    ],
+    "trackedStatusAtReceipt": "",
+    "note": "This file proves original in-memory audit-input stability and owned fixture lifecycle. It is not a filesystem/link/race/no-ghost-write snapshot suite; root owns contained-reader effects and licensed compiled CLI."
+  },
+  "privateCausal": {
+    "metadata": {
+      "path": "/private/tmp/p0-20-private-audit-causal-fixture-20261015.json",
+      "bytes": 3162,
+      "sha256": "575206191668d81e523d1d8048494653dc311a6615b99aa546ee1a0028425aa6"
+    },
+    "script": {
+      "path": "/private/tmp/p0-20-private-audit-causal-20261015.mjs",
+      "bytes": 6062,
+      "sha256": "94ef75f3970645d99c184b3ff9d32bfe46fc4301743302d65000c5ba0176d6f7"
+    },
+    "fixtureRoot": "/private/tmp/p0-20-private-audit-causal-84cu5u5a",
+    "normalization": "Only relative static imports are routed to their exact original built file URLs; bare zod resolves through the owned node_modules symlink. Baseline/private mutants share identical routing.",
+    "originalCompiledSha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f",
+    "dependencyPins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/utils/hash.js",
+        "sha256": "89eb0ccd539c4d12045ad29906d121da226aadbe5aa1f3b2519fe30c098309d0"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/utils/json.js",
+        "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/claims/eligibility/adapters.js",
+        "sha256": "4a3affe83b480384eccfd94b383d1ca67e1f4c089db5d9ac9077451419f665c7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/claims/eligibility/adapters/results.js",
+        "sha256": "72f974c0b8caa68b3c68fcdec1091ad1413a5f0408f1c7b7f36731b145b6c2f5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/claims/eligibility/render.js",
+        "sha256": "bdd84c7c568f75ced0da733710ecda4d15bf1a267ccff4cb28312c1e37cb2cf8"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/audit/binderSchema.js",
+        "sha256": "8a4adee7376cc82c868a49c6938b38ab442ded7c17dad148162cc7ff844c24ac"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/audit/binderSigner.js",
+        "sha256": "1242f865d6c2a3a14dee9d6800e8d1b671a6691b68542efcec79ee4ceec425fd"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/claims/eligibility/exampleMode.js",
+        "sha256": "5379215a9a02507124481f80906e7e90aa365fc073354719792551001eddc4ea"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/trust/index.js",
+        "sha256": "d16c417b101d105610b912511f0c84f32c59e69092a44661b75de320611dc2c5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/dist/domains/packSelfAssessment.js",
+        "sha256": "252ff3c8c1f4c152f1e213354b20e945e7cf174e2051111579f79b68bcb7a67f"
+      }
+    ],
+    "phases": [
+      {
+        "phase": "baseline",
+        "raw": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/baseline.json",
+          "bytes": 17921,
+          "sha256": "ce12ecae31dff573066d28da2183adc524b2186f1f7bf2bb7975924a2fd0d625"
+        },
+        "observedModule": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/baseline.observed.mjs",
+          "bytes": 23180,
+          "sha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af"
+        },
+        "counts": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0
+        },
+        "failures": [],
+        "originalInputsUnchanged": true,
+        "privateModuleRestoredExactly": true,
+        "originalModuleSha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f",
+        "baselineModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "observedModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "restoredModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "tamperActual": {
+          "ok": false,
+          "signatureOk": false,
+          "errors": [
+            "DIGEST_MISMATCH",
+            "SIGNATURE_INVALID"
+          ]
+        }
+      },
+      {
+        "phase": "auto-pin",
+        "raw": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/auto-pin.json",
+          "bytes": 17434,
+          "sha256": "9f02e54a5cd6ce24dac3713aa97f8add97de235298c8ec59677e873a2eda5249"
+        },
+        "observedModule": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/auto-pin.observed.mjs",
+          "bytes": 23371,
+          "sha256": "d19214c00d6b3cff3eaab6f7b2e5dc4869c506a73ff2f21633ad42bbc8d88da9"
+        },
+        "counts": {
+          "total": 4,
+          "passed": 2,
+          "failed": 2
+        },
+        "failures": [
+          {
+            "name": "foreign-strict",
+            "failedConstraints": [
+              "refused",
+              "unadmittedOtherIssuer",
+              "onlyAdmissionError"
+            ]
+          },
+          {
+            "name": "attacker-strict",
+            "failedConstraints": [
+              "refused",
+              "unadmittedOtherIssuer",
+              "onlyAdmissionError"
+            ]
+          }
+        ],
+        "originalInputsUnchanged": true,
+        "privateModuleRestoredExactly": true,
+        "originalModuleSha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f",
+        "baselineModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "observedModuleSha256": "d19214c00d6b3cff3eaab6f7b2e5dc4869c506a73ff2f21633ad42bbc8d88da9",
+        "restoredModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "tamperActual": {
+          "ok": false,
+          "signatureOk": false,
+          "errors": [
+            "DIGEST_MISMATCH",
+            "SIGNATURE_INVALID"
+          ]
+        }
+      },
+      {
+        "phase": "digest-check-removed",
+        "raw": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/digest-check-removed.json",
+          "bytes": 17963,
+          "sha256": "8b0745c66fe3416013f7bde878d4a2df4ea46f80814d9777bea08a34d90d28fe"
+        },
+        "observedModule": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/digest-check-removed.observed.mjs",
+          "bytes": 23050,
+          "sha256": "5ad64ff756e6b8f52db2611e3e3d2e9eaca2aad3c0dd8c0fdb8c76c9ffab6529"
+        },
+        "counts": {
+          "total": 4,
+          "passed": 3,
+          "failed": 1
+        },
+        "failures": [
+          {
+            "name": "tamper-rechecksum",
+            "failedConstraints": [
+              "digestDiagnostic"
+            ]
+          }
+        ],
+        "originalInputsUnchanged": true,
+        "privateModuleRestoredExactly": true,
+        "originalModuleSha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f",
+        "baselineModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "observedModuleSha256": "5ad64ff756e6b8f52db2611e3e3d2e9eaca2aad3c0dd8c0fdb8c76c9ffab6529",
+        "restoredModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "tamperActual": {
+          "ok": false,
+          "signatureOk": false,
+          "errors": [
+            "SIGNATURE_INVALID"
+          ]
+        }
+      },
+      {
+        "phase": "restored",
+        "raw": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/restored.json",
+          "bytes": 17921,
+          "sha256": "5887d6f6cbc5e95cbf5a8fe2fdf7b7cc3cac70df00d306d4e86b5ec2cfc3383d"
+        },
+        "observedModule": {
+          "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/restored.observed.mjs",
+          "bytes": 23180,
+          "sha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af"
+        },
+        "counts": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0
+        },
+        "failures": [],
+        "originalInputsUnchanged": true,
+        "privateModuleRestoredExactly": true,
+        "originalModuleSha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f",
+        "baselineModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "observedModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "restoredModuleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "tamperActual": {
+          "ok": false,
+          "signatureOk": false,
+          "errors": [
+            "DIGEST_MISMATCH",
+            "SIGNATURE_INVALID"
+          ]
+        }
+      }
+    ],
+    "patches": [
+      {
+        "path": "/private/tmp/p0-20-private-auto-pin-20261015.patch",
+        "bytes": 965,
+        "sha256": "f4b6690d247b3bc04a58b9522cdad0e7dd0305eab648c91e6f008f0291f58eb6"
+      },
+      {
+        "path": "/private/tmp/p0-20-private-digest-check-removed-20261015.patch",
+        "bytes": 654,
+        "sha256": "741185d131835090d754b1a1558522a72681781cec6f7e37eaec0bb1861e9e7c"
+      }
+    ],
+    "meaning": "Four standalone observer checks per phase are separate from21 registered tests. Auto-pin wrong acceptance breaks precisely genuine foreign/attacker refusal controls. Exact digest-comparison removal breaks only the current DIGEST_MISMATCH diagnostic assertion; fresh-digest cryptographic verification still refuses tamper. It is not a tamper-acceptance witness. All active private bytes restore after each phase; original compiled/source/test/dependency inputs remain unchanged."
+  },
+  "commands": [
+    {
+      "name": "signing-first",
+      "cmd": "pnpm exec vitest run tests/industryPackAuditSigningQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signing-first-20261015.json",
+      "exit": 0,
+      "durationMs": 3244,
+      "startedUtc": "2026-10-14T19:58:24.386473+00:00",
+      "log": "/private/tmp/p0-20-signing-first-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    },
+    {
+      "name": "signing-private-baseline",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs baseline",
+      "exit": 0,
+      "durationMs": 149,
+      "startedUtc": "2026-10-14T20:00:42.087099+00:00",
+      "log": "/private/tmp/p0-20-signing-private-baseline-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    },
+    {
+      "name": "signing-private-auto-pin",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs auto-pin",
+      "exit": 1,
+      "durationMs": 152,
+      "startedUtc": "2026-10-14T20:00:52.698303+00:00",
+      "log": "/private/tmp/p0-20-signing-private-auto-pin-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    },
+    {
+      "name": "signing-private-digest-check-removed",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs digest-check-removed",
+      "exit": 1,
+      "durationMs": 142,
+      "startedUtc": "2026-10-14T20:00:52.950501+00:00",
+      "log": "/private/tmp/p0-20-signing-private-digest-check-removed-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    },
+    {
+      "name": "signing-private-restored",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs restored",
+      "exit": 0,
+      "durationMs": 140,
+      "startedUtc": "2026-10-14T20:00:53.189154+00:00",
+      "log": "/private/tmp/p0-20-signing-private-restored-20261015.log",
+      "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+    }
+  ],
+  "commandLogs": [
+    {
+      "path": "/private/tmp/p0-20-signing-first-20261015.log",
+      "bytes": 70,
+      "sha256": "674b82eb5dffd1b217f1ffcbc07ccae82bea237b4c44c84131fb7f21dca714e4"
+    },
+    {
+      "path": "/private/tmp/p0-20-signing-private-baseline-20261015.log",
+      "bytes": 154,
+      "sha256": "e02cc8490c2c3e8d7700302b03adb6c361b3551b9ac90cf5916f948274082897"
+    },
+    {
+      "path": "/private/tmp/p0-20-signing-private-auto-pin-20261015.log",
+      "bytes": 154,
+      "sha256": "3c95713d4bcef04143177f4c5be9a544511f7882779fc6f2a206c1d24d94d097"
+    },
+    {
+      "path": "/private/tmp/p0-20-signing-private-digest-check-removed-20261015.log",
+      "bytes": 178,
+      "sha256": "62cb7b505c499682efcccad95a8c2e96dca7c446ef933b4e987950ef9af50879"
+    },
+    {
+      "path": "/private/tmp/p0-20-signing-private-restored-20261015.log",
+      "bytes": 154,
+      "sha256": "c7538fa9889b7b447e89119e274c732cc49a51b7ad4159f24ee09b8447b2a043"
+    }
+  ],
+  "currentVsHistorical": {
+    "currentSchema": "amc.industry-pack-audit/3",
+    "claimKindLocation": "overall.claimKind",
+    "currentKeyAuthority": "Explicit TrustContext artifact-seal admission, not obsolete workspace/trustedPublicKeysPem parameters or embedded-key trust.",
+    "spec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-20.md",
+      "bytes": 11001,
+      "sha256": "37ec0c324825688883f173007800cdcf3e9e1fdc3f1dc811971cf0244805ffc9"
+    },
+    "historicalBeforeFix": "No historical origin/main/1 tamper-acceptance rerun performed here. Current accepted production is already fixed, so first runtime phase is genuine GREEN.",
+    "historicalMutationDifference": "Current crypto checks freshly recomputed body digest independently of explicit mismatch comparison. Preserve refusal and report the diagnostic-only exact removal honestly; no acceptance rewrite or waiver."
+  },
+  "limits": [
+    "Only NEW tests/industryPackAuditSigningQualification.test.ts authored in repository. No producer/verifier/helper/original-test/shared-route/archive/dependency/freeze/floor edit, mocks or live mutation.",
+    "Actual licensed compiled CLI messages/exit/effects and contained binder-reader contracts are root-owned separate evidence; not inferred from these helper results. No paid-gate bypass, activation, live provider/notary transport or external request.",
+    "Node22.23.3/pnpm10.33.0 only; no Node24/whole-suite/coverage/hosted/release or full P0-20/P0-55 acceptance claim.",
+    "Prior unresolved P0-22/P0-23/P0-51/P0-52 outcomes and skipped P0-29 remain active; paused A4/shared source stays untouched."
+  ],
+  "observerNotes": "No runtime observer setup failure occurred. The private REDs are intentional guard witnesses, not current product failures. Vitest JSON reporter did not retain console evidence-directory text in its 70-byte raw log; the owned public directory was identified by its exact new-test source pin and retained location record.",
+  "runtimeIdle": true
+}

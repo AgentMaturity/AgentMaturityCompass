@@ -1,0 +1,67 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "beforeSha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+      "afterSha256": "7dd9acc745c61725fa6560b686830ae341eab1879e5f384776e2dabe69204cac",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "beforeSha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+      "afterSha256": "9762854e2cc7d9667d97dfffbe5cfd2c88474b7e66259963c98a261509d97afb",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "website/index.html",
+      "beforeSha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+      "afterSha256": "772fe9b47309956215fd19aace1c636bebdea18bc1a7fc507e024645e1d78b09",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "website/lite.html",
+      "beforeSha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+      "afterSha256": "143e98e2575b5e319d845703280bc673b20b203b745251c229ebfc23e8b6082d",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "website/i18n.js",
+      "beforeSha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+      "afterSha256": "194cfc6c8b674b25021ffd2c41644675769aead44a68c255674c556ec9ed1a8f",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "beforeSha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+      "afterSha256": "2d5c866c475e2c9b79e43599cb48f0d631822d36440783cc9a86609c1e803f29",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "beforeSha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+      "afterSha256": "b1f57c2d12748fb72260d977d962f5e2015d412e2f1416d7934d0a7a8cc99978",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "beforeSha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+      "afterSha256": "8dacba9d2538406d80fbc9eca06cc37c668d0e687ef9848aff323dbc5bf1ae70",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "beforeSha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+      "afterSha256": "20812a5784444438819208bb339b7612b41c212e1f27f7522396e4d1d130e87d",
+      "onlyTestSourceCount1679To1682": true
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "beforeSha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+      "afterSha256": "6c6907e76b3b6c074db56c14d8d2776c16c3b5eb8a19ece14ab55adf65036637",
+      "onlyTestSourceCount1679To1682": true
+    }
+  ],
+  "testSourceFileInventoryOnly": true,
+  "runtimePassingCountsInvented": false,
+  "heldRAndClaudeUntouched": true
+}

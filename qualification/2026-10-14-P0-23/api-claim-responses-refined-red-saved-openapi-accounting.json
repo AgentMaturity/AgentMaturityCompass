@@ -1,0 +1,1432 @@
+{
+  "registryCount": 113,
+  "violations": [
+    "GET /api/v1/score/evidence-drilldown/:runId/:questionId: expected exactly one operation, found 0",
+    "POST /api/v1/score/industry/adjust: expected exactly one operation, found 0",
+    "GET /api/v1/score/industry/models: expected exactly one operation, found 0",
+    "GET /api/v1/score/industry/model/:industryId: expected exactly one operation, found 0",
+    "POST /api/v1/score/lane/safety-research: expected exactly one operation, found 0",
+    "POST /api/v1/score/judge-calibration: expected exactly one operation, found 0",
+    "POST /api/v1/score/live-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/promptfoo-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/inspect-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/tensorzero-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/helm-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/patronus-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/score/trust/verify-claim: expected exactly one operation, found 0",
+    "POST /api/v1/score/trust/transitive: expected exactly one operation, found 0",
+    "POST /api/v1/score/trust/decay: expected exactly one operation, found 0",
+    "POST /api/v1/score/trust/inherited: expected exactly one operation, found 0",
+    "POST /api/v1/passport/trust-token/verify: expected exactly one operation, found 0",
+    "POST /api/v1/passport/trust-token/translate: expected exactly one operation, found 0",
+    "POST /api/v1/badge/export: expected exactly one operation, found 0",
+    "POST /api/v1/bundle/verify: expected exactly one operation, found 0",
+    "POST /api/v1/bundle/inspect: expected exactly one operation, found 0",
+    "POST /api/v1/bundle/diff: expected exactly one operation, found 0",
+    "POST /api/v1/bundle/export: expected exactly one operation, found 0",
+    "POST /api/v1/bom/verify: expected exactly one operation, found 0",
+    "POST /api/v1/enforce/formal/certificate: expected exactly one operation, found 0",
+    "POST /api/v1/enforce/formal/verify: expected exactly one operation, found 0",
+    "POST /api/v1/assurance: expected exactly one operation, found 0",
+    "GET /api/v1/assurance: expected exactly one operation, found 0",
+    "GET /api/v1/assurance/:runId: expected exactly one operation, found 0",
+    "GET /api/v1/assurance/history: expected exactly one operation, found 0",
+    "POST /api/v1/assurance/verify: expected exactly one operation, found 0",
+    "GET /api/v1/assurance/workspace/verify: expected exactly one operation, found 0",
+    "POST /api/v1/assurance/lab/:packName: expected exactly one operation, found 0",
+    "POST /api/v1/assurance/cert: expected exactly one operation, found 0",
+    "GET /api/v1/assurance/cert/latest: expected exactly one operation, found 0",
+    "POST /api/v1/assurance/cert/verify: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/verify: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/promptfoo-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/inspect-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/tensorzero-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/benchmarks/helm-provider-drift: expected exactly one operation, found 0",
+    "POST /api/v1/shield/red-team/run: expected exactly one operation, found 0",
+    "POST /api/v1/shield/trust-pipeline/run: expected exactly one operation, found 0",
+    "POST /api/v1/shield/exploit-confirmation/run: 201 response schemas lack #/components/schemas/ClaimResult",
+    "POST /api/v1/shield/replay-corpus/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/live-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/judge-calibration/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/promptfoo-provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/inspect-provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/tensorzero-provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/helm-provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/shield/patronus-provider-drift/verify: expected exactly one operation, found 0",
+    "POST /api/v1/compliance/regulatory/check: expected exactly one operation, found 0",
+    "GET /api/v1/incidents/:id/clocks: expected exactly one operation, found 0"
+  ],
+  "accounting": [
+    {
+      "method": "GET",
+      "path": "/api/v1/score/latest",
+      "matchingPaths": [
+        "/v1/score/latest"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/history",
+      "matchingPaths": [
+        "/v1/score/history"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/runs",
+      "matchingPaths": [
+        "/v1/score/runs"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/run",
+      "matchingPaths": [
+        "/v1/score/run"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/run/:runId",
+      "matchingPaths": [
+        "/v1/score/run/{runId}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/report",
+      "matchingPaths": [
+        "/v1/score/report"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json",
+            "text/markdown"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/report/:runId",
+      "matchingPaths": [
+        "/v1/score/report/{runId}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json",
+            "text/markdown"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/result/:sessionId",
+      "matchingPaths": [
+        "/v1/score/result/{sessionId}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/quick",
+      "matchingPaths": [
+        "/v1/score/quick"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/quickscore",
+      "matchingPaths": [
+        "/v1/score/quickscore"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/compare",
+      "matchingPaths": [
+        "/v1/score/compare"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/compare",
+      "matchingPaths": [
+        "/v1/score/compare"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/formal-spec",
+      "matchingPaths": [
+        "/v1/score/formal-spec"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/adversarial",
+      "matchingPaths": [
+        "/v1/score/adversarial"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/evidence-drilldown/:runId/:questionId",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/industry/adjust",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/industry/models",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/score/industry/model/:industryId",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/lane/safety-research",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/judge-calibration",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/live-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/promptfoo-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/inspect-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/tensorzero-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/helm-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/patronus-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/trust/verify-claim",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/trust/transitive",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/trust/decay",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/score/trust/inherited",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/passport/:id",
+      "matchingPaths": [
+        "/v1/passport/{id}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/passport/:id/verify",
+      "matchingPaths": [
+        "/v1/passport/{id}/verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/passports",
+      "matchingPaths": [
+        "/v1/passports"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/passport/trust-token/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/passport/trust-token/translate",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/badge/export",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bundle/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bundle/inspect",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bundle/diff",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bundle/export",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bom/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/attest/notary",
+      "matchingPaths": [
+        "/v1/attest/notary"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/attest/notary/verify",
+      "matchingPaths": [
+        "/v1/attest/notary/verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/attest/outcome",
+      "matchingPaths": [
+        "/v1/attest/outcome"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/export/badge",
+      "matchingPaths": [
+        "/v1/export/badge"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/export/badge/generate",
+      "matchingPaths": [
+        "/v1/export/badge/generate"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/export/badge/url",
+      "matchingPaths": [
+        "/v1/export/badge/url"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/security/sleeper-detection",
+      "matchingPaths": [
+        "/v1/security/sleeper-detection"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/security/gaming-resistance",
+      "matchingPaths": [
+        "/v1/security/gaming-resistance"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/security/adversarial",
+      "matchingPaths": [
+        "/v1/security/adversarial"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/security/insider/scores",
+      "matchingPaths": [
+        "/v1/security/insider/scores"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/security/insider/report",
+      "matchingPaths": [
+        "/v1/security/insider/report"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/cert/issue",
+      "matchingPaths": [
+        "/v1/crypto/cert/issue"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "201",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/cert/verify",
+      "matchingPaths": [
+        "/v1/crypto/cert/verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/cert/inspect",
+      "matchingPaths": [
+        "/v1/crypto/cert/inspect"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/cert/verify-revocation",
+      "matchingPaths": [
+        "/v1/crypto/cert/verify-revocation"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/notary/verify-attest",
+      "matchingPaths": [
+        "/v1/crypto/notary/verify-attest"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/crypto/notary/log-verify",
+      "matchingPaths": [
+        "/v1/crypto/notary/log-verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/crypto/merkle/verify-proof",
+      "matchingPaths": [
+        "/v1/crypto/merkle/verify-proof"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/enforce/formal/certificate",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/enforce/formal/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/fleet/report",
+      "matchingPaths": [
+        "/v1/fleet/report"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/fleet/agents/:agentId",
+      "matchingPaths": [
+        "/v1/fleet/agents/{agentId}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ci/gate",
+      "matchingPaths": [
+        "/v1/ci/gate"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ci/predict",
+      "matchingPaths": [
+        "/v1/ci/predict"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/proof/check",
+      "matchingPaths": [
+        "/v1/proof/check"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/proof/status",
+      "matchingPaths": [
+        "/v1/proof/status"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/compliance/verify",
+      "matchingPaths": [
+        "/v1/compliance/verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assurance",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance/:runId",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance/history",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance/readiness",
+      "matchingPaths": [
+        "/v1/assurance/readiness"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assurance/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance/workspace/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assurance/lab/:packName",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assurance/cert",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assurance/cert/latest",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assurance/cert/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/benchmarks/stats",
+      "matchingPaths": [
+        "/v1/benchmarks/stats"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/promptfoo-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/inspect-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/tensorzero-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/benchmarks/helm-provider-drift",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/red-team/run",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/trust-pipeline/run",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/exploit-confirmation/run",
+      "matchingPaths": [
+        "/v1/shield/exploit-confirmation/run"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        },
+        {
+          "status": "201",
+          "mediaTypes": [],
+          "claimReference": false
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/replay-corpus/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/live-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/judge-calibration/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/promptfoo-provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/inspect-provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/tensorzero-provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/helm-provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shield/patronus-provider-drift/verify",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/compliance/report",
+      "matchingPaths": [
+        "/v1/compliance/report"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "201",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/compliance/fleet",
+      "matchingPaths": [
+        "/v1/compliance/fleet"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/compliance/diff",
+      "matchingPaths": [
+        "/v1/compliance/diff"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/compliance/regulatory/check",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/regulatory/eu-ai-act",
+      "matchingPaths": [
+        "/v1/regulatory/eu-ai-act"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/regulatory/owasp-llm",
+      "matchingPaths": [
+        "/v1/regulatory/owasp-llm"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/regulatory/readiness",
+      "matchingPaths": [
+        "/v1/regulatory/readiness"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/incidents/:id/clocks",
+      "matchingPaths": [],
+      "operationCount": 0,
+      "successes": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id/monitor",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}/monitor"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id/verify",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}/verify"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id/readiness",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}/readiness"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id/conformance",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}/conformance"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/a4/projects/:id/value",
+      "matchingPaths": [
+        "/v1/a4/projects/{projectId}/value"
+      ],
+      "operationCount": 1,
+      "successes": [
+        {
+          "status": "200",
+          "mediaTypes": [
+            "application/json"
+          ],
+          "claimReference": true
+        }
+      ]
+    }
+  ]
+}

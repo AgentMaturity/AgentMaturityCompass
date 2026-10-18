@@ -1,0 +1,29 @@
+{
+  "schema": "p112-quality-finding-diagnostic/1",
+  "diagnosticOnly": true,
+  "qualityGateRemainsFailed": true,
+  "baselineAdopted": false,
+  "tools": {
+    "baseline": "6.39.0",
+    "current": "6.39.0"
+  },
+  "baseline": {
+    "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+    "count": 2724,
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-baseline-full.json",
+    "bytes": 248255,
+    "sha256": "7dbd9bc5036e9d763aaac5291ec63360d305b70465fcadd18dfb961e2d8ab0bc"
+  },
+  "current": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "count": 2723,
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+    "bytes": 248137,
+    "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3"
+  },
+  "removed": [
+    "[\"src/tools/guards/compiledPolicyGuard.ts\",\"exports\",{\"name\":\"compiledPolicyDenial\"}]"
+  ],
+  "added": [],
+  "boundary": "Two explicitly planned calls to the unchanged scanner export with retained full finding sets. Program completion is diagnostic execution only, not a successful dead-code quality gate. No source/config/baseline or finding was changed."
+}

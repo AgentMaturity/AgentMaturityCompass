@@ -1,0 +1,11 @@
+{
+  "schema": "p125w-private-text-construction-diagnostic/1",
+  "operation": "Initial inert text adaptation before helper was written or sealed",
+  "toolChunkId": "5f7899",
+  "exit": 1,
+  "error": "AssertionError",
+  "cause": "A predecessor metadata-protection footer name still contained142; construction refused before preferred candidate creation.",
+  "correction": "Footer now explicitly names151 active and148 nonmetadata runtime pins. Actual source/evidence was unchanged.",
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false
+}

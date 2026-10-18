@@ -234,6 +234,8 @@ with `JSON.stringify(lock, null, 2)`. It throws when the catalog did not load cl
 
 `verifyCatalogLock(lock, cat)` parses the stored lock strictly, rebuilds it from `cat` and returns
 `{ ok, mismatches: [{ path, expected, actual }] }`, naming each differing path (`packs[amc.l0.baseline].digest`).
+Duplicate pack, control and citation-source identities are invalid. Mismatch values are JSON-encoded so that
+`null` and the string `"null"` remain distinct. Valid lock serialization and catalog digests are unchanged.
 `generatedBy` is informational and not compared. A lock shows the content is unchanged; it does not show it is true.
 
 ## Published schemas

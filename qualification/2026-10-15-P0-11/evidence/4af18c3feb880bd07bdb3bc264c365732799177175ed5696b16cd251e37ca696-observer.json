@@ -1,0 +1,62 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 21954,
+  "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts"
+  ],
+  "testCount": 2,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1868585589",
+      "name": "tests/telemetryExporterFailure.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1868585589_0",
+      "name": "tests/telemetryExporterFailure.test.ts a failing telemetry exporter (failure policy: telemetry-exporter-down)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1868585589_0_0",
+      "name": "tests/telemetryExporterFailure.test.ts a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when recording throws",
+      "fullName": "a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when recording throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1868585589_0_1",
+      "name": "tests/telemetryExporterFailure.test.ts a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when the collector is unreachable",
+      "fullName": "a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when the collector is unreachable",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

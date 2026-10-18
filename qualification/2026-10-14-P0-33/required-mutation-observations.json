@@ -1,0 +1,77 @@
+[
+  {
+    "name": "registry-step-removed",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/releaseGateExecution.test.ts",
+      "--testNamePattern",
+      "registers every step in order",
+      "--reporter=dot",
+      "--reporter=json",
+      "--outputFile.json=tmp/p0-33-continuation/registry-step-removed.json"
+    ],
+    "exit": 1,
+    "durationMs": 715,
+    "sourceBeforeSha256": "0cb07348ab6e15cb6f9f1cdc4874d0ea02a71bebca6b653c8bd9a61b1921fa89",
+    "restoredSha256": "0cb07348ab6e15cb6f9f1cdc4874d0ea02a71bebca6b653c8bd9a61b1921fa89",
+    "counts": {
+      "numTotalTests": 33,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 32
+    }
+  },
+  {
+    "name": "ci-lint-removed",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/ciWorkflowContract.test.ts",
+      "--testNamePattern",
+      "requires full tests",
+      "--reporter=dot",
+      "--reporter=json",
+      "--outputFile.json=tmp/p0-33-continuation/ci-lint-removed.json"
+    ],
+    "exit": 1,
+    "durationMs": 588,
+    "sourceBeforeSha256": "4860f01ee509b1b603c9cc7d39e5e3e12197fd790f18007e3cdf88f54276cb55",
+    "restoredSha256": "4860f01ee509b1b603c9cc7d39e5e3e12197fd790f18007e3cdf88f54276cb55",
+    "counts": {
+      "numTotalTests": 4,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3
+    }
+  },
+  {
+    "name": "ci-release-job-removed",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/ciWorkflowContract.test.ts",
+      "--testNamePattern",
+      "requires full tests",
+      "--reporter=dot",
+      "--reporter=json",
+      "--outputFile.json=tmp/p0-33-continuation/ci-release-job-removed.json"
+    ],
+    "exit": 1,
+    "durationMs": 591,
+    "sourceBeforeSha256": "4860f01ee509b1b603c9cc7d39e5e3e12197fd790f18007e3cdf88f54276cb55",
+    "restoredSha256": "4860f01ee509b1b603c9cc7d39e5e3e12197fd790f18007e3cdf88f54276cb55",
+    "counts": {
+      "numTotalTests": 4,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 3
+    }
+  }
+]

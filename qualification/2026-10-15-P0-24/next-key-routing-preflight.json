@@ -1,0 +1,1241 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-14T22:19:22.732462+00:00",
+  "scope": "Read-only next-key routing after P0-24 bounded qualification; not a Done, implementation, release, expert or production transfer approval",
+  "measuredSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "workspace": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+  "headAtCapture": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "rootCurrentStagedBoundary": [],
+  "unstagedAtCapture": "",
+  "currentRootNewTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+    "bytes": 10628,
+    "lines": 171,
+    "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+  },
+  "protectedRefs": {
+    "primaryMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "primaryHeldPendingMain": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "durableClaudeCloneHead": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+  },
+  "planInputs": [
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "lines": 1128,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "lines": 910,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "lines": 270,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    }
+  ],
+  "indexParsing": {
+    "rowsAcrossAllGates": 191,
+    "allG0Rows": [
+      {
+        "key": "P0-01",
+        "issue": "Put the program contract in the repo; add tracked qualification receipts and freeze guards",
+        "priority": "Urgent",
+        "due": "Oct 9, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-09",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-02",
+        "issue": "Land or rebase the other session's uncommitted root patches",
+        "priority": "Urgent",
+        "due": "Oct 9, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "D-09",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-03",
+        "issue": "Inventory worktrees, branches and uncommitted paths; agree a cleanup plan with Sid",
+        "priority": "High",
+        "due": "Oct 16, 2026",
+        "route": "Needs-Sid",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In progress"
+      },
+      {
+        "key": "P0-04",
+        "issue": "Write the landing runbook and commit-to-slice map for candidate 37c1466b",
+        "priority": "Urgent",
+        "due": "Oct 9, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-13, P0-01",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-05",
+        "issue": "Fix fs.edit: literal replacement and atomic writes",
+        "priority": "Urgent",
+        "due": "Oct 11, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-06",
+        "issue": "Refuse the native shell outside Linux unless an explicit unsafe flag is set",
+        "priority": "Urgent",
+        "due": "Oct 11, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-07",
+        "issue": "Stop tests from rewriting tracked .amc/keys",
+        "priority": "High",
+        "due": "Oct 11, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-08",
+        "issue": "Build the shared claim-eligibility service: claim kinds and five status dimensions",
+        "priority": "Urgent",
+        "due": "Oct 14, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-09",
+        "issue": "Pin issuer keys in every verifier and treat UNANCHORED as a failure",
+        "priority": "Urgent",
+        "due": "Oct 18, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-10",
+        "issue": "Refuse unsigned break-glass overrides",
+        "priority": "High",
+        "due": "Oct 14, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-11",
+        "issue": "Write the threat model, channel coverage map and failure policy (A02)",
+        "priority": "High",
+        "due": "Oct 25, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-12",
+        "issue": "Land slice A: S3 and S5 (regulatory currency schema, register and EU AI Act timeline)",
+        "priority": "Urgent",
+        "due": "Oct 15, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-13, P0-01, P0-02, P0-04",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-13",
+        "issue": "Land slice B: S7 defect fixes and S9 fail-closed assurance packs",
+        "priority": "Urgent",
+        "due": "Oct 16, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-13, P0-01, P0-02, P0-04",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-14",
+        "issue": "Land slice C: S1 and S2 deployment hardening, including the Helm passphrase fix",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "D-03, D-13, P0-01, P0-02, P0-04",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-15",
+        "issue": "Delete fabricated-result paths; keep a labelled example mode",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08, P0-12, P0-13",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-16",
+        "issue": "Add a CI guard that proves no fabricated-score path remains",
+        "priority": "Urgent",
+        "due": "Oct 21, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-02, P0-15, P0-43",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-17",
+        "issue": "Make the compliance engine fail closed: no pass on empty data, evidence bound to control and scope",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-18",
+        "issue": "Derive trust tiers from provenance; quarantine the dogfood evidence seeder",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08, P0-09, P0-13",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-19",
+        "issue": "Fix assurance grading: refusals, tool-call-only replies and answer hints in prompts",
+        "priority": "High",
+        "due": "Oct 22, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-13, P0-17, P0-25",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-20",
+        "issue": "Sign industry-pack audits through the audit binder; correct the CLI message",
+        "priority": "High",
+        "due": "Oct 22, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-21",
+        "issue": "Use typed score units and one methodology; no certification from self-assessment",
+        "priority": "High",
+        "due": "Oct 22, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08, P0-12, P0-15",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-22",
+        "issue": "Label claim kinds on the CLI and in reports",
+        "priority": "Urgent",
+        "due": "Oct 24, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08, P0-15, P0-21",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-23",
+        "issue": "Label claim kinds on MCP, API and Studio; stop printing \"Certified\"",
+        "priority": "Urgent",
+        "due": "Oct 24, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08, P0-15, P0-21",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-24",
+        "issue": "Correct citations across packs, mappings, rubrics and profiles",
+        "priority": "High",
+        "due": "Oct 25, 2026",
+        "route": "Agent-Doable, Needs-Expert",
+        "blockedBy": "P0-12",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-25",
+        "issue": "Add a citation linter and missing-pack reference checks to CI",
+        "priority": "High",
+        "due": "Oct 21, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-02, P0-12",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-26",
+        "issue": "Review F5's 30 drop recommendations with Sid; apply confirmed drops only",
+        "priority": "High",
+        "due": "Oct 28, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "P0-12",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-27",
+        "issue": "Fix the O20 runtime findings: unsealed sessions, unsigned budget evidence, firewall HOME, export counts",
+        "priority": "High",
+        "due": "Oct 25, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-28",
+        "issue": "Run the docs truth reset (absorbs AMC-1550)",
+        "priority": "High",
+        "due": "Oct 28, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-03, P0-15, P0-22, P0-23",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-29",
+        "issue": "Reconcile the 290-ID gap register (AMC-1496) into this plan",
+        "priority": "High",
+        "due": "Oct 30, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-30",
+        "issue": "Close-out A: run the security mutation batch for in-flight fixes",
+        "priority": "Urgent",
+        "due": "Oct 25, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-01, P0-07, P0-13",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-31",
+        "issue": "Close-out B: rerun installed acceptance on the release candidate",
+        "priority": "High",
+        "due": "Oct 29, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-01, P0-13, P0-27, P0-33, P0-34",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-32",
+        "issue": "Close-out C: apply the Done contract to Done-candidates and confirm PR #22",
+        "priority": "High",
+        "due": "Oct 30, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "P0-01, P0-30, P0-31",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-33",
+        "issue": "Make the release gate and CI green on main, with every check executed",
+        "priority": "Urgent",
+        "due": "Oct 24, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-03, P0-02, P0-07, P0-16, P1-52",
+        "historicalTrackerStatus": "In progress"
+      },
+      {
+        "key": "P0-34",
+        "issue": "Prepare the 1.2.0 release surface: bundled runtime, hidden unqualified surfaces, changesets and notes",
+        "priority": "Urgent",
+        "due": "Oct 28, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-03, D-06, D-12, P0-06, P0-22, P0-23, P0-28, P0-33",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-35",
+        "issue": "Pin container base images by digest and rebuild the quickstart for 1.2.0 (absorbs AMC-1527)",
+        "priority": "Urgent",
+        "due": "Oct 28, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-03, P0-14",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-36",
+        "issue": "Draft the GitHub security advisory for 1.1.1",
+        "priority": "Urgent",
+        "due": "Oct 27, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "P0-09, P0-15, P0-18, P0-37",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-37",
+        "issue": "Rotate the exposed signing keys, publish the distrust list and record dated proof",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Needs-Sid",
+        "blockedBy": "D-10, P0-09",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-38",
+        "issue": "Set the release credentials and confirm the publish identity",
+        "priority": "Urgent",
+        "due": "Oct 30, 2026",
+        "route": "Needs-Sid",
+        "blockedBy": "D-10, P0-34",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-39",
+        "issue": "Publish 1.2.0, deprecate 1.1.1, publish the advisory, and update the About text and installers",
+        "priority": "Urgent",
+        "due": "Nov 1, 2026",
+        "route": "Needs-Sid",
+        "blockedBy": "P0-30, P0-31, P0-33, P0-34, P0-35, P0-36, P0-37, P0-38",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-40",
+        "issue": "Verify installs after publish on clean machines (absorbs AMC-7)",
+        "priority": "Urgent",
+        "due": "Nov 3, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-39",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-41",
+        "issue": "Track success metrics and post weekly status updates",
+        "priority": "Medium",
+        "due": "Oct 16, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-01",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-42",
+        "issue": "Verify the Claude Code hook installer cannot fail open",
+        "priority": "Urgent",
+        "due": "Oct 16, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-43",
+        "issue": "Stop the GRC export from marking controls PASS from maturity arithmetic",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-44",
+        "issue": "Make industry-pack weights independent of payment",
+        "priority": "Urgent",
+        "due": "Oct 20, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-08",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-45",
+        "issue": "Stop amc verify --repair from deleting reports and blobs",
+        "priority": "High",
+        "due": "Oct 22, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "Done"
+      },
+      {
+        "key": "P0-46",
+        "issue": "Install the local AMC build with pnpm in the GitHub Action (merged e0fdc9c5)",
+        "priority": "High",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-47",
+        "issue": "Snapshot frozen files on edit so restoration parity proofs stop blocking plan work (D-15)",
+        "priority": "Urgent",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-15, P0-01",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-48",
+        "issue": "Make build-test finish on GitHub runners (CI runner log line, PR #40)",
+        "priority": "Urgent",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-49",
+        "issue": "Pin proxy-addr to 2.0.8 for advisory GHSA-jqcg-44mw-7w3h (PR #42)",
+        "priority": "Urgent",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-50",
+        "issue": "Move @modelcontextprotocol/sdk past advisory GHSA-6qxp-vccf-f47h (PR #50)",
+        "priority": "Urgent",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-51",
+        "issue": "Pin issuer trust in the remaining verify surfaces (follow-up to P0-09)",
+        "priority": "High",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-52",
+        "issue": "Harden federation import and close its follow-ups 3\u20136 (PR #57, 044abba1)",
+        "priority": "High",
+        "due": "Oct 7, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "\u2014",
+        "historicalTrackerStatus": "In review"
+      },
+      {
+        "key": "P0-53",
+        "issue": "Register the A4 keys and decisions; add the CLI freeze-exception key; settle the D-12 version wording",
+        "priority": "Urgent",
+        "due": "Oct 14, 2026",
+        "route": "Agent-Doable, Needs-Sid",
+        "blockedBy": "P0-01, P0-47, D-15, D-22",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-54",
+        "issue": "Wire the A4 ingress into the G0 guards without behaviour change",
+        "priority": "High",
+        "due": "Oct 12, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-11, P0-16",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P0-55",
+        "issue": "Close the G0 security follow-ups A4's spine and verify route stand on",
+        "priority": "Urgent",
+        "due": "Oct 21, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "P0-09, P0-18, P0-20, P0-22, P0-27, P0-51",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "P1-52",
+        "issue": "Add a source-quality ratchet for duplicates and dead code (pulled forward from G1)",
+        "priority": "Urgent",
+        "due": "Oct 23, 2026",
+        "route": "Agent-Doable",
+        "blockedBy": "D-11, P0-02",
+        "historicalTrackerStatus": "Not started"
+      },
+      {
+        "key": "GATE-G0",
+        "issue": "Gate G0 review: truth reset and 1.2.0",
+        "priority": "Urgent",
+        "due": "Nov 4, 2026",
+        "route": "Needs-Sid",
+        "blockedBy": "all G0 issues (P0-01 to P0-45, P1-52) and decisions D-01, D-02, D-03, D-06, D-09, D-10, D-11, D-12, D-13",
+        "historicalTrackerStatus": "Not started"
+      }
+    ],
+    "method": "Parsed the full current Issues index and all Workstreams P0 priority lists; read plan readiness, truth, priority, critical-chain and index sections plus full selected P0-18 issue. Historical tracker Done is not fresh qualification."
+  },
+  "orderingRule": {
+    "source": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+    "lines": "169-176",
+    "order": [
+      "earliest open gate",
+      "Urgent before High before Medium before Low",
+      "earlier due date",
+      "longer dependent chain among equals"
+    ],
+    "qualificationInterpretation": "Preserve previous bounded packets and active failures; select the next unqualified existing-source seam. Formal whole-issue Ready/Done is not asserted from historical Done."
+  },
+  "recommendedNext": {
+    "key": "P0-18",
+    "title": "Derive trust tiers from provenance; quarantine the dogfood evidence seeder",
+    "priority": "Urgent",
+    "due": "2026-10-20",
+    "historicalStatus": "Done",
+    "wholeIssueCurrentStatus": "Not requalified here; source and old receipts are not current acceptance",
+    "boundedReadiness": "Ready for root to assign a fresh owned existing-source qualification lane after P0-24 canonical closure; production remains reserved",
+    "why": "Urgent due20October precedes P0-30 due25October and High P0-25/P0-21/P0-26/P0-28. It also measures a still-unqualified dependency of P0-55 without choosing human or legal defaults. Earlier exercised keys, user skips and held/paused lanes are preserved, not reopened by this routing."
+  },
+  "dependencies": [
+    {
+      "key": "P0-08",
+      "issue": "Build the shared claim-eligibility service: claim kinds and five status dimensions",
+      "priority": "Urgent",
+      "due": "Oct 14, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "\u2014",
+      "historicalTrackerStatus": "Done",
+      "actualExistingSourceBasis": "Existing claims eligibility/envelopes and synthetic/self-report vocabulary; current provenance imports them through the existing flow.",
+      "qualificationLimit": "Historical Done and source existence do not prove all current acceptance; source-only local controls may be qualified without promoting the entire dependency."
+    },
+    {
+      "key": "P0-09",
+      "issue": "Pin issuer keys in every verifier and treat UNANCHORED as a failure",
+      "priority": "Urgent",
+      "due": "Oct 18, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "\u2014",
+      "historicalTrackerStatus": "Done",
+      "actualExistingSourceBasis": "Signed trust-list loader plus root pins and independent-attestation admission exist. Existing2026-10-07 receipt is historical; active P0-51 verifier failures stay open.",
+      "qualificationLimit": "Historical Done and source existence do not prove all current acceptance; source-only local controls may be qualified without promoting the entire dependency."
+    },
+    {
+      "key": "P0-13",
+      "issue": "Land slice B: S7 defect fixes and S9 fail-closed assurance packs",
+      "priority": "Urgent",
+      "due": "Oct 16, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "D-13, P0-01, P0-02, P0-04",
+      "historicalTrackerStatus": "Done",
+      "actualExistingSourceBasis": "S7 externalEvidenceProfile/export originals and guard symbols are present; P0-19 grading/47echo and broader S7 mutation acceptance remain distinct.",
+      "qualificationLimit": "Historical Done and source existence do not prove all current acceptance; source-only local controls may be qualified without promoting the entire dependency."
+    }
+  ],
+  "selectedSpecs": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-18.md",
+      "bytes": 14225,
+      "lines": 106,
+      "sha256": "44892a201424c5271c9ebb936608c22d0ddca2f512fa5d840193118fa74590c4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-25.md",
+      "bytes": 14004,
+      "lines": 113,
+      "sha256": "43834fb56a8fafd4705b65e66dfa54a49c278a91254afe8a40154d1e00592181"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-30.md",
+      "bytes": 13749,
+      "lines": 99,
+      "sha256": "f58d1716546c6f4525c5d9353a07f5e19fcaadd2737ef1d894f97d4dcdd4c97a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-21.md",
+      "bytes": 13758,
+      "lines": 118,
+      "sha256": "ae1ed1d28f1d15d0d124b7f10e783e0fa38fb234f2001492c901c791aab7c938"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-26.md",
+      "bytes": 11744,
+      "lines": 121,
+      "sha256": "f93db22557ec8efe753a13a3a8d64f1e88ca8625aac53c91d481fd202065c1fa"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-28.md",
+      "bytes": 15667,
+      "lines": 99,
+      "sha256": "f74ae4c6cffa7e7d22a8a09670262136d2e62bc20da9c0c0762d7ddac8db127b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-08.md",
+      "bytes": 15060,
+      "lines": 140,
+      "sha256": "89888e0e36a87fdc8a53cac80cc386526c666a91e55aa1516589c074faea8a18"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "bytes": 27408,
+      "lines": 292,
+      "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-13.md",
+      "bytes": 14656,
+      "lines": 113,
+      "sha256": "a3ba258597687c85bfb8f6fd68bda6d3a8c033ccdfba4da95294e140f64547e4"
+    }
+  ],
+  "alternatives": [
+    {
+      "key": "P0-25",
+      "issue": "Add a citation linter and missing-pack reference checks to CI",
+      "priority": "High",
+      "due": "Oct 21, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "P0-02, P0-12",
+      "historicalTrackerStatus": "Done",
+      "reason": "High due21October; pure linter/CLI/mapping tests and CI/release source wiring already exist and were partly exercised underP024. Good fallback or later bounded seam; lower priority thanUrgentP018. ActualCI/release full acceptance not inferred."
+    },
+    {
+      "key": "P0-30",
+      "issue": "Close-out A: run the security mutation batch for in-flight fixes",
+      "priority": "Urgent",
+      "due": "Oct 25, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "P0-01, P0-07, P0-13",
+      "historicalTrackerStatus": "Not started",
+      "reason": "Urgent due25October but later thanP018. Mutation runner/tests absent in75cb, present only in preservedClaude990 clone. Thirteen-issue batch, auth/race/native/installed and lease-publish acceptance require a separately assigned lane; no silent held-work adoption."
+    },
+    {
+      "key": "P0-21",
+      "issue": "Use typed score units and one methodology; no certification from self-assessment",
+      "priority": "High",
+      "due": "Oct 22, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "P0-08, P0-12, P0-15",
+      "historicalTrackerStatus": "Done",
+      "reason": "High due22October. Units, all-5 no-certification and self-report cap originals exist; source-only bounded fallback afterP018/P025. P022/P023 active failures stay open."
+    },
+    {
+      "key": "P0-26",
+      "issue": "Review F5's 30 drop recommendations with Sid; apply confirmed drops only",
+      "priority": "High",
+      "due": "Oct 28, 2026",
+      "route": "Agent-Doable, Needs-Sid",
+      "blockedBy": "P0-12",
+      "historicalTrackerStatus": "Not started",
+      "reason": "High due28October. Current75cb has no decisions/packet/test. PreservedClaude clone has packet and30defer entries, reviewedBy/reviewedAt/floorPolicy allnull; genuineSid choice remains absent. Do not apply drops or retire floor."
+    },
+    {
+      "key": "P0-28",
+      "issue": "Run the docs truth reset (absorbs AMC-1550)",
+      "priority": "High",
+      "due": "Oct 28, 2026",
+      "route": "Agent-Doable",
+      "blockedBy": "D-03, P0-15, P0-22, P0-23",
+      "historicalTrackerStatus": "Not started",
+      "reason": "High due28October; blocked byP022/P023 active failures and release wording/topology. HeldClaude truth-reset work exists; do not archive/move/delete docs or adopt it without integration scope."
+    }
+  ],
+  "higherOrHeldRouting": {
+    "P0-55": "Urgent due21October, still depends onP018 plus pendingP020 and activeP022/P051 outcomes; broad follow-up is not ready for whole acceptance. No A4 auth/trust repair inferred.",
+    "P0-09": "EarlierUrgent due18October; existing historical receipt/current trust admission support localP018 controls, whileP051 failures remain unresolved. This preflight does not revisit the whole issuer-verifier repair lane.",
+    "P0-14": "Urgent due20October requires deployment decisions/topology and preservedheld integration; no deployment/runtime/tooling authority from this routing.",
+    "P0-33": "Prior qualification/fullCI and source-quality failures remain separate; do not treat it Done or rerun release/whole suite here.",
+    "userSkips": [
+      "P0-29",
+      "P0-22"
+    ],
+    "pendingNarrowHumanDecisions": [
+      "P0-19 assurance grader proposal",
+      "P0-20 sharedCLI one-line claim transfer",
+      "P0-52 federationSync destination containment/alias history repair"
+    ],
+    "preservedActiveFailures": [
+      "P0-22",
+      "P0-23",
+      "P0-51",
+      "P0-52",
+      "P0-24 strictISO A.5 and31emptyexpertrows"
+    ],
+    "pausedOrReserved": "Native runtime, A4 ingress/auth, API and privacy work,47echo/P2-27, sharedCLI/repl/registry and all heldClaude work remain untouched"
+  },
+  "boundedSeam": {
+    "onlyProposedNewFile": "tests/claims/evidenceProvenanceQualification.test.ts",
+    "fileCurrentlyAbsent": true,
+    "existingOriginalTests": [
+      "tests/claims/evidenceProvenance.test.ts",
+      "tests/evalImportTrust.test.ts",
+      "tests/ingestAttestation.test.ts",
+      "tests/trustTierWriteGuard.test.ts",
+      "tests/dogfoodMaturityEvidence.test.ts",
+      "tests/externalEvidenceProfile.test.ts",
+      "tests/externalEvidenceExport.test.ts",
+      "tests/compliance/evidenceBinding.test.ts"
+    ],
+    "actualFunctions": [
+      "producerOfMeta/evidenceProducer",
+      "bundleDigest/verifyThirdPartyAttestation/effectiveTrustTier/countAttestedOnce",
+      "loadTrustContext/signTrustList",
+      "attestIngestSession",
+      "importEvalResults",
+      "assertTrustTierProvenance/assertOutcomeTrustTier",
+      "assertDogfoodSeedingAllowed"
+    ],
+    "meaningfulNewControls": [
+      "Capture independent third-party public fingerprint and separate trust-list root fingerprint BEFORE signing any attestation/artifact; load actual signed list in ownedAMC_HOME with root captured independently, not a bare constructed trusted context.",
+      "Actual ingest/operator attestation staysSELF_REPORTED; genuine separately pinned signature can readATTESTED only when bound to original payload, event, agent, session and time. Treat fixture as operator-authored local cryptographic control, never a real external review or truth assertion.",
+      "Independently signedforeign/forged/unpinned/wrong-purpose/revoked/expired and missing-root controls refuse or downgrade as documented; no allow flags and no pins derived from artifact under test.",
+      "Legacy import/manual/webhook declarations cannot readOBSERVED; synthetic rows excluded. Actual ledger guards reject invalid elevated producer writes; show no new rows on refusal.",
+      "Seven actual importer fixtures staySELF_REPORTED; out-of-window whole-file refusal preserves rows; historical storedtime remainsrecordedtime with claimedTs/historical kept.",
+      "Cold read-side snapshots prove effectiveTrustTier/counting do not rewrite persisted original evidence; cross-subject/session/payload and duplicate-window controls use genuine signed inputs.",
+      "Seeder guard refuses absentAMC_DEV_DOGFOOD and installednode_modules path; any permitted source fixture remains synthetic and excluded from level claims. Do not execute a dogfood fleet script."
+    ],
+    "privateCausalPlan": "After explicit runtime readiness only, copy the complete current compiled closure and relevant helpers into an owned fixture. Keep identical new test input corpus for baseline/mutant/restored. Candidate guards: remove legacy read cap; skip third-party trust-list lookup; remove subject binding; remove seeder opt-in. Require assertion-specific failures and exact complete restoration; do not mutate live source or claim the whole P030 batch."
+  },
+  "contractDriftsToRetain": [
+    {
+      "oldSpec": "--trust-tier removed in1.2.0",
+      "currentSource": "EVAL_IMPORT_TRUST_TIER_REMOVED says2.0.0; hidden command option exits2 before writer",
+      "limit": "Do not silently weaken exactoldspec acceptance or choose releaseversion. Record actual text and defer humanreleasewording if needed."
+    },
+    {
+      "oldSpec": "step3 mentions evidence-attestation purpose",
+      "currentSource": "P009 andcurrentkeyPurposes/verifyThirdPartyAttestation use independent-attestation",
+      "limit": "Use currentactualcontract for local controls; document oldspec inconsistency, not a newpurpose or source repair."
+    },
+    {
+      "oldSpec": "ATTESTED digest signature enough ininitialproposal",
+      "currentSource": "Signedbundle also binds id/hash/time/agent/session; currentdedupe keys(originalEventId,agentId), window-bound",
+      "limit": "Preserve stronger current/P055 follow-up behavior and all existing originals."
+    }
+  ],
+  "ownershipAndFreeze": {
+    "controls": [
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "bytes": 275376,
+        "lines": 1616,
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+        "bytes": 196468,
+        "lines": 904,
+        "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+        "bytes": 4859,
+        "lines": 66,
+        "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+        "bytes": 3052,
+        "lines": 45,
+        "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "bytes": 18181,
+        "lines": 405,
+        "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "lines": 32,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      }
+    ],
+    "reservation": "RESERVATIONS.md1496 generic every nonE17/nonCodex Agent-Doable reservation applies toP018 even thoughexplicit1497keylist omitsit; no source release recovered. P030/P026/P028 explicit reservation additionally present.",
+    "sharedPaths": "RESERVATIONS.md1588 explicitly coordinates src/cli.ts/resultCommandRegistry.ts/replParser.ts; no sharedpath change proposed.",
+    "repairBasis": "Userserial qualification/fix authority supports assigned new tests and read-only controls, not inferred blanket transfer of heldproduction. New source repair requires exactscope/freeze review and preservedoldbytes.",
+    "readOnlySnapshotCheck": {
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+        "--paths",
+        "src/claims/evidenceProvenance.ts",
+        "src/eval/evalImporters.ts",
+        "src/ingest/ingest.ts",
+        "src/ledger/trustTierValidation.ts",
+        "src/dogfood/maturityEvidence.ts",
+        "--at",
+        "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+      ],
+      "exit": 0,
+      "stdout": "none\n",
+      "matchingExistingManifestRows": 0,
+      "meaning": "Read-only helper found no snapshot-required path at thismeasuredcommit. No snapshot created, no frozen-original verification claim, no ownership clearance; rerun exacttargetpaths before any later authorizedrepair."
+    }
+  },
+  "sourceAndOriginalTestPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "lines": 242,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "lines": 1971,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+      "relativePath": "src/eval/evalImporters.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "lines": 43,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+      "relativePath": "src/eval/evalCli.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "lines": 256,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+      "relativePath": "src/ingest/ingest.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "lines": 68,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+      "relativePath": "src/ledger/trustTierValidation.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "lines": 484,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+      "relativePath": "src/dogfood/maturityEvidence.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "lines": 129,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "relativePath": "src/trust/trustContext.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "lines": 146,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "relativePath": "src/trust/admission.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "lines": 10,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "relativePath": "src/trust/keyPurposes.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "lines": 202,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "relativePath": "src/trust/trustList.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "lines": 1295,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "relativePath": "src/ledger/ledger.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "bytes": 14631,
+      "lines": 356,
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "relativePath": "src/compliance/complianceEngine.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "lines": 238,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "relativePath": "src/diagnostic/gates.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+      "bytes": 5678,
+      "lines": 182,
+      "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19",
+      "relativePath": "src/outcomes/outcomeCli.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+      "bytes": 21889,
+      "lines": 597,
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "relativePath": "src/assurance/agentResponder.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "lines": 24430,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "relativePath": "src/cli.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "lines": 234,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+      "relativePath": "src/standard/externalEvidenceProfile.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+      "bytes": 10946,
+      "lines": 58,
+      "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+      "relativePath": "docs/EVIDENCE_TRUST.md",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+      "bytes": 17646,
+      "lines": 269,
+      "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+      "relativePath": "tests/claims/evidenceProvenance.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+      "bytes": 5728,
+      "lines": 117,
+      "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+      "relativePath": "tests/evalImportTrust.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+      "bytes": 15700,
+      "lines": 254,
+      "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+      "relativePath": "tests/ingestAttestation.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+      "bytes": 5739,
+      "lines": 100,
+      "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+      "relativePath": "tests/trustTierWriteGuard.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+      "bytes": 4544,
+      "lines": 91,
+      "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+      "relativePath": "tests/dogfoodMaturityEvidence.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "lines": 93,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+      "relativePath": "tests/externalEvidenceProfile.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "lines": 80,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+      "relativePath": "tests/externalEvidenceExport.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "lines": 207,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "relativePath": "tests/compliance/evidenceBinding.test.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "lines": 77,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "relativePath": "tests/helpers/trustContext.ts",
+      "matchesMeasured75cb": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "lines": 49,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "relativePath": "tests/trust/trustFixtures.ts",
+      "matchesMeasured75cb": true
+    }
+  ],
+  "heldWorkPins": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/mutation-batch.mjs",
+      "bytes": 11280,
+      "lines": 243,
+      "sha256": "7c556bbbf070a78cc7521d2126682ad8e6521c8a9c7b3c6a6d88b27de901fd54"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/mutationBatch.test.ts",
+      "bytes": 7305,
+      "lines": 135,
+      "sha256": "f6d2f9ff4b927cafa3c8a7ab510da6046163ed7c6b31afa5da2326c0b96494c1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/program/f5/decisions.json",
+      "bytes": 3512,
+      "lines": 161,
+      "sha256": "e77e25ab90891505cf8f251d8fed403af635fae2e299a8d46306f30496d7e261"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/program/f5-drop-review.md",
+      "bytes": 69390,
+      "lines": 722,
+      "sha256": "d1558832c1138f1a183cc6b6eb906dc682ff48c92cb88c665ad71d98bcad6c78"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/f5DropDecisions.test.ts",
+      "bytes": 2569,
+      "lines": 46,
+      "sha256": "394f56ba1f046c346a2ef4b8f58cd5fae41d38cd9eeb19223a302302736da289"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/docsTruthReset.test.ts",
+      "bytes": 5553,
+      "lines": 95,
+      "sha256": "5ebffa9a140114cea00db11c9f27a59b23167333551fa0777c14cf7ad95b8bfc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/archive/README.md",
+      "bytes": 3692,
+      "lines": 33,
+      "sha256": "3b0323268c4936f8a023cff24fbf3d10047e77ba952ac98a8c1a6eb79ca20fa5"
+    }
+  ],
+  "heldF5DecisionFacts": {
+    "status": "awaiting Sid: no decision recorded; nothing applied",
+    "reviewedBy": null,
+    "reviewedAt": null,
+    "floorPolicy": null,
+    "count": 30,
+    "allDefer": true
+  },
+  "graphNavigation": {
+    "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "reviewedRefreshPin": "graphifyy==0.9.56",
+    "installedQueryVersion": "0.9.74",
+    "freshness": "Stale navigation only; currentsource75cb verifieddirectly",
+    "queries": [
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "citations",
+          "--budget",
+          "1400"
+        ],
+        "exit": 0,
+        "found": 46,
+        "shown": 36,
+        "truncated": 10,
+        "result": "Vocabulary did not identify currentlinter/provenance seam; do not inferdependencies."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "effectiveTrustTier",
+          "--budget",
+          "1800"
+        ],
+        "exit": 0,
+        "result": "No matching nodes found."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "evalImporters",
+          "--budget",
+          "1200"
+        ],
+        "exit": 0,
+        "found": 219,
+        "shown": 42,
+        "truncated": 177,
+        "result": "OldevalImporters/ledger/test navigation; no currentbehavior claim."
+      }
+    ],
+    "refreshWatchServer": false
+  },
+  "nextCommandsNotExecuted": [
+    {
+      "stage": "After root closesP024 canonical and assigns freshlane",
+      "command": "Create/reuse managed isolated worktree from the measuredsourcecommit, verifyexactsrc/oldtest/protectedrefpins andguardownership beforewriting."
+    },
+    {
+      "stage": "Rootownedruntimepreparation after assignment",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm install --frozen-lockfile && pnpm run build"
+    },
+    {
+      "stage": "Currentoriginalsbeforeanynewqualificationclaim",
+      "command": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/claims/evidenceProvenance.test.ts tests/evalImportTrust.test.ts tests/ingestAttestation.test.ts tests/trustTierWriteGuard.test.ts tests/dogfoodMaturityEvidence.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts --reporter=json --outputFile=/private/tmp/<owned-P0-18-phase>.json"
+    },
+    {
+      "stage": "OnlyafterrootauthorizesnewfileandBUILDREADY",
+      "command": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/claims/evidenceProvenanceQualification.test.ts --reporter=json --outputFile=/private/tmp/<owned-P0-18-new-phase>.json"
+    },
+    {
+      "stage": "Rootnormalstatic/freeze/receiptchecks at final measuredsource",
+      "command": "npm run typecheck:tests; npm run check:freeze; npm run check:counts; npm run check:docs-drift; npm run check:qualification"
+    }
+  ],
+  "operationsThisPreflight": {
+    "newTests": 0,
+    "imports": 0,
+    "testRuntime": 0,
+    "builds": 0,
+    "installs": 0,
+    "legalFetches": 0,
+    "productEdits": 0,
+    "canonicalEdits": 0,
+    "sourceOrRefChanges": 0,
+    "appMessages": 0,
+    "onlyWrites": "Two requested private routing receipts"
+  },
+  "rootCommittedDeltaOver75cb": [
+    "M\tCONTRIBUTING.md",
+    "M\tREADME.md",
+    "M\tdocs/content/reddit-launch-drafts.md",
+    "M\tdocs/content/show-hn-draft.md",
+    "M\tdocs/internal/competitive-landscape.md",
+    "M\tdocs/internal/mirofish-simulation-council.md",
+    "A\ttests/citationCorrections.test.ts",
+    "M\twebsite/i18n.js",
+    "M\twebsite/index.html",
+    "M\twebsite/lite.html",
+    "M\twhitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "sourceTreeBoundary": {
+    "baseTree": "312506e6b4130ce1c46a8ec5316a087d6bbd9c71",
+    "headTree": "312506e6b4130ce1c46a8ec5316a087d6bbd9c71",
+    "matches": true,
+    "parentOfCapturedHead": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "sourceCommitMeaning": "Root source commit arrived while routing was read-only; exact source tree remains75cb, only new test and10count documents differ."
+  }
+}

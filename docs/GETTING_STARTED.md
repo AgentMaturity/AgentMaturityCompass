@@ -525,7 +525,7 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc mechanic rca list` / `amc mechanic rca show <run>` | Review signed Fixer RCA reports without exposing local workspace paths |
 | `amc experiment optimize --rca latest` | Create isolated optimizer candidates with held-out validation, leakage checks, Pareto ranking, and receipts |
 | `amc experiment optimizer-list` / `amc experiment optimizer-show latest` | Review accepted/rejected optimizer candidates and reasons |
-| `amc evidence export --agent <id> --format json --out evidence.json` | Export verifier-ready evidence for one agent: rows whose metadata names the agent plus every row of the native sessions it opened. Prints `events=`, `sessions=` and `excluded=`; the JSON (`schemaVersion` 2) records the same in `agentFilter` |
+| `amc evidence export --agent <id> --format json --out evidence.json` | Export verifier-ready evidence for one agent: rows whose metadata names the agent plus every row of the native sessions it opened, never the shared `system` session. Prints `events=`, `sessions=` and `excluded=`; the JSON (`schemaVersion` 2) records the same in `agentFilter`, with `systemSession: "excluded"` and `insufficientFor: ["requires_no_audit"]`: system rows can count against an agent, so recompute those controls from an unfiltered export |
 | `amc evidence finding-proofs list` | Trace each major finding to evidence, resources, receipts, and recommendation ids |
 | `amc evidence finding-proofs export --out proofs.json --redacted` | Export shareable proof chains without local workspace paths |
 | `amc evidence lifecycle-receipts list` | List proposal, validation, commit, rollback, and monitor receipts |

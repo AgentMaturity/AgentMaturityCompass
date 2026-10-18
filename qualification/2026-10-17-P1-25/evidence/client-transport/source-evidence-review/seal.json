@@ -1,0 +1,42 @@
+{
+  "schema": "p125c-source-evidence-review-seal/1",
+  "at": "2026-10-16T21:49:24.221425+00:00",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/README.md",
+      "bytes": 2294,
+      "sha256": "35c1a669b97d2473e42e84abaa38dc430a0c45e6dcc092af686a3e6ef272ce92"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/actual-source-pins.json",
+      "bytes": 29259,
+      "sha256": "8f3004f08e710d19bb0bd0963625d8b3c3dbe6fea6ee297841200c304e123f45"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/git-observations.json",
+      "bytes": 3853,
+      "sha256": "d0f538eff6a6bdf06f5cf10d4c81a77453628f2766e4f4dc4d409d48ce4619c4"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 95166,
+      "sha256": "695967e50e8923e24c9a6788c4ac1d4cf91f87c76e64461eceba59656d66dd66"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 11231,
+      "sha256": "7ad74534582243585561adfb13c63f7f1e609d6cc44e88ade54dcbca6571d658"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-evidence-review/source-run-join.json",
+      "bytes": 5675,
+      "sha256": "8aff54cefed4b27cb391450840631f7d5f99c9593d93135dd92a039369cb6f57"
+    }
+  ],
+  "blockers": [],
+  "inputPinCount": 300,
+  "allReadsFinished": true,
+  "productExecution": false,
+  "checkoutIndexQaWrites": false
+}

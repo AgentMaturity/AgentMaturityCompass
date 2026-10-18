@@ -1,0 +1,70 @@
+{
+  "schema": "p125f-actual-source-checkpoint/1",
+  "at": "2026-10-16T22:18:50.333819+00:00",
+  "commit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "parent": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "branch": "codex/p1-25-fallback-qualification",
+  "paths": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6"
+    },
+    {
+      "relativePath": "tests/time/tsaFallback.test.ts",
+      "bytes": 16974,
+      "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0"
+    }
+  ],
+  "clean": true,
+  "indexEmpty": true,
+  "actualGitBlobsExact": true,
+  "qualityStillRed": true,
+  "allHoldsRetained": true,
+  "noPushPrMergeRelease": true
+}

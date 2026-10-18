@@ -1,0 +1,60 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/private/tmp/p0-41-causal-qualification-20261015/source[39m
+
+ [31m❯[39m tests/p041ProgramMetricsQualification.test.ts [2m([22m[2m27 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 4506[2mms[22m[39m
+     [32m✓[39m Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations[32m 5[2mms[22m[39m
+     [32m✓[39m Q2 missing evidence stays null before any status or current-value assertions[32m 1[2mms[22m[39m
+     [32m✓[39m Q3 pure closure computation counts only a shaped declaration and does not authenticate it[32m 9[2mms[22m[39m
+     [32m✓[39m Q4 absent registered report, workflow and JSON inputs remain pending[32m 2[2mms[22m[39m
+     [32m✓[39m Q5 supplied partial surface report distinguishes two passes, one failure and two missing[32m 1[2mms[22m[39m
+     [32m✓[39m Q6a an empty assertion list stays null before later nonvacuity checks[32m 3[2mms[22m[39m
+     [32m✓[39m Q6b a failed registered file outranks its absent sibling[32m 1[2mms[22m[39m
+     [32m✓[39m Q6c duplicate matching report paths refuse rather than double count[32m 1[2mms[22m[39m
+     [32m✓[39m Q7a YAML matrices count distinct configured OS families, not versions or containment[32m 7[2mms[22m[39m
+     [32m✓[39m Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending[32m 4[2mms[22m[39m
+     [32m✓[39m Q8a a dated sourced manual zero is measured while malformed provenance refuses[32m 4[2mms[22m[39m
+     [32m✓[39m Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct[32m 3[2mms[22m[39m
+     [32m✓[39m Q9a genuine CLI check reports structural validity only[32m 226[2mms[22m[39m
+     [32m✓[39m Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values[32m 191[2mms[22m[39m
+     [32m✓[39m Q9c explicit and default markdown agree with 15 rows and funded columns[32m 283[2mms[22m[39m
+     [32m✓[39m Q10a a dirty gap closure cannot override committed open registrations[32m 209[2mms[22m[39m
+     [33m[2m✓[22m[39m Q10b committed registered JSON zero survives changed and deleted working copies [33m 368[2mms[22m[39m
+     [32m✓[39m Q11a a committed closed gap without a closing declaration refuses[32m 257[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11b invalid manual provenance refuses all output modes [33m 364[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11c conflicting modes, unknown flags and invalid report paths refuse [33m 547[2mms[22m[39m
+     [32m✓[39m Q12a a missing qualification path at HEAD refuses a shaped closure[32m 279[2mms[22m[39m
+     [32m✓[39m Q12b untracked-only evidence cannot satisfy the HEAD path check[32m 285[2mms[22m[39m
+     [32m✓[39m Q12c a zero merged SHA refuses even with a committed evidence path[32m 276[2mms[22m[39m
+[31m     [31m×[31m Q12d a nonexistent full merged SHA refuses with a committed evidence path[39m[32m 195[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12e a genuine sibling commit is not an ancestor of the closure commit [33m 397[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12f a committed synthetic path and real ancestor pass structural checks only [33m 302[2mms[22m[39m
+     [32m✓[39m Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped[32m 286[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ12d a nonexistent full merged SHA refuses with a committed evidence path
+[31m[1mAssertionError[22m: expected 1 to be 128 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 128[39m
+[31m+ 1[39m
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m508:94[22m[39m
+    [90m506|[39m     commit(owned, [path, "docs/program/gaps.json"], "Commit nonexisten…
+    [90m507|[39m     const absent = command(owned, "git", ["cat-file", "-e", "f".repeat…
+    [90m508|[39m     expect(absent.error).toBeNull(); expect(absent.signal).toBeNull();…
+    [90m   |[39m                                                                                              [31m^[39m
+    [90m509|[39m     [34mrefusal[39m([34mcli[39m(owned[33m,[39m [[32m"--json"[39m])[33m,[39m [33mCLOSED_ERROR[39m)[33m;[39m
+    [90m510|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m26 passed[39m[22m[90m (27)[39m
+[2m   Start at [22m 12:55:32
+[2m   Duration [22m 4.74s[2m (transform 42ms, setup 23ms, import 74ms, tests 4.51s, environment 0ms)[22m
+
+JSON report written to /private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/raw-producer.json

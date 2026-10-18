@@ -1,0 +1,25 @@
+{
+  "schema": "p107-static-test-design-seal/1",
+  "at": "2026-10-16T17:34:27.969203+00:00",
+  "privateOnly": true,
+  "candidateCodeWritten": false,
+  "runtimeExecuted": false,
+  "inputCount": 28,
+  "files": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/README.md",
+      "bytes": 7743,
+      "sha256": "692024f095dbfab6baad25ce61283468f6622c86fbed55113d74bd5304de319d"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/matrix.json",
+      "bytes": 7164,
+      "sha256": "0a5593b6b8f9874193afc7f24eeb2a30dbadbe504c71220e4b95e263fa165a0c"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/pins.json",
+      "bytes": 7118,
+      "sha256": "fce1918e384549940b7c2911d372596927c35fdc2152591750e5d3dce7529314"
+    }
+  ]
+}

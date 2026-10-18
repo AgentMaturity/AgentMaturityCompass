@@ -191,6 +191,6 @@ describe("governed native Streamable HTTP", () => {
   test("timeouts and remote error results retain distinct failure facts", async () => {
     const f = await fixture({ remoteError: true }); const mount = await f.mount();
     expect(await f.call()).toMatchObject({ outcome: "ERROR", timedOut: false, exitCode: 1 });
-    f.state.hold = true; expect(await f.call()).toMatchObject({ outcome: "ERROR", timedOut: true, exitCode: 1 }); await mount.close();
+    f.state.hold = true; expect(await f.call()).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", timedOut: true, exitCode: 1 }); await mount.close();
   });
 });

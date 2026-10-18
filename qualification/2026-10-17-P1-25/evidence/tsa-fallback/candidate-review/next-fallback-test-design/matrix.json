@@ -1,0 +1,70 @@
+{
+  "schema": "p125-next-fallback-fixed-test-matrix/1",
+  "status": "private unexecuted candidate",
+  "futureSourcePath": "tests/time/tsaFallback.test.ts",
+  "futureEvidencePrefix": "qualification/2026-10-17-P1-25/evidence/tsa-fallback/",
+  "authorBaselineSource": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "cases": [
+    {
+      "id": "OFFLINE",
+      "line": 212,
+      "title": "returns the exact default config and offline result without configured TSAs",
+      "positive": "Actual loadTimeConfig on a fresh mode0700 workspace without.amc gives the literal default config.",
+      "decisive": "Actual timestampDigest returns exactly that config, grant:null, failures:[]; no fixture listener is started.",
+      "limit": "Public return/early-return behavior only, not universal no-I/O proof."
+    },
+    {
+      "id": "NO-ANCHOR",
+      "line": 223,
+      "title": "skips an unmatched anchor before the wire beside a matching-anchor refusal",
+      "positive": "A matching genuine supplied anchor reaches the owned listener and produces named HTTP500 refusal first.",
+      "decisive": "Missing-anchor route has zero requests before later result assertions; matched-next route is actually reached and the two named failures remain ordered.",
+      "limit": "Configured anchor selection only, not signed trust-list verification."
+    },
+    {
+      "id": "ORDER",
+      "line": 245,
+      "title": "preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+      "positive": "Independently verify existing public token with original signed digest/fixed nonce/root; a single-TSA HTTP500 wire control then passes.",
+      "decisive": "Literal single-positive/http-first/malformed-second/genuine-third request order precedes null-grant and exact named HTTP500/TST_MALFORMED/TST_IMPRINT_MISMATCH failure-order assertions.",
+      "limit": "The other digest is a fixed literal proven different from the fixture digest; no random nonce inequality, forged AttestedTime or successful fallback grant."
+    },
+    {
+      "id": "TIMEOUT-CONTINUE",
+      "line": 272,
+      "title": "continues after the unchanged 10000 ms default abort to a real next-route refusal",
+      "positive": "Literal TSA_TIMEOUT_MS10000; no timeoutMs property is supplied. First route withholds every response byte and closes only after the actual client abort.",
+      "decisive": "The next finite HTTP500 route is actually reached; actual measured duration/failure strings/routes are logged before assertions.",
+      "limit": "Public requestTimestamp exposes failure message strings, not typed client AbortError code; candidate expects Node22 message The operation was aborted. No shortened timer, fake clock, delay assertion or deadline override."
+    }
+  ],
+  "resourceContract": [
+    "One new owned mode0700 temp workspace per body. Network bodies bind one exact127.0.0.1 ephemeral HTTP listener; the offline body creates no listening handle.",
+    "Normal checkScopedEgress and all guards remain active. No initWorkspace, malformed workspace, active-policy/registry, vault, key, ledger, native fixture, DNS override, env mutation or imported fixture helper.",
+    "Request/response/socket errors and terminal promises are installed at acquisition. Only actual ECONNRESET/EPIPE on the explicitly stalled allowPeerAbort request are categorized as expected peer aborts.",
+    "Stop accepting with ordinary server.close, await natural request/response/socket terminals, remove only the owned temp root and emit safe finite lifecycle facts. No socket.destroy, closeAllConnections, timer/retry, signal or global cleanup.",
+    "A sole body failure is thrown unchanged. Actual additional cleanup failures form a primary-first AggregateError; repeated identical owned error objects are not duplicated."
+  ],
+  "futureControlWitnesses": [
+    {
+      "id": "F1-order",
+      "test": "ORDER",
+      "first": "Literal wire order, after single-element finite refusal positive.",
+      "masks": "Earlier genuine-token or wire-positive/setup failure masks this; later result/code/body assertions may be masked by the order failure."
+    },
+    {
+      "id": "F2-no-continue",
+      "test": "ORDER and TIMEOUT-CONTINUE",
+      "first": "Literal actual second/third dispatch sequence after first caught HTTP500 or real default abort.",
+      "masks": "Later grant/failure-string assertions are masked if dispatch assertion fails; lifecycle and timeout facts remain emitted."
+    },
+    {
+      "id": "F3-unpinned-dispatch",
+      "test": "NO-ANCHOR",
+      "first": "Zero requests for the missing-anchor route after the actual matching-anchor wire positive.",
+      "masks": "Later route/result/failure assertions receive no credit after the first zero-wire failure."
+    }
+  ],
+  "noMutantsOrRuntimeOutcomesAuthored": true,
+  "allWholeIssueGapsAndHeldDecisionsRemainOpen": true
+}

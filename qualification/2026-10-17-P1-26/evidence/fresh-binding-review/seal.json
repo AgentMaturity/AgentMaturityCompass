@@ -1,0 +1,48 @@
+{
+  "schema": "p126-binding-peer-seal/1",
+  "at": "2026-10-16T20:50:13.730140+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/README.md",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/README.md",
+      "bytes": 1479,
+      "sha256": "c3126babc6326909384aea0f81ef8a021a24a4be5cb0746946a02de4234ef756",
+      "dev": 16777231,
+      "inode": 543407879,
+      "nlink": 1,
+      "readScope": "sealed output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/input-pins.json",
+      "bytes": 4559,
+      "sha256": "486ee1fc1f849bcc8a570e2695eb273d99ff1ce38d5333659a84df10fb567dec",
+      "dev": 16777231,
+      "inode": 543407878,
+      "nlink": 1,
+      "readScope": "sealed output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/observations.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/observations.json",
+      "bytes": 152933,
+      "sha256": "813ce87b58aa46c53e4a5c8ea20929934d4b579f3f77c9f79370e8a83ae5497f",
+      "dev": 16777231,
+      "inode": 543407876,
+      "nlink": 1,
+      "readScope": "sealed output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/review.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/review.json",
+      "bytes": 7091,
+      "sha256": "8b3f7147246f03ced61abf58784c2f98c7e5ca80d9c1dc69375fbbd2edeb97cd",
+      "dev": 16777231,
+      "inode": 543407877,
+      "nlink": 1,
+      "readScope": "sealed output"
+    }
+  ],
+  "blockers": [],
+  "executionOrSourceWrites": false
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "p125-private-inline-http-resource-review/1",
+  "scope": "One self-contained future test file; only private candidate authoring occurred.",
+  "workspace": {
+    "api": "mkdtempSync + chmodSync(0700)",
+    "ownedPrefix": "amc-p125-client-",
+    "unregulated": "Explicit new empty workspace, no .amc/config/plan/registry/keys/vault initialization or invalid-workspace negative. Fourth argument is passed explicitly; existing checkScopedEgress remains the only product preflight.",
+    "cleanup": "rmSync of only that mkdtemp root in finally; errors retained."
+  },
+  "http": {
+    "binding": "127.0.0.1 exact literal, ephemeral port, standard node:http only.",
+    "requestCapture": "Method, path/query, headers and real body collected outside handler assertions; each request/response close Promise is attached immediately.",
+    "terminals": "Socket close Promise attached at connection; request end/aborted/close and response finish/close/error retained; listener started/closed flags asserted after ordinary close.",
+    "finiteResponses": "Every non-stall response ends with accurate Content-Length and Connection: close. Handler errors are captured; finite 500/error end attempted without discarding the original.",
+    "expectedPeerErrors": "Only ECONNRESET/EPIPE on a response explicitly marked allowPeerAbort for the concrete oversize/stall route. Original error objects remain in the owned error records; other errors fail cleanup.",
+    "cleanup": "Stop accepting via one ordinary server.close callback, await all tracked natural request/response/socket terminals, assert closure facts, and remove owned root. No destroy/closeAllConnections/retry/forced signal/timer replacement.",
+    "setupFailure": "Server and error/connection listeners exist before workspace/listen setup. A failed bind/setup is primary; acquired resources remain referenced for finally.",
+    "noUniversalIsolation": "The client does not expose its ClientRequest; no hidden-client-handle, worker-environment, native/key-erasure, detached-descendant, universal OS/TCP or continuous-isolation claim."
+  },
+  "errors": {
+    "solePrimary": "Rethrow the original caught value unchanged if no cleanup errors.",
+    "combined": "AggregateError([primary, ...cleanupErrors]) only when cleanup contributes actual additional errors; cleanup-only errors aggregate.",
+    "setup": "Persistent server error observer plus rejecting listen error listener; no swallowed bind/setup error."
+  },
+  "deadlines": {
+    "client": "All postTimestampQuery calls pass undefined timeoutMs; TSA_TIMEOUT_MS is asserted equal to literal 10000 in the stall body.",
+    "vitest": "No per-test timeout argument or config change; current 30000 ms default remains.",
+    "stall": "No response headers/body/end; await real client abort, then natural peer closure. Capture measured elapsedMs in one safe console record, with no scheduling-bound or DNS/fallback duration inference."
+  },
+  "guardBoundary": "No environment opt-out, mock, shortened timer, DNS/TLS change, public TSA, source/guard change or F37 continuation. Actual unchanged guard refusal must remain a failure.",
+  "compilerOrRuntimeExecuted": false,
+  "sourceAllocation": false
+}

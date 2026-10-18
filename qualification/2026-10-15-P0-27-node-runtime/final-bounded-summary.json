@@ -1,0 +1,29 @@
+{
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "candidateTotals": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0
+  },
+  "sameEightCaseNames": [
+    "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed supervise abort without a fabricated report",
+    "P0-27 actual assurance session and isolated unsigned evidence a real unavailable resolver seals the signed sandbox abort without a fabricated report",
+    "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=false",
+    "P0-27 actual assurance session and isolated unsigned evidence AMC_NO_SIGN=1 isolates aborts and preserves signed DB bytes/rows, noSign=true",
+    "P0-27 actual assurance session and isolated unsigned evidence an owned first-row database fault rolls back session creation and permits a genuine sealed retry",
+    "P0-27 actual assurance session and isolated unsigned evidence an actual abort seal-update fault retains the original resolver error and reports the unsealed negative",
+    "P0-27 actual assurance session and isolated unsigned evidence the real abort helper returns the same error object and attaches the actual database failure",
+    "P0-27 actual assurance session and isolated unsigned evidence signed callers cannot divert evidence into the unsigned store"
+  ],
+  "runtime22": {
+    "raw": "/private/tmp/p0-27-compat-node22-candidate-eight-20261015.json",
+    "sha256": "f22d67ed7bb896afbd65a5e451ba997f53a6b12049b02a7b5293ba8c75fdd945"
+  },
+  "runtime24": {
+    "raw": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-eight-cases.json",
+    "sha256": "f2813d1537f31868898344239659ce7fb451e3af22edd88b58fe8b8a7f1710ac"
+  },
+  "scope": "Only two ownqualificationtest runtimepredicates widen22\u219222/24; identical8 behavioral cases execute on independentnativeABI127/137stores. Original24guardrefusals beforeproductexecution stay separate; no wholeP027/fullsuite/coverage/CI/release/P019sourcefix claim."
+}

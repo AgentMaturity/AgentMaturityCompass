@@ -1,0 +1,151 @@
+{
+  "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+  "canonicalTests": {
+    "total": 154,
+    "passed": 154,
+    "failed": 0,
+    "skipped": 0
+  },
+  "canonicalPublicRecords": [
+    {
+      "label": "cold-router-and-replay",
+      "original": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/observations/public-evidence.json",
+        "bytes": 5337,
+        "sha256": "6166d88608850a73d962e6bbbb5354d0cfe83593f448b9fe911385b6138ee1c4"
+      }
+    },
+    {
+      "label": "router-exact-ttl",
+      "original": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-IFn6UA/observations/public-evidence.json",
+        "bytes": 3004,
+        "sha256": "44a5583e2621e0dc50920d783cc767c09c52b025fec4b5d86f84da0729b45d04"
+      }
+    },
+    {
+      "label": "public-single-use",
+      "original": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-yLDGZI/observations/public-evidence.json",
+        "bytes": 917,
+        "sha256": "25687672c3091875a602f6c8b82017dae1ef7b22fe16ce4cbb2ebac364880e3e"
+      }
+    },
+    {
+      "label": "public-ttl-boundary",
+      "original": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-PnoaoS/observations/public-evidence.json",
+        "bytes": 1007,
+        "sha256": "128edd287296a9871c616bd1e885576a57da08d8024fe8769567bbd9ace2fbfc"
+      }
+    }
+  ],
+  "phaseOutcomes": {
+    "p207p-fresh-canonical": {
+      "tests": {
+        "total": 154,
+        "passed": 154,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+      "hookCount": 27,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207p-mutant-consume": {
+      "tests": {
+        "total": 154,
+        "passed": 151,
+        "failed": 3,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "title": "P2-07 persisted pending OIDC state router rejects state at the exact TTL before token exchange",
+          "messages": [
+            "AssertionError: expected 302 to be 400 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:416:28\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:403:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "title": "P2-07 persisted pending OIDC state public consume removes a valid state exactly once",
+          "messages": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:430:100\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:425:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:423:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "title": "P2-07 persisted pending OIDC state public consume admits TTL minus one and rejects exact TTL",
+          "messages": [
+            "AssertionError: expected [Function] to throw error matching /^OIDC state mismatch$/ but got 'OIDC state expired'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:448:107\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:439:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:437:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+          ]
+        }
+      ],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+      "hookCount": 27,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207p-restored-consume": {
+      "tests": {
+        "total": 154,
+        "passed": 154,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+      "hookCount": 27,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207p-mutant-expiry": {
+      "tests": {
+        "total": 154,
+        "passed": 152,
+        "failed": 2,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "title": "P2-07 persisted pending OIDC state router rejects state at the exact TTL before token exchange",
+          "messages": [
+            "AssertionError: expected 302 to be 400 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:412:32\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:9)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:406:7\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:403:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "title": "P2-07 persisted pending OIDC state public consume admits TTL minus one and rejects exact TTL",
+          "messages": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:446:107\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:439:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:437:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+          ]
+        }
+      ],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+      "hookCount": 27,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207p-restored-expiry": {
+      "tests": {
+        "total": 154,
+        "passed": 154,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+      "hookCount": 27,
+      "unhandledErrors": [],
+      "lateHits": []
+    }
+  },
+  "qualityGreen": false,
+  "F37Skipped": true,
+  "entireP207Complete": false,
+  "formalDone": false
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-independent-inert-receipt-helper-review-seal/1",
+  "at": "2026-10-17T02:02:50.066944+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 4800,
+      "sha256": "f9b20c9a6768a5ab972545215e74bc22e04d250aeab36c8f63a797ef55fe339d"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/README.md",
+      "bytes": 1499,
+      "sha256": "fce1b79cde4a61a8f9745bbdc21c3a772b5e19ee6c950cd7470c522401ec9adc"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "bytes": 5690,
+      "sha256": "3b2533421cf91e5f925383640188ae3064d936f3f8332ea00a209f452ffb0cee"
+    }
+  ],
+  "inputCount": 24,
+  "blockers": [],
+  "helperImportedParsedCompiledOrExecuted": false,
+  "privateAssemblyOrPublicationCredit": false
+}

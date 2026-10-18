@@ -1,0 +1,24 @@
+{
+  "authorization": "START_P041_CAUSAL_P041-M2-vacuous-file-pass",
+  "control": "P041-M2-vacuous-file-pass",
+  "planPath": "/private/tmp/p0-41-causal-qualification-v2-20261015/plan-bound.json",
+  "planSha256": "9888941998eb409295712feb80bc4a3c386fbbd33fbadd89db5f6ffb57da0c20",
+  "controllerPath": "/private/tmp/p0-41-causal-qualification-v2-20261015/driver/controller.py",
+  "controllerSha256": "d8a77e46b5b95f537c21f5eac47f3b16f5a9791584c53ba67fd43b63d48515ca",
+  "parentSource": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "sourceRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/source",
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+  "independentReview": {
+    "path": "/private/tmp/p0-41-v2-controller-setup-static-review-20261015.json",
+    "bytes": 7466,
+    "sha256": "e19bb568bbbc73e09dd99566a04f2c5e05df3dbe59471bd61093e0a2145cfce8"
+  },
+  "previousResult": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/result--P041-M1-missing-source-zero.json",
+    "bytes": 31575,
+    "sha256": "34426b44b8640e8f52440b8d04a710a46329d2ea82f72012b8f6ec763e058696"
+  },
+  "rootObservedM1": "27\u219219\u219227 with8bodyAssertionErrors; Q2firstnull248:27,sourceexactrestored andallownedgroupsESRCH. Laterassertionsmaskedwherefirstfailed; no broadacceptance.",
+  "note": "Exactly secondcontrol aftercompletefirstresults review; v1 staysHALTED unchanged."
+}

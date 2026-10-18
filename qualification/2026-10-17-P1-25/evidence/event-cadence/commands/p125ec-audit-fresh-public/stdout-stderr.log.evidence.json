@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/event-cadence/commands/p125ec-audit-fresh-public/stdout-stderr.log",
+    "bytes": 186,
+    "sha256": "4fc7208e068a6e9a3401c390c9ec20ffc017017f336859c2f0520bad1d37cde1"
+  },
+  "dataBase64": "eyJwaGFzZSI6ICJwMTI1ZWMtZnJlc2gtY2Fub25pY2FsIiwgImdyYW50UHVibGljQ291bnQiOiA2LCAiY2hlY2twb2ludFB1YmxpY0NvdW50IjogNCwgImNoaWxkcmVuIjogMzgsICJleHBsaWNpdENoaWxkU3RyZWFtSGFzaENvdW50IjogNzYsICJjbG9zZWRTb2NrZXRzIjogMTAsICJjbG9zZWRMZWRnZXJPd25lcnMiOiAyOH0K",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

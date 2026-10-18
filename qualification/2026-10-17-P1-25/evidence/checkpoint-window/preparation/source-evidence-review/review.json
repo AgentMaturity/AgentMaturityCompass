@@ -1,0 +1,2339 @@
+{
+  "schema": "p125k-independent-actual-source-evidence-review/1",
+  "at": "2026-10-16T23:40:14.775086+00:00",
+  "blockers": [],
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "sourceParent": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "state": "CLOSED_BOUNDED_LOCAL_SOURCE_CHECKPOINT",
+  "sourcePhases": [
+    {
+      "phase": "p125k-source-combined",
+      "helperVersion": "8d466-before-EOF",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "hooks": [
+        {
+          "id": "-455678311",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "taskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "command": {
+        "phase": "p125k-source-combined",
+        "exit": 0,
+        "durationMs": 3556,
+        "ownedPgid": 62997,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "logPin": {
+          "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-combined/stdout-stderr.log",
+          "bytes": 37216,
+          "sha256": "4c99f1024ac6bb864318a00ff4cc656a23eb98b6a77731accdd2b64aaa6c0acb"
+        }
+      },
+      "rootPublicAudit": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-source-combined-public-audit.json",
+        "bytes": 27124,
+        "sha256": "3feb54ff70ba8c153ba255bff14748638911652094e3380aeadf513fe2f69ad2"
+      },
+      "publicFacts": [
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/public-evidence.json",
+            "bytes": 12987,
+            "sha256": "44217bfdca6f39a1bb4773b012c6f353dd99cafb9f576dab57bc18685d940184"
+          },
+          "caseId": "FIRST-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/good-first"
+          ],
+          "reply": {
+            "path": "/good-first",
+            "querySha256": "ad72aba764024e9fdc4c72ee537f85ba8bb1e291ea96e5e5df36eb52456f6787",
+            "responseSha256": "163d3a96a528e5502e281f65b1cea8357e66d6e5ad145ae0a1fbedad1e314df5",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "f37f85d8acce3108d2070bb7b52cf017551a2483df459abdebb56626c0d265e7",
+              "genTime": "2026-10-16T23:27:28.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "4ffb13bc1499295ec099a68a28f0803bb65c8f894b2fa4ec807739c0986defb5",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 1,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/public-evidence.json",
+            "bytes": 13549,
+            "sha256": "506946e30ba5b40d05088b76a7c28cd21aee6f6d6492a4998cc1920189fe7e4c"
+          },
+          "caseId": "HTTP500-THEN-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "reply": {
+            "path": "/good-second",
+            "querySha256": "dc9ac12b2e58d215775ced607e41ae04f56f5c591bd72be9b6e43d6d9def463a",
+            "responseSha256": "6077347af2f48d70df3a39f7d9e00fb44b331bf3cc707daaa51f64850d188305",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "d98578a05ecab012d8ddf7363c88133ec57a2d355ba5418a4908f85aae88f682",
+              "genTime": "2026-10-16T23:27:29.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "77d5f03f7e2b04c44e2be9ddba0abfd5d806f254885f53880ed7ff4d12cde220",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 2,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/public-evidence.json",
+            "bytes": 12896,
+            "sha256": "fa449f4deb970008476f16a0b99333078127084e90af45fabeac0984e83b64ab"
+          },
+          "caseId": "CHECKPOINT-PENDING-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/http-first",
+            "/checkpoint-good"
+          ],
+          "reply": {
+            "path": "/checkpoint-good",
+            "querySha256": "2f21e8c3a21d19a151e82539b1d97b428fe6aa7f0b5c801e849500beef3569f9",
+            "responseSha256": "67bbbb572e8b48d96b822530dddfb4f11153e6fc3e1a07783c2da74f007365c4",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": null,
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 2,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/public-evidence.json",
+            "bytes": 8236,
+            "sha256": "02fb76b36466c8ee9bc217d0d532f5128cadf305b23cd9847222c0d6acb78a79"
+          },
+          "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+          "kind": "TSA",
+          "routes": [
+            "/http-first"
+          ],
+          "reply": null,
+          "result": null,
+          "children": 4,
+          "rootExplicitStreamHashRowsMatched": 8,
+          "streamsNotReadHere": true,
+          "socketsClosed": 1,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/checkpoint-public-evidence.json",
+            "bytes": 10847,
+            "sha256": "8d5184a9808014aa618b2f10c567c846ece5daa8edcfeb74caf790da41d6889c"
+          },
+          "caseId": "CHECKPOINT-PENDING-GRANT",
+          "kind": "CHECKPOINT",
+          "trust": {
+            "mode": "pinned",
+            "signatureVerifiedListCount": 1,
+            "rootKeyId": "3d3fbb5284eeb4241e4d30943d73093dd25e72f031ed6dbfc893e10fc82e4986",
+            "monitorFingerprint": "1d649594027faf8823f3627643f2bf42fbedf530dd7c375dacb5364bc791f9e3",
+            "tsaLoaded": true,
+            "signedList": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/home/checkpoint-trust-list.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/home/checkpoint-trust-list.json",
+              "bytes": 1993,
+              "sha256": "d165e3590bc28b24e187b85369634744d8095c3b7fae5c2515f2dabbf1465cc9",
+              "dev": 16777231,
+              "inode": 543659459,
+              "nlink": 1
+            }
+          },
+          "initialLedger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0,
+            "seedEventId": "070ad053-7b3f-4399-a1ab-f33a375bcf47",
+            "sessionId": "93bcc364-9b90-4b71-959b-4d73d559c047",
+            "eventCount": 1
+          },
+          "facts": {
+            "pending": {
+              "result": {
+                "sequence": 1,
+                "status": "pending",
+                "failures": [
+                  "checkpoint-tsa: HTTP 500"
+                ]
+              },
+              "signedCheckpoint": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "a997728e7f15db1ed7e7c4bbbb997ad469a5f6532d43c8316c6b4fe5076e8691",
+                "dev": 16777231,
+                "inode": 543659464,
+                "nlink": 1
+              },
+              "signatureValid": true,
+              "eventCount": 1,
+              "tokenAbsent": true,
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": null,
+                  "detail": null,
+                  "status": "pending"
+                }
+              ]
+            },
+            "completed": {
+              "result": [
+                {
+                  "sequence": 1,
+                  "status": "timestamped",
+                  "failures": []
+                }
+              ],
+              "sequenceCount": 1,
+              "checkpointBytesUnchanged": true,
+              "token": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "8c7f265b0acf11721bdc0cd5c37d1ed1ccdd6bd402da38db1a82b2b4eef0267b",
+                "dev": 16777231,
+                "inode": 543659472,
+                "nlink": 1
+              },
+              "storedTokenMatchesIndependentGrant": true,
+              "attested": {
+                "genTime": "2026-10-16T23:27:30.000Z",
+                "anchorId": "amc-p125-grant-test-root",
+                "messageImprint": {
+                  "hashAlgorithm": "sha256",
+                  "digest": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98"
+                },
+                "revocationChecked": false
+              },
+              "checkpointRows": [
+                {
+                  "id": "14c16375-c55c-479a-8539-8cae9e326fb8",
+                  "eventHash": "a11209ac67ab64c30c7009d376cea52f003dd63685ccda10018e9d7312bf5bb0",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98",
+                    "tokenSha256": "8c7f265b0acf11721bdc0cd5c37d1ed1ccdd6bd402da38db1a82b2b4eef0267b"
+                  }
+                }
+              ],
+              "ledger": {
+                "ok": true,
+                "chain": true,
+                "governance": true,
+                "anchored": true,
+                "errors": 0
+              },
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": "2026-10-16T23:27:30.000Z",
+                  "detail": null,
+                  "status": "timestamped"
+                }
+              ],
+              "seedIndex": 0,
+              "seedTime": {
+                "time": {
+                  "claimedAt": "2026-10-16T23:27:30.188Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "a95c7b08571aef44fb01056b76f04474e9b3c38b0f395c31d0fdc0f0e43145af",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-16T23:27:30.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "2",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98"
+                    },
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-upper-bound",
+                  "window": {
+                    "notBefore": null,
+                    "notAfter": "2026-10-16T23:27:30.000Z"
+                  }
+                },
+                "findings": []
+              }
+            }
+          },
+          "ledgerOwnersClosed": 5,
+          "poolReleased": true,
+          "vaultLocked": true,
+          "nativeAndImmutableInputsExact": true,
+          "environmentRestored": true,
+          "guardCloseInvocationOnly": true,
+          "bodyErrors": [],
+          "cleanupErrors": []
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/checkpoint-public-evidence.json",
+            "bytes": 5098,
+            "sha256": "3821a53a5f21ca5226a209bbaf2dde71cef6d04fbceadb7489a68c88ead46c39"
+          },
+          "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+          "kind": "CHECKPOINT",
+          "trust": {
+            "mode": "pinned",
+            "signatureVerifiedListCount": 1,
+            "rootKeyId": "d5bae57121c30203c71607b403be8573864d702b9d3cf1c2409652426d18e595",
+            "monitorFingerprint": "42fab6a2d88b854d8aa1477999cfe4149dd357386b9b21249578c2a64a73aac4",
+            "tsaLoaded": true,
+            "signedList": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/home/checkpoint-trust-list.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/home/checkpoint-trust-list.json",
+              "bytes": 1993,
+              "sha256": "f2cc2cd2e5f25c153517f4c7bc0690ee1fc342fd6f8918e7dbd98c036067bb5b",
+              "dev": 16777231,
+              "inode": 543659627,
+              "nlink": 1
+            }
+          },
+          "initialLedger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0,
+            "seedEventId": "815e6cd4-c10b-4cbe-aaba-18a9af24db5e",
+            "sessionId": "fac01b34-e14e-4f4a-a76a-0b04a408394f",
+            "eventCount": 1
+          },
+          "facts": {
+            "required": {
+              "rejected": true,
+              "rejectionName": "Error",
+              "expectedRejection": true,
+              "signatureValid": true,
+              "tokenAbsent": true,
+              "sequenceCount": 1,
+              "signedCheckpoint": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "9d82189e71a27519777018da40ee21e38e437d58f5d5b27486a001853bf038cc",
+                "dev": 16777231,
+                "inode": 543659632,
+                "nlink": 1
+              },
+              "eventCount": 1,
+              "checkpointRowCount": 0,
+              "ledger": {
+                "ok": true,
+                "chain": true,
+                "governance": true,
+                "anchored": true,
+                "errors": 0
+              },
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": null,
+                  "detail": null,
+                  "status": "pending"
+                }
+              ]
+            }
+          },
+          "ledgerOwnersClosed": 4,
+          "poolReleased": true,
+          "vaultLocked": true,
+          "nativeAndImmutableInputsExact": true,
+          "environmentRestored": true,
+          "guardCloseInvocationOnly": true,
+          "bodyErrors": [],
+          "cleanupErrors": []
+        }
+      ]
+    },
+    {
+      "phase": "p125k-source-after-eof",
+      "helperVersion": "f6140366-final-after-EOF",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "hooks": [
+        {
+          "id": "-455678311",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "taskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "command": {
+        "phase": "p125k-source-after-eof",
+        "exit": 0,
+        "durationMs": 3446,
+        "ownedPgid": 64974,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "logPin": {
+          "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-after-eof/stdout-stderr.log",
+          "bytes": 37224,
+          "sha256": "418ade4001cfc06b8905e2b738d65a98b371d5296644aacbbaae65522cee9ef2"
+        }
+      },
+      "rootPublicAudit": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-source-after-eof-public-audit.json",
+        "bytes": 27123,
+        "sha256": "4fe198641413bfdaf3daab98ccfed8d61777ed35c540035556de799f559f2a81"
+      },
+      "publicFacts": [
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qdEaPQ/public-evidence.json",
+            "bytes": 12987,
+            "sha256": "5b97d2bc55003955bb32aa15f33ab2284b1ef20b9970ed5d699f6300789fc4bc"
+          },
+          "caseId": "FIRST-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/good-first"
+          ],
+          "reply": {
+            "path": "/good-first",
+            "querySha256": "d697e8569a6b527a5877ae0f2dec732f98815e312cc10ede4bcb79b8496a7f47",
+            "responseSha256": "670de3f01a56198d8391efbc484b84731e0a8ad2c9483153a4d63aa7d083d605",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "cdcfd51437d7ac094c6652c064e10dfce59a3eb4e4d30e7c2099cb206b62262a",
+              "genTime": "2026-10-16T23:35:58.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "509ed0dcdceaf43282234be93a5ec322ef8fbcc11e6a89d58a74865c9a66b9f4",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 1,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/public-evidence.json",
+            "bytes": 13548,
+            "sha256": "e4054d5286ee05fdde34ecef3e4b9299580fa7c84d2c2335cf9e5edf58a6faff"
+          },
+          "caseId": "HTTP500-THEN-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "reply": {
+            "path": "/good-second",
+            "querySha256": "7fad6d8b17e6700f2dfd67778b05412b78212dc5b4f41da0a9487bc133609b26",
+            "responseSha256": "f166b0fabe48bdeda474658c1866a5547c5d2ac16f6e1440900cb77e2ab83a0e",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "033500de7cddaea5e6e1d5a6bd3c82941b226c8e3dc19a5325395a44d77d49de",
+              "genTime": "2026-10-16T23:35:58.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "5d5a8b262cc797ba307ce7ea18d9695b252d23b910cfb5c43fb935f9b97fd480",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 2,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4jUihi/public-evidence.json",
+            "bytes": 12901,
+            "sha256": "58d1eef3be4e82db0fb8d1473ecfa7618c1fdb2a1d987e45deb0880b7e018164"
+          },
+          "caseId": "CHECKPOINT-PENDING-GRANT",
+          "kind": "TSA",
+          "routes": [
+            "/http-first",
+            "/checkpoint-good"
+          ],
+          "reply": {
+            "path": "/checkpoint-good",
+            "querySha256": "a0f0fffe12bcacc189f6268ee3e91b9a5cdcf36fdcbc6c5668c781e0de01abf7",
+            "responseSha256": "05bc563ef10c3964f30f192b50ef403e510dd77b9bbf61184d8468328ccf8f35",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "result": null,
+          "children": 6,
+          "rootExplicitStreamHashRowsMatched": 12,
+          "streamsNotReadHere": true,
+          "socketsClosed": 2,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-120dG5/public-evidence.json",
+            "bytes": 8239,
+            "sha256": "8570c8c3242e299af525d6d089b1e4e1adc06caa50f7823938342acf8e2f14f9"
+          },
+          "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+          "kind": "TSA",
+          "routes": [
+            "/http-first"
+          ],
+          "reply": null,
+          "result": null,
+          "children": 4,
+          "rootExplicitStreamHashRowsMatched": 8,
+          "streamsNotReadHere": true,
+          "socketsClosed": 1,
+          "cleanupErrors": 0
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-0idQUM/checkpoint-public-evidence.json",
+            "bytes": 10847,
+            "sha256": "55eb5f701dd9c5d81e8b79a48839520ace7f0c530a2e4f2e26790aeb9af80125"
+          },
+          "caseId": "CHECKPOINT-PENDING-GRANT",
+          "kind": "CHECKPOINT",
+          "trust": {
+            "mode": "pinned",
+            "signatureVerifiedListCount": 1,
+            "rootKeyId": "83a787d2cf7a0d76e030322a5464c21a3d7bb1aeac5a15e514e85884c82cdb98",
+            "monitorFingerprint": "ae774f6f094f5872660563eee08bdf97570915c5a341b9f9de0818efea5be408",
+            "tsaLoaded": true,
+            "signedList": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4jUihi/home/checkpoint-trust-list.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4jUihi/home/checkpoint-trust-list.json",
+              "bytes": 1993,
+              "sha256": "408405508ef40ab6cb7d3843ec3edb9ff8c2fbc799c30a3cd301f2ece8151c27",
+              "dev": 16777231,
+              "inode": 543667508,
+              "nlink": 1
+            }
+          },
+          "initialLedger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0,
+            "seedEventId": "2f142bba-c49e-4a09-9ea7-981d87347dc6",
+            "sessionId": "b47d0fed-e495-4f8e-a579-11a39307849a",
+            "eventCount": 1
+          },
+          "facts": {
+            "pending": {
+              "result": {
+                "sequence": 1,
+                "status": "pending",
+                "failures": [
+                  "checkpoint-tsa: HTTP 500"
+                ]
+              },
+              "signedCheckpoint": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-0idQUM/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-0idQUM/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "17d6a784ea112c725e39a31fcb19ea293cd35e2b97dbb29abef1b6f40bdcc021",
+                "dev": 16777231,
+                "inode": 543667513,
+                "nlink": 1
+              },
+              "signatureValid": true,
+              "eventCount": 1,
+              "tokenAbsent": true,
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": null,
+                  "detail": null,
+                  "status": "pending"
+                }
+              ]
+            },
+            "completed": {
+              "result": [
+                {
+                  "sequence": 1,
+                  "status": "timestamped",
+                  "failures": []
+                }
+              ],
+              "sequenceCount": 1,
+              "checkpointBytesUnchanged": true,
+              "token": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-0idQUM/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-0idQUM/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "3ebbc3f3fe43578c7c619e3a0c3aec98074b14d8564460c897a3d93f5201d535",
+                "dev": 16777231,
+                "inode": 543667521,
+                "nlink": 1
+              },
+              "storedTokenMatchesIndependentGrant": true,
+              "attested": {
+                "genTime": "2026-10-16T23:35:59.000Z",
+                "anchorId": "amc-p125-grant-test-root",
+                "messageImprint": {
+                  "hashAlgorithm": "sha256",
+                  "digest": "41f4a0441e015ae288cb4918c9a2435d6a18eba425d5e2f0fec1b9e981df52af"
+                },
+                "revocationChecked": false
+              },
+              "checkpointRows": [
+                {
+                  "id": "071b78ff-c571-49ef-9045-69d0fa9c65b4",
+                  "eventHash": "03f7dd88511b5cc163a06a9dbb0e954aa57ae9d64a8be23dcf3af4d7195e588e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "41f4a0441e015ae288cb4918c9a2435d6a18eba425d5e2f0fec1b9e981df52af",
+                    "tokenSha256": "3ebbc3f3fe43578c7c619e3a0c3aec98074b14d8564460c897a3d93f5201d535"
+                  }
+                }
+              ],
+              "ledger": {
+                "ok": true,
+                "chain": true,
+                "governance": true,
+                "anchored": true,
+                "errors": 0
+              },
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": "2026-10-16T23:35:59.000Z",
+                  "detail": null,
+                  "status": "timestamped"
+                }
+              ],
+              "seedIndex": 0,
+              "seedTime": {
+                "time": {
+                  "claimedAt": "2026-10-16T23:35:59.753Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "a6b7109882beb821faef884e2e0807bdaa7eb0e76b1f3c45965c213bb971433b",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-16T23:35:59.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "2",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "41f4a0441e015ae288cb4918c9a2435d6a18eba425d5e2f0fec1b9e981df52af"
+                    },
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-upper-bound",
+                  "window": {
+                    "notBefore": null,
+                    "notAfter": "2026-10-16T23:35:59.000Z"
+                  }
+                },
+                "findings": []
+              }
+            }
+          },
+          "ledgerOwnersClosed": 5,
+          "poolReleased": true,
+          "vaultLocked": true,
+          "nativeAndImmutableInputsExact": true,
+          "environmentRestored": true,
+          "guardCloseInvocationOnly": true,
+          "bodyErrors": [],
+          "cleanupErrors": []
+        },
+        {
+          "pin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-AHdWSS/checkpoint-public-evidence.json",
+            "bytes": 5098,
+            "sha256": "114c89ce7e6cc142a9233b6590ad526b4c64d38abe6652066ea39383ad0b2688"
+          },
+          "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+          "kind": "CHECKPOINT",
+          "trust": {
+            "mode": "pinned",
+            "signatureVerifiedListCount": 1,
+            "rootKeyId": "9cbb21fb8a26c7d5f8af64aebff9994d996f6b682906e77bca3b72280923aa26",
+            "monitorFingerprint": "3470001862d1c1ac4741fa45d7870d0b697cea6e2c5d86ca46c4c4d0b2736819",
+            "tsaLoaded": true,
+            "signedList": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-120dG5/home/checkpoint-trust-list.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-120dG5/home/checkpoint-trust-list.json",
+              "bytes": 1993,
+              "sha256": "18ba2a70709a71820a3d1ea6e7ead230eb54af6b9a2fb7634402b95649913f13",
+              "dev": 16777231,
+              "inode": 543667674,
+              "nlink": 1
+            }
+          },
+          "initialLedger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0,
+            "seedEventId": "17402e22-99c9-4b9e-8bac-b23463207eba",
+            "sessionId": "a65c870a-7cca-4da7-b7c6-a76c0d136be5",
+            "eventCount": 1
+          },
+          "facts": {
+            "required": {
+              "rejected": true,
+              "rejectionName": "Error",
+              "expectedRejection": true,
+              "signatureValid": true,
+              "tokenAbsent": true,
+              "sequenceCount": 1,
+              "signedCheckpoint": {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-AHdWSS/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-AHdWSS/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "b002f2431d7018872e248789a547156c8019b843017e658c322807825e470165",
+                "dev": 16777231,
+                "inode": 543667679,
+                "nlink": 1
+              },
+              "eventCount": 1,
+              "checkpointRowCount": 0,
+              "ledger": {
+                "ok": true,
+                "chain": true,
+                "governance": true,
+                "anchored": true,
+                "errors": 0
+              },
+              "timeline": [
+                {
+                  "sequence": 1,
+                  "genTime": null,
+                  "detail": null,
+                  "status": "pending"
+                }
+              ]
+            }
+          },
+          "ledgerOwnersClosed": 4,
+          "poolReleased": true,
+          "vaultLocked": true,
+          "nativeAndImmutableInputsExact": true,
+          "environmentRestored": true,
+          "guardCloseInvocationOnly": true,
+          "bodyErrors": [],
+          "cleanupErrors": []
+        }
+      ]
+    }
+  ],
+  "sameOrdered21OriginalAndFinal": true,
+  "actualFinal21NoSkip": true,
+  "sourceChecksActualZero": [
+    "p125k-test-types",
+    "p125k-source-types",
+    "p125k-source-lint",
+    "p125k-source-build",
+    "p125k-source-counts",
+    "p125k-source-gates",
+    "p125k-source-threat-model",
+    "p125k-source-architecture",
+    "p125k-source-docs-drift",
+    "p125k-source-freeze",
+    "p125k-source-notices",
+    "p125k-source-qualification"
+  ],
+  "commands": [
+    {
+      "phase": "p125k-source-combined",
+      "exit": 0,
+      "durationMs": 3556,
+      "ownedPgid": 62997,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-combined/stdout-stderr.log",
+        "bytes": 37216,
+        "sha256": "4c99f1024ac6bb864318a00ff4cc656a23eb98b6a77731accdd2b64aaa6c0acb"
+      }
+    },
+    {
+      "phase": "p125k-source-after-eof",
+      "exit": 0,
+      "durationMs": 3446,
+      "ownedPgid": 64974,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-after-eof/stdout-stderr.log",
+        "bytes": 37224,
+        "sha256": "418ade4001cfc06b8905e2b738d65a98b371d5296644aacbbaae65522cee9ef2"
+      }
+    },
+    {
+      "phase": "p125k-test-types",
+      "exit": 0,
+      "durationMs": 37389,
+      "ownedPgid": 63561,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-test-types/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      }
+    },
+    {
+      "phase": "p125k-source-types",
+      "exit": 0,
+      "durationMs": 25836,
+      "ownedPgid": 63861,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-types/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      }
+    },
+    {
+      "phase": "p125k-source-lint",
+      "exit": 0,
+      "durationMs": 2815,
+      "ownedPgid": 64200,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-lint/stdout-stderr.log",
+        "bytes": 447,
+        "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+      }
+    },
+    {
+      "phase": "p125k-source-build",
+      "exit": 0,
+      "durationMs": 29757,
+      "ownedPgid": 64281,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      }
+    },
+    {
+      "phase": "p125k-source-counts",
+      "exit": 0,
+      "durationMs": 591,
+      "ownedPgid": 64456,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-counts/stdout-stderr.log",
+        "bytes": 239,
+        "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4"
+      }
+    },
+    {
+      "phase": "p125k-source-gates",
+      "exit": 0,
+      "durationMs": 468,
+      "ownedPgid": 64468,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-gates/stdout-stderr.log",
+        "bytes": 821,
+        "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed"
+      }
+    },
+    {
+      "phase": "p125k-source-threat-model",
+      "exit": 0,
+      "durationMs": 268,
+      "ownedPgid": 64486,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-threat-model/stdout-stderr.log",
+        "bytes": 294,
+        "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4"
+      }
+    },
+    {
+      "phase": "p125k-source-architecture",
+      "exit": 0,
+      "durationMs": 1587,
+      "ownedPgid": 64498,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-architecture/stdout-stderr.log",
+        "bytes": 95863,
+        "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751"
+      }
+    },
+    {
+      "phase": "p125k-source-docs-drift",
+      "exit": 0,
+      "durationMs": 315,
+      "ownedPgid": 64516,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-docs-drift/stdout-stderr.log",
+        "bytes": 205,
+        "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a"
+      }
+    },
+    {
+      "phase": "p125k-source-freeze",
+      "exit": 0,
+      "durationMs": 1178,
+      "ownedPgid": 64528,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p125k-source-notices",
+      "exit": 0,
+      "durationMs": 220,
+      "ownedPgid": 64570,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-notices/stdout-stderr.log",
+        "bytes": 246,
+        "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00"
+      }
+    },
+    {
+      "phase": "p125k-source-qualification",
+      "exit": 0,
+      "durationMs": 852,
+      "ownedPgid": 64582,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-qualification/stdout-stderr.log",
+        "bytes": 240,
+        "sha256": "c187c36d52bda87a6242be711ca8e430d76356675865f941d921c3a603aa494d"
+      }
+    },
+    {
+      "phase": "p125k-generate-counts",
+      "exit": 0,
+      "durationMs": 487,
+      "ownedPgid": 64147,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-generate-counts/stdout-stderr.log",
+        "bytes": 176,
+        "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4"
+      }
+    },
+    {
+      "phase": "p125k-source-quality-diagnostic",
+      "exit": 0,
+      "durationMs": 2587,
+      "ownedPgid": 64647,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-quality-diagnostic/stdout-stderr.log",
+        "bytes": 121,
+        "sha256": "a270d3c09b92e915a2f6fa7b9024c258b4a96c384ccb2571b3c0c54b8a2c3147"
+      }
+    },
+    {
+      "phase": "p125k-count-pre-freeze",
+      "exit": 0,
+      "durationMs": 1533,
+      "ownedPgid": 64016,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-count-pre-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p125k-count-pre-d15",
+      "exit": 0,
+      "durationMs": 322,
+      "ownedPgid": 64060,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-count-pre-d15/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      }
+    },
+    {
+      "phase": "p125k-counts-source-before",
+      "exit": 1,
+      "durationMs": 608,
+      "ownedPgid": 63523,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-counts-source-before/stdout-stderr.log",
+        "bytes": 1436,
+        "sha256": "b4ad81dcc093f7df8fd6dd9a553ca58e852c1a9e48cb6aef90ddcf9e6685a530"
+      }
+    },
+    {
+      "phase": "p125k-source-duplicates",
+      "exit": 1,
+      "durationMs": 585,
+      "ownedPgid": 64596,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-duplicates/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    },
+    {
+      "phase": "p125k-source-dead-code",
+      "exit": 1,
+      "durationMs": 2796,
+      "ownedPgid": 64616,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-source-dead-code/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "9ccc80a2c7b2bf514b2f1a239ce7cd87fe02e7bb328b51bc7913eea9b90363e4"
+      }
+    },
+    {
+      "phase": "p125k-counts-before",
+      "exit": 0,
+      "durationMs": 379,
+      "ownedPgid": 63503,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-counts-before/stdout-stderr.log",
+        "bytes": 81,
+        "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+      }
+    }
+  ],
+  "sourceCheckpoint": {
+    "schema": "p125k-actual-source-checkpoint/1",
+    "at": "2026-10-16T23:38:08.246913+00:00",
+    "commit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+    "parent": "3468e29027c32209a5f794b7ffea3f1565de490e",
+    "branch": "codex/p1-25-checkpoint-qualification",
+    "paths": [
+      {
+        "relativePath": "README.md",
+        "bytes": 59828,
+        "sha256": "7b19c2b09835977976c5a6f38abff99cbc9b522fdce72dcda45c2c5fef2870e4"
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "a00544afa8dc3271694fed5a7fa6fbf62ec693d5bf2f2053dd00ee94e3a9812e"
+      },
+      {
+        "relativePath": "website/index.html",
+        "bytes": 43520,
+        "sha256": "b1edca14e7b3c0bae53edff70220be007ef5715f1d46d673749517a9cd85b61d"
+      },
+      {
+        "relativePath": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "04b882a274579841f767133444091f1bd08daf2db03658a5b7ddcb735c156d20"
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "fda86f006536cb6d6a7d0d7e3cd66fb674dda79a91e0bac8ebc49ba7866e0506"
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "89a709d6036d058230884aad46870641a8cb0e55f06828e2d0d3b6df454518ad"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "38d8774b93f149f2e697bccc9ff854e941e16d8dab17e4612bc1b21bf008d444"
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "73076d52e089b9ae7926e5561fd8742be150f295e026f34af07c174a1f9441a2"
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "a884b11cb23d6eb12ae12a261fa40c4b8f21df1c3e71b60a6e01dde6cbc05ff7"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "b6fe791cc31d705fc0d4121f95456d5f8ccdf5f25f6276948d5d7354f610b39d"
+      },
+      {
+        "relativePath": "tests/time/tsaGrant.test.ts",
+        "bytes": 2964,
+        "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+      },
+      {
+        "relativePath": "tests/time/checkpointWindow.test.ts",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+      },
+      {
+        "relativePath": "tests/time/tsaTestFixture.ts",
+        "bytes": 24967,
+        "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+      }
+    ],
+    "clean": true,
+    "indexEmpty": true,
+    "actualGitBlobsExact": true,
+    "sourcePassed21": "p125k-source-after-eof",
+    "oldPreEofSource21Retained": "p125k-source-combined",
+    "qualityStillRed": true,
+    "allHoldsRetained": true,
+    "noPushPrMergeRelease": true,
+    "independentRuntimeReviewStillSeparate": true
+  },
+  "exact13CommittedAndWorkingBlobs": true,
+  "currentSourceCleanAndIndexEmpty": true,
+  "historicalStaging": {
+    "firstOrdinaryAddExit1Retained": {
+      "at": "2026-10-16T23:35:12.536129+00:00",
+      "ordinaryAddExit": 1,
+      "stderr": "The following paths are ignored by one of your .gitignore files: docs/internal; .gitignore:144 internal/",
+      "actualAll13StagedDespiteNonzero": true,
+      "allIndexBlobsExact": true,
+      "status": "M  CONTRIBUTING.md\nM  README.md\nM  docs/content/reddit-launch-drafts.md\nM  docs/content/show-hn-draft.md\nM  docs/internal/competitive-landscape.md\nM  docs/internal/mirofish-simulation-council.md\nA  tests/time/checkpointWindow.test.ts\nM  tests/time/tsaGrant.test.ts\nA  tests/time/tsaTestFixture.ts\nM  website/i18n.js\nM  website/index.html\nM  website/lite.html\nM  whitepaper/AMC_WHITEPAPER_v1.md\n",
+      "noForceOrIgnoreRuleChanges": true
+    },
+    "finalOrdinaryTrackedRefresh": {
+      "at": "2026-10-16T23:35:56.604744+00:00",
+      "ordinaryTrackedRefreshExit": 0,
+      "exact13Paths": [
+        {
+          "relativePath": "README.md",
+          "bytes": 59828,
+          "sha256": "7b19c2b09835977976c5a6f38abff99cbc9b522fdce72dcda45c2c5fef2870e4"
+        },
+        {
+          "relativePath": "CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "a00544afa8dc3271694fed5a7fa6fbf62ec693d5bf2f2053dd00ee94e3a9812e"
+        },
+        {
+          "relativePath": "website/index.html",
+          "bytes": 43520,
+          "sha256": "b1edca14e7b3c0bae53edff70220be007ef5715f1d46d673749517a9cd85b61d"
+        },
+        {
+          "relativePath": "website/lite.html",
+          "bytes": 11197,
+          "sha256": "04b882a274579841f767133444091f1bd08daf2db03658a5b7ddcb735c156d20"
+        },
+        {
+          "relativePath": "website/i18n.js",
+          "bytes": 44169,
+          "sha256": "fda86f006536cb6d6a7d0d7e3cd66fb674dda79a91e0bac8ebc49ba7866e0506"
+        },
+        {
+          "relativePath": "docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "89a709d6036d058230884aad46870641a8cb0e55f06828e2d0d3b6df454518ad"
+        },
+        {
+          "relativePath": "docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "38d8774b93f149f2e697bccc9ff854e941e16d8dab17e4612bc1b21bf008d444"
+        },
+        {
+          "relativePath": "docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "73076d52e089b9ae7926e5561fd8742be150f295e026f34af07c174a1f9441a2"
+        },
+        {
+          "relativePath": "docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "a884b11cb23d6eb12ae12a261fa40c4b8f21df1c3e71b60a6e01dde6cbc05ff7"
+        },
+        {
+          "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "b6fe791cc31d705fc0d4121f95456d5f8ccdf5f25f6276948d5d7354f610b39d"
+        },
+        {
+          "relativePath": "tests/time/tsaGrant.test.ts",
+          "bytes": 2964,
+          "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+        },
+        {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        },
+        {
+          "relativePath": "tests/time/tsaTestFixture.ts",
+          "bytes": 24967,
+          "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+        }
+      ],
+      "allIndexBlobsExact": true,
+      "defaultCachedFullRangeWhitespace0": true,
+      "onlyHelperFinalNewlineSuccessor": true,
+      "noForceOrIgnoreRuleChanges": true
+    },
+    "stagedSnapshotNotMislabelledAsCurrent": true,
+    "noForceIgnoreNoVerifyOrBaselineChange": true
+  },
+  "helperEOFSuccessor": {
+    "at": "2026-10-16T23:35:56.219932+00:00",
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "old": {
+      "bytes": 24968,
+      "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663"
+    },
+    "new": {
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+    },
+    "trigger": "git diff --cached --check: tests/time/tsaTestFixture.ts:394: new blank line at EOF.",
+    "onlyFinalExtraNewlineRemoved": true,
+    "allCodeAndTestBodiesExact": true,
+    "reviewedOriginalRetained": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-before-eof-repair.ts.source.txt",
+    "noProductionGuardDeadlineOrIgnoreChanges": true
+  },
+  "evidenceVersionBoundary": "Initial source21, type/build and quality checks ran before the EOF-only repair. Only one final newline changed; final source-after-eof21 independently ran at finalf614 bytes. No invented second compiler/build run is claimed.",
+  "publicLifecycle": {
+    "perSourceRun": {
+      "publicRecords": 6,
+      "TsaRecords": 4,
+      "checkpointRecords": 2,
+      "childrenNaturalZero": 22,
+      "rootExplicitChildStreamHashRows": 44,
+      "closedSockets": 6,
+      "closedLedgerOwners": 9,
+      "cleanupErrors": 0
+    },
+    "bothRunsNotSummedIntoCoverage": true,
+    "rootStreamHashRowsMatchedPublicMetadataWithoutReadingStreamsHere": true,
+    "actualOpenSSL": "4.0.3",
+    "optionalSignerStderrDiagnosticsRetained": true,
+    "signedOwnTrustListAndMonitorPinControlledFixtureAuthority": true,
+    "nativeSignedLedgerTokenAndRequiredRefusalPositives": true,
+    "guardCloseInvocationOnlyNotNativeHandleProof": true,
+    "oneCheckpointUpperBoundNoLowerWindowOrTTLContractClaim": true,
+    "publicRecordFinalWriteAndInheritedOuterEnvLimitsRetained": true,
+    "noSigningSiblingsKeysPrivateRunsStreamsOrDatabasesOpened": true
+  },
+  "sourceScope": {
+    "testSidePaths": [
+      "tests/time/tsaTestFixture.ts",
+      "tests/time/checkpointWindow.test.ts",
+      "tests/time/tsaGrant.test.ts"
+    ],
+    "countPaths": 10,
+    "countNumericSpans": 15,
+    "countInventory": [
+      1694,
+      1695
+    ],
+    "allOtherCountAuthoredBytesEqualParent": true,
+    "productionCheckpointBytesUnchanged": true,
+    "runtimeProtected142Exact": true,
+    "oldNineNativePhysicalPinsExact": true
+  },
+  "countRootCorrection": {
+    "at": "2026-10-16T23:30:49.520425+00:00",
+    "wrongRootReadOnlyCheck": {
+      "phase": "p125k-counts-before",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 379,
+      "startedUtc": "2026-10-16T23:29:52.382287+00:00",
+      "endedUtc": "2026-10-16T23:29:52.770631+00:00",
+      "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-counts-before/stdout-stderr.log",
+      "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "ownedProcess": {
+        "pid": 63503,
+        "ownedPgid": 63503,
+        "observedPgidAfterLaunch": 63503,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-16T23:29:52.382287+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "qualificationCredit": false,
+    "reason": "Direct generator script resolves process.cwd() to held R; --check is read-only and supplies no source count evidence. Correct explicit pnpm --dir S command ran separately.",
+    "correctSourcePhase": "p125k-counts-source-before",
+    "noSourceOrRMutation": true
+  },
+  "quality": {
+    "at": "2026-10-16T23:34:17.047426+00:00",
+    "before": 2719,
+    "after": 2712,
+    "added": [],
+    "removed": [
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointLedger\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointsDir\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"completePendingCheckpoints\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"ledgerTimeline\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"readCheckpointChain\"}]",
+      "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"CheckpointResult\"}]",
+      "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"LedgerTimeline\"}]"
+    ],
+    "remainingOrderedFindingsExact": true,
+    "duplicates": 1268,
+    "fullDuplicateResultExact": true,
+    "reason": "New test consumption removes five checkpoint exports and two types from Knip findings; no production source or baseline edits.",
+    "globalStatus": "RED",
+    "waiverOrBaselineChange": false,
+    "diagnosticZeroIsNotGatePass": true,
+    "initialEqualityHypothesisRejected": "A read-only comparison asserted unchanged full findings, failed, and was diagnosed before admission; no product retry or changed input."
+  },
+  "independentQualityComparison": {
+    "exactFiveExportsAndTwoTypesRemoved": [
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointLedger\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointsDir\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"completePendingCheckpoints\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"ledgerTimeline\"}]",
+      "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"readCheckpointChain\"}]",
+      "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"CheckpointResult\"}]",
+      "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"LedgerTimeline\"}]"
+    ],
+    "remaining2712OrderedExact": true,
+    "full1268DuplicateResultExact": true,
+    "rejectedReadOnlyEqualityHypothesisRetained": true,
+    "diagnosticZeroNotGatePass": true,
+    "globalREDUnwaived": true
+  },
+  "rootPublicAuditorPin": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-public.py",
+    "bytes": 5367,
+    "sha256": "00bbdd28399cdc07f54701e59afc5424d4c174c9f02c6027875140247052be65"
+  },
+  "gitReadRecords": [
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdoutBytes": 41,
+      "stdoutSha256": "9e5ac4a04a7218d1b18df4796d9151dc2cb85a391f88bcb6c132e4d7e40a5cf7",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--name-only",
+        "3468e29027c32209a5f794b7ffea3f1565de490e",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2"
+      ],
+      "exit": 0,
+      "stdoutBytes": 355,
+      "stdoutSha256": "895bfb54467c7b7d9912f2573d7561cdcffbca9287a192e3e4865e0aefb2967d",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:README.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 59828,
+      "stdoutSha256": "7b19c2b09835977976c5a6f38abff99cbc9b522fdce72dcda45c2c5fef2870e4",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:CONTRIBUTING.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 16220,
+      "stdoutSha256": "a00544afa8dc3271694fed5a7fa6fbf62ec693d5bf2f2053dd00ee94e3a9812e",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:website/index.html"
+      ],
+      "exit": 0,
+      "stdoutBytes": 43520,
+      "stdoutSha256": "b1edca14e7b3c0bae53edff70220be007ef5715f1d46d673749517a9cd85b61d",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:website/lite.html"
+      ],
+      "exit": 0,
+      "stdoutBytes": 11197,
+      "stdoutSha256": "04b882a274579841f767133444091f1bd08daf2db03658a5b7ddcb735c156d20",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:website/i18n.js"
+      ],
+      "exit": 0,
+      "stdoutBytes": 44169,
+      "stdoutSha256": "fda86f006536cb6d6a7d0d7e3cd66fb674dda79a91e0bac8ebc49ba7866e0506",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:docs/content/show-hn-draft.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 1951,
+      "stdoutSha256": "89a709d6036d058230884aad46870641a8cb0e55f06828e2d0d3b6df454518ad",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:docs/content/reddit-launch-drafts.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 3075,
+      "stdoutSha256": "38d8774b93f149f2e697bccc9ff854e941e16d8dab17e4612bc1b21bf008d444",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:docs/internal/competitive-landscape.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 3880,
+      "stdoutSha256": "73076d52e089b9ae7926e5561fd8742be150f295e026f34af07c174a1f9441a2",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 2489,
+      "stdoutSha256": "a884b11cb23d6eb12ae12a261fa40c4b8f21df1c3e71b60a6e01dde6cbc05ff7",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:whitepaper/AMC_WHITEPAPER_v1.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 107509,
+      "stdoutSha256": "b6fe791cc31d705fc0d4121f95456d5f8ccdf5f25f6276948d5d7354f610b39d",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:tests/time/tsaGrant.test.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 2964,
+      "stdoutSha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:tests/time/checkpointWindow.test.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 22649,
+      "stdoutSha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2:tests/time/tsaTestFixture.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 24967,
+      "stdoutSha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--check",
+        "3468e29027c32209a5f794b7ffea3f1565de490e",
+        "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:README.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 59828,
+      "stdoutSha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:CONTRIBUTING.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 16220,
+      "stdoutSha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:website/index.html"
+      ],
+      "exit": 0,
+      "stdoutBytes": 43520,
+      "stdoutSha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:website/lite.html"
+      ],
+      "exit": 0,
+      "stdoutBytes": 11197,
+      "stdoutSha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:website/i18n.js"
+      ],
+      "exit": 0,
+      "stdoutBytes": 44169,
+      "stdoutSha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:docs/content/show-hn-draft.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 1951,
+      "stdoutSha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:docs/content/reddit-launch-drafts.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 3075,
+      "stdoutSha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:docs/internal/competitive-landscape.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 3880,
+      "stdoutSha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 2489,
+      "stdoutSha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:whitepaper/AMC_WHITEPAPER_v1.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 107509,
+      "stdoutSha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:src/time/checkpoint.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 21005,
+      "stdoutSha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "stderr": ""
+    }
+  ],
+  "readOnlyAuthoringStop": {
+    "operation": "Static private source-review assembly",
+    "error": "AssertionError at <stdin>:114",
+    "exactFailedCheck": "parent=3468...; assert git(rev-parse HEAD)==parent",
+    "cause": "Root ordinary source commit advanced HEAD to the explicitly announced e49 checkpoint during the read-only audit.",
+    "beforeAnyReviewFolderWrite": true,
+    "noProductSourceIndexOrQaEffect": true,
+    "resolution": "Bind actual e49 record, exact13 committed blobs and current clean/empty index; retain earlier staging snapshots as historical.",
+    "noOldBytesRestored": true
+  },
+  "freshControlMetadataWholeIssueReleaseOrCompletePlanCredit": false,
+  "boundaries": [
+    "Both source passes are real and retain their exact helper versions. Repeated runs do not enlarge the21-case cohort.",
+    "The direct wrong-root count check earns zero source credit; explicit S countRED then ordinary generation andGREEN are retained.",
+    "Old142 prechange grant bytes are history; active142 follows the admitted c8c grant successor and all141others.",
+    "Root owns fresh checkout/control/receipt work. Local source commit does not close the issue, release or plan.",
+    "All held decisions,F37 skip, freeze and RED quality checks remain intact. No product/helper/native/OpenSSL/SQL/network/probes or checkout/index/QA writes occurred in this audit."
+  ]
+}

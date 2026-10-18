@@ -1,0 +1,80 @@
+{
+  "schema": "p125pc-control-root-bindings/1",
+  "readyForControls": false,
+  "sourceParent": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": null,
+  "freshRoot": null,
+  "baseProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "bytes": 88277,
+    "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+    "dev": 16777231,
+    "inode": 543919520,
+    "nlink": 1
+  },
+  "runtimeProtectedInputsPin": null,
+  "sourceSelectionPin": null,
+  "freshSourceBindingPin": null,
+  "observedAuditPin": null,
+  "sourceOutcomePin": null,
+  "freshOutcomePin": null,
+  "sourceSuccessors": null,
+  "phases": {
+    "source": null,
+    "fresh": null,
+    "mutants": [
+      null,
+      null
+    ],
+    "restorations": [
+      null,
+      null
+    ]
+  },
+  "rootReviewedActualSourceAndFreshOutcomes": false,
+  "rootReviewedActualSourceAndFreshPublicEvidence": false,
+  "rootReviewedActualPreservationAndNativePins": false,
+  "rootReviewedExactHelperAndControlRecipes": false,
+  "noFutureOutcomeHashesAdopted": true,
+  "directActionNaturalClosureBeforeDependentTestsRequired": true,
+  "actualActionRecordsNotFuturePins": {
+    "pattern": "/private/tmp/p1-25-producer-qualification-20261017/control-action-<apply-or-restore><1-or-2>.json",
+    "createdByRootOnlyAfterActualNaturalReturn": true,
+    "fields": [
+      "argv",
+      "startedUtc",
+      "endedUtc",
+      "exit",
+      "stdout",
+      "stderr"
+    ],
+    "futureActionHashes": null
+  },
+  "knownStaticCandidatePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "bytes": 61752,
+    "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+    "dev": 16777231,
+    "inode": 543909995,
+    "nlink": 1
+  },
+  "knownStaticPeerReviewPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "bytes": 8070,
+    "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7",
+    "dev": 16777231,
+    "inode": 543910559,
+    "nlink": 1
+  },
+  "preferredBaseline": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "activeRows": 175,
+    "retainedNativeMetadataPins": 12,
+    "prebuildCompiledObservationHashesAreNotActive": true
+  },
+  "boundary": "UNREADY. All five admission flags are false. Root must fill only actual committed source, one exact source successor/original, post-build runtime/selection/fresh binding, actual source/fresh outcomes and phases, after full helper and independent static review. No future fresh path, native pin, runtime hash, result, failure count or action hash exists here."
+}

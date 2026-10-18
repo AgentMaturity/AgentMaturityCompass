@@ -1,0 +1,526 @@
+{
+  "schema": "p124-source-sensitivity/1",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "scope": "Two separate single-source TS controls in the physical fresh checkout; no compiled rebuild and no R product mutation.",
+  "baseline": {
+    "phase": "p124-fresh-canonical",
+    "total": 109,
+    "passed": 109,
+    "failed": 0,
+    "skipped": 0,
+    "files": 7,
+    "fileCounts": [
+      {
+        "file": "dshSessionImport.test.ts",
+        "total": 15,
+        "passed": 15,
+        "failed": 0
+      },
+      {
+        "file": "importOriginals.test.ts",
+        "total": 13,
+        "passed": 13,
+        "failed": 0
+      },
+      {
+        "file": "neutralImportMapping.test.ts",
+        "total": 10,
+        "passed": 10,
+        "failed": 0
+      },
+      {
+        "file": "neutralImporter.test.ts",
+        "total": 10,
+        "passed": 10,
+        "failed": 0
+      },
+      {
+        "file": "piDurableDetection.test.ts",
+        "total": 9,
+        "passed": 9,
+        "failed": 0
+      },
+      {
+        "file": "piSessionImport.test.ts",
+        "total": 11,
+        "passed": 11,
+        "failed": 0
+      },
+      {
+        "file": "requestFieldGuard.test.ts",
+        "total": 41,
+        "passed": 41,
+        "failed": 0
+      }
+    ]
+  },
+  "controls": [
+    {
+      "id": "M1",
+      "change": "Remove only the SourceFormatError message-preservation branch in neutralImporter catch; keep generic fallback.",
+      "applied": {
+        "action": "apply",
+        "recipe": "M1-source-format-message",
+        "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+        "before": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/neutralImporter.ts",
+          "bytes": 43554,
+          "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+        },
+        "after": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/neutralImporter.ts",
+          "bytes": 43493,
+          "sha256": "55760ad79355f84b49b2f9ffc9402c9794227b34fdd87fc24148d5b4f5844ea4"
+        },
+        "original": {
+          "path": "/private/tmp/p1-24-qualification-20261016/executed-controls/originals/src/importers/neutralImporter.ts",
+          "bytes": 43554,
+          "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+        },
+        "compiledOutputsRebuilt": false
+      },
+      "restored": {
+        "action": "restore",
+        "recipe": "M1-source-format-message",
+        "restored": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/neutralImporter.ts",
+          "bytes": 43554,
+          "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+        },
+        "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+        "status": "",
+        "compiledOutputsRebuilt": false
+      },
+      "actual": {
+        "phase": "p124-mutant-format-message",
+        "total": 109,
+        "passed": 89,
+        "failed": 20,
+        "skipped": 0,
+        "files": 7,
+        "fileCounts": [
+          {
+            "file": "dshSessionImport.test.ts",
+            "total": 15,
+            "passed": 4,
+            "failed": 11
+          },
+          {
+            "file": "importOriginals.test.ts",
+            "total": 13,
+            "passed": 13,
+            "failed": 0
+          },
+          {
+            "file": "neutralImportMapping.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "neutralImporter.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "piDurableDetection.test.ts",
+            "total": 9,
+            "passed": 2,
+            "failed": 7
+          },
+          {
+            "file": "piSessionImport.test.ts",
+            "total": 11,
+            "passed": 9,
+            "failed": 2
+          },
+          {
+            "file": "requestFieldGuard.test.ts",
+            "total": 41,
+            "passed": 41,
+            "failed": 0
+          }
+        ]
+      },
+      "failureClasses": {
+        "dshSessionImport.test.ts": 11,
+        "piDurableDetection.test.ts": 7,
+        "piSessionImport.test.ts": 2
+      },
+      "classification": "Twenty genuine public preview-message body AssertionErrors. Actual generic fallback replaces expected typed version-specific refusal text. This is not a parser setup failure or a demonstration of successful unsupported imports.",
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses DSH v0 with its typed, pinned public plan message and no generic fallback",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format v0 is not supporte\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses DSH v1 with its typed, pinned public plan message and no generic fallback",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format v1 is not supporte\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses DSH v3 with its typed, pinned public plan message and no generic fallback",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format v3 is not supporte\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses DSH v4 with its typed, pinned public plan message and no generic fallback",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format v4 is not supporte\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (undefined)",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format with a missing or \u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (\"synthetic-private-version\")",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format with a missing or \u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values ({\"private\":\"synthetic-private-version\"})",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session format with a missing or \u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses an invalid v2 physical header instead of reclassifying it as Pi or generic events",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session import refused: invalid o\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:98:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts recognizes a torn DSH-only header marker and refuses without echoing its private suffix",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session import refused: malformed\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:105:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses a malformed event line rather than silently repairing a torn tail",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session import refused: malformed\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:112:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+          "title": "P1-24 explicit DSH session contracts refuses unknown required events rather than silently losing them",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'DSH session import refused: unknown r\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:119:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'durable v1' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format v1 is not s\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'durable v3' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format v3 is not s\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'durable v4' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format v4 is not s\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'storageVersion without v' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format with a miss\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'string v' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format with a miss\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination 'object v' refuses explicitly before generic event-log detection",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi durable session format with a miss\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+          "title": "P1-24 Pi durable format discrimination a Pi CLI session v4 refusal remains distinct from the durable-v4 message",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to be 'Pi session version 4 is not supported\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:91:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:87:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+          "title": "AMC-1507 \u2014 Pi v3 session import an unsupported session version is rejected explicitly, with no generic fallback",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to match /version 1/\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts:184:43\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+          "title": "AMC-1507 \u2014 Pi v3 session import an invalid version value produces a useful diagnostic without echoing source values",
+          "messages": [
+            "AssertionError: expected 'Could not parse JSONL. Inspect the so\u2026' to contain 'invalid version field'\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts:196:43\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "masking": "Later no-generic-fallback, loss/no-write or downstream assertions after a first failed message equality are not credited.",
+      "restoredActual": {
+        "phase": "p124-restored-format-message",
+        "total": 109,
+        "passed": 109,
+        "failed": 0,
+        "skipped": 0,
+        "files": 7,
+        "fileCounts": [
+          {
+            "file": "dshSessionImport.test.ts",
+            "total": 15,
+            "passed": 15,
+            "failed": 0
+          },
+          {
+            "file": "importOriginals.test.ts",
+            "total": 13,
+            "passed": 13,
+            "failed": 0
+          },
+          {
+            "file": "neutralImportMapping.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "neutralImporter.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "piDurableDetection.test.ts",
+            "total": 9,
+            "passed": 9,
+            "failed": 0
+          },
+          {
+            "file": "piSessionImport.test.ts",
+            "total": 11,
+            "passed": 11,
+            "failed": 0
+          },
+          {
+            "file": "requestFieldGuard.test.ts",
+            "total": 41,
+            "passed": 41,
+            "failed": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "M2",
+      "change": "Remove only the post-decryption reference-SHA comparison from readImportOriginal; preserve byte-length check and encrypted-blob authentication.",
+      "applied": {
+        "action": "apply",
+        "recipe": "M2-original-reference-sha",
+        "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+        "before": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/importOriginals.ts",
+          "bytes": 8521,
+          "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c"
+        },
+        "after": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/importOriginals.ts",
+          "bytes": 8490,
+          "sha256": "4d2eee22c5a51239304b255ebc6d803aa40901e839b9b2f21d0389ccfd5ac81f"
+        },
+        "original": {
+          "path": "/private/tmp/p1-24-qualification-20261016/executed-controls/originals/src/importers/importOriginals.ts",
+          "bytes": 8521,
+          "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c"
+        },
+        "compiledOutputsRebuilt": false
+      },
+      "restored": {
+        "action": "restore",
+        "recipe": "M2-original-reference-sha",
+        "restored": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/importOriginals.ts",
+          "bytes": 8521,
+          "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c"
+        },
+        "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+        "status": "",
+        "compiledOutputsRebuilt": false
+      },
+      "actual": {
+        "phase": "p124-mutant-original-sha",
+        "total": 109,
+        "passed": 108,
+        "failed": 1,
+        "skipped": 0,
+        "files": 7,
+        "fileCounts": [
+          {
+            "file": "dshSessionImport.test.ts",
+            "total": 15,
+            "passed": 15,
+            "failed": 0
+          },
+          {
+            "file": "importOriginals.test.ts",
+            "total": 13,
+            "passed": 12,
+            "failed": 1
+          },
+          {
+            "file": "neutralImportMapping.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "neutralImporter.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "piDurableDetection.test.ts",
+            "total": 9,
+            "passed": 9,
+            "failed": 0
+          },
+          {
+            "file": "piSessionImport.test.ts",
+            "total": 11,
+            "passed": 11,
+            "failed": 0
+          },
+          {
+            "file": "requestFieldGuard.test.ts",
+            "total": 41,
+            "passed": 41,
+            "failed": 0
+          }
+        ]
+      },
+      "classification": "One genuine no-throw AssertionError at importOriginals.test.ts:121:62. Two genuinely encrypted, valid, equal-length payloads first read back correctly. The substituted second reference carries the first SHA; its own GCM/envelope checks remain valid, exposing the missing external reference-SHA check.",
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts",
+          "title": "P1-24 encrypted exact import originals refuses a valid equal-length encrypted payload whose reference SHA names different bytes",
+          "messages": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts:121:62\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts:55:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts:109:106\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ],
+      "masking": "The following workspace snapshot-equality assertion is masked; no independent post-failure persistence claim.",
+      "restoredActual": {
+        "phase": "p124-restored-original-sha",
+        "total": 109,
+        "passed": 109,
+        "failed": 0,
+        "skipped": 0,
+        "files": 7,
+        "fileCounts": [
+          {
+            "file": "dshSessionImport.test.ts",
+            "total": 15,
+            "passed": 15,
+            "failed": 0
+          },
+          {
+            "file": "importOriginals.test.ts",
+            "total": 13,
+            "passed": 13,
+            "failed": 0
+          },
+          {
+            "file": "neutralImportMapping.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "neutralImporter.test.ts",
+            "total": 10,
+            "passed": 10,
+            "failed": 0
+          },
+          {
+            "file": "piDurableDetection.test.ts",
+            "total": 9,
+            "passed": 9,
+            "failed": 0
+          },
+          {
+            "file": "piSessionImport.test.ts",
+            "total": 11,
+            "passed": 11,
+            "failed": 0
+          },
+          {
+            "file": "requestFieldGuard.test.ts",
+            "total": 41,
+            "passed": 41,
+            "failed": 0
+          }
+        ]
+      }
+    }
+  ],
+  "compiledBoundary": "The real gateway children continue to select Q/dist from the clean build during source-mode controls. Passing gateway cases in those phases are baseline compatibility observations, not compiled-mutant sensitivity.",
+  "allRunsRepeatSame109": true,
+  "finalRootRecord": {
+    "schema": "p124-final-restoration/1",
+    "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+    "R": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+    "matchedPins": 40,
+    "bothStatusClean": true,
+    "restoredGreen109": true,
+    "protectedInputsUnchanged": true,
+    "compiledMutantsQualified": false
+  },
+  "independentControlAudit": {
+    "included": true,
+    "credited": true,
+    "review": "reviews/control-audit/review.json",
+    "allReadsFinished": true,
+    "blockingFindings": [],
+    "scope": "Five repeated 109-case phases; body failures, masking, exact restoration, selected-input preservation, and actual gateway public evidence.",
+    "children": 15,
+    "captures": 30,
+    "independentPublicSignatures": 25
+  },
+  "formalAcceptanceClosed": false
+}

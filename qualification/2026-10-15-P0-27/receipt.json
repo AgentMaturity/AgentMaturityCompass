@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-27",
+  "date": "2026-10-15",
+  "commit": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "branch": "codex/p0-27-current-qualification",
+  "node": "v22.23.3; Node24 unqualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 1914
+    },
+    {
+      "cmd": "node /private/tmp/p0-27-compiled-cli-20261015.mjs",
+      "exit": 0,
+      "durationMs": 7843
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4914
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 29294
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38127
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 30358
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1372
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3931
+    },
+    {
+      "cmd": "npx vitest run tests/nativeBudgets.test.ts tests/cliAgentLoopCommands.test.ts tests/assuranceSessionQualification.test.ts tests/budgetIntegrityQualification.test.ts tests/controlCheckpointQualification.test.ts tests/evidenceAgentFilterQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-final-bounded-node22-20261015.json",
+      "exit": 1,
+      "durationMs": 14695
+    },
+    {
+      "cmd": "python3 -c 'import subprocess,sys; commands=[\"check:freeze\",\"check:architecture-boundaries\",\"check:counts\",\"check:docs-drift\",\"check:clean-source\",\"check:api-ref\"]; statuses=[]; [(print(\"RUN \"+c,flush=True),statuses.append(subprocess.run([\"npm\",\"run\",c]).returncode)) for c in commands]; print(statuses);sys.exit(any(statuses))'",
+      "exit": 0,
+      "durationMs": 57259
+    }
+  ],
+  "tests": {
+    "total": 72,
+    "passed": 71,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "2b91781621c95d118bf050565510bb18ecc5ae5b09b07178da02034615d8bdf0"
+    },
+    {
+      "path": "bounded-runtime-independent-review.json",
+      "sha256": "fedb4cfa411bcf0d8a2878d72caf90bb66ecdc753eb519dd3abec054e842006a"
+    },
+    {
+      "path": "bounded-runtime-independent-review.md",
+      "sha256": "8d1f16c29ed093fcfc48a2cdeb3060106ab4227e151406b9f45ddb4eefc4a4b5"
+    },
+    {
+      "path": "budget-first.json",
+      "sha256": "585b3483818e35d128c4cf5f8841c3418057a641da4c8b0289a0e00bfd99b50d"
+    },
+    {
+      "path": "budget-integrity-first.log",
+      "sha256": "0fba09ba60b49a494e7073696db50f6220da434b31386272991027035993de47"
+    },
+    {
+      "path": "budget-qualification.json",
+      "sha256": "3d94ef645aaf4b35a6a38eb92d82501c90ca243cab633d03d9462e9832e745b3"
+    },
+    {
+      "path": "budget-qualification.md",
+      "sha256": "e3035ba5b02494916bbf322decbd6151b57c6284b49a3cd5d1bd4abad2053f25"
+    },
+    {
+      "path": "candidate-lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "candidate-production-types.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    },
+    {
+      "path": "candidate-test-types.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "causal-fixture.log",
+      "sha256": "8fd303a75cb8c2d1304fe472940896f457f5cd73b7304f5f70baa1657f1e97ea"
+    },
+    {
+      "path": "checkpoint-causal-baseline.log",
+      "sha256": "09110c6f578fc73e64ae518fd8db9d164975e44e45e7ea7315cc75df2b1d8551"
+    },
+    {
+      "path": "checkpoint-causal-mutant.log",
+      "sha256": "d4a3655a6687fb8cdafaf3684c883084c99f453c90cfa23dd69f4bbc96462530"
+    },
+    {
+      "path": "checkpoint-causal-restored.log",
+      "sha256": "9bf09f6fce4072b6d154de7d0c52b872d274996b1d8544e574e47505e36fe576"
+    },
+    {
+      "path": "checkpoint-export-qualification.json",
+      "sha256": "0868b7e884b77f29c2dd5815bd9363c48841c4adb2e99b4ab8e872742d4484f4"
+    },
+    {
+      "path": "checkpoint-export-qualification.md",
+      "sha256": "d37b9a4773be5ae9be4b041d9dcff37b08243daa9d0a95c94725b0bc27400b97"
+    },
+    {
+      "path": "checkpoint-first.json",
+      "sha256": "82a56fc40d17ca45ee48e19dcc6fb691a7415fcc0bf4478d7ad2b21aba3f10d0"
+    },
+    {
+      "path": "checkpoint-first.log",
+      "sha256": "4391bd551caf820c833ad6a48908ec41305952b316491876f9df9632bc4b933b"
+    },
+    {
+      "path": "cli-final-compiled-correspondence.json",
+      "sha256": "a90a3f823c1244b333780cda36a2e012a1df74e038c5ea9a2bd592ce88225198"
+    },
+    {
+      "path": "cli-mixed-lifecycle-observation.json",
+      "sha256": "1ffaa52ed82ee4b41d7b3f9bb95840f8dda3e5a4443b77042306858402b9b21e"
+    },
+    {
+      "path": "cli-observer-corrections.json",
+      "sha256": "e9c1d576d8558e66dc4848da9d75d992693f77bf8d1ed00b5e71f020b9dd993b"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "6663cf070704c617c5b8b6ba655e4bf5588fcf786bb030f27f8d0adfdf2d2be8"
+    },
+    {
+      "path": "compiled-cli-cold.json",
+      "sha256": "7736d2437cd25108606c5ee8b443d1e993d7c9c650ded80a754c8b4f24fe5b87"
+    },
+    {
+      "path": "compiled-cli-cold.log",
+      "sha256": "77574f21736d279913ded74f858eba4d23a3155e3d303ca4193bf82592a28662"
+    },
+    {
+      "path": "compiled-cli-current-contract.log",
+      "sha256": "b7895f52e3a7d67f5892ab19fe033d7568345d6067a019adacaad900e87f86cd"
+    },
+    {
+      "path": "compiled-cli-first.log",
+      "sha256": "aae357d49cbcaa549f01a13a0aeae2839bd8825b4afa86b0cbdadee430eacf5e"
+    },
+    {
+      "path": "credential-permissions-diagnostic.log",
+      "sha256": "9eb81b310fb57449e31b8ae21858534e961cff8e5ecb5830889293204f2e6576"
+    },
+    {
+      "path": "current-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "export-causal-baseline.log",
+      "sha256": "1625e06605de092d392e1c29de25d2f19e57518509d664fdfd2ebc7a7f81224f"
+    },
+    {
+      "path": "export-causal-selection-baseline.log",
+      "sha256": "4261d8a045cce09c53b3a4ed9e6abe7b3a62c51b76cd3e17b14ee1c3047ddc99"
+    },
+    {
+      "path": "export-causal-selection-mutant.log",
+      "sha256": "05a89970f1ffd87269f0ac730ce9b7e061f44671588337fbfb79c50904d6ded3"
+    },
+    {
+      "path": "export-causal-selection-restored.log",
+      "sha256": "a66ba0e209bc79cfe1dc28215ea02febc8743c75cb9e52b9153f9d9d3d46a96c"
+    },
+    {
+      "path": "export-first.json",
+      "sha256": "8d7c02503b0ea72c6feee1da9bcb5b2a9ab540a0138debf93fa58c0ed0b1c94a"
+    },
+    {
+      "path": "export-first.log",
+      "sha256": "8b6b808a99d7c643b8d5bbde8a98c85df97f22b1fbfa5e2e8cd7df2917bd0d01"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "bcec11f4b28d2a5c7455829029e5b5d5348e37c0c7c72def695ce1f8ce20c4f9"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "13bc462fe84cad57573200251a0f86b00534508bed0da1188a9813843c05cc66"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "9e7103b635d6f15e6b87ccb2bed1fd30308825ae70064a547e7fdbf0b0f58158"
+    },
+    {
+      "path": "final-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "final-normal-static.log",
+      "sha256": "b4784ab04b4fa08e148e43c2725bad3982a525470460f351d455c975aedee62f"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "641ee20cbbdd2b2cbaa59faa2c874ad9141a36791f2dc2004801f5faa6cd9ec2"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "7f18b6b3aa86a2b6005f61c1fdf9b0cd1f366d8831d96f72af99267512ed9c2e"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "b88d90d2575e66933858d21bbe7532ccd128e2dcd0f30b146fbdc832b36b7d61"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "45372b678a1e0fe45655513bec2b0646c4ca5f1927b5de82ed6dde2cddf0c09c"
+    },
+    {
+      "path": "generate-counts.log",
+      "sha256": "c97ef4b9ff3c72dc865e798870d720eff9a229a5f89136957f3a49fd8a696e26"
+    },
+    {
+      "path": "next-routing-preflight.json",
+      "sha256": "aef1d2aa863c787cfa4ee8665995ead6bb4efe27e9f2315d686c365bb22b22a5"
+    },
+    {
+      "path": "next-routing-preflight.md",
+      "sha256": "a7b20ada3407277cf22d46a6c76ba73570ba667ec4b6e021249e1e5cf8f5e83e"
+    },
+    {
+      "path": "original-runtime-contracts.json",
+      "sha256": "20330857ae897283d71a80f318edeb93c7580c928b5f872252eec74db829254e"
+    },
+    {
+      "path": "original-runtime-contracts.log",
+      "sha256": "27771efd88779099a29a172e9d0deb5d3c85d574938f077d55c6de8671106a55"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "8f32e8ef2ee394ffbc3cb886103ee29f13273c9df85f48a7442ade2d8dd76c55"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "05ed821ade6dae92312b02bbb8cb4c9a691b6215802af75ce5d582185704f71d"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "c60da964a836a40b456cdf46bd2c079424bbb073daf9dcea49cd1b65947c5a22"
+    },
+    {
+      "path": "routing-preflight.json",
+      "sha256": "3b594cc9347bbc5470aaaef46fd58e86ae04585579386ae9f8776560d15562ed"
+    },
+    {
+      "path": "routing-preflight.md",
+      "sha256": "b352b8e6d680310e2d90cbd8baf099dbfe23d8ce35154adafafd3f072b17ee0c"
+    },
+    {
+      "path": "scope-freeze-preflight.json",
+      "sha256": "302e70d00fedba9d178d6f612545d5a33eba226ea8a81ebcb14701f107adfb13"
+    },
+    {
+      "path": "scope-freeze-preflight.md",
+      "sha256": "5f3f220cc4df6d2657624d2127a52302a1339e09b713277535b8322fcbe61e14"
+    },
+    {
+      "path": "session-final-input-check.json",
+      "sha256": "91cd05383ddd4535921a6fc91627dab8d8caf68447e524b53cba99100de43c95"
+    },
+    {
+      "path": "session-first.json",
+      "sha256": "774f6afd4bec208e8b4ca19aed37517c274f8adafcbbc745901df1988e6bc8ce"
+    },
+    {
+      "path": "session-first.log",
+      "sha256": "6ddf3f5ea6377d74af7aca921af01ae6b8789e30d0b8f4367d419b4da67e29de"
+    },
+    {
+      "path": "session-independent-review.json",
+      "sha256": "c4bd87f2f97fc0077538f703588fe4e840a7804d362e9a6858796982d5081fe9"
+    },
+    {
+      "path": "session-independent-review.md",
+      "sha256": "8c5fe9b173e00c205d48f815a09a64c835c66721861c30901deb502d845cad6f"
+    },
+    {
+      "path": "session-private-guards-exact-inputs.log",
+      "sha256": "b3696229b756f5a779f9ae1468080e5f76241e9cb241724fca96c24cb4dff915"
+    },
+    {
+      "path": "session-private-guards.log",
+      "sha256": "7bdd54fdd81d6a49a7a5185b807b3d2fd154dd4172fd7ff990c2490044e4d40b"
+    },
+    {
+      "path": "session-qualification.json",
+      "sha256": "513b80f9330ea4d868b035290684744e86b3f17b5266a00b28daf830e7e85ba8"
+    },
+    {
+      "path": "session-qualification.md",
+      "sha256": "aa80bf9675269b9cec033b9de0e5019944f4e609c8bb09acea4a6f584ba4f2a1"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "e561fe0cc9aff52c1b0ddc127aac414f04e155cd7ba357f1326b71e24898e282"
+    }
+  ],
+  "notes": "Bounded72total71pass1literal tagged-system contract conflict,0pending/todo; notDone. Actual coldCLI9/9 includes two24eventnative stubturns aftersigned/unsignedabort, independentlyanchoredverification, all48nativeIDs in54schema2records/counts, siblingHOMEfirewall and actualintegritynotquota refusal. Source/budget/helper/seeded/canned-wire/privatecausal scopes remainseparate; allcopied4529inputs restore. Initial0755/idle observer errors, firstprivateSQLiteinitializationeffect and mixedparentSQLITE_CORRUPT observation retained/unqualified; cold9 doesnotprove mixed-cause resolution. Types/lint/finalbuild/normalfreeze/architecture/counts/docs/clean/APIrefpass; requiredquality1269duplicates2779deadfail. Wholesuite/coverage/Node24/liveproviders/hosted/release and otherunsealed/unsigned/startcleanup debtopen. Fournewtests+teninventoryonly; no production/original/shared/held/archive/guard/floor/budget/dependency edits, waiver, pausedresumption, trackerclosure, externalmessage orpublication. Earlierfailures/pendingdecisions/approvedskips remainactive; continuecurrentplan."
+}

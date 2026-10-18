@@ -1,0 +1,14 @@
+{
+  "operator": "replay",
+  "sourceBefore": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+  "mutant": "b1a9156fd714fe25be4897bea7646950b3c9294829ce4c8c45e52133aa74eda8",
+  "patchSha256": "866d12374b9b76973911420512cd61f1c9929e28eea57b5be7ff3c0b0f45618b",
+  "patchCapturedFromLiveMutant": true,
+  "at": "2026-10-16T19:38:09.799560+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/src/catalog/evidence/admission.ts",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "mode": "apply",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false
+}

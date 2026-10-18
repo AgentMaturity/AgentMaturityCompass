@@ -1,0 +1,19 @@
+
+> agent-maturity-compass@1.1.1 postinstall
+> node scripts/postinstall.js || true
+
+
+added 321 packages, and audited 322 packages in 13s
+
+69 packages are looking for funding
+  run `npm fund` for details
+
+32 vulnerabilities (1 low, 8 moderate, 22 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.

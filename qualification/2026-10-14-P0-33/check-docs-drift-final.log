@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:docs-drift /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014
+> node scripts/docs-drift-check.mjs
+
+Docs drift check passed (336 files scanned; truth claims and commands checked in 247 public files; 4 logged exceptions).

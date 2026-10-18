@@ -1,0 +1,88 @@
+{
+  "schema": "p119-tools-bounded-evidence/1",
+  "key": "P1-19",
+  "date": "2026-10-16",
+  "canonicalTestScope": "Only the actual closed fresh32; component120/oracle10/filtered repeats/historical failed31 remain separate.",
+  "sourceVariantAttribution": {
+    "historical22Commands": "HEAD a365be2ed33042eb2cbe7d11dfb486c3a35537c7 with documented source/test overlays",
+    "committedCommands": [
+      "p119-finance-tools-clean-source",
+      "p119-finance-tools-fresh"
+    ],
+    "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout",
+    "runner": "Borrowed R Vitest and external observer; fresh checkout supplies config/modules/service/build/CLI."
+  },
+  "quality": {
+    "duplicates": 1268,
+    "deadcode": 2734,
+    "newUnreachableFiles": [
+      "src/lighthouse/finance/financeOpsTools.ts",
+      "src/lighthouse/finance/financePaymentContext.ts"
+    ],
+    "waived": false
+  },
+  "scope": {
+    "candidateFiles": 18,
+    "protectedInputs": 52,
+    "docAppendOverlays": 2,
+    "countOnlyOverlays": 10,
+    "countDelta": "1667 to1669",
+    "sourceCompilerAndProjectTestCompilerSeparate": true,
+    "originalQualificationFilesChanged": false
+  },
+  "validation": {
+    "state": "NOT RUN BY THIS BUILDER",
+    "alternateReceiptAutoDiscovered": false,
+    "requiredMirror": "Byte-exact tools receipt/readme aliases in a private canonical folder, plus ten artifact paths; unchanged validator, then whole-root.",
+    "laterSidecar": "tools.validation.json; excluded from receipt artifacts; no self/future hash cycle."
+  },
+  "limits": [
+    "Root ran the tests. This peer only read public files/metadata and recomputed hashes; no product runtime,import,parser,SQL,network,R write or successful-fixture reopening occurred.",
+    "Public decision/receipt/record projections were cross-linked and rehashed,not independently retained signatures. One actual separately pinned oracle/coldCLI provides its scoped cryptographic proof with17 signed inputs; that is not independent signature verification of every fixture by this peer.",
+    "Provider log bytes/checkpoints were reconstructed from published records after successful cleanup publication. DB/WAL/key evidence is the actual oracle result,not peer SQL inspection.",
+    "Causal refinements are exact: real path obstruction is not direct fsync/power-loss evidence; query bytes remain unobserved despite real expiry/key/twoGET/applied identity.",
+    "The real SIMULATE projection reaches its preview output and completed/not_applied,while the pre-aborted fresh execution is denied at approval. No token getter instrumentation or unmeasured abort-after-start behavior is claimed.",
+    "The finite exact txnId seed-report regression is not normative F37 setup/runner completion. control-result in the actual oracle says dimensions were not requested.",
+    "Prior31/30/1 failure is preserved separately. Full F01-F38,compliance,global/full-suite coverage,Linux,Node24,hosted release and formal P119 completion are not claimed.",
+    "Root latest quality metadata records1268 duplicate findings and2734 dead-code findings,including2 new owned files; both remain open/unwaived. This narrow runtime review did not rerun quality tools.",
+    "No F01-F38/profile1/normative F37 runner/compliance/global or formal P119 completion.",
+    "The source-candidate historical pending fields remain unchanged; later records supersede them."
+  ],
+  "formalAcceptanceClosed": false,
+  "sourceCommit": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+  "freshTests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0
+  },
+  "commands": 24,
+  "nonzeroCommands": 7,
+  "builderInputs": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-supplement-proposal/proposal-v2/inputs.json",
+    "sha256": "e48801c801eef29a7f7adcc7702aab0f188899bd1f61ff951d183d166fe56ecb"
+  },
+  "sourceCandidateHistoricalPendingFlagsSupersededBy": [
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-commit-result.json",
+      "bytes": 864,
+      "sha256": "a2e8ded3e7f17f0725bfb0ce128902a7f304a5563c9fbfafaf34a85078507474"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-root-review.json",
+      "bytes": 5002,
+      "sha256": "cbf18be15f475b426ecb05640883ecbcbd69200452c047cc805754b6b5f7fcc2"
+    }
+  ],
+  "freshPeerReview": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/review.json",
+    "bytes": 218147,
+    "sha256": "6cdc0d4fc94d3bbf0e4184785ce2d9c12e7375e02c8c020bb52c6c813789a9db"
+  },
+  "priorQualification": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/preserved-existing-files.json",
+    "bytes": 34933,
+    "sha256": "7024ad6e6ea2f2f7895a91aa7dc98fce90c427cdabf7691d02013f0296bff6c9"
+  },
+  "privateReferencesFile": "tools.private-references.json"
+}

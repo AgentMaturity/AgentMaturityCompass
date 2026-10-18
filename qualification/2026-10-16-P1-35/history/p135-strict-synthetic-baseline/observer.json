@@ -1,0 +1,180 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 88465,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts"
+  ],
+  "testCount": 8,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1266807446",
+      "name": "tests/migration/legacyRelabel.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1266807446_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_2",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_3",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected undefined to be 'R5-no-claim-envelope' // Object.is equality",
+          "actual": "undefined",
+          "expected": "\"R5-no-claim-envelope\"",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\n\"R5-no-claim-envelope\"\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be 'R5-no-claim-envelope' // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:165:27\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:60:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:162:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 165,
+              "column": 27
+            },
+            {
+              "method": "owned",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 60,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 162,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_4",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'observed' to be 'self_reported' // Object.is equality",
+          "actual": "observed",
+          "expected": "self_reported",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"self_reported\"\nReceived: \"observed\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'observed' to be 'self_reported' // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:177:33\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:60:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:171:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 177,
+              "column": 33
+            },
+            {
+              "method": "owned",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 60,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 171,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_5",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_6",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_7",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

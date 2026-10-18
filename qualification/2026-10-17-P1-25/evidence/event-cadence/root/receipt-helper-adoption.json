@@ -1,0 +1,24 @@
+{
+  "schema": "p125ec-root-receipt-helper-v2-adoption/1",
+  "at": "2026-10-17T01:22:35.037999+00:00",
+  "rootFullyReadV1AndExactV2Delta": true,
+  "rootReadBothIndependentStaticReports": true,
+  "activeHelper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+    "bytes": 36929,
+    "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "bytes": 4119,
+    "sha256": "d8557ebbb7d293d9246804f413a910b9fa095cd13b2d73d6be3ba508c60b4d17"
+  },
+  "review": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/review.json",
+    "bytes": 2565,
+    "sha256": "4e6fcf8083d206a1c63dd89cd0480a1d486ac9085b5f00e1c1770986aad3f69d"
+  },
+  "helperMustBeHashOnlyForWholeMarkerGuard": true,
+  "filledManifestNotYetApproved": true,
+  "sourceCopyAndAssemblyNotYetAdmitted": true
+}

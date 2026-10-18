@@ -1,0 +1,12 @@
+diff --git a/src/mcp/oauth/discovery.ts b/src/mcp/oauth/discovery.ts
+--- a/src/mcp/oauth/discovery.ts
++++ b/src/mcp/oauth/discovery.ts
+@@ -199,7 +199,7 @@
+     const { status, body } = await nativeMcpOAuthFetch(new URL(candidate, base.origin), { method: "GET", headers: { accept: "application/json" } }, timeoutMs, network);
+     if (status !== 200) continue;
+     const document = body as Record<string, unknown> | null;
+-    if (!document || typeof document !== "object" || document.issuer !== issuer) {
++    if (!document || typeof document !== "object") {
+       return refuse("MCP authorization server metadata names a different issuer; it was refused.");
+     }
+     const methods = document.code_challenge_methods_supported;

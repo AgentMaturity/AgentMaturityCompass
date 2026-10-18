@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T22:22:46.676978+00:00",
+  "operation": "Private standard-library assembler text adaptation",
+  "exit": 1,
+  "error": "AssertionError at the in-memory old-chain block match after earlier text substitutions",
+  "state": "Exclusive preparation directory created; no helper or other artifact had been written",
+  "correction": "Use exact retained start/end block boundaries for the chain adaptation and preserve the resulting complete delta",
+  "helperOrProductExecuted": false,
+  "sourceIndexQaWrites": false
+}

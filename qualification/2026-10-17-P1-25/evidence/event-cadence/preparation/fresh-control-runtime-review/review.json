@@ -1,0 +1,192 @@
+{
+  "schema": "p125ec-independent-completed-fresh-control-runtime-chain-review/1",
+  "at": "2026-10-17T01:13:41.815209+00:00",
+  "blockers": [],
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+  "actualSixPhaseChain": [
+    {
+      "phase": "p125ec-source-combined",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 4348,
+      "ownedPgid": 77212,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 4918,
+      "ownedPgid": 78994,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "tests": {
+        "total": 23,
+        "passed": 22,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 4215,
+      "ownedPgid": 79503,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 37,
+        "explicitChildStreamHashCount": 74,
+        "closedSockets": 10,
+        "closedLedgerOwners": 24
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 4153,
+      "ownedPgid": 79678,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "tests": {
+        "total": 23,
+        "passed": 22,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 4075,
+      "ownedPgid": 79794,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 36,
+        "explicitChildStreamHashCount": 72,
+        "closedSockets": 9,
+        "closedLedgerOwners": 27
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 4075,
+      "ownedPgid": 79915,
+      "groupAbsentByESRCH": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 4,
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      }
+    }
+  ],
+  "identity": {
+    "sameOrderedUnique23AcrossSourceAndFiveFreshRuns": true,
+    "sameThreeFiles4Checkpoint2Grant17Verifier": true,
+    "same3HookEntries4PassingValuesEach": true,
+    "noUnhandledOrLateErrors": true
+  },
+  "manualAndPhysicalProtocol": {
+    "bothOriginalsExclusivePreservedAndHashed": true,
+    "exact42ByteAndOneCharacterSourceOnlyOperators": true,
+    "fourActionNaturalClosesBeforeDependentTests": true,
+    "bothManualAllFailureClassificationsBeforeExplicitRestore": true,
+    "sameInodeByteExactRestorations": true,
+    "firstRestored23GreenBeforeSecondApply": true,
+    "all161Inputs12NativeIdentities98SourceFreshPairs21CompiledPairsExact": true,
+    "sourceFreshCleanAndHeldR18Exact": true
+  },
+  "causalFindings": [
+    {
+      "operator": "COUNT-CHECKPOINT-ROWS",
+      "firstFailure": "checkpointWindow.test.ts:582:28",
+      "actual": "ran:true after one new audit",
+      "required": "ran:false",
+      "priorPositives": "Default signed trust home, initial signed checkpoint and independent first grant, first valid ledger, checkpoint-only negative and exact one-audit structure precede the witness.",
+      "masked": "583\u2013586 equality/old-file checks; second-audit/exact-two/independent-second-grant/reset/final checks.",
+      "partialPublicBoundary": "Early second request/checkpoint is captured but unverified independently. One grant, one unverified request, no final facts."
+    },
+    {
+      "operator": "STRICT-THRESHOLD",
+      "firstFailure": "checkpointWindow.test.ts:597:28",
+      "actual": "ran:false at exactly two new audits",
+      "required": "ran:true",
+      "priorPositives": "Initial genuine checkpoint/grant, checkpoint-only and one-audit negatives, two exact audit IDs/types and less-than-15-minute age precede the witness.",
+      "masked": "598\u2013599 chain/request checks; second independent grant/head/token/event/reset/final checks.",
+      "partialPublicBoundary": "One grant and no second request/checkpoint/final facts. No absent fact gains credit."
+    }
+  ],
+  "boundary": [
+    "Resource values are actual per-phase observations, never summed into canonical test or resource totals. The canonical corpus is23.",
+    "All explicit child stream hash records match the successful public audits and public metadata. No stream bytes, signing keys, private siblings or native/crypto execution were read or performed by this reviewer. Nonempty child stderr remains represented.",
+    "Source-only controls changed fresh checkpoint.ts only; selected compiled/native bytes remain original. No rebuild or compiled sensitivity credit is claimed.",
+    "Default trust/config and query-specific proof pins are finite public reads. Signature/PKI/ledger verification remains actual source execution evidence, not independently reexecuted crypto.",
+    "Whole P1-25, plan, release, elapsed-minute/Studio/nonzero-accuracy and F37 credit remain absent; all held decisions and RED1268/2712 quality remain unwaived."
+  ],
+  "noProductHelperParserCompilerCryptoNativeNetworkSourceIndexQaOrReservationOperation": true
+}

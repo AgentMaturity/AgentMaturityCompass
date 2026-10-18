@@ -1,0 +1,352 @@
+{
+  "key": "P0-30",
+  "candidate": "AMC-1525 supplemental direct ten-case readonly guard",
+  "date": "2026-10-15",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewedPrivateRoot": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015",
+  "reviewedRoot": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "findings": [],
+  "conclusion": "The separate unchanged ten-case corpus provides a completed assertion-specific direct-module control: 10 passing baseline cases, seven passing and three measured AssertionErrors under the exact writable-open mutation, then 10 passing restored cases. There are no pending/todo cases or setup failures. The original 62-case fifth result remains 44 passed, three failed and 15 pending; this supplement does not relabel it.",
+  "reviewedReceiptHashes": {
+    "json": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad",
+    "md": "c325cea2e7f4c6c1284a4c937f8cba4fd32288dacde7c4352e541937ee618662",
+    "index": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+  },
+  "verification": {
+    "artifactReferences": {
+      "supplementIndex": 62,
+      "actualIndex": 62,
+      "supplementReceiptInclusive": 74,
+      "originalIndex": 322,
+      "combinedUnique": 392
+    },
+    "journal": {
+      "count": 8,
+      "unique": 8,
+      "phases": [
+        {
+          "phase": "supplemental-private-copy-setup",
+          "exit": 0,
+          "durationMs": 3700,
+          "executionError": null
+        },
+        {
+          "phase": "direct-P30-1525-cold-vault-initializes-baseline",
+          "exit": 0,
+          "durationMs": 6956,
+          "executionError": null
+        },
+        {
+          "phase": "direct-P30-1525-cold-vault-initializes-compile-mutant",
+          "exit": 0,
+          "durationMs": 28358,
+          "executionError": null
+        },
+        {
+          "phase": "direct-P30-1525-cold-vault-initializes-mutant",
+          "exit": 1,
+          "durationMs": 7562,
+          "executionError": null
+        },
+        {
+          "phase": "direct-P30-1525-cold-vault-initializes-compile-restored",
+          "exit": 0,
+          "durationMs": 28835,
+          "executionError": null
+        },
+        {
+          "phase": "direct-P30-1525-cold-vault-initializes-restored",
+          "exit": 0,
+          "durationMs": 7363,
+          "executionError": null
+        },
+        {
+          "phase": "supplemental-final-preservation",
+          "exit": 0,
+          "durationMs": 2397,
+          "executionError": null
+        },
+        {
+          "phase": "supplemental-final-live-status",
+          "exit": 0,
+          "durationMs": 46,
+          "executionError": null
+        }
+      ]
+    },
+    "phases": [
+      {
+        "phase": "baseline",
+        "counts": {
+          "total": 10,
+          "passed": 10,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        },
+        "exit": 0,
+        "actualStatuses": [
+          "passed"
+        ],
+        "rawSha256": "8d8bb3400692b7b31d95158d9bf964e7971ad0a3b82b45ef5efd820310ea35b2",
+        "setupErrors": []
+      },
+      {
+        "phase": "mutant",
+        "counts": {
+          "total": 10,
+          "passed": 7,
+          "failed": 3,
+          "pending": 0,
+          "todo": 0
+        },
+        "exit": 1,
+        "actualStatuses": [
+          "passed",
+          "failed"
+        ],
+        "rawSha256": "22be5926eb2f8d29ea483c5a83605669f06cab9feb0861452a4011a9e865f4d5",
+        "setupErrors": []
+      },
+      {
+        "phase": "restored",
+        "counts": {
+          "total": 10,
+          "passed": 10,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        },
+        "exit": 0,
+        "actualStatuses": [
+          "passed"
+        ],
+        "rawSha256": "b919cf2d50e7c2d5dc8e3ad2da9452d15ccc20ca51942a293d29ae2feec2a323",
+        "setupErrors": []
+      }
+    ],
+    "compiledIsolation": {
+      "baselineCount": 4529,
+      "mutantChanged": [
+        "ledger/ledgerVerification.js"
+      ],
+      "mutantEmit": {
+        "compilerEmittedChangedPaths": [
+          "kernel/amcRuntime.js",
+          "ledger/ledgerVerification.js"
+        ],
+        "targetedCompiledPaths": [
+          "ledger/ledgerVerification.d.ts",
+          "ledger/ledgerVerification.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "ledger/ledgerVerification.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "restoredEmit": {
+        "compilerEmittedChangedPaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "ledger/ledgerVerification.d.ts",
+          "ledger/ledgerVerification.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "restoredExact": true
+    },
+    "newClosure": {
+      "expected": 12268,
+      "actual": 12268,
+      "missing": [],
+      "added": [],
+      "changed": []
+    },
+    "originalClosure": {
+      "expected": 12268,
+      "actual": 12268,
+      "missing": [],
+      "added": [],
+      "changed": []
+    },
+    "liveCompiled": {
+      "count": 4529,
+      "missing": [],
+      "added": [],
+      "changed": []
+    },
+    "capturedSource": {
+      "count": 7739,
+      "beforeAfterAndPrivateEqual": true
+    },
+    "protectedPins": {
+      "count": 31,
+      "absent": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/keyHistory.ts",
+          "exists": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/standard/callbackTelemetryCapture.ts",
+          "exists": false
+        }
+      ]
+    },
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    }
+  },
+  "sourceAndAdapterReview": {
+    "controllerSha256": "0e4b11f12e54ab1506b7e9651fc882c160b3a452399d821013b8b213acd7fb1b",
+    "controllerProvenance": "The supplement selects only the original ledgerVerificationReadOnly.test.ts ten cases and existing guardWorkspace setup, using a separate BASE/closure. The controller's installed compiler, emission isolation, exact source-delta checks and restoration mechanics remain explicit in driver.py:85-123.",
+    "adapters": [
+      {
+        "path": "tests/ledgerVerificationReadOnly.test.ts",
+        "original": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96",
+        "adapted": "5a72ab933d393e3c1c120dbde3d18c823df092759e2fa767aa751d888b34de0d",
+        "declaredOnlyTransformsExact": true,
+        "actualRestoredOriginal": true
+      },
+      {
+        "path": "tests/setup/guardWorkspace.ts",
+        "original": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "adapted": "2bfa7cf6368e6dffaaaa4a68086bf57421fbc706398659bfadd34f8577747eac",
+        "declaredOnlyTransformsExact": true,
+        "actualRestoredOriginal": true
+      }
+    ],
+    "allowedTransforms": "Two copied files have only relative source-to-dist module prefixes changed. The readonly test additionally maps its existing src/ledger/ledger.ts cold-child URL to dist/ledger/ledger.js. No assertions, response fixtures, subprocess flags, deadlines, passphrase logic or cleanup were changed.",
+    "proof": "The reviewer reproduced each adapted hash from the frozen original through only the declared substitutions, and rehashed both actual final private files to their original hashes. Complete full-closure hashing additionally verifies source/config/helper restoration.",
+    "recipe": {
+      "id": "P30-1525-cold-vault-initializes",
+      "file": "src/ledger/ledgerVerification.ts",
+      "sourceSha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "find": "ledger = openLedger(workspacePath, { readonly: true });",
+      "replace": "ledger = openLedger(workspacePath);",
+      "actualOriginalOccurrences": 1,
+      "transientMutantSourceSha256": "0ca112241e5d0ca736b3f110cc713107f9c8ec1a71fdd74f0670809b755b5acd",
+      "meaning": "The original statement occurs exactly once. The source mutation metadata describes the transient phase; the target source file is restored afterward, not treated as an immutable mutant file reference."
+    },
+    "compiledScope": "Actual tsc emits both the target and a different bundled kernel output. The controller restores only the unrelated kernel sibling from its verified baseline before testing. Full phase manifests independently show ledger/ledgerVerification.js as the sole remaining mutant change; restored manifests have no changes. Standalone/kernel mutation behavior is not claimed."
+  },
+  "measuredFailures": [
+    {
+      "name": "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+      "firstLines": [
+        "AssertionError: expected +0 to be 1 // Object.is equality"
+      ],
+      "locations": [
+        "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:99:27"
+      ]
+    },
+    {
+      "name": "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+      "firstLines": [
+        "AssertionError: expected { …(84) } to deeply equal { …(79) }"
+      ],
+      "locations": [
+        "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:102:42"
+      ]
+    },
+    {
+      "name": "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+      "firstLines": [
+        "AssertionError: expected [ …(2) ] to deeply equal []"
+      ],
+      "locations": [
+        "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:125:25"
+      ]
+    }
+  ],
+  "failureMeaning": [
+    "The missing-passphrase case fails the unchanged child-exit refusal assertion at line 99: the mutant returns exit 0 instead of 1.",
+    "The missing-vault case fails the unchanged exact filesystem-preservation assertion at line 102.",
+    "The public-only case fails the unchanged trust/validation assertion at line 125. These are measured behavioral failures, not parser/help failures or a nonzero exit interpreted without its assertions."
+  ],
+  "corpus": "The same ordered ten names, fixture generators, setup, assertions, deadlines and cleanup run in all three phases. Physical random keys and times are fresh per original fixture generation; identical physical data across these test phases is not claimed. The JSONL, missing-ledger, current/legacy, wrong-passphrase and corrupt-vault controls remain among the seven passing mutant cases.",
+  "originalPacketPreservation": {
+    "receiptSha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d",
+    "markdownSha256": "77d12b860e6747093ececf69f79f43e26988de7c2d0b55c69905235218391b6a",
+    "indexSha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339",
+    "partialCounts": {
+      "passed": 44,
+      "failed": 3,
+      "pending": 15
+    },
+    "fixed": [
+      {
+        "case": "current",
+        "paths": 126,
+        "exact": true
+      },
+      {
+        "case": "legacy",
+        "paths": 126,
+        "exact": true
+      },
+      {
+        "case": "missing-vault",
+        "paths": 125,
+        "exact": true
+      }
+    ],
+    "activeRestored": true
+  },
+  "fixedEffectsReuse": {
+    "scope": "The original separate fixed-data observations are reused by their immutable pins and compatible baseline hashes. No fixed-data probe was rerun in this supplement. They do not become new ten-case assertions or a new lifecycle interval.",
+    "sourceCompatibility": "Both baseline compiled manifests contain the same 4,529 byte hashes at the same source pin.",
+    "originalMeasuredEffects": "Previously observed baseline/restored fixed cold inputs preserve files and rows. The missing-vault mutant changes 14 non-coordination vault/key/history paths plus WAL/SHM with all SQL rows unchanged. Inspector coordination-file effects remain separately attributed.",
+    "physicalPreservation": "The reviewer rehashed all original frozen current/legacy/missing-vault inputs and the restored active current fixture. All names, full modes and file contents match their original inventories. The original 322 indexed artifacts, receipt pair, index and 12,268-file closure also remain exact."
+  },
+  "runtime": {
+    "currentLauncherActual": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "launcherRaw": {
+      "path": "/private/tmp/p0-30-actual-runtime-fingerprint-20261015.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    "scope": "ABI127 is observed for the current same-launcher probe. Prior children record version/executable only, not invented per-child ABI fields.",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "noNativeRebuildOrInstall": true
+  },
+  "runtimeInterpretation": "The raw process-only root observation establishes Node v22.23.3 and modules ABI 127 for the configured same launcher. It does not create retrospective per-child ABI observations. The unchanged native file hash/device/inode/nlink and successful real baseline/restored child behavior are separately recorded.",
+  "sourceInterval": "The 7,739-file source equality belongs to the supplement's captured before/after interval. The reviewer directly rehashed the new and original private 12,268-file closures, stable live compiled files, 31 protected inputs and native file. This is not a claim about future authorized metadata changes.",
+  "methods": "Read-only controller and provenance inspection, standard-library filesystem/JSON/hash checks, actual raw result and command parsing, exact adapter byte reconstruction and complete immutable closure/fixture manifest comparison. No product imports, tests, builds, compilers, native rebuilds, installations or runtime reruns were performed by this reviewer.",
+  "limits": [
+    "This is a separate completed ten-case direct helper/backend control, not a completed original 62-case fifth matrix.",
+    "The original initial compiler-contaminated attempt remains unqualified, and the original fifth matrix remains partial 44/3/15.",
+    "The held 76-case runner and absent guard tests are not transferred, adopted or qualified; no whole P0-30, native/race batch, Node 24, full suite, hosted CI, release or Done approval is inferred.",
+    "No routed authenticated API/CLI behavior, authenticated person, external issuer truth, OS syscall isolation or universal no-effects/race property is claimed.",
+    "No production, original test/helper, archive, counter, dependency, native module, held/shared source, Git or canonical artifact was edited."
+  ],
+  "allLiveReadsFinished": true,
+  "allReadsFinished": true,
+  "artifactWrites": "Only this private JSON/Markdown review pair."
+}

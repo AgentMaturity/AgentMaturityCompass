@@ -1,0 +1,28 @@
+{
+  "schema": "private-finite-quality-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/review.json",
+      "bytes": 9348,
+      "sha256": "67fcb7cdb2570494a42ffab0f60d7a4163f39ea5f5203401fcf5eb98e33d7027"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/project-equivalence.json",
+      "bytes": 3596,
+      "sha256": "f143fa43d291e8c700ef86145cb0c07a87fea98a649a2ec0d05d104a0dd1bd83"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/README.md",
+      "bytes": 1005,
+      "sha256": "7b947a804dcf88a5295826ec5eec96d1783defb6c8d356b26155c6478eeb5ae4"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/input-pins.json",
+      "bytes": 11345,
+      "sha256": "4ca22d7a44fbe3efb938c708f9fcb079d8b8351523b73b4c7d328f5c78daf26c"
+    }
+  ],
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

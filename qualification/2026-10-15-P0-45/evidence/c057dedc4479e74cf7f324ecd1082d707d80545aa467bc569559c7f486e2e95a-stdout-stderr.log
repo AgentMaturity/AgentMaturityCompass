@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass
+
+ ✓ tests/verifyRepair.test.ts (12 tests) 2655ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  11:24:05
+   Duration  5.09s (transform 1.71s, setup 22ms, import 2.29s, tests 2.65s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-qualification-20261015/command-original-core/raw-producer.json

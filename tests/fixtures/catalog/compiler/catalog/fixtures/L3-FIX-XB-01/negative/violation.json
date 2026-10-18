@@ -1,0 +1,14 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L3-FIX-XB-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "synthetic": true,
+    "purpose": "Compiler planning data only; not an executed evidence record."
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "SYNTHETIC_COMPILER_FIXTURE"
+  }
+}

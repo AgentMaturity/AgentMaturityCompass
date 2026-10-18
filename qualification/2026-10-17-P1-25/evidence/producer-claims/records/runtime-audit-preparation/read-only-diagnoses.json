@@ -1,0 +1,20 @@
+{
+  "schema": "p125pc-auditor-author-read-only-diagnoses/1",
+  "reads": [
+    {
+      "toolChunk": "2fc725",
+      "naturalExit": 1,
+      "readBeforeError": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-adapter-review/review.json",
+      "absentGuessedPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-audit-preparation/README.md",
+      "effect": "The established review was read; a guessed adjacent README was absent. No product/helper/source effect or credit."
+    },
+    {
+      "naturalExit": 1,
+      "toolChunkCorrection": "Actual tool result did not emit its chunk identifier in the compact displayed projection; the failed read is retained in the conversation tool result.",
+      "readBeforeError": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+      "absentGuessedPath": "/private/tmp/p1-25-producer-qualification-20261017/branch-adoption.json",
+      "effect": "The established auditor tail was read; an unestablished branch-adoption filename was absent. No follow-up probe, product/helper/source effect or credit."
+    }
+  ],
+  "boundary": "These are author read-only lookup errors, not wrapper commands or qualification evidence."
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "p112-source-run-review-seal/1",
+  "at": "2026-10-16T19:56:56.548474+00:00",
+  "blockers": [],
+  "inputCount": 139,
+  "inputsPin": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/pins.json",
+    "bytes": 57717,
+    "sha256": "3e40ad106bc71ce1fc623b06ffa5c2c7a02f4aaffbcc690b5ced658d5dfeebb5",
+    "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/pins.json",
+    "dev": 16777231,
+    "inode": 543248422,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/review.json",
+      "bytes": 4401,
+      "sha256": "356ae69ec93c3c5343d59ac1e019474b81517e4eacf8e4d69c1ec9179bc0d42d",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/review.json",
+      "dev": 16777231,
+      "inode": 543248420,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/README.md",
+      "bytes": 1517,
+      "sha256": "dde1ee738b65d9cc73c8b7f16266aa31b177c572fcf2563277eb6e8663898630",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/README.md",
+      "dev": 16777231,
+      "inode": 543248421,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/current-pin-observations.json",
+      "bytes": 99453,
+      "sha256": "5b8c927ced1a0356b6c9a84db8511a5309e1a53f8b4ec1a7980145b62e4c261a",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/current-pin-observations.json",
+      "dev": 16777231,
+      "inode": 543248419,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/pins.json",
+      "bytes": 57717,
+      "sha256": "3e40ad106bc71ce1fc623b06ffa5c2c7a02f4aaffbcc690b5ced658d5dfeebb5",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/pins.json",
+      "dev": 16777231,
+      "inode": 543248422,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputBytePinsRechecked": true,
+  "execution": "Private read/hash/stat/data audit only; no product execution or source/index writes."
+}

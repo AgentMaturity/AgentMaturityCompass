@@ -1,0 +1,115 @@
+{
+  "kind": "P0-20 industry claim minimal proposal source/freeze review",
+  "reviewedAt": "2026-10-14T20:11:42.816913+00:00",
+  "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "decision": "Source design has no semantic or preservation finding; explicit shared CLI transfer remains pending. Proposal is unexecuted and unapplied.",
+  "approvalGranted": false,
+  "rejectedWrapper": {
+    "reviewPath": "/private/tmp/p0-20-auditcli-independent-review-20261015.json",
+    "reviewSha256": "d25c982cf61f0e40bcae4c4ac33d5340172588c2ef157ddde950029d4fcc4fd2",
+    "flaw": "withClaimFields sets internal labelled=true; text finishVerify receives no claim and prints no Claim line, so exit70 is suppressed without satisfying actual stdout labelling.",
+    "wrapperCandidateSha256": "4e646870a7f58245e9e517c130571e66b09ad0c89f693c1fb75be8a11b91c1a5",
+    "rollbackAlreadyObserved": true,
+    "currentAuditCliSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee"
+  },
+  "proposal": {
+    "path": "src/cli.ts",
+    "line": 17225,
+    "before": "        details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`] });",
+    "after": "        details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`], claim: artifactClaim(\"audit:industry-pack\") });",
+    "patchPath": "/private/tmp/p0-20-industry-claim-proposal-20261015.patch",
+    "patchSha256": "e1a7c42f7dbbac3cbb3ae9adcd71a50d79dc18f091f8a7d18b5bff6420e6f3e7",
+    "currentSourceSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "proposedSourceSha256": "89f382491c7e31f9edbd91f100c1e0f11c7be6197e4e497a17f455eddcf75831",
+    "changedLines": 1,
+    "architectureLinesBefore": 24431,
+    "architectureLinesAfter": 24431,
+    "cap": 24431,
+    "netLines": 0,
+    "applied": false
+  },
+  "sourceReview": [
+    "artifactClaim is already imported and used by the ordinary binder verification branch; no import or helper change is needed.",
+    "finishVerify with opts.claim invokes printClaimResult after the text verdict and withClaimFields only as it serializes JSON. Both formats emit their canonical label through the existing mechanism.",
+    "Existing artifactClaim defaults to a conservative self_reported, not_evaluated artifact envelope; signature verification never raises answer claimKind. Original audit.overall claims remain intact.",
+    "Verification result/report, cryptography, issuer admission, allow override semantics, detail strings and existing nonzero verdict exits remain unchanged.",
+    "Only the existing industry branch receives a claim; ordinary .amcaudit binder branch remains byte-identical.",
+    "No command registration, argument, option, registry, REPL, Studio, export, signer, core producer, guard/floor/baseline or archive change is proposed."
+  ],
+  "freezeAndOwnership": {
+    "humanBasis": "Current human serial qualification/fix authorization demonstrates repair relevance; it does not by itself erase the explicit shared CLI coordination reservation. Root will request the narrow transfer against this concrete preview before applying.",
+    "reservationPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "applicableRuleLine": 1588,
+    "exactRule": "Codex and 7fccbbfa: tell Claude before editing src/cli.ts, resultCommandRegistry.ts or replParser.ts. P0-28 and P0-55 also edit cli.ts net-zero on int. At the combine, rebase and keep the line count.",
+    "helperAbsenceIsNotClearance": true,
+    "freezeActive": true,
+    "P020Exception": false,
+    "counts": "1236 CLI commands /1236 inventory;41packs;632questions",
+    "staticD15SelectedPathCheck": {
+      "method": "Read-only targeted tracked-original, matching manifest JSON key and landed-reader searches using the same provenance exclusions. No helper/product execution.",
+      "path": "src/cli.ts",
+      "originals": [],
+      "nonProvenanceManifestReferences": [],
+      "provenanceOnlyReferenceCount": 115,
+      "matchingLandedReaderTests": [],
+      "registeredRows": [],
+      "meaning": "No current selected-path snapshot requirement found by static inputs; this has no ownership-clearance meaning. Root must retain unmodified normal D15/freeze/architecture guards."
+    },
+    "guardPins": [
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/line-budgets.json",
+        "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+        "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/architecture-boundaries-check.mjs",
+        "sha256": "485eee162256218e2d51c1ada9dd4185a478a632ba86288e89438d1c2b24a067",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+        "matchesPreflight": true
+      }
+    ],
+    "heldHead": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "heldCliSha256": "aab9e5a84ab6270ff9a5e08b9fad8858c79ac9547c232251c74e8ddf295a2cc1",
+    "heldIndustryCall": [
+      {
+        "line": 17189,
+        "call": "      finishVerify(\"Industry-pack audit\", verify.report, { json: opts.json, result: verify,",
+        "next": "        details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`] });"
+      }
+    ],
+    "heldPreservation": "Do not overlay the held CLI or remove held A4/P1-65/P1-78 work; apply only this reviewed accepted-line hunk after narrow transfer and preserve held refs/bytes independently."
+  },
+  "requiredQualification": [
+    "Actual trusted text must contain the canonical Claim line immediately after its verdict, preserve real signer/hash detail, and exit0 without strict stderr.",
+    "Actual trusted JSON must carry canonical claimKind/statusDimensions/claimLabel, preserve report.trusted/checksum/signature/fingerprint/audit.overall fields, and exit0.",
+    "Unsigned, foreign, rechecksummed tamper, baseline signing, locked vault and paid refusal gates retain exact refusal/exit/effect semantics.",
+    "Ordinary unchanged freeze, architecture and applicable parity checks must pass; no baseline or floor update."
+  ],
+  "performed": "Read-only source/Git/control inspection and mode0600 private patch/JSON/Markdown writes. No product edit, runtime/test/build, live dist read, source/ref/archive/guard mutation or app messaging.",
+  "limits": "Proposal only; no repaired runtime GREEN, shared-path approval, Done, whole qualification or release claim."
+}

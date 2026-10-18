@@ -1,4 +1,7 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   getLabTemplates,
   getLabTemplate,
@@ -18,8 +21,12 @@ import {
   resetLabState,
 } from "../src/lab/cognitionLab.js";
 
+const workspaces: string[] = [];
+
 afterEach(() => {
   resetLabState();
+  vi.restoreAllMocks();
+  for (const workspace of workspaces.splice(0)) rmSync(workspace, { recursive: true, force: true });
 });
 
 // ---------------------------------------------------------------------------
@@ -180,6 +187,71 @@ describe("probe results", () => {
 // Simulation
 // ---------------------------------------------------------------------------
 describe("experiment simulation", () => {
+  test("simulates a persisted experiment after a cold restart and retains its synthetic results", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-restart-"));
+    workspaces.push(workspace);
+    const experiment = createLabExperiment({
+      kind: "typed_attention", name: "Cold restart", description: "Durable lab fixture", modelId: "fixture-model"
+    }, workspace);
+    resetLabState();
+    const fetch = vi.spyOn(globalThis, "fetch");
+
+    // The CLI passes its working directory explicitly; a library call never falls back to it.
+    const results = simulateExperiment(experiment.experimentId, workspace);
+    expect(results).toHaveLength(experiment.probes.length);
+    expect(results.length).toBeGreaterThan(0);
+    expect(fetch).not.toHaveBeenCalled();
+    for (const result of results) {
+      expect(result.metadata).toMatchObject({
+        simulated: true,
+        modelId: "fixture-model",
+        envelope: {
+          claimKind: "synthetic_example",
+          eligibleLevel: null,
+          statusDimensions: { result: "not_evaluated", evidence: "incomplete" }
+        }
+      });
+    }
+    const stored = JSON.parse(readFileSync(join(workspace, ".amc", "lab", "experiments", `${experiment.experimentId}.json`), "utf8"));
+    expect(stored.status).toBe("completed");
+    expect(stored.startedTs).toEqual(expect.any(Number));
+    expect(stored.completedTs).toEqual(expect.any(Number));
+    expect(stored.completedTs).toBeGreaterThanOrEqual(stored.startedTs);
+
+    resetLabState();
+    expect(getLabExperiment(experiment.experimentId, workspace)?.status).toBe("completed");
+    const report = generateLabReport(experiment.experimentId, workspace);
+    expect(report?.probeResults).toHaveLength(results.length);
+    for (const result of results) {
+      expect(report?.probeResults.find((storedResult) => storedResult.probeId === result.probeId)).toMatchObject(result);
+    }
+    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  test("keeps cached library simulations memory-only when no workspace is supplied", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-memory-"));
+    workspaces.push(workspace);
+    vi.spyOn(process, "cwd").mockReturnValue(workspace);
+    const experiment = createLabExperiment({ kind: "trace_memory", name: "Memory only", description: "Library compatibility", modelId: "fixture-model" });
+    expect(simulateExperiment(experiment.experimentId)).toHaveLength(experiment.probes.length);
+    expect(getLabExperiment(experiment.experimentId)?.status).toBe("completed");
+    expect(generateLabReport(experiment.experimentId)?.probeResults).toHaveLength(experiment.probes.length);
+    expect(existsSync(join(workspace, ".amc"))).toBe(false);
+  });
+
+  test("a library call without a workspace never reads or writes the working directory, even after a cold restart", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-cwd-"));
+    workspaces.push(workspace);
+    const experiment = createLabExperiment({ kind: "trace_memory", name: "Durable", description: "cwd fallback", modelId: "fixture-model" }, workspace);
+    resetLabState();
+    vi.spyOn(process, "cwd").mockReturnValue(workspace);
+    const before = readdirSync(join(workspace, ".amc", "lab"), { recursive: true }).sort();
+    expect(simulateExperiment(experiment.experimentId)).toEqual([]);
+    expect(generateLabReport(experiment.experimentId)).toBeNull();
+    expect(readdirSync(join(workspace, ".amc", "lab"), { recursive: true }).sort()).toEqual(before);
+  });
+
   test("simulates all probes for experiment", () => {
     const exp = createLabExperiment({ kind: "typed_attention", name: "Test", description: "D", modelId: "qwen-2.5" });
     const results = simulateExperiment(exp.experimentId);
@@ -242,6 +314,27 @@ describe("experiment comparison", () => {
       expect(p.candidateExperimentId).toBe(exp2.experimentId);
       expect(Object.keys(p.deltas).length).toBeGreaterThan(0);
     }
+  });
+
+  test("compares two experiments from the workspace store after a cold restart; without a workspace it stays memory-only", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-compare-"));
+    workspaces.push(workspace);
+    const exp1 = createLabExperiment({ kind: "typed_attention", name: "Baseline", description: "D", modelId: "m1" }, workspace);
+    const exp2 = createLabExperiment({ kind: "typed_attention", name: "Candidate", description: "D", modelId: "m2" }, workspace);
+    simulateExperiment(exp1.experimentId, workspace);
+    simulateExperiment(exp2.experimentId, workspace);
+    resetLabState();
+
+    expect(compareExperiments(exp1.experimentId, exp2.experimentId)).toEqual([]);
+    const pairs = compareExperiments(exp1.experimentId, exp2.experimentId, workspace);
+    expect(pairs.map((p) => p.probeId).sort()).toEqual(exp1.probes.map((p) => p.probeId).sort());
+    for (const p of pairs) {
+      expect(p.baselineExperimentId).toBe(exp1.experimentId);
+      expect(p.candidateExperimentId).toBe(exp2.experimentId);
+    }
+    const other = createLabExperiment({ kind: "trace_memory", name: "Other", description: "D", modelId: "m1" }, workspace);
+    simulateExperiment(other.experimentId, workspace);
+    expect(compareExperiments(exp1.experimentId, other.experimentId, workspace)).toEqual([]);
   });
 
   test("comparison handles no matching probes", () => {
@@ -334,6 +427,111 @@ describe("lab report generation", () => {
     expect(report).not.toBeNull();
     expect(report!.probeResults.length).toBe(0);
     expect(report!.summary).toContain("no probe results");
+  });
+});
+
+describe("durable probe record validation", () => {
+  function fixture() {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-record-"));
+    workspaces.push(workspace);
+    const experiment = createLabExperiment({
+      kind: "typed_attention", name: "Stored probes", description: "Malformed record boundary", modelId: "fixture-model"
+    }, workspace);
+    const results = simulateExperiment(experiment.experimentId, workspace);
+    const records = join(workspace, ".amc", "lab", "probe-results");
+    const path = join(records, readdirSync(records).find((name) => name.endsWith(".json"))!);
+    const record = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
+    resetLabState();
+    return { workspace, experiment, results, records, path, record };
+  }
+
+  const malformed: Array<[string, (record: Record<string, unknown>) => string, string]> = [
+    ["null without an identifiable experiment", () => "null", "record"],
+    ["matching scores null", (record) => JSON.stringify({ ...record, scores: null }), "scores"],
+    ["matching numeric-string score", (record) => JSON.stringify({ ...record, scores: { fixture: "0.75" } }), "scores.fixture"],
+    ["matching nonfinite score", (record) => JSON.stringify({ ...record, scores: { fixture: "__infinite_probe_score__" } })
+      .replace('"__infinite_probe_score__"', "1e309"), "scores.fixture"],
+    ["matching missing probe identity", (record) => {
+      const { probeId: _probeId, ...rest } = record;
+      return JSON.stringify(rest);
+    }, "probeId"],
+    ["matching metadata null", (record) => JSON.stringify({ ...record, metadata: null }), "metadata"]
+  ];
+
+  test.each(malformed)("refuses a malformed persisted probe record: %s", (_name, tamper, field) => {
+    const { workspace, experiment, path, record } = fixture();
+    writeFileSync(path, `${tamper(record)}\n`);
+    expect(() => generateLabReport(experiment.experimentId, workspace)).toThrow(`Invalid persisted lab probe result at ${field}:`);
+  });
+
+  test("allows an empty score object without changing synthetic metadata or stored wrapper fields", () => {
+    const { workspace, experiment, path, record, results } = fixture();
+    const emptyScores = { ...record, scores: {} };
+    writeFileSync(path, JSON.stringify(emptyScores));
+    const report = generateLabReport(experiment.experimentId, workspace);
+    expect(report?.probeResults).toHaveLength(results.length);
+    expect(report?.probeResults.find((result) => result.probeId === record.probeId)).toMatchObject(emptyScores);
+    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
+  });
+
+  test("preserves own __proto__ metadata without changing object prototypes", () => {
+    const { workspace, experiment, path, record, results } = fixture();
+    const ownKeys = JSON.parse('{"__proto__":{"labProbeOwnValue":"preserved"},"valid":true}');
+    const metadata = { ...record.metadata as Record<string, unknown>, ...ownKeys };
+    expect(Object.hasOwn(metadata, "__proto__")).toBe(true);
+    expect(Object.getPrototypeOf(metadata)).toBe(Object.prototype);
+    const stored = { ...record, metadata };
+    writeFileSync(path, JSON.stringify(stored));
+
+    const report = generateLabReport(experiment.experimentId, workspace);
+    expect(report?.probeResults).toHaveLength(results.length);
+    const restored = report?.probeResults.find((result) => result.probeId === record.probeId);
+    expect(restored).toBeDefined();
+    expect(Object.hasOwn(restored!.metadata, "__proto__")).toBe(true);
+    expect(Object.keys(restored!.metadata).sort()).toEqual(Object.keys(metadata).sort());
+    expect(restored).toEqual(stored);
+    expect(Object.getPrototypeOf(restored)).toBe(Object.prototype);
+    expect(Object.getPrototypeOf(restored!.metadata)).toBe(Object.prototype);
+    expect(Object.hasOwn(Object.prototype, "labProbeOwnValue")).toBe(false);
+    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
+  });
+
+  test("preserves a numeric own __proto__ score in the stored result and aggregate", () => {
+    const { workspace, experiment, records, record, results } = fixture();
+    const scores = JSON.parse('{"__proto__":0.7,"quality":0.6}');
+    for (const name of readdirSync(records)) {
+      const path = join(records, name);
+      const stored = JSON.parse(readFileSync(path, "utf8"));
+      writeFileSync(path, JSON.stringify({ ...stored, scores }));
+    }
+    const report = generateLabReport(experiment.experimentId, workspace);
+    expect(report?.probeResults).toHaveLength(results.length);
+    const restored = report?.probeResults.find((result) => result.probeId === record.probeId);
+    expect(Object.hasOwn(restored!.scores, "__proto__")).toBe(true);
+    expect(restored!.scores).toEqual(scores);
+    expect(Object.getPrototypeOf(restored!.scores)).toBe(Object.prototype);
+    expect(Object.hasOwn(report!.aggregateScores, "__proto__")).toBe(true);
+    expect(report!.aggregateScores).toEqual(scores);
+    expect(Object.getPrototypeOf(report!.aggregateScores)).toBe(Object.prototype);
+    expect(restored!.metadata).toEqual(record.metadata);
+    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
+  });
+
+  test("refuses a nonnumeric own __proto__ score in a stored result", () => {
+    const { workspace, experiment, path, record } = fixture();
+    writeFileSync(path, JSON.stringify({ ...record, scores: JSON.parse('{"__proto__":"bad"}') }));
+    expect(() => generateLabReport(experiment.experimentId, workspace)).toThrow("Invalid persisted lab probe result at scores.__proto__:");
+  });
+
+  test("preserves another identified experiment's scope before validating its probe payload", () => {
+    const { workspace, experiment, results, records } = fixture();
+    writeFileSync(join(records, "unrelated.json"), JSON.stringify({ experimentId: "lab_other_scope", scores: null }));
+    const report = generateLabReport(experiment.experimentId, workspace);
+    expect(report?.probeResults).toHaveLength(results.length);
+    for (const result of results) {
+      expect(report?.probeResults.find((storedResult) => storedResult.probeId === result.probeId)).toMatchObject(result);
+    }
+    expect(report?.boundaryMarker).toBe("RESEARCH_ONLY");
   });
 });
 

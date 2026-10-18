@@ -1,0 +1,100 @@
+{
+  "schema": "p126-source-run-independent-review/1",
+  "at": "2026-10-16T20:40:51.484089+00:00",
+  "blockers": [],
+  "disclosure": "I authored the thirteen new test bodies. This independently audits root’s actual source run and retained evidence; it is not independent authorship of those test expectations. The earlier independent static candidate review remains separate.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headAtAdmissionAndReadOnlyReview": "2aa32d5e436e789037c6a8a161d6cf0424b4f4ac",
+    "branchRecorded": "codex/p1-26-tree-qualification",
+    "exactCandidateFiles": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/rfc9162.test.ts",
+        "bytes": 18552,
+        "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/rfc9162.test.ts",
+        "dev": 16777231,
+        "inode": 543332279,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/legacyAmbiguity.test.ts",
+        "bytes": 3053,
+        "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/legacyAmbiguity.test.ts",
+        "dev": 16777231,
+        "inode": 543332280,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/LICENSE.transparency-dev-merkle",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/LICENSE.transparency-dev-merkle",
+        "dev": 16777231,
+        "inode": 543332281,
+        "nlink": 1
+      }
+    ],
+    "productionAndExistingTests": "The 113 post-repair protected byte pins match. Read-only status records only the two allocated tests and exact Apache licence as S additions; both indexes empty; held R’s18 rows and head match.",
+    "authority": "The frozen runner is borrowed from held R at bf3b7766. Explicit --root S, all five actual raw/observer absolute test paths, relative imports, and exact current source bytes bind this run to S. These five files contain no process.cwd-based R/src source census. This is TS source evidence, not a fresh compiled-output test.",
+    "publicEvidenceRecords": 0
+  },
+  "actualCombined": {
+    "phase": "p126-source-combined",
+    "total": 54,
+    "passed": 54,
+    "failed": 0,
+    "files": 5,
+    "newCases": 13,
+    "unchangedCases": 41,
+    "hookTaskEntries": 46,
+    "individualHookValues": 46,
+    "afterAll": 5,
+    "afterEach": 41,
+    "durationMs": 8348,
+    "exit": 0,
+    "ownedPgid": 31799,
+    "naturalESRCH": true,
+    "taskUnhandledLateErrors": 0,
+    "rawObserverOutcomeJoin": true
+  },
+  "separateBaseline": {
+    "phase": "p126-unchanged-transparency",
+    "total": 41,
+    "passed": 41,
+    "files": 3,
+    "hookTaskEntries": 44,
+    "individualHookValues": 44,
+    "durationMs": 8451,
+    "exit": 0,
+    "ownedPgid": 31229,
+    "naturalESRCH": true,
+    "notAddedToCombinedTotal": true
+  },
+  "actualNewTestCredit": "All13 fixed pure test bodies passed. Exact vendor vectors, deterministic independent recursive roots/proof checks/frontier rows and algorithm-aware legacy3/4 contrast ran with the admitted bytes. The documented2080 inclusion and2144 consistency loop iterations are data rows inside two passed bodies, not additional tests. No mutant or future qualification result is inferred.",
+  "lifecycleBoundary": "New bodies own no IO/native-addon fixture/env/clock resources. Existing three files have workspace cleanup and un-restored passphrase/pool/vault limitations documented in unchanged-cohort-review. Passing hooks, empty error arrays and naturally absent owned group do not establish universal native closure, key erasure, exact worker environment restoration or all descendant isolation. Wrapper inherited other environment. No public cleanup records exist.",
+  "preservation": {
+    "protectedBytePinsExact": 113,
+    "nativePhysicalPinsExact": 5,
+    "nativeDistinctSingleLink": true,
+    "RStatusRowsExact": 18,
+    "RIndexEmpty": true,
+    "SIndexEmpty": true,
+    "missingReservationReprobe": false
+  },
+  "navigationCorrection": {
+    "operation": "Read-only ls included guessed /private/tmp/p1-39-post-typecheck-20261016/p126-source-combined.observed.json",
+    "exit": 1,
+    "stderr": "ls: /private/tmp/p1-39-post-typecheck-20261016/p126-source-combined.observed.json: No such file or directory",
+    "resolution": "Actual command record and command-p126-source-combined/observer.json were used. No product rerun or evidence rewrite."
+  },
+  "remaining": [
+    "TypeScript/source compiler and generated-count results are later root work, not included as credit here.",
+    "Fresh checkout and source-control sensitivity are unobserved in this review.",
+    "Full suite, coverage and global quality remain separate.",
+    "Signed migration/default/log authority, C2SP, public-log/SCITT/TSA integration, genuine recorded anchors, permanent public-entry approval, library selection and full P1-25/P1-26 remain open.",
+    "All Claude work, held provider/archive decisions, reservations and F37 skip remain intact."
+  ],
+  "execution": "Read-only file/Git observations, standard-library JSON/hash/stat comparisons and private review writes only. No product/helper/test/compiler/native-addon/SQL/network/process probe, source/index/Git mutation, QA write or Claude contact."
+}

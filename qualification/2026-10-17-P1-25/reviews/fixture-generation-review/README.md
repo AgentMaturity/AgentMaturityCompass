@@ -1,0 +1,9 @@
+The actual private generation matches the admitted generator (`0a71c1a2…`) and unchanged OpenSSL (`b9730327…`). Its outer phase closed naturally with exit 0 in 515 ms and recorded owned PGID 10086 absent by ESRCH. All 41 prepared/closed child rows and 82 retained streams match: 40 exits are zero; the expected tampered signed-attribute refusal is exit 4 with actual RSA bad-signature diagnostics.
+
+All four CMS verifications recover the exact 93-byte TSTInfo. Each token embeds its exact public leaf and intermediate, and its recorded ESSCertIDv2 hash matches the leaf. Certificate metadata has the fixed validity dates and intended critical/missing/noncritical EKU variants. The primary separately passed OpenSSL TS query/path/purpose verification with its explicit root, intermediate and fixture-time epoch. The negative leaves' CMS `-noverify` checks establish signature/content only and give no PKI policy acceptance.
+
+The public export is exactly 11 physically distinct, single-link files totaling 105,252 bytes, all below 1 MiB; every public/provenance hash matches. No private-key file or key material is exported. Public provenance retains paths and command metadata; private key bytes, CSRs and CA databases remain outside the public directory.
+
+The tampered token differs at exactly byte 1937 (152 to 153), the unique candidate SHA-256 TSTInfo signed-attribute value. Root's independent ASN.1 location evidence is separate. The granted response contains the exact original token at offset 9 and the recorded extraction round trip is byte-identical. It is an OpenSSL conversion, not a TSA responder run.
+
+No blocker was found in this bounded generation audit. Controlled dates do not establish historical content existence. No AMC verifier result, AttestedTime claim, test pass, source integration, fresh-source/control result or whole P1-25 completion is claimed. This review executed no generator, cryptographic tool or product command.

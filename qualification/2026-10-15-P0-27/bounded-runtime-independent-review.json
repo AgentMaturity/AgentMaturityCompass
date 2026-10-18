@@ -1,0 +1,642 @@
+{
+  "kind": "P0-27 bounded runtime independent read-only review",
+  "reviewedAt": "2026-10-14T20:51:32.629242+00:00",
+  "measuredSource": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "actualRuntimePhaseSource": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "result": "No new material findings in the assigned retained evidence. Literal tagged-system contract failure and mixed lifecycle uncertainty remain unresolved.",
+  "newFindings": [],
+  "inputReceipts": [
+    {
+      "path": "/private/tmp/p0-27-budget-integrity-qualification-20261015.json",
+      "sha256": "3d94ef645aaf4b35a6a38eb92d82501c90ca243cab633d03d9462e9832e745b3"
+    },
+    {
+      "path": "/private/tmp/p0-27-compiled-cli-cold-20261015.json",
+      "sha256": "7736d2437cd25108606c5ee8b443d1e993d7c9c650ded80a754c8b4f24fe5b87"
+    },
+    {
+      "path": "/private/tmp/p0-27-checkpoint-export-qualification-20261015.json",
+      "sha256": "0868b7e884b77f29c2dd5815bd9363c48841c4adb2e99b4ab8e872742d4484f4"
+    },
+    {
+      "path": "/private/tmp/p0-27-cli-final-compiled-correspondence-20261015.json",
+      "sha256": "a90a3f823c1244b333780cda36a2e012a1df74e038c5ea9a2bd592ce88225198"
+    }
+  ],
+  "budget": {
+    "registeredCases": 6,
+    "passed": 6,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "raw": {
+      "path": "/private/tmp/p0-27-budget-integrity-first-20261015.json",
+      "sha256": "585b3483818e35d128c4cf5f8841c3418057a641da4c8b0289a0e00bfd99b50d",
+      "bytes": 3287
+    },
+    "effects": {
+      "path": "/private/tmp/p0-27-budget-first-evidence-20261015/budget-observations.json",
+      "sha256": "50997481b4263d2f8dd1e090612b161e9445532159bba7f240be7f9aaeaccd20",
+      "bytes": 19641,
+      "observations": 16
+    },
+    "observations": 16,
+    "actualIntegrityFaults": [
+      {
+        "phase": "literal unsigned",
+        "rowId": "2a121f58-a325-48f8-9153-30b61318e536",
+        "readerError": "Budget evidence signature or hash is invalid (row 2a121f58-a325-48f8-9153-30b61318e536; its signature is the literal \"unsigned\" that AMC_NO_SIGN=1 writes)",
+        "transmitted": 0,
+        "liveCode": "AMC_EVIDENCE_INTEGRITY",
+        "storedCode": "AMC_EVIDENCE_INTEGRITY",
+        "projectedCodes": [
+          "AMC_EVIDENCE_INTEGRITY"
+        ]
+      },
+      {
+        "phase": "invalid signature",
+        "rowId": "6459c624-8f92-4310-8829-58e8bb4563f3",
+        "readerError": "Budget evidence signature or hash is invalid (row 6459c624-8f92-4310-8829-58e8bb4563f3)",
+        "transmitted": 0,
+        "liveCode": "AMC_EVIDENCE_INTEGRITY",
+        "storedCode": "AMC_EVIDENCE_INTEGRITY",
+        "projectedCodes": [
+          "AMC_EVIDENCE_INTEGRITY"
+        ]
+      },
+      {
+        "phase": "invalid hash",
+        "rowId": "229b0910-9937-4d2c-be62-ae62757c9150",
+        "readerError": "Budget evidence signature or hash is invalid (row 229b0910-9937-4d2c-be62-ae62757c9150)",
+        "transmitted": 0,
+        "liveCode": "AMC_EVIDENCE_INTEGRITY",
+        "storedCode": "AMC_EVIDENCE_INTEGRITY",
+        "projectedCodes": [
+          "AMC_EVIDENCE_INTEGRITY"
+        ]
+      }
+    ],
+    "quotaControl": {
+      "transmitted": 1,
+      "code": "QUOTA",
+      "status": 429
+    },
+    "faultBoundary": "Four owned one-row/session field changes occur after positive checks; the exact owned immutability trigger SQL is immediately restored and asserted. Reviewer executes no SQL.",
+    "pinLimit": "A monitor fingerprint is independently recorded before the owned control rows; direct budget reader uses its existing workspace-key verification. No separate external-admission or key-substitution claim is added.",
+    "wireLimit": "Actual LlmRuntime/diagnostics with installed local canned transport and credential test dependency, not a live model/provider or classifier-mutant qualification."
+  },
+  "coldCLI": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "commands": [
+      {
+        "name": "unsigned-assurance-abort",
+        "argc": 11,
+        "argv": [
+          "assurance",
+          "run",
+          "--agent",
+          "default",
+          "--pack",
+          "healthcarePHI",
+          "--mode",
+          "supervise",
+          "--model",
+          "amc-stub-1",
+          "--no-sign"
+        ],
+        "exit": 2,
+        "expectedExit": 2,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "native-after-unsigned-abort",
+        "argc": 16,
+        "argv": [
+          "--agent",
+          "default",
+          "agent-loop",
+          "run",
+          "P0-27 owned operational fixture",
+          "--provider",
+          "stub",
+          "--model",
+          "amc-stub-1",
+          "--tools",
+          "echo",
+          "--max-steps",
+          "2",
+          "--max-tokens",
+          "512",
+          "--json"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "verify-native-after-unsigned-abort",
+        "argc": 6,
+        "argv": [
+          "agent-loop",
+          "verify",
+          "0139ec7b-ba9d-4507-a23c-7de23db83ac2",
+          "--expect-monitor",
+          "17fe1d75ee074ae5ab180471f3e72700fba39def7eba48140ea0f456712a7431",
+          "--json"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": true,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "signed-assurance-abort",
+        "argc": 10,
+        "argv": [
+          "assurance",
+          "run",
+          "--agent",
+          "default",
+          "--pack",
+          "healthcarePHI",
+          "--mode",
+          "supervise",
+          "--model",
+          "amc-stub-1"
+        ],
+        "exit": 2,
+        "expectedExit": 2,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "native-after-signed-abort",
+        "argc": 16,
+        "argv": [
+          "--agent",
+          "default",
+          "agent-loop",
+          "run",
+          "P0-27 owned operational fixture",
+          "--provider",
+          "stub",
+          "--model",
+          "amc-stub-1",
+          "--tools",
+          "echo",
+          "--max-steps",
+          "2",
+          "--max-tokens",
+          "512",
+          "--json"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "verify-native-after-signed-abort",
+        "argc": 6,
+        "argv": [
+          "agent-loop",
+          "verify",
+          "dc8fbd29-0e91-42d9-92a2-4b022a82ce21",
+          "--expect-monitor",
+          "17fe1d75ee074ae5ab180471f3e72700fba39def7eba48140ea0f456712a7431",
+          "--json"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "agent-evidence-export",
+        "argc": 9,
+        "argv": [
+          "evidence",
+          "export",
+          "--format",
+          "json",
+          "--out",
+          "/private/tmp/p0-27-compiled-cli-WjlhgJ/owned-state/outputs/agent-evidence.json",
+          "--agent",
+          "default",
+          "--include-chain"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "firewall-enable-sibling-home",
+        "argc": 2,
+        "argv": [
+          "firewall",
+          "enable"
+        ],
+        "exit": 0,
+        "expectedExit": 0,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      },
+      {
+        "name": "native-integrity-refusal",
+        "argc": 16,
+        "argv": [
+          "--agent",
+          "default",
+          "agent-loop",
+          "run",
+          "P0-27 owned operational fixture",
+          "--provider",
+          "stub",
+          "--model",
+          "amc-stub-1",
+          "--tools",
+          "echo",
+          "--max-steps",
+          "2",
+          "--max-tokens",
+          "512",
+          "--json"
+        ],
+        "exit": 1,
+        "expectedExit": 1,
+        "checkError": null,
+        "recordedEffectsEqual": false,
+        "requiredUnchanged": false
+      }
+    ],
+    "streamEffectPins": [
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/unsigned-assurance-abort.stdout",
+        "sha256": "363cae8a1e5014b9b7ce553025ecf5ca976ddcc08d510453c97dc9e96ee73cae",
+        "bytes": 86
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/unsigned-assurance-abort.stderr",
+        "sha256": "cf4e074b7ad5532b1e4d140a230c2c0dee68c69553a2cb2fd09e2b93c88ed48e",
+        "bytes": 286
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/unsigned-assurance-abort.effects.json",
+        "sha256": "5f3ff39022fbb7148cd295fa9bed7fda62826eff254e0fa132acb7193af09d10",
+        "bytes": 36871
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-unsigned-abort.stdout",
+        "sha256": "09151501825170ade9453961e3dfb1cdda39b012ef57e7427719f311e054af96",
+        "bytes": 3010
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-unsigned-abort.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-unsigned-abort.effects.json",
+        "sha256": "c379d104d708e186bbcdb77237a9dc25c9ee820bbb8d354defc1367f280f7897",
+        "bytes": 41033
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-unsigned-abort.stdout",
+        "sha256": "d05cda570a97608811f986e3968d78e2c43848e5264a1c1252c40918737b2349",
+        "bytes": 955
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-unsigned-abort.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-unsigned-abort.effects.json",
+        "sha256": "16c127974ca9f6fa9df26a60bbffdedcd74fcc0302678e6287dcbf7ff5a66b45",
+        "bytes": 44778
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/signed-assurance-abort.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/signed-assurance-abort.stderr",
+        "sha256": "cf4e074b7ad5532b1e4d140a230c2c0dee68c69553a2cb2fd09e2b93c88ed48e",
+        "bytes": 286
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/signed-assurance-abort.effects.json",
+        "sha256": "dc739ad4789f6ef7ec51932f71d48ea889befa4683c0797dbdcde8e695d1ff8f",
+        "bytes": 44424
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-signed-abort.stdout",
+        "sha256": "d8e76be3385572976e704c499c35b2a9ba56a52700b346af235566c8b184a62d",
+        "bytes": 3010
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-signed-abort.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-after-signed-abort.effects.json",
+        "sha256": "e58bd5b60df8614efb7c5c0127aba5a93e7b1e1f0ea7756c1d8cbdf91d8766ef",
+        "bytes": 46824
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-signed-abort.stdout",
+        "sha256": "8ac9f1d7630b942b9c6e356394b5228aebbb7b5a7251eb0e0167cc44d28b62e3",
+        "bytes": 955
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-signed-abort.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/verify-native-after-signed-abort.effects.json",
+        "sha256": "827a483848f54e326b3b3860ac074dc3a0920686840f7d07c1d7b8fb2b3c2e29",
+        "bytes": 49224
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/agent-evidence-export.stdout",
+        "sha256": "7e6b14ccdb7e6bc6baaf4a959683dc9e73a770ecb905eba577da4cf0c2eeaf43",
+        "bytes": 229
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/agent-evidence-export.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/agent-evidence-export.effects.json",
+        "sha256": "e64d64c7c3f2774b1333691ec7de95e31d2edc11c36f2d011ae1dbaa2cb11910",
+        "bytes": 49394
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/firewall-enable-sibling-home.stdout",
+        "sha256": "7c7c3ebbb131dea29cdde80a6e766de946a6fe80bbc10dc3a66673d7fa1b2b4a",
+        "bytes": 1013
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/firewall-enable-sibling-home.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/firewall-enable-sibling-home.effects.json",
+        "sha256": "55530f771bfab1196ef3eeb70572faa4a9a0142d8659deaf45a13fdfe6a04524",
+        "bytes": 51757
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-integrity-refusal.stdout",
+        "sha256": "48925420fdb16defbf9b41b32cdea2af06d5768247a662f4ff686ca06da63d96",
+        "bytes": 2741
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-integrity-refusal.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "/private/tmp/p0-27-compiled-cli-WjlhgJ/native-integrity-refusal.effects.json",
+        "sha256": "24803c884068a5ace4e2b70e5b86f5913a63a8d3a89eb776973479358871d741",
+        "bytes": 53888
+      }
+    ],
+    "coldInitializer": {
+      "cold": true,
+      "exit": 0,
+      "script": "/private/tmp/p0-27-compiled-cli-WjlhgJ/cold-init.mjs",
+      "stdout": "/private/tmp/p0-27-compiled-cli-WjlhgJ/cold-init.stdout",
+      "stderr": "/private/tmp/p0-27-compiled-cli-WjlhgJ/cold-init.stderr"
+    },
+    "monitorPin": {
+      "capturedBeforeArtifacts": true,
+      "sha256": "17fe1d75ee074ae5ab180471f3e72700fba39def7eba48140ea0f456712a7431",
+      "record": "/private/tmp/p0-27-compiled-cli-WjlhgJ/monitor-pin-before-rows.json"
+    },
+    "noAllowFlags": true,
+    "native": {
+      "sessions": [
+        "0139ec7b-ba9d-4507-a23c-7de23db83ac2",
+        "dc8fbd29-0e91-42d9-92a2-4b022a82ce21"
+      ],
+      "eventsPerTurn": [
+        24,
+        24
+      ],
+      "nativeIds": 48,
+      "driverStatus": "idle",
+      "ending": "complete",
+      "requestsPerTurn": [
+        2,
+        2
+      ],
+      "syntheticRequestsPerTurn": [
+        2,
+        2
+      ],
+      "reportedModelRequests": 0,
+      "anchoredVerification": true
+    },
+    "export": {
+      "records": 54,
+      "nativeIdsIncluded": 48,
+      "schemaVersion": 2,
+      "sessions": 2,
+      "excluded": 0,
+      "chainInvalid": 0,
+      "datasetHash": "10ca45fc830e43aecf224794b472e9c4ba83f8f821579b09cd2775e8b7b1a64e"
+    },
+    "integrityRefusal": {
+      "exit": 1,
+      "code": "AMC_EVIDENCE_INTEGRITY",
+      "dispatchAttempted": false
+    },
+    "effectsLimit": "No blanket no-write assertion: writers/export/firewall/refusal append owned artifacts. Signed verification creates WAL/SHM sidecars and changes parent link count, retained in snapshots.",
+    "compiledCorrespondence": "Root recorded all10 measured compiled pins matching after normal final8c build, keeping executed1291 HEAD. Reviewer did not read live dist or rerun CLI."
+  },
+  "partialObservers": {
+    "first": {
+      "receipt": "/private/tmp/p0-27-cli-observer-correction-20261015.json",
+      "sha256": "e9c1d576d8558e66dc4848da9d75d992693f77bf8d1ed00b5e71f020b9dd993b",
+      "homeMode": "0755",
+      "actual": "Native stdout empty; stderr composition did not provide amcCredentials; aggregate parsing stopped. HOME0700/driver completed\u2192idle are observer corrections without disabling contracts.",
+      "fullQualification": false
+    },
+    "mixed": {
+      "receipt": "/private/tmp/p0-27-cli-lifecycle-observer-20261015.json",
+      "sha256": "1ffaa52ed82ee4b41d7b3f9bb95840f8dda3e5a4443b77042306858402b9b21e",
+      "actual": "Two24-event turns and pinned verification streams precede parent snapshot SQLITE_CORRUPT while initializer pool remains open. Retained note records later cold read quick_check ok with54events.",
+      "cause": "Unresolved mixed parent/child lifecycle observation, not a proven or repaired product cause.",
+      "fullQualification": false
+    },
+    "finalCold": "Completed isolated initializer child plus immediately retained9 command outcomes; source unchanged. It does not resolve the mixed observation."
+  },
+  "checkpointExport": {
+    "checkpoint": {
+      "registered": 13,
+      "passed": 13,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "snapshotPairs": 15,
+      "allEqual": true
+    },
+    "export": {
+      "registered": 11,
+      "passed": 10,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "matrixRows": 40,
+      "selectedDefault": 28,
+      "selectedOther": 5,
+      "missingAgent": 0,
+      "unfiltered": 40,
+      "snapshotsAndSemanticRows": 10,
+      "allEqual": true,
+      "seededClaimKind": "self_reported",
+      "nativeExecutionClaim": false
+    },
+    "literalSystemContract": {
+      "status": "RED and unresolved",
+      "specPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+      "specLine": 49,
+      "specText": "Never include system rows for a named agent.",
+      "actualFailedCase": "P0-27 genuine seeded evidence collector [strict spec conflict] never includes a system row even when its direct metadata names the agent",
+      "testLine": 178,
+      "actual": "One explicitly agent-tagged system/open row is selected; system is not included in sessionsIncluded, and its untagged tail is excluded.",
+      "acceptedHistory": "Original F4 commit 151d471d8f7c82e30ce5a1e5833b176f1de0aaf9 already carries direct metadata selection and the same scoped system-session exclusion. GETTING_STARTED.md:527 describes rows whose metadata names the agent plus every row of its native sessions.",
+      "sourceLines": [
+        291,
+        293,
+        301
+      ],
+      "interpretation": "Accepted compatibility code and docs establish existing behavior but do not reconcile the literal specification. Both the compatibility control and strict failing control remain; no repair or green reinterpretation is made."
+    },
+    "realOutput": "Actual JSON exporter output/hash is qualified, outside-workspace file creation is intentional; no blanket zero-filesystem effects.",
+    "retainedReferenceHashes49Match": true
+  },
+  "privateCausal": {
+    "root": "/private/tmp/p0-27-private-causal-v8mdbxtn",
+    "wholeDistFiles": 4529,
+    "allPrivateCurrentHashesAndFileSetRestored": true,
+    "beforeAfterHashTablesEqual": true,
+    "phases": [
+      {
+        "family": "checkpoint",
+        "target": "dist/utils/pathSafety.js",
+        "restoredSha256": "f81acfa5f8dd237c20b94ab6f7c464a6ffe1c645816e1a523368b654676fb837",
+        "phases": [
+          {
+            "phase": "baseline",
+            "passed": 4,
+            "failed": 0,
+            "failedChecks": [],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-baseline.json",
+            "rawSha256": "90939503d75b26f69a650eadba646f16c495ed657e9d08e12dd586bbf60a5655",
+            "changedPrivateCompiledFiles": []
+          },
+          {
+            "phase": "mutant",
+            "passed": 3,
+            "failed": 1,
+            "failedChecks": [
+              "dotdot-cache"
+            ],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-mutant.json",
+            "rawSha256": "2316e1f18fdb62bab2d98a9ba2f597a8854d34cca2b28618f1e1f36c87e25a0a",
+            "changedPrivateCompiledFiles": [
+              "dist/utils/pathSafety.js"
+            ]
+          },
+          {
+            "phase": "restored",
+            "passed": 4,
+            "failed": 0,
+            "failedChecks": [],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-restored.json",
+            "rawSha256": "94f5e0c09b00953974e75816f75e3860d11a45c55ffc1a997f4b0230a2a3c559",
+            "changedPrivateCompiledFiles": []
+          }
+        ]
+      },
+      {
+        "family": "export",
+        "target": "dist/evidence/exporter.js",
+        "restoredSha256": "b6c5d4ed0d122daa936feaa8e83a5c74efdb0c4354dea0fed4fd9646e2fa8072",
+        "phases": [
+          {
+            "phase": "selection-baseline",
+            "passed": 10,
+            "failed": 0,
+            "failedChecks": [],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-baseline.json",
+            "rawSha256": "b888163c4ce47b051bc7290c6b7debf05b16eb7125c46ebe2153664fa24338eb",
+            "changedPrivateCompiledFiles": []
+          },
+          {
+            "phase": "selection-mutant",
+            "passed": 7,
+            "failed": 3,
+            "failedChecks": [
+              "all-owned-session-rows-and-legacy-ids",
+              "foreign-owned-session-ids",
+              "default-dataset-two-counts"
+            ],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-mutant.json",
+            "rawSha256": "7182a8f571f7be81306e67f068ffad62a1eacabb48e946cc8176d4fa673dfd55",
+            "changedPrivateCompiledFiles": [
+              "dist/evidence/exporter.js"
+            ]
+          },
+          {
+            "phase": "selection-restored",
+            "passed": 10,
+            "failed": 0,
+            "failedChecks": [],
+            "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-restored.json",
+            "rawSha256": "6a25f661e3c9debf7291e8dc941991f9ff121b13c1defd7c3ac109321409f103",
+            "changedPrivateCompiledFiles": []
+          }
+        ]
+      }
+    ],
+    "retainedFirstReaderObserver": {
+      "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-baseline.json",
+      "exit": 1,
+      "passed": 9,
+      "failed": 1,
+      "failedCase": "persistent-names-and-bytes-unchanged",
+      "actualEffects": "The fresh-process reader initialized .amc/evidence.sqlite-wal and .amc/evidence.sqlite-shm, changing the .amc parent link count. All selection and semantic row assertions passed; the phase was not counted as a killed behavioral mutation.",
+      "observerCorrection": "The corrected private observer records entrySnapshot, opens the same owned ledger, and then records the before-collector snapshot. Initial coordination effects remain visible in every corrected phase. Collector and persistent-byte assertions are unchanged; no production/test criteria were relaxed.",
+      "observerSource": {
+        "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-observer.mjs",
+        "sha256": "82b9e2840639481c19c6001b8404a3ce86abb3afec853b81bc7ae91e1c59d32a"
+      }
+    },
+    "meaning": "Checkpoint legacy predicate loses only ..cache refusal (4/4\u21923/4\u21924/4). Export valid false owned-session predicate consumes the same third parameter and loses exact owned IDs/counts (10/10\u21927/10\u219210/10). Initial export9/10 fails coordination-sidecar baseline only and is not counted as behavioral mutation. No live module changes or changed TypeScript compilation; standalone counts add no registered tests."
+  },
+  "limits": [
+    "This review reads retained evidence, new budget test and private copied modules only; no product imports/runtime/tests/builds/install or live dist reads, source/ref/guard mutation.",
+    "No successful assurance model scan, live provider, authenticated HTTP, race/atomicity/old-checkpoint migration, heldP0-57, Node24, full suite/coverage, installedP0-31/G0, hosted/release or Done approval.",
+    "Strict never-system contract remains1RED; compatibility behavior is not a waiver. Mixed lifecycle source cause remains unresolved. Earlier P0-20/P0-22/P0-23/P0-51/P0-52 and pending narrow decisions remain unchanged."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "p125-client-explicit-existing-metadata-scope/1",
+  "activeExistingPaths": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 9421,
+      "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 66214,
+      "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 80751,
+      "sha256": "e726c06516d9310170f22dd34ed53b7db02827d80c725875f541ed9ba8dc3df9"
+    }
+  ],
+  "absentUnallocatedEarlierPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/evidence/assembly-inputs.json",
+  "pathCorrection": "The active assembly index is at the packet root. The earlier prospective evidence/assembly-inputs.json observation correctly recorded absence; it must not be allocated as an existing file.",
+  "newEvidencePrefix": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/evidence/client-transport",
+  "rootOwnsFutureVersionedExtensionAndAllocation": true
+}

@@ -1,0 +1,451 @@
+{
+  "schemaVersion": 1,
+  "task": "P0-50 final read-only readiness preparation",
+  "createdUtc": "2026-10-14T15:01:42.630673+00:00",
+  "activeImplementation": false,
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "priorPreflight": {
+    "path": "/private/tmp/p0-50-readonly-preflight-20261014.json",
+    "sha256": "901d2d8a2775be38cb9f08acc8fb0d1a29ab7d944c4cddbad324cab2af32a7f3"
+  },
+  "primaryAcceptance": {
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/50",
+    "number": 50,
+    "title": "[P0-50] Move @modelcontextprotocol/sdk past GHSA-6qxp-vccf-f47h (high)",
+    "mergedAt": "2026-10-06T19:04:37Z",
+    "mergeCommit": "e680f2a6098b53c665b7f2ee7e738c2f05f24984",
+    "issueCommit": "561f97f2c10b56a653260ad84df5881cfbcd4e78",
+    "stackedIntegrationHead": "9c0835b7",
+    "historicalChecked": [
+      "audit:runtime reported no known vulnerabilities",
+      "typecheck, build, check:package, check:third-party-notices, check:vendor-links, check:freeze, check:docs-drift",
+      "Parity and MCP tests: 7,209 tests across 33 files",
+      "Four focused MCP files: 47/47 tests"
+    ],
+    "explicitUnchecked": [
+      "Full ci.yml plus release:gate on the merged integration (orchestrator)"
+    ],
+    "historicalCheckedAreFreshQualification": false
+  },
+  "exactAcceptanceBoundary": "PR50 explicitly leaves Full ci.yml plus release:gate on the merged integration unchecked. Current dependency/source/unit/installed fixtures are narrower layers, not that full result. No new product change is needed to expose an initialize-era installed HTTP MCP fixture, but current execution has not occurred.",
+  "currentDependency": {
+    "range": "^1.31.0",
+    "lockResolved": "1.32.1(zod@4.4.3)",
+    "existingInstalledFixture": {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/package.json",
+      "version": "1.32.1",
+      "packageJsonSha256": "0216319ea53177f7ed419d660b2f52ccc7e3327e57f9ee2ef03225ff543aeae4",
+      "scope": "Existing Node24 fixture metadata only, not a new packed-install result"
+    },
+    "SDKAuthBoundary": "nativeMcpHttpTransport.ts175-180 constructs StreamableHTTPClientTransport with pinned fetch and no authProvider; unauthorized metadata is not an SDK OAuth enrollment. AMC own stateless2026/OAuth paths are outside these legacy installed fixtures."
+  },
+  "sourceInputHashes": [
+    {
+      "path": "package.json",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "workingEqualsSource": true
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "bytes": 14111,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "scripts/release-gate.mjs",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "bytes": 17338,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "scripts/packed-install-check.mjs",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "d83ede99025cacf1c84b061be9f236022d67cf929afab8e28d6824fe7e5ce318",
+      "bytes": 9562,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "scripts/installed-crash-recovery-check.mjs",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "5d7e87682ff6bfc9db5cfdc399999156d4a151a435f8bf56d8104dbc0ac1c1a7",
+      "bytes": 20508,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "scripts/lib/installedCrashMcpServer.mjs",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+      "bytes": 2503,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "scripts/lib/ownedProcessCommand.mjs",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560",
+      "bytes": 4006,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "src/cli-agent-guide-commands.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "732af7fc769e4836487af78f36ec52da9691b01373b82ca17fb08d62fafee4ec",
+      "bytes": 5712,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "src/setup/nativeMcpConfig.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1",
+      "bytes": 18690,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "src/mcp/nativeMcpHttpTransport.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+      "bytes": 41548,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "docs/NATIVE_MCP.md",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "253a2fad4f35f1229f5c59eea3bb1f47d7b6c0def3c77cfca454d0a586187587",
+      "bytes": 14137,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "tests/nativeMcpHttp.test.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+      "bytes": 16350,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "tests/nativeMcpClient.test.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+      "bytes": 18930,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcp.test.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+      "bytes": 6336,
+      "workingEqualsSource": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "source": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+      "bytes": 6376,
+      "workingEqualsSource": true
+    }
+  ],
+  "retainedFixtureInputHashes": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/attempt2/run.mjs",
+      "sha256": "efe7a52c326be8bd9f6ebb8c2356ad822e4bf2fd2bc10be6955379e03007fb24",
+      "bytes": 16162
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/helpers/provider.mjs",
+      "sha256": "9878511e9a863c35d4d0f661bb1b391f8e2363aa41ae928c4adaa4ef42a3e48e",
+      "bytes": 4187
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/helpers/server.cjs",
+      "sha256": "6e203e0cc2f6363f63b29521371fd81cbf8c6f3a160114285764c1a9e282a242",
+      "bytes": 1346
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/helpers/owner-pty.py",
+      "sha256": "93d056a8390ac06537a4dc3e1ee24e9978936b4828192fb453a13bf3f64087af",
+      "bytes": 1160
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/run.mjs",
+      "sha256": "00b5510f50c2c41ac5e99cb41a53c64baa65c56f8540065333d33ba1a3ae0199",
+      "bytes": 20297
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/provider.mjs",
+      "sha256": "7c45344a5acea1eb7da541f22fa63d057077831a60307a2d6e08da943a8c0e91",
+      "bytes": 4199
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/http-server.mjs",
+      "sha256": "b87ab7662a4666e2885d4050e2cab1d32b8771d39582975a2d3abc80bf97759a",
+      "bytes": 3768
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/owner-pty.py",
+      "sha256": "93d056a8390ac06537a4dc3e1ee24e9978936b4828192fb453a13bf3f64087af",
+      "bytes": 1160
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/release.json",
+      "sha256": "93216ce9ede88800292825db9582182220b1eb04a21c24330f4cadc697572ddc",
+      "bytes": 243
+    }
+  ],
+  "existingHarnesses": {
+    "genericPackedInstall": {
+      "script": "scripts/packed-install-check.mjs",
+      "parameterized": true,
+      "stdoutSourceBoundaries": "Fresh outside-tree consumer, empty HOME/npm cache, no @amc/core, keyless stub run and evidence verification; NO MCP mount/HTTP assertion. Keep optional real-provider lane unset and explicit skipped."
+    },
+    "currentStdioRecovery": {
+      "script": "scripts/installed-crash-recovery-check.mjs",
+      "parameterized": true,
+      "runtime": "Node22 POSIX only as explicitly asserted by current runner",
+      "helper": "scripts/lib/installedCrashMcpServer.mjs",
+      "uses": "Public native SDK/CLI through installed ESM consumer; append_once stdio uncertain-outcome recovery fixture. No external model/provider key; uses stub.",
+      "inputPins": [
+        "artifact SHA256",
+        "installed CLI SHA256",
+        "sourceCommit",
+        "committed runner/helper bytes",
+        "fresh output directory"
+      ]
+    },
+    "historicalFullStdio": {
+      "runner": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/attempt2/run.mjs",
+      "helpers": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/helpers",
+      "mustNotRunInOriginal": "Original attempt2 contains archived evidence and lacks its expected helpers directory. The shared helpers/server.cjs/provider.mjs/owner-pty.py exist and must be copied to a fresh layout. Its artifact/source pins are historical and cannot stand for current source."
+    },
+    "historicalFullHTTP": {
+      "runner": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/run.mjs",
+      "helpers": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers",
+      "releaseInput": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/release.json",
+      "mustNotRunInOriginal": "Current original directory preserves old artifacts/release.json and lacks private/; do not overwrite it. The runner already reads a release.json input, so current tarball/hash/source can be supplied only in a new owned layout.",
+      "protocolConflict": "Existing helper understands initialize/tools/list/tools/call, not server/discover. The helper marks unknown methods as failure. Pin protocolVersion2025-11-25 in the existing public fixture config to exercise SDK1.32.1 without changing helper/product behavior.",
+      "publicSDK": "public consumer exports AMCNativeClient from agent-maturity-compass/sdk/native; it uses installed ACP and actual digest-bound approvals."
+    }
+  },
+  "currentActualNode22McpUnitEvidence": {
+    "report": "/private/tmp/p0-47-full-correctness-20261014.json",
+    "sha256": "3d659821bae47f08a2fe5a09c281d04e79eeb45ce8eb36afaba13d028a64c30a",
+    "source": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "runtime": "Node22.23.3",
+    "files": [
+      {
+        "path": "tests/nativeMcpHttp.test.ts",
+        "test_sha256": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+        "testBytesMatchAcceptedMain": true,
+        "suite_status": "passed",
+        "counts": {
+          "passed": 15,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      },
+      {
+        "path": "tests/nativeMcpClient.test.ts",
+        "test_sha256": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+        "testBytesMatchAcceptedMain": true,
+        "suite_status": "passed",
+        "counts": {
+          "passed": 15,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      },
+      {
+        "path": "tests/reconciliationDefectsMcp.test.ts",
+        "test_sha256": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+        "testBytesMatchAcceptedMain": true,
+        "suite_status": "passed",
+        "counts": {
+          "passed": 2,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      },
+      {
+        "path": "tests/reconciliationDefectsMcpHttp.test.ts",
+        "test_sha256": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+        "testBytesMatchAcceptedMain": true,
+        "suite_status": "passed",
+        "counts": {
+          "passed": 2,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "passed": 34,
+    "scope": "34 current assertions all pass; report as scoped MCP outcomes within an overall failing full run. Historical47/47 source/profile is not reused as a fresh result."
+  },
+  "minimalLaterCommandsAndEvidence": [
+    {
+      "id": "preflight_and_current_exact_source",
+      "argvs": [
+        "git rev-parse HEAD",
+        "git status --porcelain=v1 --untracked-files=all",
+        "pnpm --version",
+        "node --version"
+      ],
+      "requirements": "Owned isolated accepted-main branch; no paused source resumption. Record exact source and package/lock/input hashes. SDK source range remains^1.31.0 and lock1.32.1; preserve D15 P009 package/P049 lock originals."
+    },
+    {
+      "id": "reuse_current_audit_and_Node22_MCP",
+      "source": "Completed same-input P0-49 production audit may be reused after hash equality; actual existing immutable7a81 Node22 report supplies34/34 current tests in the four named MCP files, not the historical47/47 claim.",
+      "requirements": "No whole-suite or Node24 claim from these rows; source mcp production at7a81 equals accepted main, and all four test blobs match."
+    },
+    {
+      "id": "focused_Node24_if_needed",
+      "argv": "pnpm exec vitest run tests/nativeMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts --reporter=default --reporter=json --outputFile.json={new_private_fixture}/mcp-focused-node24.json",
+      "requirements": "Run only when active/authorized and not already covered by an exact-source report. Reuse current runtime audit/typecheck/build/package/vendor/freeze/docs receipts when input hashes and relevant source are identical."
+    },
+    {
+      "id": "explicit_package_build_and_install",
+      "argvs": [
+        "npm run build",
+        "node scripts/packed-install-check.mjs --no-build --keep"
+      ],
+      "requirements": "The existing check packs with npm pack --ignore-scripts to avoid recursive prepack, explicitly leaving full release qualification separate. Retain artifact path/hash, build source/runtime/lock receipt and outside-checkout consumer; @amc/core must be absent. Its generic stub turn does not prove MCP HTTP."
+    },
+    {
+      "id": "existing_current_parameterized_stdio_recovery",
+      "argv": "node scripts/installed-crash-recovery-check.mjs --artifact {current_tarball} --artifact-sha256 {artifact_sha256} --cli-sha256 {installed_expected_cli_sha256} --source {full_source_commit} --source-tree {committed_owned_checkout} --out {new_private_stdio_recovery_fixture}",
+      "requirements": "Existing Node22 POSIX runner asserts committed/clean source and exact helper/source bytes; it uses public installed SDK/CLI, deterministic stub provider and real operator-trusted stdio tool. It has an outside-workspace checkpoint root and explicit owner bootstrap. It is stdio/recovery evidence only and does not load SDK HTTP transport."
+    },
+    {
+      "id": "retained_installed_stdio_full_approval_fixture",
+      "argv": "node {new_private_stdio_acceptance_fixture}/run.mjs",
+      "requirements": "Copy original attempt2 runner plus shared helpers into a NEW private layout. Initialize artifacts/private dirs only there. Replace only historical artifact path/hash/sourceRevision inputs with current receipt; preserve all assertions, generated synthetic credentials, actual user/login/digest approvals, tools/budget signing, public consumer import and pinned-catalog refusals. Pin initialize-era protocol through existing config to keep the legacy fixture scope explicit."
+    },
+    {
+      "id": "retained_installed_HTTP_fixture",
+      "argv": "node {new_private_http_acceptance_fixture}/run.mjs",
+      "requirements": "Copy attempt3 runner/helpers into a NEW private layout and provide release.json {tarball,sha256,sourceRevision} for the current artifact. Preserve private/artifact layout and all15 checkpoint-group assertions. Add server.protocolVersion:\"2025-11-25\" to the explicit fixture config to avoid its unsupported server/discover probe; current public config supports this. Keep headerRefs with generated local credential, no auth.kind oauth2/no --authorize. This selects the SDK initialize-era StreamableHTTP path, not AMC2026 stateless/OAuth qualification."
+    },
+    {
+      "id": "verify_actual_installed_SDK_and_inputs",
+      "requirements": "A fresh npm tarball install resolves ranges independently of source pnpm-lock; resolve @modelcontextprotocol/sdk/client/streamableHttp.js from the installed AMC dist/mcp/nativeMcpHttpTransport.js importer and record actual SDK version/path/library hashes and consumer lock. Require1.32.1 for a same-version claim. If floating install differs, stop that claim; an explicit SDK1.32.1 pin is fixture-only input and must be recorded, never change product package/lock or inherit checkout node_modules. Verify installed CLI/tarball hashes and no @amc/core leakage."
+    },
+    {
+      "id": "explicit_full_release_gate",
+      "argv": "npm run release:gate -- --json --out tmp/release-gate/p0-50.json",
+      "requirements": "NO --quick. Actual structured full-test report requires zero failed/pending/todo/errored suites, global/per-file floors remain required. Preserve every failure and dependency skip. Packed smoke and narrow MCP tests cannot substitute."
+    },
+    {
+      "id": "explicit_full_CI_workflow",
+      "requirement": "Fresh pinned current merged/integration CI evidence for both Node22/24 and every required ci.yml job, including installed clean/packed, container, Helm and security checks. Local bash/run-block proofs and source existence are not full hosted acceptance. This preparation triggers no workflow and changes no release/publish policy."
+    }
+  ],
+  "exactPublicCliFixtures": [
+    "amc init --minimal",
+    "amc policy action init",
+    "amc policy approval init",
+    "amc budgets init",
+    "amc firewall enable --mode block --json",
+    "amc tools init",
+    "amc budgets sign --json",
+    "amc user init --username mcp-owner (masked PTY input)",
+    "amc approvals login --username mcp-owner --token-file {private_token} --password-stdin --json",
+    "amc credentials set AMC_HTTP_FIXTURE_AUTH --file {private_credentials_file} --project-dir {fixture_workspace} --json (synthetic stdin only)",
+    "amc agent-loop mcp-catalog --config {mcp_json} --credentials-file {private_credentials_file} --json",
+    "amc tools sign --json",
+    "amc tools verify",
+    "amc budgets verify",
+    "amc policy action verify",
+    "amc policy approval verify",
+    "amc agent-loop run --provider openai-responses --base-url {loopback_scripted_provider} --model synthetic-mcp-fixture --tools workspace --credentials-file {private_credentials_file} --mcp-config {mcp_json} --mcp-config-sha256 {current_config_sha256} --approve-tools WRITE_LOW --approve-risk low --max-tokens 137 --max-steps 3 --json -- {synthetic_prompt}",
+    "amc approvals list --agent default --status pending --json",
+    "amc approvals show --agent default {request_id}",
+    "amc approvals approve --agent default {request_id} --mode execute --reason {synthetic_local_fixture_reason} --username {actual_logged_in_owner} --user-id {actual_owner_id} --roles {actual_owner_roles} --session-token-file {private_token} --expect-request-digest {exact_reviewed_digest}",
+    "amc session verify --json",
+    "amc agent-loop verify {session_id} --json"
+  ],
+  "historicalAcceptanceStillRetained": [
+    {
+      "directory": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance",
+      "readme": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/README.md",
+      "summary": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/final-summary.json",
+      "summarySha256": "87054695c25515d42a44096fd422ea149a22fb76d0a1f06adab416dbba8944b7",
+      "receipt": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/attempt2/receipt.json",
+      "receiptSha256": "79886a3a26bb3b489a8c9ea4139290fa3557c78cf1a42d8862b037b784fa4532",
+      "matchesRecordedReceiptHash": true,
+      "ok": true,
+      "sourceRevision": "90855cf7324ccaa710e7b82f3ab75036e89cf0b8",
+      "artifactSha256": "9cff98d81cf38225b2ca3e148ba02d17578969501aefd3adcfabe84b78f33578",
+      "node": "v22.22.0",
+      "platform": "darwin",
+      "date": "2026-09-08T15:25:44.091Z",
+      "checkCount": 10,
+      "commands": 29,
+      "limits": [
+        "Scripted local provider and stdio fixture; no live model, external service or OS confinement claim.",
+        "Pinned catalog proves the advertised contract; the local program remains operator-trusted.",
+        "Only stdio and macOS ARM64 Node22 qualified; other transport/platform combinations remain separate."
+      ],
+      "label": "Historical installed conformance for earlier source; not current dependency qualification"
+    },
+    {
+      "directory": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance",
+      "readme": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/README.md",
+      "summary": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/final-summary.json",
+      "summarySha256": "4d5f5d23375e428888e42b55a31d311318688e9b4e523643e4d02b41be56be25",
+      "receipt": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/artifacts/receipt.json",
+      "receiptSha256": "4d6f3bdfa02a621003049ea69337ab688f9457149b77a89e4794afaff7060104",
+      "matchesRecordedReceiptHash": true,
+      "ok": true,
+      "sourceRevision": "0af82e28572b325bae9389275b4904f2fca5b087",
+      "artifactSha256": "ef091fc5af4be28ff7ae274d9a49dc411c97290cd88dd9c960777ad3a7c624fa",
+      "node": "v22.22.0",
+      "platform": "Darwin ARM64",
+      "date": "2026-09-08",
+      "checkCount": 15,
+      "commands": 36,
+      "limits": [
+        "Scripted local Responses provider and real loopback Streamable HTTP/SSE fixture; no live model or external vendor.",
+        "HTTPS validation is source-tested; this installed lane uses explicitly permitted loopback HTTP, not live TLS or OAuth.",
+        "Pinned catalog is a reviewed advertised contract, not proof of remote implementation behavior.",
+        "Cancellation proves local disposal and fixture DELETE, not reversal of a remote committed side effect.",
+        "macOS ARM64 Node22; other platforms and HTTP server implementations remain separate."
+      ],
+      "label": "Historical installed conformance for earlier source; not current dependency qualification"
+    }
+  ],
+  "requiredCurrentEvidence": [
+    "Build-source/runtime/package/lock/input digest receipt and tarball/CLI digest correspondence",
+    "Actual installed runtime-resolved MCP SDK version plus library/consumer-lock hashes; no checkout or private workspace leakage",
+    "All command argv/status and local scripted provider/MCP transcripts, with actual zero-before-approval and exact two allowed effects/one failed cancellation",
+    "Pin snapshots unchanged, actual catalog/grant/redirect/401 refusals and zero second-origin requests, final remote-session/process disposal",
+    "Public SDK updates/session identity and actual closeAndVerify/cold verifier receipts; private synthetic credentials/token/vault never copied to public artifacts",
+    "Structured focused/full-test reports and actual coverage summary, honest source-quality results, freeze against accepted base, all full-gate skips and CI job results"
+  ],
+  "inheritedBroadGateDebt": {
+    "coverage": "Immutable7a81 current full report has51 assertion failures and global functions71.96<75; independently924 per-file violations/289 files. Preserved P0-33 profile also fails functions72.89<75 and880 per-file violations; no passing report is available to substitute.",
+    "sourceQuality": "Accepted ci.yml Source duplication and reachability remains continue-on-error:true; full release gate requires source-duplicates/dead-code commands directly. No fresh accepted-source source-quality outcome is claimed here. P0-33 owns blocking workflow/gate reconciliation; do not weaken or silently import its held source.",
+    "deployment": "Accepted release-gate liveHealthStep skips with generic missing AMC_RELEASE_GATE_LIVE_URL reason. Missing environment value is not proof no deployment exists. The separate directly approved P0-33 D03 omission untilP2-06 must retain its exact authority/reason; it does not qualify deployment or a complete full gate.",
+    "timeoutsProfiles": "Accepted release gate full suite is npx vitest run --coverage with900000ms timeout and strict zero-pending report. CI excludes performance from coverage and executes serial performance separately, with45-minute step/90-minute job budgets. P0-33 owns any reconciled full profile/deadline changes; do not transplant them as P0-50 dependency changes.",
+    "currentFullCi": "Latest retained accepted-main CI38132701944 fails; Node24 was cancelled by default matrix behavior. The P0-48 isolated fail-fast candidate changes only completion policy; it does not create a green current main run.",
+    "noDirectMCPGate": "Neither generic packed-install nor release gate has a dedicated installed HTTP MCP step. Full unit corpus may cover MCP source, but explicit installed replay remains distinct."
+  },
+  "limits": [
+    "Preparation only: no tests, builds, installs, new code, fixture creation/replay, hosted workflow or provider execution.",
+    "No source/SDK/MCP/CLI ownership resumption, archived input replacement, paused-scope implementation, tracker change or publication.",
+    "Installed HTTP proof remains real loopback HTTP/SSE with generated local header credential and scripted local Responses provider; it proves neither live TLS/vendor interoperability nor OAuth enrollment.",
+    "Pinned catalog proves a reviewed advertised contract, not remote implementation honesty. Cancellation/DELETE proves local disposal and fixture cleanup, not rollback of a remote side effect.",
+    "Existing retained runners assert Node22/macOS-style process/PTY assumptions; do not remove runtime guards merely to label Node24 or cross-platform support. Focused Node24 units are separate evidence."
+  ],
+  "memoryUse": "Ownership-preservation guidance only; all technical/current claims were verified from primary source, reports and retained runners."
+}

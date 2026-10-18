@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /private/tmp/p0-11-causal-qualification-20261015/closure
+
+ ✓ tests/toolEvidenceRecording.test.ts (7 tests) 1230ms
+     ✓ records an ALLOWED call  302ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  12:13:54
+   Duration  3.73s (transform 1.74s, setup 19ms, import 2.37s, tests 1.23s, environment 0ms)
+
+JSON report written to /private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/raw.json

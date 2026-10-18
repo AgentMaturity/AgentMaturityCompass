@@ -1,0 +1,35 @@
+{
+  "tests": {
+    "numTotalTests": 57,
+    "numPassedTests": 57,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "actualFiles": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+      "total": 17
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+      "total": 12
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+      "total": 16
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+      "total": 3
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+      "total": 9
+    }
+  ],
+  "unhandledErrors": [],
+  "observerTaskErrors": [],
+  "failedHooks": [],
+  "hooksPassed": 22,
+  "failures": []
+}

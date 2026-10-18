@@ -1,0 +1,1788 @@
+{
+  "schema": "p125k-exact-fresh-ordered-case-occurrence-joins/1",
+  "phaseJoins": [
+    {
+      "phase": "p125k-fresh-canonical",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-455678311_0_0",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 283,
+                  "column": 30
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 219,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-455678311_0_1",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 283,
+                  "column": 30
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 286,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 283,
+                  "column": 30
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 10,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 283,
+                  "column": 30
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 30,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "p125k-fresh-canonical-corrected-path",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "p125k-m1",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected [] to have a length of 1 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:268:32\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:220:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-455678311_0_0",
+          "observerErrors": [
+            {
+              "message": "expected [] to have a length of 1 but got +0",
+              "actual": "0",
+              "expected": "1",
+              "showDiff": true,
+              "diff": "- Expected\n+ Received\n\n- 1\n+ 0",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected [] to have a length of 1 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:268:32\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:220:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 268,
+                  "column": 32
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 172,
+                  "column": 7
+                },
+                {
+                  "method": "withCheckpointWorkspace",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 121,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 220,
+                  "column": 7
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 311,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 219,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "p125k-restore1",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "p125k-m2",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:316:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:287:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-455678311_0_1",
+          "observerErrors": [
+            {
+              "message": "expected false to be true // Object.is equality",
+              "actual": "false",
+              "expected": "true",
+              "showDiff": true,
+              "operator": "strictEqual",
+              "diff": "- Expected\n+ Received\n\n- true\n+ false",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected false to be true // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:316:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:287:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 316,
+                  "column": 26
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 172,
+                  "column": 7
+                },
+                {
+                  "method": "withCheckpointWorkspace",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 121,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 287,
+                  "column": 7
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+                  "line": 311,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+                  "line": 286,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "p125k-restore2",
+      "caseJoins": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-455678311_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "hooks": [
+        {
+          "id": "-455678311",
+          "kind": "file",
+          "name": "tests/time/checkpointWindow.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ]
+    }
+  ],
+  "allActualFailureRows": [
+    {
+      "phase": "p125k-fresh-canonical",
+      "kind": "test",
+      "name": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+      "errors": [
+        {
+          "message": "expected null not to be null",
+          "actual": "null",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "notStrictEqual",
+          "diff": "",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 283,
+              "column": 30
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 219,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p125k-fresh-canonical",
+      "kind": "test",
+      "name": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+      "errors": [
+        {
+          "message": "expected null not to be null",
+          "actual": "null",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "notStrictEqual",
+          "diff": "",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 283,
+              "column": 30
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 286,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p125k-fresh-canonical",
+      "kind": "test",
+      "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+      "errors": [
+        {
+          "message": "expected null not to be null",
+          "actual": "null",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "notStrictEqual",
+          "diff": "",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 283,
+              "column": 30
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts",
+              "line": 10,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p125k-fresh-canonical",
+      "kind": "test",
+      "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+      "errors": [
+        {
+          "message": "expected null not to be null",
+          "actual": "null",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "notStrictEqual",
+          "diff": "",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected null not to be null\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:283:30)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 283,
+              "column": 30
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaGrant.test.ts",
+              "line": 30,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p125k-m1",
+      "kind": "test",
+      "name": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+      "errors": [
+        {
+          "message": "expected [] to have a length of 1 but got +0",
+          "actual": "0",
+          "expected": "1",
+          "showDiff": true,
+          "diff": "- Expected\n+ Received\n\n- 1\n+ 0",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [] to have a length of 1 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:268:32\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:220:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:219:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 268,
+              "column": 32
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 172,
+              "column": 7
+            },
+            {
+              "method": "withCheckpointWorkspace",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 220,
+              "column": 7
+            },
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 311,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 219,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p125k-m2",
+      "kind": "test",
+      "name": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+      "errors": [
+        {
+          "message": "expected false to be true // Object.is equality",
+          "actual": "false",
+          "expected": "true",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected\n+ Received\n\n- true\n+ false",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected false to be true // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:316:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:172:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:121:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:287:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts:286:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 316,
+              "column": 26
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 172,
+              "column": 7
+            },
+            {
+              "method": "withCheckpointWorkspace",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 287,
+              "column": 7
+            },
+            {
+              "method": "withGrantFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/tsaTestFixture.ts",
+              "line": 311,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+              "line": 286,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "allRawAndObserverErrorsRetained": true
+}

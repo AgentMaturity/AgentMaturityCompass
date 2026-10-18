@@ -1,0 +1,231 @@
+{
+  "schema": "p126-pure-tree-contract-review/1",
+  "at": "2026-10-16T20:28:34.026227+00:00",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headFromRootAdmission": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+    "headIndependentlyRequeried": false,
+    "rfc9162Pin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/rfc9162.ts",
+      "bytes": 6476,
+      "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35",
+      "readScope": "full source"
+    }
+  },
+  "verdict": "The two new pure offline test paths can meaningfully qualify the existing tree/helper component. No concrete static blocker found for that bounded contract; the actual candidate and runtime remain unqualified.",
+  "blockers": [],
+  "allReadsFinishedForDeclaredScope": true,
+  "scope": [
+    "tests/transparency/rfc9162.test.ts",
+    "tests/transparency/legacyAmbiguity.test.ts"
+  ],
+  "separateLicenseAdmission": "The extra tests/transparency/LICENSE.transparency-dev-merkle path has an independent root/sibling scope review; this contract does not materialize it.",
+  "requiredContract": [
+    {
+      "family": "Pinned external values",
+      "requirements": [
+        "Port exact upstream empty-root, leaf/node/root literal vectors and ten happy-path inclusion/consistency vectors. Retain exact commit/path/copyright/licence provenance. Null Go proof arrays mean empty arrays.",
+        "Proof JSON inputs are already hashed leaf/root bytes encoded as base64; leaf-data constants instead exercise leafHash over raw data. Keep the layers distinct."
+      ]
+    },
+    {
+      "family": "Independent finite oracle",
+      "requirements": [
+        "Use node:crypto directly for a naive recursive tree over deterministic distinct binary data; do not call AMC hashing/root helpers to compute expected values.",
+        "Cross-check every size 1..64, every inclusion index and every consistency pair 0<=m<=n, plus the empty root. Verify generated proofs against independently calculated roots. Retain exact external proof paths separately so shared generator/verifier errors cannot make the only oracle pass."
+      ]
+    },
+    {
+      "family": "Negative verification",
+      "requirements": [
+        "Require false for malformed non-lowercase/non-64-hex verification hashes, invalid safe-integer/range inputs, tampered leaf/root/proof hash, a discriminating wrong index, and concrete extra/missing path cases, each after valid positives.",
+        "Use the dedicated size2-to-size3 proof witness from controls.json; never generalize it to all alternate declared sizes. Low-level nodeHash/rootHash are typed helpers, not a newly invented malformed-input throwing API."
+      ]
+    },
+    {
+      "family": "Entry adapter and frontier",
+      "requirements": [
+        "AMC entryLeafHash consumes the raw32 bytes of an entry hash; rootHash consumes already hashed leaves. Do not double-hash either vector family.",
+        "Exercise both legacy and RFC adapters and finite frontier roots/shapes. RFC verification derives sides from index/size and ignores display-only position flags; signed-root authority remains a caller responsibility."
+      ]
+    },
+    {
+      "family": "Legacy preservation",
+      "requirements": [
+        "Show [a,b,c] and [a,b,c,c] share the legacy root but have different RFC roots using deterministic distinct entry hashes.",
+        "Verify existing legacy proofs with existing legacy APIs; no deletion, rewrite or migration of legacy data."
+      ]
+    }
+  ],
+  "rfcSemantics": {
+    "source": "https://www.rfc-editor.org/rfc/rfc9162.html",
+    "sections": [
+      "2.1.1",
+      "2.1.3.1",
+      "2.1.3.2",
+      "2.1.4.1",
+      "2.1.4.2"
+    ],
+    "readViaOfficialWeb": true,
+    "localRawCaptureHashClaim": false,
+    "summary": "Section2.1.1 separates leaves/nodes and defines the empty root and power-of-two split. Inclusion verification uses index/size and requires a completed walk plus root equality. Consistency verification section2.1.4.2 is stated for strictly positive smaller first size, so it does not prescribe the helper zero/equal-size extensions.",
+    "zeroEqualExtension": {
+      "actualSource": "verifyConsistency checks equal sizes first: equal valid-hex roots and an empty proof succeed, including0/0. For0<n it separately requires the canonical empty old root and empty proof.",
+      "strictZeroZeroCanonicalNegative": "Pending contract interpretation only; excluded from the proposed strict tests and not a defect/fix requirement or human hold.",
+      "correction": "An earlier strict0/0 rejection suggestion exceeded the cited verifier algorithm; this report preserves that correction."
+    }
+  },
+  "upstream": {
+    "repository": "https://github.com/transparency-dev/merkle",
+    "commit": "c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+    "selectedFiles": [
+      {
+        "path": "rfc6962/rfc6962_test.go",
+        "bytes": 3368,
+        "sha256": "6237bd8f8131c49832575d4ce03395a62f98a6555080783b7ca5d1fb06a83678",
+        "gitBlobSha": "9d3d7a33d8adcadd40d4b6d40934ef182247ada0",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/consistency/0/happy-path.json",
+        "bytes": 209,
+        "sha256": "5aae6059f25e905b9ba2eb20471d584e50f31ba5dc8a1797547fb38af25d032e",
+        "gitBlobSha": "db1fd04fe048908a00d68fe152d93b4be1d5d271",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/consistency/1/happy-path.json",
+        "bytes": 365,
+        "sha256": "3d94a9f4a5ecd5ec6338beba1a523798a8553553cadb8247ed5d9e3ba9b3cea6",
+        "gitBlobSha": "7092acc2e365aaf3dd0b139789fdbfcc35de923e",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/consistency/2/happy-path.json",
+        "bytes": 365,
+        "sha256": "084d20811521ec2017cb0cf8d4ebe9aa987e7415e559374f51f5647635b12636",
+        "gitBlobSha": "611166e6abbcb0432faad84222d7ea50ec30c835",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/consistency/3/happy-path.json",
+        "bytes": 313,
+        "sha256": "2254557f34595bcbeff662da226507648be8cbf570653f54d053806024d12f8c",
+        "gitBlobSha": "a4092fdc1d0b82c83af3f87684287f6d810bd772",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/consistency/4/happy-path.json",
+        "bytes": 365,
+        "sha256": "e57266a3bff16d997c57a1a30b6f9283cf8dd150d165201016cb4d9774cde020",
+        "gitBlobSha": "963a90eaa1f8aad6cf58fe41df209a35bc66443b",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/inclusion/0/happy-path.json",
+        "bytes": 216,
+        "sha256": "c572c07efd1183529a7139b88d7b9785969067bcc6fa7cac54c9b14ac7f5ef01",
+        "gitBlobSha": "4975d9eebd08ef3417a43a010440203f3b8cbb6c",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/inclusion/1/happy-path.json",
+        "bytes": 372,
+        "sha256": "d345b72a74b4647f68f92e9bcd05c19f7fd3080858bc6ff25979270d9d9b0083",
+        "gitBlobSha": "ac4afcf849394b79ddcf79a3c7d9fa7093426133",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/inclusion/2/happy-path.json",
+        "bytes": 372,
+        "sha256": "4eede9de7ed9989bcc2f53cb8ae770cecf5c56dbfae25e2d38d9e551e7226722",
+        "gitBlobSha": "610e4257fe6b8bb877b7443a1926b0f9b516600e",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/inclusion/3/happy-path.json",
+        "bytes": 268,
+        "sha256": "be604298d4ed651d66dd96dc769fdd6c60f3b04db1080afaff4b10a1070d2e23",
+        "gitBlobSha": "21e93a736305e084bdad7ea375325090fe2f4848",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testdata/inclusion/4/happy-path.json",
+        "bytes": 372,
+        "sha256": "0d5679d8a828eebda5d498ca0187a568c805e4d1be17f373ec5058c99b74a9cc",
+        "gitBlobSha": "4b9009603a0ad25c573f21810ec4bccfe3689413",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "cmd/proofgen/main.go",
+        "bytes": 33874,
+        "sha256": "8a8792670f67a1453970824b4385d22f13c186766f985a1f02efbd3bffa06585",
+        "gitBlobSha": "44f9fdb49f6bd7455fdbc5eba34595fbd98425c2",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "proof/verify_test.go",
+        "bytes": 7410,
+        "sha256": "ee9aafcb201119b92b4e45db4bc048ebc054be428e54f0822047a6c399bcc97a",
+        "gitBlobSha": "fd848aa0fbfb45d4dc3fccf64162037b92ef6e58",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "testonly/constants.go",
+        "bytes": 4201,
+        "sha256": "6faf1957b5727c99593412ca0375f7e1f90ba10d7747dc42624585f948da32a8",
+        "gitBlobSha": "364768643dc584cc4613d681e5082933d840fb4c",
+        "selectedTreeRowMatches": true
+      },
+      {
+        "path": "LICENSE",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "gitBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+        "selectedTreeRowMatches": true
+      }
+    ],
+    "localSha256AndGitBlobCompared": true,
+    "selectedCapturedTreeRowsCompared": true,
+    "signedCommitOrReconstructedTreeClaim": false,
+    "dependencyAdopted": false,
+    "productCopied": false,
+    "publicLogSubmission": false
+  },
+  "graph": {
+    "generatedAt": "2026-09-08T21:14:45.370785+00:00",
+    "revision": "d69d7037c20161ae65c1030efa4e39598c1beb21",
+    "version": "0.9.56",
+    "rfc9162ManifestEntryPresent": false,
+    "authority": "Stale static navigation only. Current direct source is authoritative; no watcher/server or graph refresh executed."
+  },
+  "unchangedRegressionRecommendation": [
+    {
+      "path": "tests/transparencyMerkleIncremental.test.ts",
+      "purpose": "Both frontier algorithms, cache/resume and real persisted root update behavior."
+    },
+    {
+      "path": "tests/transparencyMerkleFailLoud.test.ts",
+      "purpose": "Root publication failure, committed-log lag, marker and repair semantics."
+    },
+    {
+      "path": "tests/sessionAnchorOfflineProof.test.ts",
+      "purpose": "Offline signed-root/session descriptor and bad signature/ledger refusal; deeper than pure tree scope."
+    }
+  ],
+  "callerBoundary": "benchProofs, sessionAnchorVerify and bundledRootTree forward algorithm/index/size from their signed-root contexts. Pure helper tests do not independently verify those signatures, trust keys, migration persistence or complete exported artifacts.",
+  "wholeIssueRemaining": [
+    "New-workspace default and signed1000-entry migration binding both roots, with existing passports/certificates/session anchors.",
+    "C2SP note format/signatures/unknown-key behavior and pinned vector provenance.",
+    "Recorded Rekorv2/SCITT offline receipts, service/profile/library decisions, pinned log trust and required P1-25 trusted-time integration.",
+    "Permanent public entries require the existing written approval boundary; no submission performed or inferred.",
+    "Docs/dependency review/changeset/release/merge/full-suite and all specified global checks remain separate acceptance work. Existing quality RED and held decisions are not waived."
+  ],
+  "prohibitedClaims": [
+    "No actual test/compiler/control result or predicted totals.",
+    "No universal cryptographic collision/secrecy/lifecycle proof.",
+    "No completion of P1-26/P1-25/G1/plan.",
+    "No ownership release or new human hold from missing reservations."
+  ],
+  "execution": "Read source/metadata and compare local hashes/Git blob encodings; primary RFC web read; private report/patch proposals only. No product/test/compiler/native/SQL execution, source/index writes, network fixture/public submission, package changes or Claude contact."
+}

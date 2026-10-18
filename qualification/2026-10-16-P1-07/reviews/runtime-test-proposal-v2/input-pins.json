@@ -1,0 +1,447 @@
+{
+  "schema": "p107-runtime-test-proposal-inputs/2",
+  "at": "2026-10-16T17:57:20.077068+00:00",
+  "state": "PRIVATE_UNEXECUTED_PREFERRED_V2",
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "head": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+    "authorObservedStatus": [
+      "?? tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "?? tests/diagnostic/levelCumulative.test.ts"
+    ],
+    "note": "Two other root-admitted new pure tests are untracked; all selected prior production inputs rehashed exact. This author made no checkout writes."
+  },
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+      "bytes": 140164,
+      "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/review.json",
+      "bytes": 24844,
+      "sha256": "058071197907ec1e2b4897d3ee748764ce7e16e7394e2eaad59050a31be62b51",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/seal.json",
+      "bytes": 2250,
+      "sha256": "462af5a5bbb29031a7475ad23bf535bec8a6345fccd446f60a70d672bd5dcf7e",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-regressions-outcome.json",
+      "bytes": 1032,
+      "sha256": "95c58fc5ca9fc58931b03db8bc71c2f4f628dc733c0fde044e4a4b4e38f1aa89",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/root-pre-admission.json",
+      "bytes": 11039,
+      "sha256": "af7af383d9b9e0d29d66dc4024056736b9d583b51286fb4de7d8c53f1ba262f4",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-gate-reachability-baseline/stdout-stderr.log",
+      "bytes": 821,
+      "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-07.md",
+      "bytes": 16067,
+      "sha256": "59ee0fa85c0bb14c39eb9cecdecfd66df9ec64a44c1f9c0c42764a2e45692236",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "readScope": "actual finite ownership/spec/closed baseline record; no new runtime"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/sessionAnchorableWithTools.test.ts",
+      "bytes": 5838,
+      "sha256": "95a4ed904f83030b281fafaea62c9756c7b76c16b5ccc86f153378e8b4d249a2",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/nativeEvidenceTrustTier.test.ts",
+      "bytes": 6279,
+      "sha256": "bd3dfd1716deb376d536b6ee03a32af92d88f9b8e7e0fb676058e9f646530564",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+      "bytes": 23750,
+      "sha256": "7347f3396a48bcd6e1d5a20cf85f0b42eba5629026b2ea8ae76b88da139ff40f",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/helpers/agentLoopHarness.ts",
+      "bytes": 13071,
+      "sha256": "959a72a75aafc499307b3cdfa0466478dd9a29572edc2b457a1fccfd16d97873",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/helpers/nativeValidationOperator.ts",
+      "bytes": 5003,
+      "sha256": "c66ef0a6bc6b125597a744a5bf6ab5eb3fcc0c3bb321a95bf5b3afb735b3eab0",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionService.ts",
+      "bytes": 36194,
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionSpine.ts",
+      "bytes": 14439,
+      "sha256": "a5bf435606892bb27645b0c7629bf20b0dc6207fdbbfc14e226cbcb854989641",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionApiTypes.ts",
+      "bytes": 9452,
+      "sha256": "cf2a35849a23a0088743ebceb4f32a312c421b485e1e4e6106752852969f47f1",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionTypes.ts",
+      "bytes": 12503,
+      "sha256": "9dafd965d894cee2cd7eb886c24ff867f09e09814915a48ae615002bab5ef9b7",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/persistence/openSessionEventStore.ts",
+      "bytes": 4197,
+      "sha256": "6acc86f7b20c0fd13ec20600bb8aba44c3ffaf0b5fdee22abf41327d061a8970",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/persistence/sqliteSessionEventStore.ts",
+      "bytes": 5575,
+      "sha256": "a7670667f4ddf2db4fc82b3328139eb160048882e077b0412675126fd76257d4",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32571,
+      "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/toolhub/toolsSchema.ts",
+      "bytes": 8719,
+      "sha256": "20b0bb72942c67d7ca36a9070edc30cba11eab0693ddf6077e6ed98bea63bc05",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/liveEvidenceProjection.ts",
+      "bytes": 8812,
+      "sha256": "e0acf7be8b03ac8ad9abb59c94b0e9c5b2fdd957c153f7a72454cb7a24b675fd",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/sessionRootDescriptor.ts",
+      "bytes": 12624,
+      "sha256": "48948efe102bc19925469ccc331fdfcc29900cc88fc69a93fb91069f00c3906d",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/sandboxRunner.ts",
+      "bytes": 4585,
+      "sha256": "f8c37fe487e069d9b1e1a0a89aa1687625fbd7f7e65dc66a3f80f1b6dbc0b5c0",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/nativeShellGate.ts",
+      "bytes": 6328,
+      "sha256": "27f4c9a6d3776bd0214b167783a229ab2c5a5a2e7058cf0090c1016050e8b2d4",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/processConfinement.ts",
+      "bytes": 9879,
+      "sha256": "915ccf9186133168f16780d643f4c449a0564199de4c9c162a6c7262a72a91e4",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/seatbeltBackend.ts",
+      "bytes": 6442,
+      "sha256": "4283c4371a09f82e87627b2ccfa6c043260f231b33c03d0dcdc8d751aa39ecb6",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+      "bytes": 14615,
+      "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/sandbox/seatbeltNativeShell.ts",
+      "bytes": 12224,
+      "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/time.ts",
+      "bytes": 759,
+      "sha256": "620fc738ab7832545965978942eb5e067ad69c9d25cd4b1e76c27c4d6a67c009",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/runtime/firewall.ts",
+      "bytes": 60642,
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "readScope": "full small helper/source where read or exact relevant API/lifecycle spans; full-byte pin"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-path-admission.json",
+      "bytes": 10909,
+      "sha256": "b6b7a6e5fd2f278493bddae92cc47b48fd430b210c429e15d580c74db4430bfd",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/design.json",
+      "bytes": 12132,
+      "sha256": "fbf1d251754358cdc111a4b6f7b1ce6bed5dbc896b265f668fbfca12e6e949f7",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/README.md",
+      "bytes": 2969,
+      "sha256": "4ff393b3975b7b31d309934a0861b32ef7256e34abd28d958f501c297079ba68",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/seal.json",
+      "bytes": 1137,
+      "sha256": "7addebfc0c1a4b316d0d0285433b733a152e8c6aea9f21258e88e6204d873dfa",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/pins.json",
+      "bytes": 15540,
+      "sha256": "9a5e6c173c9b9a4f011e156de09162b666e9bbbe93900cf8068a4d8b7b9e55f9",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/packed-install-check.mjs",
+      "bytes": 9562,
+      "sha256": "d83ede99025cacf1c84b061be9f236022d67cf929afab8e28d6824fe7e5ce318",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/installPersonaIsolation.test.ts",
+      "bytes": 8500,
+      "sha256": "898b396d41ee4de4d10a150ecf3b20d1c4ad3b74bd666f6853f7c970ae2221d4",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/toolSeam.ts",
+      "bytes": 5145,
+      "sha256": "0b4e2945a09a6581252eb7148aa8f89e6a06bb27b6f493412c0320b47f907798",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/pipelineToolSeam.ts",
+      "bytes": 7602,
+      "sha256": "09f27e8be247e024ff1e9a0856b8fc26e5fd11fb93829751a32964237f5d74ba",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/persistence/sessionEventStore.ts",
+      "bytes": 7901,
+      "sha256": "e7161a3cd76190e3f7e2a6a52666189d4e02c6145fd49d5e344fcf442ee49792",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/evidenceEmitter.ts",
+      "bytes": 24443,
+      "sha256": "fc6885586da01b60ce062dedce3d6fde872fd87ae2919ae08e92d280d4190b41",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/builtin/fsTools.ts",
+      "bytes": 9098,
+      "sha256": "66cece4b743e715dfcc6b296f17713caec027991348961b9b6777b0cc78d4771",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/sessionAnchorSchema.ts",
+      "bytes": 5740,
+      "sha256": "2215ce787faf281a96fc186820c90f044ba6c271bbcfa19873dca2c41ed54c23",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "full-byte pin; full small metadata/helper or exact public API, lifecycle, shape and environment spans read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 27005,
+      "sha256": "27fd19d0ad963d7221dd2c4c08b105d2b430abb3a49da22f07bdb2610910e9c9",
+      "readScope": "preserved V1 proposal or full independent missing-seal review read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/README.md",
+      "bytes": 5274,
+      "sha256": "7e3ffb7d1616752aeb50186a3b9ef2bdad572929eeb42dfe117e22698c061c74",
+      "readScope": "preserved V1 proposal or full independent missing-seal review read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/input-pins.json",
+      "bytes": 23889,
+      "sha256": "1809f742041a6cb720e911eb043f99ff580f65bda8a46b926a840d2e9b77f56b",
+      "readScope": "preserved V1 proposal or full independent missing-seal review read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/seal.json",
+      "bytes": 1162,
+      "sha256": "6716e4689bb10df9a6f5fb5e3ea9399d47046aadd4151a805ffbc45757378b3c",
+      "readScope": "preserved V1 proposal or full independent missing-seal review read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review/review.json",
+      "bytes": 6038,
+      "sha256": "7a7ee852ecae960f96ed48a7b2d39e6cb597f2eb023b3276f356c528687895d7",
+      "readScope": "preserved V1 proposal or full independent missing-seal review read"
+    }
+  ],
+  "allInputHashesVerified": true,
+  "allReadsFinished": true,
+  "candidateReadBoundary": "V1 full static read, then exact V1-to-V2 delta and affected context fully read; all remaining test bytes unchanged. Relevant source endTurn/sealTurn/close contracts read directly. No parser/compiler/runtime.",
+  "blockers": []
+}

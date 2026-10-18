@@ -1,0 +1,214 @@
+{
+  "schema": "p135-actual-current-certificate-independent-review/1",
+  "at": "2026-10-16T17:17:45.894279+00:00",
+  "runtimeExecutedHere": false,
+  "productRerunHere": false,
+  "boundedOutcome": "RED: ordinary current certificate verification refuses the unchanged genuine old certificate before and after relabel; other seven invariants pass.",
+  "actualPhase": {
+    "phase": "p135-current-certificate-v2",
+    "exit": 1,
+    "durationMs": 2031,
+    "ownedPgid": 94417,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "runnerCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "runnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "sourceAuthority": "Current pinned S source/dist in V2 manifest; runner R HEAD is not source authority."
+  },
+  "deepPrivateResult": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Ky5icg/result.json",
+    "bytes": 2459946,
+    "sha256": "c321882219542ce6a637f44e31148589830483f05a0adc3b215868e826b0a17c"
+  },
+  "wholeOriginalCertificate": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/actual.amccert",
+    "bytes": 1996064,
+    "sha256": "8d1ec6ad5e4048ef0aec7bb0c15df6644f2f0b1b1defb257f7afbed925701384"
+  },
+  "currentBeforeAfter": {
+    "ok": false,
+    "verifierExit": 1,
+    "integrity": "fail",
+    "issuerAdmission": "pass",
+    "anchoring": "anchored",
+    "errors": 711,
+    "uniqueErrors": 711,
+    "onlyMissingBlobErrors": true,
+    "orderedErrorListsEqual": true,
+    "canonicalVerdictHash": "8f248f26f8397b174ced84bb66a0a3008ef1f32713329748b68c39a8792e5c07",
+    "onlyExcludedField": "verifiedAt",
+    "bothFullReportsRetainedPrivately": true,
+    "fullSectionPins": {
+      "before": {
+        "actual": {
+          "canonicalJsonBytes": 128313,
+          "canonicalSha256": "b409889cf64d8d3c827d87fc50192e614bd124385eba832fffee39cbdd664a97"
+        },
+        "classification": {
+          "canonicalJsonBytes": 193,
+          "canonicalSha256": "31fb6b37c93b7eef6619b1af82a0fe1522dd0891d5effd1a8fe12c8095614d66"
+        },
+        "envelope": {
+          "canonicalJsonBytes": 476,
+          "canonicalSha256": "cb53e3d0452e137e727f07d48960df8f4a415e1c4bb4976fc11c023733eb86bc"
+        },
+        "capturedRun": {
+          "canonicalJsonBytes": 836033,
+          "canonicalSha256": "a3154fc8f47d95558ad74fc81c1c2631cef652360d4e26320345115eda97bf35"
+        },
+        "canonicalVerdict": {
+          "canonicalJsonBytes": 64913,
+          "canonicalSha256": "8f248f26f8397b174ced84bb66a0a3008ef1f32713329748b68c39a8792e5c07"
+        }
+      },
+      "after": {
+        "actual": {
+          "canonicalJsonBytes": 128313,
+          "canonicalSha256": "89795db3c69f35fa98963c6296b240eab91bf79dcc4786651330a96980756464"
+        },
+        "classification": {
+          "canonicalJsonBytes": 193,
+          "canonicalSha256": "31fb6b37c93b7eef6619b1af82a0fe1522dd0891d5effd1a8fe12c8095614d66"
+        },
+        "envelope": {
+          "canonicalJsonBytes": 476,
+          "canonicalSha256": "cb53e3d0452e137e727f07d48960df8f4a415e1c4bb4976fc11c023733eb86bc"
+        },
+        "capturedRun": {
+          "canonicalJsonBytes": 836033,
+          "canonicalSha256": "a3154fc8f47d95558ad74fc81c1c2631cef652360d4e26320345115eda97bf35"
+        },
+        "canonicalVerdict": {
+          "canonicalJsonBytes": 64913,
+          "canonicalSha256": "8f248f26f8397b174ced84bb66a0a3008ef1f32713329748b68c39a8792e5c07"
+        }
+      }
+    }
+  },
+  "independentEmbeddedDatabaseRead": {
+    "mode": "Python 3.14 sqlite3 deserialize into :memory:, PRAGMA query_only=ON; no original DB opened and no DB extracted to disk.",
+    "sqliteVersion": "3.53.4",
+    "sqliteBytes": 6127616,
+    "sqliteSha256": "65f6ec89c14ab5719f0a6190c4f4e378312d4547690ae8dd6d16ac0344481ee4",
+    "events": 3275,
+    "sessions": 7,
+    "inlineEvents": 2564,
+    "nonInlineUnprunedPathEvents": 711,
+    "uniqueReferencedIds": 711,
+    "uniqueReferencedPaths": 711,
+    "allReferencePathsBeginAgents": true,
+    "archiveAgentsTreeEntries": 0,
+    "archiveBlobFiles": 0,
+    "prunedRows": 0,
+    "archivedRows": 0,
+    "observedErrorIdsExactlyEqualReferencedIdsInRowidOrder": true,
+    "extraOrMissingIds": [],
+    "orderedIdsCanonicalSha256": "3adcb4adce2262c814b6e235f7cc7e9a32184b954f35090d196f57acb26bf5d1",
+    "orderedReferenceRowsCanonicalSha256": "7f87e65518e00545e8f2df5781e83dad953f87345b7ed9da2970748c4c38f15d",
+    "orderedErrorsCanonicalSha256": "d042ba846e34c1132e74f3bb08e4abd7e6d965bf25203ed47875d1ba1bb89f0c"
+  },
+  "preservation": {
+    "wholeCertificateAndEmbeddedRunAndSqlite": true,
+    "all40RawArchiveMemberPins": true,
+    "exact20LogicalProductMemberPins": true,
+    "knownAppleDoubleMembers": 20,
+    "newOwnedSqliteBeforeAfter": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Ky5icg/workspace/.amc/evidence.sqlite",
+      "bytes": 446464,
+      "sha256": "2f7d55c7bb6cf9400231bef5266a07a10cff34929379674f260f4aa0b9eaf26b"
+    },
+    "oldVaultOrPrivateKeyReadsHere": false,
+    "oldBlobFilesReadOrCopiedHere": false,
+    "productSourceOrPolicyChangedHere": false
+  },
+  "legacyReadout": {
+    "rule": "R5-no-claim-envelope",
+    "claimKind": "self_reported",
+    "legacy": true,
+    "levelCap": "L1",
+    "eligibleLevel": 1,
+    "originalLevel": "L3.92",
+    "originalLabel": "HIGH TRUST",
+    "originalMethodologyVersion": "1.1.1",
+    "originalLayerMean": 3.9230000000000005,
+    "exactL3": false,
+    "notAFullFixtureOrPlanAcceptance": true
+  },
+  "migration": {
+    "records": 1,
+    "kind": "trust_certificate",
+    "logHead": "0ee74b5c07f5278efe4f506163cd91babd43754219593858e5089ad863224289",
+    "receiptAttestation": {
+      "lines": 1,
+      "head": "0ee74b5c07f5278efe4f506163cd91babd43754219593858e5089ad863224289"
+    },
+    "integrity": "integrityFailed",
+    "trusted": false,
+    "originalsDigest": "fa84a907fa21a25abc555d1ab58f9761fefe9c7fd406c01cc838f78784fd9ae4",
+    "signedReceipt": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Ky5icg/workspace/.amc/migrations/receipts/20261016T171156247Z.json",
+      "bytes": 874,
+      "sha256": "57136e0da8edf4c631313e4382ba9e15b88a5863f8d2033e0ba35874aa982f42"
+    },
+    "signatureFile": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Ky5icg/workspace/.amc/migrations/receipts/20261016T171156247Z.json.sig",
+      "bytes": 782,
+      "sha256": "4be8d16b21d645b0440b48a7f4dadf1d0fa74526c2b7055e029f0effbe2da32a"
+    },
+    "log": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Ky5icg/workspace/.amc/migrations/relabel.jsonl",
+      "bytes": 63997,
+      "sha256": "57d5dd734120275c4b2f4faf296a1917cd9e124f90a6bd3935bc18d2c4cc7cca"
+    },
+    "actualProductVerifyRelabelLogPassed": true,
+    "actualProductAttestedLogHeadPassed": true,
+    "independentReceiptDigestAndPublicEnvelopeBindingPassed": true,
+    "independentLogChainAndReceiptHeadBindingPassed": true,
+    "independentCryptoSignatureOperationExecutedHere": false,
+    "signatureBoundary": "Cryptographic acceptance is the retained ordinary product verifier result, not a newly executed independent cryptographic check."
+  },
+  "actualChecks": {
+    "currentCertificateVerifiedBeforeAndAfter": false,
+    "ownLedgerVerified": true,
+    "wholeCertificateAndEmbeddedRunAndSqliteUnchanged": true,
+    "ownedCurrentSqliteUnchanged": true,
+    "canonicalVerdictUnchangedExceptVerifiedAt": true,
+    "signedReceiptAndLogVerified": true,
+    "exactCertificateRow": true,
+    "beforeAndAfterLegacyLabel": true
+  },
+  "preservedV1": {
+    "setupOnly": true,
+    "exit": 1,
+    "durationMs": 568,
+    "noInitOrVerifierOrRelabelCredit": true,
+    "deepFailure": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/retained-Xcgp7s/result.json",
+      "bytes": 3291,
+      "sha256": "ffcc5af05cf0cf3bacbafe714fa44582f7b3e16dadd8b4da4c9832de933c86c2"
+    },
+    "seal": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-qualification-proposal/seal.json",
+      "bytes": 1354,
+      "sha256": "8a8c936ab306ed58dc3b5504138b4a0643908f49786f9e448cda298c50716265"
+    }
+  },
+  "acceptanceGaps": [
+    "Exact L3 not produced: genuine old layer mean is 3.923 and stored original label is L3.92.",
+    "Whole genuine default-policy certificate remains oversized and private; committed genuine-certificate corpus coverage stays open.",
+    "Current certificate integrity refuses 711 absent payloads; no missing bytes, seals, ledger verdicts, or policy were invented."
+  ],
+  "preparationHistory": [
+    "One source-cwd Python interpreter lacked sqlite3.Connection.deserialize and stopped before any database query; corrected by selecting the observed Homebrew Python 3.14 interpreter for in-memory read-only comparison."
+  ],
+  "metadataSizePolicy": {
+    "maximumBytesPerFile": 1048576,
+    "deepResultCopied": false,
+    "oversizedCertificateCopied": false,
+    "chunkingOrRepackingOrResigning": false
+  },
+  "blockers": [
+    "Ordinary current certificate verification remains RED because its archive omits 711 referenced payload files."
+  ],
+  "scope": "No new product/helper/runtime execution, source/index/QA writes, network requests or process probes. Only static reads, hashes, in-memory archive and explicitly authorized in-memory read-only SQLite queries, and new private audit files."
+}

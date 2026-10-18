@@ -1,0 +1,244 @@
+{
+  "issue": "P0-20",
+  "kind": "Superseded wrapper-field candidate observer; not product acceptance",
+  "recordedUtc": "2026-10-14T20:11:32.009118+00:00",
+  "sourceHeadDuringCandidateRun": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "actualCandidateCounts": {
+    "numTotalTests": 23,
+    "numPassedTests": 23,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "caseBasis": "Original21 signing cases plus two genuine wrapper field/core controls. They were authored and executed under the earlier explicit root assignment/build-ready notice.",
+  "phase": {
+    "name": "signing-wrapper-expanded",
+    "cmd": "pnpm exec vitest run tests/industryPackAuditSigningQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signing-wrapper-expanded-20261015.json",
+    "exit": 0,
+    "durationMs": 3786,
+    "startedUtc": "2026-10-14T20:09:18.472518+00:00",
+    "log": "/private/tmp/p0-20-signing-wrapper-expanded-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  "raw": {
+    "path": "/private/tmp/p0-20-signing-wrapper-expanded-20261015.json",
+    "bytes": 10008,
+    "sha256": "72b9b42ca92bfcf0c3dc5b3603f64c672d65e9bbdf68858bd9e48244b2a78ea7"
+  },
+  "rawLog": {
+    "path": "/private/tmp/p0-20-signing-wrapper-expanded-20261015.log",
+    "bytes": 81,
+    "sha256": "246781862d68a8b96de5a6e3cb223c32223dbadf65ad653ce6c054ef866468de"
+  },
+  "expandedCandidateSource": {
+    "path": "/private/tmp/p0-20-signing-wrapper-expanded-candidate-20261015.ts",
+    "bytes": 16406,
+    "sha256": "a5d3dc343d5e5a001e0ba13e941c89a79b849337d7452c374846c783507daedf"
+  },
+  "publicEvidence": [
+    {
+      "directory": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO",
+      "files": [
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/attacker-admitted-control.audit.json",
+          "bytes": 40599,
+          "sha256": "e1729689cd2602f7d7a849614b2d0f6013762840e56a7e302b4f8568ccae28f5"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/attacker-allow-unanchored.audit.json",
+          "bytes": 40599,
+          "sha256": "e1729689cd2602f7d7a849614b2d0f6013762840e56a7e302b4f8568ccae28f5"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/attacker-allow-unpinned.audit.json",
+          "bytes": 40599,
+          "sha256": "e1729689cd2602f7d7a849614b2d0f6013762840e56a7e302b4f8568ccae28f5"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/attacker-both-allows.audit.json",
+          "bytes": 40599,
+          "sha256": "e1729689cd2602f7d7a849614b2d0f6013762840e56a7e302b4f8568ccae28f5"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/attacker-strict.audit.json",
+          "bytes": 40599,
+          "sha256": "e1729689cd2602f7d7a849614b2d0f6013762840e56a7e302b4f8568ccae28f5"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/claim-cap-3.audit.json",
+          "bytes": 40599,
+          "sha256": "8d36b6b7ac5dd9394f9358565e4dd199d7cb5dce326dcbf450f45296df54e2df"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/claim-cap-5.audit.json",
+          "bytes": 21321,
+          "sha256": "8eb9449cd0fccce7c3534b7038fc3ebc0dc28000999e9bfa746c56718e8c7eb6"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/foreign-admitted-control.audit.json",
+          "bytes": 40599,
+          "sha256": "3df556b593f40e7d4c6fae0ee8fac1e556a45d10f0d9038daf53853c40190332"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/foreign-allow-unanchored.audit.json",
+          "bytes": 40599,
+          "sha256": "3df556b593f40e7d4c6fae0ee8fac1e556a45d10f0d9038daf53853c40190332"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/foreign-allow-unpinned.audit.json",
+          "bytes": 40599,
+          "sha256": "3df556b593f40e7d4c6fae0ee8fac1e556a45d10f0d9038daf53853c40190332"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/foreign-both-allows.audit.json",
+          "bytes": 40599,
+          "sha256": "3df556b593f40e7d4c6fae0ee8fac1e556a45d10f0d9038daf53853c40190332"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/foreign-strict.audit.json",
+          "bytes": 40599,
+          "sha256": "3df556b593f40e7d4c6fae0ee8fac1e556a45d10f0d9038daf53853c40190332"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/locator-false.audit.json",
+          "bytes": 40599,
+          "sha256": "0e205acb6abef669317b0d3ddbf4e240c57695c778bcd21d14cc9a2723f58ce6"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/locator-true.audit.json",
+          "bytes": 40599,
+          "sha256": "0e205acb6abef669317b0d3ddbf4e240c57695c778bcd21d14cc9a2723f58ce6"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/pins-before-signing.json",
+          "bytes": 2921,
+          "sha256": "cb01b729be95bc3e8e15ce7d2f3d50e3ad8d7dda642090d8985f33637fa5a753"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/signed-after-pins.json",
+          "bytes": 127100,
+          "sha256": "64332d40867e4e4a37ea1a8b8ca86dc9feefa5f107c7ccf92a00ba1b7229ddcb"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/synthetic-refused.audit.json",
+          "bytes": 39617,
+          "sha256": "62f1936187523ba694a0dae4cd6b635bd5d313899f73b645ca0a885f32e628d6"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/tamper-rechecksum.audit.json",
+          "bytes": 40595,
+          "sha256": "dad816beb8dbf240bcb50f352a5667a971deb89aa4a23135a5945263536b1922"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/unsigned-allow-unanchored.audit.json",
+          "bytes": 39691,
+          "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/unsigned-allow-unpinned.audit.json",
+          "bytes": 39691,
+          "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/unsigned-both-allows.audit.json",
+          "bytes": 39691,
+          "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/unsigned-strict.audit.json",
+          "bytes": 39691,
+          "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/untouched.audit.json",
+          "bytes": 40599,
+          "sha256": "0e205acb6abef669317b0d3ddbf4e240c57695c778bcd21d14cc9a2723f58ce6"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/verification-observations.json",
+          "bytes": 57168,
+          "sha256": "2dd43d764ac632bacb72401cdd689157c33831438f8ce7efd6ce9822ffbb3371"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/wrapper-foreign.json",
+          "bytes": 44952,
+          "sha256": "43a78705389c577703f9befafe31da5e8be5d847b1dd6db96172106865dc7fb1"
+        },
+        {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-HRIsUO/wrapper-trusted.json",
+          "bytes": 44509,
+          "sha256": "d12c5e127958696686a0ca35885a231a2cec0165de6bd737aa550009ea6577b6"
+        }
+      ],
+      "sourceInputs": [
+        {
+          "path": "src/domains/industryPackAudit.ts",
+          "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+        },
+        {
+          "path": "src/audit/binderSigner.ts",
+          "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d"
+        },
+        {
+          "path": "src/org/orgSigner.ts",
+          "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf"
+        },
+        {
+          "path": "src/trust/admission.ts",
+          "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+        },
+        {
+          "path": "src/trust/signatureCheck.ts",
+          "sha256": "460aea518cdf88b219e75696e0e5244008f4739b5cbeaea42a370a2062d2a3b6"
+        },
+        {
+          "path": "tests/helpers/trustContext.ts",
+          "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+        },
+        {
+          "path": "src/audit/auditCli.ts",
+          "sha256": "4e646870a7f58245e9e517c130571e66b09ad0c89f693c1fb75be8a11b91c1a5"
+        },
+        {
+          "path": "src/cli/claimOutput.ts",
+          "sha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686"
+        },
+        {
+          "path": "tests/industryPackAudit.test.ts",
+          "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6"
+        },
+        {
+          "path": "tests/industryPackAuditSigningQualification.test.ts",
+          "sha256": "a5d3dc343d5e5a001e0ba13e941c89a79b849337d7452c374846c783507daedf"
+        }
+      ]
+    }
+  ],
+  "reasonReverted": "Independent review found auditCli-only withClaimFields records a label for the strict hook without causing actual text stdout to print a canonical Claim line. Helper-field GREEN does not qualify product output; earlier12 compiled CLI statuses were also insufficient without actual text assertions. Root owns that evidence and corrected source disposition.",
+  "disposition": "Expanded candidate retained privately; only owned live new test restored byte-exact to original21 at root instruction. No production/shared CLI source change by this agent.",
+  "liveOwnedTestAfterRestoration": {
+    "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/tests/industryPackAuditSigningQualification.test.ts",
+    "bytes": 14300,
+    "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7"
+  },
+  "original21Source": {
+    "path": "/private/tmp/p0-20-signing-original-21-test-20261015.ts",
+    "bytes": 14300,
+    "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7"
+  },
+  "original21Raw": {
+    "path": "/private/tmp/p0-20-signing-first-20261015.json",
+    "bytes": 9108,
+    "sha256": "a3e92cc0b7ce53530c01a6cf1a6b7bc9119ec207faa3c3acd36b9ae59a277b13"
+  },
+  "original21Receipt": {
+    "path": "/private/tmp/p0-20-signing-qualification-20261015.json",
+    "bytes": 28643,
+    "sha256": "9959d38414eac38abd90e6392adcac72954cbc83ed61b310efe8d14aa0c4a9b8"
+  },
+  "original21StillQualifiedAtItsRecordedScope": true,
+  "proposedBoundary": "Root proposes the existing shared CLI finishVerify claim mechanism in one line. The shared-path narrow user transfer question is pending; no approval, reservation clearance, freeze bypass or actual repair acceptance is inferred here.",
+  "runtime": "No new runtime after the boundary correction. Root normal build is active; this agent remains idle.",
+  "preservation": "Original21 raw/receipt remain unchanged. Private candidate/control evidence is retained separately and not transferred as final acceptance. Only this agent-owned new test was restored."
+}

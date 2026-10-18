@@ -1,0 +1,14 @@
+{
+  "startedUtc": "2026-10-17T01:04:54.036589+00:00",
+  "endedUtc": "2026-10-17T01:04:54.484650+00:00",
+  "argv": [
+    "python3",
+    "/private/tmp/p1-25-cadence-qualification-20261017/bind-fresh.py"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass",
+  "exit": 0,
+  "stdout": "{\"commit\": \"80268079f804ed0ecb7659cd02a75e8b88ee3e0d\", \"freshRoot\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout\", \"selectedPathsEachRoot\": 98, \"compiledPairs\": 21, \"activeProtectedPins\": 161, \"nativePins\": 12, \"freshNative\": {\"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node\", \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node\", \"bytes\": 1931552, \"sha256\": \"1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560\", \"dev\": 16777231, \"inode\": 543893277, \"nlink\": 1}}\n",
+  "stderr": "",
+  "directBecauseBinderRefusesActiveWrapperMarkers": true,
+  "noProductTestCredit": true
+}

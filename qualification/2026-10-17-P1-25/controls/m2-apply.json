@@ -1,0 +1,16 @@
+{
+  "schema": "p125-owned-source-control-operation/1",
+  "at": "2026-10-16T18:59:33.855090+00:00",
+  "operation": "apply",
+  "number": 2,
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "target": "src/time/verifyTimestamp.ts",
+  "actualBytes": 16393,
+  "actualSha256": "0b08cac16b8d1f4f2f70e54947607fff244422077037608ad2e493c83177fcce",
+  "all44BoundInputsExactExceptOwnedTarget": true,
+  "allThreeNativePinsExact": true,
+  "sourceAndBorrowedCheckoutUnmodified": true,
+  "compiledOutputMutation": false,
+  "forceResetNoVerifyBaselineOrWaiver": false
+}

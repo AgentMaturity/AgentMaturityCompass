@@ -1,0 +1,81 @@
+{
+  "schema": "p1-19-private-oracle-source-v2/1",
+  "capturedUtc": "2026-10-15T22:43:39.828990+00:00",
+  "state": "closed-unexecuted",
+  "allReadsFinished": true,
+  "allSourceWritesFinished": true,
+  "formalAcceptanceClosed": false,
+  "repositoryWrites": false,
+  "runtimeExecuted": false,
+  "files": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/interface-addendum.json",
+      "bytes": 2005,
+      "sha256": "937865aa4653c63da62a43f875cc7692efab111e411dad5c7bbe2aa79d6281c3"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/v1-to-v2.patch",
+      "bytes": 8706,
+      "sha256": "4d9fe2a40b633607d0f577e8b2e40408bc4d03b157bc3743029da1df458a6f7e"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/README.md",
+      "bytes": 4143,
+      "sha256": "ab176ba89f174f87c573350c7c5acad1bdd2930c070b9bab8b5be606ff9d15f8"
+    }
+  ],
+  "preservedV1": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/pins.json",
+      "bytes": 2678,
+      "sha256": "84fa955db720f7c25bd0673a0d212afff7eb0bd559bdf2008214ad0bc403ddad"
+    }
+  ],
+  "defaultRuleSource": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+    "bytes": 12366,
+    "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+  },
+  "sourceFrames": [
+    "src/approvals/approvalPolicyEngine.ts:86-91",
+    "src/approvals/approvalChainStore.ts:248-255"
+  ],
+  "manifestAdditions": [
+    "approvalPolicySha256",
+    "financialRule"
+  ],
+  "semanticCorrections": [
+    "Independent default financial policy pin and exact request strength",
+    "Unique exact bodyFields key/cardinality",
+    "Exact supported expected dimensions and matching outcome pair"
+  ],
+  "checksNotRun": [
+    "syntax",
+    "types",
+    "imports",
+    "tests",
+    "CLI",
+    "SQL",
+    "service"
+  ]
+}

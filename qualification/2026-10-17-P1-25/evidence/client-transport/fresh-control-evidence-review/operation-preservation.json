@@ -1,0 +1,243 @@
+{
+  "schema": "p125c-control-operation-preservation-review/1",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "operators": [
+    {
+      "operator": "C1-certReq-false",
+      "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+      "originalBytes": 10927,
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "proposedBytes": 10927,
+      "proposedSha256": "07c5a901c577f845982b44e94059e396f057a6f94e8a66a43b3f407ff27abe42",
+      "actualLivePatch": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m1.patch",
+        "bytes": 585,
+        "sha256": "9de8690cd4e1db1961bcfc55bb71b72850f1b98335c994d5f5e565be5611607e",
+        "readScope": "actual live source mutation patch"
+      },
+      "oneExactTextReplacement": true,
+      "manualClassificationBeforeExplicitRestore": true,
+      "classification": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m1-classification.json",
+        "bytes": 2876,
+        "sha256": "c81a40c4f91308dec648688c1a2e04a756fc6f73538ceaf98dbce4f0ba234ad0",
+        "readScope": "full finite evidence bytes and relevant fields read"
+      },
+      "restoredByteExact": true,
+      "targetInodeBeforeAndAfterEachWrite": 543459613,
+      "targetRegularSingleLink": true,
+      "noCompiledNativeMutationOrAutoRestore": true
+    },
+    {
+      "operator": "C2-ignore-response-MIME",
+      "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+      "originalBytes": 10927,
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "proposedBytes": 10908,
+      "proposedSha256": "21321afdac587df4fd834909c5c0f44e4d32d79b11fe77369afa59fb2bc54baa",
+      "actualLivePatch": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m2.patch",
+        "bytes": 817,
+        "sha256": "46e301a93b2032f906cf1e165f45151ffa4c24f4d242d5b9541c6611d801b21d",
+        "readScope": "actual live source mutation patch"
+      },
+      "oneExactTextReplacement": true,
+      "manualClassificationBeforeExplicitRestore": true,
+      "classification": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m2-classification.json",
+        "bytes": 2056,
+        "sha256": "e561c3e268c7f89f441ad19ae3134af1324a7083234776ec4303018fde303453",
+        "readScope": "full finite evidence bytes and relevant fields read"
+      },
+      "restoredByteExact": true,
+      "targetInodeBeforeAndAfterEachWrite": 543459613,
+      "targetRegularSingleLink": true,
+      "noCompiledNativeMutationOrAutoRestore": true
+    }
+  ],
+  "currentSelectedSourceFreshRegularDistinctPins": 142,
+  "compiledPairs": 8,
+  "protectedInputsExact": 121,
+  "nativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543125595,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543200130,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543305423,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543396326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543499352,
+      "nlink": 1
+    }
+  ],
+  "allPhysicalNativeIdsDistinct": true,
+  "SAndQClean": true,
+  "heldR18RowsHeadIndexExact": true,
+  "gitReadOnlyObservations": [
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "5beb3eae69b08f2e895520c7f459e1465780beeb\n",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "5beb3eae69b08f2e895520c7f459e1465780beeb\n",
+      "stderr": ""
+    },
+    {
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d\n",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "boundary": "Current and retained finite snapshots. No continuous or universal isolation claim; no old state reconstructed from current files alone."
+}

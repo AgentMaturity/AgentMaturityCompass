@@ -1,0 +1,323 @@
+{
+  "schema": "p125p-independent-one-test-source-scope-preparation/1",
+  "at": "2026-10-17T01:48:55.462765+00:00",
+  "blockers": [],
+  "futureWriteScopeOnly": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+  "readOnlyConsumedPaths": [
+    "src/ledger/ledger.ts",
+    "src/ledger/eventHash.ts",
+    "src/ledger/ledgerVerification.ts",
+    "src/ledger/sessionVerification.ts",
+    "src/time/checkpoint.ts",
+    "src/time/timeEvidence.ts",
+    "tests/time/tsaTestFixture.ts",
+    "tests/time/tsaGrant.test.ts",
+    "dist/ledger/ledger.js",
+    "dist/ledger/eventHash.js",
+    "dist/ledger/ledgerVerification.js",
+    "dist/ledger/sessionVerification.js"
+  ],
+  "snapshot": {
+    "sourceHead": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+    "branch": "codex/p1-25-producer-qualification",
+    "sourceCleanIndexEmpty": true,
+    "ownedOldTest": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    },
+    "privateCandidate": {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+      "bytes": 61752,
+      "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+      "dev": 16777231,
+      "inode": 543909995,
+      "nlink": 1
+    }
+  },
+  "inventory": {
+    "registries": 3,
+    "registeredLogicalRoots": 170,
+    "physicalRoots": 187,
+    "priorRootAndAuthoritySetsRetained": true,
+    "historyAuthorities": 20,
+    "pathPresenceChecks": 2431,
+    "all187ThirteenPathStatusesEmpty": true,
+    "naturallyClosedReadOnlyGitCommands": 595,
+    "allGitExitsZero": true
+  },
+  "target": {
+    "presentRoots": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "head": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+        "pin": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543658576,
+          "nlink": 1,
+          "bytes": 48568,
+          "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7"
+        }
+      },
+      {
+        "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout",
+        "head": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+        "pin": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543768695,
+          "nlink": 1,
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7"
+        }
+      },
+      {
+        "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout",
+        "head": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+        "pin": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543685409,
+          "nlink": 1,
+          "bytes": 22649,
+          "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+        }
+      },
+      {
+        "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+        "head": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+        "pin": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543855658,
+          "nlink": 1,
+          "bytes": 48568,
+          "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7"
+        }
+      }
+    ],
+    "distinctVersions": 3,
+    "allTargetHistoriesPrivate": true,
+    "uniqueHistoricalTargetCommits": [
+      "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+      "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+      "f11a15ae06a318e0ce9a4c778269b2020af4eb7c"
+    ],
+    "oldFourBodiesPreservedInCandidate": [
+      {
+        "title": "completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+        "bytes": 5344,
+        "sha256": "2c88db9a07b39807848ba170a1152f4d19a487caeea3b655128c8b57d0c94714",
+        "occursExactlyOnceInCandidate": true
+      },
+      {
+        "title": "rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+        "bytes": 2868,
+        "sha256": "79497fc77e1b25e09da85cc57bfbf6dd9fd705c022bcf6dc5a45dcabc79bad7b",
+        "occursExactlyOnceInCandidate": true
+      },
+      {
+        "title": "derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+        "bytes": 10890,
+        "sha256": "60dc9d73553a2d7f7689ae0c292d8e53b99f37df46b5dd6cf0da0c57b908b4a5",
+        "occursExactlyOnceInCandidate": true
+      },
+      {
+        "title": "uses the default signed trust home and checkpoints after exactly two new audit events",
+        "bytes": 11462,
+        "sha256": "ccc59a8f2bc361d34009c61f294cda969c2315b61f1fefc0b6a4cf16b0b7f2e4",
+        "occursExactlyOnceInCandidate": true
+      }
+    ]
+  },
+  "readOnlyVariants": {
+    "tests/time/checkpointWindow.test.ts": {
+      "presentRoots": 4,
+      "sha256Versions": 3
+    },
+    "src/ledger/ledger.ts": {
+      "presentRoots": 187,
+      "sha256Versions": 10
+    },
+    "src/ledger/eventHash.ts": {
+      "presentRoots": 148,
+      "sha256Versions": 1
+    },
+    "src/ledger/ledgerVerification.ts": {
+      "presentRoots": 148,
+      "sha256Versions": 4
+    },
+    "src/ledger/sessionVerification.ts": {
+      "presentRoots": 148,
+      "sha256Versions": 2
+    },
+    "src/time/checkpoint.ts": {
+      "presentRoots": 87,
+      "sha256Versions": 3
+    },
+    "src/time/timeEvidence.ts": {
+      "presentRoots": 87,
+      "sha256Versions": 1
+    },
+    "tests/time/tsaTestFixture.ts": {
+      "presentRoots": 4,
+      "sha256Versions": 2
+    },
+    "tests/time/tsaGrant.test.ts": {
+      "presentRoots": 5,
+      "sha256Versions": 2
+    },
+    "dist/ledger/ledger.js": {
+      "presentRoots": 101,
+      "sha256Versions": 8
+    },
+    "dist/ledger/eventHash.js": {
+      "presentRoots": 93,
+      "sha256Versions": 1
+    },
+    "dist/ledger/ledgerVerification.js": {
+      "presentRoots": 93,
+      "sha256Versions": 4
+    },
+    "dist/ledger/sessionVerification.js": {
+      "presentRoots": 93,
+      "sha256Versions": 2
+    }
+  },
+  "comparisonToPriorSourceScope": {
+    "priorPin": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/observations.json",
+      "bytes": 1674075,
+      "sha256": "70d199c3d2b821be705cb7c0a96a1fa94afff477c78aaf0c56b41f2bd6ab477a"
+    },
+    "comparisons": 186,
+    "differences": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "relativePath": "tests/time/checkpointWindow.test.ts",
+        "prior": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543658576,
+          "nlink": 1,
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7"
+        },
+        "current": {
+          "relativePath": "tests/time/checkpointWindow.test.ts",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+          "regular": true,
+          "symlink": false,
+          "dev": 16777231,
+          "inode": 543658576,
+          "nlink": 1,
+          "bytes": 48568,
+          "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7"
+        }
+      }
+    ],
+    "classification": "The sole prior-scope change is the already completed own S cadence test successor. Its source802 and metadata888 provenance is closed. All other overlapping earlier source/physical observations remain exact; retained cadence Q is included in the current187 inventory."
+  },
+  "activeProtection": {
+    "preferredV3": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    "activeInputs": 175,
+    "prior171RowsExactAndRetained": true,
+    "fourReadOnlySourceDependenciesAdded": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+        "dev": 16777231,
+        "inode": 542460160,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+        "bytes": 1726,
+        "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a",
+        "dev": 16777231,
+        "inode": 542460159,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+        "bytes": 35501,
+        "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+        "dev": 16777231,
+        "inode": 542460166,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+        "bytes": 3048,
+        "sha256": "b231357057916a626c440d5f11462bbe8004994602024b93f47f75744abf2f7f",
+        "dev": 16777231,
+        "inode": 542460169,
+        "nlink": 1
+      }
+    ],
+    "nativePins": 12,
+    "allCurrentByteAndPhysicalPinsExact": true,
+    "heldR18HeadAndEmptyIndexExact": true,
+    "compiledObservationBoundary": "The four requested dist/ledger JavaScript paths are read-only pre-build observations. They are absent from active V3 input pins. Root separately preserves six compiled pre-build observations and an unadopted V2 draft; none is a post-build/fresh binding. Future Q is unknown."
+  },
+  "reservationBoundary": {
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "noProbeSearchRecreationContactOrSharedAppend": true,
+    "currentReservationDeltasUnavailable": true,
+    "neitherReleaseNorNewHumanApprovalHoldInferred": true
+  },
+  "conclusion": "No concrete new overlap was observed for this existing own S test successor within the finite187-root/20-authority snapshot. Only that test may be proposed for later root allocation. Dirty-tree absence, clean status, authorship strings and historical presence do not release any reservation. Read-only production, compiled, helper, grant and Claude variants must stay untouched.",
+  "requiredLaterRootActions": [
+    "Fresh hosted WIP/PR-path review, with verified Dependabot excluded from WIP only.",
+    "Ordinary freeze and D15 checks, then explicit exact one-test successor admission.",
+    "Preserve original e5a7 bytes and all active175/12 physical pins; admit any post-build compiled/fresh binding only from actual later outputs."
+  ],
+  "allHoldsClaudeWorkIgnoredD15ArchiveF37SkipAndQualityFreezeRetained": true,
+  "noSourceAllocationProductCompilerParserHelperNativeOpenSslSqlNetworkOrSourceIndexQaWrites": true
+}

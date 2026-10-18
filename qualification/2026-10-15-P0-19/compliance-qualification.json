@@ -1,0 +1,758 @@
+{
+  "kind": "P0-19 bounded actual compliance grading eligibility qualification; signed operator-authored reader controls only",
+  "capturedUtc": "2026-10-14T21:16:21.011564+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+  "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "ownedNewTest": "tests/compliance/assuranceGradingEligibilityQualification.test.ts",
+  "firstRegisteredRun": {
+    "numTotalTests": 14,
+    "numPassedTests": 14,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "runtime": {
+    "wrapperExecutable": "/opt/homebrew/opt/node@22/bin/node",
+    "wrapperPathPrefix": "/opt/homebrew/opt/node@22/bin",
+    "actualVersions": [
+      "v22.23.3"
+    ],
+    "actualExecutables": [
+      "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+    ],
+    "permanentTestPolicy": "Children inherit process.execPath and are checked against parent version/executable; no hardcoded Node22 exclusion for future Node24 CI."
+  },
+  "fixtures": {
+    "classification": "Operator-authored locally signed helper controls, not an actual structured/executed agent pack, executed tool or externally regulated proof. Report VALID/verificationPassed/MEASURED are authored fixture fields; the real consumer and independent Nodecrypto seal checks are exercised.",
+    "pins": "Fresh auditor and monitor public keys recorded in pins-before-artifacts.json immediately after initialization, before signed maps/reports. Nodecrypto verifies real map/report signatures under that prior auditor public key. No allowUnpinned/allowUnanchored flag or implicit report-key admission.",
+    "requirements": "One actual signed SOC2 map, toolGovernance minScore50/maxSucceeded0, at least one scenario in every report. Positive structured/executed declarations keep evidence sufficient, result not_evaluated, applicability unresolved and score null. Measured failures give MISSING/fail/sufficient and coverage score0. Keyword/token/legacy missing fields are untrusted. Partial positive/all inconclusive and insufficient/missing evidenceStatus remain incomplete.",
+    "tamper": "Original eligible report/map control is sufficient but applicability unresolved. Rechecksummed changed report retains original auditor signature; Nodecrypto and actual reader refuse it. Map comment byte tamper preserves signature and yields genuine digest mismatch/configTrusted false.",
+    "credentialsAndNetwork": "Each child receives only PATH/HOME/AMC_HOME/LANG and a known fixture vault passphrase. Builtin transport guards saw no attempts; no provider/model/external endpoint or product method mock.",
+    "effects": "Retained full before/after regular-file/link/hash/mode/link-count snapshots and sessions/evidence_events/assurance_runs SQL rows. Reader phases preserve semantic rows; file/coordination and deliberate fixture writes remain visible. No blanket no-effects or byte-isolation claim.",
+    "importantConsumerLimit": "mappingAdapter currently keys this refusal on regulatedEligible===true, not an independent gradingMethod cross-check. Tests use internally consistent declarations; contradictory signed producer flags were not qualified."
+  },
+  "children": [
+    {
+      "caseName": "keyword-positive-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused/first.json",
+        "sha256": "8f406543cae2c930df58fa7d35ae98d3201395018c40d2838d18f5ed539886fd",
+        "bytes": 58928
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused/pins-before-artifacts.json",
+        "sha256": "ef2614aa812fe9f5dbd6cf5edb72095dfd9ba75e2b8828b380712f6a7e98c535",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused-first.process.json",
+        "sha256": "4cc6b73a763461a1c9129d2b471008994e7446c8b2dad69cc7d7043230538bab",
+        "bytes": 613
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused-first.stdout",
+        "sha256": "62c12a604fbeaea8703fd7d1bbe2f5b313f23b91a3e9eb81819dcf3cdc8b88ea",
+        "bytes": 45369
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-positive-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "keyword-failure-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused/first.json",
+        "sha256": "bae0db5f1923b907fc186ce9d192c36ee0834c886d419c46cab04c6d80c99220",
+        "bytes": 58811
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused/pins-before-artifacts.json",
+        "sha256": "006a1a31927e0a521939bfc8815cb5b5ad7a947b7168a2d0e0183ae83673ba18",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused-first.process.json",
+        "sha256": "6ec8eebbf6f06295aa3f0d58cf957e25ea9d142b3faacb42e204120aa4e15004",
+        "bytes": 610
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused-first.stdout",
+        "sha256": "de2d1d0c70dc00a42979c3e485a011ae9b2b9f05aaa081ca0d3943da246f576f",
+        "bytes": 45220
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/keyword-failure-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "token-claim-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused/first.json",
+        "sha256": "41488c39bc238d9d9a4ae965c24bc6c9bc1066ac65a820c6985be44556e377ed",
+        "bytes": 58087
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused/pins-before-artifacts.json",
+        "sha256": "6122cddecd06384eb09cbe81ad3cac9ea897cf17e5912ee1921983149d005110",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused-first.process.json",
+        "sha256": "f3b6149022e5986911c45390cd1594b5ebbeadfd9264368fe862fe7e8fc4d18a",
+        "bytes": 611
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused-first.stdout",
+        "sha256": "2b1934bb1503b2f4aef121adb1521bda23a53d45bf6f8247d43d26729e6919a1",
+        "bytes": 44528
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/token-claim-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "legacy-missing-fields-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused/first.json",
+        "sha256": "12f6fa9f5aeea1c7c3ac93c66392cd0a0e5c3698e8c2ae4d9bb71d57a9adebb6",
+        "bytes": 59669
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused/pins-before-artifacts.json",
+        "sha256": "4e334409cfa6f6f5c6a2c7114a445f32bd9d2855491b485d2ae8943acb4526ec",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused-first.process.json",
+        "sha256": "9a91ba7c7707e58b3353dad84641b2d29aa45a0f3b742cf53b03c1f5f368c0cf",
+        "bytes": 571
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused-first.stdout",
+        "sha256": "5a19db6e0dadb3e373d5273474a7c9d49e944955814a82019ca16c170666c6e4",
+        "bytes": 46146
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/legacy-missing-fields-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "structured-declared-positive",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive/first.json",
+        "sha256": "203e11f6033ee5410afbad3b0201ea7af839b52103d1b8c30a67fab5e681bfb5",
+        "bytes": 59417
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive/pins-before-artifacts.json",
+        "sha256": "4900d764bb57b1b0e5db8b84d4178234403932f4823d3b67433db79952ba9285",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive-first.process.json",
+        "sha256": "0cfeb41c70de7b0bd8ade20d5b387a409f458063ca390ff68b6fc0fe744870d7",
+        "bytes": 634
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive-first.stdout",
+        "sha256": "976fe4c2a867c4eed1b441486e2fb1e8cce1aa98e0be97b1258e416e666b527a",
+        "bytes": 45758
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-declared-positive/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "executed-declared-positive",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive/first.json",
+        "sha256": "33987064e612eb1280f92e3ba540f5811f3e2ece1fb3abc808846c44ea59e8ec",
+        "bytes": 59067
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive/pins-before-artifacts.json",
+        "sha256": "660c9849ffe1cbe274d9bbfbd96a8501df9090b891208c87eb9e0f21b0dac65f",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive-first.process.json",
+        "sha256": "e2695fc69d824fed8d1965c17d8a4935618c480fa557375963007b0ad5f7e5f0",
+        "bytes": 628
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive-first.stdout",
+        "sha256": "98ecfb5e3dac2fc0ed61ff0843dd67e557fe848fb767334a10cdac320185f0b2",
+        "bytes": 45408
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/executed-declared-positive/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "structured-measured-failure",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure/first.json",
+        "sha256": "77135614e99742b8cc20923f2831e0a346978ab0947abad6f3767312d36a6cfc",
+        "bytes": 58875
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure/pins-before-artifacts.json",
+        "sha256": "71832e04d488bf33fff8fad9850d1d54e4af5d63731330dfbd5cf9cd1d6dc6a9",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure-first.process.json",
+        "sha256": "a2eb8d4a3e8f629fdc4a69f15f9db5eadd27ef9f9e00141702d7e3d28e98cf36",
+        "bytes": 650
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure-first.stdout",
+        "sha256": "14ad32ab06eda1cf30cddc58d07451936f8ca23225634e39ce98601545f6b36d",
+        "bytes": 45342
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/structured-measured-failure/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "partial-positive-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused/first.json",
+        "sha256": "14e09f8dc7354113b6d601a597214de2d1483124de86c605b1ccfc8c186967bc",
+        "bytes": 58957
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused/pins-before-artifacts.json",
+        "sha256": "9398006234cd9119fe662a996e8f0ed737ca99b74ca158562f085ef5175f3e7a",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused-first.process.json",
+        "sha256": "8d39ef028da9246199c58942341fc39b2a6ae4b14b58ffa5e8584e048008df00",
+        "bytes": 656
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused-first.stdout",
+        "sha256": "3a2b06c6f71cd76427d6df4fba42dea7d60bac591a68b5e045529cc87881ec53",
+        "bytes": 45282
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-positive-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "all-inconclusive-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused/first.json",
+        "sha256": "89efd0b0633a907d6b9caa3e9d81e5082e37623c917b800f0065a888bcada10a",
+        "bytes": 58607
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused/pins-before-artifacts.json",
+        "sha256": "de3f91b84ccad9fd3989b51b7b6237edf853eb0c0d61847fa08aac153955efca",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused-first.process.json",
+        "sha256": "ba5f37fddd2ee82f4becba4e03c98554fab632ac9ee8c49ad7b2b06c9f8a5089",
+        "bytes": 645
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused-first.stdout",
+        "sha256": "b5b77b7ba351b3f2e9a2e59bf704fc5de0be455e7e3ad689482348f89f2fbdb3",
+        "bytes": 45054
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/all-inconclusive-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "partial-measured-failure",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure/first.json",
+        "sha256": "3efe8fe778cacd2c07ae315f8bf78388ded4102d6fae0b82b3c5b32d0659d866",
+        "bytes": 58873
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure/pins-before-artifacts.json",
+        "sha256": "b5afa947e1c34e3a9ec7a5005679ae0bbe2c9078917565f08f9f4b6eb746409a",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure-first.process.json",
+        "sha256": "6ec80deb25135a4e6e5a32c874de3e2364634205ec260d809b63514797fbbc47",
+        "bytes": 669
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure-first.stdout",
+        "sha256": "3639341bcc61482bd41acb12c016732e05775d57f0646e8381472edbb0e97ef5",
+        "bytes": 45090
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/partial-measured-failure/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "canned-insufficient-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused/first.json",
+        "sha256": "474d48a528f01ef9bfa51d6e900fe4d3f7dec82542a40098fbb46c984fd30f0e",
+        "bytes": 58649
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused/pins-before-artifacts.json",
+        "sha256": "9fb01d8d4266f6224f17a5203adf427291c6b3042118c871e123705ac4c9a464",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused-first.process.json",
+        "sha256": "0b870e3401a04abccfaf926c14481a82801769bf14012abeda1c088523ea069c",
+        "bytes": 680
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused-first.stdout",
+        "sha256": "15b64b9ba21c16352de5c4d7db5a669d3a4a92a3c28a9023ba1f109108e36da5",
+        "bytes": 45312
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/canned-insufficient-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "missing-evidence-status-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused/first.json",
+        "sha256": "2d15dd5c5bd96f945f4f2d9b3a1867c086899037030d5d6adacd3b815dd3c49a",
+        "bytes": 59270
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused/pins-before-artifacts.json",
+        "sha256": "b9603a0c9682bef25353152b806f3eaf9a5ce1c63d877534138f8ecf5010bae2",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused-first.process.json",
+        "sha256": "cf7618b0d132e41365a855ccc37b49c83b01e427d1b6363d6a95cf0619a46963",
+        "bytes": 674
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused-first.stdout",
+        "sha256": "0d18dc5fecf9b4ef79f5321a65cdffbb156783148b85b5b42cef3b52e53f08d7",
+        "bytes": 45941
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/missing-evidence-status-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "rechecksummed-report-tamper-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused/first.json",
+        "sha256": "b52c4a521152c649bda17f48b25d1fb7c2e43b668683d710e79284c817931b5c",
+        "bytes": 122154
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused/pins-before-artifacts.json",
+        "sha256": "9210797bc1ed9d01e31e70691bb4e0b32c048315e738fd1e525d184868d20ec0",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused-first.process.json",
+        "sha256": "951c414039edfa13ab8ac69b58f3ad7fc85daa94986a014eae4648ca1c891340",
+        "bytes": 696
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused-first.stdout",
+        "sha256": "4220145948c80e4a51a4df3564fde6ff7b0a7aefab47da4240d78c7f30ef6b29",
+        "bytes": 92414
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/rechecksummed-report-tamper-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    },
+    {
+      "caseName": "signed-map-byte-tamper-refused",
+      "result": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused/first.json",
+        "sha256": "6271c5b2d38ca32152bef2b086f948a5045ff12bd6e14820fcfb7e1666e2104b",
+        "bytes": 118365
+      },
+      "pinsBeforeArtifacts": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused/pins-before-artifacts.json",
+        "sha256": "014a7830a40791eb14238af5fd2734dbe60e5038c4d1710836917e65b3d47a49",
+        "bytes": 675
+      },
+      "process": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused-first.process.json",
+        "sha256": "3603970b5d91bd426b7a4e816b4b015e7f70e7954b99e85ada74139aff0dda7d",
+        "bytes": 652
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused-first.stdout",
+        "sha256": "9414213cff7c8cb1dcd813653167accb4a51379f655bef974383a505b8c2fa90",
+        "bytes": 89137
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused-first.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "networkAttempts": [],
+      "semanticRowsUnchanged": true,
+      "workspace": "/private/tmp/p0-19-compliance-evidence-PUITuJ/signed-map-byte-tamper-refused/workspace",
+      "snapshotBeforeFiles": 81,
+      "snapshotAfterFiles": 81
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/catalog/evidence/mappingAdapter.ts",
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "bytes": 13302
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "bytes": 14631
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/compliance/evidenceBinding.ts",
+      "sha256": "e8756dd77213e02343c3eb3e68fc56ed59bf0cb44f605ead8d958cc49e2d8eec",
+      "bytes": 5791
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/diagnostic/reportSeal.ts",
+      "sha256": "890711c710ce278edef9081355417474cdfe7ae281c562d1d277a64e48d80c4f",
+      "bytes": 1471
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "bytes": 7037
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "bytes": 9168
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/compliance/mappingSchema.ts",
+      "sha256": "10536aac9362d1e29663439ea679ba26e7565176671952761b2c65b24d847f38",
+      "bytes": 5004
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/compliance/coverageScorer.ts",
+      "sha256": "aca2f0a8eec10f68ef62fab1c907f5bbb9f40230bbd84112a8da5f2bf60d339c",
+      "bytes": 1081
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/compliance/complianceFailClosed.test.ts",
+      "sha256": "0f503d86bb822b93308a46144f8a107cf08e7084982e4f9d8dfcb91fbdf64297",
+      "bytes": 20978
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/compliance/assuranceGradingEligibilityQualification.test.ts",
+      "sha256": "c83a77b468373230a6c4fbb140a7deb8092bb1679585d4c2153c4a541df3ae82",
+      "bytes": 17716
+    }
+  ],
+  "privateCausal": {
+    "privateRoot": "/private/tmp/p0-19-compliance-causal-2az11jzy",
+    "module": "dist/catalog/evidence/mappingAdapter.js",
+    "exactMutation": "if (pack.regulatedEligible !== true) { -> if (false) {",
+    "copiedDistRegularFiles": 4529,
+    "allCopiedInputsIncludingCatalogAndPackage": 4547,
+    "dependencyResolver": "Only node_modules symlink points to installed dependencies; full dist and catalog and package were copied. Relative engine/adapter imports resolve wholly inside private copy.",
+    "savedFixtureReplay": "Exactly the same 14 first signed fixtures, public pins, signed reports, mapping bytes, and assertion source are reused for baseline/mutant/restored. Baseline/restored category, coverage and config observations are byte-equivalent after excluding outer wall-clock/report ID. Semantic SQL rows unchanged across all qualified phases.",
+    "qualifiedPhases": {
+      "baseline": {
+        "numTotalTests": 14,
+        "numPassedTests": 14,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "mutant": {
+        "numTotalTests": 14,
+        "numPassedTests": 10,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "restored-after-driver-correction": {
+        "numTotalTests": 14,
+        "numPassedTests": 14,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      }
+    },
+    "behavioralFailures": [
+      "keyword-positive-refused",
+      "keyword-failure-refused",
+      "token-claim-refused",
+      "legacy-missing-fields-refused"
+    ],
+    "everyCopiedInputRestored": true,
+    "firstDriverCorrection": "First Python review compared Vitest quoted display titles against unquoted expected names, stopped before restoration. The already launched first restored phase therefore still used mutant bytes; it is unqualified and retained separately. Actual restoration occurs here before a unique new restored phase.",
+    "unqualifiedFirstRestoredPhase": {
+      "numTotalTests": 14,
+      "numPassedTests": 10,
+      "numFailedTests": 4,
+      "numPendingTests": 0,
+      "success": false
+    },
+    "setupBoundary": "Initial registered run and qualified causal children had no fixture/parser/import failure. The Python review assertion failure exists in tool transcript and the retained correction note; the mislabelled first restored Vitest raw/streams remain separate and do not count as restoration.",
+    "liveSourceOrDistMutated": false
+  },
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-19-compliance-first-20261015.json",
+      "sha256": "d8322512f489d07250247cc8a9c48fcd0473290c3d42c9eece2cbfde166eeca7",
+      "bytes": 5356
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-first-20261015.stdout",
+      "sha256": "64728c6bbe90090c8892abca140b9ab97197a9e16731d3a7f140dbeb0ea7c1ba",
+      "bytes": 73
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-first-20261015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-private-causal-fixture-20261015.json",
+      "sha256": "ac41f8846ad3ba4c94c2e8100fb78b5cacc4d95f739d49f28ebc16d10d6d5f77",
+      "bytes": 764814
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/location.json",
+      "sha256": "c1422963aeb247724bb72eb214648ed3a76f305dad3df79254f141cf9d36880e",
+      "bytes": 260
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/replay-index.json",
+      "sha256": "e0a123aa107059465e0126f999239e2ce8a553f158a83104603afb7dec675296",
+      "bytes": 1682
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-evidence-PUITuJ/child-script.mjs",
+      "sha256": "895d6f3336e0c94e9867f79fe589c7685365bac41c3912c0270b287929aa6d97",
+      "bytes": 7665
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/baseline.json",
+      "sha256": "6f05701af05b72489279d18ad35f993293cd3de883afd527d616af02073877a2",
+      "bytes": 5351
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/baseline.stdout",
+      "sha256": "695591d4d39f56d5cceb28fdb1d3e312a45bb7aa66989bb5fc109b13c8c9e4fa",
+      "bytes": 83
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/baseline.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mutant.json",
+      "sha256": "2c9457ea78220a9ca934300ff6bb18e764e8cfa9acb2c159f12ee2035329c359",
+      "bytes": 10798
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mutant.stdout",
+      "sha256": "0d085215ed1a89d623698f942b590d12644ac0f9ad88d434e334e0a3501de988",
+      "bytes": 81
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mutant.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored.json",
+      "sha256": "4260fd26a40733dce0a0094bdff5e1a8c3db0b83366dc0f5b9c62690488da01f",
+      "bytes": 10824
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored.stdout",
+      "sha256": "53226509ed249d318b68d84f414b54904c77b798d4128a4777cac040807cd449",
+      "bytes": 83
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored-after-driver-correction.json",
+      "sha256": "7019a21876fa9533b8d1c7923e3e0bdddbd773498fe7760f192af899e8a2289b",
+      "bytes": 5356
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored-after-driver-correction.stdout",
+      "sha256": "9cfe1f1daa084e110d0d2c43439d64efb0c85ae6a431975bf910d4725f629987",
+      "bytes": 107
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/restored-after-driver-correction.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mutation.diff",
+      "sha256": "642ef5d340280b8f76d24dbef3bb4706ab9b33dd8b2a412ef327e3cb6738366b",
+      "bytes": 146
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mutation-restoration.json",
+      "sha256": "2b3a34b0568fe655d7f7bac2e17ee60c264bde76a33f15ab879f3483086d1088",
+      "bytes": 824
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/mappingAdapter.original.js",
+      "sha256": "5e85fedd5bf95cda130fe3c21a278ed14156691e6219d5ca30c8d79db0ca8b40",
+      "bytes": 11831
+    },
+    {
+      "path": "/private/tmp/p0-19-compliance-causal-2az11jzy/guards-summary.json",
+      "sha256": "9132c865d1a757f48a737c9e43f03a954b0621e92ccd1eb6731b33c1050f90db",
+      "bytes": 9319
+    }
+  ],
+  "preservation": {
+    "productionScriptsAndOriginalComplianceTestDiff": "",
+    "ownedTestOnly": true,
+    "noBuildInstallOldTestGuardArchiveRoleCountCommit": true
+  },
+  "limits": [
+    "This slice does not close whole P0-19/P0-55, the 47 echo deferral/P2-27, applicability plans or regulated agent execution.",
+    "No authenticated API/Studio, provider model, external entitlement, actual executed tool, Node24 run, full suite, release or G0 claim.",
+    "Existing P0-22/P0-23/P0-51/P0-52 active failures, P0-27 strict tagged-system and mixed SQLite cause, and pending narrow Sync/shared CLI decisions remain unchanged."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "base": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "source": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "65d3f2722f7b2cbe84856e1d7e13026d6b1ed5bfd0890c5a607a8d8d83bf3ac4",
+      "lines": 485
+    },
+    "README.md": {
+      "sha256": "890d90c10e674e1de79bd16b5d6b43316c593f490b29c7cbb1c7df6ac7d939c7",
+      "lines": 941
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "1923c5281088f0ccea01144f7a72395653120728c490978b0993f12088615414",
+      "lines": 52
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "9570620b0036d55cac7e35ce3c5cdf8dae0cbd3712d6d018cab3e14b30d97e27",
+      "lines": 35
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "f4378fca8b89230aeaad1358b89e83a3995b0a97c90963e818bfb3d8a3c3f688",
+      "lines": 71
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "ff8359d371829d80575d0fa3b2267806315ac089c9d794047a438490682a5afb",
+      "lines": 32
+    },
+    "tests/a4GuardQualification.test.ts": {
+      "sha256": "b402f8aed22f144c7421000bbb76ae5e72afdc9654d70b41aa6986d10cc451bb",
+      "lines": 112
+    },
+    "tests/a4OwnerModeQualification.test.ts": {
+      "sha256": "f848651383cedbeb17f8bdc2ef9eb6647b47804c6cd21bb18e03bf754d8f4fd8",
+      "lines": 137
+    },
+    "website/i18n.js": {
+      "sha256": "c878a17d993e84d38881be029c26e2772ac249c8ae93f87a19b3ca1247ee3790",
+      "lines": 568
+    },
+    "website/index.html": {
+      "sha256": "27acf8307f060a13ace1a70c7f9cd62930789bb922066be65ef3fc227e4a64fb",
+      "lines": 461
+    },
+    "website/lite.html": {
+      "sha256": "56c25b1585f825912a008cadaf6002fd6d37c8b20230d07029166a3cc9e82d7b",
+      "lines": 195
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "2108f493dd097452fcca95bcc67b03b0aa194516b3018f8a2bd41ab5988aabbd",
+      "lines": 1216
+    }
+  },
+  "protectedEqualAcceptedMain": {
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/api/accessPolicy.ts": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+    "src/api/resultRouteRegistry.ts": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/studio/openapi.ts": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+    "website/openapi.yaml": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+    "src/console/assets/app.js": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+    "src/console/assets/components/claimBadge.js": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+    "src/mcp/amcMcpServer.ts": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+    "src/mcp/a4Tools.ts": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff"
+  },
+  "additionalProtectedEqualBase": {
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "p054GuardInputs": {
+    "scripts/check-no-fabrication.mjs": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+    "scripts/no-fabrication-allowlist.json": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937",
+    "scripts/check-gate-reachability.mjs": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+    "scripts/check-threat-model.mjs": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+    "src/diagnostic/evidenceEmitters.ts": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+    "docs/security/channel-map.json": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+    "docs/security/THREAT_MODEL.md": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+    "src/mode/mode.ts": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0",
+    "src/a4/a4Store.ts": "ab1d4b6efdf129ff25cefe37f3a3c401ee82430c0649ed1b6c5eabb8ff1525c0",
+    "src/a4/a4Identity.ts": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2",
+    "docs/program/metrics.json": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed",
+    "tests/checkNoFabrication.test.ts": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528",
+    "tests/threatModelMap.test.ts": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+    "tests/portableVerifierServerQualification.test.ts": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+    "src/api/apiHelpers.ts": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/audit/auditApi.ts": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+    "src/claims/evidenceProvenance.ts": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+    "src/claims/eligibility/adapters/results.ts": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+    "src/compliance/complianceEngine.ts": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805"
+  },
+  "allProductionScriptsArchivesDependenciesActionWorkflowSecurityMapMetricsEqualBase": true,
+  "actualTypescriptVersion": "6.0.3"
+}

@@ -1,0 +1,13 @@
+# P0-25 read-only readiness
+
+P0-25 is next after the P0-30 bounded handoff: G0, High, due 21 October, blocked by P0-02/P0-12 and blocking P0-19/P1-09/GATE-G0. All five RTD plan input hashes still match the frozen authority. Historical Done is not current qualification, and dependency status is not independently requalified. Claude’s umbrella reservation remains; a new existing-source qualification lane does not authorize reserved production edits.
+
+The current collector, package command, CI step after Build and release DAG citation task already exist. The original suites contain 21 linter cases, including 13 issue fixtures, nine CLI cases and two mapping-reference cases. The catalogue re-exports the linter’s shared host list; the register checker reads its JSON policy list, whose subset is tested. Preserve that distinction while checking literal acceptance.
+
+Exact-input reuse is supported: all 14 direct pins, 2,471 original protected inputs and 4,529 compiled files match frozen P0-24 evidence. Earlier actual same-corpus controls were resolver 30→26→30 and ratchet 30→29→30, with zero pending/todo. Those are measured results at75cb, not fresh execution atsource58. Reuse them without relabelling them as a new run. Actual current collector output and CI/release execution still need their own evidence. Existing releaseGateExecution uses an injected executor, not a genuine complete gate.
+
+Keep CIT002=3 and CIT004=620 unchanged. The strict ISO A.5 assertion remains RED, the ISO reference table stays empty pending licensed expert data, and all 31 correction-log expert columns remain empty. No baseline update, tolerance change, missing-pack registration, mapping removal, expert approval or legal-currentness claim is authorized.
+
+Safe next work is an explicitly assigned fresh owned lane, qualified runtime pins, normal freeze/D15 checks, owned build, existing citation/mapping corpus and actual `check:citations --json`, followed by honestly scoped command-failure evidence. Full suite/types/lint, hosted CI, PR/merge and all remaining acceptance are not implied by this preflight. No current S7/notary closure should be changed or executed.
+
+No product runtime, imports, tests, builds, installs, mutations, network, Git, tracker or messaging operation occurred. Guessed root/specs and standalone Claude-plan paths were absent; the exact recovered spec and real reservation notes were used. The first report writer stopped before writing because its numeric-only row filter omitted10a; the corrected observation retains31 empty expert cells with no source or criterion change. Only this private readiness pair was written. All reads are finished.

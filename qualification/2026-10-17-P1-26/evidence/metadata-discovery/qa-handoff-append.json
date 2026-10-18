@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-16T20:35:38.252153+00:00",
+  "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+  "marker": "P1-12 metadata representation repair \u2014 17 October 2026 \u2014 2aa32d5e436e",
+  "oldBytes": 998950,
+  "oldSha256": "7e8ef795a96a952513bab375f2ac7b0fec0988a825637a90f58ff76cc3840915",
+  "appendedBytes": 2336,
+  "appendedSha256": "f8d746775e2deef2765dc821a82d8f1716d23d3c7e9feb4fa5a07446f3efcf06",
+  "newBytes": 1001286,
+  "newSha256": "bea71d5656988b2beb2255f99579df0116d07fb2324be8bea5f61d65ee4ee0ae",
+  "oldPrefixExact": true,
+  "onlyOwnEntryAppended": true
+}

@@ -1,0 +1,118 @@
+{
+  "schema": "amc-private-p1-01-canonical-bound-builder-static-review/1",
+  "createdAt": "2026-10-15T08:49:10.662211+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "builder": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-bound-20261015.py",
+    "bytes": 25935,
+    "sha256": "e295c11f60a61edae30baab65330f31ff39e55f39492d81956a1a5260245c91f"
+  },
+  "unboundV2": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-v2-prepared-20261015.py",
+    "bytes": 15566,
+    "sha256": "e2109ad1fdfd6cabbcd75d53a1b3645819ce5849e5cdd5833f2161dc2a835a79"
+  },
+  "bindingNote": {
+    "path": "/private/tmp/p1-01-canonical-bound-builder-preparation-20261015.json",
+    "bytes": 13238,
+    "sha256": "4527ad31736f11026ffd392bbc014e0ab7aeb4e46a25f98838631e405208dd21"
+  },
+  "priorPreparationReview": {
+    "path": "/private/tmp/p1-01-canonical-builder-prepared-static-review-20261015.json",
+    "bytes": 5822,
+    "sha256": "e574c095cb9ca73854544a447e5309c045ca915503353007204899bf50f44494"
+  },
+  "blockingFindings": [],
+  "method": "Read complete final bound source, complete original-to-v2 diff, binding metadata, final actual-review gate fields and root outcome. Independently verify 58 final frozen input pins and reconstruct shallow selection/scan with read-only stdlib calculations. Builder not imported, parsed as Python, compiled or executed; no Git command/product runtime/canonical write by reviewer.",
+  "bindingCheck": {
+    "onlyNoneToLiteralChanged": true,
+    "verifiedFrozenPins": 58,
+    "curated": 45,
+    "fixed": 5,
+    "explicitPrivate": 8,
+    "actualReviewSha256": "ef87b3461d584dd71e8c8886728f43545fd636186c495e257ed0c3453ab62bc1",
+    "rootOutcomeSha256": "c71d6c87a3402c9801490685494747297a413a00251c3a1748c21c6fcd904216",
+    "reviewAllReadsFinished": true,
+    "reviewBlockingListsEmpty": true,
+    "formalAcceptanceClosed": false
+  },
+  "closedMetadataCheck": {
+    "rootJournalRows": 21,
+    "frozenEqualsOriginalClosedJournal": true,
+    "rootNonzeroExits": {
+      "duplicates": 1,
+      "dead-code": 1,
+      "source-control": 1
+    },
+    "successfulStripChildExits": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "failedLiteralChildExits": [
+      0,
+      0,
+      2
+    ],
+    "successfulControlMarkersAbsent": true,
+    "failedLiteralActiveHaltedRetained": true,
+    "failedLiteralFinalResultAbsent": true,
+    "meaning": "Counts and field links checked from frozen metadata only; full actual evidence attribution is reused from pinned independent actual review, not rerun here."
+  },
+  "selectionCheck": {
+    "selectedEvidenceFiles": 189,
+    "selectedMaxBytes": 95539,
+    "selectedTotalBytes": 772507,
+    "selectedPinRowsSha256": "45644cda45d9d2994c8dd212221d5120ad942a27a3a1f92a00fe4cd175ba90cb",
+    "digestEncoding": "Path-sorted selected {path,bytes,sha256} rows serialized with Python json.dumps(sort_keys=True,separators=(comma,colon)), UTF-8.",
+    "finalPrivateOnlyUnsplitCount": 9,
+    "additionalPrivateReference": "/private/tmp/p1-01-source-control-20261015/physical-manifest.json",
+    "noProductOrFixtureBodiesSelected": true,
+    "secretPatternCategories": [
+      "private-key PEM",
+      "GitHub PAT",
+      "OpenAI-style token",
+      "AWS access ID",
+      "literal Authorization Bearer value"
+    ],
+    "secretPatternHits": [],
+    "secretBoundary": "Bounded pattern inspection of exact selected bytes, not a universal secret detector. No credential values emitted."
+  },
+  "closedPreparationObservations": [
+    {
+      "id": "O1",
+      "status": "resolved",
+      "basis": "All selected and generated evidence/private references/summary/README/receipt bodies are planned and cap/marker checked before Q.mkdir. Per-file cap remains1MiB. I/O failure may still leave partial output, explicitly documented; no cleanup or retry exists."
+    },
+    {
+      "id": "O2",
+      "status": "resolved",
+      "basis": "Synthesized README now states exact thin compiler artifact retention, accepted kernel restored as constant, direct compiled-contract scope and no fresh complete mutant build/kernel-route proof."
+    },
+    {
+      "id": "O3",
+      "status": "bounded-final-check-complete",
+      "basis": "Exact frozen selection scanned without tested credential patterns; restricted shallow metadata/log selection and private-only exclusions verified."
+    }
+  ],
+  "writeBoundary": {
+    "target": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/qualification/2026-10-15-P1-01",
+    "qualificationAbsentAtReview": true,
+    "sourceTreeHashAuthority": "Pinned final independent actual review and root preservation; this metadata release check did not repeat8751+4529 whole-tree byte reads. Builder itself rechecks parent byte/mode rows before Q creation.",
+    "onlyWrites": "Exclusive Q directory/evidence files and generated metadata; no deletion, product/source edit, process action beyond read-only Git queries, schema regeneration or qualification runtime.",
+    "hashOrder": "Receipt artifact list is computed from already planned other bodies before receipt is planned; no self-hash cycle."
+  },
+  "preservedLimits": [
+    "Primary receipt test count is16; schema38/parity75/outside-layout9/probes3/root21/strip7/failed3 remain separate.",
+    "Failed literal passthrough criterion stays open; typed strip result does not replace it.",
+    "Quality nonzero findings, absent permanent tests/contracts, A4/shared ownership, hosted/full-suite/Node24/release and formal dependency holds remain explicit."
+  ],
+  "builderExecutedByReviewer": false,
+  "canonicalWritesByReviewer": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

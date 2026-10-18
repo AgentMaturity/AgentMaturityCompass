@@ -1,0 +1,45 @@
+{
+  "schema": "p125ec-source-evidence-independent-review-seal/1",
+  "at": "2026-10-17T01:04:28.090458+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 3053,
+      "sha256": "b94001d9f5e692a1a7e093f5908c98517f974dfc65c4d5ed3fd1f67b1a24782d",
+      "dev": 16777231,
+      "inode": 543898549,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/README.md",
+      "bytes": 1453,
+      "sha256": "00fd8ec0776dd6020e0a778ffa32cc3f34c7400b167af6f90ec0fb8b624946e8",
+      "dev": 16777231,
+      "inode": 543898550,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/observations.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/observations.json",
+      "bytes": 85338,
+      "sha256": "64aec6f6d4776a6be19f5a7a2a2c10315c4f433eb197de61fbb2fd5bcf04e930",
+      "dev": 16777231,
+      "inode": 543898548,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 104300,
+      "sha256": "f832cff363bf9595e91fd3c94f338ab8f2c343306534d120e0757f9150393f3e",
+      "dev": 16777231,
+      "inode": 543898551,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 248,
+  "boundary": "Read-only bytes/metadata/public artifacts; no product execution or source/index/QA writes."
+}

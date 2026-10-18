@@ -1,0 +1,1478 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "preparedUtc": "2026-10-15T05:44:04.973222+00:00",
+  "state": "read-only readiness; no P011 runtime or implementation",
+  "allReadsFinished": true,
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "observedHead": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "observedStatus": "",
+    "recoveredSpec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "bytes": 16346,
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8"
+    },
+    "meaning": "Current pinned source inspected statically. No P011 test collection, product import, execution, build, install or physical copy was performed."
+  },
+  "routing": {
+    "conditionalNextKey": "P0-11",
+    "activationCondition": "Only after root completes the P021 and P045 bounded handoffs and explicitly opens an owned P011 lane. No automatic activation or formal dependency closure.",
+    "gate": "G0",
+    "priority": "High",
+    "due": "2026-10-25",
+    "route": "Agent-Doable",
+    "indexStatus": "In review",
+    "blockedBy": [],
+    "blocks": [
+      "P1-02",
+      "P1-03",
+      "P1-05",
+      "P1-12",
+      "P2-01",
+      "GATE-G0"
+    ],
+    "orderingAuthority": "Plan lines170-174: earliest open gate, priority, due date, dependent-chain depth. Earlier handled lanes retain their bounded residuals; they are not reopened merely because formal acceptance remains open.",
+    "comparedCandidates": [
+      {
+        "key": "P0-45",
+        "due": "2026-10-22",
+        "meaning": "Earlier High; root plans this before P011. This report does not claim its handoff complete."
+      },
+      {
+        "key": "P0-03",
+        "due": "2026-10-16",
+        "meaning": "Needs Sid and preservation/cleanup decision; no autonomous cleanup."
+      },
+      {
+        "key": "P0-26",
+        "due": "2026-10-28",
+        "blockedBy": [
+          "P0-12"
+        ],
+        "meaning": "Claude-reserved and Needs Sid; all30 keep/drop/defer choices remain unapproved here."
+      },
+      {
+        "key": "P0-28",
+        "due": "2026-10-28",
+        "blockedBy": [
+          "D-03",
+          "P0-15",
+          "P0-22",
+          "P0-23"
+        ],
+        "meaning": "Claude-reserved, known claim-label and shared-path boundaries. D03 C was answered previously; it is not ownership clearance."
+      },
+      {
+        "key": "P0-41",
+        "priority": "Medium",
+        "meaning": "Eligible High P011 precedes Medium. No status/tracker write requested."
+      }
+    ],
+    "heldUrgent": "P014/P053/P055/P152/release/rotation lanes retain their existing ownership, human, dependency and residual constraints; no clearance is inferred from historical Done or idle sessions."
+  },
+  "authority": {
+    "planPins": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 · Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+      }
+    ],
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "priorRouting": {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    "P045Readiness": {
+      "path": "/private/tmp/p0-45-readonly-readiness-20261015.json",
+      "bytes": 46780,
+      "sha256": "4b2742a95afa6f06d8c3b680fe7264df0c6548e1784e76d41a03f3d0cd86c8c0"
+    },
+    "planLocations": {
+      "issues": "Issues.md:21,36,38,55,64,71",
+      "ordering": "AMC Ready-to-Deploy Implementation Plan.md:165-174,209,262-263,285",
+      "workstreamAcceptance": "Workstreams.md:246,265",
+      "reservations": "RESERVATIONS.md:340,495,549,1114-1130,1496-1499,1588"
+    }
+  },
+  "graphNavigation": {
+    "graph": {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "observedInstalledVersion": "0.9.74",
+    "reviewedRefreshPin": "graphifyy==0.9.56",
+    "queries": [
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "threat model channel map failure policy telemetry exporter",
+          "--budget",
+          "1400"
+        ],
+        "exit": 0,
+        "found": 270,
+        "shown": 48,
+        "truncated": 222,
+        "limit": "Broad terms hit unrelated nodes; not used as enforcement proof."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "queueEvidenceEventSpan OTelExporter flush telemetry",
+          "--budget",
+          "1200"
+        ],
+        "exit": 0,
+        "found": 164,
+        "shown": 39,
+        "truncated": 125,
+        "located": [
+          "queueEvidenceEventSpan at old src/observability/otelExporter.ts:L846",
+          "ledger appendEvidenceWithReceipt",
+          "JSONL appendSessionEvent",
+          "ops OTELExporter"
+        ]
+      }
+    ],
+    "meaning": "Stale navigation only. The graph retains the old47-line docs/THREAT_MODEL and omits the new P011 map/checker/tests. Current source was verified directly. No refresh, watcher, server, extraction, package installation or graph write occurred."
+  },
+  "existingAcceptanceArtifacts": {
+    "present": true,
+    "channelMapVersion": 1,
+    "mapVerifiedAt": "2026-10-07",
+    "mapCommit": "e25cce1a03b17a023d4aadfbcdb71dfe653db87a",
+    "channels": 16,
+    "failureRows": 8,
+    "channelRows": [
+      {
+        "id": "tool-pipeline",
+        "name": "Tool pipeline",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/tools/toolPipeline.ts",
+            "symbol": "ToolPipeline"
+          },
+          {
+            "path": "src/tools/toolPipeline.ts",
+            "symbol": "askApproval"
+          },
+          {
+            "path": "src/agent/agentToolset.ts",
+            "symbol": "agentToolset"
+          },
+          {
+            "path": "src/actions/authorize.ts",
+            "symbol": "bindAuthorization"
+          },
+          {
+            "path": "src/actions/authorize.ts",
+            "symbol": "recheckAuthorization"
+          },
+          {
+            "path": "src/tools/toolEvidence.ts",
+            "symbol": "toolEvidenceFor"
+          },
+          {
+            "path": "src/tools/guards/compiledPolicyGuard.ts",
+            "symbol": "compiledPolicyGuard"
+          },
+          {
+            "path": "src/catalog/compiler/activate.ts",
+            "symbol": "loadActiveCompiledPolicy"
+          },
+          {
+            "path": "src/policy/effectivePolicyReceipt.ts",
+            "symbol": "writeEffectivePolicyReceipt"
+          }
+        ],
+        "owners": [
+          "P1-02",
+          "P1-03",
+          "P1-12",
+          "P2-01",
+          "P2-24"
+        ],
+        "bypassCount": 5
+      },
+      {
+        "id": "native-shell",
+        "name": "Native shell",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/sandbox/nativeShellGate.ts",
+            "symbol": "nativeShellReadiness"
+          },
+          {
+            "path": "src/sandbox/nativeSandboxBinding.ts",
+            "symbol": "createNativeSandboxBash"
+          },
+          {
+            "path": "src/sandbox/bwrapBackend.ts",
+            "symbol": "bwrapBackend"
+          },
+          {
+            "path": "src/sandbox/seatbeltNativeShell.ts",
+            "symbol": "seatbeltNativeShell"
+          },
+          {
+            "path": "src/sandbox/processCap.ts",
+            "symbol": "withProcessLimit"
+          },
+          {
+            "path": "src/tools/builtin/bashTool.ts",
+            "symbol": "bashTool"
+          }
+        ],
+        "owners": [
+          "P1-05",
+          "P1-48",
+          "P2-14"
+        ],
+        "bypassCount": 4
+      },
+      {
+        "id": "fs-tools",
+        "name": "fs tools",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/tools/builtin/fsTools.ts",
+            "symbol": "insideWorkspace"
+          },
+          {
+            "path": "src/tools/builtin/readBeforeEdit.ts",
+            "symbol": "ReadBeforeEditLedger"
+          },
+          {
+            "path": "src/toolhub/toolhubValidators.ts",
+            "symbol": "validateToolRequest"
+          }
+        ],
+        "owners": [
+          "P1-36"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "network-egress",
+        "name": "Network egress",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/tools/guards/policyGuards.ts",
+            "symbol": "networkEgressGuard"
+          },
+          {
+            "path": "src/enforce/egressAllowlist.ts",
+            "symbol": "decideEgress"
+          },
+          {
+            "path": "src/enforce/egressAllowlist.ts",
+            "symbol": "resolveAndCheck"
+          },
+          {
+            "path": "src/gateway/server.ts",
+            "symbol": "hostAllowed"
+          },
+          {
+            "path": "src/gateway/server.ts",
+            "symbol": "createProxyServer"
+          },
+          {
+            "path": "src/sandbox/egress/shellEgressProxy.ts",
+            "symbol": "startShellEgressProxy"
+          },
+          {
+            "path": "src/gateway/requestFieldGuard.ts",
+            "symbol": "prepareFieldGuard"
+          },
+          {
+            "path": "src/gateway/requestFieldGuard.ts",
+            "symbol": "checkUpstreamEgress"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+            "symbol": "governedGet"
+          }
+        ],
+        "owners": [
+          "P1-05",
+          "P2-13"
+        ],
+        "bypassCount": 5
+      },
+      {
+        "id": "native-tool-breadth",
+        "name": "Native web and session tools",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/agent/nativeToolCapabilities.ts",
+            "symbol": "NATIVE_BUILTIN_CAPABILITIES"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/originPolicy.ts",
+            "symbol": "loadOriginPolicy"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+            "symbol": "governedGet"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+            "symbol": "labelUntrusted"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/nativeReceipt.ts",
+            "symbol": "receiptedBody"
+          },
+          {
+            "path": "src/tools/builtin/nativeToolBreadth/sessionListTool.ts",
+            "symbol": "readSessionList"
+          },
+          {
+            "path": "src/tools/builtin/askUserTool.ts",
+            "symbol": "askUserTool"
+          }
+        ],
+        "owners": [
+          "P2-13"
+        ],
+        "bypassCount": 4
+      },
+      {
+        "id": "mcp-stdio",
+        "name": "MCP stdio",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/mcp/nativeMcpClient.ts",
+            "symbol": "mountNativeMcpServer"
+          },
+          {
+            "path": "src/mcp/nativeMcpClient.ts",
+            "symbol": "StdioClientTransport"
+          }
+        ],
+        "owners": [
+          "P1-39"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "mcp-http",
+        "name": "MCP HTTP",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/mcp/nativeMcpHttpTransport.ts",
+            "symbol": "nativeMcpHttpEndpoint"
+          },
+          {
+            "path": "src/mcp/nativeMcpHttpTransport.ts",
+            "symbol": "NativeMcpHttpTransport"
+          },
+          {
+            "path": "src/mcp/nativeMcpClient.ts",
+            "symbol": "negotiate"
+          },
+          {
+            "path": "src/mcp/oauth/discovery.ts",
+            "symbol": "discoverNativeMcpAuthorizationServer"
+          },
+          {
+            "path": "src/mcp/oauth/authorize.ts",
+            "symbol": "validateNativeMcpAuthorizationResponse"
+          },
+          {
+            "path": "src/mcp/oauth/tokenStore.ts",
+            "symbol": "NativeMcpOAuthTokenStore"
+          }
+        ],
+        "owners": [
+          "P1-39"
+        ],
+        "bypassCount": 2
+      },
+      {
+        "id": "provider-calls",
+        "name": "Provider calls",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/llm/adapter/llmRuntime.ts",
+            "symbol": "reserveNativeModelBudget"
+          },
+          {
+            "path": "src/llm/adapter/providerCapabilities.ts",
+            "symbol": "assertRequestCapabilities"
+          },
+          {
+            "path": "src/llm/adapter/adapterRegistry.ts",
+            "symbol": "PinnedRoute"
+          }
+        ],
+        "owners": [
+          "P2-01"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "imports",
+        "name": "Imports",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/ledger/trustTierValidation.ts",
+            "symbol": "assertTrustTierProvenance"
+          },
+          {
+            "path": "src/importers/piSessionImport.ts",
+            "symbol": "PI_SESSION_SUPPORTED_VERSION"
+          },
+          {
+            "path": "src/importers/dshSessionContract.ts",
+            "symbol": "DSH_IMPORT_LIMITS"
+          },
+          {
+            "path": "src/eval/evalImporters.ts",
+            "symbol": "EVAL_IMPORT_MAX_AGE_MS"
+          },
+          {
+            "path": "src/ingest/ingest.ts",
+            "symbol": "attestIngestSession"
+          }
+        ],
+        "owners": [
+          "P1-24"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "studio",
+        "name": "Studio API and UI",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/studio/studioServer.ts",
+            "symbol": "authenticate"
+          },
+          {
+            "path": "src/studio/nativeAdmission.ts",
+            "symbol": "nativeCsrfTokenForSession"
+          },
+          {
+            "path": "src/studio/nativeAdmission.ts",
+            "symbol": "nativeAllowedBrowserOrigins"
+          },
+          {
+            "path": "src/studio/nativeAdmission.ts",
+            "symbol": "isNativeStudioPath"
+          },
+          {
+            "path": "src/studio/nativeAdmission.ts",
+            "symbol": "assertNativeBrowserAdmission"
+          },
+          {
+            "path": "src/a4/a4Identity.ts",
+            "symbol": "resolveA4Principal"
+          },
+          {
+            "path": "src/a4/a4Router.ts",
+            "symbol": "a4PreviewEnabled"
+          },
+          {
+            "path": "src/a4/a4Router.ts",
+            "symbol": "handleA4Route"
+          }
+        ],
+        "owners": [
+          "P0-23",
+          "D-06"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "cli",
+        "name": "CLI",
+        "status": "advisory",
+        "enforcementPoints": [
+          {
+            "path": "src/cli.ts",
+            "symbol": "skipVault"
+          },
+          {
+            "path": "src/vault/vault.ts",
+            "symbol": "unlockVault"
+          }
+        ],
+        "owners": [
+          "P0-22"
+        ],
+        "bypassCount": 2
+      },
+      {
+        "id": "sdk-acp",
+        "name": "SDK and ACP",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/acp/acpAgentServer.ts",
+            "symbol": "createAcpAgent"
+          },
+          {
+            "path": "src/sdk/nativeAgentClient.ts",
+            "symbol": "AMCNativeClient"
+          }
+        ],
+        "owners": [
+          "P2-13"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "extensions",
+        "name": "Extensions",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/extensions/nativeExtensionRuntime.ts",
+            "symbol": "loadNativeExtensions"
+          },
+          {
+            "path": "src/plugins/nativeExecutableRunner.ts",
+            "symbol": "NativeExecutableRunner"
+          }
+        ],
+        "owners": [
+          "P0-31"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "managed-hooks",
+        "name": "Managed hooks",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/adapters/managedHookLease.ts",
+            "symbol": "verifyManagedLease"
+          },
+          {
+            "path": "src/bridge/hookControl.ts",
+            "symbol": "evaluateProviderHookControl"
+          }
+        ],
+        "owners": [
+          "P0-30"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "notary",
+        "name": "Notary",
+        "status": "enforced",
+        "enforcementPoints": [
+          {
+            "path": "src/notary/notaryAuth.ts",
+            "symbol": "verifyNotaryRequestAuth"
+          },
+          {
+            "path": "src/notary/notaryServer.ts",
+            "symbol": "startNotaryServer"
+          },
+          {
+            "path": "src/notary/notaryLog.ts",
+            "symbol": "appendNotaryLogEntry"
+          }
+        ],
+        "owners": [
+          "P0-30",
+          "P2-08"
+        ],
+        "bypassCount": 1
+      },
+      {
+        "id": "helm-compose",
+        "name": "Helm and Compose",
+        "status": "none",
+        "enforcementPoints": [
+          {
+            "path": "deploy/helm/amc/templates/secret.yaml",
+            "symbol": "change-me-vault-passphrase"
+          },
+          {
+            "path": "deploy/compose/docker-compose.yml",
+            "symbol": "AMC_VAULT_PASSPHRASE_FILE"
+          }
+        ],
+        "owners": [
+          "P0-14",
+          "P0-35"
+        ],
+        "bypassCount": 2
+      }
+    ],
+    "failurePolicy": [
+      {
+        "id": "authority-store-unavailable",
+        "tests": [
+          "tests/nativeBudgets.test.ts"
+        ],
+        "owners": [
+          "P1-03",
+          "P1-04"
+        ]
+      },
+      {
+        "id": "recorder-fails-after-effect",
+        "tests": [
+          "tests/toolEvidenceRecording.test.ts"
+        ],
+        "owners": [
+          "P1-03",
+          "P1-04"
+        ]
+      },
+      {
+        "id": "process-dies-before-receipt",
+        "tests": [
+          "tests/sessionRecovery.test.ts"
+        ],
+        "owners": [
+          "P1-04",
+          "P2-12"
+        ]
+      },
+      {
+        "id": "approval-stale-or-changed",
+        "tests": [],
+        "owners": [
+          "P1-02"
+        ]
+      },
+      {
+        "id": "residency-route-unsupported",
+        "tests": [],
+        "owners": [
+          "P2-01"
+        ]
+      },
+      {
+        "id": "legal-hold-unknown",
+        "tests": [],
+        "owners": [
+          "P2-01"
+        ]
+      },
+      {
+        "id": "model-or-provider-outage",
+        "tests": [],
+        "owners": [
+          "P2-26",
+          "P1-17"
+        ]
+      },
+      {
+        "id": "telemetry-exporter-down",
+        "tests": [
+          "tests/telemetryExporterFailure.test.ts"
+        ],
+        "owners": [
+          "P2-18"
+        ]
+      }
+    ],
+    "sixteenthChannel": "native-tool-breadth was added by P1-43 and is explicitly documented at THREAT_MODEL.md:3. The recovered baseline said15 and instructs adding rows after P143/P144. Current original test intentionally expects16; do not delete a row or rewrite this as a measured15-channel pass.",
+    "archive": "Old pointer and archive banner exist; all three requested link sites name docs/security/THREAT_MODEL.md. Original archive bytes were not rewritten.",
+    "CI": "package script check:threat-model invokes the actual MJS checker. Existing build-test step runs npm run check:threat-model without an if/continue-on-error override in Ubuntu Node22/24 matrix. Static wiring only; no hosted run or failure-propagation execution here."
+  },
+  "actualFlow": [
+    {
+      "flow": "Map checker",
+      "path": "scripts/check-threat-model.mjs",
+      "detail": "Standalone child CLI, rooted from import.meta.url, Ajv2020 actual schema. Checks duplicate channel/failure IDs, each path exists, whole-identifier textual symbol occurrence, referenced test-path existence and non-orphan failure rows; schema checks status/owner syntax/ASI/path patterns. Emits offending entry and exit1 or prints ok/exit0. It does not execute enforcement points, verify symbol call reachability, ensure owners exist in the plan, establish current commit/date freshness or validate STRIDE truth."
+    },
+    {
+      "flow": "Map tests",
+      "detail": "Seven literal definitions; six checker children use process.execPath with inherited environment/CWD and no explicit spawnSync timeout. Seventh reads doc and verifies each channel ID/heading, failure ID and ASI01..10 occur. Neither test nor script proves every channel enforces its advertised status."
+    },
+    {
+      "flow": "Governed telemetry recorder failure",
+      "detail": "readyWorkspace initializes actual isolated workspace/vault/budgets/firewall, then agentToolset.seam.execute performs fs.read of owned workspace/n.txt. Composed recorder writes toolEvidenceFor through actual ledger.appendEvidenceBatch; ledger queues telemetry after durable append. Prototype recordEvidenceEvent throws in one case; queueEvidenceEventSpan catches and counts a drop. Outcome stays OK and independent readonly SQLite connection counts exactly one matching TOOL_CALL_ALLOWED audit. Count assertion is not independent signature/seal verification."
+    },
+    {
+      "flow": "Telemetry dispatch failure",
+      "detail": "Second original case forces getBufferStats threshold and mocks global fetch to reject ECONNREFUSED, awaits shared exporter.flush, then checks fetch was invoked, OK and one audit. Current transport actually gates egress with checkScopedEgress and uses manual redirects/retries; this test supplies canned rejection, not a real collector/socket outage. Disabled preview tests are serialization checks only."
+    },
+    {
+      "flow": "Drop reporting and mandatory evidence",
+      "detail": "noteTelemetryDropped/takeDroppedTelemetry maintain a local count. actionJournal.writeTelemetryDrops takes it, appends and seals a TELEMETRY_DROPPED audit at most once per minute, returning count on write failure; exporter excludes those audit spans to prevent feedback. Existing P0112 tests do not assert drop count/audit delivery, retention on preparation failure, retries, concurrent workspaces or process-death behavior."
+    }
+  ],
+  "corpus": {
+    "registrationBasis": "Static source definitions only; no collection/import. Existing explicit test/it definitions are not dynamically wrapped in registration loops. Actual runner registrations remain to be observed.",
+    "primary": [
+      {
+        "file": "tests/threatModelMap.test.ts",
+        "staticLiteralDefinitions": 7,
+        "cases": [
+          {
+            "line": 21,
+            "name": "a valid map passes"
+          },
+          {
+            "line": 27,
+            "name": "a cited path that does not exist fails and names the entry"
+          },
+          {
+            "line": 34,
+            "name": "a symbol absent from its file fails"
+          },
+          {
+            "line": 41,
+            "name": "an owner that is not a plan key fails"
+          },
+          {
+            "line": 48,
+            "name": "a failure row with no test and no owner fails"
+          },
+          {
+            "line": 55,
+            "name": "the real channel map passes with 16 channels and 8 failure rows"
+          },
+          {
+            "line": 64,
+            "name": "the threat model document names every channel, failure row and ASI id in the map"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": true
+      },
+      {
+        "file": "tests/telemetryExporterFailure.test.ts",
+        "staticLiteralDefinitions": 2,
+        "cases": [
+          {
+            "line": 82,
+            "name": "does not fail a governed tool call or drop its ledger row when recording throws"
+          },
+          {
+            "line": 95,
+            "name": "does not fail a governed tool call or drop its ledger row when the collector is unreachable"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": true
+      }
+    ],
+    "staticPrimaryDefinitions": 9,
+    "optionalFocusedContext": [
+      {
+        "file": "tests/observabilityOtelExporter.test.ts",
+        "staticLiteralDefinitions": 5,
+        "cases": [
+          {
+            "line": 26,
+            "name": "exports evidence events as OTLP spans"
+          },
+          {
+            "line": 56,
+            "name": "exports score computations as OTLP metrics"
+          },
+          {
+            "line": 84,
+            "name": "exports incidents as OTLP logs"
+          },
+          {
+            "line": 110,
+            "name": "supports Zipkin exporter by converting all signals to spans"
+          },
+          {
+            "line": 139,
+            "name": "supports Jaeger OTLP endpoints for traces, metrics, and logs"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": false
+      },
+      {
+        "file": "tests/toolEvidenceRecording.test.ts",
+        "staticLiteralDefinitions": 7,
+        "cases": [
+          {
+            "line": 83,
+            "name": "records an ALLOWED call"
+          },
+          {
+            "line": 97,
+            "name": "records a DENIED call, with which guard refused and why"
+          },
+          {
+            "line": 113,
+            "name": "writes an audit row AND a metric row per call"
+          },
+          {
+            "line": 141,
+            "name": "correlates a call to its token, so a denial can be traced"
+          },
+          {
+            "line": 154,
+            "name": "does NOT copy the arguments into the audit row"
+          },
+          {
+            "line": 185,
+            "name": "returns the tool's real outcome when the recorder throws"
+          },
+          {
+            "line": 218,
+            "name": "labels the three outcomes distinctly"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": false
+      }
+    ],
+    "optionalContextDefinitions": 12,
+    "notWhole16Channels": "The two primary files qualify documentation/reference checking and two best-effort telemetry branches. They are not a 16-channel destination/auth/race suite."
+  },
+  "runtimeAndFixtureBoundaries": [
+    "Fresh owned native-compatible Node22/pnpm10.33 lane must be assigned and installed/built/frozen normally before any P011 runtime; no prepared copy/controller or runtime is created here.",
+    "Telemetry tests require better-sqlite3, vault KDF/signing, real filesystem workspaces, normal runtime policy and toolset cleanup. They use a second SQLite readonly connection while the toolset holds its ledger; this is not fully cold evidence or universal no-WAL-effects proof.",
+    "beforeEach enables OTEL before readyWorkspace; prototype/fetch spies are installed after initialization. The file alone does not prove zero transport during initialization or credential-free environment. A future owned launcher must record actual environment/transport boundaries, not relabel inherited os.environ as isolated.",
+    "afterEach restores mocks/env, resets shared exporter, closes registered toolsets with caught close errors, then removes owned dirs. All actual cleanup/late diagnostics must be retained; setup or timeout failures are not product assertion kills.",
+    "The optional toolEvidenceRecording suite includes actual owned SQLite rows plus a direct READ_ONLY echo ToolPipeline with a genuinely throwing callback. It does not make a real evidence store fail; its direct outcome preservation control is not durable reconciliation proof.",
+    "Normal Vitest global/per-file repository-workspace guards and30s deadlines remain intact. External child bounding must preserve actual child PID/exit and avoid claiming universal detached-process cleanup."
+  ],
+  "acceptanceGaps": [
+    {
+      "kind": "Human review",
+      "evidence": "THREAT_MODEL.md:3 explicitly says Sid review of residual-risk/status is pending.",
+      "meaning": "No local reviewer approval or heading comment was established. No external PR/tracker was queried; approval elsewhere is not inferred."
+    },
+    {
+      "kind": "External titles",
+      "evidence": "THREAT_MODEL.md:251-255 retains re-verify and experimental labeling for ASI01..10.",
+      "meaning": "No OWASP page was fetched in this preparation. Preserve the re-verify label until separately authorized factual verification before publishing."
+    },
+    {
+      "kind": "Follow-up key collision",
+      "evidence": "THREAT_MODEL.md:272-274 proposes P1-56/57/58 for MCP containment, skip-vault passphrase and egressProxy. Current Issues.md:133-135 assigns those keys to A4.",
+      "meaning": "Historical proposals are not actual free plan keys or filed follow-ups. Root/plan owner must resolve attribution before any issue/PR closure; do not overwrite A4 keys."
+    },
+    {
+      "kind": "Freshness/coverage",
+      "evidence": "Map still declares verifiedAt2026-10-07 and commit e25cce1a03b17a023d4aadfbcdb71dfe653db87a; docs carry later P105/P102/P112/P166/P167 updates.",
+      "meaning": "Existence/identifier/schema guard is not current behavioral validation, complete STRIDE assurance or no-bypass proof. Do not update timestamps to manufacture acceptance."
+    },
+    {
+      "kind": "Required mutation semantics",
+      "evidence": "Checker missing-path branch pushes an error and continues. Removing the entire existence if would fall through to readFileSync and still refuse ENOENT.",
+      "meaning": "A generic nonzero or altered error does not show the requested missing-path fixture passed. A later exact private fail-open error-removal-with-continue control can be proposed, reviewed and measured with unchanged seven tests; that is not silently the same textual removal. No recipe/controller or mutation is authored now."
+    },
+    {
+      "kind": "Current validation pending",
+      "evidence": "No P011 runtime occurred.",
+      "meaning": "Original9, actual checker/negative fixtures, causal mutation, full suite/types/lint/docs/architecture, PR/merged SHA and Sid review remain unqualified here. Earlier broad passes do not transfer automatically."
+    },
+    {
+      "kind": "Inherited debt",
+      "evidence": "Current prior exact-code context reports duplicate1269/dead2751 failed, plus earlier bounded residuals.",
+      "meaning": "No thresholds/freeze/baselines are changed or waived. P029 skip, P022 arrays, P023 heldAPI/Studio, P051 trust/formal failures, P024 ISO/expert cells, P019/P020 proposals, P030 batch/runner/installed-pack gaps and paused/shared/Claude boundaries persist."
+    }
+  ],
+  "ownership": {
+    "wholeIssue": "No explicit P011 issue reservation was found in the frozen notes, but this is not path transfer. Existing-source read-only qualification can be proposed independently.",
+    "heldPaths": [
+      "docs/security/THREAT_MODEL.md",
+      "docs/security/channel-map.json",
+      "src/a4/*",
+      "src/api/*",
+      "src/studio/*",
+      "src/approvals/*",
+      "src/mode/mode.ts",
+      "src/verify/verifyAll.ts",
+      "shared CLI/registries",
+      "paused P2-02 sources"
+    ],
+    "telemetry": "Observability paths have an existing Codex P201 source-only reservation/history. New P011 fixes are not authorized by that history; no telemetry, ledger or action journal repair is proposed.",
+    "futureRepairRule": "Root must audit the exact path, accepted base and live owner before authoring any repair. No transfer, source edits, held-code copy or baseline change follows from this readiness."
+  },
+  "minimalFuturePlanOnly": [
+    {
+      "step": 1,
+      "action": "After P045 bounded handoff, root creates an explicitly owned P011 lane from the accepted source and records current source/plan/reservation pins, frozen install, normal build, native fingerprint and normal freeze.",
+      "commandsNotExecuted": [
+        "pnpm install --frozen-lockfile",
+        "pnpm run build",
+        "pnpm run check:freeze"
+      ]
+    },
+    {
+      "step": 2,
+      "action": "Run unchanged threatModelMap and telemetryExporterFailure normally, preserving defaults/guards and actual raw reporter/exit/late diagnostics. Observe actual registration count; static target is7+2, not assumed acceptance.",
+      "commandsNotExecuted": [
+        "pnpm exec vitest run tests/threatModelMap.test.ts tests/telemetryExporterFailure.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --outputFile.json=<fresh-owned-raw.json>",
+        "node scripts/check-threat-model.mjs",
+        "npm run check:threat-model"
+      ]
+    },
+    {
+      "step": 3,
+      "action": "Run optional existing five preview cases and seven tool-evidence cases only if useful to explain actual flows, separately counted and scoped. These do not establish destination enforcement or telemetry outage/drop reporting.",
+      "commandsNotExecuted": [
+        "pnpm exec vitest run tests/observabilityOtelExporter.test.ts tests/toolEvidenceRecording.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --outputFile.json=<separate-owned-raw.json>"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "Read-only/current owner review resolves15baseline-vs16current, stale proposed follow-up keys, Sid-review evidence and external-title status. No automatic document rewrite, issue filing or human decision."
+    },
+    {
+      "step": 5,
+      "action": "Only after exact private recipe review/release: causal missing-path guard baseline/mutant/restored with unchanged original tests and positive controls, source-mode if a complete owned copy is appropriate; full restoration and process evidence. Retain ENOENT masking if a literal guard removal refuses instead of accepting."
+    },
+    {
+      "step": 6,
+      "action": "Root decides final normal checks/full-suite scope and records remaining strict gaps. No full CI, Node24, merged PR, Done or formal dependency claim follows from a focused pass."
+    }
+  ],
+  "directPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/security/THREAT_MODEL.md",
+      "bytes": 49246,
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/security/channel-map.json",
+      "bytes": 20174,
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/security/channel-map.schema.json",
+      "bytes": 2669,
+      "sha256": "6d11b2bf91471c4da936d793e686d755f147d444bed09600994c5a2d8c7cce42"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/THREAT_MODEL.md",
+      "bytes": 403,
+      "sha256": "9172c2a1e3c9b25eced0fb70972658158ea658f5090936f3b681e1f8dbaa40d3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/archive/THREAT_MODEL-2026-02.md",
+      "bytes": 2943,
+      "sha256": "6449f0bc83aa43fed09986238fc2c98757c5f0667d8ac1db29667a1ca762de28"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/HARDENING.md",
+      "bytes": 1598,
+      "sha256": "7ac55a463b818f70d415472e900cdc992ff22e907310d152ac53499296530d6a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/READING_ORDER.md",
+      "bytes": 15006,
+      "sha256": "9348552e0dbba4aba2c5075970943231298f5f87c86dacdae1787b9c99002b1c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "bytes": 873,
+      "sha256": "fbf932970bfb250de91121430ff8903b28787d609977119f5cbedac85130c298"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+      "bytes": 3560,
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 29435,
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "bytes": 18803,
+      "sha256": "0d835399a02ebb3ce8b22daee1eccfcf4864dc1533342657d39983a5d3f79a5c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/observability/otelExporter.ts",
+      "bytes": 29231,
+      "sha256": "8e6fee4594df8b74c87e3fa0b583888cbe1bb126195a4f49d2ddf973390a9d58"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/observability/otelExportTransport.ts",
+      "bytes": 3282,
+      "sha256": "b47298f37f681a75c68919d8c8de0b7dfe700281ac357ab8780b1195bbfe71b3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/observability/telemetryDrops.ts",
+      "bytes": 705,
+      "sha256": "3648fb9dd42536b2822f6e97fe984c0cd103c4ee2fea05f563d0a1cfee4bbe96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ops/otelExporter.ts",
+      "bytes": 13248,
+      "sha256": "250eb6d4ebe930eaef7f1e8df4a47ae75eddabe2ab373ba09b171aaf91cb18ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+      "bytes": 3263,
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+      "bytes": 4746,
+      "sha256": "fcf694842227d513eaf52e2c62c57910ccbb332e420cf82f38a57bc29d836e16"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+      "bytes": 5975,
+      "sha256": "4bab25e8a2d72c4c9c2d703a45434a15b5f5005c89aa8d7f1e5f6287568986d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+      "bytes": 11449,
+      "sha256": "8dcbb281f950c7f0f60cf50e9b2e3c1c620db985b684b7c2005885818bc73168"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/fixtures/threat-model/bad-owner.json",
+      "bytes": 867,
+      "sha256": "05a6739b2a7b881cb62e5f76cc55b4ebc190876041a48bed33a3c6a327c8150e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-path.json",
+      "bytes": 869,
+      "sha256": "fd72bcc1821a8461370a3624be441e9f51ad53c0d9008f0294d2cf7e8e440f77"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-symbol.json",
+      "bytes": 868,
+      "sha256": "012beba72e467ed34a0b56626c444864df13e19d00b04c6d21a08231675eb967"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/fixtures/threat-model/orphan-failure-row.json",
+      "bytes": 791,
+      "sha256": "2d6292637d403a8dbcbf43fc15213c76cf6c076b6f245ed9d6db73f7e71a049d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/fixtures/threat-model/valid.json",
+      "bytes": 867,
+      "sha256": "d5b5e641c830ccb5c0ca5014b5b5e44f7a324818494522694631e94bf6887661"
+    }
+  ],
+  "mappedPointSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/deploy/compose/docker-compose.yml",
+      "bytes": 1816,
+      "sha256": "6b3bb1d6df4ff79ea64da152f32ca7a9b01036defd05a0f83a7b6be11b1f67d6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/deploy/helm/amc/templates/secret.yaml",
+      "bytes": 561,
+      "sha256": "bf65938c1b7b9444016790940862dfb8932526606d394590ed06a9239578c5b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/a4/a4Identity.ts",
+      "bytes": 12907,
+      "sha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/a4/a4Router.ts",
+      "bytes": 45906,
+      "sha256": "15d1ba135a81f1b7561051c02835a0121cce7f1e386a5c965cc990b9c65de94e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/acp/acpAgentServer.ts",
+      "bytes": 30835,
+      "sha256": "610e6133606ed5bda3cf141f9eaac3c0a01f6f329e051e14c85a23ecc12451e5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/adapters/managedHookLease.ts",
+      "bytes": 2173,
+      "sha256": "a8877d45b882fc17eedee87a3cb9b8edc6c114e8ada4e192fcf96ef6c50f9470"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/agent/nativeToolCapabilities.ts",
+      "bytes": 3510,
+      "sha256": "40266971f3e6feafc6924a04da62789fe8374cc07dc2d168d5d47d894dca7a44"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/bridge/hookControl.ts",
+      "bytes": 48026,
+      "sha256": "437e972888298aefa36ef18296f5924e5ddd0901a78d34f6dc958fb69ad8653e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+      "bytes": 8093,
+      "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/extensions/nativeExtensionRuntime.ts",
+      "bytes": 10239,
+      "sha256": "f5e5115bc703c0c9c9811919cbc4e522d2edc848680c0ae3dadb5d55007d836e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/gateway/requestFieldGuard.ts",
+      "bytes": 10355,
+      "sha256": "e37b362e82476c298e86a2d7bb62cdca9b8dec6ef9175b562183c9a6385085c7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/gateway/server.ts",
+      "bytes": 68401,
+      "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/importers/dshSessionContract.ts",
+      "bytes": 9596,
+      "sha256": "bdfe228ee9119f60e85e8d2fb0896f9dc8ce7abed42369ca549d62e5e09a79b3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/importers/piSessionImport.ts",
+      "bytes": 20249,
+      "sha256": "0dac5dd10c9355eddf192a8d3d08f41772397f7bf8acb5071e920196376b1e10"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/llm/adapter/adapterRegistry.ts",
+      "bytes": 10935,
+      "sha256": "9d8479ded01f1a500cb8a5eb92f3cf006fe8e6e261b477fd434e0a280cdb6e3e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/llm/adapter/llmRuntime.ts",
+      "bytes": 22504,
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/llm/adapter/providerCapabilities.ts",
+      "bytes": 13151,
+      "sha256": "29160f7f8fb8899c4856fac2286dfd8bdaac836250b199a77281a9de734a0d73"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/mcp/nativeMcpClient.ts",
+      "bytes": 25454,
+      "sha256": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+      "bytes": 41548,
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/mcp/oauth/authorize.ts",
+      "bytes": 14742,
+      "sha256": "7a73271cccd63f81abd4b3417decd0ef2393420d34c2f607648a90fe5e1878ad"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/mcp/oauth/discovery.ts",
+      "bytes": 13603,
+      "sha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/mcp/oauth/tokenStore.ts",
+      "bytes": 2544,
+      "sha256": "02ec50a11780f42ec41bc5781029f44a50eb6943cd1ee26cf87520d2b2d80ab8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/notary/notaryAuth.ts",
+      "bytes": 3821,
+      "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/notary/notaryLog.ts",
+      "bytes": 5990,
+      "sha256": "71ae01cea6e4eff4a2c817f9ebd9966aad068b2bc9e83455d70ba3978f211e7d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/notary/notaryServer.ts",
+      "bytes": 13001,
+      "sha256": "f97c992ca0043e0b8fcf8c7e2a3f2048b5284b8729efc91f0e0aa96e7308f120"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/plugins/nativeExecutableRunner.ts",
+      "bytes": 14286,
+      "sha256": "8619e028486eb6a2eefc397cd3e943ff8ea27649e33ec13516bf9b8a66dc3fa3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/policy/effectivePolicyReceipt.ts",
+      "bytes": 7579,
+      "sha256": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+      "bytes": 14615,
+      "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/egress/shellEgressProxy.ts",
+      "bytes": 6819,
+      "sha256": "78927f47b6f98ac04a68d862e78f72ac238a1cab0e4ce97bebbd12c5d2abe550"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/nativeSandboxBinding.ts",
+      "bytes": 7003,
+      "sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/nativeShellGate.ts",
+      "bytes": 6328,
+      "sha256": "27f4c9a6d3776bd0214b167783a229ab2c5a5a2e7058cf0090c1016050e8b2d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/processCap.ts",
+      "bytes": 2402,
+      "sha256": "c7b3cc7f51d51bc240c5aabc1172b18b6452356edb90e285bb1f7877ecf1bdfb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sandbox/seatbeltNativeShell.ts",
+      "bytes": 12224,
+      "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+      "bytes": 47921,
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/studio/nativeAdmission.ts",
+      "bytes": 7292,
+      "sha256": "70c7e9cff9e9a09468810073e0e5f754b64b54a9844b03ab33d9fcd914960125"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/askUserTool.ts",
+      "bytes": 8984,
+      "sha256": "51e961564058bc728c588d119cde363595fee842c59ab82f3a6e8ff843580654"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/bashTool.ts",
+      "bytes": 6113,
+      "sha256": "1c6277340a2cc336186485ed6b15fb4a014d3082924ca644134513196df9f7df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/fsTools.ts",
+      "bytes": 9098,
+      "sha256": "66cece4b743e715dfcc6b296f17713caec027991348961b9b6777b0cc78d4771"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+      "bytes": 10592,
+      "sha256": "ecf0aae9dc6f83cd52d9dbb713e3d8dd9ef7bacb0b52b282e838492467a6e209"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/nativeReceipt.ts",
+      "bytes": 1979,
+      "sha256": "965b299e44f992ade3c31ea82c21284f7b9f252fb36cb37bb8c249c35bbb1e81"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/originPolicy.ts",
+      "bytes": 4151,
+      "sha256": "62e6a15cfba8ef670cce0c4699e9127236c6ed63a7b4dc7a261e22620fcccdce"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/nativeToolBreadth/sessionListTool.ts",
+      "bytes": 6363,
+      "sha256": "cd2121bff70a99115b90793e3f5823f4ee61c278fefe23bb07f274a316570f97"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/builtin/readBeforeEdit.ts",
+      "bytes": 4531,
+      "sha256": "a776895cb04b874555caf063ede3f63450aa2e639f5a544e0144ecc53e21dda8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 29435,
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    }
+  ],
+  "absentOptionalPathsObserved": [],
+  "referencePins": [
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+      "bytes": 3352,
+      "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/initial-preflight.json",
+      "bytes": 15064,
+      "sha256": "b039ec6dd5834b494623d6a1ddc3c4415675d829532c38e4ca3c30835de62802"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/original-corpora-summary.json",
+      "bytes": 6370,
+      "sha256": "c6098f0805c3ec3879a90f4f03f29d6fbe51047f9dd9a327c6c966c6750d6e52"
+    }
+  ],
+  "toolAndScopeNotes": [
+    "Current owned root has no AGENTS.md or AMC_OS rolebooks; the user-provided AGENTS instructions and existing primary AMC_OS global/revenue rolebooks were read instead. No inbox append is allowed by the explicit two-file scope.",
+    "Graph query succeeded on existing graphify0.9.74; it is stale and differs from reviewed refresh pin0.9.56. No graph build/refresh or product parser was invoked.",
+    "All writes in this task are only this NEW JSON/Markdown pair. No runtime/import/collection/build/install/copy/setup/controller/mutation, source/test/guard/workflow/archive/qualification/Git mutation, tracker or Claude message occurred."
+  ],
+  "memoryUse": "Memory workflow guidance only: preserve authored work, verify current plan/source and distinguish candidate/qualified/released/live. All factual routing/source evidence above was refreshed locally; no old runtime or status was treated as current proof."
+}

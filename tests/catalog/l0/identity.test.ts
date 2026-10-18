@@ -2,6 +2,8 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
+import { bindAuthorization, carryBoundPrincipal, recheckAuthorization } from "../../../src/actions/authorize.js";
+import type { ToolExecution } from "../../../src/tools/toolTypes.js";
 import { agentToolset } from "../../../src/agent/agentToolset.js";
 import { decideApprovalForIntent } from "../../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../../src/approvals/approvalPolicyEngine.js";
@@ -282,4 +284,24 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       expect(text, "the compiled-policy guard names the control and the reason").toContain(`control L0-IDN-01@0.1.0): ${f.envelope.expected.reasonCode}`);
     });
   }
+});
+
+describe("P1-78 bound principal across journal admission", () => {
+  it("a record re-derived with fresh journal IDs keeps its bound principal for the recheck", () => {
+    const ws = newWorkspace();
+    const { owner } = initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+    const leaseToken = issue(ws, "default", ["toolhub:execute"], "1h", undefined, { userId: owner.userId });
+    const execution = { token: "tok_principal-carry", callId: "call-principal-carry", rootCallId: "call-principal-carry", name: "fixture.write",
+      agentId: "default", workspace: ws, actionClass: "WRITE_HIGH", requestedMode: "EXECUTE", effectiveMode: "EXECUTE",
+      arguments: {}, parentToken: null } as unknown as ToolExecution;
+    const bound = bindAuthorization(execution, { leaseToken });
+    if (!bound.ok) throw new Error(`fixture bind refused: ${bound.reason}`);
+    expect(bound.record.principal).toMatchObject({ principalId: owner.userId, authenticatedVia: "lease" });
+    expect(recheckAuthorization(bound.record, execution, { leaseToken }).ok).toBe(true);
+    // A copy with the journal's IDs is a new object: without the carried state its recheck cannot match the principal.
+    const rebased = { ...bound.record, executionId: "exec_principal-carry" };
+    expect(recheckAuthorization(rebased, execution, { leaseToken })).toMatchObject({ ok: false });
+    const carried = carryBoundPrincipal(bound.record, { ...bound.record, executionId: "exec_principal-carry" });
+    expect(recheckAuthorization(carried, execution, { leaseToken }).ok).toBe(true);
+  });
 });

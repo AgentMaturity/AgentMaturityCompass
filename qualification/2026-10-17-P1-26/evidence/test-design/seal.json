@@ -1,0 +1,70 @@
+{
+  "schema": "p126-private-candidate-seal/1",
+  "at": "2026-10-16T20:30:01.266496+00:00",
+  "inputCount": 47,
+  "outputCount": 6,
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "privateOnly": true,
+  "unexecuted": true,
+  "fixedTestCount": 13,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "dev": 16777231,
+      "inode": 543324878,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "dev": 16777231,
+      "inode": 543324879,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/README.md",
+      "bytes": 3295,
+      "sha256": "179756b9421ef55d9cd05f278c6c1cdb9374c0d224dfc35f842c307ceca57f0c",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/README.md",
+      "dev": 16777231,
+      "inode": 543325426,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/matrix.json",
+      "bytes": 6246,
+      "sha256": "06ffa5567a318d97578011a68376121d760222adb378fa4e06d24bc072c5a475",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/matrix.json",
+      "dev": 16777231,
+      "inode": 543325425,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/input-pins.json",
+      "bytes": 19519,
+      "sha256": "a80a4432a5651a5f088305d9161e2952d217f4722cbcb94e7c631e4dbb128b2b",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/input-pins.json",
+      "dev": 16777231,
+      "inode": 543325427,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/author-review.json",
+      "bytes": 6869,
+      "sha256": "e093afb324f9dcec56456fd4ec90a52ddd9c66465fbfd643e076e409f3c112e9",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/author-review.json",
+      "dev": 16777231,
+      "inode": 543325428,
+      "nlink": 1
+    }
+  ],
+  "inputPinsSha256": "a80a4432a5651a5f088305d9161e2952d217f4722cbcb94e7c631e4dbb128b2b",
+  "allInputAndOutputPinsRechecked": true,
+  "independentReviewRequiredBeforeRootAdoption": true,
+  "noSourceAdmissionOrRuntimeCredit": true
+}

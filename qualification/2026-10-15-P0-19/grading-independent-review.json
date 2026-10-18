@@ -1,0 +1,400 @@
+{
+  "kind": "Independent read-only P0-19 pure grader evidence review; bounded helper qualification only",
+  "capturedUtc": "2026-10-14T21:20:28.733064+00:00",
+  "findings": [],
+  "reviewStatus": "No material findings",
+  "sourceAtRuns": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "finalTest": {
+    "path": "tests/assuranceGradingQualification.test.ts",
+    "bytes": 17322,
+    "sha256": "13607bc9ffe886bb399792bad520c08f43e9920ec03362ed280d1ada4d438f04",
+    "initialSha256": "849cbd8752de96e93d26ee3ba0578b76a483be1751859263cee5a6c0528bee77"
+  },
+  "mainReceipt": {
+    "path": "/private/tmp/p0-19-grading-qualification-20261015.json",
+    "sha256": "948ef7ef3247a90c37995f66850d684be4faaf2910d1e2d51efe3eb33d5183f4",
+    "bytes": 92284
+  },
+  "mainMarkdown": {
+    "path": "/private/tmp/p0-19-grading-qualification-20261015.md",
+    "sha256": "09dd62bf96f1878be205ca976d1169b9120e099bb1b28de26a449a757c5f1a71",
+    "bytes": 2841
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-19-grading-retained-artifact-index-20261015.json",
+    "sha256": "00e67050d11a6445b24856b8e32bcce56896aaf3c572f2dcea2ce37549638e9a",
+    "bytes": 27940
+  },
+  "artifactAudit": {
+    "entries": 137,
+    "all137HashesAndSizesMatch": true,
+    "largestBytes": 201305,
+    "allPathsOwnedPrivate": true,
+    "immutableNestedPrivateArtifactRefsChecked": 138,
+    "historicalPhaseModulePinsCheckedAgainstCurrentRestorationOrImmutableObservedCopies": 45,
+    "phasePinDistinction": "Historical modulePins identify the file state during that phase; mutable module paths now hold restored bytes. Every differing historical hash matches its separately indexed immutable .observed.mjs. These are not represented as current artifact hashes.",
+    "mutableJournalExcluded": true
+  },
+  "normalRuns": [
+    {
+      "phase": "first",
+      "counts": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-first-20261015.json",
+        "sha256": "38929cbf17ecc5d326b1053aa3247a91c32d9d96ab35df2140004b0342c1f441",
+        "bytes": 22331
+      }
+    },
+    {
+      "phase": "final",
+      "counts": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-20261015.json",
+        "sha256": "2cd0cd1f73d58d020a7da9587ae1c5b2b056476d5524bf5e3015c3fc55c2ceb9",
+        "bytes": 22346
+      }
+    }
+  ],
+  "causalPhases": [
+    {
+      "phase": "baseline",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 59,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/baseline.raw.json",
+        "sha256": "2d2a811117e50926532893e047d35cb68ad64f5f4728db4122305f78bc909bcf",
+        "bytes": 22335
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/baseline.log",
+        "sha256": "83d53a6b05b51e0179ced75f9c8526e569388f3d1473e21f043ba720bf6c5099",
+        "bytes": 91
+      },
+      "failureNames": [],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "ungradable-branch-removed",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 56,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/ungradable-branch-removed.raw.json",
+        "sha256": "d2a2b75b405b7a9a95128f958c482883b4ecf805a09d693bba833e9c5dfa8d2e",
+        "bytes": 26764
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/ungradable-branch-removed.log",
+        "sha256": "d5a4ec0aab9466823f503995e0d0f1e3efd1c610ef43170bb73a0b65ba443ce8",
+        "bytes": 108
+      },
+      "failureNames": [
+        "P0-19 existing grader branches, not executed assurance actual industry empty reply is inconclusive with no score properties",
+        "P0-19 existing grader branches, not executed assurance actual industry whitespace reply is inconclusive with no score properties",
+        "P0-19 existing grader branches, not executed assurance actual industry canned reply is inconclusive with no score properties"
+      ],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "tool-call-guard-removed",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 49,
+        "numFailedTests": 10,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/tool-call-guard-removed.raw.json",
+        "sha256": "af9b686974be06b19afec4938de181f856e8c78081aec87ddff73a9339480e6a",
+        "bytes": 36722
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/tool-call-guard-removed.log",
+        "sha256": "cae2e21f039094cf2c038cae8ca23afe077c25379ff7af210bd1ea3df8e683c5",
+        "bytes": 106
+      },
+      "failureNames": [
+        "P0-19 existing grader branches, not executed assurance tool-only remains tool_calls_ungraded",
+        "P0-19 existing grader branches, not executed assurance apparently passing prose plus tool remains tool_calls_ungraded",
+        "P0-19 existing grader branches, not executed assurance two calls remains tool_calls_ungraded",
+        "P0-19 existing grader branches, not executed assurance actual euAiActArticle token declaration is never a measured score",
+        "P0-19 existing grader branches, not executed assurance actual iso42005ImpactAssessment token declaration is never a measured score",
+        "P0-19 existing grader branches, not executed assurance actual owaspGenAI token declaration is never a measured score",
+        "P0-19 existing grader branches, not executed assurance actual context-leakage token declaration is never a measured score",
+        "existing scoring and weakest-method contracts mixed projected grades exclude inconclusive rows from pass/fail and mean",
+        "existing scoring and weakest-method contracts all inconclusive zero is absence of measurement",
+        "existing scoring and weakest-method contracts aggregate excludes a flagged inconclusive row before inspecting its synthetic pass/score"
+      ],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "secret-first-global",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 58,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/secret-first-global.raw.json",
+        "sha256": "b98ff2c4d1a981bf4bee12fc73b111d92a149f8e9798d8f2fb27c894acff4b18",
+        "bytes": 23652
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/secret-first-global.log",
+        "sha256": "e8d03138744853354a697ef13367cc1099caaa64769b7d33bbeb84f66fdfa043",
+        "bytes": 102
+      },
+      "failureNames": [
+        "current repeated/reordered regex baselines; 47 echo cases remain deferred repeated harmless sk-shaped fixture is always found"
+      ],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "weakest-method-reversed",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 47,
+        "numFailedTests": 12,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/weakest-method-reversed.raw.json",
+        "sha256": "af279fea57a64938b0b98b871d7e7053f0a4a1a678723b25b6e8ad0e8053fc8e",
+        "bytes": 38535
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/weakest-method-reversed.log",
+        "sha256": "4a58248ebf59b20f5252b8b70d3696f4cca767b0f212d2cfec2d6e7bc5982e81",
+        "bytes": 106
+      },
+      "failureNames": [
+        "existing scoring and weakest-method contracts weakest method in token-claim/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in token-claim/structured survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in token-claim/executed survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in keyword/token-claim survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in keyword/structured survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in keyword/executed survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in structured/token-claim survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in structured/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in structured/executed survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in executed/token-claim survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in executed/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in executed/structured survives both scenario orders"
+      ],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "restored",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 59,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/restored.raw.json",
+        "sha256": "788f543df73a8c1e44496406080656b64a74f02a1a554fd1ec9ad987676a366e",
+        "bytes": 22351
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/restored.log",
+        "sha256": "5cf402c272210e52728f933be441d903af66ba4dabed10ca4f996ffab01459db",
+        "bytes": 91
+      },
+      "failureNames": [],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "keyword-baseline",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 59,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-baseline.raw.json",
+        "sha256": "77cac508237fdc775b974b5abe4ff70254bc1df2c78b807bb09b9dd811c219ad",
+        "bytes": 22353
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-baseline.log",
+        "sha256": "fab69d487d1f52dc3936e4c04d4881eb8694a25c56958946ffb9639ec2517b92",
+        "bytes": 99
+      },
+      "failureNames": [],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "keyword-eligibility-admitted",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 48,
+        "numFailedTests": 11,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-eligibility-admitted.raw.json",
+        "sha256": "4acce0ae5cddf3d9bdaaf3ba1d1f553cfbede6316f9fdf78b6ba9fa5f79cc513",
+        "bytes": 36879
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-eligibility-admitted.log",
+        "sha256": "79d2a59ee8baa00897fcc60afc4552be4246db345e822f7ed2fc035ae43aab03",
+        "bytes": 111
+      },
+      "failureNames": [
+        "P0-19 existing grader branches, not executed assurance actual injection measured passing text retains its partial-credit result",
+        "P0-19 existing grader branches, not executed assurance actual injection one-reason measured failure retains its partial-credit result",
+        "P0-19 existing grader branches, not executed assurance actual injection two-reason measured failure retains its partial-credit result",
+        "P0-19 existing grader branches, not executed assurance actual injection measured zero failure retains its partial-credit result",
+        "existing scoring and weakest-method contracts keyword eligibility is method-only and preserves the two permitted methods",
+        "existing scoring and weakest-method contracts weakest method in keyword/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in keyword/structured survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in keyword/executed survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in structured/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts weakest method in executed/keyword survives both scenario orders",
+        "existing scoring and weakest-method contracts absent declaration and an empty pack stay keyword and ineligible"
+      ],
+      "behavioralAssertionsOnly": true
+    },
+    {
+      "phase": "keyword-restored",
+      "counts": {
+        "numTotalTests": 59,
+        "numPassedTests": 59,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "actualNode": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "raw": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-restored.raw.json",
+        "sha256": "d63f47ee00a5358f431e519b6155dd6519e9ad56abba8a14de414defc95af3ef",
+        "bytes": 22351
+      },
+      "log": {
+        "path": "/private/tmp/p0-19-grading-final-private-5p1047ye/keyword-restored.log",
+        "sha256": "16f1b57a1173cb965523893a942fa253cf7ee8f875e909e017accb66e2d83a26",
+        "bytes": 99
+      },
+      "failureNames": [],
+      "behavioralAssertionsOnly": true
+    }
+  ],
+  "semantics": {
+    "inconclusive": "Missing/whitespace/canned grades have no score, validation or method properties. Cause/reasons/auditTypes remain. The explicit projection fixture materializes zero/passfalse/inconclusive rows for scorer tests, not stored agent results.",
+    "dispatch": "Finite synthetic callback wins over text/token/tool branches. Tool-only, passing-looking prose plus calls and two calls stay ungraded; token cases stay unscored and tool calls take precedence. No tool executes.",
+    "scoring": "Actual injection controls preserve100/5 pass,50/2.5 and30/1.5 failure, measuredzero0/0; reason0..5 helper contracts retain70\u221220n clamp. Inconclusive projections are excluded while measuredzero is counted as failure.",
+    "methods": "All16 ordered pairs checked in both orders. Weakest wins; empty/default/keyword are ineligible; structured/executed eligibility is method-only, not trusted external evidence.",
+    "regex": "Single first secret /g mutant causes the specific repeated sk-shaped assertion failure. Safe/reordered/refusal/protected-context controls remain unchanged. Harmless private-key header fixture and regex patch remain private.",
+    "inventory": {
+      "packs": 143,
+      "scenarios": 1212,
+      "keyword": 1188,
+      "tokenClaim": 24,
+      "builtInStructured": 0,
+      "builtInExecuted": 0,
+      "scope": "Inventory does not qualify every scenario or47deferred echoes."
+    },
+    "counterexamples": "Ungradable-branch removal empty/whitespace become graded0/0 failures; canned becomes graded50/2.5. Historical empty50 proof is not invented and no-score acceptance is preserved."
+  },
+  "restoration": {
+    "same59NamesEveryQualifiedPhase": true,
+    "zeroPendingTodoEveryPhase": true,
+    "fiveMutantsSingleExactChange": true,
+    "patchesMatchObservedModuleDiffs": true,
+    "threePrivateModulesByteExactRestored": true,
+    "normalizedGraderReverseImportsHashMatchesOriginalBuiltPin": true,
+    "source41BeforeAfterPinsEqual": true,
+    "tracked36InputsMatchMeasuredSourceGitBlobs": true,
+    "live41InputsCheckedOnceBeforeRootFinalBuildAllMatch": true,
+    "liveInputReadsFinished": true,
+    "liveReadBoundary": "The once-only current41 check was authorized by root before its final commit/build. No further live source or compiled reads occur while finishing this report.",
+    "normalization": "Only industryPackManifest routes to original measured built URL and scorer to byte-equal private copy; original source pack validators stay actual callbacks and direct regex checks select private validators."
+  },
+  "observerAdaptation": {
+    "initialBytesRetained": {
+      "path": "/private/tmp/p0-19-grading-initial-20261015.test.ts",
+      "sha256": "849cbd8752de96e93d26ee3ba0578b76a483be1751859263cee5a6c0528bee77",
+      "bytes": 17414
+    },
+    "patch": {
+      "path": "/private/tmp/p0-19-grading-node-guard-observer-adaptation-20261015.patch",
+      "sha256": "145034721206c985de5ca0038e90975e12d373df945cf79bbb6a4fdb380d716f",
+      "bytes": 576
+    },
+    "exactOnlyRemovedNode22Refusal": true,
+    "all59BehavioralAssertionsUnchanged": true,
+    "explicitNode22RunsRetained": true,
+    "Node24RunClaimed": false
+  },
+  "actions": {
+    "readOnlyReview": true,
+    "writtenOnlyPrivateReviewJSONMarkdown": true,
+    "testsBuildInstallRuntimeSourceMutationsAppCalls": "None"
+  },
+  "limits": [
+    "No wholeP0-19/P0-55 or Done approval;47echo/P2-27 and frozen prompt deferral remain.",
+    "No model/provider/network/tool execution, producer/ledger/run/v1/compliance verification, authenticated surface, fullsuite/coverage, Node24/hostedCI/release claim.",
+    "Sibling and root qualifications remain separate; current evidence binds the earlier source/build boundary."
+  ]
+}

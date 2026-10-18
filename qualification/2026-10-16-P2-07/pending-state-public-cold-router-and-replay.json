@@ -1,0 +1,181 @@
+{
+  "schema": "amc-p207-pending/1",
+  "label": "cold-router-and-replay",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+  "compiledChildModules": [
+    "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/workspaces/workspaceRouter.js",
+    "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/hostVault.js"
+  ],
+  "observations": [
+    {
+      "kind": "parent-router-started",
+      "port": 54957,
+      "hostDir": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/host"
+    },
+    {
+      "kind": "client",
+      "path": "/host/api/auth/oidc/synthetic-pending-provider/login",
+      "status": 302,
+      "responseEnded": true,
+      "responseComplete": true,
+      "requestClosed": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "client",
+      "path": "/733eb01b-1708-4487-9091-617e3e162ecc/authorize",
+      "status": 302,
+      "responseEnded": true,
+      "responseComplete": true,
+      "requestClosed": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "parent-router-closed",
+      "port": 54957
+    },
+    {
+      "milestone": "parent-vault-locked-before-cold-child"
+    },
+    {
+      "kind": "client",
+      "path": "/host/api/auth/oidc/synthetic-pending-provider/callback",
+      "status": 302,
+      "responseEnded": true,
+      "responseComplete": true,
+      "requestClosed": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "client",
+      "path": "/host/api/auth/me",
+      "status": 200,
+      "responseEnded": true,
+      "responseComplete": true,
+      "requestClosed": true,
+      "socketClosed": true
+    },
+    {
+      "milestone": "cold-callback-and-identity-session-passed",
+      "tokenPosts": 1
+    },
+    {
+      "kind": "client",
+      "path": "/host/api/auth/oidc/synthetic-pending-provider/callback",
+      "status": 400,
+      "responseEnded": true,
+      "responseComplete": true,
+      "requestClosed": true,
+      "socketClosed": true
+    },
+    {
+      "milestone": "cold-replay-refused-before-exchange",
+      "tokenPosts": 1
+    },
+    {
+      "kind": "child",
+      "pid": 53382,
+      "ready": true,
+      "closed": true,
+      "outcome": {
+        "code": 0,
+        "signal": null
+      },
+      "stdout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/child.stdout.log",
+      "stderr": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/child.stderr.log",
+      "events": [
+        {
+          "type": "ready",
+          "pid": 53382,
+          "host": "127.0.0.1",
+          "port": 54957,
+          "hostDir": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/host",
+          "routerUrl": "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/workspaces/workspaceRouter.js",
+          "vaultUrl": "file:///private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/hostVault.js"
+        },
+        {
+          "type": "close",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "type": "pid-probe",
+          "pid": 53382,
+          "absent": true,
+          "elapsedMs": 0.14424999999937427
+        },
+        {
+          "type": "streams",
+          "stdoutBytes": 0,
+          "stderrBytes": 0
+        }
+      ],
+      "detached": false,
+      "explicitEnvironment": true
+    },
+    {
+      "kind": "idp-closure",
+      "counters": {
+        "discovery": 2,
+        "authorize": 1,
+        "token": 1,
+        "jwks": 1,
+        "pkceVerified": 1
+      },
+      "requests": [
+        {
+          "path": "/733eb01b-1708-4487-9091-617e3e162ecc/.well-known/openid-configuration",
+          "method": "GET",
+          "ended": true,
+          "responseClosed": true,
+          "complete": true,
+          "status": 200
+        },
+        {
+          "path": "/733eb01b-1708-4487-9091-617e3e162ecc/authorize",
+          "method": "GET",
+          "ended": true,
+          "responseClosed": true,
+          "complete": true,
+          "status": 302
+        },
+        {
+          "path": "/733eb01b-1708-4487-9091-617e3e162ecc/.well-known/openid-configuration",
+          "method": "GET",
+          "ended": true,
+          "responseClosed": true,
+          "complete": true,
+          "status": 200
+        },
+        {
+          "path": "/733eb01b-1708-4487-9091-617e3e162ecc/token",
+          "method": "POST",
+          "ended": true,
+          "responseClosed": true,
+          "complete": true,
+          "status": 200
+        },
+        {
+          "path": "/733eb01b-1708-4487-9091-617e3e162ecc/jwks",
+          "method": "GET",
+          "ended": true,
+          "responseClosed": true,
+          "complete": true,
+          "status": 200
+        }
+      ],
+      "started": true,
+      "closed": true,
+      "listening": false,
+      "openSockets": 0
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG"
+}

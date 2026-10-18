@@ -1,0 +1,70 @@
+{
+  "schema": "p107-runtime-test-static-peer-review/2",
+  "at": "2026-10-16T17:58:35.399413+00:00",
+  "state": "STATIC_REVIEW_CLOSED_NO_BLOCKERS_UNEXECUTED",
+  "candidate": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/runtimeEvidenceEndToEnd.test.ts",
+    "bytes": 28111,
+    "sha256": "4dfc2dc3a9c96a900286a728d5c2e0bace934a37c4ec549d45ef49486509c8ed",
+    "readScope": "Full static read."
+  },
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHead": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "blockers": [],
+  "resolvedV1Finding": {
+    "id": "TURN_SEAL_MISSING",
+    "v1Preserved": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 27005,
+      "sha256": "27fd19d0ad963d7221dd2c4c08b105d2b430abb3a49da22f07bdb2610910e9c9",
+      "readScope": "Previously full read; unchanged exact bytes."
+    },
+    "correction": "Ordinary endTurn runs once; only a successful return permits the separate once-only sealTurn. turnOpen clears only after sealTurn succeeds; only then may the one session.close run. Explicit attempted/success flags survive to retained facts and final success assertion.",
+    "failureBoundary": "A failed end or seal retains its cleanup error, leaves the session unclosed and permits only the retained store idempotent public release. Outer cleanup does not retry end, turn seal or session seal."
+  },
+  "staticVerification": {
+    "authorInputPins": 71,
+    "preferredOutputPins": 5,
+    "inputMismatches": [],
+    "fullCandidateAndReadmeRead": true,
+    "actualUnifiedDeltaEqualsSealedPatch": true,
+    "firstExactMappingAssertionLine": 357,
+    "candidateLiteralTestCount": 1,
+    "sourceProductionChanges": false,
+    "fixturePolicyTrustMappingAndGateAssertionsPreserved": true
+  },
+  "findings": [
+    {
+      "area": "Source API and types",
+      "detail": "SessionService.sealTurn229-255 is the separate ordinary operation required for the one-seal descriptor. Successful SessionService.close769-797 closes the injected store. The explicit retained SQLite store, live recorder, signed expectedToolsDigest, string|Buffer tool content and public readonly ledger/descriptor APIs fit current source. allowJs:true permits the existing .mjs helper import. This is not compiler evidence."
+    },
+    {
+      "area": "Ownership and cleanup",
+      "detail": "Store acquisition precedes construction/open; constructor or partial-open failure leaves the retained public release path. Toolsets close before turns/sessions. Failed end/seal is not concealed by a manufactured completed session. Readonly getter/body and cleanup failures remain separate; body+cleanup aggregate in original order. Guard close executes while owned environment is still set and guard ALS work is scoped to this fixture. Pool closure refuses active leases, vault lock covers partial initialization and exact environment plus protected/native pins are checked. No private field or force closure is used."
+    },
+    {
+      "area": "Actual native/policy/trust prerequisites",
+      "detail": "Both target files exist. Default fs.read allow scope and protected denials are preserved with one narrowed denied path; public signed tools/firewall/budgets initialize actual policies. Real same-process native allowed/denied outcomes, direct writer/session signatures, pinned ledger verification and root descriptors precede exact audit mapping. No mocked result, seed, question/clock/gate edit, signing/guard bypass or external-identity claim is introduced."
+    },
+    {
+      "area": "Gate witness and control sensitivity boundary",
+      "detail": "Exactly four independently call-correlated disposition audit IDs are selected; all crypto/projection positives precede line357 exact L2 matched-ID equality. Later admission/gate/final claims remain after that first sensitive assertion. Canonical denied-emitter removal may make L2 not_evaluated with zero matched IDs; no actual causal-control result is predicted. Metrics and bookkeeping cannot inflate this equality."
+    },
+    {
+      "area": "Continuity and publication boundaries",
+      "detail": "Actual persisted UTC day/session counts determine the ordinary shipped continuity expectation. A same-day fixture earns no L2 continuity; canonical L3-L5 must remain not_evaluated. Public facts are finite/redacted and exclude canary/private-key/passphrase/raw-environment/session-body data. The guard close function is best-effort, public facts are written before two final assertions, and actual root observer/process evidence remains necessary. No universal cleanup, fresh-Q, model-loop, full P1-07 or global-quality claim is made."
+    }
+  ],
+  "reviewBoundary": "Preferred candidate, README, author review, exact patch and metadata fully read. Relevant source API/lifecycle spans were read during v1 review and reused with exact current full-byte pins. Seventy-one preferred inputs independently match; no exhaustive whole-file architecture review is implied. V1 blocker review remains sealed and unchanged.",
+  "executions": {
+    "parser": false,
+    "compiler": false,
+    "helper": false,
+    "productOrTest": false,
+    "nativeOrSql": false,
+    "networkOrProbe": false
+  },
+  "checkoutIndexQaWrites": false,
+  "next": "Root alone may materialize/run this exact preferred candidate through unchanged deadlines/freezes/quality checks. Actual type/runtime and later controls remain unestablished here. The reported21/21 unit cohort and retained initial zero-test setup are separate evidence."
+}

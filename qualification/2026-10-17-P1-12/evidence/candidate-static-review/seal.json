@@ -1,0 +1,28 @@
+{
+  "schema": "private-static-candidate-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/review.json",
+      "bytes": 5903,
+      "sha256": "96550d5f62aa37789c3217c62c0b9cba843260666886e1b02b9d2fa2f821e985"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/controls-witnesses.json",
+      "bytes": 3013,
+      "sha256": "3d1aa454a727836a5a5c21516eb17db68fbc27b8bd577ca8700e34a0afdf9b80"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/README.md",
+      "bytes": 913,
+      "sha256": "39930be2f0f8ed86ec3a27f090f5a5e66b4e474a8ad6edfa8ea3963a07d67c8e"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/input-pins.json",
+      "bytes": 9167,
+      "sha256": "f652f25936ccebc02ce5bfbf4662e518b6e7943c39efad31a39d171b892e0740"
+    }
+  ],
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

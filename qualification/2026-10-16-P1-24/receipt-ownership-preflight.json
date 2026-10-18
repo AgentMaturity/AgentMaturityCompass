@@ -1,0 +1,1011 @@
+{
+  "at": "2026-10-16T10:18:14.709287+00:00",
+  "registries": [
+    {
+      "repo": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "sha256": "cc62de440d727aa3b221a2f91cf74e0360f2fded679a72095e4827df2af2456a"
+    },
+    {
+      "repo": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "sha256": "9298f65e3aa1c45c78d511a40c07a1cc588c4db38606fc36b80b90a7405c6960"
+    }
+  ],
+  "roots": 163,
+  "folderRows": [
+    {
+      "worktree": "/Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/finance-fixture/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/global-regulatory-guidance/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/low-priority-jurisdictions/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/oidc-hardening/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-49-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/.codex/worktrees/toolhub-journal/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-operator",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-runtime",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1546-agent-auth-tests",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-lifecycle",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-mutation-prep",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-session-tests",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-storage",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-cancellation-candidate-prep",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/amc-stop-auth-mutation-prep",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-closure-map",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-human-first-use",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-installed-spill",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-observer-guide",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-boundaries",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-commands",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/cos-study-capture",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/interesting-haslett-d9efa9",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/combine1",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-14",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-26",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28f",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30f",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31c",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-32",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-34",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-35",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36f",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-56",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-06",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-08",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-14",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-18",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-22",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-23",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-27",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-40",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-41",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-48",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-52",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-78",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p2-01t",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/sweet-merkle-71246c",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/vigilant-merkle-2d8549",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_0b845f07-2cd-4",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-17",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-18",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-19",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-20",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-1",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-10",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-2",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-20",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-3",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-4",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-5",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-6",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-7",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-8",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-9",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-15",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-16",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-5",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-6",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-5",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-6",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-1",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-10",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-2",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-3",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-4",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-5",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-6",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-7",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-8",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-9",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-1",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-2",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-3",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-4",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-1",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-2",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-3",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-4",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f",
+      "path": "qualification/2026-10-16-P1-24",
+      "absent": true
+    }
+  ],
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "sourceHead": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "folderWriteOnly": true,
+  "noSourceWrite": true,
+  "wip": {
+    "open": 13,
+    "excludedDependabot": 13,
+    "counted": 0,
+    "prs": [
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/dev-dependencies-3ecedad193",
+        "isDraft": false,
+        "number": 33,
+        "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+        "updatedAt": "2026-07-10T20:35:08Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/33"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/better-sqlite3-12.11.1",
+        "isDraft": false,
+        "number": 28,
+        "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+        "updatedAt": "2026-06-22T06:27:11Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/28"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/semver-7.8.5",
+        "isDraft": false,
+        "number": 27,
+        "title": "deps: bump semver from 7.7.4 to 7.8.5",
+        "updatedAt": "2026-06-22T06:25:16Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/27"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/commander-15.0.0",
+        "isDraft": false,
+        "number": 21,
+        "title": "deps: bump commander from 14.0.3 to 15.0.0",
+        "updatedAt": "2026-07-09T20:50:37Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/21"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/inquirer-14.0.2",
+        "isDraft": false,
+        "number": 20,
+        "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+        "updatedAt": "2026-07-09T20:50:36Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/20"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/yaml-2.9.0",
+        "isDraft": false,
+        "number": 19,
+        "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+        "updatedAt": "2026-06-26T16:05:36Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/19"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/zod-4.4.3",
+        "isDraft": false,
+        "number": 17,
+        "title": "deps: bump zod from 4.3.6 to 4.4.3",
+        "updatedAt": "2026-06-26T16:05:35Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/17"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/github_actions/actions/setup-node-6",
+        "isDraft": false,
+        "number": 8,
+        "title": "ci: bump actions/setup-node from 4 to 6",
+        "updatedAt": "2026-05-22T07:31:27Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/8"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/github_actions/azure/setup-helm-5",
+        "isDraft": false,
+        "number": 7,
+        "title": "ci: bump azure/setup-helm from 4 to 5",
+        "updatedAt": "2026-05-22T07:31:26Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/7"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/github_actions/docker/setup-buildx-action-4",
+        "isDraft": false,
+        "number": 6,
+        "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+        "updatedAt": "2026-05-22T07:31:25Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/6"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/github_actions/actions/deploy-pages-5",
+        "isDraft": false,
+        "number": 5,
+        "title": "ci: bump actions/deploy-pages from 4 to 5",
+        "updatedAt": "2026-05-22T07:31:24Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/5"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/github_actions/actions/upload-artifact-7",
+        "isDraft": false,
+        "number": 4,
+        "title": "ci: bump actions/upload-artifact from 4 to 7",
+        "updatedAt": "2026-05-22T07:31:23Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/4"
+      },
+      {
+        "author": {
+          "is_bot": true,
+          "login": "app/dependabot"
+        },
+        "baseRefName": "main",
+        "headRefName": "dependabot/npm_and_yarn/modelcontextprotocol/sdk-1.29.0",
+        "isDraft": false,
+        "number": 3,
+        "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+        "updatedAt": "2026-05-22T07:31:22Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "p125pc-root-bounded-readme-preparation/1",
+  "at": "2026-10-17T02:09:21.700977+00:00",
+  "readmeBytes": 46394,
+  "readmeSha256": "ef521dd3f249614cb13579abc4342f68e590207cefaa4a5c8bd3256a4cf2aaaf",
+  "exactPriorReadmeSuffix": true,
+  "latestRuntimeReviewSha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214",
+  "laterPublicationCredit": false,
+  "allHoldsRemainOpen": [
+    "P1-01 recorded gaps",
+    "P0-29 successor decisions",
+    "P0-22 empty-result contract",
+    "D-03 written live-health skip until P2-06",
+    "P0-09/P0-51 key precedence",
+    "P0-24 expert wording",
+    "P2-02 pause/P2-27 echo",
+    "P1-06 Claude ownership",
+    "P1-02 three held failures and coordination",
+    "Provider D15 ignored archive staging held; no force-add or bypass",
+    "Existing private-provider/package/library/manual-generator/public-entry/CI and other recorded human/external holds"
+  ]
+}

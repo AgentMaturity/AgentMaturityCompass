@@ -1,0 +1,116 @@
+{
+  "capturedUtc": "2026-10-16T10:48:02.816896+00:00",
+  "phase": "p137-tests-typecheck",
+  "childExit": 2,
+  "wrapperExit": 70,
+  "processDurationMs": 37776,
+  "ownedPgid": 38063,
+  "ownedGroupAbsentByESRCH": true,
+  "errno": 3,
+  "signalsOtherThanZeroSent": false,
+  "freshOwnedProbes": [
+    {
+      "kind": "pid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    },
+    {
+      "kind": "pgid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+  "failure": "TS2339 tests/autoCompaction.test.ts345:42: encodedSha256 is only on SpillRefV2; Vitest expect(v).toBe(2) does not narrow the union for TypeScript.",
+  "originalProtocol": "The wrapper accepts only natural child0/1 and correctly halted on child2. Original ACTIVE/HALTED and all owned evidence remain untouched. No signal, retry, restoration or repository edit has been performed.",
+  "pins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/ACTIVE.json",
+      "bytes": 251,
+      "sha256": "90eb356b14c052743c5f405c514b52a1c3132b2c3d578bc7e2e70b573672ed13"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/HALTED.json",
+      "bytes": 291,
+      "sha256": "8d778f747a485c094f78a74863ed7e6fb331b4ca6494b5dc35d3251327d6cfcf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-tests-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "277a98e7ff7c0d00cbc9dda9fe684dd40101c2af9d76852645c4ebe5a1127608"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-tests-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "19e2c46b46033e654152556eb500621cd37b8dfec70ccae535822d5b66341ba1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-tests-typecheck/stdout-stderr.log",
+      "bytes": 176,
+      "sha256": "c63f50bd5e4b2334507a7aef5f4266a926a1d25ae3bc5bda3517cabc78cf1bc7"
+    },
+    {
+      "path": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+      "bytes": 12312,
+      "sha256": "90501440d5e16ff4584faa673e5c02bbae6a306a2052421fd2243dce062044fd"
+    }
+  ],
+  "sourceAtClosure": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts",
+      "bytes": 44169,
+      "sha256": "de82e627018a708ea131fa7a23ac0a02d21413e88cf09fa11e759283ee4ea6c9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/autoCompact.ts",
+      "bytes": 15090,
+      "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceCompactionValidation.ts",
+      "bytes": 11644,
+      "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    }
+  ],
+  "next": "Independent closed-evidence audit first. Only then use a separate namespace requiring this pinned certificate and all original closure checks. Admit the narrow runtime v2 type guard in the owned new test; no cast, compiler relaxation, guard or baseline change.",
+  "formalDone": false
+}

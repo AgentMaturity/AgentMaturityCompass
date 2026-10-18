@@ -1,0 +1,91 @@
+{
+  "version": 3,
+  "kind": "Unexecuted preparation correction, not product failure",
+  "preservedEarlierVersionPins": [
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup.json",
+      "bytes": 6837,
+      "sha256": "d7511c53ff825e7897b89af9327e91ee17301c4b6831ab2a7310789bbca4e246"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index.json",
+      "bytes": 3131,
+      "sha256": "cc36bfc5492d94d192cd7fe85a71d8efe22d916c19b94f1753e8c4809fc38129"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary.json",
+      "bytes": 1945,
+      "sha256": "ab1f9b7e7b7f00a6fdea2580f58c3eaef323d129dcb044badcef0a00f8427bba"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template.json",
+      "bytes": 1142,
+      "sha256": "28069f891808c6f636d8788fb3fa4c9397aa011011f66ef67cb98f40409e8bcd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README.md",
+      "bytes": 2408,
+      "sha256": "c8a21161af01abc0ee862c74c67474cc983c5c9465506a55e554f71b3e74ffe7"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "bytes": 18783,
+      "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v2.json",
+      "bytes": 11235,
+      "sha256": "97c93d1f7bbbce3355dca17100e99ac13dd9aebc62b4c2c49c515720ddfe5069"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v2.json",
+      "bytes": 3937,
+      "sha256": "9649af436870ee038f022c14e3d24695c072465d2e636c12883c77cffba43c90"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v2.json",
+      "bytes": 2275,
+      "sha256": "2742d75e0507197cc4c37f54a03ff9e309727fbb4aa3e7358528981c415bc5b6"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v2.json",
+      "bytes": 1425,
+      "sha256": "8463a9fc5477b006b9021fa299655072eb478e148d8eba3c88698615d8935490"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v2.md",
+      "bytes": 1404,
+      "sha256": "c44541f58745c8cfb19bbdaeacd5b3c8bd67e93f0c07a72b919cbec57d17d6cd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v2-change-note.json",
+      "bytes": 2440,
+      "sha256": "c777a5c0b0ab09166bbfaa5ae1c6183d3121366707e51c12702a7d06fd75b12d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v2.py",
+      "bytes": 19778,
+      "sha256": "5b90ef9ba51eecbb58456d164a351f862a47088fdd85879125c84bfc8fc4c3ba"
+    }
+  ],
+  "changes": [
+    "Rename exception-handler metadata to automaticRestorationOnException:false; do not imply no earlier normal restoration.",
+    "Add explicit error during global teardown late-banner guard.",
+    "Bind separate setup-v3/index-v3 and actual controller path/hash."
+  ],
+  "installedDiagnosticSource": {
+    "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+    "bytes": 498779,
+    "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+  },
+  "sourceLines": [
+    14021,
+    14035,
+    14038,
+    14039,
+    14040
+  ],
+  "blockedPreparedContext": null,
+  "productExecutionOccurred": false,
+  "mutantWritten": false
+}

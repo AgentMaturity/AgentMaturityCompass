@@ -1,0 +1,25 @@
+{
+  "rootReadActualFailures": true,
+  "causalWitnessEstablished": true,
+  "unexplainedFailures": [],
+  "actual": {
+    "passed": 81,
+    "total": 85,
+    "failed": 4,
+    "directWitnesses": [
+      "synthetic persistence308",
+      "genuine persistence511"
+    ],
+    "additionalWitnesses": [
+      "log-tamper original preservation374 after refusal assertions passed",
+      "receipt-signature original preservation402 after refusal assertions passed"
+    ],
+    "cleanupWitness": "genuine installed original hashes475: deliberate fixture-local diagnostic rewrite",
+    "masked": "genuine subsequent signature/idempotence/ledger acceptance assertions after511 not credited"
+  },
+  "publicRecords": 10,
+  "expectedCleanupErrors": 1,
+  "environmentAndNativeUnchanged": true,
+  "sourceOnlyControl": true,
+  "encodedFixtureUnchanged": true
+}

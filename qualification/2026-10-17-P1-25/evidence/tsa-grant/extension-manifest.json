@@ -1,0 +1,1830 @@
+{
+  "schema": "p125-grant-private-extension-input/3",
+  "readyForPrivateAssembly": true,
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "branch": "codex/p1-25-grant-qualification",
+  "environment": {
+    "node": "v22.23.3",
+    "os": "darwin",
+    "arch": "arm64",
+    "pnpm": "10.33.0"
+  },
+  "basePacket": "/private/tmp/p1-25-grant-qualification-20261017/original-p125-packet",
+  "baseReceipt": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/original-p125-packet/receipt.json",
+    "bytes": 189462,
+    "sha256": "8b65debfaf983bc607529aa87239b845bdcc692e6a33145c97b0db5d46c50cdc"
+  },
+  "baseReadme": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/original-p125-packet/README.md",
+    "bytes": 20240,
+    "sha256": "0e06dd9663a62f3f861ead994abede47c20083ea35c48e30ee08bed85f559072"
+  },
+  "baseAssembly": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/original-p125-packet/assembly-inputs.json",
+    "bytes": 253487,
+    "sha256": "7ba7697de9c12d7990bd635a70656ddde71f44aa4b2e8b8e682075de3acb5b1c"
+  },
+  "requiredPins": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-checkpoint.json",
+      "bytes": 2288,
+      "sha256": "3dba34147f1d322aa5153bfab3d898c832e90afa0b3c770af88437b763d8ef05"
+    },
+    "sourceOutcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+      "bytes": 4330,
+      "sha256": "7badbc66b8e813647ad56627da9c651e3cdf171ac25403c03a94b85fe029f6e0"
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+      "bytes": 90075,
+      "sha256": "dd478ef6153d0b03af4b9bb032fa8c7630b759cc37e021f6d5a0cdaae9c6fd35"
+    },
+    "canonicalOutcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+      "bytes": 4362,
+      "sha256": "0c7370c8b8e212217abe841e4de7efa32833af56ab4073e2e59de6e2d208f01a"
+    },
+    "independentChainReview": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 138585,
+      "sha256": "fe2cabe3d756856edef139ebe448eaac71d84cff4164230047c04064acd2a32c"
+    },
+    "finalPreservation": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-final.json",
+      "bytes": 1635,
+      "sha256": "5c438b52ca8a8539b7c05d0625bc25a03f5c8fdee1dbdc6af460d133b6c1dd92"
+    },
+    "wholeIssueGaps": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/whole-issue-gaps.json",
+      "bytes": 1796,
+      "sha256": "0551f6f2de7fb04204576a613329121af2e04b1f4f9c360c002423ea5c175547"
+    },
+    "protectedInputs": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/protected-inputs.json",
+      "bytes": 42394,
+      "sha256": "5ea619b92200115427bcccf2deb339f0b436f7cd1d1616fb9ff25d6b8f513198",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/protected-inputs.json",
+      "dev": 16777231,
+      "inode": 543583655,
+      "nlink": 1
+    },
+    "m1Outcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m1-outcome.json",
+      "bytes": 8815,
+      "sha256": "a38d161c644cd80152a8869a48967e8a69fd83ed780ccad6bf2038c8da1d0dad"
+    },
+    "restore1Outcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-restore1-outcome.json",
+      "bytes": 4348,
+      "sha256": "bf7fbec45a9dd3d5d8c15fc1e642cb4182fbaa888b99e588de1643e923898d0f"
+    },
+    "m2Outcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m2-outcome.json",
+      "bytes": 8186,
+      "sha256": "a6f42405cb4dc76dbdf6412d8e25b38b42ff388d489da5554b90f02603f34cf2"
+    },
+    "restore2Outcome": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-restore2-outcome.json",
+      "bytes": 4348,
+      "sha256": "17c33f410c33107d77991a2101744b160ac90ef5fc1f7c64498f451fc4411d45"
+    }
+  },
+  "newCommandPins": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-openssl-version/command.json",
+      "bytes": 1189,
+      "sha256": "a295142949e127b9b63fd18e8f24d0d4538eec3b4f466d3aa3484c5ab3c78953"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-freeze/command.json",
+      "bytes": 1353,
+      "sha256": "8513a2ecfc8637883da06c6f439f4a32f4ea60fb9523bc8df323a15fdac6bf44"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-d15/command.json",
+      "bytes": 2001,
+      "sha256": "f1e1627f8ef7c4add5bfcc48b74c561114e813333e711af80d217733a359c2df"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/command.json",
+      "bytes": 2750,
+      "sha256": "b7b1c77363c4aa933ec2346eaba2cd31f9562202686152fefa05537151d82bba"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/command.json",
+      "bytes": 2789,
+      "sha256": "683254623548d9a4ef3573e42a51adbe85622785edad0f07e2f355d908aa7b77"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "0b712cdf7f84a799ff8a2a3873bd65bfbd0d0c78fb686e58a88b085af63765f0"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-test-types/command.json",
+      "bytes": 1360,
+      "sha256": "25143200e6426c5c5653e3b791f73d2d3c2633b69bce29f0e34bafbe0ddbcf78"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-types/command.json",
+      "bytes": 1352,
+      "sha256": "405c777b6144c239c77696e1db439ab6c82e74bd70dd92eaf3fe42af9bacd77f"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-lint/command.json",
+      "bytes": 1325,
+      "sha256": "e041b8078c707d2dc02251170026f30a2680f554468b615f5a9d1ba6c57c0596"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-build/command.json",
+      "bytes": 1330,
+      "sha256": "a4e35050db8d096515ebdf6da3e81ec6c7b4468d984ae69864769823764d5e99"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/command.json",
+      "bytes": 1372,
+      "sha256": "e2c1260fca57e3f53863a95116fecb0916e37bf514b97e7f56f5384c2e7549f2"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/command.json",
+      "bytes": 1369,
+      "sha256": "c74b673ee729b911485c6474a1f53b91cc70074f90be2b1327829ebd84f4e1b9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-quality-after-diagnostic/command.json",
+      "bytes": 1367,
+      "sha256": "37d8e20cabcb6b25efbca1f8ea9b03921b39b169e7f378682118feb2058545c4"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-freeze/command.json",
+      "bytes": 1357,
+      "sha256": "46822e7abe2e3af7c31743fcb8e90e73d4d771590bead21ec49aec0357039206"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-d15/command.json",
+      "bytes": 2559,
+      "sha256": "9214699842036b5882c30d013a28a45a82ead992f1227e13c2d733053ef384aa"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-gen-counts/command.json",
+      "bytes": 1348,
+      "sha256": "64f2a3be86b772ed96e104ffc74ec71ccfeebdf81f0104e24c2be6f49e93ec2b"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-counts/command.json",
+      "bytes": 1358,
+      "sha256": "7e0b212d6daba7ffdf6583d712e13a2b7e1d06bfc720def700b48062ea36e6a4"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-gates/command.json",
+      "bytes": 1354,
+      "sha256": "6d112731361f76b45df9e634b3decac21def9609f007fe14d35a311971e9483c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-threat/command.json",
+      "bytes": 1370,
+      "sha256": "d750d472584bc1546e7103ff05e3f563917027f9a398ebf40afbbf438e497e36"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-architecture/command.json",
+      "bytes": 1405,
+      "sha256": "42e42fbbdc96ca980f0303fa0f71b7b9b5469f78fe5a08605b1ee9ad079940fb"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-docs/command.json",
+      "bytes": 1362,
+      "sha256": "8086a8593942ca4ee80169b994a715faf8a23f38b9af6894e111940ffa77d52a"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-freeze/command.json",
+      "bytes": 1359,
+      "sha256": "357b7ac86dd1f6f54580d1845d2acd1055cea073b4f9d27138192ea999242e19"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-notices/command.json",
+      "bytes": 1386,
+      "sha256": "fa2b8b24f0e2da1993c26e4cd0e357549fabb6a2e849265d636c844cf8d030f4"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-clean-source/command.json",
+      "bytes": 1486,
+      "sha256": "11f1ee66a1497ac61adad6cfa6040c904712361403582ee7e505a1426c596849"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/command.json",
+      "bytes": 2821,
+      "sha256": "e510a9d7e7e2c3220f61095d9f8a8235b2e7eaa14ec01fc289fb58d87a358ecf"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/command.json",
+      "bytes": 2731,
+      "sha256": "0f8c35ab33a777f272ecaee1aec0f47dba31ed53f53041e33e545980ca9a11ee"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/command.json",
+      "bytes": 2772,
+      "sha256": "d5860318fdd95b6d3ef2264815c473140b61a2641f1fbf49d06b050869d48de3"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/command.json",
+      "bytes": 2731,
+      "sha256": "211931b7c39d17a1b4b79661c3e054a157e8efd8ad960344dde161b4757b3b1c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/command.json",
+      "bytes": 2772,
+      "sha256": "4416454af71fe296bcd6297b3e3339a6de9ad7a3a59715fd83afa7aa1563190d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-node-environment/command.json",
+      "bytes": 1349,
+      "sha256": "994b38e0aae44c133c814d206f62d5e6b41a541ab0be0ae99460db9fd0d6c6fb"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pnpm-version/command.json",
+      "bytes": 1173,
+      "sha256": "f23f005e3e152007379cb3e67c9228e4ccfc34611bb54bbf1e6aaffe91b4c3f4"
+    }
+  ],
+  "newArtifacts": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/public-evidence.json",
+      "bytes": 12992,
+      "sha256": "fb97ac2eb4d1a822cf337cf0142bd75ce6291eae7cf254d7307c11e3bc8b5373",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-source-combined-FIRST-GRANT.json",
+      "bytes": 3086,
+      "sha256": "0839ff4f1ba3aa4c47bbd8f9fc02b50dee017cfb397899a89c40b1e30e3c6a34",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/request-1.tsq",
+      "bytes": 76,
+      "sha256": "5073a3d1498f6b3834248671598e90b70b1fc362bd97f1054a8b23a009671e59",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "ee65d41f31a100b9e727a88934330c1f586775efa9391eedc66284e2ff42e270",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/public-evidence.json",
+      "bytes": 13547,
+      "sha256": "10b2deec9636d49bce10c4c2b1b600e8d8d21e87b13198efc30888d81f743167",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-source-combined-HTTP500-THEN-GRANT.json",
+      "bytes": 3093,
+      "sha256": "7555f34bced733f84715164eea4e0dced0ebb85b23978c117d9d3c724218e2df",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/request-2.tsq",
+      "bytes": 76,
+      "sha256": "f358126e49e55de9bad9fa028ccc91f02f2d56ead9cf174c69dedf4938aed6c8",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "b94117e12cb466f0f9235beb3fe05d8f610f2ca4c9c0be45eecd29ad2faac86e",
+      "target": "evidence/tsa-grant/public/p125g-source-combined-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/public-evidence.json",
+      "bytes": 13005,
+      "sha256": "6e68a440d774d9133b51ebcc2a26636798b202af913ad739384994e017827f31",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-fresh-canonical-FIRST-GRANT.json",
+      "bytes": 3086,
+      "sha256": "06f957d5837d83278019dbe18118492d192c8c99e49ed2a79cab2b0b7f339e22",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/request-1.tsq",
+      "bytes": 76,
+      "sha256": "c60e19b442a194bd34de6130aa99653f66181a0ce1b68e438116d1016bf16b6d",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "8e50fb10adc46e523eede879128d1c00acf0e981624e1113c18854573fa936b4",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/public-evidence.json",
+      "bytes": 13563,
+      "sha256": "f00cb3856a2ff3bc1d3f4c7fb3f6ea8ea8b5350aa22e79aa7741c9d7aaaf1896",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "bytes": 3093,
+      "sha256": "6ee3ce2bb6270450f829243571edd4ed6c3b9741fbe6586b87114ad5306688bc",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/request-2.tsq",
+      "bytes": 76,
+      "sha256": "074585636f01902dbd0b187876daf545ecdcf62217a8ee9b30b52eeb09ea71b9",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "33946b9182305192a181601719f707294416f43d551b5b56cda0c6a580f05522",
+      "target": "evidence/tsa-grant/public/p125g-fresh-canonical-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/public-evidence.json",
+      "bytes": 13549,
+      "sha256": "c4b3189cc318c9ab95c1f2dc9e7864e1cd658d77ce2e8d3297687464feb9eaa6",
+      "target": "evidence/tsa-grant/public/p125g-m1-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-m1-FIRST-GRANT.json",
+      "bytes": 3073,
+      "sha256": "53b778bebf49b867130fa17a1bce1519a48287c9d86266c210d77798a14febe6",
+      "target": "evidence/tsa-grant/public/p125g-m1-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/request-2.tsq",
+      "bytes": 76,
+      "sha256": "804cea5b926822458c04e5526dd194f26f3de3e07b025de5fa228e59bcd906b2",
+      "target": "evidence/tsa-grant/public/p125g-m1-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "803df082bc045dff2cb4a5b611affa90254c5069c393e179977e70a19aef127b",
+      "target": "evidence/tsa-grant/public/p125g-m1-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/public-evidence.json",
+      "bytes": 13565,
+      "sha256": "2b88848da2342fda8a5dffdfadab10dac45d0de93b0904ff36179ccaba160d39",
+      "target": "evidence/tsa-grant/public/p125g-m1-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-m1-HTTP500-THEN-GRANT.json",
+      "bytes": 3080,
+      "sha256": "ae02a44f827723d108f62023aba3adf7e12c87c43725a07bef60163b647d0739",
+      "target": "evidence/tsa-grant/public/p125g-m1-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/request-2.tsq",
+      "bytes": 76,
+      "sha256": "90d2023d02d9ed44f45cd72994b13ed3b8017dce1997fe52c14289b18faf0f04",
+      "target": "evidence/tsa-grant/public/p125g-m1-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "0f69f61fc6422e0d7fbb9a7079a84016af76b24597ba8eebd47ee8501f91e075",
+      "target": "evidence/tsa-grant/public/p125g-m1-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/public-evidence.json",
+      "bytes": 13001,
+      "sha256": "53de86ffd2782fd7c6016fffaf53f3c086e91ee273ba063711d99a1fa9d70056",
+      "target": "evidence/tsa-grant/public/p125g-restore1-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-restore1-FIRST-GRANT.json",
+      "bytes": 3079,
+      "sha256": "32d465ac958b871082acb76ced9cfdddbb293ae0cfe99d6ad570abf6d631d59c",
+      "target": "evidence/tsa-grant/public/p125g-restore1-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/request-1.tsq",
+      "bytes": 76,
+      "sha256": "2c5e7aa953a6204e843d022584540de33b4de880cbcd987d01d52819bf9fbb94",
+      "target": "evidence/tsa-grant/public/p125g-restore1-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "08b9f6d13a0ee76d49778d811a70d8ab82135fc518b5055a77b8df8210519ef7",
+      "target": "evidence/tsa-grant/public/p125g-restore1-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/public-evidence.json",
+      "bytes": 13559,
+      "sha256": "93162685e1315415ec4dac5b5223f2a89a8e31053c82964bc71451b07d66ed74",
+      "target": "evidence/tsa-grant/public/p125g-restore1-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-restore1-HTTP500-THEN-GRANT.json",
+      "bytes": 3086,
+      "sha256": "12485607526dae1bf4e51089dacea8abb2d384942fd7da3e4bbafae1de351701",
+      "target": "evidence/tsa-grant/public/p125g-restore1-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/request-2.tsq",
+      "bytes": 76,
+      "sha256": "ff0f1bd8fa3c44fb41169e382476d105e055c146b558eb00ad7f7e2694cbb238",
+      "target": "evidence/tsa-grant/public/p125g-restore1-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "4ea5d379e69f03695aeecef9ac350a0f6763ef8f3cde2c0aa48a0b16b151a9bb",
+      "target": "evidence/tsa-grant/public/p125g-restore1-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/public-evidence.json",
+      "bytes": 12441,
+      "sha256": "801922e1e940b84bdb43f43976c8f0f305c8b054c21d63a42fa36b3718a83663",
+      "target": "evidence/tsa-grant/public/p125g-m2-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-m2-FIRST-GRANT.json",
+      "bytes": 3073,
+      "sha256": "51cca501ec10e499b7e374a180dd71112ccc6607a4b1a37d0b02fc9769b7a738",
+      "target": "evidence/tsa-grant/public/p125g-m2-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/request-1.tsq",
+      "bytes": 76,
+      "sha256": "0a5e605925b9412b2c3d319fb982ac5292b5b13a139d08833b6dce6a5e9d9608",
+      "target": "evidence/tsa-grant/public/p125g-m2-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "3a240a9b90ec7a3ea0db33e9ae45ce62c6d16b5c586452d5ab5411a08d0169be",
+      "target": "evidence/tsa-grant/public/p125g-m2-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/public-evidence.json",
+      "bytes": 13001,
+      "sha256": "1555f5c76ad7b9a121e8846c8dce228713057cc1b4e42301163d99853ed3b96f",
+      "target": "evidence/tsa-grant/public/p125g-m2-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-m2-HTTP500-THEN-GRANT.json",
+      "bytes": 3080,
+      "sha256": "905a85ca6d5c14b5df5e4c2b78d6e6538710ae19e447b1f5aa98db220f708155",
+      "target": "evidence/tsa-grant/public/p125g-m2-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/request-2.tsq",
+      "bytes": 76,
+      "sha256": "06bec3d50377c043ccb38daeac7b585b45fcc3f5aa8b2cfeddb88ca60586497f",
+      "target": "evidence/tsa-grant/public/p125g-m2-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "b4332d5f72d68f9dc61a31f1efe73ab486e29e22d20d948ee98749a5218f7df8",
+      "target": "evidence/tsa-grant/public/p125g-m2-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/public-evidence.json",
+      "bytes": 13006,
+      "sha256": "43798d053b50162a6e49a8a68020c0e01350ad616e4285985e51f378a65cafd6",
+      "target": "evidence/tsa-grant/public/p125g-restore2-FIRST-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-restore2-FIRST-GRANT.json",
+      "bytes": 3079,
+      "sha256": "d24ced053460703cdc0e83cd17d29f0bdf5594b1dc28f1ff4b5b5a9ea5e864b2",
+      "target": "evidence/tsa-grant/public/p125g-restore2-FIRST-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/request-1.tsq",
+      "bytes": 76,
+      "sha256": "23f8cf03f307824caaa6b9781a71ba55b619019f6c4931433e5c9960d7a581bc",
+      "target": "evidence/tsa-grant/public/p125g-restore2-FIRST-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "87e69abac6bf84a14e193bc6513edfb7ed52a05cb7fa8618b174ab3edb503e6a",
+      "target": "evidence/tsa-grant/public/p125g-restore2-FIRST-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/public-evidence.json",
+      "bytes": 13562,
+      "sha256": "40fce9a15c4c12df4c7e30f32dc50c6a391f1e5579adf1887005fc4573f8a3f3",
+      "target": "evidence/tsa-grant/public/p125g-restore2-HTTP500-THEN-GRANT/public-evidence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-certificate-bundles/p125g-restore2-HTTP500-THEN-GRANT.json",
+      "bytes": 3086,
+      "sha256": "0863b31a6f39558aaa8361cbeb966a0436ea7bb7b25dc0753df6612d45ab693e",
+      "target": "evidence/tsa-grant/public/p125g-restore2-HTTP500-THEN-GRANT/public-certificates.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/request-2.tsq",
+      "bytes": 76,
+      "sha256": "4fcebd43eaf484c1b22c763da67f50d8e47ac74321a7eecc1b83643e8dd1853b",
+      "target": "evidence/tsa-grant/public/p125g-restore2-HTTP500-THEN-GRANT/query.tsq",
+      "envelope": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "1834a0e1ae1873e112a92d4275604966b38104539bfe990b7272b473178cb2fb",
+      "target": "evidence/tsa-grant/public/p125g-restore2-HTTP500-THEN-GRANT/response.tsr",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-openssl-version/command.json",
+      "bytes": 1189,
+      "sha256": "a295142949e127b9b63fd18e8f24d0d4538eec3b4f466d3aa3484c5ab3c78953",
+      "target": "evidence/tsa-grant/commands/p125g-openssl-version/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-openssl-version/stdout-stderr.log",
+      "bytes": 410,
+      "sha256": "20048b8aed3f93ac2be0b5311b6403716a73cde9b20d6789e2bce263a884b811",
+      "target": "evidence/tsa-grant/commands/p125g-openssl-version/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-freeze/command.json",
+      "bytes": 1353,
+      "sha256": "8513a2ecfc8637883da06c6f439f4a32f4ea60fb9523bc8df323a15fdac6bf44",
+      "target": "evidence/tsa-grant/commands/p125g-pre-freeze/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-freeze/stdout-stderr.log",
+      "bytes": 268,
+      "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+      "target": "evidence/tsa-grant/commands/p125g-pre-freeze/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-d15/command.json",
+      "bytes": 2001,
+      "sha256": "f1e1627f8ef7c4add5bfcc48b74c561114e813333e711af80d217733a359c2df",
+      "target": "evidence/tsa-grant/commands/p125g-pre-d15/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-d15/stdout-stderr.log",
+      "bytes": 5,
+      "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+      "target": "evidence/tsa-grant/commands/p125g-pre-d15/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/command.json",
+      "bytes": 2750,
+      "sha256": "b7b1c77363c4aa933ec2346eaba2cd31f9562202686152fefa05537151d82bba",
+      "target": "evidence/tsa-grant/commands/p125g-unchanged-verifier/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/stdout-stderr.log",
+      "bytes": 414,
+      "sha256": "b1e6876292cda04a69c42063bcdb94024a10365fd341c0f8ea85fd6eccf56a83",
+      "target": "evidence/tsa-grant/commands/p125g-unchanged-verifier/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-unchanged-verifier.raw.json",
+      "bytes": 5353,
+      "sha256": "feaf54cf33abc4dc02988e6bd40e8918432055809510cef3987924d7a8a1b34a",
+      "target": "evidence/tsa-grant/commands/p125g-unchanged-verifier/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/raw.json",
+      "bytes": 5353,
+      "sha256": "feaf54cf33abc4dc02988e6bd40e8918432055809510cef3987924d7a8a1b34a",
+      "target": "evidence/tsa-grant/commands/p125g-unchanged-verifier/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/observer.json",
+      "bytes": 7060,
+      "sha256": "37bbb95a899a92d028373d4c229ca101dd00ae6ef66212b1181e183ed1c381a2",
+      "target": "evidence/tsa-grant/commands/p125g-unchanged-verifier/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/command.json",
+      "bytes": 2789,
+      "sha256": "683254623548d9a4ef3573e42a51adbe85622785edad0f07e2f355d908aa7b77",
+      "target": "evidence/tsa-grant/commands/p125g-source-combined/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/stdout-stderr.log",
+      "bytes": 20452,
+      "sha256": "77c37a58fedd643017d21b04d6b5fce875a99fd20d40038fd13ce809dd947175",
+      "target": "evidence/tsa-grant/commands/p125g-source-combined/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-source-combined.raw.json",
+      "bytes": 6356,
+      "sha256": "60746560333c0a3afd41100e9821b7c10612a99bf06bbaf5f18b3a390f6b3c36",
+      "target": "evidence/tsa-grant/commands/p125g-source-combined/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/raw.json",
+      "bytes": 6356,
+      "sha256": "60746560333c0a3afd41100e9821b7c10612a99bf06bbaf5f18b3a390f6b3c36",
+      "target": "evidence/tsa-grant/commands/p125g-source-combined/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/observer.json",
+      "bytes": 8751,
+      "sha256": "062b300ba165516cb259c3ada7bfde5e5d3ff4c884889d60b28ae487b14126fa",
+      "target": "evidence/tsa-grant/commands/p125g-source-combined/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "0b712cdf7f84a799ff8a2a3873bd65bfbd0d0c78fb686e58a88b085af63765f0",
+      "target": "evidence/tsa-grant/commands/p125g-counts-before/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "1e8dbf860104a0d98edde26793d535a89b9acaf1cfbf3cd2acdb0b75f879f3cb",
+      "target": "evidence/tsa-grant/commands/p125g-counts-before/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-test-types/command.json",
+      "bytes": 1360,
+      "sha256": "25143200e6426c5c5653e3b791f73d2d3c2633b69bce29f0e34bafbe0ddbcf78",
+      "target": "evidence/tsa-grant/commands/p125g-test-types/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-test-types/stdout-stderr.log",
+      "bytes": 161,
+      "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865",
+      "target": "evidence/tsa-grant/commands/p125g-test-types/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-types/command.json",
+      "bytes": 1352,
+      "sha256": "405c777b6144c239c77696e1db439ab6c82e74bd70dd92eaf3fe42af9bacd77f",
+      "target": "evidence/tsa-grant/commands/p125g-source-types/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-types/stdout-stderr.log",
+      "bytes": 149,
+      "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5",
+      "target": "evidence/tsa-grant/commands/p125g-source-types/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-lint/command.json",
+      "bytes": 1325,
+      "sha256": "e041b8078c707d2dc02251170026f30a2680f554468b615f5a9d1ba6c57c0596",
+      "target": "evidence/tsa-grant/commands/p125g-lint/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-lint/stdout-stderr.log",
+      "bytes": 447,
+      "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95",
+      "target": "evidence/tsa-grant/commands/p125g-lint/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-build/command.json",
+      "bytes": 1330,
+      "sha256": "a4e35050db8d096515ebdf6da3e81ec6c7b4468d984ae69864769823764d5e99",
+      "target": "evidence/tsa-grant/commands/p125g-build/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-build/stdout-stderr.log",
+      "bytes": 955,
+      "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce",
+      "target": "evidence/tsa-grant/commands/p125g-build/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/command.json",
+      "bytes": 1372,
+      "sha256": "e2c1260fca57e3f53863a95116fecb0916e37bf514b97e7f56f5384c2e7549f2",
+      "target": "evidence/tsa-grant/commands/p125g-duplicates-after/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/stdout-stderr.log",
+      "bytes": 2064,
+      "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29",
+      "target": "evidence/tsa-grant/commands/p125g-duplicates-after/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/command.json",
+      "bytes": 1369,
+      "sha256": "c74b673ee729b911485c6474a1f53b91cc70074f90be2b1327829ebd84f4e1b9",
+      "target": "evidence/tsa-grant/commands/p125g-dead-code-after/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/stdout-stderr.log",
+      "bytes": 1207,
+      "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043",
+      "target": "evidence/tsa-grant/commands/p125g-dead-code-after/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-quality-after-diagnostic/command.json",
+      "bytes": 1367,
+      "sha256": "37d8e20cabcb6b25efbca1f8ea9b03921b39b169e7f378682118feb2058545c4",
+      "target": "evidence/tsa-grant/commands/p125g-quality-after-diagnostic/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-quality-after-diagnostic/stdout-stderr.log",
+      "bytes": 121,
+      "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90",
+      "target": "evidence/tsa-grant/commands/p125g-quality-after-diagnostic/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-freeze/command.json",
+      "bytes": 1357,
+      "sha256": "46822e7abe2e3af7c31743fcb8e90e73d4d771590bead21ec49aec0357039206",
+      "target": "evidence/tsa-grant/commands/p125g-count-freeze/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-freeze/stdout-stderr.log",
+      "bytes": 268,
+      "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+      "target": "evidence/tsa-grant/commands/p125g-count-freeze/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-d15/command.json",
+      "bytes": 2559,
+      "sha256": "9214699842036b5882c30d013a28a45a82ead992f1227e13c2d733053ef384aa",
+      "target": "evidence/tsa-grant/commands/p125g-count-d15/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-d15/stdout-stderr.log",
+      "bytes": 5,
+      "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+      "target": "evidence/tsa-grant/commands/p125g-count-d15/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-gen-counts/command.json",
+      "bytes": 1348,
+      "sha256": "64f2a3be86b772ed96e104ffc74ec71ccfeebdf81f0104e24c2be6f49e93ec2b",
+      "target": "evidence/tsa-grant/commands/p125g-gen-counts/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-gen-counts/stdout-stderr.log",
+      "bytes": 176,
+      "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4",
+      "target": "evidence/tsa-grant/commands/p125g-gen-counts/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-counts/command.json",
+      "bytes": 1358,
+      "sha256": "7e0b212d6daba7ffdf6583d712e13a2b7e1d06bfc720def700b48062ea36e6a4",
+      "target": "evidence/tsa-grant/commands/p125g-source-counts/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-counts/stdout-stderr.log",
+      "bytes": 239,
+      "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4",
+      "target": "evidence/tsa-grant/commands/p125g-source-counts/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-gates/command.json",
+      "bytes": 1354,
+      "sha256": "6d112731361f76b45df9e634b3decac21def9609f007fe14d35a311971e9483c",
+      "target": "evidence/tsa-grant/commands/p125g-source-gates/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-gates/stdout-stderr.log",
+      "bytes": 821,
+      "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed",
+      "target": "evidence/tsa-grant/commands/p125g-source-gates/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-threat/command.json",
+      "bytes": 1370,
+      "sha256": "d750d472584bc1546e7103ff05e3f563917027f9a398ebf40afbbf438e497e36",
+      "target": "evidence/tsa-grant/commands/p125g-source-threat/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-threat/stdout-stderr.log",
+      "bytes": 294,
+      "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4",
+      "target": "evidence/tsa-grant/commands/p125g-source-threat/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-architecture/command.json",
+      "bytes": 1405,
+      "sha256": "42e42fbbdc96ca980f0303fa0f71b7b9b5469f78fe5a08605b1ee9ad079940fb",
+      "target": "evidence/tsa-grant/commands/p125g-source-architecture/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-architecture/stdout-stderr.log",
+      "bytes": 95863,
+      "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751",
+      "target": "evidence/tsa-grant/commands/p125g-source-architecture/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-docs/command.json",
+      "bytes": 1362,
+      "sha256": "8086a8593942ca4ee80169b994a715faf8a23f38b9af6894e111940ffa77d52a",
+      "target": "evidence/tsa-grant/commands/p125g-source-docs/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-docs/stdout-stderr.log",
+      "bytes": 205,
+      "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a",
+      "target": "evidence/tsa-grant/commands/p125g-source-docs/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-freeze/command.json",
+      "bytes": 1359,
+      "sha256": "357b7ac86dd1f6f54580d1845d2acd1055cea073b4f9d27138192ea999242e19",
+      "target": "evidence/tsa-grant/commands/p125g-source-freeze/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-freeze/stdout-stderr.log",
+      "bytes": 268,
+      "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+      "target": "evidence/tsa-grant/commands/p125g-source-freeze/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-notices/command.json",
+      "bytes": 1386,
+      "sha256": "fa2b8b24f0e2da1993c26e4cd0e357549fabb6a2e849265d636c844cf8d030f4",
+      "target": "evidence/tsa-grant/commands/p125g-source-notices/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-notices/stdout-stderr.log",
+      "bytes": 246,
+      "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00",
+      "target": "evidence/tsa-grant/commands/p125g-source-notices/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-clean-source/command.json",
+      "bytes": 1486,
+      "sha256": "11f1ee66a1497ac61adad6cfa6040c904712361403582ee7e505a1426c596849",
+      "target": "evidence/tsa-grant/commands/p125g-clean-source/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "4897241c03b2cdb25b29abb9a43f9c53d9134b78db2f0d714f40f96869f8fd31",
+      "target": "evidence/tsa-grant/commands/p125g-clean-source/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/command.json",
+      "bytes": 2821,
+      "sha256": "e510a9d7e7e2c3220f61095d9f8a8235b2e7eaa14ec01fc289fb58d87a358ecf",
+      "target": "evidence/tsa-grant/commands/p125g-fresh-canonical/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/stdout-stderr.log",
+      "bytes": 20497,
+      "sha256": "d6158c09c207b58fba1a29860702f21a7b18c1979718898d9e0d7c4071d61144",
+      "target": "evidence/tsa-grant/commands/p125g-fresh-canonical/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-fresh-canonical.raw.json",
+      "bytes": 6373,
+      "sha256": "4ce43dfba4648c924623e56d6eb93dadf3b57bfd312a3c40affa5d2b90c336b9",
+      "target": "evidence/tsa-grant/commands/p125g-fresh-canonical/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/raw.json",
+      "bytes": 6373,
+      "sha256": "4ce43dfba4648c924623e56d6eb93dadf3b57bfd312a3c40affa5d2b90c336b9",
+      "target": "evidence/tsa-grant/commands/p125g-fresh-canonical/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/observer.json",
+      "bytes": 8815,
+      "sha256": "9cb21f526cbd6b012d41a59606188ed4f74ed5a4ed98097908bf93cfb2669978",
+      "target": "evidence/tsa-grant/commands/p125g-fresh-canonical/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/command.json",
+      "bytes": 2731,
+      "sha256": "0f8c35ab33a777f272ecaee1aec0f47dba31ed53f53041e33e545980ca9a11ee",
+      "target": "evidence/tsa-grant/commands/p125g-m1/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/stdout-stderr.log",
+      "bytes": 23099,
+      "sha256": "c6a75c8f010da00f49feab43bd1d817618ceef83ecbc0a72590fd6808d66154e",
+      "target": "evidence/tsa-grant/commands/p125g-m1/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-m1.raw.json",
+      "bytes": 7794,
+      "sha256": "dd3716e1d8bfff3a2943bff7077ac84a20456ff4b51d91ab1382b857193bf7fa",
+      "target": "evidence/tsa-grant/commands/p125g-m1/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/raw.json",
+      "bytes": 7794,
+      "sha256": "dd3716e1d8bfff3a2943bff7077ac84a20456ff4b51d91ab1382b857193bf7fa",
+      "target": "evidence/tsa-grant/commands/p125g-m1/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/observer.json",
+      "bytes": 12890,
+      "sha256": "7615e124ddbadb41d7ee73c37eed2b5a2a35baa90b48467e762be34b095d2d7d",
+      "target": "evidence/tsa-grant/commands/p125g-m1/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/command.json",
+      "bytes": 2772,
+      "sha256": "d5860318fdd95b6d3ef2264815c473140b61a2641f1fbf49d06b050869d48de3",
+      "target": "evidence/tsa-grant/commands/p125g-restore1/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/stdout-stderr.log",
+      "bytes": 20482,
+      "sha256": "5325dfa79fe70fb78407d855b1950134ac416d33703a78056e3ebee52c71946a",
+      "target": "evidence/tsa-grant/commands/p125g-restore1/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-restore1.raw.json",
+      "bytes": 6384,
+      "sha256": "16fd172d95e1d0dff927db18bc63b659ea1486df0649aed826121e2323bde4a0",
+      "target": "evidence/tsa-grant/commands/p125g-restore1/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/raw.json",
+      "bytes": 6384,
+      "sha256": "16fd172d95e1d0dff927db18bc63b659ea1486df0649aed826121e2323bde4a0",
+      "target": "evidence/tsa-grant/commands/p125g-restore1/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/observer.json",
+      "bytes": 8815,
+      "sha256": "5cbb025c14bea21b04f6e6a7b47a994e36850c18575581ce45dcc6f351547c38",
+      "target": "evidence/tsa-grant/commands/p125g-restore1/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/command.json",
+      "bytes": 2731,
+      "sha256": "211931b7c39d17a1b4b79661c3e054a157e8efd8ad960344dde161b4757b3b1c",
+      "target": "evidence/tsa-grant/commands/p125g-m2/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/stdout-stderr.log",
+      "bytes": 21459,
+      "sha256": "8916665f5c2790d09ebce870a1f5aa7e415aa769e5aeb579ecd5ca107057054a",
+      "target": "evidence/tsa-grant/commands/p125g-m2/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-m2.raw.json",
+      "bytes": 7607,
+      "sha256": "fb01bbbb0d59a4f5492ae30bbb5336ddea45d24ca1286e952e7c9365c096fd15",
+      "target": "evidence/tsa-grant/commands/p125g-m2/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/raw.json",
+      "bytes": 7607,
+      "sha256": "fb01bbbb0d59a4f5492ae30bbb5336ddea45d24ca1286e952e7c9365c096fd15",
+      "target": "evidence/tsa-grant/commands/p125g-m2/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/observer.json",
+      "bytes": 12261,
+      "sha256": "f66b425e21982e4a52f7d2c88b5a4ae75e6c39a7686eb6d94232413c38924011",
+      "target": "evidence/tsa-grant/commands/p125g-m2/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/command.json",
+      "bytes": 2772,
+      "sha256": "4416454af71fe296bcd6297b3e3339a6de9ad7a3a59715fd83afa7aa1563190d",
+      "target": "evidence/tsa-grant/commands/p125g-restore2/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/stdout-stderr.log",
+      "bytes": 20490,
+      "sha256": "ff447d7f1fa60a96130f3f301dc16130376d9f70022362487384744ba83038e6",
+      "target": "evidence/tsa-grant/commands/p125g-restore2/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125g-restore2.raw.json",
+      "bytes": 6392,
+      "sha256": "e3537c53b92e98a80414bd06f3c7716fa968dc509834134b48b10c70b83e4845",
+      "target": "evidence/tsa-grant/commands/p125g-restore2/rawProducer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/raw.json",
+      "bytes": 6392,
+      "sha256": "e3537c53b92e98a80414bd06f3c7716fa968dc509834134b48b10c70b83e4845",
+      "target": "evidence/tsa-grant/commands/p125g-restore2/rawSnapshot.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/observer.json",
+      "bytes": 8815,
+      "sha256": "994707cf90980386b519e70f86e030a2d680109db95ad1ccf55b25069fd2e603",
+      "target": "evidence/tsa-grant/commands/p125g-restore2/observer.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-node-environment/command.json",
+      "bytes": 1349,
+      "sha256": "994b38e0aae44c133c814d206f62d5e6b41a541ab0be0ae99460db9fd0d6c6fb",
+      "target": "evidence/tsa-grant/commands/p125g-node-environment/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-node-environment/stdout-stderr.log",
+      "bytes": 49,
+      "sha256": "e8be1a8773f0cd760c13d91edfe516b462e26f10d3e380e29b9b585053e10f5b",
+      "target": "evidence/tsa-grant/commands/p125g-node-environment/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pnpm-version/command.json",
+      "bytes": 1173,
+      "sha256": "f23f005e3e152007379cb3e67c9228e4ccfc34611bb54bbf1e6aaffe91b4c3f4",
+      "target": "evidence/tsa-grant/commands/p125g-pnpm-version/command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pnpm-version/stdout-stderr.log",
+      "bytes": 8,
+      "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf",
+      "target": "evidence/tsa-grant/commands/p125g-pnpm-version/stdout-stderr.log",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/protected-inputs.json",
+      "bytes": 42394,
+      "sha256": "5ea619b92200115427bcccf2deb339f0b436f7cd1d1616fb9ff25d6b8f513198",
+      "target": "evidence/tsa-grant/records/protected-inputs.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/branch-adoption.json",
+      "bytes": 577,
+      "sha256": "f1d695f1f58fb2e861acbf8bbf41c60d001b6a96a8608bb5cb4a4a2ef6b560b8",
+      "target": "evidence/tsa-grant/records/branch-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/hosted-path-admission.json",
+      "bytes": 10774,
+      "sha256": "811b2ee0e1c99f6252d800e18ece5f5f9a329e213dbab6ba7db7ac9f4a684ec5",
+      "target": "evidence/tsa-grant/records/hosted-path-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-path-allocation.json",
+      "bytes": 3011,
+      "sha256": "ae54f36a31c682f7977ceeb9f5bf5720a4acc54e9e793e8326bb0b501e9b2a3a",
+      "target": "evidence/tsa-grant/records/source-path-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/test-materialization.json",
+      "bytes": 513,
+      "sha256": "6b6905103b045c7deffec5c5e741a47c2ef678ccdebc46c41595da9662c02f41",
+      "target": "evidence/tsa-grant/records/test-materialization.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-filesystem-inventory.json",
+      "bytes": 1192,
+      "sha256": "8bd973dfeea9f25f3b0977ec6f6f63368573a1f403848845f13a6187dded4cb1",
+      "target": "evidence/tsa-grant/records/tool-filesystem-inventory.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/quality-before-source-reference.json",
+      "bytes": 843,
+      "sha256": "8e3d935d0cb6e1470322f758ca193a5e29fb40bbc29b6ad0811fd799261538af",
+      "target": "evidence/tsa-grant/records/quality-before-source-reference.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/after-source-full.json",
+      "bytes": 247821,
+      "sha256": "0c0ad51bb621ff2208fab191e0e431f01b7086c5ca80230ae407572825f91a5d",
+      "target": "evidence/tsa-grant/records/after-source-full.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/quality-source-delta.json",
+      "bytes": 235,
+      "sha256": "bff46a8f9230b35e828369212f21e2b93449cf1eddda82a0ae032e25c448371c",
+      "target": "evidence/tsa-grant/records/quality-source-delta.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/openssl-optional-config-diagnostics.json",
+      "bytes": 1140,
+      "sha256": "68eba78dd80087d54e435291a5f11f51497e31a171865bbf89305f7be5f15999",
+      "target": "evidence/tsa-grant/records/openssl-optional-config-diagnostics.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-lifecycle-review.json",
+      "bytes": 40236,
+      "sha256": "1ac84278662a9aa1c9b705ac43c7fa14e103348e4b585c5952e793d5df501514",
+      "target": "evidence/tsa-grant/records/source-lifecycle-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/all-phases-lifecycle-review.json",
+      "bytes": 77041,
+      "sha256": "3069fedfdeec29fff8f0977ff7fbd33f774d4c521bf163d73a28636758f10a03",
+      "target": "evidence/tsa-grant/records/all-phases-lifecycle-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/public-output-allowlist.json",
+      "bytes": 17453,
+      "sha256": "3729d0a1a23b80fe5356a563f268c228a10a221ac24b290f04c2f15eca6ad4d1",
+      "target": "evidence/tsa-grant/records/public-output-allowlist.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-adoption.json",
+      "bytes": 796,
+      "sha256": "ae6e22b0a719e165ca1d7ed3676f2ab0dc249988721a068339951cb31150215a",
+      "target": "evidence/tsa-grant/records/runtime-audit-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/root-control-count-peer-adoption.json",
+      "bytes": 1127,
+      "sha256": "a1ab47d6c00adf5df35992ed659625627fa17d8d0c9af6eff53acd0f42217e71",
+      "target": "evidence/tsa-grant/records/root-control-count-peer-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-hosted-admission.json",
+      "bytes": 11125,
+      "sha256": "84b9ce3b458fef18875c67e8e231cad1e934d6c999d7b4b88916f53c9d95690d",
+      "target": "evidence/tsa-grant/records/count-hosted-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-source-allocation.json",
+      "bytes": 905,
+      "sha256": "fe06f05385cc4aff2817e3b0ce4ff053b4eedc003686c092d875a734d996f6c3",
+      "target": "evidence/tsa-grant/records/count-source-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/generated-counts-actual.json",
+      "bytes": 8551,
+      "sha256": "79b8bd781156cfc64c1f6424c692eab6a4075951ff26597ba09c894b0ed76be3",
+      "target": "evidence/tsa-grant/records/generated-counts-actual.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-stage-1.json",
+      "bytes": 535,
+      "sha256": "efb2b2a791dc6377c32a32ec4d583060b5d43e58f1e02cb42b595047f5bf4582",
+      "target": "evidence/tsa-grant/records/source-stage-1.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-stage-2.json",
+      "bytes": 222,
+      "sha256": "2875b5993a982d8c02351239b0be85a6fa7e1cb8c4f319b83b3e67bdabe52103",
+      "target": "evidence/tsa-grant/records/source-stage-2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-checkpoint-prepared.json",
+      "bytes": 3163,
+      "sha256": "6d604ab1e0bf116d8831ff5187aecb17b182c8bc74c5676ebf1e019e4f2db15a",
+      "target": "evidence/tsa-grant/records/source-checkpoint-prepared.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-commit-command.json",
+      "bytes": 476,
+      "sha256": "9dc995492585579d7ba68e498c0461767721c195046f0d0a8c339de6b702d213",
+      "target": "evidence/tsa-grant/records/source-commit-command.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-checkpoint.json",
+      "bytes": 2288,
+      "sha256": "3dba34147f1d322aa5153bfab3d898c832e90afa0b3c770af88437b763d8ef05",
+      "target": "evidence/tsa-grant/records/source-checkpoint.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+      "bytes": 90075,
+      "sha256": "dd478ef6153d0b03af4b9bb032fa8c7630b759cc37e021f6d5a0cdaae9c6fd35",
+      "target": "evidence/tsa-grant/records/fresh-source-binding.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-before-controls.json",
+      "bytes": 1645,
+      "sha256": "48f68e043f284e4f48610e8ce0442d9eb92795903d33ba4c462b0e10443f0935",
+      "target": "evidence/tsa-grant/records/preservation-before-controls.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-after-m1.json",
+      "bytes": 1638,
+      "sha256": "64ec9c2d7b6e3a1c75ab2e3ec7a9c7c75588ce506498a333f3e196fd32ed52d3",
+      "target": "evidence/tsa-grant/records/preservation-after-m1.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-final.json",
+      "bytes": 1635,
+      "sha256": "5c438b52ca8a8539b7c05d0625bc25a03f5c8fdee1dbdc6af460d133b6c1dd92",
+      "target": "evidence/tsa-grant/records/preservation-final.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-apply-prepared.json",
+      "bytes": 2311,
+      "sha256": "88e3665470a34155133c14308bdb59765057bea52d3275ba094dc07b73bb0c45",
+      "target": "evidence/tsa-grant/records/m1-apply-prepared.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-apply.json",
+      "bytes": 2785,
+      "sha256": "261aab193410b38fa23928551dfe3a0defd7c3cf37907b137b398b9d63aa1df0",
+      "target": "evidence/tsa-grant/records/m1-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-classification.json",
+      "bytes": 1439,
+      "sha256": "e9a9c81cff4a36fcde7594f03926a4d827e0f1508ef201a7e09cfc9830e0fd88",
+      "target": "evidence/tsa-grant/records/m1-classification.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-restore-prepared.json",
+      "bytes": 3253,
+      "sha256": "5a86c9fd89bdcbc4d39403d9151251231ec9eb41f1971a5860fdff06bc4c1090",
+      "target": "evidence/tsa-grant/records/m1-restore-prepared.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-restore.json",
+      "bytes": 3591,
+      "sha256": "3d04b8707545965efb90e513ed33569567fcd7e0fb11db4e70ef25ba3578c811",
+      "target": "evidence/tsa-grant/records/m1-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-apply-prepared.json",
+      "bytes": 2322,
+      "sha256": "3a7f48e26e3f3479ed522b9dac073c43b7a28337d2330016dfd1fac30e305743",
+      "target": "evidence/tsa-grant/records/m2-apply-prepared.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-apply.json",
+      "bytes": 2796,
+      "sha256": "72230766032b246375a4c502182fbcb6325c98d40d4f4028e9cd2600a58f749f",
+      "target": "evidence/tsa-grant/records/m2-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-classification.json",
+      "bytes": 1444,
+      "sha256": "bfc4bb60a379db4a2d9da5a3390ca9ecfe8a2ac2d071f42f7a0ea4f07e75cb90",
+      "target": "evidence/tsa-grant/records/m2-classification.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-restore-prepared.json",
+      "bytes": 3264,
+      "sha256": "8ea171f97734a42f0a657dbb81f045324e49a1017f5c57605d44a9a8fcf500d4",
+      "target": "evidence/tsa-grant/records/m2-restore-prepared.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-restore.json",
+      "bytes": 3602,
+      "sha256": "cb253b32779b4a298f5348f25e7452db7cac891e91143b80e0921e3d8f39f3a1",
+      "target": "evidence/tsa-grant/records/m2-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-read-lookup-diagnostic.json",
+      "bytes": 518,
+      "sha256": "69b06ca8739ebfdebfc00197153c603e77b361d07929837bfd7b6b5e9d773349",
+      "target": "evidence/tsa-grant/records/m1-read-lookup-diagnostic.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-helper-lookup-diagnostic.json",
+      "bytes": 507,
+      "sha256": "6c1608f7829dc90aa0c435847b6ae81c10ec3398ebb8f24120e9ed3ae13857c6",
+      "target": "evidence/tsa-grant/records/receipt-helper-lookup-diagnostic.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-read-lookup-followup-diagnostic.json",
+      "bytes": 475,
+      "sha256": "885c59e861184ded2f3babf9efafe6a1f492bb37813d0cd001b7c2098094232d",
+      "target": "evidence/tsa-grant/records/receipt-read-lookup-followup-diagnostic.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/whole-issue-gaps.json",
+      "bytes": 1796,
+      "sha256": "0551f6f2de7fb04204576a613329121af2e04b1f4f9c360c002423ea5c175547",
+      "target": "evidence/tsa-grant/records/whole-issue-gaps.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/root-peer-evidence-adoption.json",
+      "bytes": 554,
+      "sha256": "e832179c4f0d0d6af3e2f697b0ac75cfaced9a35c24b44d0b843f0baa1e287f0",
+      "target": "evidence/tsa-grant/records/root-peer-evidence-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/actual-environment.json",
+      "bytes": 83,
+      "sha256": "b85a8599a43bdf2f5ee3640e95b553100e8ae5af9466349aa351473b00fc1be7",
+      "target": "evidence/tsa-grant/records/actual-environment.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/command-selection-v2.json",
+      "bytes": 6997,
+      "sha256": "be4be450e83aed4f4ecd0b803dece87c330f3699d6dbbc184f65193854e281a4",
+      "target": "evidence/tsa-grant/records/command-selection-v2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-unchanged-verifier-outcome.json",
+      "bytes": 3467,
+      "sha256": "3937d61a11fd96300cb7019f2806d3c8bec57762c0a2e8c9f0cf42455ac7edbd",
+      "target": "evidence/tsa-grant/records/p125g-unchanged-verifier-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+      "bytes": 4330,
+      "sha256": "7badbc66b8e813647ad56627da9c651e3cdf171ac25403c03a94b85fe029f6e0",
+      "target": "evidence/tsa-grant/records/p125g-source-combined-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+      "bytes": 4362,
+      "sha256": "0c7370c8b8e212217abe841e4de7efa32833af56ab4073e2e59de6e2d208f01a",
+      "target": "evidence/tsa-grant/records/p125g-fresh-canonical-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m1-outcome.json",
+      "bytes": 8815,
+      "sha256": "a38d161c644cd80152a8869a48967e8a69fd83ed780ccad6bf2038c8da1d0dad",
+      "target": "evidence/tsa-grant/records/p125g-m1-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-restore1-outcome.json",
+      "bytes": 4348,
+      "sha256": "bf7fbec45a9dd3d5d8c15fc1e642cb4182fbaa888b99e588de1643e923898d0f",
+      "target": "evidence/tsa-grant/records/p125g-restore1-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m2-outcome.json",
+      "bytes": 8186,
+      "sha256": "a6f42405cb4dc76dbdf6412d8e25b38b42ff388d489da5554b90f02603f34cf2",
+      "target": "evidence/tsa-grant/records/p125g-m2-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-restore2-outcome.json",
+      "bytes": 4348,
+      "sha256": "17c33f410c33107d77991a2101744b160ac90ef5fc1f7c64498f451fc4411d45",
+      "target": "evidence/tsa-grant/records/p125g-restore2-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/review.json",
+      "bytes": 4869,
+      "sha256": "5dcf4acf3fc81d4f9fe5b5efa882ca3b5e0780bacdfd48437bbf5b37c6793730",
+      "target": "evidence/tsa-grant/records/scope-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/seal.json",
+      "bytes": 1070,
+      "sha256": "6660150f8e709dfec6b01a7e57c5a4afb3b4f8eb0ab708afcac1fcedb3cea030",
+      "target": "evidence/tsa-grant/records/scope-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/review.json",
+      "bytes": 7843,
+      "sha256": "5a94f0dcfc57cdd92abc2bb50fe26201e178cbe85625089a9f30bfd6cde2a522",
+      "target": "evidence/tsa-grant/records/tool-doc-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/README.md",
+      "bytes": 1859,
+      "sha256": "de09f0def19a7663ed0e905cf8b7c531734edfe60015c41498709ed6371ab33c",
+      "target": "evidence/tsa-grant/records/tool-doc-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/seal.json",
+      "bytes": 1248,
+      "sha256": "42448a4e494871827aa4504ada478076ac3e98610698b1ca52c0148dabd3cdda",
+      "target": "evidence/tsa-grant/records/tool-doc-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/review-v3.json",
+      "bytes": 2547,
+      "sha256": "72706fe7304cbd9860decd26dc1d49228dd167077dcf20c590733e8bd5a1b011",
+      "target": "evidence/tsa-grant/records/count-surface-review/review-v3.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/README-v3.md",
+      "bytes": 1690,
+      "sha256": "ddadabbfe4bdca346811f58fa38e3ec6bf2f1637abe1544badccdf934ede1bb2",
+      "target": "evidence/tsa-grant/records/count-surface-review/README-v3.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/proposed-admission-v3.json",
+      "bytes": 21007,
+      "sha256": "61605cf3a30deb76d77ce510f490b82f284735b8665057bba7c18378482cce47",
+      "target": "evidence/tsa-grant/records/count-surface-review/proposed-admission-v3.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/seal-v3.json",
+      "bytes": 1688,
+      "sha256": "b9db9fb191669cba255e86f447422bd9cdfa3832933acae3ec602b90f614d52c",
+      "target": "evidence/tsa-grant/records/count-surface-review/seal-v3.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/lost-session-limitation.json",
+      "bytes": 1243,
+      "sha256": "200805ac3c855952a4406bc52815f26b63c7fa7d80ac9fa3c224af2c17e6e561",
+      "target": "evidence/tsa-grant/records/count-surface-review/lost-session-limitation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/review-v2.json",
+      "bytes": 48906,
+      "sha256": "6b4f358d2503c3c03a1131ff060f139431752b1beabc80204a38e360b6d16d46",
+      "target": "evidence/tsa-grant/records/source-evidence-review/review-v2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/README-v2.md",
+      "bytes": 3639,
+      "sha256": "5fce2b1f46fc40beade1f79f467e1f27704c39b860eca260a9f22552b87a4ef6",
+      "target": "evidence/tsa-grant/records/source-evidence-review/README-v2.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/seal-v2.json",
+      "bytes": 1590,
+      "sha256": "ee9f3007cdd160c8ff50e740019fede0309cb676471d3a1cfb8022fe103aa242",
+      "target": "evidence/tsa-grant/records/source-evidence-review/seal-v2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 138585,
+      "sha256": "fe2cabe3d756856edef139ebe448eaac71d84cff4164230047c04064acd2a32c",
+      "target": "evidence/tsa-grant/records/fresh-control-runtime-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/README.md",
+      "bytes": 4189,
+      "sha256": "2143a3c154d73c54fedde6f2d3410523387246ddef77ce46c6d562da7b8ad14c",
+      "target": "evidence/tsa-grant/records/fresh-control-runtime-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/seal-v2.json",
+      "bytes": 1802,
+      "sha256": "868e8cb46630643a15524820808c3f4943f51791f202535303b9ffcefc165b4c",
+      "target": "evidence/tsa-grant/records/fresh-control-runtime-review/seal-v2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7366,
+      "sha256": "7077824c86030863e607e7d19de0d67641cbada2edbdf5b680bda8b9085d2661",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/source-pinset.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 3842,
+      "sha256": "72426bacdef43659fba7c4c299b1da54687b7d94cf20c60011dafe1eab0f96e5",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/controls.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal-v2.json",
+      "bytes": 3448,
+      "sha256": "4407f3ef6911bd11afc87f5c9d1ba4b078f17c558a902b5e28a7e50d0cf1561f",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/seal-v2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/README-v2.md",
+      "bytes": 3053,
+      "sha256": "dd0ceaf572a85c52e4c2d9681ce38145122139ed7826481f4aa7152f5460024b",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/README-v2.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-control-helper-static-review/review.json",
+      "bytes": 5306,
+      "sha256": "d467b273b200bc4dcb46e390ea9860ba152de788b9acc6805440a5119dd77f8d",
+      "target": "evidence/tsa-grant/records/runtime-control-helper-static-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-control-helper-static-review/seal.json",
+      "bytes": 1939,
+      "sha256": "fd01bc6c97836c0475b4f0e905991b4d4e2131b8d284efface2635ca48539447",
+      "target": "evidence/tsa-grant/records/runtime-control-helper-static-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-control-helper-static-review/README.md",
+      "bytes": 1982,
+      "sha256": "ed61df9e84614a5a775da87e62bb090ccdd117b05c877fc57fafe12af28c5715",
+      "target": "evidence/tsa-grant/records/runtime-control-helper-static-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m1.patch",
+      "bytes": 624,
+      "sha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22",
+      "target": "evidence/tsa-grant/records/m1.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/m2.patch",
+      "bytes": 1017,
+      "sha256": "88dc42851df1155f12c35a0b61b15ce688ca12d0b52bf569bd339b7198db58a5",
+      "target": "evidence/tsa-grant/records/m2.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/ORDER.patch",
+      "bytes": 483,
+      "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/ORDER.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/DROP-VALID-GRANT.patch",
+      "bytes": 876,
+      "sha256": "6c6027557916fb4bc33300fd41a992eb5bd39d7082db73e3669169a08fbb09e2",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/DROP-VALID-GRANT.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/audit-observed.py",
+      "bytes": 1799,
+      "sha256": "0671f636048bb159b449362c00ad1949174be12160421b3f0ed81eadc93db359",
+      "target": "evidence/tsa-grant/records/audit-observed.py.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/capture-quality.mjs",
+      "bytes": 913,
+      "sha256": "771f83b3dd6578c45791a556f2d4768b9b6eb74f7b515882588e99b6c2e43005",
+      "target": "evidence/tsa-grant/records/capture-quality.mjs.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15919,
+      "sha256": "8725ba26ae7d0fb7b8a66cba763c14caddc66b07ec6426008232a3e59f046147",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/source-control.py.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1457,
+      "sha256": "4255f6d908e3ce5cf8eda86ef301d6c92ccefb97793a09fe8a36beba92de274c",
+      "target": "evidence/tsa-grant/records/fresh-control-preparation/check-preservation.py.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+      "target": "evidence/tsa-grant/source/tsaGrant.test.ts.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "target": "evidence/tsa-grant/source/tsaClient.ts.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/seal.json",
+      "bytes": 2513,
+      "sha256": "6e408070922025a625aefabdc0869066992f71c960d2c8285d58b646938abf34",
+      "target": "evidence/tsa-grant/records/receipt-extension-preparation/v3/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "bytes": 2881,
+      "sha256": "80f5556467aa13a8f782ff1a462334bcb7787abbf5966c33cf8dbdfd54023ad1",
+      "target": "evidence/tsa-grant/records/receipt-extension-preparation/v3/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/author-static-review.json",
+      "bytes": 1249,
+      "sha256": "4e190c17ebb8f3eda1c9cdbf4f09ff5beab4ea00bc4b59abd01d94813559ba03",
+      "target": "evidence/tsa-grant/records/receipt-extension-preparation/v3/author-static-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/assembler-v2-static-blockers.json",
+      "bytes": 887,
+      "sha256": "043ed17c8560d210f7076082e723606a6fd7d54d611eaeade9659e1145c14a4f",
+      "target": "evidence/tsa-grant/records/assembler-v2-static-blockers.json",
+      "envelope": false
+    }
+  ],
+  "hashOnlyPins": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "bytes": 25753,
+      "sha256": "f95873d2163af4f9d54333673c4c0f1ab420e3c0776218bdb1a32ee3efdecff7"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 12589,
+      "sha256": "0504f2b883624ec291574a12eeb678ae8fe8dbfcfdafa4c284183cf0387a5a48"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 19127,
+      "sha256": "ff84136862c89d4cf2bc78aac2361442c8822172c2ae9e76caca3cb6316dd21c"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 5471,
+      "sha256": "81c5530db55d24763b7b30e46bdd424f4a3f9c69755efe420ea55652109dccf3"
+    }
+  ],
+  "commandSelectionCutoffUtc": "2026-10-16T23:04:06.889220+00:00",
+  "rootReviewedExactCommandAndArtifactInventory": true,
+  "readmePin": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/README-combined.md",
+    "bytes": 24235,
+    "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68"
+  },
+  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim.",
+  "rootReviewedActualControlsAndMasks": true,
+  "rootReadFullReadmeAndWholeIssueGaps": true,
+  "noAggregateCohortTotal": true,
+  "boundary": "Actual root-reviewed private-only assembly input at source188681b32. Same19 source/fresh and classified2/2 controls with exact restores19/19, actual31 closed commands at the named cutoff, exact219 artifacts including48 explicitly public outputs, complete old897 preservation and all135/eightold+freshninth pins. Independent final static/input review and explicit root execution admission still precede execution. Later source publication/index/whitespace/quality/commit/export checks have no credit here.",
+  "basePreservationPin": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/original-p125-pinset.json",
+    "bytes": 180673,
+    "sha256": "23d0c34e553caaea9474c4c8147f821278636fd77cfc9a48f027712ff7b3826e"
+  },
+  "publicOutputAllowlistPin": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/public-output-allowlist.json",
+    "bytes": 17453,
+    "sha256": "3729d0a1a23b80fe5356a563f268c228a10a221ac24b290f04c2f15eca6ad4d1"
+  }
+}

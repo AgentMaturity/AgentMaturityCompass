@@ -1,0 +1,13 @@
+{
+  "schema": "amc-p207-causal-chain-independent-audit/1",
+  "privateOriginal": {
+    "path": "/private/tmp/p2-07-oidc-qualification-20261016/causal-chain-independent-audit/review.json",
+    "bytes": 14362,
+    "sha256": "d615d78a3ca70ce078375b84f543a313a2292e53324faddfa1bf94f8249df64d"
+  },
+  "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "projection": "Compact closure and blocker fields only. Full phase/source/public-evidence audit remains private and pinned; no detector literals or private data are copied."
+}

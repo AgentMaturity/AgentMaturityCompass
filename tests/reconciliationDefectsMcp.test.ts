@@ -82,7 +82,7 @@ describe("AMC-1515 nativeMcpClient.ts:264 — a received result discarded after 
     const fixture = await mounted(true);
     const outcome = await fixture.call();
     expect(fixture.remoteCalls()).toBe(1);
-    expect(outcome.outcome).toBe("ERROR");
+    expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(outcome.content)).toContain("the remote tool executed and its received result was discarded. It was not replayed.");
   });
 });

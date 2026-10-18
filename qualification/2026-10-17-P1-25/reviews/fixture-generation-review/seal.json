@@ -1,0 +1,33 @@
+{
+  "schema": "private-static-audit-seal/1",
+  "inputCount": 204,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-generation-review/review.json",
+      "bytes": 22908,
+      "sha256": "e2076335f3718a3930c549266c1f2f58620596f420adcd0e9a1cd6b0bd05be50",
+      "dev": 16777231,
+      "inode": 543069981,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-generation-review/README.md",
+      "bytes": 1953,
+      "sha256": "b853e1272c7dfad9c36ace04be54cfd98f9d1282c9c6760a1f7b1cc2d3ca10f1",
+      "dev": 16777231,
+      "inode": 543069982,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-generation-review/pins.json",
+      "bytes": 64096,
+      "sha256": "2f03ae65783d70b74d65bb0a133350a9a04b2d7301558a4cf3d9320011cc9f04",
+      "dev": 16777231,
+      "inode": 543069983,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "actualGenerationOnly": true,
+  "AMCExecutedByReviewer": false
+}

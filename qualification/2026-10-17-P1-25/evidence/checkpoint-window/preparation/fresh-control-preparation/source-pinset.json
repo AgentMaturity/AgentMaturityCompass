@@ -1,0 +1,214 @@
+{
+  "schema": "p125k-finite-fresh-source-pinset-proposal/1",
+  "at": "2026-10-16T23:27:13.094171+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "preChangeSourceHead": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "futureSourceCommit": null,
+  "freshRoot": null,
+  "relativePaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "dist/config/amcConfigSignature.js",
+    "dist/crypto/keys.js",
+    "dist/enforce/egressAllowlist.js",
+    "dist/ledger/ledger.js",
+    "dist/ledger/ledgerConnection.js",
+    "dist/ledger/ledgerSchema.js",
+    "dist/ledger/ledgerVerification.js",
+    "dist/residency/checkEgress.js",
+    "dist/residency/destinationRegistry.js",
+    "dist/storage/sqlitePool.js",
+    "dist/time/checkpoint.js",
+    "dist/time/der.js",
+    "dist/time/timeEvidence.js",
+    "dist/time/tsaClient.js",
+    "dist/time/verifyTimestamp.js",
+    "dist/trust/amc-distrust.json",
+    "dist/trust/trustContext.js",
+    "dist/trust/trustList.js",
+    "dist/vault/vault.js",
+    "dist/workspace.js",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "knip.json",
+    "package.json",
+    "pnpm-lock.yaml",
+    "qualification/receipt.schema.json",
+    "scripts/check-freeze.mjs",
+    "scripts/check-qualification-receipts.mjs",
+    "scripts/clean-source-check.mjs",
+    "scripts/freeze-baseline.json",
+    "scripts/gen-counts.mjs",
+    "scripts/source-quality.mjs",
+    "src/catalog/compiler/activate.ts",
+    "src/catalog/compiler/compile.ts",
+    "src/config/amcConfigSignature.ts",
+    "src/crypto/keys.ts",
+    "src/crypto/signing/signatureEnvelope.ts",
+    "src/crypto/signing/signer.ts",
+    "src/enforce/egressAllowlist.ts",
+    "src/enforce/evidenceEmitter.ts",
+    "src/ledger/ledger.ts",
+    "src/ledger/ledgerConnection.ts",
+    "src/ledger/ledgerSchema.ts",
+    "src/ledger/ledgerVerification.ts",
+    "src/residency/checkEgress.ts",
+    "src/residency/destinationRegistry.ts",
+    "src/residency/types.ts",
+    "src/storage/sqlitePool.ts",
+    "src/time/checkpoint.ts",
+    "src/time/der.ts",
+    "src/time/timeEvidence.ts",
+    "src/time/tsaClient.ts",
+    "src/time/verifyTimestamp.ts",
+    "src/trust/amc-distrust.json",
+    "src/trust/keyPurposes.ts",
+    "src/trust/trustContext.ts",
+    "src/trust/trustList.ts",
+    "src/utils/fs.ts",
+    "src/utils/hash.ts",
+    "src/utils/json.ts",
+    "src/vault/vault.ts",
+    "src/workspace.ts",
+    "tests/fixtures/rfc3161/README.md",
+    "tests/fixtures/rfc3161/expired.token.der",
+    "tests/fixtures/rfc3161/missing-eku.token.der",
+    "tests/fixtures/rfc3161/noncritical-eku.token.der",
+    "tests/fixtures/rfc3161/provenance.json",
+    "tests/fixtures/rfc3161/public-certificates.json",
+    "tests/fixtures/rfc3161/query.der",
+    "tests/fixtures/rfc3161/tampered-attribute.token.der",
+    "tests/fixtures/rfc3161/tstinfo.der",
+    "tests/fixtures/rfc3161/valid.response.der",
+    "tests/fixtures/rfc3161/valid.token.der",
+    "tests/setup/guardWorkspace.ts",
+    "tests/setup/repoWorkspaceGuard.global.ts",
+    "tests/setup/repoWorkspaceGuard.ts",
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaClient.test.ts",
+    "tests/time/tsaFallback.test.ts",
+    "tests/time/tsaGrant.test.ts",
+    "tests/time/tsaTestFixture.ts",
+    "tests/time/verifyTimestamp.test.ts",
+    "tests/trust/trustFixtures.ts",
+    "tsconfig.json",
+    "tsconfig.tests.json",
+    "vitest.config.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "selectedPathCount": 94,
+  "compiledPairs": [
+    {
+      "sourceRelativePath": "src/time/tsaClient.ts",
+      "compiledRelativePath": "dist/time/tsaClient.js"
+    },
+    {
+      "sourceRelativePath": "src/time/der.ts",
+      "compiledRelativePath": "dist/time/der.js"
+    },
+    {
+      "sourceRelativePath": "src/time/verifyTimestamp.ts",
+      "compiledRelativePath": "dist/time/verifyTimestamp.js"
+    },
+    {
+      "sourceRelativePath": "src/time/timeEvidence.ts",
+      "compiledRelativePath": "dist/time/timeEvidence.js"
+    },
+    {
+      "sourceRelativePath": "src/residency/checkEgress.ts",
+      "compiledRelativePath": "dist/residency/checkEgress.js"
+    },
+    {
+      "sourceRelativePath": "src/residency/destinationRegistry.ts",
+      "compiledRelativePath": "dist/residency/destinationRegistry.js"
+    },
+    {
+      "sourceRelativePath": "src/enforce/egressAllowlist.ts",
+      "compiledRelativePath": "dist/enforce/egressAllowlist.js"
+    },
+    {
+      "sourceRelativePath": "src/trust/trustContext.ts",
+      "compiledRelativePath": "dist/trust/trustContext.js"
+    },
+    {
+      "sourceRelativePath": "src/time/checkpoint.ts",
+      "compiledRelativePath": "dist/time/checkpoint.js"
+    },
+    {
+      "sourceRelativePath": "src/config/amcConfigSignature.ts",
+      "compiledRelativePath": "dist/config/amcConfigSignature.js"
+    },
+    {
+      "sourceRelativePath": "src/ledger/ledger.ts",
+      "compiledRelativePath": "dist/ledger/ledger.js"
+    },
+    {
+      "sourceRelativePath": "src/ledger/ledgerConnection.ts",
+      "compiledRelativePath": "dist/ledger/ledgerConnection.js"
+    },
+    {
+      "sourceRelativePath": "src/ledger/ledgerVerification.ts",
+      "compiledRelativePath": "dist/ledger/ledgerVerification.js"
+    },
+    {
+      "sourceRelativePath": "src/ledger/ledgerSchema.ts",
+      "compiledRelativePath": "dist/ledger/ledgerSchema.js"
+    },
+    {
+      "sourceRelativePath": "src/storage/sqlitePool.ts",
+      "compiledRelativePath": "dist/storage/sqlitePool.js"
+    },
+    {
+      "sourceRelativePath": "src/vault/vault.ts",
+      "compiledRelativePath": "dist/vault/vault.js"
+    },
+    {
+      "sourceRelativePath": "src/trust/trustList.ts",
+      "compiledRelativePath": "dist/trust/trustList.js"
+    },
+    {
+      "sourceRelativePath": "src/crypto/keys.ts",
+      "compiledRelativePath": "dist/crypto/keys.js"
+    },
+    {
+      "sourceRelativePath": "src/workspace.ts",
+      "compiledRelativePath": "dist/workspace.js"
+    }
+  ],
+  "compiledPairCount": 19,
+  "prior73Retained": true,
+  "addedRelativePaths": [
+    "dist/config/amcConfigSignature.js",
+    "dist/crypto/keys.js",
+    "dist/ledger/ledger.js",
+    "dist/ledger/ledgerConnection.js",
+    "dist/ledger/ledgerSchema.js",
+    "dist/ledger/ledgerVerification.js",
+    "dist/storage/sqlitePool.js",
+    "dist/time/checkpoint.js",
+    "dist/trust/amc-distrust.json",
+    "dist/trust/trustList.js",
+    "dist/vault/vault.js",
+    "dist/workspace.js",
+    "src/config/amcConfigSignature.ts",
+    "src/ledger/ledgerSchema.ts",
+    "src/ledger/ledgerVerification.ts",
+    "src/storage/sqlitePool.ts",
+    "src/time/checkpoint.ts",
+    "src/trust/amc-distrust.json",
+    "src/vault/vault.ts",
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaTestFixture.ts"
+  ],
+  "activeProtectedInputsRequired": 142,
+  "baseProtectedInputsArePrechangeOnly": true,
+  "runtimeProtectedInputsRequiredAt": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-protected-inputs.json",
+  "existingNativePinsRequired": 9,
+  "futureFreshNativeRequired": true,
+  "boundary": "Names only. Old73 are retained; new helper/checkpoint test and core checkpoint/config/ledger/trust/vault/pool dependencies are selected explicitly. Root supplies actual source checkpoint, post-build matched source/fresh bytes, physical identities, runtime grant-successor pinset and distinct tenth native. No complete transitive dependency closure, future hash, runtime result or compiled sensitivity is claimed."
+}

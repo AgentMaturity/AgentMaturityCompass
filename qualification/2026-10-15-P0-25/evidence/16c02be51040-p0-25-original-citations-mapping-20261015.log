@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass
+
+ ✓ tests/citations/checkCitationsCli.test.ts (9 tests) 54ms
+ ✓ tests/citations/lintCitations.test.ts (21 tests) 18ms
+ ✓ tests/compliance/mappingPackRefs.test.ts (2 tests) 5ms
+
+ Test Files  3 passed (3)
+      Tests  32 passed (32)
+   Start at  10:03:48
+   Duration  961ms (transform 384ms, setup 77ms, import 494ms, tests 77ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-25-original-citations-mapping-20261015.json

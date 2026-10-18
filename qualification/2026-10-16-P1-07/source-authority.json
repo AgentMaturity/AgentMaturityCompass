@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "canonicalFreshPhysicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "wrapperCwdsAndHeads": [
+    [
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "bf3b7766e7b2e70d8e72135773a5c0e612ae013d"
+    ]
+  ],
+  "historicalProofFlagsPreserved": {
+    "sourceFreshQualificationPending": true,
+    "bindingCanonicalAndControlsPending": true
+  },
+  "boundary": "Borrowed wrapper cwd/HEAD is separate from S/Q source authority. Root source proof, fresh binding, control records and final review are retained exactly; assembly executes no source verifier."
+}

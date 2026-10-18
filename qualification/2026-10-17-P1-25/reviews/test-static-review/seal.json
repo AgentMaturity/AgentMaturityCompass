@@ -1,0 +1,42 @@
+{
+  "schema": "p125-independent-test-static-review-seal/1",
+  "at": "2026-10-16T18:48:07.508788+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "inputCount": 46,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/review.json",
+      "bytes": 4701,
+      "sha256": "d64d842ab12bfdd6794ebd8bc88ea900a3acb935aa2d8e8b1162f7704f0ff2f1",
+      "dev": 16777231,
+      "ino": 543069974,
+      "nlink": 1,
+      "readScope": "private authored review"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/README.md",
+      "bytes": 1077,
+      "sha256": "6b23d4525699f300a2b56c3d98c834db470b25fc39bb1565afbb6b6fc5cfec87",
+      "dev": 16777231,
+      "ino": 543069975,
+      "nlink": 1,
+      "readScope": "private authored review"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-static-review/input-pins.json",
+      "bytes": 22329,
+      "sha256": "14c88bac0fed304c24ad9b0fc72c6a70f3d47a93769c5a277bdae4e88fc5b41f",
+      "dev": 16777231,
+      "ino": 543069973,
+      "nlink": 1,
+      "readScope": "private authored review"
+    }
+  ],
+  "candidateExecutedOrParsed": false,
+  "OpenSSLExecutedByReviewer": false,
+  "checkoutWrites": false
+}

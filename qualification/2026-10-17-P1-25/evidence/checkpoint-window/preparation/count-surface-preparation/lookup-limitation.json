@@ -1,0 +1,9 @@
+{
+  "operation": "Read-only initial 142-row pinset filename lookup",
+  "error": "FileNotFoundError for initial-protected-inputs.json",
+  "cause": "The filename was guessed from ambiguous joined wording; root was asked for the literal full existing path.",
+  "noSourceOrGeneratorExecutionOrMutation": true,
+  "evidenceCredit": false,
+  "coordinatorToolResultMetadataNotRetainedForThisFailedLookup": true,
+  "doesNotEstablishAnyPinsetAbsenceOrRelease": true
+}

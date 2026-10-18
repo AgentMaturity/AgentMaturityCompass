@@ -1,0 +1,2122 @@
+{
+  "schema": "p125pc-explicit-public-output-review-input-pins/1",
+  "at": "2026-10-17T02:18:20.724125+00:00",
+  "count": 235,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+      "bytes": 340585,
+      "sha256": "923373ef519e24ee9fa25f2f0d63bf60988a52d0fb5896035ad24bf129a8ad91",
+      "dev": 16777231,
+      "inode": 544002476,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+      "bytes": 4256,
+      "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048",
+      "dev": 16777231,
+      "inode": 543999010,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+      "bytes": 30212,
+      "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214",
+      "dev": 16777231,
+      "inode": 543998886,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/command.json",
+      "bytes": 1292,
+      "sha256": "a478ebe75851efd0c23093ec205e7c87caf36ac18d434fe47d8781a2b69e5fc4",
+      "dev": 16777231,
+      "inode": 544002478,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/stdout-stderr.log",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/stdout-stderr.log",
+      "bytes": 340,
+      "sha256": "ae61f79e4fe712f49788955b66fe34dac52682877c706332addae182be26fef6",
+      "dev": 16777231,
+      "inode": 544002431,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+      "bytes": 7969,
+      "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045",
+      "dev": 16777231,
+      "inode": 543926549,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+      "bytes": 235594,
+      "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b",
+      "dev": 16777231,
+      "inode": 543926557,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+      "bytes": 8001,
+      "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac",
+      "dev": 16777231,
+      "inode": 543992114,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+      "bytes": 235614,
+      "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b",
+      "dev": 16777231,
+      "inode": 543992141,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+      "bytes": 11364,
+      "sha256": "246ee26d463193f1b2a3b10d8fc3c5cef9fa6b0faf93787f2167ee6c64121fd0",
+      "dev": 16777231,
+      "inode": 543993836,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+      "bytes": 188394,
+      "sha256": "ea20094c661260d2d57eeb1aab66daf2bca964619b54ca6aa70e2b8bdf8aaa9b",
+      "dev": 16777231,
+      "inode": 543993849,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+      "bytes": 7987,
+      "sha256": "08b8776018332147b54e73aee8f1ee667aa4ed5d4f1673b67c139c8eec3f327d",
+      "dev": 16777231,
+      "inode": 543995494,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+      "bytes": 235595,
+      "sha256": "67bb7af19f978ff00c9a17ce07857a7e2da6f71ffcd3d9b3ebbc5b6e6ac6ced7",
+      "dev": 16777231,
+      "inode": 543995511,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+      "bytes": 11364,
+      "sha256": "58c6ad9a9284c73896311c95ce3bc90c583eb5e647c338bbbf989bf66ee50bda",
+      "dev": 16777231,
+      "inode": 543997160,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+      "bytes": 190169,
+      "sha256": "f4f3060d261bf8d48d19f73700e29aff31594d05d7c132812124e45e4920c890",
+      "dev": 16777231,
+      "inode": 543997170,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+      "bytes": 7987,
+      "sha256": "5c3192efccab323d6db4e958d86222ab982445be8740ba87f86d3c4b70de4a3c",
+      "dev": 16777231,
+      "inode": 543998813,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+      "bytes": 235600,
+      "sha256": "57f4637cdd9ec37504e18d66be2c906776f693c050c619974cdff0653263aab3",
+      "dev": 16777231,
+      "inode": 543998823,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/public-evidence.json",
+      "bytes": 12982,
+      "sha256": "e183ce9532dcf19200a0ea17d89391d175288faff24537007a2c70908635563f",
+      "dev": 16777231,
+      "inode": 543920253,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-FIRST-GRANT.json",
+      "bytes": 3268,
+      "sha256": "b67f2341420c2ef44591b0c59d3adf95300db8701e89e6d8adcb73220e37722c",
+      "dev": 16777231,
+      "inode": 544002434,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ea257e2caa81793221458fbca9a3204abad9a2b5327f211563fe80b6dffa9ae2",
+      "dev": 16777231,
+      "inode": 543920243,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D5xZaI/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "1271d2e883cac35eafe68c7b6d154e8b553bf737fb50d5b70e158c8ebbbfba27",
+      "dev": 16777231,
+      "inode": 543920244,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/public-evidence.json",
+      "bytes": 13545,
+      "sha256": "0976d94bc443357ebb21fc0614f8c273ff212f3a42d346f97624ae3362f28d0a",
+      "dev": 16777231,
+      "inode": 543920289,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-HTTP500-THEN-GRANT.json",
+      "bytes": 3275,
+      "sha256": "4fdddeff7034b144a5a1252b9544982451bd6fc917bb941764aa9a015bc1bc47",
+      "dev": 16777231,
+      "inode": 544002435,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/request-2.tsq",
+      "bytes": 76,
+      "sha256": "d064e58f3e34bca14ef6c59ad3d1c0f8177dbd3607956c7cc9332cddc14adcbb",
+      "dev": 16777231,
+      "inode": 543920280,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-u4tNph/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ba4f6ce3a0d4dda54479e80ca1bbbdc6bd7167d853748e41db1352bc1f10fb2c",
+      "dev": 16777231,
+      "inode": 543920281,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/public-evidence.json",
+      "bytes": 12903,
+      "sha256": "706ce6896cd22bfc47e3ef64e60703dd243d69cea511e91dbfdf087b47ff6a67",
+      "dev": 16777231,
+      "inode": 543920793,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3281,
+      "sha256": "4e5afc22e4c537445a82a99337f6474efa2528f0f36ad0a55c674523eeee4abc",
+      "dev": 16777231,
+      "inode": 544002436,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/request-2.tsq",
+      "bytes": 76,
+      "sha256": "f892105f3d8a595abce081983c55bcf008def4f9cd6c6a88a97bc833931cc704",
+      "dev": 16777231,
+      "inode": 543920782,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nKDLw1/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "9ec975ae7002b1babd3b0d20671e5cb11342e0ef796e5ac01203a3b07e8dec05",
+      "dev": 16777231,
+      "inode": 543920783,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UzFMGH/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UzFMGH/public-evidence.json",
+      "bytes": 8234,
+      "sha256": "f19a3d75cba29b99b35d2609417393cb2b9b52b353928c4d1d60aff9f6bb4bb7",
+      "dev": 16777231,
+      "inode": 543920950,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3284,
+      "sha256": "b95238c1ce95b16a48243cd242906ddadd48413800977fc0af56b5a811efb598",
+      "dev": 16777231,
+      "inode": 544002437,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/public-evidence.json",
+      "bytes": 16744,
+      "sha256": "19aed7c20953afbb602901c9aa025fef220ea302f02935814a100fdc67e8b739",
+      "dev": 16777231,
+      "inode": 543921124,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3284,
+      "sha256": "0a5ed91cff9b98aa2868c3466a4ca4ef59a7ab8109bf832f55bbfd2dea5d7d47",
+      "dev": 16777231,
+      "inode": 544002438,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/request-1.tsq",
+      "bytes": 76,
+      "sha256": "8d60eb7bf82129e63a4d1e80fcaf6b2af0d8703ef13c068501bfbf3f9da1ce87",
+      "dev": 16777231,
+      "inode": 543921103,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "4480b7b351741e31ee711bebdb9d4a7da59efdc2818ea32f996dee64bfe822ff",
+      "dev": 16777231,
+      "inode": 543921104,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/request-2.tsq",
+      "bytes": 76,
+      "sha256": "eb8aa15a247d0e2352dd1eda66e354d31f0791b5f0eb24096f11ca3d30bbbe99",
+      "dev": 16777231,
+      "inode": 543921113,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SbbSQ6/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "1b4883bda11d67641c3f8a9c8dd81f0217d4dbf28d31714f26a76189e428d5f2",
+      "dev": 16777231,
+      "inode": 543921114,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/public-evidence.json",
+      "bytes": 16744,
+      "sha256": "9d4cd7439c46fa361563dd4b39919830995d0ce90a5398a88f57582a5d9da4a0",
+      "dev": 16777231,
+      "inode": 543921303,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3281,
+      "sha256": "bab7ac06e15d6e9e5f74d0b6ddf8e350ac1703bef1d324baaf5eea8614cd92c1",
+      "dev": 16777231,
+      "inode": 544002439,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/request-1.tsq",
+      "bytes": 76,
+      "sha256": "e0502bf7e74a20ab5b3e5a3f1f61b667615bdcc17e89aaa0813702c6bb1b0c01",
+      "dev": 16777231,
+      "inode": 543921282,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "b58175bb30b96b7f8f379df8364e3001ffa7637d77209dbb9c78920a28cc73c0",
+      "dev": 16777231,
+      "inode": 543921283,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/request-2.tsq",
+      "bytes": 76,
+      "sha256": "7747d5efb36fbfdfd06f78ad6b81cc40928fb7e3723e852af69562a146c3c27c",
+      "dev": 16777231,
+      "inode": 543921292,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "34b495e392714f5f7d7f6a7cdad486ed34862593740eb46180799c715a9fafcd",
+      "dev": 16777231,
+      "inode": 543921293,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/public-evidence.json",
+      "bytes": 16750,
+      "sha256": "027f3f6b0b85653898002f31b122cf38329a805b8748543e6b9df9b2f52a6be4",
+      "dev": 16777231,
+      "inode": 543921477,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-source-combined-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3293,
+      "sha256": "b07031f68de0090529a29e037e38eb7aa8e35bb3e5c0f480325004369657da8f",
+      "dev": 16777231,
+      "inode": 544002440,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/request-1.tsq",
+      "bytes": 76,
+      "sha256": "925c9e7b3eaac58bda772eb3cbae8961c7ecaa9aac5d52b1f33ba89fbad74150",
+      "dev": 16777231,
+      "inode": 543921456,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "bef5a9778fe4f22cf929a1ea1eef807c54968f89536cb0f36786166632f064f6",
+      "dev": 16777231,
+      "inode": 543921457,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/request-2.tsq",
+      "bytes": 76,
+      "sha256": "1d7c8061efe2d8d3a73cee1ae655bfc43536b468f256162e967cb9fa61a1f684",
+      "dev": 16777231,
+      "inode": 543921466,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "87acebd5765e35c48e4897032c2417ebc855613527b0d60e1295e7d045fbf861",
+      "dev": 16777231,
+      "inode": 543921467,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ydv44n/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ydv44n/checkpoint-public-evidence.json",
+      "bytes": 10847,
+      "sha256": "39af41f9fc581b333d634ad2bf6c1cb0029fc81cb80b75784306c524c497cfc9",
+      "dev": 16777231,
+      "inode": 543920791,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-qFz7Lz/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-qFz7Lz/checkpoint-public-evidence.json",
+      "bytes": 5098,
+      "sha256": "4e848d5f4e5f541951075874f5f5d0d7be26598efbf0d915a50d559f04d41ec6",
+      "dev": 16777231,
+      "inode": 543920948,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-bVUEBs/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-bVUEBs/checkpoint-public-evidence.json",
+      "bytes": 62146,
+      "sha256": "a2a872669f0cb4c2b90b2a1f51b1431fb5f9ec291e122aa207907b1cdd35fee5",
+      "dev": 16777231,
+      "inode": 543921122,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/checkpoint-public-evidence.json",
+      "bytes": 32576,
+      "sha256": "a56bfbd0433af66274beeb8d2c309d57396fcb5e790f45fbf3a8a5ae2179d53c",
+      "dev": 16777231,
+      "inode": 543921301,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QBpPTO/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QBpPTO/checkpoint-public-evidence.json",
+      "bytes": 27330,
+      "sha256": "cb0e19b1436f90444929267d1b435d142ae703e10759b35a7a166df7e9a9f6a5",
+      "dev": 16777231,
+      "inode": 543921475,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/public-evidence.json",
+      "bytes": 12997,
+      "sha256": "5eb81876f393d9b7e8a064dd58dd56736ee887ed1333f644b4e92605156d1a2d",
+      "dev": 16777231,
+      "inode": 543990743,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-FIRST-GRANT.json",
+      "bytes": 3268,
+      "sha256": "e023eb215ba517ee326b4ac5a0d02497a133e8cb1cd8bd527e61805a430b931d",
+      "dev": 16777231,
+      "inode": 544002441,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/request-1.tsq",
+      "bytes": 76,
+      "sha256": "7b6ee14896e60ee844eeb2c2e3317d49659b45de385e803e6a742348dbb969d9",
+      "dev": 16777231,
+      "inode": 543990734,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hwEmvk/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "fd2d96f14bfe81fa982a603fa313c51107d7011060e6760993f1266dca59da5e",
+      "dev": 16777231,
+      "inode": 543990735,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/public-evidence.json",
+      "bytes": 13555,
+      "sha256": "5f1e131cc1ad64c59549e26910aa231a686fb015f8cdd8f4692946801a493212",
+      "dev": 16777231,
+      "inode": 543990780,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "bytes": 3275,
+      "sha256": "e9c73664003854caa28268bff3b15c861913066224920920a571cea88dabb6d4",
+      "dev": 16777231,
+      "inode": 544002442,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/request-2.tsq",
+      "bytes": 76,
+      "sha256": "8c6a01b8622bdd9db8196d72eef08c4d6832c586da51b77d147fb20115ffc988",
+      "dev": 16777231,
+      "inode": 543990771,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kXbcpo/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "cdd279b4ba917ff7f1901b410acd13ce36099d4b6d5d6eb9d490ccb5bf57a24b",
+      "dev": 16777231,
+      "inode": 543990772,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/public-evidence.json",
+      "bytes": 12916,
+      "sha256": "bef0597e3d6c79599e41f27d56f1d81500fe67b8997ff58114624833be22edd7",
+      "dev": 16777231,
+      "inode": 543991290,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3281,
+      "sha256": "0f54f826fd0479ae63e4d28ca1154ae3810ccb2409a722b56f90d05bd798d912",
+      "dev": 16777231,
+      "inode": 544002443,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/request-2.tsq",
+      "bytes": 76,
+      "sha256": "a13794875593a9731a57880bc9a9fb7837dc0416a0eb78a3a9722fcd0b77f114",
+      "dev": 16777231,
+      "inode": 543991279,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RtHfsU/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "b3adf0f9384fc1adb8ca92c89af46252608c56659631bde57d981fa6817c7317",
+      "dev": 16777231,
+      "inode": 543991280,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cXpaMP/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cXpaMP/public-evidence.json",
+      "bytes": 8257,
+      "sha256": "2a514faf022c7fc5c7bbea3875b8cfc3681df3921485db948b81b5fca9f95f05",
+      "dev": 16777231,
+      "inode": 543991445,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3284,
+      "sha256": "8dc3ea11ccc63be9424e5eaabe0635dd2554ef9ddcb14325c54eb2dde10708e7",
+      "dev": 16777231,
+      "inode": 544002444,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/public-evidence.json",
+      "bytes": 16768,
+      "sha256": "fa7fdbba7080c4aed6fef6dd6c4f7d28979a843a2763908031dc2e4c053c6af9",
+      "dev": 16777231,
+      "inode": 543991620,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3284,
+      "sha256": "bc86c7b5e12a5cebae00f53ab320f4fa9381aa68e484ee4a6432a3cfed707aa5",
+      "dev": 16777231,
+      "inode": 544002445,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/request-1.tsq",
+      "bytes": 76,
+      "sha256": "7883be150b4d131e84fe32c2c9e1f745ee589dc0809b4c106711ba657360ceee",
+      "dev": 16777231,
+      "inode": 543991599,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "c73b9de2469c492776f13c1ca608a439a264a51c40b52c90951b89957461b1da",
+      "dev": 16777231,
+      "inode": 543991600,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/request-2.tsq",
+      "bytes": 76,
+      "sha256": "7a1896e7ac09321c90c5edeadba7e6ae0427d235a8bc15a6595172518d33aa2d",
+      "dev": 16777231,
+      "inode": 543991609,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-SB4lkv/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ef424f89417e832cd42671430206ed9055e8da1b897373678fef95d1d6944288",
+      "dev": 16777231,
+      "inode": 543991610,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/public-evidence.json",
+      "bytes": 16765,
+      "sha256": "45b157a251052336eeb3ac28866e27883403807a79479f76dab3a8f46ff388fc",
+      "dev": 16777231,
+      "inode": 543991799,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3281,
+      "sha256": "c728a06c119b0675f6b6677ce63cdc8f1c6eba601aef8291d68ae6b29b485a13",
+      "dev": 16777231,
+      "inode": 544002446,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/request-1.tsq",
+      "bytes": 76,
+      "sha256": "77a4ece748eacc2de952f7e7865012c01ceb768ddeb2af0b6be4d24487bd986e",
+      "dev": 16777231,
+      "inode": 543991778,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "1ffb66dfe73fa81f3b465063b7b8175043f9248df5132365479947a976039d77",
+      "dev": 16777231,
+      "inode": 543991779,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/request-2.tsq",
+      "bytes": 76,
+      "sha256": "cbab50a979097c6eb9024b659449df28a014b6cbc78f51e0e7a3a1be5bc387e4",
+      "dev": 16777231,
+      "inode": 543991788,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VTK70o/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "fb99ec6bfe0a0ed8c95f52c934b54196a1e298dfa890e62b36785207d752780d",
+      "dev": 16777231,
+      "inode": 543991789,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/public-evidence.json",
+      "bytes": 16780,
+      "sha256": "ebd58253f3395362fba5a3ec8849103543cc0d32f50996efac280ea8a7d91df2",
+      "dev": 16777231,
+      "inode": 543991974,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-fresh-canonical-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3293,
+      "sha256": "c09a770a827ba6fa12486f63c68dbfab480d46ae962d0ae7cd899e690cd541b8",
+      "dev": 16777231,
+      "inode": 544002447,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/request-1.tsq",
+      "bytes": 76,
+      "sha256": "5e1f2ebafae55eed5e316c42814c1774f85dca754bcc0aad76a1f85c545ff51a",
+      "dev": 16777231,
+      "inode": 543991953,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "ccd18e6ee0cd1fbb91f36763cf65bd25186c015a5e3e1c9cde967859d46f220c",
+      "dev": 16777231,
+      "inode": 543991954,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/request-2.tsq",
+      "bytes": 76,
+      "sha256": "3ba0cc8d1f891f0386c082560306628b55b6337ff93ed52336f136c9aacb17cc",
+      "dev": 16777231,
+      "inode": 543991963,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ee7cc393f8111d0763e7b7f0efd51cc7d0d0b5fc91db6f3f6a6dd8b1787cb0c7",
+      "dev": 16777231,
+      "inode": 543991964,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Uj3isc/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Uj3isc/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "6a532ff9dd79cd5e7f9795b2bc40d64b7c6ba7bebfae32b765008f529bb732a7",
+      "dev": 16777231,
+      "inode": 543991288,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "d9eaa765914000f52e213f94b747d8805acd2724b91f1a5a4d9d377084a2d36f",
+      "dev": 16777231,
+      "inode": 543991443,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jFMcBL/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jFMcBL/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "75d01f68bc04139f2e527dc27f50ee1e88878e7cb2e4f8f122342b9ed7244174",
+      "dev": 16777231,
+      "inode": 543991618,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-yOMTT0/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-yOMTT0/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "37d28846bd5493fb7589a47015166fa76db00028dff951bdedd14c787514a63f",
+      "dev": 16777231,
+      "inode": 543991797,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-LG12nv/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-LG12nv/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "eba80e0a46a015bc84d5993701d253788e35e3ffcca55f5615c83aaf20085302",
+      "dev": 16777231,
+      "inode": 543991972,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/public-evidence.json",
+      "bytes": 13002,
+      "sha256": "34f2aea27bfc4a6732127423cb62e2964fb3fac8afe0d1773dfe6c46ffb56c3c",
+      "dev": 16777231,
+      "inode": 543992584,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-FIRST-GRANT.json",
+      "bytes": 3255,
+      "sha256": "42cc47c7e912efdf0c7701bd5820f18aa3ed3d5eddadab784fbb6334fbb030c3",
+      "dev": 16777231,
+      "inode": 544002448,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/request-1.tsq",
+      "bytes": 76,
+      "sha256": "a20732fde72ad528c08ae63be1c97bfc16876343756dacf1dd5bfaf324c7bd7c",
+      "dev": 16777231,
+      "inode": 543992575,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TOvr62/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "d931fd927046e4e293531df1c6b96f1d6849fd2aa303be503c5da59d28c8f928",
+      "dev": 16777231,
+      "inode": 543992576,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/public-evidence.json",
+      "bytes": 13562,
+      "sha256": "bba14f3b3d0b25eeb442d6d1934899f54ddb8f92629cd059912dc3461854c3e2",
+      "dev": 16777231,
+      "inode": 543992622,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-HTTP500-THEN-GRANT.json",
+      "bytes": 3262,
+      "sha256": "f1f76e05282c629c9883fcf5a9ebccd30ee46db2596c5006a79c6028c6ede49f",
+      "dev": 16777231,
+      "inode": 544002449,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/request-2.tsq",
+      "bytes": 76,
+      "sha256": "bd16cb6db41da128f5c0ed4063fc7bae97c6e2cd2a87c8e885b9e4f40ad1ae85",
+      "dev": 16777231,
+      "inode": 543992613,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4nuJZi/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "db05f3fad9480802949964986a4a8c8e46973a5c9cd677af04059c4dda3097c0",
+      "dev": 16777231,
+      "inode": 543992614,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/public-evidence.json",
+      "bytes": 12918,
+      "sha256": "0638785da0be0566966873f3e87f6f22c36d7ec5281e259be8811adfdef4ecea",
+      "dev": 16777231,
+      "inode": 543993133,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3268,
+      "sha256": "4797da23fac169a0d335983b0a9c0e7ddecac3c49656fc7401859fb28e1fb4d7",
+      "dev": 16777231,
+      "inode": 544002450,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/request-2.tsq",
+      "bytes": 76,
+      "sha256": "5cc6ae36c6a296f632478f53a7430164c3b45f6e051a3546000165207dbdaeb7",
+      "dev": 16777231,
+      "inode": 543993122,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AkTa9G/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "cfa4c06b0b55a7c87e3a32875eedc65e7071999cbda62b12c6f957fa2376d70b",
+      "dev": 16777231,
+      "inode": 543993123,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aSQM5A/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aSQM5A/public-evidence.json",
+      "bytes": 8255,
+      "sha256": "d397a5aaa87be6a75ede9898c545585ce5735227d09d2f6d26796d0a2b7fb1d4",
+      "dev": 16777231,
+      "inode": 543993288,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3271,
+      "sha256": "ee9a7cf7557f186a9243ad6a488a7ff12f2fef825992d82cc6b34ac476c8f1d3",
+      "dev": 16777231,
+      "inode": 544002451,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/public-evidence.json",
+      "bytes": 16767,
+      "sha256": "2a9ff05a2e3003caad346fbc176de6ed2f48b141f14cd02b56f4189b7326cd1c",
+      "dev": 16777231,
+      "inode": 543993464,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3271,
+      "sha256": "67e40944111534fabdfb588a3788bd805bfd3dbce876e7ba9a4f504fc62b8c4f",
+      "dev": 16777231,
+      "inode": 544002452,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ba876e6424405ec495aead14d31885a5448fcaa488ac9216db1eb23ac5bfb64e",
+      "dev": 16777231,
+      "inode": 543993443,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "1f353f5d2b46b719d41d7ff6964626464a999cce82e5f504403d9fe0ccba97d8",
+      "dev": 16777231,
+      "inode": 543993444,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/request-2.tsq",
+      "bytes": 76,
+      "sha256": "369a661dfa33e6da4182e8bdd52625f5144b75de76a808c8ed383df657cd4e76",
+      "dev": 16777231,
+      "inode": 543993453,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-zWqWSG/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "005f98ace83aa4dd27ce766c0021e8aa327c66a85c136013e3593993e0ff4edf",
+      "dev": 16777231,
+      "inode": 543993454,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/public-evidence.json",
+      "bytes": 16764,
+      "sha256": "53a079a765a4fa5f07afbcbaa0766f5d2192bddd75035c5051e980ad60867445",
+      "dev": 16777231,
+      "inode": 543993643,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3268,
+      "sha256": "3856a987e3811fb40043a5aa9ffdd3e95e98caf68dd523dfeaf6b5121f252fb7",
+      "dev": 16777231,
+      "inode": 544002453,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/request-1.tsq",
+      "bytes": 76,
+      "sha256": "8e87b6f2edbe3e048f699c17a507209bb8e04bcab66f7db074514ae2f7fe7844",
+      "dev": 16777231,
+      "inode": 543993622,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "062b478c2cf6eb4cea23da6fcda5b0ca219727a32847ad5450f93250360334ed",
+      "dev": 16777231,
+      "inode": 543993623,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/request-2.tsq",
+      "bytes": 76,
+      "sha256": "4abca7b9bcdbb93f2e519c30c21865a4c6f008592a334399c17fee643442f27d",
+      "dev": 16777231,
+      "inode": 543993632,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RYDQN9/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "86b982a55362e8723620f61e415d0930a0666fffe158ba01a1d43b1109faade5",
+      "dev": 16777231,
+      "inode": 543993633,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/public-evidence.json",
+      "bytes": 12407,
+      "sha256": "673f96caf4b0c009b869206b13cd94dd311f1d0a8c5698e51cf1930fbc832cd0",
+      "dev": 16777231,
+      "inode": 543993807,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m1-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3280,
+      "sha256": "4427dfcba2daa470eb172eb185e3ca37c657490b6ce353f4070425105a7fccec",
+      "dev": 16777231,
+      "inode": 544002454,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/request-1.tsq",
+      "bytes": 76,
+      "sha256": "e5c4beb483b7955f695fb6b212c40b843c75745086f73137e388c12109864f77",
+      "dev": 16777231,
+      "inode": 543993796,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "fb7ac8e390180d5c939653ff6d4ddf03f2d24d07781f4224152df6b02929b654",
+      "dev": 16777231,
+      "inode": 543993797,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-W4YfD2/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-W4YfD2/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "d826289cf3395fde463547f8cb3cf7001464a35e913bd7409a1099e87bed2211",
+      "dev": 16777231,
+      "inode": 543993131,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ZYBS0p/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ZYBS0p/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "ef1ffb5f3f289a8f463916a081c9b26d6e3f2dc868a79598a1b51954f094c76b",
+      "dev": 16777231,
+      "inode": 543993286,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-IYlQ9h/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-IYlQ9h/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "f7c9a3d09d0036456d8a1235a879b7d8f271635cf41e88bfe0a58d0616642a77",
+      "dev": 16777231,
+      "inode": 543993462,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-slLRLt/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-slLRLt/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "9f10ace93a18ba2bd477f9eeeef0ebc5259504a48faa73f99548153721902dbd",
+      "dev": 16777231,
+      "inode": 543993641,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/checkpoint-public-evidence.json",
+      "bytes": 9306,
+      "sha256": "77ca13ffb6910de0191b576431dbd057c2db4103e9402eab1534c960a457e3c5",
+      "dev": 16777231,
+      "inode": 543993805,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/public-evidence.json",
+      "bytes": 13000,
+      "sha256": "d1332a2ceae8135f8e18ec52eea995aef5503cbc4445a6c814c833183ce7389b",
+      "dev": 16777231,
+      "inode": 543994249,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-FIRST-GRANT.json",
+      "bytes": 3261,
+      "sha256": "c648054474831adf836d43d85f596a6d76ad1106a1d9ea28d8485e656253558d",
+      "dev": 16777231,
+      "inode": 544002455,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ebfd2487db67c5a916f99d3182867439a8d62772845a86fb6bde498eb37bde1e",
+      "dev": 16777231,
+      "inode": 543994237,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uhVk6l/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "eef48e12087fc53be24db2123943ac5c446030bf5e54ddba9b2abdd2c2f15a45",
+      "dev": 16777231,
+      "inode": 543994238,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/public-evidence.json",
+      "bytes": 13563,
+      "sha256": "270361d18887b280985562d6101aee7b47c2d87a2fc9ec5f2fcc2fb12b4a8ad4",
+      "dev": 16777231,
+      "inode": 543994286,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-HTTP500-THEN-GRANT.json",
+      "bytes": 3268,
+      "sha256": "56ec8470b06c2b50890bc034cf8a8b5e7761a7104c19b685df61dc9815f01702",
+      "dev": 16777231,
+      "inode": 544002456,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/request-2.tsq",
+      "bytes": 76,
+      "sha256": "46ab9fdea99fbfe53daf48d6b490ff1ab8841280c5e722020dbe06c04bfe0fd4",
+      "dev": 16777231,
+      "inode": 543994277,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aIZNkL/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ec55cef32674850ff1170ac4ec2c4a318d0833815b055dbb93127bad0add6a41",
+      "dev": 16777231,
+      "inode": 543994278,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/public-evidence.json",
+      "bytes": 12914,
+      "sha256": "c9710d6ed82826b2943f273c041651de2f22eed05c54f726cb673126ca56bc00",
+      "dev": 16777231,
+      "inode": 543994793,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3274,
+      "sha256": "4366e171affee577004214caa2d027c8f5750427daf388e367cce12dddc66d84",
+      "dev": 16777231,
+      "inode": 544002457,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/request-2.tsq",
+      "bytes": 76,
+      "sha256": "ca548a5379894d9e26a81f9d7877455595783ac58ed098acccc3cf6a240986ac",
+      "dev": 16777231,
+      "inode": 543994782,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GZhmHF/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "5f4df9df021a35a7555522325f58d912f10fcb2a9ec4edc63d0541e044255915",
+      "dev": 16777231,
+      "inode": 543994783,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZbwKJj/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZbwKJj/public-evidence.json",
+      "bytes": 8253,
+      "sha256": "695793128c754ad4f920b2565ffe9fc5b264653abf1b4f03fe9ae6aea14481ff",
+      "dev": 16777231,
+      "inode": 543994948,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3277,
+      "sha256": "aae2fa76a8d4f9800d850d41876858d5aa3c9c0fde33313067011c770faa2322",
+      "dev": 16777231,
+      "inode": 544002458,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/public-evidence.json",
+      "bytes": 16766,
+      "sha256": "9292ad40213366f639463cc6b76e63f812731c3956574c1e053c205c03aa0154",
+      "dev": 16777231,
+      "inode": 543995122,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3277,
+      "sha256": "3a043802caf5c0271547eb2a682032ae0147048234cd0312584e38bbf9ec454d",
+      "dev": 16777231,
+      "inode": 544002459,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/request-1.tsq",
+      "bytes": 76,
+      "sha256": "1ffae96391488c328698059ec342a5e6685aedab02db3db41096b5d81bdda243",
+      "dev": 16777231,
+      "inode": 543995101,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "f9e309a19df1241f85666bbff87175ce48b5856646d885239dc220cbcd26e194",
+      "dev": 16777231,
+      "inode": 543995102,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/request-2.tsq",
+      "bytes": 76,
+      "sha256": "46b23343d3e9b15dbb62d13a0b1cc9cca52b0cc45b1b368b9c16b73441186bf6",
+      "dev": 16777231,
+      "inode": 543995111,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Wld3rl/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "b3fd0987cc01ce2d80fcd223fdbb741ded62c151b05be7b3fc721285523e6ab1",
+      "dev": 16777231,
+      "inode": 543995112,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/public-evidence.json",
+      "bytes": 16767,
+      "sha256": "f012812d5453f4ebd4954d1840ddc2953323e023fbb657363fa4238fd60c936b",
+      "dev": 16777231,
+      "inode": 543995301,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3274,
+      "sha256": "bba6d6ef84030463ae88c68d9b53daf50853424a18ed7ffa91fd35468f427b41",
+      "dev": 16777231,
+      "inode": 544002460,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/request-1.tsq",
+      "bytes": 76,
+      "sha256": "56541f76a09f5bfbc4728f53cb87eaecb0b1c8e209bd7280c3b51a4ab04e6d1c",
+      "dev": 16777231,
+      "inode": 543995280,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "9c121f400a772a235658e0b85f717b05b06b7e2d8306658faa78ba654c563e0f",
+      "dev": 16777231,
+      "inode": 543995281,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/request-2.tsq",
+      "bytes": 76,
+      "sha256": "80f806521c0550fba5c1ef7d3cf4d939a404b2f07bce8fdfef444e6439df739c",
+      "dev": 16777231,
+      "inode": 543995290,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-luz8q6/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "06abcd9b1234fdab1665ca79f0f40c18e8243a323b1c17fe9f8e1d6e4c3f16da",
+      "dev": 16777231,
+      "inode": 543995291,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/public-evidence.json",
+      "bytes": 16781,
+      "sha256": "a135d95ce7d6d4503bc10d66a55714b4368f51f70e24eae14726b1add80c7386",
+      "dev": 16777231,
+      "inode": 543995475,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore1-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3286,
+      "sha256": "1911fee1aeca63a7d78e1e24eb06e4f659be76947b0cf6c7a2a943a5f8d171c9",
+      "dev": 16777231,
+      "inode": 544002461,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/request-1.tsq",
+      "bytes": 76,
+      "sha256": "5664e21292382a0627ebff4cd507c1251e85dd580cc52f2f33a0ebb6cc489c0d",
+      "dev": 16777231,
+      "inode": 543995454,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "76b617626910325ce893a393a38ce8364c8efdea4931032f9463ca43c5f86c45",
+      "dev": 16777231,
+      "inode": 543995455,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/request-2.tsq",
+      "bytes": 76,
+      "sha256": "05bf14b804e1d761dd1881c02dee4948b68a16908a1fb0af8824071a8cbe6c53",
+      "dev": 16777231,
+      "inode": 543995464,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ac2e81726063e6596e76a45fad9365b682bb7b9f59f203a0cd02e834687e218c",
+      "dev": 16777231,
+      "inode": 543995465,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-yRgPDe/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-yRgPDe/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "61df24ef45db0c7dfc3a0c46daa5f807c376b49c4735846f67237d6b2ed4021b",
+      "dev": 16777231,
+      "inode": 543994791,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-X4gu2Q/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-X4gu2Q/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "5de00827091cb44ded86b72a2e9e29204843df624662407067366f14fb16b4cf",
+      "dev": 16777231,
+      "inode": 543994946,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-raUw0h/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-raUw0h/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "894a0d8010e20bdede3ecf352471b30c1ea0f8c7aaec6d95923f7b3c0024a3ff",
+      "dev": 16777231,
+      "inode": 543995120,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6lDTxV/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6lDTxV/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "48417138979f40fa85a540d00cfaaf0a3874c8063ce21ffabf05507544c62404",
+      "dev": 16777231,
+      "inode": 543995299,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-doZSmR/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-doZSmR/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "5932f57663369e048754d6cb556c8450dc9d1dffb3272b0f65ad8337ecbb9766",
+      "dev": 16777231,
+      "inode": 543995473,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/public-evidence.json",
+      "bytes": 12996,
+      "sha256": "0ac4002d61de7e050e25df8e5a3c32e62ea3665be4346ad6940516a8baade8b3",
+      "dev": 16777231,
+      "inode": 543995911,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-FIRST-GRANT.json",
+      "bytes": 3255,
+      "sha256": "a37bcd51b502bf32c91c8442ce839ba240afb63a1d75dc10a4925e91b10d5984",
+      "dev": 16777231,
+      "inode": 544002462,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ccd6eb01b4d3fcce3bac845053afbcaa0e9757f850b704d3f97efaff83b27efa",
+      "dev": 16777231,
+      "inode": 543995893,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rF0XQV/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "34cf44461545c8ba72bfc295fd1b55c504e9f799ae3cde6d8e404fbc3d75a70c",
+      "dev": 16777231,
+      "inode": 543995894,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/public-evidence.json",
+      "bytes": 13560,
+      "sha256": "d3114027e137e321fb803fa8b11f011fbedaf8fa2636b77729ef0f88bb1a4c22",
+      "dev": 16777231,
+      "inode": 543995948,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-HTTP500-THEN-GRANT.json",
+      "bytes": 3262,
+      "sha256": "bd34cf87d7f6467587ee175f0ab684cedc837fd0aa2a7dc458122899b46af006",
+      "dev": 16777231,
+      "inode": 544002463,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/request-2.tsq",
+      "bytes": 76,
+      "sha256": "fccd4c96b95f9a932f496e7f9142e5355e1989129f7a8d8f377979c2379c8873",
+      "dev": 16777231,
+      "inode": 543995939,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nHKX8c/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "a87c432da1f02367977f26fe5a770f3dcf89feb18a5adc888688bed364d5eb7c",
+      "dev": 16777231,
+      "inode": 543995940,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/public-evidence.json",
+      "bytes": 12914,
+      "sha256": "288271d6fdc00ec83a16ffdad3975a6cb7e9038f0a95b80d37dcd457875d80a3",
+      "dev": 16777231,
+      "inode": 543996453,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3268,
+      "sha256": "8d8367ed4801f682fc4b889f363474e12b09f7a92fad6ec4dffce6ca840b6887",
+      "dev": 16777231,
+      "inode": 544002464,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/request-2.tsq",
+      "bytes": 76,
+      "sha256": "a73fb97aa912fe60037b401a47ec74154c7478bb8067c697236754aef27b1366",
+      "dev": 16777231,
+      "inode": 543996442,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qCMEMk/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "dbcaed81e0e3ad1b90f375a1a44c22ba677ff1fa541113af5fc87f1cb7adae9b",
+      "dev": 16777231,
+      "inode": 543996443,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uuWmrm/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uuWmrm/public-evidence.json",
+      "bytes": 8252,
+      "sha256": "16944c8c43b07afde3bf456340cab660afd91d366dead397257491e3c210f365",
+      "dev": 16777231,
+      "inode": 543996608,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3271,
+      "sha256": "529b5acec4c1dc65c253a80ee4ed0520dc130429dd6e3700142c7913c211c6de",
+      "dev": 16777231,
+      "inode": 544002465,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/public-evidence.json",
+      "bytes": 16761,
+      "sha256": "8800c4753ee456a85b54177ac53e6d3842e424c52facb89961dcafec3598e0b3",
+      "dev": 16777231,
+      "inode": 543996783,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3271,
+      "sha256": "7f1e8bcd723709cf17bfc9f1ee474bd8376defcc98354afe84610fcc1a95ec81",
+      "dev": 16777231,
+      "inode": 544002466,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/request-1.tsq",
+      "bytes": 76,
+      "sha256": "97429e9b103ab2adc4a05191c80875e3e4482e778b64c5431c08d5a58af0b015",
+      "dev": 16777231,
+      "inode": 543996761,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "96d0925f7fe6f28a4c4a2030e92b6e124cb70e9c70e86c493d79f2232caaf9c5",
+      "dev": 16777231,
+      "inode": 543996762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/request-2.tsq",
+      "bytes": 76,
+      "sha256": "c179a27c85a10b97b4e8294ad4d6b2da49807567cec232cdd5376dcb24384698",
+      "dev": 16777231,
+      "inode": 543996771,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-D9tJ2a/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "2f8e7718ac10adb0d885d340cea05ba79e5b6cd939e966cb6f47f0089115c823",
+      "dev": 16777231,
+      "inode": 543996772,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/public-evidence.json",
+      "bytes": 16762,
+      "sha256": "e2cdc7a35ce1a2b07473afab0fa6d59da552d5cb1cd7b2b0705c9da3932a4249",
+      "dev": 16777231,
+      "inode": 543996962,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3268,
+      "sha256": "db7f1c63936b9017407274dbf2da44166ff0fa2834000672b993ab199c0db3b9",
+      "dev": 16777231,
+      "inode": 544002467,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/request-1.tsq",
+      "bytes": 76,
+      "sha256": "c6c612f18ce329d675cec49618930a9eba23daaedde626c44052f153afc27c4e",
+      "dev": 16777231,
+      "inode": 543996941,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "75735df806e7292c8e10f484b3a8be230850f30e81eb7fdf03d7260af03e80c3",
+      "dev": 16777231,
+      "inode": 543996942,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/request-2.tsq",
+      "bytes": 76,
+      "sha256": "5f656176bda8db7858ed1b3a73b21c2b8e5674ab5e06803f958bc6d8e45ca147",
+      "dev": 16777231,
+      "inode": 543996951,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tDd3JM/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "7306d3744751e68620059d11c354c179253b1605891206c319de3064fe28cbbe",
+      "dev": 16777231,
+      "inode": 543996952,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/public-evidence.json",
+      "bytes": 12411,
+      "sha256": "f6e6d972dc2227eb1fb1bd0efdd06c22256b68ea6f420085894c805122069ff3",
+      "dev": 16777231,
+      "inode": 543997129,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-m2-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3280,
+      "sha256": "ca9163da7b35e1d8fe2de80f6c51d7df212ae1a95b2934b2f0b30f1a590734cc",
+      "dev": 16777231,
+      "inode": 544002468,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/request-1.tsq",
+      "bytes": 76,
+      "sha256": "2e670e75f3ce684f32ea936c79fa1af2dc8fdac03a2d58f64850d74a7164f05b",
+      "dev": 16777231,
+      "inode": 543997118,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "4879bbdcafdfb6aff7f651bcd37e3d73a044ac46c29981f911b8bbcf22622877",
+      "dev": 16777231,
+      "inode": 543997119,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-qlVmlo/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-qlVmlo/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "98ab4d67fca3a6c9ee522fa76f1709e40b0dde2e282e3771f4517a13a392fb92",
+      "dev": 16777231,
+      "inode": 543996451,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-9bMWPE/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-9bMWPE/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "d3ad537d14ab33dfda7b4c1d452b69a8f8f5a375fcaee6ac23120fca04ae42c7",
+      "dev": 16777231,
+      "inode": 543996606,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-i4cdt7/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-i4cdt7/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "6e669e159dbfbcce7fb6603791c90bb4231f75b5081ab017808ac3cd2e9a152d",
+      "dev": 16777231,
+      "inode": 543996781,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-mcBB93/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-mcBB93/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "6454206c29ece0aac6b20a632fb7beb79be2a9b57d5fce82b2a4a07c346a1187",
+      "dev": 16777231,
+      "inode": 543996960,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w30qOt/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w30qOt/checkpoint-public-evidence.json",
+      "bytes": 9989,
+      "sha256": "d9faccec1e5dd9481a61aea22850a7c6ecc21bcbc62fa4d0a3fc278711879546",
+      "dev": 16777231,
+      "inode": 543997127,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/public-evidence.json",
+      "bytes": 13005,
+      "sha256": "02afc7daecac898e3a0cd91961af5bea24ac21a6374db736319ed3f4ce89a7f3",
+      "dev": 16777231,
+      "inode": 543997565,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-FIRST-GRANT.json",
+      "bytes": 3261,
+      "sha256": "4be1f8b4de81fa415e946131c43254753b57133acd270f51306341db9687bac2",
+      "dev": 16777231,
+      "inode": 544002469,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/request-1.tsq",
+      "bytes": 76,
+      "sha256": "82408dcd1e3bdbffd472339c2d7df00f3500f11fd62d5a216348ed503d5fc031",
+      "dev": 16777231,
+      "inode": 543997556,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yMA8MS/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "07b716dc7fd88d12caa5f4b548cec0c22dea8f409e4212f44011dcddcf150b40",
+      "dev": 16777231,
+      "inode": 543997557,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/public-evidence.json",
+      "bytes": 13563,
+      "sha256": "96c269aa7f57069ddcf45bcc1baaba573cabbdd18e22aa95702bcbbead662a52",
+      "dev": 16777231,
+      "inode": 543997602,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-HTTP500-THEN-GRANT.json",
+      "bytes": 3268,
+      "sha256": "0ac462f33041e002e2ef3adba2fb90155a7d2c744dd532e891e5bf6960d45cf2",
+      "dev": 16777231,
+      "inode": 544002470,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/request-2.tsq",
+      "bytes": 76,
+      "sha256": "985802826067c4ad349abb5e0224beae49c6d9cc76db4aec26c8e503644924d7",
+      "dev": 16777231,
+      "inode": 543997593,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vOIdS/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "4cd4f568dd23dc136f1da6436f6f91fe41e5268765ca9683ea1018a20e0bbe4f",
+      "dev": 16777231,
+      "inode": 543997594,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/public-evidence.json",
+      "bytes": 12920,
+      "sha256": "883fda6c32859e29780dafa97b3f4a3ae0da7d2858de2010ed170c9fa19dbff9",
+      "dev": 16777231,
+      "inode": 543998106,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3274,
+      "sha256": "9d381e6b077173bfd7455969ff79a1465c5e16353be7c97636f78b574b480cde",
+      "dev": 16777231,
+      "inode": 544002471,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/request-2.tsq",
+      "bytes": 76,
+      "sha256": "8c9330fcc1c419ac93a8c6d64216b3e9837dacd119e6b26395aa70f097ca5bd3",
+      "dev": 16777231,
+      "inode": 543998095,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jlgaAh/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "d4feb7f4f6f428b2eb7b60236113b18ec36c54810892309a4c477ef5bb617c8d",
+      "dev": 16777231,
+      "inode": 543998096,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wXIeRY/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wXIeRY/public-evidence.json",
+      "bytes": 8252,
+      "sha256": "38fe25595d54830ece97a66ba268904eb76146f9a35d33ff0028bf4042ac35e6",
+      "dev": 16777231,
+      "inode": 543998261,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3277,
+      "sha256": "bd6acce5f7459699c777b0c919947a8fc00b641f3504b5a2b78f936466f06031",
+      "dev": 16777231,
+      "inode": 544002472,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/public-evidence.json",
+      "bytes": 16772,
+      "sha256": "cd7ec5595208b321ad9373a15b2ba5f42dd30187e3244b8cb9b3d3eb276ae050",
+      "dev": 16777231,
+      "inode": 543998435,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3277,
+      "sha256": "bb215bf7669292c70d465cce2575d616252a1f791f65cc618d982e41ae18be32",
+      "dev": 16777231,
+      "inode": 544002473,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/request-1.tsq",
+      "bytes": 76,
+      "sha256": "7450827ec3497daa1dea60e32b682572c9b528fae204cb8aa36fff6b58ca3faf",
+      "dev": 16777231,
+      "inode": 543998414,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "38bc2d80e422e9b5baecdee6668c66b0c678850f2c78716957fdf96bb7a2acc1",
+      "dev": 16777231,
+      "inode": 543998415,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/request-2.tsq",
+      "bytes": 76,
+      "sha256": "f86c449a463c682c44e1185ba298b65b1f91af2b303196a0ca1b86a069101929",
+      "dev": 16777231,
+      "inode": 543998424,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sudL8x/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "e4de3a17904a54b0da48904bfe11b16fb2694d97a9dfa31073acfde68cf201d8",
+      "dev": 16777231,
+      "inode": 543998425,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/public-evidence.json",
+      "bytes": 16761,
+      "sha256": "5071ae64365dbed8ce6fef185d283b8a20e72823ea2efb4e4b2a6667a54a5210",
+      "dev": 16777231,
+      "inode": 543998614,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3274,
+      "sha256": "3a4ed0f38bdac93e62e52dd9350fcf0c0ab806a19b6e044caac0d00849b24cdc",
+      "dev": 16777231,
+      "inode": 544002474,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/request-1.tsq",
+      "bytes": 76,
+      "sha256": "36bf9b87987c2056cfb920620e8aae1055f0d34358265d970a72f4709bce036b",
+      "dev": 16777231,
+      "inode": 543998593,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "4664e1e646b3f9522ef3fd9324fb802ab1e9a7034cbe8aa60a06d7f73dcbe3ec",
+      "dev": 16777231,
+      "inode": 543998594,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/request-2.tsq",
+      "bytes": 76,
+      "sha256": "3034346b33bcb9f337548d46d3198d14674fe9597c7d42f5adf11bbd63dd7d95",
+      "dev": 16777231,
+      "inode": 543998603,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-WjhtfI/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "a68f03d5e05d7648b6897de36160678ae60c0a21e8f5194b00212f5113910c58",
+      "dev": 16777231,
+      "inode": 543998604,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/public-evidence.json",
+      "bytes": 16781,
+      "sha256": "2f30957fe63c7af55b5dfd3efb3793869d5fd57b277aa99d0549b05969dd3541",
+      "dev": 16777231,
+      "inode": 543998788,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-certificate-bundles/p125pc-restore2-CHECKPOINT-PERSISTED-PRODUCER-CLAIMS.json",
+      "bytes": 3286,
+      "sha256": "c24e31c48f20b385269058ed34b2f27ba16753e35a5fdff75f8e8fca5b1109e3",
+      "dev": 16777231,
+      "inode": 544002475,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/request-1.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/request-1.tsq",
+      "bytes": 76,
+      "sha256": "b0ecdfd9f0244ee57a22e8aec091d022a42133ec79b2de77d30079426c41b3f3",
+      "dev": 16777231,
+      "inode": 543998767,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/response-1.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "e0ea8eb374ca5cf1cd293a67c945b80ea0ad1f184d57f1c74488d0c33a611581",
+      "dev": 16777231,
+      "inode": 543998768,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/request-2.tsq",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/request-2.tsq",
+      "bytes": 76,
+      "sha256": "c96b3edc63650112f7d0c3af82e10f85b996dc97a6d8d3a16f12ef11128992c6",
+      "dev": 16777231,
+      "inode": 543998777,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/response-2.tsr",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "4e4ab59b125ac41cd78ffef4bf307ff01fb714201c19b7111577e1f295e42f16",
+      "dev": 16777231,
+      "inode": 543998778,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-1Fp6GB/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-1Fp6GB/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "7f9b76844d83cc62129267c7b30f5c6b491e9580a00de65afcc583163c941eaf",
+      "dev": 16777231,
+      "inode": 543998104,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jOsme3/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jOsme3/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "a58a6df29d1fd17f96c8775990c80fbc73efd708535f3f3d74c14e336f284ff4",
+      "dev": 16777231,
+      "inode": 543998259,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Nxnn1D/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Nxnn1D/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "e5457994582933699dc9db8c776b16a06885817fea47c4e625306a34010a89a2",
+      "dev": 16777231,
+      "inode": 543998433,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lESvpL/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lESvpL/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "ed72a5c84b1f42c4f235cc993aaa8c27ee1a1b14a2877efd483178b414286b13",
+      "dev": 16777231,
+      "inode": 543998612,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-uGWU1Q/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-uGWU1Q/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "4da1daffe3efddcf2dac9654337f46d4653f761f0d1cc800766e8d44719bcec5",
+      "dev": 16777231,
+      "inode": 543998786,
+      "nlink": 1
+    }
+  ]
+}

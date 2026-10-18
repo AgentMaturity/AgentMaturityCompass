@@ -1,0 +1,25 @@
+{
+  "schema": "p135-current-cert-actual-review-seal/1",
+  "at": "2026-10-16T17:17:45.894279+00:00",
+  "privateOnly": true,
+  "runtimeExecutedHere": false,
+  "actualOutcome": "RED",
+  "inputCount": 101,
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-actual-review/review.json",
+      "bytes": 9650,
+      "sha256": "58be5c9f78cf2aff2c225532ae2548034cc14571ed5c85e85fba7415dab0267c"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-actual-review/README.md",
+      "bytes": 3108,
+      "sha256": "c827bf40e45e0e14f4f9dcb4c09e76b8d92f3c1d20ec3812cf1cc7a54bbed07c"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-actual-review/pins.json",
+      "bytes": 24846,
+      "sha256": "46435b4e3d64c0f7224a3507c7cee666995e1d3491bf7ded55fc2857fba4d6a8"
+    }
+  ]
+}

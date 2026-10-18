@@ -1,0 +1,86 @@
+{
+  "schema": "p125pc-independent-fresh-binder-static-review-input-pins/1",
+  "count": 16,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "bytes": 9352,
+      "sha256": "0ea9b25dc1a08dd53b7ae3b4d98e360e79977ed991c96b46974910def7ed45bb"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/bind-fresh.delta.patch.txt",
+      "bytes": 13555,
+      "sha256": "3ddf861b2f7a8e408be2d105da42b1efcbdb7a510e86ddbc8bf4b3a6bed41682"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/fields.json",
+      "bytes": 3653,
+      "sha256": "60cf3bc4cd71cfe4380de778f008b10e9b47de776d7a4e31c4497050aeaaa0e5"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/author-review.json",
+      "bytes": 1658,
+      "sha256": "a5fd3744bdd254669746125fc9b923eb4179ba7312de4402deac206f7d30819e"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/README.md",
+      "bytes": 2807,
+      "sha256": "9585a2234a3365081d111c5a6eb52121b765bfde401072010fe450b8f736b682"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/input-pins.json",
+      "bytes": 1948,
+      "sha256": "32df42ad95875cf75705643ea2bf1f2eaa0a9110a591f2c4b0d90022679aab10"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/bind-fresh.py",
+      "bytes": 8794,
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "bytes": 7899,
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "bytes": 8137,
+      "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "bytes": 122294,
+      "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/seal.json",
+      "bytes": 1872,
+      "sha256": "8ee4420223ff34f48e9cf626bcfb5bc1c7397d2d14c36495ccf09f1dd5c988b4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/review.json",
+      "bytes": 5302,
+      "sha256": "2097aa093ba9d583f387eb3164ce5140ce72bf79c6d7c8c86f7e5bb94cd995d0"
+    }
+  ]
+}

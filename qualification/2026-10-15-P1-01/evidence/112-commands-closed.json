@@ -1,0 +1,17 @@
+{
+  "kind": "closed",
+  "utc": "2026-10-15T08:40:51.223948+00:00",
+  "journalPath": "/private/tmp/p1-01-commands-20261015.jsonl",
+  "rows": 21,
+  "frozenJournal": {
+    "path": "/private/tmp/p1-01-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 29025,
+    "sha256": "18d349e1868c2fe83a78dfbe31bfb81f3bfe9ed4c857bb5b598c22572cc07510"
+  },
+  "noFurtherAppendAuthorizedByThisPacket": true,
+  "actualNonzeroRootExits": {
+    "duplicates": 1,
+    "dead-code": 1,
+    "source-control": 1
+  }
+}

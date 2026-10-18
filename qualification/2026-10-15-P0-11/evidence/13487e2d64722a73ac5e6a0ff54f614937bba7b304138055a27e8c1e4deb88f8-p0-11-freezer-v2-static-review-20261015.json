@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:50:02.707747+00:00",
+  "scope": "Independent full-source prepared-freezer and complete bound-v2 diff/field-contract static review. No freezer or product execution.",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "reviewedFreezer": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 52709,
+    "sha256": "00c8fd2ef5d934aef19af621e45c07d6266a6bd6609a64a53b50f6ea5086e0fe"
+  },
+  "preservedPreparedFreezer": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-prepared-20261015.py",
+    "bytes": 44252,
+    "sha256": "3c87f034df3b79a10adce0a4f2f767d471c00dad2f86eef49ec8e87ea3f9236a"
+  },
+  "preparationNote": {
+    "path": "/private/tmp/p0-11-freezer-preparation-20261015.json",
+    "bytes": 6918,
+    "sha256": "8afd693029f98f164593fce818dfb32d6fa32a2f029bc00506898e560cafb5de"
+  },
+  "v2BindingNote": {
+    "path": "/private/tmp/p0-11-freezer-v2-binding-note-20261015.json",
+    "bytes": 995,
+    "sha256": "7bcaa1d1b5da29eaf493a26694e9eb399d4bed2b4f60ed05b4dd95672ffaf75c"
+  },
+  "resolvedPreparationDefects": [
+    {
+      "identifiedBy": "root before execution",
+      "preparedContract": "precausal-normal-freeze",
+      "actualAndV2": "pre-causal-normal-freeze",
+      "meaning": "Exact phase spelling repaired; no actual command changed."
+    },
+    {
+      "identifiedBy": "root before execution",
+      "preparedContract": "Direct fixture executable list omitted actual opt Node path",
+      "actualAndV2": "Adds /opt/homebrew/opt/node@22/bin/node while exact ordered journal argv and expected exits stay mandatory.",
+      "meaning": "Accept recorded spelling, not a generic argv/guard waiver."
+    }
+  ],
+  "boundPriorReviewContracts": [
+    {
+      "role": "original",
+      "pin": {
+        "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+        "bytes": 23426,
+        "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+      },
+      "blockingFindings": [],
+      "allReadsFinished": true,
+      "formalAcceptanceClosed": false,
+      "decision": "FOUR_SEPARATE_ORIGINAL_CORPORA_VERIFIED_WITH_BOUNDED_MEANING",
+      "companion": {
+        "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.md",
+        "bytes": 3460,
+        "sha256": "1b42150ef1a54466cd24f81c739e506d103219e056c8bd00b4e09c0766cc95df"
+      }
+    },
+    {
+      "role": "recipe",
+      "pin": {
+        "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+        "bytes": 21585,
+        "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+      },
+      "blockingFindings": [],
+      "allReadsFinished": true,
+      "formalAcceptanceClosed": false,
+      "decision": "NO_BLOCKING_RECIPE_FINDINGS_WITH_EXPLICIT_SCOPE_LIMITS",
+      "companion": {
+        "path": "/private/tmp/p0-11-recipes-static-review-20261015.md",
+        "bytes": 5159,
+        "sha256": "8d86900942fd1dc460012bc27b75aab1d2d57633ea6aa39d90ef32ce5b40aee0"
+      }
+    },
+    {
+      "role": "code",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+        "bytes": 5353,
+        "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+      },
+      "blockingFindings": [],
+      "allReadsFinished": true,
+      "formalAcceptanceClosed": false,
+      "decision": "NO_BLOCKING_STATIC_CODE_FINDINGS",
+      "companion": {
+        "path": "/private/tmp/p0-11-controller-code-static-review-20261015.md",
+        "bytes": 4118,
+        "sha256": "7c337761b5d9dae852ec2f75e42959f350e624778b8878162dfe3e48578b7413"
+      }
+    },
+    {
+      "role": "sealed",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.json",
+        "bytes": 15390,
+        "sha256": "17782c03541ccfe9be068809b2b25a1a4ffbba2d4bc0dde0b76354848b5ab76c"
+      },
+      "blockingFindings": [],
+      "allReadsFinished": true,
+      "formalAcceptanceClosed": false,
+      "decision": "SEALED_PREPARATION_VERIFIED_NO_RUNTIME_RELEASE",
+      "companion": {
+        "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.md",
+        "bytes": 3178,
+        "sha256": "5c7976bf076d45f9bf08adec369b8ca768252a1e7f115471ce813812987bf370"
+      }
+    }
+  ],
+  "otherBoundInputPins": [
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/initial-preflight.json",
+      "bytes": 26306,
+      "sha256": "23f1964928e523777c6f61b1a733011318427abfcf2ad9b25c3703e20590cbba"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/acceptance-static-and-checker-inventory.json",
+      "bytes": 3818,
+      "sha256": "b80a39f7212d1bb2de2afa5e8eb159ad858a56f22837f55cd5589bb9e6b63dea"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/exact-source-validation-context.json",
+      "bytes": 3444,
+      "sha256": "8da5cb92cd12460dfc38c7572b1d6f2b74eb078f0032f6c38c28f533b2b82ffe"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-root-sealed-input-verification-20261015.json",
+      "bytes": 2515,
+      "sha256": "f0e93980ecf307cc50ac8fa74b85d8d8b87839fcfaa3fe7b0d31ff50e2d2fce0"
+    },
+    {
+      "path": "/private/tmp/p0-11-author-causal-release-20261015.py",
+      "bytes": 5152,
+      "sha256": "23eebeb4e9decca89cc5b6452ab2144a7d69d71b0374338cf4fbac4186c70475"
+    },
+    {
+      "path": "/private/tmp/p0-11-author-causal-release-v2-20261015.py",
+      "bytes": 5153,
+      "sha256": "fbd1c829fd98444d69f913d45ecddd65e31581395c344ef7e661398ca13b817c"
+    },
+    {
+      "path": "/private/tmp/p0-11-release-helper-count-issue-20261015.json",
+      "bytes": 975,
+      "sha256": "134ae70f43e5c702c71461e0e8541824f39905589c603989e5269f2549433eed"
+    },
+    {
+      "path": "/private/tmp/p0-11-root-causal-attribution-20261015.json",
+      "bytes": 4543,
+      "sha256": "275a99bc5f718abdfedd3d3688d99fc8645e4e0b47c2e859b5036f89b9e2a564"
+    },
+    {
+      "path": "/private/tmp/p0-11-freeze-qualified-evidence-prepared-20261015.py",
+      "bytes": 44252,
+      "sha256": "3c87f034df3b79a10adce0a4f2f767d471c00dad2f86eef49ec8e87ea3f9236a"
+    },
+    {
+      "path": "/private/tmp/p0-11-freezer-preparation-20261015.json",
+      "bytes": 6918,
+      "sha256": "8afd693029f98f164593fce818dfb32d6fa32a2f029bc00506898e560cafb5de"
+    },
+    {
+      "path": "/private/tmp/p0-11-root-runtime-attribution-20261015.json",
+      "bytes": 920,
+      "sha256": "9a2c12d209e85a4d5f1a72997cce3fd2fb21a745653797be3156daf5c4da6f32"
+    },
+    {
+      "path": "/private/tmp/p0-11-run-final-command-20261015.py",
+      "bytes": 1148,
+      "sha256": "bd36de3d82cb46994f05df616e9e93db44d06d3b30fc78693f4586314f9e64f9"
+    }
+  ],
+  "existingContractPins": [
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/original-corpora-summary.json",
+      "bytes": 14279,
+      "sha256": "820707b3b52608f9659db54f06da636dd5a8b52123d489ff6a166a10a13d20e9"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/setup.json",
+      "bytes": 6138,
+      "sha256": "782e8f05272eccad954f372f2ce686b9f408b962cce70aae17811fb7506853ec"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/setup-index.json",
+      "bytes": 2623,
+      "sha256": "83422e1b1f1922731b3ef145274d64548925669ed9a5523249b54992f5c26760"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/proposal.json",
+      "bytes": 2735,
+      "sha256": "74b34ab3fd8943b6d573ef8277cb6f187a43efe05edd04e7909129fac86db9e9"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 2209,
+      "sha256": "94c9ff968471bc6cc3be324e7241df7d23a8677673e34627b021563c20e9c8dc"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 50800,
+      "sha256": "0264617d15daa39ea7c52dfa01d4a391f1ceb33bfc608a877170722b8bc68d35"
+    }
+  ],
+  "rootJournal": {
+    "closedObservedPin": {
+      "path": "/private/tmp/p0-11-commands-20261015.jsonl",
+      "bytes": 29638,
+      "sha256": "f1d769c08ecc1948a2cc3ffbed391ab22e7dbc53f260e0225b66a7f4406e7176"
+    },
+    "rows": 20,
+    "exit0": 16,
+    "exit1": 4,
+    "allowedNegativePhases": [
+      "checker-missing-path",
+      "checker-missing-symbol",
+      "checker-bad-owner",
+      "checker-orphan-failure"
+    ],
+    "penultimate": "pre-causal-normal-freeze",
+    "last": "final-normal-freeze",
+    "exactBoundRolePhaseArgvExpectedExitContractMatchesObserved": true,
+    "noSourceGuardWaiver": true
+  },
+  "countsAndShapes": {
+    "source": 8362,
+    "compiled": 4529,
+    "private": 12891,
+    "ownInputs": 10,
+    "setupIndexArtifacts": 11,
+    "externalInputs": 221,
+    "nativeInode": 538824643,
+    "physicalManifestBytes": 5036200,
+    "originalSeparateRuns": [
+      7,
+      2,
+      5,
+      7
+    ],
+    "originalDistinctRegistrations": 21,
+    "primaryAggregateAcrossTwoRuns": 9,
+    "single9Or21RunClaimed": false,
+    "causalControls": 3,
+    "causalPhases": 9,
+    "distinctRepeatedRegistrations": 14,
+    "repeatedExecutions": 63,
+    "outcomesDerivedNotHardcoded": true,
+    "groupedIdentitiesAndOriginalReportPinsMatchExactSummaryOrder": true
+  },
+  "checkedSemantics": [
+    "Exact three plan recipes and nine release hash/path bindings.",
+    "Raw/observer identity,state,error,counters and known late/hook/unhandled/pending gates agree with controller contracts.",
+    "C2 exact same original Error/body frames distinct from AssertionError; L1 caught ENOENT/diagnostic is not admission.",
+    "Normal process0/1 and owned-group positiveESRCH/no nonzero signals; original420s/30s boundaries retained.",
+    "Whole stored parent/private/source/dist/native/immutable preservation prerequisites precede metadata writes.",
+    "Five private roots pruned/asserted; all three manifest bodies private hash references, not copied or split.",
+    "Seven exclusive nontransactional outputs, no retry/rollback; completed-output pin ordering has no hash cycle.",
+    "Prior review informational findings preserved, formalfalse/allReads completion explicit; no future own-output-review prerequisite.",
+    "Split scanner and compact1MiB cap preserve partial failure rather than truncating."
+  ],
+  "allSevenOutputsAbsentAtCheck": true,
+  "limits": [
+    "Static contract audit only; no actual final evidence audit or canonical readiness decision is supplied.",
+    "No global12891-file,221-reference, native-body or phase raw rehash repeated; separate prior review/proof methods remain attributed.",
+    "Physical/source/compiled manifest bodies must remain private in later canonical packaging too.",
+    "Later root enactment and independent actual output review remain separate steps.",
+    "Human/quality/claim/ownership/fullsuite/release/formal gaps are not waived."
+  ],
+  "performed": {
+    "fullPreparedSourceRead": true,
+    "fullBoundV2DiffRead": true,
+    "boundedFrozenMetadataAndPinsRead": true,
+    "closedOriginalJournalRead": true,
+    "targetImportedParsedSyntaxCompiledExecuted": false,
+    "productRuntimeTestsBuildInstall": false,
+    "globalSourceNativeOrPhaseRawAuditRepeated": false,
+    "sourceGitProducerOrFinalOutputWrites": false,
+    "writes": "Only NEW v2 static-review JSON/MD pair."
+  },
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-11-freezer-v2-static-review-20261015.md",
+    "bytes": 4505,
+    "sha256": "9bc2c1209a3e6fb08a218e8ddbf4da8959462fa28c91041474b3b57c39bbcbb7"
+  }
+}

@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../../src/claims/eligibility/render.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initComplianceMaps } from "../../src/compliance/complianceEngine.js";
 import type { ComplianceEvidenceRequirement, ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
@@ -141,6 +142,14 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
     expect(md).toContain("| SOC 2");
     expect(md).toContain("## Framework Claims");
     expect(md).toContain("**Applicability:** unresolved");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    for (const framework of matrix.frameworks) {
+      expect(md).toContain(`- ${framework.displayName}: ${formatClaimLabel(renderClaimLabel(framework.claim), "report")}`);
+      const row = md.split("\n").find((line) => line.startsWith(`| ${framework.displayName} |`));
+      expect(row).toMatch(new RegExp(`\\| ${framework.claim.claimKind} \\|$`));
+    }
+    expect(md.split("\n").filter((line) => line.includes("**Claim:**"))).toHaveLength(matrix.frameworks.length + 1);
+    expect(md.split("\n").filter((line) => line.includes("**Claim:**"))).toMatchSnapshot();
     const heatmap = renderCoverageHeatmap(matrix);
     for (const line of ["? fx_ok", "░ fx_partial", "░ fx_missing", "? fx_none", "Overall: 0.0%"]) {
       expect(heatmap).toContain(line);

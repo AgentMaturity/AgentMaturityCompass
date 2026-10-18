@@ -1,0 +1,18 @@
+{
+  "schema": "p112-root-source-path-allocation/1",
+  "at": "2026-10-16T19:54:34.707345+00:00",
+  "sourceHead": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+  "paths": [
+    "tests/policy/compiledPolicyGuard.test.ts",
+    "qualification/2026-10-17-P1-12/"
+  ],
+  "candidate": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+  },
+  "rootAllCandidateLinesAndConsumedSourceRead": true,
+  "independentPreliminaryReview": "No static blocker after full candidate and current types read. Exact peer seal is separate later evidence.",
+  "currentAdmission": "179 roots, current full-path hosted no conflicts/WIP0, D15none, freeze0, 88 protected inputs and four native identities exact; unchanged baseline24/24.",
+  "boundary": "Typed already-derived helper decisions only. Existing production/old tests/docs/packages/guards read-only; generated count scope is not yet allocated. All held decisions, F37 skip and P1-07 strict-binding closure remain. No signed activation, authentic lease/principal, live approval, signed receipt or destination/amount proof is claimed."
+}

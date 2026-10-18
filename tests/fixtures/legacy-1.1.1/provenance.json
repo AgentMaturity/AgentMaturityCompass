@@ -1,0 +1,1285 @@
+{
+  "schema": "amc-legacy-fixture-generation/2",
+  "oldCommit": "ff53902225ff276c55558d5ca17a8fc60b780655",
+  "source": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+  "retainedRoot": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0",
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "physicalPath": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "bytes": 67024,
+    "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+    "dev": 16777231,
+    "inode": 494874661,
+    "nlink": 1
+  },
+  "nodeVersion": "v22.23.3",
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/make-legacy-fixtures.mjs",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/make-legacy-fixtures.mjs",
+    "bytes": 20953,
+    "sha256": "0d756ecec2b9f95520b38ac8a54a4fe22a26843aa0df338f4ef4ac426b6ba9cb",
+    "dev": 16777231,
+    "inode": 542858625,
+    "nlink": 1
+  },
+  "sourcePins": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/package.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/package.json",
+      "bytes": 4445,
+      "sha256": "025fa4072bba848a9af7a928f41642560dea80317ec9f17ac5b6d58c82d394ab",
+      "dev": 16777231,
+      "inode": 542831813,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/package-lock.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/package-lock.json",
+      "bytes": 181023,
+      "sha256": "de11478321f06884f9626e9a25cd434122e5952018f7813d7179506bc494129d",
+      "dev": 16777231,
+      "inode": 542831812,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/cli.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/cli.ts",
+      "bytes": 1034393,
+      "sha256": "058b12989582dfab456c17e94bebaf315b61a6ca19893d1b79ea325bb2f06385",
+      "dev": 16777231,
+      "inode": 542832709,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+      "bytes": 1025700,
+      "sha256": "9095149d14964a3dc7d552d7000a51dad6308527ed89921f18eb74efbef8b2d9",
+      "dev": 16777231,
+      "inode": 542857330,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/assurance/assuranceRunner.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/assurance/assuranceRunner.ts",
+      "bytes": 27018,
+      "sha256": "15628075f4801b29903a822e5ddd784181718f6c5950832f118634a63c3e6a29",
+      "dev": 16777231,
+      "inode": 542832338,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/assurance/assuranceRunner.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/assurance/assuranceRunner.js",
+      "bytes": 27424,
+      "sha256": "2970ed6ae8fc26fbb6e7fb853c21cea9551067507576fb9d6d81b1eeb0bc2fe5",
+      "dev": 16777231,
+      "inode": 542855210,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/bundles/bundle.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/bundles/bundle.ts",
+      "bytes": 39917,
+      "sha256": "bdb504c1efd17cd83fca79ceaf1fe322ed568865fdc13b6b589ae5f7e151ebea",
+      "dev": 16777231,
+      "inode": 542832644,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/bundles/bundle.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/bundles/bundle.js",
+      "bytes": 39923,
+      "sha256": "32f0d48d96dc4eb7956583753e28b7c0f329a428b752bc151f0fc20879e45a28",
+      "dev": 16777231,
+      "inode": 542855298,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/cert/trustCertificate.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/cert/trustCertificate.ts",
+      "bytes": 15307,
+      "sha256": "da3bb9e6e516fea4dd55c318a9495e24155adaa5c7690d9dd696d4ab49f55d1c",
+      "dev": 16777231,
+      "inode": 542832666,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cert/trustCertificate.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cert/trustCertificate.js",
+      "bytes": 13948,
+      "sha256": "c248c557440c9861afccf54e576e6c104d51741ed206345ec81d9b0c2df8dfde",
+      "dev": 16777231,
+      "inode": 542856346,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/dogfood/maturityEvidence.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/dogfood/maturityEvidence.ts",
+      "bytes": 14841,
+      "sha256": "fa47d53f9af77062692cdf4b44429c654dfd24c6573efd9ec116ab87f9997228",
+      "dev": 16777231,
+      "inode": 542832992,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/dogfood/maturityEvidence.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/dogfood/maturityEvidence.js",
+      "bytes": 14261,
+      "sha256": "4901f309dd1770541b76e7201e065022d0046020bce06c4db2750337a6003b77",
+      "dev": 16777231,
+      "inode": 542857661,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/diagnostic/questionBank.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/diagnostic/questionBank.ts",
+      "bytes": 287279,
+      "sha256": "1fbaa1af116333ac631d0148f1f097a039b44a305a1c6caf0a76ddfeb0f8dafe",
+      "dev": 16777231,
+      "inode": 542832972,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/diagnostic/questionBank.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/diagnostic/questionBank.js",
+      "bytes": 304187,
+      "sha256": "3eeb4e92c5f3f5abbb848fcb766a14d57c33c183af0c67391bd277ef2bd9cd7c",
+      "dev": 16777231,
+      "inode": 542854762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/domains/domainCliIntegration.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/domains/domainCliIntegration.ts",
+      "bytes": 9266,
+      "sha256": "8b3ccb412ce6a20191aac037cee3a816749903cc752f840b0229464c2df90c6a",
+      "dev": 16777231,
+      "inode": 542833007,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/domains/domainCliIntegration.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/domains/domainCliIntegration.js",
+      "bytes": 8117,
+      "sha256": "4dcf2668744e46bc7be9ce433801506574a310211cc8a6fca28cec8c77764947",
+      "dev": 16777231,
+      "inode": 542855601,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/fleet/paths.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/fleet/paths.ts",
+      "bytes": 5403,
+      "sha256": "1b66647f9d03266b09f53e5428c5fedbb62d6d1945cda464eb1dbc6b76954840",
+      "dev": 16777231,
+      "inode": 542833132,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/fleet/paths.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/fleet/paths.js",
+      "bytes": 4973,
+      "sha256": "750590549d735bbb2b643aec9da33820ad71eb8649264495d9f9c2500210b50b",
+      "dev": 16777231,
+      "inode": 542854729,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/ledger/ledger.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/ledger/ledger.ts",
+      "bytes": 70004,
+      "sha256": "fc6f5b7aeeb2ccd0b420cd5ca2b1eb33a0064b50bd02b4375ffab646d8bedf20",
+      "dev": 16777231,
+      "inode": 542833272,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/ledger/ledger.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/ledger/ledger.js",
+      "bytes": 68893,
+      "sha256": "0e3ba40af33628da2037774e81f15beafafe17bc64830ee9132b7bff2b64dfdd",
+      "dev": 16777231,
+      "inode": 542854825,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/passport/passportArtifact.ts",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/src/passport/passportArtifact.ts",
+      "bytes": 12461,
+      "sha256": "a021ef820323caf6e66d96158a7ba666942df85c0b6037f0fb797c149d2df817",
+      "dev": 16777231,
+      "inode": 542833458,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/passport/passportArtifact.js",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/passport/passportArtifact.js",
+      "bytes": 12067,
+      "sha256": "96c86eebc5110810ac30eea2d7cb06d07e41d47b93fb26c68612948c01339e6f",
+      "dev": 16777231,
+      "inode": 542855742,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1913424,
+      "sha256": "7a70b6490d17beb6a8af398d153ed623da1a991bb24e1c8087ae00e4c0c3d1a7",
+      "dev": 16777231,
+      "inode": 542854602,
+      "nlink": 1
+    }
+  ],
+  "buildRecords": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/ci-result.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/ci-result.json",
+      "bytes": 1412,
+      "sha256": "87900d2d0374e7e8dad432df91b5a220470edd64ff74dc14212fd3efe5990f5b",
+      "dev": 16777231,
+      "inode": 542854622,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/build-result.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/build-result.json",
+      "bytes": 1429,
+      "sha256": "7ac660fb507b2c1625fb7836c444fe5d69dd7c32ccdbe07a409deded781deb6e",
+      "dev": 16777231,
+      "inode": 542858106,
+      "nlink": 1
+    }
+  ],
+  "generatedInputs": [
+    {
+      "kind": "new synthetic operator input to old importer",
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/eval-input.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/eval-input.json",
+      "bytes": 211,
+      "sha256": "ecf9eeb001a96d1d0834cddd19bfa637167f8b7c44069485c9d386f592f50cf5",
+      "dev": 16777231,
+      "inode": 542884195,
+      "nlink": 1
+    },
+    {
+      "kind": "new driver calling pinned old exported source APIs",
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/supplemental.mjs",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/supplemental.mjs",
+      "bytes": 1969,
+      "sha256": "64448218d27a24b14f51068980c4fb3d5c599986f34a3197332af143435010fa",
+      "dev": 16777231,
+      "inode": 542884209,
+      "nlink": 1
+    }
+  ],
+  "commands": [
+    {
+      "index": 1,
+      "label": "source-head",
+      "command": "git",
+      "argv": [
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+      "startedAt": "2026-10-16T16:58:23.952Z",
+      "pid": 92282,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:23.967Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/1-source-head.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/1-source-head.stdout",
+        "bytes": 41,
+        "sha256": "ecef876c071d6acde9eb0acd7e0166651515426dd6449d7594ce37a74876bd10",
+        "dev": 16777231,
+        "inode": 542884055,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/1-source-head.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/1-source-head.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884056,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 2,
+      "label": "source-status",
+      "command": "git",
+      "argv": [
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=no"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+      "startedAt": "2026-10-16T16:58:23.969Z",
+      "pid": 92290,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:23.990Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/2-source-status.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/2-source-status.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884058,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/2-source-status.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/2-source-status.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884059,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 3,
+      "label": "init",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "init",
+        "--trust-boundary",
+        "isolated",
+        "--profile",
+        "dev"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:23.998Z",
+      "pid": 92291,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:24.935Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/3-init.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/3-init.stdout",
+        "bytes": 640,
+        "sha256": "32a7064a4fcc64c78ab4611c380caa3fdb85a23c5993c7bac0e8245ad1f8d8e3",
+        "dev": 16777231,
+        "inode": 542884061,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/3-init.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/3-init.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884062,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 4,
+      "label": "operator-import",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "eval",
+        "import",
+        "--format",
+        "openai",
+        "--file",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/eval-input.json",
+        "--agent",
+        "default",
+        "--trust-tier",
+        "OBSERVED",
+        "--json"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:24.936Z",
+      "pid": 92310,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:25.481Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/4-operator-import.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/4-operator-import.stdout",
+        "bytes": 487,
+        "sha256": "5556c1168bb3736f9a9ef2c3d9c2773270570369c5270c84e4949b4d8cf487be",
+        "dev": 16777231,
+        "inode": 542884196,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/4-operator-import.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/4-operator-import.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884197,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 5,
+      "label": "old-source-seed",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/supplemental.mjs",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports",
+        "seed"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:25.482Z",
+      "pid": 92311,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:25.702Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/5-old-source-seed.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/5-old-source-seed.stdout",
+        "bytes": 201,
+        "sha256": "f954d7d0aa95613cd30a534104322a8fd605e13fb3d1450c84f293638191d810",
+        "dev": 16777231,
+        "inode": 542884210,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/5-old-source-seed.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/5-old-source-seed.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884211,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 6,
+      "label": "old-source-domain",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/supplemental.mjs",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports",
+        "domain"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:25.702Z",
+      "pid": 92312,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:25.790Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/6-old-source-domain.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/6-old-source-domain.stdout",
+        "bytes": 174,
+        "sha256": "eccd01a24fc1418e456ace5b4db415173b2fb321eadba5fb71aa871dc7f41a77",
+        "dev": 16777231,
+        "inode": 542884235,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/6-old-source-domain.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/6-old-source-domain.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884236,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 7,
+      "label": "old-source-ledger",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/supplemental.mjs",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports",
+        "ledger"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:25.791Z",
+      "pid": 92313,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:25.972Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/7-old-source-ledger.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/7-old-source-ledger.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884239,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/7-old-source-ledger.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/7-old-source-ledger.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884240,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 8,
+      "label": "diagnostic",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "--agent",
+        "default",
+        "run",
+        "--score-only",
+        "--json"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:25.974Z",
+      "pid": 92314,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:26.792Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/8-diagnostic.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/8-diagnostic.stdout",
+        "bytes": 2921,
+        "sha256": "c0ee3865b42c08b63a2cfd0d0056e3398a56d4463f0b6f35761125932437cb94",
+        "dev": 16777231,
+        "inode": 542884254,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/8-diagnostic.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/8-diagnostic.stderr",
+        "bytes": 316,
+        "sha256": "66bf71e02b99beb6c43832b976db1a2ac2c037401988a654382afb7a688ba4d7",
+        "dev": 16777231,
+        "inode": 542884255,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 9,
+      "label": "assurance",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "assurance",
+        "run",
+        "--scope",
+        "agent",
+        "--id",
+        "default",
+        "--pack",
+        "injection",
+        "--mode",
+        "sandbox"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:26.807Z",
+      "pid": 92315,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:27.479Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/9-assurance.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/9-assurance.stdout",
+        "bytes": 1515,
+        "sha256": "22d8aec4324a5494979b9b30366d403e4532f71829771de2f8036671982ba4ab",
+        "dev": 16777231,
+        "inode": 542884380,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/9-assurance.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/9-assurance.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884381,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 10,
+      "label": "trust-certificate",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "cert",
+        "generate",
+        "--agent",
+        "default",
+        "--output",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/trust-certificate.json"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:27.479Z",
+      "pid": 92316,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:27.975Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/10-trust-certificate.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/10-trust-certificate.stdout",
+        "bytes": 428,
+        "sha256": "f446730cf14dff777995751f6675da407bede43786ba3c983d667183c4492865",
+        "dev": 16777231,
+        "inode": 542884496,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/10-trust-certificate.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/10-trust-certificate.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884497,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 11,
+      "label": "passport-init",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "passport",
+        "init"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:27.975Z",
+      "pid": 92317,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:28.500Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/11-passport-init.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/11-passport-init.stdout",
+        "bytes": 50,
+        "sha256": "32ddc493768e0f04dfc67507e7597e119af3a4de7fe1a52fb609266038ed1084",
+        "dev": 16777231,
+        "inode": 542884504,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/11-passport-init.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/11-passport-init.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884505,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 12,
+      "label": "passport",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "passport",
+        "create",
+        "--scope",
+        "agent",
+        "--id",
+        "default",
+        "--out",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/passport.amcpass"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:28.501Z",
+      "pid": 92318,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:29.052Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/12-passport.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/12-passport.stdout",
+        "bytes": 277,
+        "sha256": "d68f1248b887fd451146164c5af4370feb89a2d4d52c708bda13dd16699f9b0b",
+        "dev": 16777231,
+        "inode": 542884512,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/12-passport.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/12-passport.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884513,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 13,
+      "label": "bundle",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "bundle",
+        "export",
+        "--agent",
+        "default",
+        "--run",
+        "2632a367-de7b-4eed-bd77-d169a0a361eb",
+        "--out",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/run.amcbundle"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:29.052Z",
+      "pid": 92328,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:29.638Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/13-bundle.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/13-bundle.stdout",
+        "bytes": 157,
+        "sha256": "e88f150caefad11ae3dc086e6f7b9ec3acd039cec6811d4edb73b0fc4f4126a7",
+        "dev": 16777231,
+        "inode": 542884556,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/13-bundle.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/13-bundle.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884557,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 14,
+      "label": "ci-init",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "ci",
+        "init",
+        "--agent",
+        "default"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:29.642Z",
+      "pid": 92337,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.172Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/14-ci-init.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/14-ci-init.stdout",
+        "bytes": 617,
+        "sha256": "fcfdb8beade47d5019c04adc9dd3a2513f4330c27df992b24b9f6efe3b03fbce",
+        "dev": 16777231,
+        "inode": 542884603,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/14-ci-init.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/14-ci-init.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884604,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 15,
+      "label": "diagnostic-certificate",
+      "command": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "argv": [
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout/dist/cli.js",
+        "certify",
+        "--agent",
+        "default",
+        "--run",
+        "2632a367-de7b-4eed-bd77-d169a0a361eb",
+        "--policy",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/gatePolicy.json",
+        "--out",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/run.amccert"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:30.172Z",
+      "pid": 92338,
+      "exitCode": 1,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.934Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/15-diagnostic-certificate.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/15-diagnostic-certificate.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884617,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/15-diagnostic-certificate.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/15-diagnostic-certificate.stderr",
+        "bytes": 360,
+        "sha256": "05a866c5504b4c83db4f771b57841e05d2a72bc24054fc7610626f30f2f1b103",
+        "dev": 16777231,
+        "inode": 542884618,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 16,
+      "label": "list-passport.amcpass",
+      "command": "tar",
+      "argv": [
+        "-tzf",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/passport.amcpass"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:30.934Z",
+      "pid": 92378,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.939Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stdout",
+        "bytes": 586,
+        "sha256": "25ab2d68866d1187d218d9b3a27afc41e0fb279761f55ecee13c8c51ebaaa5d9",
+        "dev": 16777231,
+        "inode": 542884766,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884767,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 17,
+      "label": "list-run.amcbundle",
+      "command": "tar",
+      "argv": [
+        "-tzf",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/run.amcbundle"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:30.939Z",
+      "pid": 92386,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.944Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stdout",
+        "bytes": 296,
+        "sha256": "0f4bca8c59c0527919dd4d352fda82e14459c0384901d0384560a38fc3f45d6b",
+        "dev": 16777231,
+        "inode": 542884769,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884770,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 18,
+      "label": "source-head-final",
+      "command": "git",
+      "argv": [
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+      "startedAt": "2026-10-16T16:58:30.944Z",
+      "pid": 92394,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.955Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/18-source-head-final.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/18-source-head-final.stdout",
+        "bytes": 41,
+        "sha256": "ecef876c071d6acde9eb0acd7e0166651515426dd6449d7594ce37a74876bd10",
+        "dev": 16777231,
+        "inode": 542884772,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/18-source-head-final.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/18-source-head-final.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884773,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 19,
+      "label": "source-status-final",
+      "command": "git",
+      "argv": [
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=no"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/checkout",
+      "startedAt": "2026-10-16T16:58:30.956Z",
+      "pid": 92402,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:30.970Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/19-source-status-final.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/19-source-status-final.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884775,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/19-source-status-final.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/19-source-status-final.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884776,
+        "nlink": 1
+      }
+    },
+    {
+      "index": 20,
+      "label": "pack-originals",
+      "command": "tar",
+      "argv": [
+        "-czf",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/originals.tar.gz",
+        "-C",
+        "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals",
+        "domain-report.md",
+        "ledger-observation.json",
+        "evidence.sqlite",
+        "diagnostic-report.json",
+        "assurance-report.json",
+        "trust-certificate.json",
+        "passport.amcpass",
+        "run.amcbundle"
+      ],
+      "cwd": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace",
+      "startedAt": "2026-10-16T16:58:30.980Z",
+      "pid": 92410,
+      "exitCode": 0,
+      "signal": null,
+      "finishedAt": "2026-10-16T16:58:31.016Z",
+      "stdout": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/20-pack-originals.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/20-pack-originals.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884786,
+        "nlink": 1
+      },
+      "stderr": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/20-pack-originals.stderr",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/20-pack-originals.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 542884787,
+        "nlink": 1
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "name": "domain-report.md",
+      "origin": "Byte-exact old exported domain builder output; no paid CLI entitlement claim.",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/domain-report.md",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/domain-report.md",
+        "bytes": 29387,
+        "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4",
+        "dev": 16777231,
+        "inode": 542884237,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/domain-report.md",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/domain-report.md",
+        "bytes": 29387,
+        "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4",
+        "dev": 16777231,
+        "inode": 542884778,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "ledger-observation.json",
+      "origin": "Derived actual old public ledger getter observations; not an independently emitted historical report.",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/ledger-observation.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/ledger-observation.json",
+        "bytes": 6067,
+        "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db",
+        "dev": 16777231,
+        "inode": 542884251,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/ledger-observation.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/ledger-observation.json",
+        "bytes": 6067,
+        "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db",
+        "dev": 16777231,
+        "inode": 542884779,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "evidence.sqlite",
+      "origin": "Byte-exact naturally closed old inline R2/R4 ledger snapshot before diagnostic and assurance; later full workspace ledger remains retained.",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+        "bytes": 331776,
+        "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+        "dev": 16777231,
+        "inode": 542884253,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/evidence.sqlite",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/evidence.sqlite",
+        "bytes": 331776,
+        "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+        "dev": 16777231,
+        "inode": 542884780,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "diagnostic-report.json",
+      "origin": "byte-exact old CLI output",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/runs/2632a367-de7b-4eed-bd77-d169a0a361eb.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/runs/2632a367-de7b-4eed-bd77-d169a0a361eb.json",
+        "bytes": 3333257,
+        "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a",
+        "dev": 16777231,
+        "inode": 542884282,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/diagnostic-report.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/diagnostic-report.json",
+        "bytes": 3333257,
+        "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a",
+        "dev": 16777231,
+        "inode": 542884781,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "assurance-report.json",
+      "origin": "byte-exact old CLI output",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/reports/assurance/b6a40131-7e05-493f-aa10-bd0bb193ec78.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/reports/assurance/b6a40131-7e05-493f-aa10-bd0bb193ec78.json",
+        "bytes": 26126,
+        "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a",
+        "dev": 16777231,
+        "inode": 542884493,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/assurance-report.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/assurance-report.json",
+        "bytes": 26126,
+        "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a",
+        "dev": 16777231,
+        "inode": 542884782,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "trust-certificate.json",
+      "origin": "byte-exact old CLI output",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/trust-certificate.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/trust-certificate.json",
+        "bytes": 3118,
+        "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d",
+        "dev": 16777231,
+        "inode": 542884502,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/trust-certificate.json",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/trust-certificate.json",
+        "bytes": 3118,
+        "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d",
+        "dev": 16777231,
+        "inode": 542884783,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "passport.amcpass",
+      "origin": "byte-exact old CLI output",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/passport.amcpass",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/passport.amcpass",
+        "bytes": 3675,
+        "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f",
+        "dev": 16777231,
+        "inode": 542884539,
+        "nlink": 1
+      },
+      "memberList": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/16-list-passport.amcpass.stdout",
+        "bytes": 586,
+        "sha256": "25ab2d68866d1187d218d9b3a27afc41e0fb279761f55ecee13c8c51ebaaa5d9",
+        "dev": 16777231,
+        "inode": 542884766,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/passport.amcpass",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/passport.amcpass",
+        "bytes": 3675,
+        "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f",
+        "dev": 16777231,
+        "inode": 542884784,
+        "nlink": 1
+      }
+    },
+    {
+      "name": "run.amcbundle",
+      "origin": "byte-exact old CLI output",
+      "source": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/run.amcbundle",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/run.amcbundle",
+        "bytes": 371307,
+        "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa",
+        "dev": 16777231,
+        "inode": 542884595,
+        "nlink": 1
+      },
+      "memberList": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stdout",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/logs/17-list-run.amcbundle.stdout",
+        "bytes": 296,
+        "sha256": "0f4bca8c59c0527919dd4d352fda82e14459c0384901d0384560a38fc3f45d6b",
+        "dev": 16777231,
+        "inode": 542884769,
+        "nlink": 1
+      },
+      "rawCopy": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/run.amcbundle",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals/run.amcbundle",
+        "bytes": 371307,
+        "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa",
+        "dev": 16777231,
+        "inode": 542884785,
+        "nlink": 1
+      }
+    }
+  ],
+  "ledgerSnapshot": {
+    "boundary": "before-diagnostic-and-assurance",
+    "sourceAtClosure": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/evidence.sqlite",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/evidence.sqlite",
+      "bytes": 331776,
+      "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+      "dev": 16777231,
+      "inode": 542884098,
+      "nlink": 1
+    },
+    "snapshot": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+      "bytes": 331776,
+      "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+      "dev": 16777231,
+      "inode": 542884253,
+      "nlink": 1
+    },
+    "walAbsent": true,
+    "observationCommandIndex": 7,
+    "observationPid": 92313
+  },
+  "storage": {
+    "format": "tar-gzip",
+    "rawOriginals": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/raw-originals",
+    "rawOriginalBytes": 4104713,
+    "archive": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/originals.tar.gz",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/originals.tar.gz",
+      "bytes": 709335,
+      "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c",
+      "dev": 16777231,
+      "inode": 542884788,
+      "nlink": 1
+    },
+    "decodedHashAuthority": "candidates[].source.bytes and sha256; rawCopy must match each original",
+    "decodedHashesVerified": false,
+    "rootDecodedHashReviewRequired": true
+  },
+  "gaps": [
+    {
+      "step": "genuine-L3",
+      "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+    },
+    {
+      "step": "diagnostic-certificate",
+      "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+    },
+    {
+      "step": "run.amccert",
+      "reason": "No output file was emitted."
+    }
+  ],
+  "fatal": null,
+  "completeSpecCorpusClaimed": false,
+  "publicationApproved": false,
+  "archiveContentAndLinkReviewRequiredBeforePublication": true,
+  "rawWorkspaceKeysOrVaultCopied": false,
+  "notes": [
+    "Actual generated observations only; synthetic import input is operator-authored.",
+    "Embedded public verification keys/signatures remain exact. Legacy claims never upgraded.",
+    "All roots and streams retained. No retries, timeout, forced closure, cleanup or repository publication.",
+    "Archive member listing is a path check only; root must review bounded contents and link types before publication."
+  ],
+  "stagingOriginalsAdmitted": true,
+  "proposedCorpusBytes": 770817
+}

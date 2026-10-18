@@ -1,0 +1,19 @@
+{
+  "schema": "p107-private-control-review-seal/1",
+  "at": "2026-10-16T17:39:29.314631+00:00",
+  "privateOnly": true,
+  "unexecuted": true,
+  "inputCount": 14,
+  "files": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/review.json",
+      "bytes": 6410,
+      "sha256": "73a74d109912fd76b961b20e0246f311d083339c70c357ccdd38a73e11243dd0"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/pins.json",
+      "bytes": 3439,
+      "sha256": "97f57f8268b0950e27f03c2b45c8f394a46e50a664e6e6138c8db216df4eb13d"
+    }
+  ]
+}

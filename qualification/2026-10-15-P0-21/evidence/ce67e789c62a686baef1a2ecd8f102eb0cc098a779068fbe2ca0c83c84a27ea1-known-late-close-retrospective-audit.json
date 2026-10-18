@@ -1,0 +1,50 @@
+{
+  "capturedUtc": "2026-10-15T05:06:20.188853+00:00",
+  "purpose": "Separate retrospective diagnostic audit after the unexecuted private controller review identified three missing installed-Vitest close banners. Original packets and original results are unchanged.",
+  "patterns": [
+    "error during close",
+    "close timed out",
+    "Tests closed successfully but something prevents",
+    "Unhandled Errors?",
+    "Unhandled Rejection",
+    "uncaught exception",
+    "Error during teardown",
+    "Error during global teardown",
+    "Tests modified the repository workspace",
+    "Hook timed out",
+    "ELIFECYCLE"
+  ],
+  "streams": [
+    {
+      "path": "/private/tmp/p0-21-original-core-20261015.log",
+      "bytes": 756,
+      "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d",
+      "matchingKnownLateDiagnostics": []
+    },
+    {
+      "path": "/private/tmp/p0-21-original-cli-20261015.log",
+      "bytes": 1283,
+      "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41",
+      "matchingKnownLateDiagnostics": []
+    },
+    {
+      "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+      "bytes": 543,
+      "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08",
+      "matchingKnownLateDiagnostics": []
+    },
+    {
+      "path": "/private/tmp/p0-25-original-citations-mapping-20261015.log",
+      "bytes": 519,
+      "sha256": "16c02be51040858b2b5745d5d19cc02211af2eb932f6aeda5e94ab33faa248be",
+      "matchingKnownLateDiagnostics": []
+    },
+    {
+      "path": "/private/tmp/p0-25-release-executor-contracts-20261015.log",
+      "bytes": 392,
+      "sha256": "229086382cfd8366fb30821c3b0e4785ad4ad3f35c7e387f208c782b319f834d",
+      "matchingKnownLateDiagnostics": []
+    }
+  ],
+  "boundary": "Known text diagnostics absent in these five immutable combined streams. This is not rerun runtime, universal healthy teardown or descendant absence. ControllerV1 remains unexecuted; V2 review must gate actual future output before restoration."
+}

@@ -1,0 +1,138 @@
+{
+  "schema": "p107-bounded-pure-test-design/1",
+  "at": "2026-10-16T17:34:27.969203+00:00",
+  "paths": [
+    "tests/diagnostic/levelCumulative.test.ts",
+    "tests/diagnostic/evidenceEmitterRegistry.test.ts"
+  ],
+  "candidateCodeWritten": false,
+  "runtimeExecuted": false,
+  "expectedRuntimeTestCount": "Not predicted; root records actual collected identities after candidate admission.",
+  "fixedInventoryUnderControls": true,
+  "levelMatrix": [
+    {
+      "id": "CUM-1",
+      "lane": "synthetic gate graph",
+      "positive": "All lower synthetic gates pass with the same registered lower-level row fixture; result3.",
+      "negative": "L1pass/L2fail/L3pass yields final1, with later perLevel3pass retained.",
+      "firstSensitiveAssertion": "Final level equals1 after independently asserting pass/fail/pass.",
+      "boundary": "Artificial L3 threshold is not current production evidence-map reachability."
+    },
+    {
+      "id": "CUM-2",
+      "lane": "synthetic gate graph",
+      "cases": [
+        "Gate array order does not change semantics.",
+        "Missing L1 yields0 despite later passing gates.",
+        "Missing L2 yields1 despite later pass.",
+        "Duplicate gate levels throw.",
+        "Lower notEvaluated stops advancement and preserves reported status."
+      ],
+      "boundary": "Gate.level, not positional indexing, is authoritative."
+    },
+    {
+      "id": "CAN-1",
+      "lane": "canonical AMC-5.29",
+      "positive": "4 literal audit rows:2allowed/2denied,2sessions/2freshUTCdays; actual parser derives runtime OBSERVED; level2.",
+      "negative": "4allowed-only rows meet counts but lack denied; L2fails with unmet audit type and final1.",
+      "firstSensitiveAssertion": "Positive final level equals2, before later detail assertions.",
+      "boundary": "All maps l3empty; canonical3/4/5not_evaluated."
+    },
+    {
+      "id": "CAN-2",
+      "lane": "canonical thresholds and binding",
+      "cases": [
+        "Same positive shapes on one day or one session fail the independent minimum and name that cause.",
+        "Untitled or other-question-tagged map-admitted rows still evidence mapped question.",
+        "Registered rows tagged to an unmapped real question do not create an L2 map.",
+        "Duplicate/trimmed question tags yield one ID/match, not multiplied rows.",
+        "Optional valid taggedRows index agrees with ordinary tags; map rows still bind."
+      ],
+      "boundary": "Callers own agent/time window filtering; no arbitrary duplicate-row-ID dedup claim."
+    },
+    {
+      "id": "CAN-3",
+      "lane": "canonical claim ceilings",
+      "cases": [
+        "All actual maps have emptyL3 and all canonicalL4/L5 report not_evaluated, never pass.",
+        "Registered eval-import rows parsed from declaredOBSERVED becomeSELF_REPORTED, can reachL1 but noL2/L3.",
+        "Explicit manual and dogfood lookalikes do not become observed registered runtime evidence.",
+        "Keyword-only registered stdout may reachL1, cannot create higher map evidence."
+      ],
+      "boundary": "Do not manufacture a realL3 positive or expect every self-reported/keyword row to yield0."
+    }
+  ],
+  "registryMatrix": [
+    {
+      "id": "REG-1",
+      "cases": [
+        "Fixed-body unique IDs and required allow/deny anchors.",
+        "Each module exists and contains quoted literal/required metadata text.",
+        "Event type appears in published contract vocabulary.",
+        "No seeder module or synthetic claim.",
+        "Importers self_reported/import withL1-only use."
+      ],
+      "boundary": "No recursive replacement for existing check:gates census and no runtime-emission theorem."
+    },
+    {
+      "id": "REG-2",
+      "cases": [
+        "Matching observed shape+amc-runtime+effectiveOBSERVED/HARDENED admits.",
+        "Matching import shape+producerimport+effectiveSELF_REPORTED admits.",
+        "Wrong event/audit/metric field, explicit wrong producer or effective tier refuses.",
+        "requiresMeta needs an own field, not an inherited field.",
+        "fromRegisteredEmitter rejects an audit type matching no entry; a generic stdout shape need not identify a unique writer."
+      ],
+      "boundary": "DirectAdmissionRow is synthetic already-derived-tier input; no crypto/ledger verification."
+    },
+    {
+      "id": "REG-3",
+      "cases": [
+        "Known manual/operator/import/eval_import/dogfood metadata uses parseEvidenceEventWith and explicit local no-trust reader.",
+        "Manual/import declaredOBSERVED derivesSELF_REPORTED; dogfood derives synthetic and is excluded.",
+        "Missing/unmapped source defaults runtime; do not assert unknown-source rejection.",
+        "UnboundATTESTED readsSELF_REPORTED without inventing positive admission."
+      ],
+      "boundary": "No ambient user trust loader, fake attestation, raw signed-ledger claim or provenance source edit."
+    }
+  ],
+  "futureControls": [
+    {
+      "id": "M1",
+      "target": "src/diagnostic/levelSemantics.ts",
+      "operator": "Replace the final upward contiguous1..5 selection with highest-pass selection; leave gate evaluation intact.",
+      "currentLines": "187-191",
+      "baselineWitness": "CUM-1 pass/fail/pass graph gives1 and adjacent all-pass positive gives3.",
+      "firstIntendedSensitiveAssertion": "CUM-1 finallevel1 sees a later pass wrongly selected.",
+      "feasibleWithoutMapChange": true,
+      "futureOutcomePredicted": false
+    },
+    {
+      "id": "M2",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "operator": "Add one unique, type-correct registry entry naming src/dogfood/maturityEvidence.ts with synthetic_example claim; no production admission or writer code change.",
+      "baselineWitness": "REG-1 fixed-body no-seeder/no-synthetic truth, existing nonempty valid registry positive.",
+      "firstIntendedSensitiveAssertion": "The exact seeder/module or synthetic-claim truth assertion rejects that entry.",
+      "feasibleWithoutChangingTestInventory": true,
+      "futureOutcomePredicted": false
+    },
+    {
+      "id": "M3",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "operator": "Remove only existing tool-call-denied item; new imported registry map then lacks that emitter.",
+      "baselineWitness": "CAN-1 independent literal allowed/denied rows reaches canonicalAMC-5.29L2 before mutation.",
+      "firstIntendedSensitiveAssertion": "CAN-1 finallevel2 detects loss of mapped denied entry; fixed registry anchor test may also fail, to be classified from actual output.",
+      "mechanism": "levelGates marksL2notEvaluated for an inadmissible map, leavingL1; no map edits are needed.",
+      "realGovernedRunAcceptance": "Later owned fixture must independently demonstrate recorded call behavior; this unit witness is not that fixture.",
+      "futureOutcomePredicted": false
+    }
+  ],
+  "canonicalMapsPreserved": {
+    "mapCount": 4,
+    "l3Empty": true,
+    "l4L5NotEvaluated": true
+  },
+  "sourceOwnership": "Registry remains Claude-protected; no source integration/control admission is conveyed.",
+  "nextRuntimeScope": "Actual governed owned fixture later, separately admitted.",
+  "fullP107Accepted": false
+}

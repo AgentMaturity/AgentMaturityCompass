@@ -1,0 +1,28 @@
+{
+  "capturedUtc": "2026-10-15T04:31:58.648097+00:00",
+  "graph": {
+    "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+    "bytes": 45692207,
+    "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+  },
+  "query": {
+    "argv": [
+      "graphify",
+      "query",
+      "lintCitations",
+      "--budget",
+      "1600"
+    ],
+    "cwd": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "exit": 0,
+    "stdout": "No matching nodes found.\n"
+  },
+  "installedVersion": {
+    "exit": 0,
+    "stdout": "graphify 0.9.74\n",
+    "stderr": ""
+  },
+  "reviewedRefreshPin": "graphifyy==0.9.56",
+  "freshness": "Existing graph is historical source4247 navigation only, not current source2d552/code58 evidence. Relevant actual source and exact readiness pins verified directly.",
+  "refreshWatcherServer": false
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "p125-client-contract-seal/1",
+  "at": "2026-10-16T21:11:35.717393+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C1-certReq-false.patch",
+      "bytes": 412,
+      "sha256": "1bb9fbacc7dda0e6bcf46dc55991334aef50f813205005c599a79b108a48499b",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C2-ignore-response-MIME.patch",
+      "bytes": 648,
+      "sha256": "cda51cf7e9242a0acbdea9506e07096c43e3f65df545cec3b63f261384c8ed15",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/README.md",
+      "bytes": 3006,
+      "sha256": "591155ff1507e1a1e9d2a853179c812c601a987c043ea50f6617e98e93793a15",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/controls.json",
+      "bytes": 4060,
+      "sha256": "469352701add22df95ffd784157decc215cc85a41e37491e2243f63fbe71b316",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/input-pins.json",
+      "bytes": 9363,
+      "sha256": "6bc6c713f7384019b39c3574430e56daab3064b90b1384121a07f18f04a0de1a",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/lifecycle.json",
+      "bytes": 3981,
+      "sha256": "e3018e42e6432a6a2b75769a091d2b978fcd024e46bf71c8fd717f13ca305e67",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/matrix.json",
+      "bytes": 7047,
+      "sha256": "655056b5e193ac59c2dd695ce2749b86125aaa26442104880ce0968f4ebc099d",
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/review.json",
+      "bytes": 4714,
+      "sha256": "8121e3446467c73648d4af8a00d7f79fd4bbdecc240948c62062881880072ce2",
+      "readScope": "sealed private output"
+    }
+  ],
+  "inputCount": 32,
+  "blockers": [],
+  "noExecutionOrCheckoutWrites": true,
+  "sourceTestAllocated": false
+}

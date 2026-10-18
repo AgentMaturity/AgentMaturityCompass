@@ -1,0 +1,60 @@
+{
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "capturedUtc": "2026-10-15T04:35:44.278297+00:00",
+  "directCollector": {
+    "path": "/private/tmp/p0-25-actual-collector-json-20261015.log",
+    "bytes": 170681,
+    "sha256": "dde3bd869c7d2ad044fd5c435e5035713e0d07e987b6b699977d925bedfc5110"
+  },
+  "npmPackageCommand": {
+    "path": "/private/tmp/p0-25-actual-package-command-20261015.log",
+    "bytes": 170772,
+    "sha256": "295b1b187a5c887c085b00af08a970627db1bec09587b908c83e08e97ddbba3e"
+  },
+  "directAndPackageStructuredOutputsExact": true,
+  "ok": true,
+  "errors": 0,
+  "ratcheted": 623,
+  "baseline": 623,
+  "rules": {
+    "CIT001": {
+      "name": "superseded-as-live",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    },
+    "CIT002": {
+      "name": "framework-id",
+      "zeroTolerance": false,
+      "findings": 3,
+      "zeroToleranceFindings": 0,
+      "baseline": 3
+    },
+    "CIT003": {
+      "name": "pack-reference",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    },
+    "CIT004": {
+      "name": "record-incomplete",
+      "zeroTolerance": false,
+      "findings": 620,
+      "zeroToleranceFindings": 0,
+      "baseline": 620
+    },
+    "CIT005": {
+      "name": "status-type",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    }
+  },
+  "baselineProblems": [],
+  "overBaseline": [],
+  "belowBaseline": [],
+  "boundary": "Two genuine processes execute the current built collector. 623 permitted baseline findings are not blocking command errors. This does not establish legal correctness, reference provenance truth, expert review, whole release/hosted qualification, nor erase strict P024 ISO failure. No reasoned baseline update was invoked."
+}

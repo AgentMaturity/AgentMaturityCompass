@@ -1,0 +1,176 @@
+{
+  "schema": "p107-runtime-public-mirror-diagnosis/1",
+  "at": "2026-10-16T18:02:15.019910+00:00",
+  "state": "READ_ONLY_DIAGNOSIS_NO_PATCH_OR_EXECUTION",
+  "actualRun": {
+    "phase": "p107-runtime-v2",
+    "exit": 1,
+    "durationMs": 3188,
+    "ownedPgid": 2705,
+    "groupAbsentByESRCH": true,
+    "tests": {
+      "numTotalTests": 1,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "unhandledErrors": [],
+    "firstBodyFailureLine": 365,
+    "cleanupPreservationFailureLine": 392,
+    "failureMessagesRetained": [
+      "AssertionError: expected [ { \u2026(7) }, { \u2026(7) }, { \u2026(7) }, \u2026(5) ] to deeply equal [ { \u2026(7) }, { \u2026(7) }, { \u2026(7) }, \u2026(5) ]\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:365:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:181:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+      "Error: captured owned file/policy/public-key pin changed\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:392:58\n    at cleanup (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:123:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:383:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    ],
+    "qualificationPass": false
+  },
+  "observedPinChanges": {
+    "afterPins": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975566,
+            "after": 542975703
+          }
+        }
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975568,
+            "after": 542975704
+          }
+        }
+      }
+    ],
+    "finalProtectedPins": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig",
+        "differences": {}
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975566,
+            "after": 542975703
+          }
+        }
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975568,
+            "after": 542975704
+          }
+        }
+      }
+    ]
+  },
+  "nativeFullPinExact": true,
+  "publicMonitorFingerprint": "1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17",
+  "actualBlobKeyMetadata": {
+    "v": 1,
+    "keyVersion": 1,
+    "createdTs": 1792173557320,
+    "algorithm": "AES-256-GCM"
+  },
+  "sourceSupportedCause": {
+    "chain": [
+      "candidate first session recordSystemPrompt before startTurn/native calls",
+      "sessionService.ts399-408 recordSystemPrompt delegates to recordContent",
+      "sessionSpine.ts100-129 recordContent supplies payload to appendSessionEvent; appendSessionEvent179-190 writes through store",
+      "sqliteSessionEventStore.ts67-83 maps supplied payload to inline:false Ledger.appendEvidenceDetailed",
+      "ledger.ts515-523 buildEvidenceInsert sends noninline payload to storeBlob; storeBlob268-289 honors enabled default encryption and calls storeEncryptedBlob",
+      "blobStore.ts159-177 storeEncryptedBlob calls ensureBlobKey",
+      "blobKeys.ts185-195 ensureBlobKey initializes when current metadata absent; initBlobKey117-126 calls setVaultSecret then writes signed key metadata",
+      "vault.ts646-652 setVaultSecret -> rewriteUnlockedVault624-643 -> createVault245-246 -> persistVault249-310",
+      "vault.ts290-291 persistVault calls writeFileAtomic for all four public mirrors, even when key bytes are unchanged",
+      "utils/fs.ts9-18 writeFileAtomic creates a fresh temporary file then renameSync replaces destination"
+    ],
+    "readOnlyPathsExcluded": [
+      "keys.ts117-123 getPublicKeyPem is a read only",
+      "vault.ts450-467 existing-vault ensure/unlock branch does not itself rewrite public mirrors unless an actual legacy-key migration is needed"
+    ],
+    "actualTimingSupport": {
+      "firstSessionStartedTs": 1792173557314,
+      "blobKeyCreatedTs": 1792173557320,
+      "firstNativeAuditTs": 1792173557390
+    },
+    "boundary": "This is a source-derived causal explanation consistent with actual byte-preserving inode deltas and first-session blob-key metadata timing. No new syscall trace or secret/vault-envelope inspection was performed; no claim is made that actual rewrite calls were instrumented."
+  },
+  "minimalChoices": [
+    {
+      "choice": "Preferred: initialize the ordinary blob key during fixture setup before pre-call trust and physical pin capture",
+      "publicAPI": "ensureBlobKey(workspace) from src/storage/blobs/blobKeys.ts",
+      "placement": "After initWorkspace has unlocked the owned vault, and before monitorPem/monitorFingerprint, beforePins and pre-call-public-pins.json capture; no session, content or native call is needed.",
+      "semantics": "The fresh signed workspace uses normal keyVersion1 AES-256-GCM material, persists it through the actual vault and writes current metadata/signature. Subsequent ensureBlobKey calls load existing metadata rather than set another secret. This introduces no evidence row or dummy blob and changes no default policy/offload setting.",
+      "optionalFiniteWitness": "The existing verifyBlobCurrentKeySignature(workspace) reports valid signature and exact public metadata paths; a normal keyVersion1 check may disclose setup without recording secret material. No private-field, key-material read or manual metadata creation is required.",
+      "preserved": "Keep all existing eight full physical input pin comparisons in body and cleanup, unchanged native physical equality, pre-call monitor PEM hash and out-of-workspace pin, signed ledger/root verification and exact mapping/continuity assertions. Capture happens only after ordinary setup is complete.",
+      "limitation": "A future actual run must establish that no later vault secret mutation occurs; this static diagnosis does not predict a pass or authorize application."
+    },
+    {
+      "choice": "Alternative: permit replacement inode only for the exact monitor/auditor public mirror rows",
+      "semantics": "Retain path/physicalPath/device/nlink/regular-file/byte-length/hash and pre-call monitor fingerprint/signature authority, record both inode observations, and compare all other owned/native/policy pins exactly.",
+      "tradeoff": "Key content/trust remains pinned but the test no longer establishes stable physical identity for those two public mirrors. This is a wider contract change than ordinary setup initialization and is unnecessary if the intended assertion is physical stability after setup.",
+      "recommendation": "Do not relax the generic file pin or remove inode/device checks from all files."
+    }
+  ],
+  "maskingAndBoundaries": {
+    "passedBeforeLine365": "Actual run reached the protected-pin equality after native disposition, cryptographic/session-root, exact four-ID mapping and gate/continuity assertions. The earned level was1: events4/4,sessions2/2,days1/2; L3-L5 not_evaluated.",
+    "masked": "The immediate nativeAfter equality at line366 and final assertions after the body/cleanup AggregateError did not execute. Native before/after/final equality is independently verified from retained public facts; it is not relabeled as an executed line366 assertion.",
+    "cleanup": "Both original body AssertionError and cleanup preservation error remain recorded. Actual public facts show vaultLocked/environmentRestored/poolClosed true and both once-only turn/session closures, but the failed test remains RED.",
+    "noProductionDiagnosis": "The observed public mirror rewrite is the normal shipped vault-secret persistence path; no production repair, key rotation or signature failure has been established."
+  },
+  "noExecution": true,
+  "checkoutIndexQaWrites": false,
+  "noProposalOrPatchAuthored": true,
+  "privateOutputOnly": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis",
+  "readLimit": "Initial large combined outcome print was truncated; subsequent bounded raw/log/public-delta reads supply the retained failure identities and exact deltas. One rg search included absent src/control and returned2; corrected scoped source reads supplied this report, with no validation credit given to that search."
+}

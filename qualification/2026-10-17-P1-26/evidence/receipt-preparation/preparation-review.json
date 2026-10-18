@@ -1,0 +1,40 @@
+{
+  "schema": "p126-receipt-prose-static-preparation/1",
+  "at": "2026-10-16T20:57:09.724893+00:00",
+  "purpose": "Private root-reviewable prose and inert artifact mapping only. It is not a receipt, command audit or final acceptance.",
+  "actualReadInputs": {
+    "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+    "sourceCombined": 54,
+    "separateUnchangedBaseline": 41,
+    "freshCanonical": {
+      "total": 54,
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0
+    },
+    "freshDurationMs": 9280,
+    "M1OutcomeOnly": {
+      "total": 54,
+      "passed": 43,
+      "failed": 11,
+      "skipped": 0
+    },
+    "M1DurationMs": 8287,
+    "M1SemanticClassificationConsumed": false,
+    "laterControlOrRestorationCredit": false
+  },
+  "provenanceBoundary": "Existing sealed source/static/unchanged/binding/metadata-repair packets and retained root outcome data are cited. This task did not re-audit full fresh/control raw streams or inspect live mutant Q.",
+  "candidateInertMappingVerified": true,
+  "rootToComplete": [
+    "Read/classify actual M1 and M2 failures and masks.",
+    "Exact restoration, identical fresh reruns, final preservation and independent causal review.",
+    "Final fresh checks and actual metadata validation/staging/commit results.",
+    "Resolve every explicit README placeholder; retain this draft historically."
+  ],
+  "navigationCorrection": {
+    "read": "A cat included nonexistent B32/receipt-revision-v2/README.md and exited1.",
+    "resolution": "The existing B32/private-receipt-root-v2/2026-10-17-P1-12/README.md was read as the template; the absent lookup and original command output were not suppressed."
+  },
+  "executedProductOrHelper": false,
+  "sourceIndexOrCheckoutWrites": false
+}

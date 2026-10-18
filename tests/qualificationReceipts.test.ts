@@ -77,6 +77,15 @@ describe("P0-01 qualification receipts", () => {
     expect(errorsFor()).toMatch(/key/);
   });
 
+  test("a second receipt for the same key and day may add a lowercase variant to the folder key", () => {
+    writeReceipt(receipt(), `${folder}-node-runtime`);
+    expect(validateQualificationDir(root).errors).toEqual([]);
+    rmSync(join(root, `${folder}-node-runtime`), { recursive: true });
+    // An uppercase suffix reads as another key, and a different key is still a mismatch.
+    writeReceipt(receipt(), `${folder}-NODE`);
+    expect(errorsFor()).toMatch(/folder key P0-01-NODE differs/);
+  });
+
   test("a folder date that differs from the receipt date fails", () => {
     writeReceipt(receipt({ date: "2026-10-06" }));
     expect(errorsFor()).toMatch(/date/);

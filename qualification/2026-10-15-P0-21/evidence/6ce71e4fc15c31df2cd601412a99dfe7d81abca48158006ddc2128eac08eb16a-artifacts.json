@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/classification.json",
+    "bytes": 7014,
+    "sha256": "6424830018612742f1b066e285fe19c5ac5b61ee55b997ead0bce78bc3833022"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/command.json",
+    "bytes": 1930,
+    "sha256": "c00f0f622c3c2290daf3229421fabb9fd9b85c9a9fcdccc22a22f9525ab1a2b9"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/inputs-after.json",
+    "bytes": 858,
+    "sha256": "d2f65a6aaf910792a70a6773a94202cf51e77851a658c361b6abcc9f60659321"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/inputs-before.json",
+    "bytes": 858,
+    "sha256": "e37d771502c3c5d39bafeb8a91e4478a0b19d6a454fc2c7a21f0b8b25b46f9a3"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/observer.json",
+    "bytes": 24253,
+    "sha256": "cf4e5f1bd18b33570ed2a8bbfcd24479f2ed77920952243dcaf25d06f3a41525"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "ce96b905119235a7a50a9bc6473cf55e12a149ea1e411762b978b5e0c12a8b00"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/owned-process.json",
+    "bytes": 1555,
+    "sha256": "21cf61aea182d44a5c09e2757041254866f9707f4efadbcff1cad23d007df8b2"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/raw.json",
+    "bytes": 15993,
+    "sha256": "16441402113405195c484c041686697ed9a7b2549da5fa8306d0150c01ca7b23"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/stdout-stderr.log",
+    "bytes": 2813,
+    "sha256": "af5851e322313008d7cd2786e0e251df3b15f53b5a15a4885ac0986128e2edcb"
+  }
+]

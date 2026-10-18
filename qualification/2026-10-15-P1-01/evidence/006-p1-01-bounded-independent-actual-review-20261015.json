@@ -1,0 +1,710 @@
+{
+  "schema": "amc-private-bounded-independent-actual-review/1",
+  "key": "P1-01",
+  "createdUtc": "2026-10-15T08:45:29.983856+00:00",
+  "source": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "frozenJournalSha256": "18d349e1868c2fe83a78dfbe31bfb81f3bfe9ed4c857bb5b598c22572cc07510",
+  "controlResultSha256": "75da6150f94040f1bdeda3ce71626e119c985cca77394ad93b38ff9a1e2186dc",
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "blockingFindings": [],
+  "blockingPacketFindings": [],
+  "findings": [],
+  "method": "Independent read-only JSON/text, SHA-256/stat/inode and exact source/emitted-JS delta comparison. No product imports, tests, compilation, build, signals, Git mutation or repository edit by this reviewer. Earlier preliminary pair unchanged.",
+  "closedCommands": {
+    "count": 21,
+    "exitZero": 18,
+    "nonzero": {
+      "duplicates": 1,
+      "dead-code": 1,
+      "source-control": 1
+    },
+    "liveAndFrozenJournalEqual": true,
+    "closedFlagVerified": true,
+    "commands": [
+      {
+        "phase": "install",
+        "exit": 0,
+        "durationMs": 5297,
+        "pid": 37101
+      },
+      {
+        "phase": "build",
+        "exit": 0,
+        "durationMs": 31979,
+        "pid": 37168
+      },
+      {
+        "phase": "native",
+        "exit": 0,
+        "durationMs": 78,
+        "pid": 37367
+      },
+      {
+        "phase": "initial-freeze",
+        "exit": 0,
+        "durationMs": 1249,
+        "pid": 37374
+      },
+      {
+        "phase": "schemas",
+        "exit": 0,
+        "durationMs": 593,
+        "pid": 37430
+      },
+      {
+        "phase": "existing-tests",
+        "exit": 0,
+        "durationMs": 4312,
+        "pid": 37459
+      },
+      {
+        "phase": "pages",
+        "exit": 0,
+        "durationMs": 33051,
+        "pid": 37541
+      },
+      {
+        "phase": "no-fabrication",
+        "exit": 0,
+        "durationMs": 2228,
+        "pid": 37879
+      },
+      {
+        "phase": "architecture",
+        "exit": 0,
+        "durationMs": 1776,
+        "pid": 37907
+      },
+      {
+        "phase": "docs",
+        "exit": 0,
+        "durationMs": 257,
+        "pid": 37942
+      },
+      {
+        "phase": "counts",
+        "exit": 0,
+        "durationMs": 415,
+        "pid": 37962
+      },
+      {
+        "phase": "clean-source",
+        "exit": 0,
+        "durationMs": 50948,
+        "pid": 37983
+      },
+      {
+        "phase": "qualification-prior",
+        "exit": 0,
+        "durationMs": 354,
+        "pid": 38540
+      },
+      {
+        "phase": "duplicates",
+        "exit": 1,
+        "durationMs": 1611,
+        "pid": 38584
+      },
+      {
+        "phase": "dead-code",
+        "exit": 1,
+        "durationMs": 3310,
+        "pid": 38608
+      },
+      {
+        "phase": "vectors",
+        "exit": 0,
+        "durationMs": 65,
+        "pid": 39023
+      },
+      {
+        "phase": "publication",
+        "exit": 0,
+        "durationMs": 81,
+        "pid": 39037
+      },
+      {
+        "phase": "receipt-witness",
+        "exit": 0,
+        "durationMs": 198,
+        "pid": 39044
+      },
+      {
+        "phase": "source-control",
+        "exit": 1,
+        "durationMs": 35378,
+        "pid": 39469
+      },
+      {
+        "phase": "source-strip-control",
+        "exit": 0,
+        "durationMs": 39750,
+        "pid": 39980
+      },
+      {
+        "phase": "final-freeze",
+        "exit": 0,
+        "durationMs": 1177,
+        "pid": 40125
+      }
+    ],
+    "allCommandJsonAndOwnedMetadataAgree": true,
+    "allHeadBeforeAfter": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+    "allOwnedProcessGroupsReachedPositiveESRCH": true,
+    "knownLateCloseBannersFound": []
+  },
+  "originalTests": {
+    "uniqueCases": 16,
+    "externalEvidenceCases": 15,
+    "standardSchemaCases": 1,
+    "files": 2,
+    "passed": 16,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "rawSuccess": true,
+    "rawObserverNamesPIDHooksAndErrorsAgree": true,
+    "caseNames": [
+      "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+      "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+      "external evidence profile rejects corrupt id without accepting a trust claim",
+      "external evidence profile rejects corrupt parent without accepting a trust claim",
+      "external evidence profile rejects corrupt tool without accepting a trust claim",
+      "external evidence profile rejects corrupt duration without accepting a trust claim",
+      "external evidence profile rejects corrupt calendar without accepting a trust claim",
+      "external evidence profile rejects corrupt digest without accepting a trust claim",
+      "external evidence profile rejects corrupt unicode without accepting a trust claim",
+      "external evidence profile a signing key cannot promote imports or self-admit",
+      "external evidence profile independent authority is scoped to producer and capture method",
+      "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+      "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+      "external evidence profile the verifier never raises a producer's own lower declaration",
+      "external evidence profile future fields/versions and duplicate tool settlements refuse",
+      "published standard schemas are the generated spec schemas, with no permissiveness caveat"
+    ],
+    "boundary": "Local genuine Ed25519 over synthetic inputs and explicitly supplied authority objects; no independent people, source truth, default signed-list loading or real governed transport. Standard case compares nine generated legacy schema exports to committed bytes in a fresh signed workspace, then removes its fixture."
+  },
+  "schemasAndPages": {
+    "schemasCurrent": 38,
+    "contractFixturesAgree": 75,
+    "pagesFilesVerified": 4047,
+    "publicGuides": 201,
+    "typeDocWarnings": 469,
+    "typeDocErrors": 0,
+    "sourceRevision": null,
+    "all38NamesIDsAndBothLocalPublicationCopiesAgree": true,
+    "specIndexAndAcceptanceHTMLChecks": {
+      "contractTitle": true,
+      "acceptanceTitle": true,
+      "acceptanceHeading": true,
+      "vectorPresent": true
+    },
+    "boundary": "Current Zod/Ajv/fixture and committed-byte agreement plus local filesystem publication, not full normative acceptance, deployment or live HTTP."
+  },
+  "supplementalProbes": {
+    "vectorExit": 0,
+    "vectorObservation": {
+      "section": "vectors",
+      "canonical": "{\"9\":false,\"10\":true,\"B\":1.5,\"a\":null,\"b\":[2,{\"c\":\"\u00e9\",\"d\":1}]}",
+      "canonicalDigest": "be049feb25544cbaf5fead41ede37dfc528e19a0d49a90c2be2107769e333fa1",
+      "metadata": "{\"event_type\":\"stdout\",\"id\":\"evt-1\",\"meta_json\":\"{\\\"trustTier\\\":\\\"OBSERVED\\\",\\\"agentId\\\":\\\"agent-1\\\"}\",\"payload_inline\":\"hello\",\"payload_path\":null,\"runtime\":\"amc\",\"session_id\":\"session-1\",\"ts\":1767225600000}",
+      "payloadDigest": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+      "eventHash": "7d81c2c4b940f5411fa454457be71c7d3e8ee15e086829ff3e5be415dd7b8ffe"
+    },
+    "publicationExit": 0,
+    "receiptWitnessExit": 0,
+    "receiptObservation": {
+      "state": "authorized",
+      "cleanZod": true,
+      "cleanContractAccepted": true,
+      "cleanAjv": true,
+      "extraZod": false,
+      "extraContractAccepted": false,
+      "extraContractError": {
+        "name": "Error",
+        "message": "violates receipt v1: (root) Unrecognized key: \"qualificationExtra\""
+      },
+      "extraAjv": false
+    },
+    "meaning": "Three narrow scripted probes are separate from the16 registered Vitest cases and seven control children. Vector is the documented current JavaScript canonicalization/event preimage; not RFC8785 conformance or export-only portable hash recomputation."
+  },
+  "stripControl": {
+    "result": {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/result.json",
+      "bytes": 5188,
+      "sha256": "75da6150f94040f1bdeda3ce71626e119c985cca77394ad93b38ff9a1e2186dc"
+    },
+    "childExits": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "children": [
+      {
+        "phase": "baseline-receipt",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+          "receipt",
+          "/private/tmp/p1-01-source-strip-control-20261015/copy"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 39982,
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 204,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:11.680577+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "baseline-schemas",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-spec-schemas.mjs",
+          "--check"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 39983,
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 435,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:12.115773+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "mutant-compile",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.json"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 39987,
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 29720,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:42.658695+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "mutant-receipt",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+          "receipt",
+          "/private/tmp/p1-01-source-strip-control-20261015/copy"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 40041,
+        "exit": 1,
+        "expectedExit": 1,
+        "durationMs": 197,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:44.940854+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "mutant-schemas",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-spec-schemas.mjs",
+          "--check"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 40042,
+        "exit": 1,
+        "expectedExit": 1,
+        "durationMs": 438,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:45.378842+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "restored-receipt",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+          "receipt",
+          "/private/tmp/p1-01-source-strip-control-20261015/copy"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 40043,
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 184,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:46.851577+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      },
+      {
+        "phase": "restored-schemas",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-spec-schemas.mjs",
+          "--check"
+        ],
+        "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+        "pid": 40044,
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 446,
+        "ownedGroupProbes": [
+          {
+            "utc": "2026-10-15T08:39:47.297441+00:00",
+            "signal": 0,
+            "errno": 3,
+            "absentByESRCH": true
+          }
+        ],
+        "signalsOtherThanZeroSent": false
+      }
+    ],
+    "realTypeScriptCompilerExit": 0,
+    "exactSourceAndEmittedJSReplacementVerified": true,
+    "sourceDelta": "Only first requested/authorized/started/outcome_unknown branch: z.strictObject to z.object.",
+    "mutantPaths": [
+      "src/contracts/v1/receipt.ts",
+      "dist/contracts/index.d.ts",
+      "dist/contracts/v1/receipt.d.ts",
+      "dist/contracts/v1/receipt.js"
+    ],
+    "observations": {
+      "baseline-receipt": {
+        "state": "authorized",
+        "cleanZod": true,
+        "cleanContractAccepted": true,
+        "cleanAjv": true,
+        "extraZod": false,
+        "extraContractAccepted": false,
+        "extraContractError": {
+          "name": "Error",
+          "message": "violates receipt v1: (root) Unrecognized key: \"qualificationExtra\""
+        },
+        "extraAjv": false
+      },
+      "mutant-receipt": {
+        "state": "authorized",
+        "cleanZod": true,
+        "cleanContractAccepted": true,
+        "cleanAjv": true,
+        "extraZod": true,
+        "extraContractAccepted": true,
+        "extraContractError": null,
+        "extraAjv": false
+      },
+      "restored-receipt": {
+        "state": "authorized",
+        "cleanZod": true,
+        "cleanContractAccepted": true,
+        "cleanAjv": true,
+        "extraZod": false,
+        "extraContractAccepted": false,
+        "extraContractError": {
+          "name": "Error",
+          "message": "violates receipt v1: (root) Unrecognized key: \"qualificationExtra\""
+        },
+        "extraAjv": false
+      }
+    },
+    "failure": {
+      "type": "AssertionError [ERR_ASSERTION]",
+      "message": "receipt V2 must refuse the unrecognized top-level member",
+      "frame": "p1-01-contract-probe-v2-prepared-20261015.mjs:64:10",
+      "actual": true,
+      "expected": false,
+      "laterAssertionsMasked": true
+    },
+    "schemaMessages": [
+      "spec/schemas/v1/receipt.schema.json is stale: run npm run gen:schemas",
+      "spec/schemas/index.json is stale: run npm run gen:schemas"
+    ],
+    "meaning": "Actual Zod/assertContract accept the extra member while committed Ajv refuses. First extraZod assertion fails; observations emitted before it also record extraContractAccepted=true and extraAjv=false. Schema checker separately detects receipt/index staleness. Exact restored probes pass. Two narrow sensitivities to one guard, not seven unique behavior cases.",
+    "kernelBoundary": "Actual tsc emitted the exact known thin kernel artifact. V4 retained it, restored unchanged accepted parent bundle before probes, and retained four actual contract deltas: source, receipt.js and two declarations. Full mutant build, bundling and kernel-route behavior are unqualified.",
+    "restored13280FilesExact": true,
+    "freshPhysicalCopiesNotGitClone": true,
+    "borrowedDependencySymlink": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules",
+    "activeOrHaltedMarkersRemain": false
+  },
+  "literalAttempt": {
+    "index": {
+      "path": "/private/tmp/p1-01-literal-control-failed-artifact-index-20261015.json",
+      "bytes": 3341530,
+      "sha256": "cf225683857de5dd6a47578dab5b8173b0f638c09bc6928e65cdbaf60c9b985d"
+    },
+    "childExits": [
+      0,
+      0,
+      2
+    ],
+    "compilerDiagnostic": "src/actions/actionJournal.ts(202,92): error TS2339: Property 'fromReceiptId' does not exist on type '{}'.",
+    "negativeRuntimeChecksExecuted": false,
+    "restorationExecuted": false,
+    "mutationKill": false,
+    "activeAndHaltedRetained": true,
+    "actualChangedPaths": [
+      "src/contracts/v1/receipt.ts",
+      "dist/contracts/index.d.ts",
+      "dist/contracts/v1/receipt.d.ts",
+      "dist/contracts/v1/receipt.js",
+      "dist/kernel/amcRuntime.js"
+    ],
+    "meaning": "Literal first-branch passthrough stopped on genuine TS2339. Its separate private tree remains mutated and halted, exactly indexed. No retry, negative runtime qualification or restoration is claimed."
+  },
+  "preservation": {
+    "parentTracked8751AndDist4529BytesSizesModesExact": true,
+    "distMembership4529Exact": true,
+    "successfulRestored13280FilesExact": true,
+    "bothPrivateCopies13280DistinctSingleLinkPhysicalFilesVerified": true,
+    "protectedHeads": {
+      "/Users/sid/AgentMaturityCompass": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+      "held": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+    },
+    "heldBoundary": "Held SHA independently matches primary pending-main-442cd919; no ancestry in another clone asserted.",
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "inode": 539021299,
+      "nlink": 1
+    },
+    "nativeBytesInodeAndBeforeAfterMatch": true,
+    "runtimeBoundary": "Root/native and receipt/vector probe contexts directly observed Nodev22.23.3/ABI127; no separate ABI measurement inferred for compiler/schema children.",
+    "manifestCorrectionVerified": true
+  },
+  "normalChecks": {
+    "finalFreezeCounts": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "quality": {
+      "duplicateExit": 1,
+      "duplicates": 1269,
+      "deadCodeExit": 1,
+      "deadCode": 2751,
+      "waived": false
+    },
+    "cleanSourceBoundary": "Actual committed private clone install/build and keyless stub/echo signed/resume checks passed. Its successful fixture is deleted; outer retained log is not independently re-verifiable original rows, installed release, real model behavior or full-suite proof.",
+    "priorReceiptValidation": "13 earlier receipts valid; not acceptance of a future P1-01 packet."
+  },
+  "metadataObserverCorrection": {
+    "initialRead": "Loose-ref-only helper raised FileNotFoundError for primary .git/refs/heads/main before any report output or product operation.",
+    "correction": "The read-only helper also read packed-refs, then verified all four protected tips. This was a reviewer metadata assumption, not a product or source failure."
+  },
+  "limits": [
+    "Root and control environments inherit os.environ with scoped HOME/PATH; they are not credential-free allowlists. Dependency/native borrowing is explicit.",
+    "Owned-group ESRCH and known-banner checks do not prove absence of every detached descendant or universal filesystem isolation.",
+    "Current normative verifier-report spelling and merged trusted boolean gaps, and legacy non-strict receipt compatibility, remain open. Schema parity does not close P0-08/P0-09 formal acceptance.",
+    "All earlier unresolved choices, skips, Claude reservations, quality debt, freeze holds and human signoffs remain. Bots are excluded from the user WIP count; source protections are unchanged.",
+    "No full suite, coverage, Node24, hosted CI/Pages, independent issuer truth, legal/expert approval, PR/merge, G0 or Done is asserted."
+  ],
+  "verifiedIndices": [
+    {
+      "index": {
+        "path": "/private/tmp/p1-01-root-runtime-artifact-index-20261015.json",
+        "bytes": 19971,
+        "sha256": "e59a161085b19acb37283ae88b849aa39309228f1a232ab93c39bc0a1b386f4e"
+      },
+      "entriesIndependentlyRehashed": 93,
+      "mismatches": [],
+      "modeInodeDeviceNlinkVerifiedWhenRecorded": true
+    },
+    {
+      "index": {
+        "path": "/private/tmp/p1-01-strip-control-runtime-artifact-index-20261015.json",
+        "bytes": 3426456,
+        "sha256": "971676ba19e3b83c53e456f521642d8d8d4df00290b53be6ba82d111fcda2111"
+      },
+      "entriesIndependentlyRehashed": 13319,
+      "mismatches": [],
+      "modeInodeDeviceNlinkVerifiedWhenRecorded": true
+    },
+    {
+      "index": {
+        "path": "/private/tmp/p1-01-literal-control-failed-artifact-index-20261015.json",
+        "bytes": 3341530,
+        "sha256": "cf225683857de5dd6a47578dab5b8173b0f638c09bc6928e65cdbaf60c9b985d"
+      },
+      "entriesIndependentlyRehashed": 13296,
+      "mismatches": [],
+      "modeInodeDeviceNlinkVerifiedWhenRecorded": true
+    },
+    {
+      "index": {
+        "path": "/private/tmp/p1-01-qualification-20261015/pages-output-files.json",
+        "bytes": 1037058,
+        "sha256": "8d841f01c1a3b7e497fabcce36d64d7e6ced6055c80556625c30986f77694ba4"
+      },
+      "entriesIndependentlyRehashed": 4047,
+      "mismatches": [],
+      "modeInodeDeviceNlinkVerifiedWhenRecorded": true
+    }
+  ],
+  "evidencePins": [
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 29025,
+      "sha256": "18d349e1868c2fe83a78dfbe31bfb81f3bfe9ed4c857bb5b598c22572cc07510"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/commands-closed.json",
+      "bytes": 500,
+      "sha256": "ecef558460558ca8f6941555cbb5f8db7a332c73a74d509a26f5bb639c2ee12a"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/final-source-preservation.json",
+      "bytes": 1367,
+      "sha256": "f0ca6c26aca8cabc952331e4b93e8135c40f692bdb99b4ddd24bdad535332d4b"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/manifest-pin-correction.json",
+      "bytes": 657,
+      "sha256": "24b6ffafa6caea8021c8a5b62d509a1a0f1eb8b8ddab6c8dbabe19d5d3393ff6"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/original-tracked-files.json",
+      "bytes": 1432354,
+      "sha256": "4e9cb8099bb2faab68082a7ee231970f6c2741319dfa36f0f902b238f2b1176a"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/original-dist-files.json",
+      "bytes": 656697,
+      "sha256": "2af55d06288b5b6046e7acb8c819dc8b271e3a035190e14e61460c50f59ee1d2"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/raw.json",
+      "bytes": 6024,
+      "sha256": "f64ba17ac20f6d65c290e727a66603e9895f89977292d1e63254fa43b56f2a5f"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/command-existing-tests/observer.json",
+      "bytes": 8461,
+      "sha256": "0d2bb7b83e82a6d5a4a25adacb356ce5898fa5b02b0fff17f9d446b69bddf7c1"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/result.json",
+      "bytes": 5188,
+      "sha256": "75da6150f94040f1bdeda3ce71626e119c985cca77394ad93b38ff9a1e2186dc"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/mutation.json",
+      "bytes": 422,
+      "sha256": "cb8a79d5f506dabcacab94fbf74b96e66ff26d3904783d62130febef96fa2d08"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/mutant-differences.json",
+      "bytes": 137,
+      "sha256": "caef4602061010e25d90ad022f3faee057169e1fa377e991d81200535b581a02"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/mutant-input-pins.json",
+      "bytes": 615,
+      "sha256": "5f3f8b1643d132d9b8713635713b7ed50ca201ab31ddfeb6628e7d5c43f5447d"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/kernel-build-artifact.json",
+      "bytes": 363,
+      "sha256": "2010bd14c47a7ffd1c9257ed10f209940f6288bb63a737683600d4bae5426c55"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-20261015/ACTIVE.json",
+      "bytes": 95,
+      "sha256": "1836db7168275921b5a2ee8e8a1c2fe399f2fafe92f456f7e3dab1495f7e1e98"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-20261015/HALTED.json",
+      "bytes": 225,
+      "sha256": "85779a07f0a6735342894fa5495b96d2a151dd50650a532aca008bb771544a26"
+    },
+    {
+      "path": "/private/tmp/p1-01-literal-control-failure-review-20261015.json",
+      "bytes": 1940,
+      "sha256": "ae1acee9963c0be95b324c479c15daf1c2bc9e9d6ddd51fe0df660e40f7d8761"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v4-prepared-20261015.py",
+      "bytes": 11064,
+      "sha256": "01931c4fd626984a21946ed5276df8eed94d7ab716052509c9f67dea7ea4cb59"
+    },
+    {
+      "path": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+      "bytes": 8360,
+      "sha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-v2-prepared-20261015.py",
+      "bytes": 9978,
+      "sha256": "b5985003cd2d469ceb6800b84938e3389a09664414d35fc46a2425d9b8511205"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-v1-static-review-20261015.json",
+      "bytes": 5304,
+      "sha256": "1fa8cb654fc8430d013755e1402730ffd0b87a8fff5a92c1baff728de8e20edc"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v4-static-review-20261015.json",
+      "bytes": 5269,
+      "sha256": "034cc187390e1c026f1e8c9d29c7cc2ed337c8a0e78cbd0a75fe72b07f63fdef"
+    },
+    {
+      "path": "/private/tmp/p1-01-existing-runtime-preliminary-review-20261015.json",
+      "bytes": 33955,
+      "sha256": "10986f30d30af13e1a9246118470812ca0368f95d4603dd7b7893ab26446e7ca"
+    },
+    {
+      "path": "/private/tmp/p1-01-existing-runtime-preliminary-review-20261015.md",
+      "bytes": 3431,
+      "sha256": "dd2203336a3a09bdcb797420e2a53bba4768e7e2b6f4ad08370835a3e1d3b4b7"
+    }
+  ]
+}

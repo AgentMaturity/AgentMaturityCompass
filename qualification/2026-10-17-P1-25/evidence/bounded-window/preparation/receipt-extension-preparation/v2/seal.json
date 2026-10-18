@@ -1,0 +1,46 @@
+{
+  "schema": "p125w-private-extension-v2-skeleton-seal/1",
+  "at": "2026-10-17T00:28:34.650328+00:00",
+  "preferredHelper": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+  "preferredDelta": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+  "preservedV1Seal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/seal.json",
+    "bytes": 2187,
+    "sha256": "3d567d0b880166aefb17cffb460c9077221420e2c2de299883cfaff91b75fd1c"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 36997,
+      "sha256": "4a446052426c9ed59637dd0952d483d64bc8a4ea1dccb55bf1d821aaac989683"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 1538,
+      "sha256": "02448a2efbd3ad3065a46c34beab8f79b2ac298814265735fead08c89f2c5693"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/input-template.json",
+      "bytes": 9330,
+      "sha256": "dbb810015b1c0e83061c1f18c1a47f6d3b6509332be8a436bf8d925578e9bdcd"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+      "bytes": 2038,
+      "sha256": "cee17743b95a1ff852c088d215466dbc92e0ece173cad961572d0564ecd152e8"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/README.md",
+      "bytes": 1917,
+      "sha256": "1a86503ae1b28ce77ae61fb6ea133654945a6eb673bd011ebf808a6a270cff6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/v2/report.json",
+      "bytes": 1123,
+      "sha256": "0180838f74399b600c1a2325f92eb5f07809aca072d0054098f72bb0a24ed89d"
+    }
+  ],
+  "readyForPrivateAssembly": false,
+  "rootFullReadIndependentReviewActualManifestAndAdmissionRequired": true,
+  "noHelperProductExecutionOrSourceIndexQaWrites": true
+}

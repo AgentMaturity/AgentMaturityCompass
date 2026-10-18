@@ -1,0 +1,24 @@
+{
+  "schema": "private-finite-control-chain-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/review.json",
+      "bytes": 27478,
+      "sha256": "dc8fc737852ffdfab162779708707c71c914a30922e7a924c8827a0d064f9feb"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/README.md",
+      "bytes": 1418,
+      "sha256": "29e830ae897fe65520b7a142418c75ff1409c10ea6bc3a0b4a255c83360e54a5"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "bytes": 91029,
+      "sha256": "13a4d3600c27960bce4d92f0526189d36da03b451062345f5396e0d341daeed9"
+    }
+  ],
+  "inputCount": 288,
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

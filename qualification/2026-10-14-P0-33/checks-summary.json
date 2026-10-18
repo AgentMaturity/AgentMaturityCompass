@@ -1,0 +1,3622 @@
+{
+  "sourceCommit": "e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+  "baseCommit": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+  "branch": "codex/p0-33-current-qualification",
+  "status": "bounded fixes verified; broad P0-33 and release qualification incomplete",
+  "environments": {
+    "Node 22.23.3": {
+      "passed": 699,
+      "failed": 0,
+      "skipped": 0,
+      "total": 699
+    },
+    "Node 24.21.0": {
+      "passed": 50,
+      "failed": 0,
+      "skipped": 0,
+      "total": 50
+    }
+  },
+  "commands": [
+    {
+      "cmd": "node scripts/source-quality.mjs duplicates --base origin/main",
+      "exit": 0,
+      "durationMs": 1455,
+      "log": "tmp/p0-33-checks/duplicates.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "34af1e1ebed560a71e4abb4b8b0a0301d9799c7d37154840e6839621a34c1655"
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs dead-code --base origin/main",
+      "exit": 0,
+      "durationMs": 2928,
+      "log": "tmp/p0-33-checks/dead-code.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "73cb0713c2fded2d59196c946c4c2c375b1a016940e304ca4c74c6ffcdf7a4d8"
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 29986,
+      "log": "tmp/p0-33-checks/typecheck.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "73c91b58be5300cad2a44509e8142720f3bfafd9785bfe5f8b3ffd61a9901020"
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 39808,
+      "log": "tmp/p0-33-checks/typecheck-tests.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "62a5f1db82a2452f9bc6c9035d5779fc5c6316dd3fd88305070f2ec9003de916"
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4136,
+      "log": "tmp/p0-33-checks/lint.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "d2b00ba4c05cda42d0ab135a63b2b9296f03f1c7e5c7e6013e19002f83721ae0"
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 1,
+      "durationMs": 1104,
+      "log": "tmp/p0-33-checks/check-counts.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "d81f73742312324600c2f163184e9d54b2b0de530689031e46d8d4b2389b87e3"
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 643,
+      "log": "tmp/p0-33-checks/check-docs-drift.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "51ef0d4f16e7dda7f5d286dd6e752a4d1acae440dc307c7e7c5edfee179a0a9a"
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2841,
+      "log": "tmp/p0-33-checks/check-architecture-boundaries.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "0493b3396332354da68051888e0914a0af27649a70378b27b8d64d1ac1ed1564"
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 1,
+      "durationMs": 2021,
+      "log": "tmp/p0-33-checks/check-freeze.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "2e86d09cbe72712e59cdc89d0af623f086769a71c4f15ba634e37b9efac620bb"
+    },
+    {
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 419,
+      "log": "tmp/p0-33-checks/check-qualification.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "db441e6f8e2658ae4bfc316b384efd07c0a076b57aae85eb514ccd23ea04d624"
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3003,
+      "log": "tmp/p0-33-checks/postfix-lint.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "d2b00ba4c05cda42d0ab135a63b2b9296f03f1c7e5c7e6013e19002f83721ae0"
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 665,
+      "log": "tmp/p0-33-checks/postfix-check-counts.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "655e055cb122fb058143872c2f3417b7b642383b7e5d0de5e9febfdd01c5a870"
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 425,
+      "log": "tmp/p0-33-checks/postfix-check-docs-drift.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "51ef0d4f16e7dda7f5d286dd6e752a4d1acae440dc307c7e7c5edfee179a0a9a"
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1936,
+      "log": "tmp/p0-33-checks/postfix-check-architecture-boundaries.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "0493b3396332354da68051888e0914a0af27649a70378b27b8d64d1ac1ed1564"
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 55216,
+      "log": "tmp/p0-33-checks/clean-source.log",
+      "environment": "Node 22.23.3",
+      "logSha256": "09d43b63c45a2943dc87eab49d4c64d28cfcf4b7ce6f4c9e883cba931c1b1959"
+    },
+    {
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 323,
+      "environment": "Node 22.23.3",
+      "log": "qualification/2026-10-14-P0-33/receipt-validation.log",
+      "logSha256": "212f1f073fac816aef4f37d25d99ddcc6b444e65ef62a2ca9446a9b54e39f77e"
+    }
+  ],
+  "testReports": [
+    {
+      "localReport": "tmp/p0-33-focused-final.json",
+      "sha256": "e67b689d33efef5b3da64fcbd733d60abc417262f335b07f227805105e50ce19",
+      "environment": "Node 22.23.3",
+      "phase": "final",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/releaseGateExecution.test.ts",
+          "status": "passed",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "release gate execution and qualification scope fails release qualification when the real lint step fails",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails release qualification when strict package lint fails",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails release qualification when the citation check fails, after build",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope blocks qualification on unresolved source-duplicates findings",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope blocks qualification on unresolved source-dead-code findings",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope executes packed acceptance once after build without another build or tracked inventory write",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope marks every quick omission while preserving the process result contract",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope does not equate an omitted live check with complete qualification in full mode",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope never invokes build-dependent consumers after build failure, even with a stale CLI present",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails the gate when installed evidence fails even if every other registered check passed",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful CLI exit without an actual inventory artifact",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a missing JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a malformed JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a failed JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a skipped JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a some-pending JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a todo JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a invalid-count JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a suite-error JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a file-error JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope does not let a successful JSON report override Vitest process failure",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope retains separate full-suite reports so a later run cannot reuse a stale report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/sourceQuality.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners detects real duplicated code and accepts a single copy",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners refuses missing scan evidence",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/sourceQualityRatchet.test.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "source-quality ratchet passes when the current findings equal the baseline",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails on one new duplicate pair and names both paths",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet counts a further copy of an already-recorded clone in the same pair as new",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails on a fixed finding until --shrink removes exactly that id",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet ignores a Knip finding that only moved to another line",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet treats a moved file in a duplicate pair as a new finding (documented behaviour)",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet accepts a new finding only with a recorded reason of at least 20 characters",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet --shrink with new and stale findings removes the stale ids and adds nothing",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails with the drift message when .jscpd.json or a tool version changes",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet keeps still-current accepted findings and their reasons across a rebaseline",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses malformed tool reports",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet writes a sorted, LF, one-entry-per-line baseline and refuses a hand-made acceptance without a reason",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet prints one trend row for both scans",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet commits a valid baseline under 1 MB for the current configs",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses an acceptance without a reason before scanning",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate does not allow a failed ratchet to pass the build job",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate propagates a failed duplicates command from the real workflow",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate propagates a failed dead-code command from the real workflow",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-jsonl.json",
+      "sha256": "bc90af6417cadeaab51d1e2eadc0dc3cc8d2c739655d133ff886bec78416f070",
+      "environment": "Node 22.23.3",
+      "phase": "final",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/jsonlWriterResume.test.ts",
+          "status": "passed",
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "authenticated native JSONL writer recovery real killed writer: original prefix, acknowledged effects and pending usage survive genuine resume",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery two real resumers cannot acquire the same abandoned writer",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery an empty replacement operations journal cannot authorize uncertain dispatch recovery",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery kernel mutex excludes contenders even with an absent advisory owner record",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery a released complete turn resumes only as a new explicit turn",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery a released cancelled turn resumes only as a new explicit turn",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery a parent cancellation cannot be promoted to a standalone resumed agent",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery changed agent refuses before new writer rights or append",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery changed composition refuses before new writer rights or append",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery changed policy refuses before new writer rights or append",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery changed head refuses before new writer rights or append",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery changed trust refuses before new writer rights or append",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery torn history refuses without rewriting its bytes",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery unterminated history refuses without rewriting its bytes",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery signature history refuses without rewriting its bytes",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery future history refuses without rewriting its bytes",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery unreadable workspace owner is not stolen",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery foreign workspace owner is not stolen",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery live workspace owner is not stolen",
+              "status": "passed"
+            },
+            {
+              "title": "authenticated native JSONL writer recovery direct recovery cannot steal a handle dropped by a live process",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-ci-failures-after-build.json",
+      "sha256": "b3ee5e60bb75297ae8a037473eed01ea86b243d3028dbd0fe20667edea102418",
+      "environment": "Node 22.23.3",
+      "phase": "final",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/apiRouters.test.ts",
+          "status": "passed",
+          "passed": 31,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "AMC API routers score router covers interactive, reporting, industry, trust, and lane routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers score router rejects malformed request bodies with safe 400 errors",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers tools router covers tools, guardrails, and plugins",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers guardrail API reports a committed mutation when only the post-commit status refresh races",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers guardrail mutation APIs reject missing, mistyped, and unknown request fields",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers compliance router covers compliance, policy, waiver, and regulatory routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers crypto router covers notary, cert, merkle, and receipts chain routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers crypto cert generate passes unsigned preview mode through",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers security router covers all security endpoints",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers bom router covers bom, sbom, badge, and bundle routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers canary router covers policy canary, micro-canary, and mode routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers config router covers config, logs, doctor, version, and status routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers drift router covers drift, freeze, and alerts routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers enforce router covers status and formal verification routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers evidence router covers status, list, gaps, ingest, collect, export, attest, and bundle routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers export router covers export and attestation routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers gateway router covers status, config, init, bind, sign, verify, and providers",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers governor router covers governor, oversight, and mode routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers identity router covers init, verify, providers, mapping, and SCIM token creation",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers memory router covers assess, integrity, extract, advisories, report, and expire routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers metrics router covers metrics, SLO, and indices routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers sandbox router covers run and docker-args routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers watch router covers watch, governor, oversight, and profiler routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers workflow router covers workorders, tickets, and lifecycle routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers benchmark router covers list, stats, export, import, and verify routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers benchmark provider-drift API returns observability-pipeline alerts and gate state",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers ci router covers init, steps, gate, policy, and predict routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers adapters router covers init, verify, list, detect, capability receipts, configure, env, run, and init-project routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers product router covers batch and portal routes",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers shield router covers status, scanning, red team, trust pipeline, and attack generation",
+              "status": "passed"
+            },
+            {
+              "title": "AMC API routers vault router covers status, lock state, keys, secrets, DLP, and ZK routes",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/archiveFilesParity.test.ts",
+          "status": "passed",
+          "passed": 50,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "artifact privacy enforcement before signing bench rejects schema-valid unsafe collector output before signing or exporting",
+              "status": "passed"
+            },
+            {
+              "title": "artifact privacy enforcement before signing passport rejects schema-valid unsafe collector output before the first signature",
+              "status": "passed"
+            },
+            {
+              "title": "audit binder public archive inspection and listing inspects canonical, alternate and flat layouts with optional privacy report",
+              "status": "passed"
+            },
+            {
+              "title": "audit binder public archive inspection and listing lists nested exports, skips broken and linked entries, and orders metadata deterministically",
+              "status": "passed"
+            },
+            {
+              "title": "audit binder public archive inspection and listing missing exports return an empty list and malformed archives fail visibly",
+              "status": "passed"
+            },
+            {
+              "title": "bench public archive inspection and listing inspects canonical, alternate and flat layouts with optional privacy report",
+              "status": "passed"
+            },
+            {
+              "title": "bench public archive inspection and listing lists nested exports, skips broken and linked entries, and orders metadata deterministically",
+              "status": "passed"
+            },
+            {
+              "title": "bench public archive inspection and listing missing exports return an empty list and malformed archives fail visibly",
+              "status": "passed"
+            },
+            {
+              "title": "passport public archive inspection and listing inspects canonical, alternate and flat layouts with optional privacy report",
+              "status": "passed"
+            },
+            {
+              "title": "passport public archive inspection and listing lists nested exports, skips broken and linked entries, and orders metadata deterministically",
+              "status": "passed"
+            },
+            {
+              "title": "passport public archive inspection and listing missing exports return an empty list and malformed archives fail visibly",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts ignores file and directory symlinks, including cycles",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts missing root retains filesystem error",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/audit/binderArtifact.ts recursive cleanup removes the owned tree and remains idempotent",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts ignores file and directory symlinks, including cycles",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts missing root retains filesystem error",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/bench/benchArtifact.ts recursive cleanup removes the owned tree and remains idempotent",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts ignores file and directory symlinks, including cycles",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts missing root retains filesystem error",
+              "status": "passed"
+            },
+            {
+              "title": "archive file utility parity: src/passport/passportArtifact.ts recursive cleanup removes the owned tree and remains idempotent",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts retains all other declarations, cleanup, crypto, extraction guards and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts retains exclusion of file/directory symlinks and cycles",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/assurance/assuranceCertificates.ts retains missing and regular-file root filesystem failures",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts retains all other declarations, cleanup, crypto, extraction guards and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts retains exclusion of file/directory symlinks and cycles",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/plugins/pluginPackage.ts retains missing and regular-file root filesystem failures",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts retains all other declarations, cleanup, crypto, extraction guards and public APIs",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts collect empty",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts collect nested deterministic paths",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts collect unicode and whitespace",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts retains exclusion of file/directory symlinks and cycles",
+              "status": "passed"
+            },
+            {
+              "title": "additional archive file utility: src/prompt/promptPackArtifact.ts retains missing and regular-file root filesystem failures",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/compareBadgeDocs.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "compare badge DevRel docs documents compare badge generation in public onboarding docs",
+              "status": "passed"
+            },
+            {
+              "title": "compare badge DevRel docs compare --badge writes an SVG for two-run comparisons",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/enterpriseSsoScim.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) OIDC provider add bootstraps host identity config on a fresh host",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) SAML ACS path verifies signed compact assertion and grants mapped roles",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) SCIM users/groups provisioning applies and revokes workspace memberships by group source",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) SCIM init enables provisioning without resetting existing SSO providers",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) tampered identity config signature fails closed for auth/scim endpoints",
+              "status": "passed"
+            },
+            {
+              "title": "enterprise identity (OIDC/SAML/SCIM) responses do not leak client secrets, SCIM token, or private key markers",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/evidencePathsExist.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "evidence paths introduces no path naming a module nobody wrote",
+              "status": "passed"
+            },
+            {
+              "title": "evidence paths credits the capabilities AMC actually ships",
+              "status": "passed"
+            },
+            {
+              "title": "evidence paths keeps the frozen list honest \u2014 every entry really is absent",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/explainabilityContractParity.test.ts",
+          "status": "passed",
+          "passed": 42,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "explainability shared contracts retain complete original exported flows restores full original bytes and keeps public types, callers, package entries and historical guards untouched",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows forward edits are exactly the landed intended changes and only move repair hints and the hashes over them",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows rows whose next level is evaluable keep the archived repair advice byte for byte",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows uses existing literal report inputs and exercises every changed domain with a ready original receipt",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows ragFlowDiagnostics: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows incidentTriageLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows benchmarkSubmissionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows testSuiteEvaluationLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows evalAiLibraryQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows openModelRagQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows opikEvaluationQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows deepEvalQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows statisticalAgentTrialLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows codeQuestQualityLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows multiUserBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows professionalTaskLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows retailSalesQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows obsStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: getter order stays eager when an early hash is missing",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows status callback stays lazy and failed receipts remain replayable without satisfying proof",
+              "status": "passed"
+            },
+            {
+              "title": "explainability shared contracts retain complete original exported flows drilldown empty branches, additional professional proof and malformed paper metadata retain distinct refusals",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/llmResponsesCapabilities.test.ts",
+          "status": "passed",
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "explicit Responses protocol and required capabilities function replay preserves provider call IDs, raw arguments, result text and stateless body",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities refuses the unsupported/owned previous_response_id parameter",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities refuses the unsupported/owned max_tokens parameter",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities refuses the unsupported/owned include parameter",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities refuses the unsupported/owned store parameter",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities orphan and repeated tool results refuse rather than guessing their parent call",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities refuses unsupported media and thinking but preserves failed tool state as explicit text",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities explicit unknown or unsupported requirements refuse before reading session/credentials or transport",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities capability snapshots cannot drift with a caller's mutable feature object",
+              "status": "passed"
+            },
+            {
+              "title": "explicit Responses protocol and required capabilities envelope carries the exact prepared bytes, explicit endpoint and cancellation signal",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement assembles text with disjoint reported cache counts and leaves absent counts unknown",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement missing usage cannot become successful zero-token evidence",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement truncated transport cannot manufacture a terminal finish",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement changed final text or unsupported assistant phase refuses",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement function arguments retain their own provider ID and a complete boundary",
+              "status": "passed"
+            },
+            {
+              "title": "Responses streamed content and honest settlement existing adapters reject missing final accounting and inconsistent reported cache totals",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/nativeSandboxPolicyBinding.test.ts",
+          "status": "passed",
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "signed native shell mount policy dispatches command-only public arguments with exactly the signed directory grant and digest",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy retains a read-only native shell when no mount field is declared",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy never bypasses an ordinary allow.paths rule or migrates it to mounts",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy never bypasses an ordinary deny.paths rule or migrates it to mounts",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy retains command deny rules with the explicit mount field",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount workspace/** before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount ../outside before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount /tmp before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount .amc before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount missing before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses unenforceable mount workspace/link before launch",
+              "status": "passed"
+            },
+            {
+              "title": "signed native shell mount policy refuses malformed kind, unknown mount fields, and non-native declarations before signing",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses direct ToolHub validation and a forged serialized permit",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses a linux-bwrap policy on macOS without running the replacement body",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses a same-name scoped replacement without calling it",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body cannot authorize an earlier unconfined body by removing its scope override during approval",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses a signed policy change between admission and dispatch",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses a unsigned policy change between admission and dispatch",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses changed execution metadata and cancellation before launcher dispatch",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body clears the private selected definition when an unexpected guard throws",
+              "status": "passed"
+            },
+            {
+              "title": "the requirement follows the actual confined body refuses direct calls to the confined body without pipeline admission",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/privateModuleHelperVisibility.test.ts",
+          "status": "passed",
+          "passed": 229,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/runAliases.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/runAliases.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workspace.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workspace.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/gateway/config.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/gateway/config.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/changeReceipt.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/changeReceipt.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/observabilityLane.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/observabilityLane.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/fleet/paths.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/fleet/paths.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/fleet/fleetLifecycle.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/fleet/fleetLifecycle.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workorders/workorderEngine.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workorders/workorderEngine.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/drift/alerts.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/drift/alerts.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bom/bomVerifier.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bom/bomVerifier.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/benchmarks/providerDriftBenchmark.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/benchmarks/providerDriftBenchmark.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/benchmarks/replayBenchmarkCorpus.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/benchmarks/replayBenchmarkCorpus.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/ops/policy.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/ops/policy.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/authApi.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/authApi.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/pairing/lanMode.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/pairing/lanMode.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/runtime/firewall.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/runtime/firewall.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/runtime/runManager.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/runtime/runManager.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/trust/trustConfig.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/trust/trustConfig.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/trust/temporalDecay.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/trust/temporalDecay.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workspaces/hostBootstrap.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/workspaces/hostBootstrap.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/cgx/cgxDiff.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/cgx/cgxDiff.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/cgx/cgxStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/cgx/cgxStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/l5DeltaReport.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/l5DeltaReport.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lab/packs/compoundThreatPack.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lab/packs/compoundThreatPack.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lab/packs/shutdownCompliancePack.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lab/packs/shutdownCompliancePack.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/eval/evaluatorRegistryMetadata.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/eval/evaluatorRegistryMetadata.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/fixerRca.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/fixerRca.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/claims/confidenceDrift.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/claims/confidenceDrift.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/corrections/lessonStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/corrections/lessonStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/policyCanaryMode.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/policyCanaryMode.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/policyDebt.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/policyDebt.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/emergencyOverride.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/governor/emergencyOverride.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/shield/exploitConfirmation.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/shield/exploitConfirmation.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/score/outputAttestation.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/score/outputAttestation.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/domains/industryPackEntitlement.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/domains/industryPackEntitlement.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/enforce/guardrailControlState.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/enforce/guardrailControlState.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/notary/notaryConfigStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/notary/notaryConfigStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchRegistryClient.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchRegistryClient.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/outcomes/outcomeContractEngine.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/outcomes/outcomeContractEngine.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/casebooks/casebookStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/casebooks/casebookStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/compliance/complianceEngine.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/compliance/complianceEngine.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/integrations/noCodeGovernanceStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/integrations/noCodeGovernanceStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transformation/transformTasks.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transformation/transformTasks.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transformation/transformAttestations.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transformation/transformAttestations.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/attachments/nativeAudioInput.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/attachments/nativeAudioInput.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/session/sessionPayloadCap.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/session/sessionPayloadCap.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseCli.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseCli.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/validators.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/validators.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/toolhubValidators.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/toolhubValidators.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/passport/passportStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/passport/passportStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/persistence/jsonl/jsonlEventLog.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/persistence/jsonl/jsonlEventLog.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/apiKeyCli.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/apiKeyCli.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchPolicyStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchPolicyStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/assurancePolicyStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/assurancePolicyStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/audit/auditMapStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/audit/auditMapStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/audit/auditPolicyStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/audit/auditPolicyStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/business/grcExport.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/business/grcExport.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/agent/providers/delegationProviders.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/agent/providers/delegationProviders.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/profiles.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/profiles.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/bank/bankLoader.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/bank/bankLoader.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/sandbox/sandboxRunner.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/sandbox/sandboxRunner.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/demo/prospectDemo.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/demo/prospectDemo.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/enterprise/license.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/enterprise/license.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/identityConfig.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/identityConfig.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/forecast/forecastStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/forecast/forecastStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/tools/builtin/readBeforeEdit.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/tools/builtin/readBeforeEdit.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/blastRadiusConsent.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/blastRadiusConsent.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/watch/traceFailureIndex.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/watch/traceFailureIndex.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/experiments/governedOptimizer.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/experiments/governedOptimizer.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/signedControlJournal.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/lifecycle/signedControlJournal.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/crypto/keyHistoryChain.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/crypto/keyHistoryChain.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/storage/blobs/blobStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/storage/blobs/blobStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/marketplace/marketplaceStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/marketplace/marketplaceStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/targetsStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/targetsStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/simulator.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/simulator.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/agent/nativeToolCapabilities.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/agent/nativeToolCapabilities.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/autoAnswer/autoAnswerMappings.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/autoAnswer/autoAnswerMappings.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPackVerifier.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPackVerifier.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPolicyStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPolicyStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/receipts/receiptChain.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/receipts/receiptChain.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transparency/sessionAnchor.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transparency/sessionAnchor.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transparency/sessionAnchorProof.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/transparency/sessionAnchorProof.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/setup/setupWizard.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/setup/setupWizard.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/skills/skillPrompt.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/skills/skillPrompt.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/spineEvidenceProjection.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/diagnostic/spineEvidenceProjection.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/value/valueStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/value/valueStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/watch/siemExporter.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/watch/siemExporter.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mirofish/scenarios.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mirofish/scenarios.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/ops/retention/retentionArchive.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/ops/retention/retentionArchive.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseCarriers.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/leases/leaseCarriers.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/tuningStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/mechanic/tuningStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/hostVault.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/hostVault.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginRegistryClient.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginRegistryClient.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/federation/federationStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/federation/federationStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/notary/notaryAttestation.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/notary/notaryAttestation.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchRegistryStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bench/benchRegistryStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPackStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/prompt/promptPackStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bridge/hookActionIdentity.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/bridge/hookActionIdentity.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/pairing/pairingApi.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/pairing/pairingApi.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/humanLog.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/auth/humanLog.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/org/orgValidator.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/org/orgValidator.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/org/orgAggregation.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/org/orgAggregation.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/toolhubReceipts.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/toolhub/toolhubReceipts.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/assuranceStore.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/assurance/assuranceStore.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginIdentifiers.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/plugins/pluginIdentifiers.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/credentials/credentialsFilePermissions.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/credentials/credentialsFilePermissions.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/importers/dshSessionImport.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/importers/dshSessionImport.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/executive/brief.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/executive/brief.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/value/valueRedaction.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/value/valueRedaction.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/credentials/dotenvLayer.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/credentials/dotenvLayer.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/sessionCookie.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/sessionCookie.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/scim/scimAuth.ts retains every function, parameter, body and caller while changing only the declared visibility",
+              "status": "passed"
+            },
+            {
+              "title": "individually reviewed module-private helper visibility src/identity/scim/scimAuth.ts retains the entire emitted implementation except those unused export assignments",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/publicDocsGraph.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "AMC public Docs graph allows the generated API entry without admitting arbitrary non-guide paths",
+              "status": "passed"
+            },
+            {
+              "title": "AMC public Docs graph every promoted guide has a repository Markdown source",
+              "status": "passed"
+            },
+            {
+              "title": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+              "status": "passed"
+            },
+            {
+              "title": "AMC public Docs graph intentionally internal planning docs have no incoming public edges",
+              "status": "passed"
+            },
+            {
+              "title": "AMC public Docs graph linked user workflow guides are promoted instead of becoming dead ends",
+              "status": "passed"
+            },
+            {
+              "title": "AMC public Docs graph every promoted guide appears in one category and the open category stays bounded",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/questionScoreExplainability.test.ts",
+          "status": "passed",
+          "passed": 51,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "question score explainability receipts binds SkillLens-style rubric checks, fix hints, market signals, and certificate hashes into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Promptflow-style RAG flow, evaluator, mapping, variant, and deployment evidence into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Promptflow-style RAG question explainability lacks evaluator mapping proof",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds AI-Coding-Landscape category, cohort, dataset, freshness, and repair proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when AI-Coding-Landscape question proof is stale or missing dataset/cohort bindings",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds PinchBench-style benchmark submission, task, criterion, status, and leaderboard proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when benchmark submission proof omits task breakdown, criterion scoring, status, or hashes",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Multi-User-LLM-Agent-style scenario, role, policy, trace, evaluator, metric, and repair proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Multi-User-LLM-Agent question proof omits scenario hashes, roles, or scenario-specific metrics",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Dokimos-style test-suite, JUnit, CI, dataset, evaluator, trace, and export proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Dokimos-style test-suite question proof lacks dataset, CI, evaluator, trace, or export evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when rage4j-style source metadata is presented without replayable JVM eval corpus proof",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds AgentTrial-style statistical trials, confidence intervals, regression, and failure attribution into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when AgentTrial-style statistical proof lacks trials, hashes, CI proof, or non-regression evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds CodeQuest-style evaluator and optimizer quality dimensions into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when CodeQuest-style quality proof is README-only or dimension-regressing",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds eval-ai-library source, metric, question, evidence, and repair proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when eval-ai-library proof is source metadata without question-level evidence reasons",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts GAP-0616 binds DOI/OpenAlex metadata-only review to eval-score explainability pack rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds auto-bench-audit reproducible eval pack rows to signed evidence and fail-closed thresholds",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when auto-bench-audit proof is source metadata without row-level evidence or regression thresholds",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Incident Triage SRE task, root-cause, red-herring, remediation, and deterministic grader proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Incident Triage SRE question proof lacks logs, metrics, grader, reward, or ordered remediation evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds OccuBench-style professional task, LWM environment, fault, verifier, trajectory, and repair evidence into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when OccuBench-style professional task question proof lacks scenario, verifier, trajectory, or replay evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Adsum-style IoT firmware hardware evidence into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Adsum-style IoT firmware proof lacks hardware, artifact, privacy, or metric evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds ShampooSalesAgent-style retail sales evidence into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when ShampooSalesAgent-style retail sales proof lacks order, policy, provider, privacy, or metric evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds CL-Bench-style continual learning stateful workflow proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when CL-Bench-style continual learning question proof lacks stateful replay evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Hermes Turbo performance dashboard proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Hermes Turbo proof is source metadata without benchmark traces or thresholds",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Scorable SDK Studio drilldown source, artifact, state, and preview proof into question rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when Scorable Studio drilldown proof is metadata without route, preview, or state receipts",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts builds deterministic rows with accepted evidence, rejected evidence reasons, and repair hints",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when prompt-artifact criteria include a failed objective check",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts fails closed when off-policy optimization evidence is missing a baseline comparison",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts explains event-forecasting questions with temporal, source, and tool criteria",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts explains SDK-style agent runtime questions with orchestration, session, auth, and sandbox criteria",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts explains untrusted-tool questions with trajectory trust and final-action risk criteria",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts explains step-level routing questions with prefix, model choice, trajectory, success, and cost criteria",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts explains autonomous red-team benchmark questions with challenge, sandbox, exploit, outcome, and step-budget criteria",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts diagnostic reports include question explainability receipts in JSON and markdown",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Open Models LangChain4j/Ollama RAG source proof into question-explainability rows",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds W&B Weave-style eval exports into eval-score explainability packs without standalone subsystem",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts GAP-0625 binds Confident AI DeepEval-style metadata to AMC-owned question score proof",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts GAP-0625 fails closed when Confident AI metadata is presented without AMC-owned score evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds Opik-style eval score explainability without allowing metadata-only evidence",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts GAP-0634 binds cognitive-retrieval preprint metadata to existing eval score explainability primitives",
+              "status": "passed"
+            },
+            {
+              "title": "question score explainability receipts binds UpTrain repository metadata to existing eval score explainability primitives",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/signedArtifactVerificationParity.test.ts",
+          "status": "passed",
+          "passed": 61,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "entire archived signed artifact workflows against real local signatures archives are pinned to the ownership base with a complete restoration map",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder real signatures verify through embedded, explicit and workspace trust paths",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder P1-26: the unedited archive refuses the RFC 9162 proofs it gets no root for; a proof naming another tree refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder public argument getters keep the original access order",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder preserves renamed child root discovery",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder preserves flat root root discovery",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder canonical directory wins even when a valid sibling exists",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder missing json refuses with the original ordered error",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder missing sig refuses with the original ordered error",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder native malformed document/schema errors refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder tampered digest refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder tampered signature refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder tampered unsupported algorithm refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder tampered envelope mismatch refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder no admitted key and wrong explicit public key refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder privacy missing scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder privacy failed scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder privacy malformed scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder privacy checksum mismatch retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder privacy missing checksum retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder the native schema parser getter runs before malformed scan JSON is read",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder proof loading preserves filename order, ignores other suffixes and refuses invalid proof bytes",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder absent inclusion directory and ignored suffixes preserve existing proof admission",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder multiple privacy failures retain error order and checksum whitespace behavior",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder a cryptographically invalid inclusion proof and mismatched ids refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder root and calculation-manifest hash tampering refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder missing input preserves the native pre-extraction exception",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures binder unsupported archive data and symlink extraction are refused",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport real signatures verify through embedded, explicit and workspace trust paths",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport P1-26: the unedited archive refuses the RFC 9162 proofs it gets no root for; a proof naming another tree refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport public argument getters keep the original access order",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport preserves renamed child root discovery",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport preserves flat root root discovery",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport canonical directory wins even when a valid sibling exists",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport missing json refuses with the original ordered error",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport missing sig refuses with the original ordered error",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport native malformed document/schema errors refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport tampered digest refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport tampered signature refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport tampered unsupported algorithm refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport tampered envelope mismatch refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport no admitted key and wrong explicit public key refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport privacy missing scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport privacy failed scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport privacy malformed scan retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport privacy checksum mismatch retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport privacy missing checksum retains the domain policy",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport the native schema parser getter runs before malformed scan JSON is read",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport proof loading preserves filename order, ignores other suffixes and refuses invalid proof bytes",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport absent inclusion directory and ignored suffixes preserve existing proof admission",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport multiple privacy failures retain error order and checksum whitespace behavior",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport a cryptographically invalid inclusion proof and mismatched ids refuse",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport root and calculation-manifest hash tampering refuses",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport missing input preserves the native pre-extraction exception",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport unsupported archive data and symlink extraction are refused",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures multiple unbound expected proof ids refuse even when their input order differs",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures workspace verification reports every refusal from a tampered registered binder",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures workspace policy trust refusals match both complete originals",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport revocation remains enforced with workspace trust",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures passport expiry is enforced without changing the signed document",
+              "status": "passed"
+            },
+            {
+              "title": "entire archived signed artifact workflows against real local signatures verification cleanup removes only the supplied temporary directory",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/studioNativeTaskService.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "Studio offers a signed read-only subset without advertising unknown or misclassified tools",
+              "status": "passed"
+            },
+            {
+              "title": "real stub turns are committed once, survive release/restart/resume and cold verify",
+              "status": "passed"
+            },
+            {
+              "title": "owner/selected-agent/demo and stale submission boundaries refuse without extra native requests",
+              "status": "passed"
+            },
+            {
+              "title": "cancel during initial preparation prevents the original prompt from later dispatching",
+              "status": "passed"
+            },
+            {
+              "title": "a stale non-owning observer recovers the exact lost follow-up acknowledgement without dispatching it again",
+              "status": "passed"
+            },
+            {
+              "title": "JSONL managed task cold inspection, verification and archive retain actual history and create deduplication",
+              "status": "passed"
+            },
+            {
+              "title": "a turn AMC's own budget refused says so instead of a generic failure, and names no provider quota (P0-59)",
+              "status": "passed"
+            },
+            {
+              "title": "a writer still appending neither fails the turn nor hides authenticated history; Studio waits for it to settle (P0-62)",
+              "status": "passed"
+            },
+            {
+              "title": "a writer appending between Studio's pre-verify read and the verifier makes verification fail, not pass (P0-62 review)",
+              "status": "passed"
+            },
+            {
+              "title": "a release that completes the task while its turn waits for settled history wins; the turn is not dispatched (P0-62 review)",
+              "status": "passed"
+            },
+            {
+              "title": "archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart",
+              "status": "passed"
+            },
+            {
+              "title": "archive refuses active, foreign, stale, unsealed and uncertain tasks without changing retained metadata",
+              "status": "passed"
+            },
+            {
+              "title": "archive authenticates evidence again and hidden archived descriptors still fail closed on tampering",
+              "status": "passed"
+            },
+            {
+              "title": "a physical workspace alias runs the same native session, while a different ACP root is refused",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/compliance/dataResidencyPersistence.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "data residency survives the process keeps a tenant's region across invocations",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process reports the registered region, not the us-east-1 fallback",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process keeps a legal hold visible after the issuing process exits",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process records a release so a later process sees it",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process sees every registered tenant when checking isolation",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process keeps a residency policy retrievable by region",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process signs each stored hold and anchors the set in HEAD and the journal (P2-01)",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process refuses a forged release in the record instead of reporting the tenant unheld",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process refuses a broken record signature instead of reporting the tenant unheld",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process refuses a deleted record and signature instead of reporting the tenant unheld",
+              "status": "passed"
+            },
+            {
+              "title": "data residency survives the process still works without a workspace, for library callers",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/compliance/evidenceBinding.test.ts",
+          "status": "passed",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"eval_import\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"import\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"watch\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"attested_ingest\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"chatgpt\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"claude_console\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"gemini_ui\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"generic_json\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"generic_text\"} -> import",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"manual\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"operator\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"feedback.ingest\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"user\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"inferred\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"carried\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"default\"} -> manual",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"webhook\"} -> external-report",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {\"source\":\"constructor\"} -> amc-runtime",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer {} -> amc-runtime",
+              "status": "passed"
+            },
+            {
+              "title": "evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)",
+              "status": "passed"
+            },
+            {
+              "title": "source-literal enumeration every source literal in src is classified",
+              "status": "passed"
+            },
+            {
+              "title": "isBoundToControl binds through meta.controlIds naming the mapping",
+              "status": "passed"
+            },
+            {
+              "title": "isBoundToControl binds an audit event through the requirement's auditTypes only",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {} in session-1 with scope agent -> none",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {} in session-1 with scope workspace -> none",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {} in system with scope agent -> violation-only",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole meta {} in system with scope workspace -> positive",
+              "status": "passed"
+            },
+            {
+              "title": "subjectRole a missing agent id is never credited to default",
+              "status": "passed"
+            },
+            {
+              "title": "verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+              "status": "passed"
+            },
+            {
+              "title": "verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+              "status": "passed"
+            },
+            {
+              "title": "verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+              "status": "passed"
+            },
+            {
+              "title": "verifiedAssuranceByPack an agent without a reports folder has no verified packs",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/security/api-security.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "API security hardening internal /api/v1 routes require human/admin auth and reject lease principals",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening Studio sessions enforce least-privilege roles across protected /api/v1 routes",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening console snapshot is no longer anonymously accessible",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening expired signed session token is rejected",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening CORS blocks non-allowlisted origins",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening host and workspace login flows are rate-limited",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening workspace IDOR attempt with cross-workspace cookie is denied",
+              "status": "passed"
+            },
+            {
+              "title": "API security hardening OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-packaging-serial.json",
+      "sha256": "ee56449801e4e4f7e0aa1252e20353c4ef2ced2ec7b513fe79b5e454df316cfe",
+      "environment": "Node 22.23.3",
+      "phase": "serial diagnosis",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/releaseEngineeringPack.test.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "release engineering pack packs and verifies a signed .amcrelease bundle and prints summary",
+              "status": "passed"
+            },
+            {
+              "title": "release engineering pack embeds the gated npm tarball, SBOM and licence files byte for byte instead of packing (P0-34)",
+              "status": "passed"
+            },
+            {
+              "title": "release engineering pack fails verify on tampered manifest and artifact and wrong pubkey",
+              "status": "passed"
+            },
+            {
+              "title": "release engineering pack generates deterministic SBOM and sorted license report",
+              "status": "passed"
+            },
+            {
+              "title": "release engineering pack secret scan detects fake key patterns inside archive",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts trusts an untouched bundle whose signer is pinned for the release purpose",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts keeps integrity separate from admission: an intact bundle nobody pinned is not trusted, and names the key to pin",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts gives --allow-unpinned an integrity-only result: never ok, exit 2, and the override is recorded",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts does not admit the signer when its pin is for another purpose",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts refuses a distrusted signer even when it is pinned and --allow-unpinned was used",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts uses --pubkey only to find the signer: an unrelated key file does not stop the embedded key being checked and admitted",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts verifies a bundle that carries no key when --pubkey names the signer, and refuses it when nothing does",
+              "status": "passed"
+            },
+            {
+              "title": "verifyReleaseBundle verdicts fails a bundle whose archive is missing or is not an archive, with a report that records no signature check",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-secret-scan-serial.json",
+      "sha256": "a795977459bb9d9e9f6d589c68af5f0bd6080455709175f0838cf04f0c64d2e9",
+      "environment": "Node 22.23.3",
+      "phase": "final",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/releaseSecretScanCoverage.test.ts",
+          "status": "passed",
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "release secret scanner content coverage detects a token at the end of a 999999-byte file",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage detects a token at the end of a 1000000-byte file",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage detects a token at the end of a 1000001-byte file",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage detects a token beyond 1 MB even when it spans a common chunk boundary",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage scans large members through the actual npm archive API",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage preserves detection through a release bundle's nested npm archive",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage retains PASS for genuinely empty and fully readable clean inputs",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage does not report a nonexistent directory as a successful empty scan",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage does not silently omit content beyond the archive entry-size bound",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage does not silently ignore symlinked content in a directory scan",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses a symlink scan root with suffix \"\"",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses a symlink scan root with suffix \"/\"",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage fully scans a regular file at the documented per-file limit",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses one byte above the file budget with safe typed context",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses aggregate bytes beyond the budget even when each file is permitted",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage bounds filesystem entry count independently of content bytes",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses a file supplied as the scan directory",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage shares entry budgets across every nested npm archive",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage retains a complete report at the finding budget",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage refuses an incomplete report when another finding exceeds the shared cap",
+              "status": "passed"
+            },
+            {
+              "title": "release secret scanner content coverage fails explicitly when a discovered file cannot be read",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-docs-fixed-final.json",
+      "sha256": "fc0a5cb308c0ebd9204b86ccc68a24f750895116238d3bcaf73688e646a8d7d9",
+      "environment": "Node 22.23.3",
+      "phase": "final",
+      "sourceScope": "docs source-link patch e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+      "files": [
+        {
+          "path": "tests/publicDocsArtifact.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "public Docs Pages artifact uses only same-origin runtime inputs and a lockfile-pinned renderer",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact rejects unsafe, duplicate, internal, and destructive build inputs",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact keeps manifest-bound Docs assets network-first through the root service worker",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-node24-final.json",
+      "sha256": "8733db00b929dbf9945e63685261b19919dc09d810fc628dfc0a2741494442e6",
+      "environment": "Node 24.21.0",
+      "phase": "final",
+      "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+      "files": [
+        {
+          "path": "tests/releaseGateExecution.test.ts",
+          "status": "passed",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "release gate execution and qualification scope fails release qualification when the real lint step fails",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails release qualification when strict package lint fails",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails release qualification when the citation check fails, after build",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope blocks qualification on unresolved source-duplicates findings",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope blocks qualification on unresolved source-dead-code findings",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope executes packed acceptance once after build without another build or tracked inventory write",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope marks every quick omission while preserving the process result contract",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope does not equate an omitted live check with complete qualification in full mode",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope never invokes build-dependent consumers after build failure, even with a stale CLI present",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope fails the gate when installed evidence fails even if every other registered check passed",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful CLI exit without an actual inventory artifact",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a missing JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a malformed JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a failed JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a skipped JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a some-pending JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a todo JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a invalid-count JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a suite-error JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope rejects successful Vitest exit with a file-error JSON report",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope does not let a successful JSON report override Vitest process failure",
+              "status": "passed"
+            },
+            {
+              "title": "release gate execution and qualification scope retains separate full-suite reports so a later run cannot reuse a stale report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/sourceQuality.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners detects real duplicated code and accepts a single copy",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+              "status": "passed"
+            },
+            {
+              "title": "real source quality scanners refuses missing scan evidence",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "path": "tests/sourceQualityRatchet.test.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "source-quality ratchet passes when the current findings equal the baseline",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails on one new duplicate pair and names both paths",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet counts a further copy of an already-recorded clone in the same pair as new",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails on a fixed finding until --shrink removes exactly that id",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet ignores a Knip finding that only moved to another line",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet treats a moved file in a duplicate pair as a new finding (documented behaviour)",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet accepts a new finding only with a recorded reason of at least 20 characters",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet --shrink with new and stale findings removes the stale ids and adds nothing",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet fails with the drift message when .jscpd.json or a tool version changes",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet keeps still-current accepted findings and their reasons across a rebaseline",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses malformed tool reports",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet writes a sorted, LF, one-entry-per-line baseline and refuses a hand-made acceptance without a reason",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet prints one trend row for both scans",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet commits a valid baseline under 1 MB for the current configs",
+              "status": "passed"
+            },
+            {
+              "title": "source-quality ratchet refuses an acceptance without a reason before scanning",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate does not allow a failed ratchet to pass the build job",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate propagates a failed duplicates command from the real workflow",
+              "status": "passed"
+            },
+            {
+              "title": "required source-quality CI gate propagates a failed dead-code command from the real workflow",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "localReport": "tmp/p0-33-docs-node24.json",
+      "sha256": "28d12fb3489830b85a4b2a98a83427c779b817fe045e0ff3a53dea634e3264c2",
+      "environment": "Node 24.21.0",
+      "phase": "final",
+      "sourceScope": "docs source-link patch e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+      "files": [
+        {
+          "path": "tests/publicDocsArtifact.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "assertions": [
+            {
+              "title": "public Docs Pages artifact uses only same-origin runtime inputs and a lockfile-pinned renderer",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact rejects unsafe, duplicate, internal, and destructive build inputs",
+              "status": "passed"
+            },
+            {
+              "title": "public Docs Pages artifact keeps manifest-bound Docs assets network-first through the root service worker",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedRedRegression": {
+    "localReport": "tmp/p0-33-ci-mutation.json",
+    "sha256": "cc40b57f9c724b9620723f2b4212ddb638224510dcd5dff8959ff051c4431946",
+    "environment": "Node 22.23.3",
+    "phase": "expected failure with original CI workflow restored temporarily; then fixed workflow restored",
+    "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+    "files": [
+      {
+        "path": "tests/sourceQualityRatchet.test.ts",
+        "status": "failed",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 18,
+        "assertions": [
+          {
+            "title": "source-quality ratchet passes when the current findings equal the baseline",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet fails on one new duplicate pair and names both paths",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet counts a further copy of an already-recorded clone in the same pair as new",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet fails on a fixed finding until --shrink removes exactly that id",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet ignores a Knip finding that only moved to another line",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet treats a moved file in a duplicate pair as a new finding (documented behaviour)",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet accepts a new finding only with a recorded reason of at least 20 characters",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet --shrink with new and stale findings removes the stale ids and adds nothing",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet fails with the drift message when .jscpd.json or a tool version changes",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet keeps still-current accepted findings and their reasons across a rebaseline",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet refuses malformed tool reports",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet writes a sorted, LF, one-entry-per-line baseline and refuses a hand-made acceptance without a reason",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet prints one trend row for both scans",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet commits a valid baseline under 1 MB for the current configs",
+            "status": "skipped"
+          },
+          {
+            "title": "source-quality ratchet refuses an acceptance without a reason before scanning",
+            "status": "skipped"
+          },
+          {
+            "title": "required source-quality CI gate does not allow a failed ratchet to pass the build job",
+            "status": "failed",
+            "failures": [
+              "AssertionError: expected true to be false // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tests/sourceQualityRatchet.test.ts:355:48\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          },
+          {
+            "title": "required source-quality CI gate propagates a failed duplicates command from the real workflow",
+            "status": "skipped"
+          },
+          {
+            "title": "required source-quality CI gate propagates a failed dead-code command from the real workflow",
+            "status": "skipped"
+          }
+        ]
+      }
+    ]
+  },
+  "preFixDocsDiagnosis": {
+    "localReport": "tmp/p0-33-packaging-serial.json",
+    "sha256": "ee56449801e4e4f7e0aa1252e20353c4ef2ced2ec7b513fe79b5e454df316cfe",
+    "environment": "Node 22.23.3",
+    "phase": "before docs source-link fix",
+    "sourceScope": "working tree leading to 4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821; relevant source unchanged by docs patch",
+    "files": [
+      {
+        "path": "tests/publicDocsArtifact.test.ts",
+        "status": "failed",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "assertions": [
+          {
+            "title": "public Docs Pages artifact uses only same-origin runtime inputs and a lockfile-pinned renderer",
+            "status": "passed"
+          },
+          {
+            "title": "public Docs Pages artifact builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+            "status": "failed",
+            "failures": [
+              "AssertionError: expected '{\"schemaVersion\":\"2.0\",\"id\":0,\"name\":\u2026' to contain '/blob/0123456789abcdef0123456789abcde\u2026'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tests/publicDocsArtifact.test.ts:161:24\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          },
+          {
+            "title": "public Docs Pages artifact rejects unsafe, duplicate, internal, and destructive build inputs",
+            "status": "passed"
+          },
+          {
+            "title": "public Docs Pages artifact keeps manifest-bound Docs assets network-first through the root service worker",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "interruptedCoverage": {
+    "status": "interrupted_after_failures",
+    "exit": 130,
+    "commit": "4a60a4f665ce89c1d24ca4ae2c7e851c33ecd821",
+    "completed_file_lines": 505,
+    "tests_in_completed_file_lines": 15455,
+    "failed_cases_in_completed_files": 3,
+    "failed_file_lines": [
+      " \u276f tests/releaseEngineeringPack.test.ts (13 tests | 1 failed) 113509ms",
+      " \u276f tests/publicDocsArtifact.test.ts (4 tests | 1 failed) 62824ms",
+      " \u276f tests/releaseSecretScanCoverage.test.ts (21 tests | 1 failed) 73330ms"
+    ],
+    "log": "tmp/p0-33-full-suite.log",
+    "limits": "Parsed progress from an interrupted run. Not a final Vitest report, full-suite acceptance, or coverage result."
+  },
+  "interruptedCoverageLogSha256": "8d382b6a3145a879c526be96cd4dc4cf9f1d963168b5701218bae8456db11ae2",
+  "limits": [
+    "Final counts combine distinct latest passing test files, not a complete suite or coverage result. Node versions are separate.",
+    "The releaseEngineeringPack file passed within a paired serial run whose pre-fix publicDocsArtifact file failed; the latter subsequently passed after e3c173766 on Node 22 and 24.",
+    "The full coverage attempt exited 130 after three failures. It has no final JSON or coverage acceptance. Serial results do not establish the causes of its other two failures.",
+    "Initial counts check failed after a new test file; moving tests into the existing ratchet file restored published count consistency without changing count metadata.",
+    "check:freeze still fails because P1-65 is absent from origin/main base allowedExceptionKeys. No exception or waiver was applied.",
+    "Source-quality base scans found no base baseline on origin/main and used their documented one-time bootstrap; no new or stale baseline allowances.",
+    "No PR, push, release, deployment, tracker closure, or whole-issue Done claim."
+  ]
+}

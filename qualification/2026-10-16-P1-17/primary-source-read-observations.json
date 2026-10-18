@@ -1,0 +1,40 @@
+{
+  "capturedUtc": "2026-10-16T09:31:52.235200+00:00",
+  "purpose": "Read-only primary-source navigation while qualifying existing experimentalclockdata; no legal approval or source metadata update.",
+  "sourceTableUnchanged": true,
+  "historicalRetrievalDatesRemain": "2026-10-07 in existing table and receipt",
+  "observations": [
+    {
+      "url": "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4",
+      "read": "Whole314.4 returned; page declares Title16up-to-date2026-10-14. Paragraphj retains30days/500consumers and discoverydefinition.",
+      "limit": "Does not independently determine applicability or expertapproval."
+    },
+    {
+      "url": "https://www.dfs.ny.gov/cybersecurity/23-NYCRR-Part-500",
+      "read": "AgencyhostedPDFread section500.17plusdefinitions;72-hourincidentnotice and24-hour/30-dayextortionrequirements align existingliteralbaseclocks.",
+      "limit": "PDF cover says notanofficialversion of the SecondAmendment. No new legalattestation."
+    },
+    {
+      "url": "https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1020/subpart-C/section-1020.320",
+      "read": "Automatedaccessredirect; nosectiontext returned.",
+      "limit": "No currenteCFRSARverificationclaimed."
+    },
+    {
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/pdf/CFR-2025-title31-vol3-sec1020-320.pdf",
+      "read": "GPO2025annualeditionsection1020.320returned, including30-daybase/conditionalextra30days, exceptions, retention and confidentiality.",
+      "limit": "2025edition; no independentcurrent2026amendmenthistoryproof. XML2025failedfetch and2026XMLinaccessible."
+    },
+    {
+      "url": "https://statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm",
+      "read": "Returnedsiteportal only;521.053notpresent.",
+      "limit": "No newTexasstatuterecheckpass. Existinghistoricaltablebytes remain unchanged."
+    }
+  ],
+  "excludedAsEvidence": [
+    "SearchengineCornellandotherthirdpartyresults; spec requiresprimaryhosts.",
+    "Historicalsourceverifiedfields are not currentexpertapproval."
+  ],
+  "allClocksRemainExperimental": true,
+  "expertSignOffPending": "D-08",
+  "fullCurrentLegalSourceRequalification": false
+}

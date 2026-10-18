@@ -1,0 +1,132 @@
+{
+  "schema": "p135-raw-evidence-representation-adoption/1",
+  "at": "2026-10-16T17:30:29.556995+00:00",
+  "reason": "Ordinary staged git diff --check reported trailing whitespace in one patch context and extra EOF blank lines in nine exact raw logs. No whitespace check or Git attribute was weakened.",
+  "originalPacketPreserved": "/private/tmp/p1-35-legacy-qualification-20261016/private-receipt-root/2026-10-16-P1-35",
+  "originalCheckExit": 2,
+  "originalCheckStdout": "qualification/2026-10-16-P1-35/controls/M2-rewrite-original-report.patch:15: trailing whitespace.\n+ \nqualification/2026-10-16-P1-35/logs/p135-build-current.log:21: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-final-test-typecheck.log:4: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-genuine-generation-v2.log:10: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-genuine-generation-v3.log:10: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-genuine-generation-v4.log:10: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-genuine-generation.log:10: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-old-build.log:16: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-test-typecheck.log:4: new blank line at EOF.\nqualification/2026-10-16-P1-35/logs/p135-typecheck-current.log:4: new blank line at EOF.\n",
+  "changes": [
+    {
+      "original": {
+        "relativePath": "controls/M2-rewrite-original-report.patch",
+        "bytes": 1603,
+        "sha256": "74560221623a8d0a50f71fc13e5a5deecef28b9aa15263661239e5ccc606a1e8"
+      },
+      "envelope": {
+        "relativePath": "controls/M2-rewrite-original-report.patch.evidence.json",
+        "bytes": 2590,
+        "sha256": "263ba969808415dd8297cc990c15be30c85ae29e0db9373ec670ec6c45a5b0be"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-build-current.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-build-current.log.evidence.json",
+        "bytes": 1711,
+        "sha256": "6d9c31ed5b1cd9b73b9867621ee78db5c8f5b90e1b3a186a3caf4568127ab520"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-final-test-typecheck.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-final-test-typecheck.log.evidence.json",
+        "bytes": 658,
+        "sha256": "d11e5408743e5dc2b159a76c4a61a042d8e5b6dc133e0c351ede71db9d2d3c14"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-genuine-generation-v2.log",
+        "bytes": 446,
+        "sha256": "2b15d8797846343e4ee06a86a1e99898d1c2ad7b8ef7ee46d3d15644891cf388"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-genuine-generation-v2.log.evidence.json",
+        "bytes": 1039,
+        "sha256": "9f966f649d66f1d6cb8850bc7d8b31b619bb43432dbb9cdd1b2cf397dfff113b"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-genuine-generation-v3.log",
+        "bytes": 446,
+        "sha256": "4e4f1249103b2efcf16adb820ae9824cd414b08f374c37ca2d52267c51b6583c"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-genuine-generation-v3.log.evidence.json",
+        "bytes": 1039,
+        "sha256": "e7a03d72592798d8ed7028cb1e38b1fdf1e91eba146e9007ea9acd353a782338"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-genuine-generation-v4.log",
+        "bytes": 446,
+        "sha256": "81663ec1e6fd9dd65c70c3f64c9450480133ed18c9929215b6e691966c88a773"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-genuine-generation-v4.log.evidence.json",
+        "bytes": 1039,
+        "sha256": "3b581bf158c8ce81b79f718a7077e92d460660a4545df6aa0d5c3fb5673293b6"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-genuine-generation.log",
+        "bytes": 446,
+        "sha256": "f65fd00e575e3ef0f8127f87e6fd47ec8a2e6da3b6b8742cc1053089a60a2b7c"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-genuine-generation.log.evidence.json",
+        "bytes": 1036,
+        "sha256": "b20c776b9a2d5a76ef6872dea08a60003df90706aac625501ea3026ef8d1d6ac"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-old-build.log",
+        "bytes": 530,
+        "sha256": "b4f7bb3e5f237927ca3202d533b4141ca8352543a55f6855f544ffc8933fe034"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-old-build.log.evidence.json",
+        "bytes": 1139,
+        "sha256": "9d7b47cbdf15cbbd3ae367f3f282e909447e34e8c64e20521fef9e322a1fabfe"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-test-typecheck.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-test-typecheck.log.evidence.json",
+        "bytes": 652,
+        "sha256": "4c412f8df9a5d0d0f76c4383f903664a1e8ff0455af09be496c4c6777878cb9e"
+      }
+    },
+    {
+      "original": {
+        "relativePath": "logs/p135-typecheck-current.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      },
+      "envelope": {
+        "relativePath": "logs/p135-typecheck-current.log.evidence.json",
+        "bytes": 639,
+        "sha256": "f20602d51961c7f5d8c447d4f28ae5488d0b717b65672a3c34ab916afb803ea3"
+      }
+    }
+  ],
+  "losslessRoundTripVerified": true,
+  "commandOutcomesUnchanged": true
+}

@@ -1,0 +1,9 @@
+# Actual-input curator successor V2
+
+This inert successor pins the actual completed six-phase root review and exact outcome/public-audit inputs. It has not run and has produced no public copy, certificate bundle or allowlist. The unready V1 and every sealed output remain unchanged.
+
+The code changes only the final input path/SHA and direct actual root-review schema/key bindings. Actual schema is p125pc-root-completed-runtime-review/1; actual keys are qualityRed2712DeadCode1268DuplicatesExactUnwaived, allHoldsRetained, wholeP1_25Complete and each phase's actualResources. The earlier inherited names would reject this real input. No record is reshaped, wrapped, aliased, relabelled or weakened to fit the helper. The exact reverse delta recovers V1, leaving all producer/window/cadence/non-window proof and privacy guards intact.
+
+The six actual phase rows match their retained outcome and audit pins, test/command projections and resource metadata. This is a finite metadata compatibility check, not a new runtime or independent peer audit. Each producer proof contains its own storedTokenPin and named query/response child. Full and partial producer stages remain exact. Source, fresh and restorations each pass 24; each source-only control has one actual failure. Repeated acceptance cohorts stay separate; any cross-run resource sums remain labelled inventory only.
+
+Root must read the exact delta and actual phase inputs, obtain independent static review and explicitly adopt the helper before execution. Only the explicit public files and certificate bundles allowed by the unchanged guard bodies can then be selected. No signing-directory traversal, private key, child-stream read, raw PEM publication, source/index/QA change, parser, compiler, helper, product or OpenSSL operation occurred in this preparation. All earlier errors and versions, held decisions, missing-reservation limits, freeze and unwaived quality checks remain preserved.

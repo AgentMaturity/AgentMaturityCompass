@@ -1,0 +1,153 @@
+{
+  "schema": "p119-corrected-oracle-audit-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/corrected-oracle-audit/README.md",
+      "bytes": 2610,
+      "sha256": "da44bb3f905178f7c6dc0f1c524ba5f9e51748f25376f925746916ccffcc3bae",
+      "device": 16777231,
+      "inode": 541829385,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/corrected-oracle-audit/review.json",
+      "bytes": 176680,
+      "sha256": "180b8e20ab75925e26d3de5fc1ebba330d109d9068052b57e8812259d20bed27",
+      "device": 16777231,
+      "inode": 541829386,
+      "nlink": 1
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/command.json",
+      "bytes": 2882,
+      "sha256": "133037c1c942ca2aab04db225283be163843245ccbf900e31c184be68763a361",
+      "device": 16777231,
+      "inode": 541770422,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-process.json",
+      "bytes": 892,
+      "sha256": "796bf51af3158cf0b6c483f64d68ff63267ab14977e23aed1247011edf21e4bb",
+      "device": 16777231,
+      "inode": 541770191,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3cd02b7594bf853357aee209c7c8222fd0b6921161877286a4ba68468070f827",
+      "device": 16777231,
+      "inode": 541770420,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/raw.json",
+      "bytes": 4794,
+      "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb",
+      "device": 16777231,
+      "inode": 541770421,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/observer.json",
+      "bytes": 6486,
+      "sha256": "9f4f6f88886582872ac6cba363ab1df301d0939121c203117bc534e8244ad3f0",
+      "device": 16777231,
+      "inode": 541770419,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/stdout-stderr.log",
+      "bytes": 28234,
+      "sha256": "c013011b8896212229bd66a9bd793adc606c7957b113e7ed790cf4fdd0a6c913",
+      "device": 16777231,
+      "inode": 541770190,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/command.json",
+      "bytes": 2692,
+      "sha256": "0e61615e1bf20676af4fbfeffd9552d291ffa7ceb11ef65cc4ebfc80bb9c7f40",
+      "device": 16777231,
+      "inode": 541772557,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-process.json",
+      "bytes": 807,
+      "sha256": "b18573ad73fb98676b2195315ee087a574ff1139c0c6fa28ddf5aaeb92d49505",
+      "device": 16777231,
+      "inode": 541770449,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "67f00e60bdef1a101b7c3f9f684786b35fee958350bc3cee3236c1cff985072f",
+      "device": 16777231,
+      "inode": 541772555,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/raw.json",
+      "bytes": 5041,
+      "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392",
+      "device": 16777231,
+      "inode": 541772556,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/observer.json",
+      "bytes": 6504,
+      "sha256": "3741aa933153a06f73080f7e6859592c36e093b79c58cb0f85c9db97816767f8",
+      "device": 16777231,
+      "inode": 541772553,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/stdout-stderr.log",
+      "bytes": 319468,
+      "sha256": "aa7eb1bb57a8cfe661005627d76cc027f95c7c09e234daa313dc10394f9c7bcc",
+      "device": 16777231,
+      "inode": 541770448,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f",
+      "device": 16777231,
+      "inode": 541767592,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869",
+      "device": 16777231,
+      "inode": 541767593,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923",
+      "device": 16777231,
+      "inode": 541766981,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d",
+      "device": 16777231,
+      "inode": 541766982,
+      "nlink": 1
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}
