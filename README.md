@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C711-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C713-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -270,7 +270,7 @@ In these counts, registered = packs returned by `listAssurancePacks()`; files on
 | Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are implemented behind an entitlement boundary, with a planned commercial price of `$9.99/month` for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.** `amc domain pack access` reports this state; `amc domain pack checkout` fails closed unless an operator has configured a verified checkout provider. Do not send payment based on repository copy alone.
+Industry Packs are paid, self-reported questionnaires behind a licence gate, with a planned price of `$9.99/month` for all 41 packs. A licence unlocks access to pack questions and runs only; the same answers and evidence give the same score, gap, report, assurance result and roadmap with or without one, and pack names and descriptions stay visible without one. **Public checkout is not live.** `amc domain pack access` states what your deployment offers: checkout appears only when a checkout URL and a licence signing key pinned in your AMC trust list are both configured; otherwise it says checkout is not available in this deployment and to contact sales. Do not send payment based on repository copy alone.
 
 ### Simulation & Forecast Evaluation Lane
 
@@ -779,12 +779,12 @@ All four targets stay documented (decision D-03). Only a qualified target may be
 
 ## Pricing
 
-The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live.
+The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live. Payment unlocks access only: it never changes a result, a trust tier or a verification outcome.
 
 | Tier | What you get |
 |---|---|
 | **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,255 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
+| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs, which are self-reported questionnaires; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
 > Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays MIT licensed. See [`website/publication-status.json`](website/publication-status.json) before making any availability claim.
@@ -917,7 +917,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,711<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,713<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
