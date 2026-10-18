@@ -12,7 +12,7 @@ import {
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
@@ -1215,7 +1215,7 @@ describe("AMC Pi hook installation (P1-22)", () => {
     manifest: join(workspace, ".amc", "hooks", "pi.json"),
     signature: join(workspace, ".amc", "hooks", "pi.json.sig"),
   });
-  const piModule = resolve("dist", "adapters", "pi", "amcPiExtension.js");
+  const piModule = fileURLToPath(new URL("../dist/adapters/pi/amcPiExtension.js", import.meta.url));
 
   test("dry-run lists the exact files and writes nothing", () => {
     const workspace = newWorkspace();
