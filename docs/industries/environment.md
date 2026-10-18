@@ -154,29 +154,29 @@ No output above was produced for this guide. Each row names the function that pr
 | C25 | Domain assurance runs the registry's packs | `src/domains/domainCliIntegration.ts:216` | `export function runDomainAssurance` |
 | C26 | Without an agent each pack is not evaluated | `src/domains/domainCliIntegration.ts:199` | `status: "not_evaluated", reason: NO_AGENT_INVOKED` |
 | C27 | Example mode grades the built-in reply | `src/domains/domainCliIntegration.ts:206` | `scenario.validate(EXAMPLE_ASSURANCE_REPLY` |
-| C28 | The native toolset registers the prompt-injection guard | `src/agent/agentToolset.ts:447` | `registry.guard("prompt-injection"` |
+| C28 | The native toolset registers the prompt-injection guard | `src/agent/agentToolset.ts:452` | `registry.guard("prompt-injection"` |
 | C29 | Guards cannot allow; the first denial is named | `src/agent/agentToolset.ts:428` | `guards cannot allow` |
-| C30 | Prompt-injection guard definition | `src/tools/guards/policyGuards.ts:213` | `export function promptInjectionGuard` |
-| C31 | The guard matches at BLOCK_CONFIDENCE only | `src/tools/guards/policyGuards.ts:216` | `minConfidence: BLOCK_CONFIDENCE` |
-| C32 | The native toolset registers the runtime-firewall guard | `src/agent/agentToolset.ts:448` | `registry.guard("runtime-firewall"` |
-| C33 | Runtime firewall guard definition | `src/tools/guards/policyGuards.ts:46` | `export function runtimeFirewallGuard` |
+| C30 | Prompt-injection guard definition | `src/tools/guards/policyGuards.ts:216` | `export function promptInjectionGuard` |
+| C31 | The guard matches at BLOCK_CONFIDENCE only | `src/tools/guards/policyGuards.ts:219` | `minConfidence: BLOCK_CONFIDENCE` |
+| C32 | The native toolset registers the runtime-firewall guard | `src/agent/agentToolset.ts:453` | `registry.guard("runtime-firewall"` |
+| C33 | Runtime firewall guard definition | `src/tools/guards/policyGuards.ts:47` | `export function runtimeFirewallGuard` |
 | C34 | Firewall evaluation entry point | `src/runtime/firewall.ts:1055` | `export function evaluateRuntimeFirewall` |
 | C35 | No policy yields mode missing-policy with action block | `src/runtime/firewall.ts:1107` | `mode = "missing-policy";` |
-| C36 | The native toolset registers the budgets guard | `src/agent/agentToolset.ts:451` | `registry.guard("budgets"` |
-| C37 | Budget guard definition | `src/tools/guards/policyGuards.ts:77` | `export function budgetGuard` |
+| C36 | The native toolset registers the budgets guard | `src/agent/agentToolset.ts:456` | `registry.guard("budgets"` |
+| C37 | Budget guard definition | `src/tools/guards/policyGuards.ts:78` | `export function budgetGuard` |
 | C38 | Native tool budget admission | `src/budgets/nativeBudgetAdmission.ts:73` | `export function reserveNativeToolBudget` |
 | C39 | No signed budget refuses the native call | `src/budgets/nativeBudgetAdmission.ts:36` | `no signed budget applies to this native agent` |
 | C40 | Exhausted daily tool budget refuses | `src/budgets/nativeBudgetAdmission.ts:42` | `daily tool budget exhausted` |
 | C41 | Budget status function | `src/budgets/budgets.ts:206` | `export function evaluateBudgetStatus` |
 | C42 | Invalid budgets signature is reported | `src/budgets/budgets.ts:219` | `budgets config signature invalid` |
 | C43 | No per-agent budget returns ok | `src/budgets/budgets.ts:229` | `if (!budget) {` |
-| C44 | The native toolset registers the network-egress guard | `src/agent/agentToolset.ts:457` | `registry.guard("network-egress"` |
-| C45 | Network egress guard definition | `src/tools/guards/policyGuards.ts:161` | `export function networkEgressGuard` |
-| C46 | Unlisted network tool is refused | `src/tools/guards/policyGuards.ts:185` | `so its egress is ungoverned` |
-| C47 | The native toolset registers the tool-allowlist guard | `src/agent/agentToolset.ts:458` | `registry.guard("tool-allowlist"` |
-| C48 | Tool allowlist guard definition | `src/tools/guards/policyGuards.ts:96` | `export function toolhubAllowlistGuard` |
-| C49 | Unverifiable allowlist denies | `src/tools/guards/policyGuards.ts:110` | `An unverifiable allowlist is not an empty allowlist.` |
-| C50 | Deny-by-default for unlisted tools | `src/tools/guards/policyGuards.ts:120` | `snapshot.config.tools.denyByDefault` |
+| C44 | The native toolset registers the network-egress guard | `src/agent/agentToolset.ts:462` | `registry.guard("network-egress"` |
+| C45 | Network egress guard definition | `src/tools/guards/policyGuards.ts:163` | `export function networkEgressGuard` |
+| C46 | Unlisted network tool is refused | `src/tools/guards/policyGuards.ts:188` | `so its egress is ungoverned` |
+| C47 | The native toolset registers the tool-allowlist guard | `src/agent/agentToolset.ts:463` | `registry.guard("tool-allowlist"` |
+| C48 | Tool allowlist guard definition | `src/tools/guards/policyGuards.ts:97` | `export function toolhubAllowlistGuard` |
+| C49 | Unverifiable allowlist denies | `src/tools/guards/policyGuards.ts:112` | `An unverifiable allowlist is not an empty allowlist.` |
+| C50 | Deny-by-default for unlisted tools | `src/tools/guards/policyGuards.ts:122` | `snapshot.config.tools.denyByDefault` |
 | C51 | Native sandbox admission | `src/sandbox/nativeSandboxBinding.ts:41` | `export function admitNativeSandboxPolicy` |
 | C52 | Admission requires Linux, or macOS for a kind other than linux-bwrap | `src/sandbox/nativeSandboxBinding.ts:32` | `return process.platform === "linux" || (process.platform === "darwin"` |
 | C53 | bubblewrap backend | `src/sandbox/bwrapBackend.ts:107` | `export function bwrapBackend` |
