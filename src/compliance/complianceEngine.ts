@@ -357,7 +357,7 @@ export function generateComplianceReport(params: {
       configTrusted: verify.valid,
       configReason: verify.valid ? null : verify.reason,
       trustTierCoverage,
-      coverage: coverageScore(categories.filter((row) => row.descoped === undefined)),
+      coverage: coverageScore(categories),
       categories,
       familyReview: familyReview(params.framework),
       nonClaims: [
