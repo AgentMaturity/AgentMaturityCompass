@@ -17,7 +17,7 @@ export interface FakeTokenApi {
   cleanup(): Promise<void>;
 }
 
-export type WindowsPrototypeReason =
+type WindowsPrototypeReason =
   | "unsupported-platform" | "prototype-not-qualified"
   | "invalid-request" | "api-unavailable" | "api-failure"
   | "status-missing" | "status-invalid" | "status-mismatch" | "cleanup-failed"
