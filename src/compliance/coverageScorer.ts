@@ -21,7 +21,7 @@ export function coverageScore(categories: ComplianceCategoryResult[]): Complianc
     const observed = row.claimKind === "observed" || row.claimKind === "independently_reviewed";
     if (row.status === "SATISFIED" && observed) counts.satisfied += 1;
     // A self-reported pass or partial is shown, never evaluated (D-03, P1-45).
-    else if (row.status === "SATISFIED") counts.notEvaluated += 1;
+    else if (row.status === "SATISFIED" || (row.status === "PARTIAL" && !observed)) counts.notEvaluated += 1;
     else if (row.status === "PARTIAL") counts.partial += 1;
     else if (row.status === "MISSING") counts.missing += 1;
     else if (row.status === "NOT_EVALUATED") counts.notEvaluated += 1;
