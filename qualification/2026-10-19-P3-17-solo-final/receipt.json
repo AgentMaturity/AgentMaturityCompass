@@ -1,0 +1,545 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-17",
+  "date": "2026-10-19",
+  "commit": "031a98c0f7d6eed7d440734a094a16ffeaa7fccb",
+  "branch": "codex/p3-17-solo-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 34351
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 30691
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 49383
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4508
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 841
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 394
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref f56a6ad88f4044bcdda176f362d2087b62427a22",
+      "exit": 0,
+      "durationMs": 1771
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 331
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1698
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 203
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 178
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 572
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 275
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1306
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 407
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref f56a6ad88f4044bcdda176f362d2087b62427a22",
+      "exit": 0,
+      "durationMs": 871
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2253
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 398
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 253
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 63196
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 709
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3525
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 187
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/domainRegistry.test.ts tests/domain-packs.test.ts tests/industryPacks-environment.test.ts tests/industryPacksSplitEquality.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/regulatoryClocks.test.ts tests/environmentalInfraPack.test.ts tests/industryPacks-mobility.test.ts tests/mobilityFunctionalSafetyPack.test.ts tests/publicStatsDrift.test.ts tests/trust/admission.test.ts tests/trust/trustContext.test.ts tests/trust/trustList.test.ts tests/trust/verifySurfaces.test.ts --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/solo-20261019/focused-final-product/report.json",
+      "exit": 0,
+      "durationMs": 113940
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/compiled.test.ts tests/catalog/stations/mobility/fixtures.test.ts tests/catalog/stations/mobility/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/initial-green/report.json",
+      "exit": 0,
+      "durationMs": 4990
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/compiled.test.ts tests/catalog/stations/mobility/fixtures.test.ts tests/catalog/stations/mobility/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/restored-green/report.json",
+      "exit": 0,
+      "durationMs": 3491
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ complete\\ wrong\\-control\\ protocols\\ and\\ consistently\\ malformed\\ facility\\ identifiers)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/01-shared-bounded-identifiers/report.json",
+      "exit": 1,
+      "durationMs": 2541
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ complete\\ wrong\\-control\\ protocols\\ and\\ consistently\\ malformed\\ facility\\ identifiers)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/02-shared-exact-control/report.json",
+      "exit": 1,
+      "durationMs": 2431
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:binds\\ every\\ subject,\\ control\\ version\\ and\\ illustrative\\ plan\\ field\\ in\\ nested\\ records)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/03-shared-whole-binding/report.json",
+      "exit": 1,
+      "durationMs": 2092
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/04-shared-uniqueness/report.json",
+      "exit": 1,
+      "durationMs": 2181
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-incomplete\\-r156\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/05-shared-complete-text/report.json",
+      "exit": 1,
+      "durationMs": 1823
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ rolled,\\ zone\\-less\\ and\\ submillisecond\\ protocol\\ times\\ without\\ truncating\\ expiry\\ or\\ deadline)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/06-shared-time-precision/report.json",
+      "exit": 1,
+      "durationMs": 1953
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ nonfinite\\ speed,\\ unsafe\\ deadlines\\ and\\ string\\ booleans\\ from\\ complete\\ fallback\\ inputs)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/07-shared-finite-speed/report.json",
+      "exit": 1,
+      "durationMs": 2214
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ nonfinite\\ speed,\\ unsafe\\ deadlines\\ and\\ string\\ booleans\\ from\\ complete\\ fallback\\ inputs)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/08-shared-strict-boolean/report.json",
+      "exit": 1,
+      "durationMs": 2737
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:does\\ not\\ install\\ with\\ an\\ envelope\\-supplied\\ trust\\ context\\ or\\ absent,\\ invalid,\\ future\\ or\\ expired\\ trust)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/09-shared-no-envelope-trust-flags/report.json",
+      "exit": 1,
+      "durationMs": 2369
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:never\\ invents\\ a\\ P2\\-27\\ adapter\\ or\\ releases\\ a\\ warm\\ lot\\ under\\ pending\\ scenario\\ metadata)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/10-missing-cold-dependency-promotion/report.json",
+      "exit": 1,
+      "durationMs": 2281
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ whitespace\\-equivalent\\ ZIP\\ proxy\\ lineage\\ before\\ releasing\\ any\\ notice)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/11-screening-proxy-normalization/report.json",
+      "exit": 1,
+      "durationMs": 2288
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/12-screening-pair-application-identity/report.json",
+      "exit": 1,
+      "durationMs": 1948
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:binds\\ every\\ subject,\\ control\\ version\\ and\\ illustrative\\ plan\\ field\\ in\\ nested\\ records)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/13-screening-record-binding-time/report.json",
+      "exit": 1,
+      "durationMs": 1947
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch)|(?:refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/14-screening-feature-reason-source-uniqueness/report.json",
+      "exit": 1,
+      "durationMs": 1915
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-screening\\-inconsistent\\-pair\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/15-screening-valid-counterfactual/report.json",
+      "exit": 1,
+      "durationMs": 2084
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-screening\\-no\\-lineage\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/16-screening-lineage-availability/report.json",
+      "exit": 1,
+      "durationMs": 2024
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-screening\\-reason\\-difference\\.json)|(?:oracle\\-screening\\-proxy\\-lineage\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/17-mandatory-screening-decisions-only/report.json",
+      "exit": 1,
+      "durationMs": 1900
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-screening\\-decision\\-difference\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/18-screening-decision-comparison/report.json",
+      "exit": 1,
+      "durationMs": 1899
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:holds\\ every\\ adverse\\ notice\\ until\\ all\\ paired\\ applications\\ and\\ lineage\\ have\\ passed)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/19-screening-atomic-notice-release/report.json",
+      "exit": 1,
+      "durationMs": 1857
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-port\\-unknown\\-level\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/20-port-current-level-availability/report.json",
+      "exit": 1,
+      "durationMs": 2155
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ current\\ authorization\\ identity,\\ expiry\\ and\\ chronological\\ port\\ events)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/21-port-captured-event-order/report.json",
+      "exit": 1,
+      "durationMs": 2165
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ current\\ authorization\\ identity,\\ expiry\\ and\\ chronological\\ port\\ events)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/22-port-authorization-identity/report.json",
+      "exit": 1,
+      "durationMs": 1891
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ current\\ authorization\\ identity,\\ expiry\\ and\\ chronological\\ port\\ events)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/23-port-authorization-availability/report.json",
+      "exit": 1,
+      "durationMs": 1651
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-port\\-lower\\-authorization\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/24-port-authorization-level/report.json",
+      "exit": 1,
+      "durationMs": 1628
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-port\\-raised\\-without\\-recheck\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/25-port-raise-recheck/report.json",
+      "exit": 1,
+      "durationMs": 1679
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ current\\ authorization\\ identity,\\ expiry\\ and\\ chronological\\ port\\ events)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/26-port-authorization-time/report.json",
+      "exit": 1,
+      "durationMs": 1619
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-change\\-unclassified\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/27-ecu-unknown-classification/report.json",
+      "exit": 1,
+      "durationMs": 1618
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-change\\-missing\\-analysis\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/28-ecu-analysis-required/report.json",
+      "exit": 1,
+      "durationMs": 1697
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-change\\-missing\\-approval\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/29-ecu-approval-required/report.json",
+      "exit": 1,
+      "durationMs": 1585
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-change\\-wrong\\-digest\\.json)|(?:binds\\ current\\ change\\ bytes\\ and\\ approval\\ identity,\\ decision\\ and\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/30-ecu-actual-byte-digest/report.json",
+      "exit": 1,
+      "durationMs": 1785
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:binds\\ current\\ change\\ bytes\\ and\\ approval\\ identity,\\ decision\\ and\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/31-ecu-human-separation/report.json",
+      "exit": 1,
+      "durationMs": 1591
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:binds\\ current\\ change\\ bytes\\ and\\ approval\\ identity,\\ decision\\ and\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/32-ecu-positive-approval/report.json",
+      "exit": 1,
+      "durationMs": 1636
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-change\\-expired\\-approval\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/33-ecu-approval-expiry/report.json",
+      "exit": 1,
+      "durationMs": 1627
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:binds\\ current\\ change\\ bytes\\ and\\ approval\\ identity,\\ decision\\ and\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/34-ecu-record-chronology/report.json",
+      "exit": 1,
+      "durationMs": 1661
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-trust\\-unavailable\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/35-ota-trust-availability/report.json",
+      "exit": 1,
+      "durationMs": 1661
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ actual\\ content,\\ records,\\ fleet/model/version\\ and\\ metadata\\-time\\ mismatches\\ without\\ install\\ effects)|(?:refuses\\ duplicate\\ fleet\\ and\\ model\\ identities\\ before\\ any\\ synthetic\\ install)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/36-ota-package-fleet-binding/report.json",
+      "exit": 1,
+      "durationMs": 1650
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-incomplete\\-r156\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/37-ota-complete-update-records/report.json",
+      "exit": 1,
+      "durationMs": 1653
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ actual\\ content,\\ records,\\ fleet/model/version\\ and\\ metadata\\-time\\ mismatches\\ without\\ install\\ effects)|(?:refuses\\ duplicate\\ fleet\\ and\\ model\\ identities\\ before\\ any\\ synthetic\\ install)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/38-ota-update-version-model/report.json",
+      "exit": 1,
+      "durationMs": 1675
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ empty\\ and\\ noncanonical\\ payload\\ bytes\\ even\\ with\\ their\\ actual\\ signed\\ digest)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/39-ota-canonical-nonempty-payload/report.json",
+      "exit": 1,
+      "durationMs": 1659
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-bad\\-content\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/40-ota-actual-content-digest/report.json",
+      "exit": 1,
+      "durationMs": 1849
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ root\\ pins\\ and\\ caller\\ trust\\ flags\\ under\\ an\\ otherwise\\ valid\\ signed\\ authority)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/41-ota-no-authority-flags/report.json",
+      "exit": 1,
+      "durationMs": 1664
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ root\\ pins\\ and\\ caller\\ trust\\ flags\\ under\\ an\\ otherwise\\ valid\\ signed\\ authority)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/42-ota-distinct-root-pins/report.json",
+      "exit": 1,
+      "durationMs": 1601
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-invalid\\-trust\\.json)|(?:does\\ not\\ install\\ with\\ an\\ envelope\\-supplied\\ trust\\ context\\ or\\ absent,\\ invalid,\\ future\\ or\\ expired\\ trust)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/43-ota-native-signed-list/report.json",
+      "exit": 1,
+      "durationMs": 1586
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:does\\ not\\ install\\ with\\ an\\ envelope\\-supplied\\ trust\\ context\\ or\\ absent,\\ invalid,\\ future\\ or\\ expired\\ trust)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/44-ota-owned-trust-currentness/report.json",
+      "exit": 1,
+      "durationMs": 1617
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-unsigned\\.json)|(?:keeps\\ the\\ unsigned\\ OTA\\ install\\ log\\ empty\\ despite\\ native\\ candidate\\ admission)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/45-mandatory-ota-signature-integrity/report.json",
+      "exit": 1,
+      "durationMs": 1596
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-unknown\\-signer\\.json)|(?:oracle\\-ota\\-revoked\\-signer\\.json)|(?:oracle\\-ota\\-wrong\\-purpose\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/46-ota-native-release-admission/report.json",
+      "exit": 1,
+      "durationMs": 1626
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-revoked\\-signer\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/47-ota-no-candidate-pin-bypass/report.json",
+      "exit": 1,
+      "durationMs": 1604
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-ota\\-invalid\\-trust\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/48-ota-verification-error-fail-closed/report.json",
+      "exit": 1,
+      "durationMs": 1790
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-fallback\\-undefined\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/49-fallback-defined-condition/report.json",
+      "exit": 1,
+      "durationMs": 1626
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ actual\\ independent\\ safe\\ stop,\\ exact\\ vehicle\\ identity\\ and\\ post\\-crash\\ sample\\ order)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/50-fallback-trajectory-identity/report.json",
+      "exit": 1,
+      "durationMs": 1631
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ actual\\ independent\\ safe\\ stop,\\ exact\\ vehicle\\ identity\\ and\\ post\\-crash\\ sample\\ order)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/51-fallback-trajectory-time/report.json",
+      "exit": 1,
+      "durationMs": 1626
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ actual\\ independent\\ safe\\ stop,\\ exact\\ vehicle\\ identity\\ and\\ post\\-crash\\ sample\\ order)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/52-fallback-zero-speed/report.json",
+      "exit": 1,
+      "durationMs": 1860
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ actual\\ independent\\ safe\\ stop,\\ exact\\ vehicle\\ identity\\ and\\ post\\-crash\\ sample\\ order)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/53-fallback-safe-area/report.json",
+      "exit": 1,
+      "durationMs": 1732
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:requires\\ actual\\ independent\\ safe\\ stop,\\ exact\\ vehicle\\ identity\\ and\\ post\\-crash\\ sample\\ order)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/54-fallback-independent-controller/report.json",
+      "exit": 1,
+      "durationMs": 2005
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:oracle\\-fallback\\-late\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/55-fallback-inclusive-deadline/report.json",
+      "exit": 1,
+      "durationMs": 1627
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/compiled.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ every\\ fixture\\ subject\\ outside\\ the\\ actual\\ compiled\\ profile)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/56-adapter-compiled-subject/report.json",
+      "exit": 1,
+      "durationMs": 1834
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/compiled.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ an\\ unselected\\ Mobility\\ control\\ even\\ when\\ its\\ subject\\ matches\\ the\\ profile)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/57-adapter-selected-control/report.json",
+      "exit": 1,
+      "durationMs": 1914
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ invalid\\ bounded\\ duration\\ contracts)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/58-shared-duration-contract/report.json",
+      "exit": 1,
+      "durationMs": 1602
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ consistently\\ malformed\\ illustrative\\ plan\\ digests)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/59-shared-digest-contract/report.json",
+      "exit": 1,
+      "durationMs": 1623
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:rejects\\ consistently\\ malformed\\ control\\ versions)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/60-shared-version-contract/report.json",
+      "exit": 1,
+      "durationMs": 1555
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ duplicate\\ port\\ event\\ and\\ request\\ identities)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/61-port-event-request-uniqueness/report.json",
+      "exit": 1,
+      "durationMs": 1839
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ a\\ foreign\\ initial\\ security\\ record\\ with\\ a\\ valid\\ event\\ stream)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/62-port-initial-state-binding/report.json",
+      "exit": 1,
+      "durationMs": 1599
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ a\\ mismatched\\ proposer\\ or\\ change\\ binding)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/63-ecu-proposer-change-binding/report.json",
+      "exit": 1,
+      "durationMs": 1677
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ analysis\\ and\\ approval\\ for\\ another\\ exact\\ change)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/64-ecu-analysis-approval-binding/report.json",
+      "exit": 1,
+      "durationMs": 1581
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ whitespace\\-only\\ current\\ impact\\ text)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/65-ecu-analysis-text-completeness/report.json",
+      "exit": 1,
+      "durationMs": 1602
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ an\\ OTA\\ package\\ without\\ target\\ inventory)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/66-ota-fleet-availability/report.json",
+      "exit": 1,
+      "durationMs": 1615
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:reports\\ future\\ metadata\\ as\\ an\\ explicit\\ package\\-time\\ refusal)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/67-ota-owned-metadata-time/report.json",
+      "exit": 1,
+      "durationMs": 1552
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ a\\ foreign\\ fallback\\ profile\\ with\\ valid\\ own\\ trajectory)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/68-fallback-profile-identity/report.json",
+      "exit": 1,
+      "durationMs": 1937
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:refuses\\ computed\\ fallback\\ deadline\\ overflow\\ from\\ a\\ schema\\-valid\\ duration)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/69-fallback-safe-deadline-arithmetic/report.json",
+      "exit": 1,
+      "durationMs": 1585
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses\\ format\\-obscured\\ ZIP\\ proxy\\ lineage\\ before\\ releasing\\ any\\ notice' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/70-screening-format-proxy-normalization/report.json",
+      "exit": 1,
+      "durationMs": 1565
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17-solo-mutations-031a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/mobility/fixtures.test.ts --maxWorkers=1 --testNamePattern 'binds\\ every\\ subject,\\ control\\ version\\ and\\ illustrative\\ plan\\ field\\ in\\ nested\\ records' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/031a98c0f7d6eed7d440734a094a16ffeaa7fccb/final-h-v1/mutations/71-shared-control-id-binding/report.json",
+      "exit": 1,
+      "durationMs": 1619
+    },
+    {
+      "cmd": "node --import tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/solo-20261019/probe-mobility-solo-root-reviewed-031a9.mts 031a98c0f7d6eed7d440734a094a16ffeaa7fccb f56a6ad88f4044bcdda176f362d2087b62427a22 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/solo-20261019/native-cases-final-031a9.json",
+      "exit": 0,
+      "durationMs": 1649
+    },
+    {
+      "cmd": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/solo-20261019/verify-profile-normalization-root-reviewed-031a9.mjs",
+      "exit": 0,
+      "durationMs": 519
+    }
+  ],
+  "tests": {
+    "total": 2332,
+    "passed": 2332,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.json",
+      "sha256": "dc6c3a85b63a8b24dd3d6d1f464ff0a23df39cdccc3825258d17e6c96da69225"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "7a4a41e5e97a5edb71d9eff5c84686d9b53805611b1c3342728b453344f36eaf"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "3b803b4766084d3460febbdf84df6c491068b270984e549df6859a53fe2612e7"
+    },
+    {
+      "path": "inventory.json",
+      "sha256": "3477599e92242eaca0c0e88a210c4afc41ec6f1c67f3e4306da18c1d572b27f6"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "3b70195313b9ed69df197ae591ca94eeb603ecde0eee615fabedaf6a60dc2b85"
+    },
+    {
+      "path": "decisions.json",
+      "sha256": "543d981bbe6fc75f9c4a872117db1019601d4bc76674d45ccf1961cbbc5cacd5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "254a7d2fa3c8b9432d6a763013895664f29082c1120199d0db1c3d257572973e"
+    }
+  ],
+  "notes": "Preparation receipt for product 031a98c0f7d6eed7d440734a094a16ffeaa7fccb. Tests are actual focused-only totals 2332/2332, including 177 own Mobility tests, not full qualification. All 23 ordinary checks passed. The current isolated matrix recorded 71 intended kills and 86 AssertionErrors with exact restoration. Native, synthetic local and empty-input results remain distinct; cold-chain integration, human review and production/legal authority stay open. All 110 IDs and 20 unread instruments retain provenance. Full on receipt-bearing Q remains NOT_RUN_AT_ASSEMBLY; repeat 23 checks plus the unfiltered two-worker full and validate off-tree completion/classifications before landing, without another source commit. The old packet is unchanged. The embedded inventory catalogLandingPlan is historical, superseded pre-resolution planning, not a current version/prefix/digest binding. currentCatalogSourceAudit records actual catalog version 0.1.5 and the ed14 catalog digest, resolved source hashes, and the exact 19,251-byte immutable int history prefix with controlled resolution and final source proofs."
+}
