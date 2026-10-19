@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -11,6 +11,9 @@ import type { ComplianceMapping, ComplianceReportJson } from "../src/compliance/
 import { openLedger } from "../src/ledger/ledger.js";
 import type { EvidenceEventType } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
+import { getAgentPaths } from "../src/fleet/paths.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 /**
  * P1-45: a result for one framework never sets a result for another, although mappings of different frameworks share
@@ -38,8 +41,34 @@ const ofFramework = (framework: string) => builtInComplianceMappings.filter((row
 /** A mapping whose requirements bound runtime events alone can meet (no assurance run needed). */
 const eventsOnly = (mapping: ComplianceMapping) => mapping.evidenceRequirements.every((req) => req.type !== "requires_assurance_pack");
 
+/** Synthetic structured report using the existing complianceFailClosed fixture shape, with native sealing/admission. */
+function structuredAssuranceFixture() {
+  const now = Date.now();
+  return {
+    assuranceRunId: `crosswalk-${randomUUID()}`, agentId: AGENT, ts: now, mode: "supervise",
+    windowStartTs: now - 1000, windowEndTs: now, trustTier: "OBSERVED", status: "VALID", verificationPassed: true,
+    sessionId: "synthetic-crosswalk-fixture", evidenceStatus: "MEASURED",
+    packResults: [{ packId: "sbom-supply-chain", score0to100: 100,
+      scenarioResults: [{ auditEventTypes: [] as string[], inconclusive: false }],
+      gradingMethod: "structured", regulatedEligible: true }],
+    overallScore0to100: 100, integrityIndex: 1, trustLabel: "MEASURED", reportJsonSha256: "", runSealSig: ""
+  };
+}
+
+function writeSealedAssuranceFixture(workspace: string, base: ReturnType<typeof structuredAssuranceFixture>): void {
+  const hash = sha256Hex(canonicalize(base));
+  const ledger = openLedger(workspace);
+  let signature: string;
+  try { signature = ledger.signRunHash(hash); } finally { ledger.close(); }
+  const dir = join(getAgentPaths(workspace, AGENT).reportsDir, "assurance");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, `${base.assuranceRunId}.json`),
+    JSON.stringify({ ...base, reportJsonSha256: hash, runSealSig: signature }, null, 2));
+}
+
 /** One OBSERVED runtime event per (mapping, required event type), bound to that mapping when `bind`. */
-function workspaceWithEvidence(mappings: readonly ComplianceMapping[], bind: boolean): string {
+function workspaceWithEvidence(mappings: readonly ComplianceMapping[], bind: boolean,
+  assurance?: ReturnType<typeof structuredAssuranceFixture>): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-crosswalk-no-auto-pass-"));
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "crosswalk-no-auto-pass-passphrase";
@@ -65,6 +94,7 @@ function workspaceWithEvidence(mappings: readonly ComplianceMapping[], bind: boo
   } finally {
     ledger.close();
   }
+  if (assurance !== undefined) writeSealedAssuranceFixture(workspace, assurance);
   return workspace;
 }
 
@@ -72,11 +102,13 @@ function report(workspace: string, framework: ComplianceFramework): ComplianceRe
   return generateComplianceReport({ workspace, framework, window: "14d", agentId: AGENT });
 }
 
-/** What a category says, without per-workspace ids. */
+/** Complete category semantics; only opaque per-workspace evidence reference ids/hashes are omitted. */
 function view(out: ComplianceReportJson) {
-  return out.categories.map((row) => ({
-    id: row.id, status: row.status, result: row.result, evidence: row.evidence, claimKind: row.claimKind,
-    admitted: row.admitted.length, rejected: row.rejected.map((entry) => entry.reason).sort(), reasons: row.notEvaluatedReasons
+  return out.categories.map(({ evidenceRefs, admitted, rejected, ...category }) => ({
+    ...category,
+    evidenceRefs: evidenceRefs.map(({ eventType }) => ({ eventType })),
+    admitted: admitted.map(({ ref, ...item }) => ({ ...item, ref: { kind: ref.kind } })),
+    rejected: rejected.map(({ ref, ...item }) => ({ ...item, ref: { kind: ref.kind } }))
   }));
 }
 
@@ -104,8 +136,11 @@ describe("no auto-pass across crosswalk links", () => {
 
   test("evidence bound to DORA controls only leaves every NIS2 result as it is without the binding: not evaluated", () => {
     const dora = ofFramework("DORA");
-    const bound = workspaceWithEvidence(dora, true);
-    const unbound = workspaceWithEvidence(dora, false);
+    // Synthetic structured report, locally sealed through the native fixture helper pattern; not an executed pack.
+    // Both workspaces get the same captured base bytes, so the shared assurance requirement is not the variable.
+    const assurance = structuredAssuranceFixture();
+    const bound = workspaceWithEvidence(dora, true, assurance);
+    const unbound = workspaceWithEvidence(dora, false, assurance);
 
     // The binding is real: DORA admits the bound evidence, and under the seam an events-only DORA category passes.
     const doraBound = report(bound, "DORA");
@@ -115,6 +150,18 @@ describe("no auto-pass across crosswalk links", () => {
     expect({ status: reporting.status, result: reporting.result, evidence: reporting.evidence })
       .toEqual({ status: "SATISFIED", result: "pass", evidence: "sufficient" });
     expect(report(unbound, "DORA").categories.find((row) => row.id === "dora_art19_major_incident_reporting")!.evidence).toBe("incomplete");
+
+    // Unlike Art. 19, this passing category shares an actual clause-level control with NIS2.
+    const linkedDoraId = "dora_art8_identification";
+    const linkedNis2Id = "nis2_art21_2d_supply_chain";
+    expect(frameworkControls.some((control) => [linkedDoraId, linkedNis2Id]
+      .every((id) => control.mappings.some((link) => link.mappingId === id)))).toBe(true);
+    expect(doraBound.categories.find((row) => row.id === linkedDoraId)).toMatchObject({
+      status: "SATISFIED", result: "pass", evidence: "sufficient", claimKind: "observed"
+    });
+    expect(report(unbound, "DORA").categories.find((row) => row.id === linkedDoraId)).toMatchObject({
+      status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete"
+    });
 
     // NIS2 sees exactly what it would see if the evidence were bound to nothing.
     const nis2Bound = report(bound, "NIS2");

@@ -51,6 +51,12 @@ describe("coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04)", 
     expect(coverageScore([row("SATISFIED"), row("UNKNOWN"), row("UNKNOWN"), row("UNKNOWN")]).score).toBe(0.25);
   });
 
+  test("a self-reported SATISFIED row is displayed but earns no evaluated coverage", () => {
+    const selfReported = { ...row("SATISFIED"), claimKind: "self_reported" as const };
+    expect(coverageScore([selfReported])).toEqual({ satisfied: 0, partial: 0, missing: 0,
+      unknown: 0, notEvaluated: 1, evaluated: 0, score: null });
+  });
+
   test("a self-reported PARTIAL is not an evaluation: the score stays null, not 0", () => {
     const selfReported = { ...row("PARTIAL"), claimKind: "self_reported" as const };
     expect(coverageScore([selfReported])).toEqual({ satisfied: 0, partial: 0, missing: 0, unknown: 0, notEvaluated: 1, evaluated: 0, score: null });
