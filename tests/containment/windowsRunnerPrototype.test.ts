@@ -101,6 +101,14 @@ describe("P2-14 cut-first Windows prototype boundary", () => {
     const f = fixture(reply => ({ ...reply, statusBytes: Buffer.concat([Buffer.from(reply.statusBytes!), Buffer.alloc(64_001, 32)]) }));
     refused(await exercise(f), "status-invalid"); expect(f.events).toEqual(["run", "cleanup"]);
   });
+  test("shadowed status byteLength cannot bypass the captured-byte cap", async () => {
+    const f = fixture(reply => {
+      const statusBytes = Buffer.concat([Buffer.from(reply.statusBytes!), Buffer.alloc(64_001, 32)]);
+      Object.defineProperty(statusBytes, "byteLength", { value: 1 });
+      return { ...reply, statusBytes };
+    });
+    refused(await exercise(f), "status-invalid"); expect(f.events).toEqual(["run", "cleanup"]);
+  });
   test("status for another child refuses with all other bindings valid", async () => {
     const f = fixture((reply, call) => ({ ...reply, statusBytes: bytes({ version: 1, callNonce: call.callNonce,
       childId: 43, policySha256: call.policySha256, exitCode: 0 }) }));
