@@ -10,7 +10,7 @@ export function runScreeningLog(value: unknown): ScreeningOutcome {
   if (!parsed.success) return outcome;
   const input = parsed.data;
   const now = Date.parse(input.at);
-  const isProxy = (id: string) => ["name", "zip", "zipcode"].includes(id.toLowerCase().replace(/[_-]/g, ""));
+  const isProxy = (id: string) => ["name", "zip", "zipcode"].includes(id.toLowerCase().replace(/[\s_-]/g, ""));
   if (!unique(input.permittedFeatureIds) || input.permittedFeatureIds.some(isProxy)) return stop("fail", "proxy_feature_not_permitted");
   const applications = input.pairs.flatMap(pair => [pair.baseline, pair.counterfactual]);
   if (!unique(input.pairs.map(pair => pair.pairId)) || !unique(applications.map(application => application.applicationId))) return stop("fail", "duplicate_screening_identity");

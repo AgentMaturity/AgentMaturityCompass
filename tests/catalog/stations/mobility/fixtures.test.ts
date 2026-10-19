@@ -7,7 +7,7 @@ import { runScreeningLog } from "./screeningLog.js";
 import { runPortAccess } from "./portAccess.js";
 import { runChangeGate } from "./changeGate.js";
 import { runOtaDeployer } from "./otaDeployer.js";
-import { runMobilityOracle, type FixtureCryptoMode } from "./harness.js";
+import { prepareOtaFixture, runMobilityOracle, type FixtureCryptoMode } from "./harness.js";
 import { runVehicleSimulator } from "./vehicleSimulator.js";
 import { changeSchema, fallbackSchema, otaSchema, portSchema, screeningSchema, utcTime } from "./protocol.js";
 
@@ -149,15 +149,21 @@ describe("Mobility synthetic local reference oracles (P3-17)", () => {
     input.pairs.push(extra); const actual = runScreeningLog(input);
     expect(actual.result).toBe("fail"); expect(actual.noticeReleases).toEqual([]);
   });
-  it("refuses duplicate application, pair, reason and feature identities", () => {
-    const fixture = named("oracle-screening-permitted-pairs");
-    const original = screeningSchema.parse(fixture.oracle.input);
-    const variants = [structuredClone(original), structuredClone(original), structuredClone(original), structuredClone(original)];
-    variants[0]!.pairs.push(structuredClone(variants[0]!.pairs[0]!));
-    variants[1]!.pairs[0]!.counterfactual.applicationId = variants[1]!.pairs[0]!.baseline.applicationId;
-    variants[2]!.pairs[0]!.baseline.reasons!.push(structuredClone(variants[2]!.pairs[0]!.baseline.reasons![0]!));
-    variants[3]!.pairs[0]!.baseline.features.push(structuredClone(variants[3]!.pairs[0]!.baseline.features[0]!));
-    for (const input of variants) refused(runScreeningLog(input));
+  it.each(["pair", "application", "reason", "feature", "source"] as const)("refuses duplicate screening %s identities without a second mismatch", (scenario) => {
+    const input = screeningSchema.parse(named("oracle-screening-permitted-pairs").oracle.input);
+    const pair = input.pairs[0]!;
+    if (scenario === "pair") {
+      input.pairs[1]!.pairId = pair.pairId;
+      for (const application of [input.pairs[1]!.baseline, input.pairs[1]!.counterfactual]) application.pairId = pair.pairId;
+    }
+    if (scenario === "application") pair.counterfactual.applicationId = pair.baseline.applicationId;
+    if (scenario === "feature") input.permittedFeatureIds.push("additional-fixture-feature");
+    for (const application of [pair.baseline, pair.counterfactual]) {
+      if (scenario === "reason") application.reasons!.push(structuredClone(application.reasons![0]!));
+      if (scenario === "feature") application.features.push(structuredClone(application.features[0]!));
+      if (scenario === "source") application.reasons![0]!.sourceFeatureIds.push(application.reasons![0]!.sourceFeatureIds[0]!);
+    }
+    refused(runScreeningLog(input));
   });
   it("does not open a raised-level gate from a previously checked revision", () => {
     const actual = runPortAccess(named("oracle-port-raised-without-recheck").oracle.input);
@@ -212,6 +218,36 @@ describe("Mobility synthetic local reference oracles (P3-17)", () => {
     refused(runMobilityOracle({ kind: "ota_deployer", input: { ...input, contextOverride: { explicitPins: ["self-vouch"], allowUnpinned: true } } }));
     expect(runOtaDeployer(input, null)).toMatchObject({ result: "not_evaluated", reasonCode: "trust_unavailable", installedPackages: [] });
     for (const mode of ["invalid_trust", "future_trust", "expired_trust"] as const) refused(runMobilityOracle({ kind: "ota_deployer", input }, { mode }));
+  });
+  it("refuses empty and noncanonical payload bytes even with their actual signed digest", () => {
+    for (const scenario of ["empty", "noncanonical"] as const) {
+      const input = otaSchema.parse(named("oracle-ota-trusted").oracle.input);
+      input.package.payloadBase64 = scenario === "empty" ? "" : input.package.payloadBase64 + "\n";
+      const actual = runMobilityOracle({ kind: "ota_deployer", input });
+      expect(actual.installedPackages).toEqual([]);
+      expect(actual.result).toBe("deny"); expect(actual.reasonCode).toBe("payload_invalid");
+    }
+  });
+  it("refuses duplicate fleet and model identities before any synthetic install", () => {
+    for (const scenario of ["fleet", "model"] as const) {
+      const input = otaSchema.parse(named("oracle-ota-trusted").oracle.input);
+      if (scenario === "fleet") input.fleet!.vehicleIds.push(input.fleet!.vehicleIds[0]!);
+      else input.package.metadata.r156!.vehicleModelIds!.push(input.package.metadata.r156!.vehicleModelIds![0]!);
+      const actual = runMobilityOracle({ kind: "ota_deployer", input });
+      expect(actual.installedPackages).toEqual([]); expect(actual.result).toBe("deny");
+    }
+  });
+  it("refuses duplicate root pins and caller trust flags under an otherwise valid signed authority", () => {
+    const prepared = prepareOtaFixture(named("oracle-ota-trusted").oracle.input, "valid");
+    const authority = prepared.authority!;
+    for (const candidate of [
+      { ...authority, pinnedRootKeyIds: [...authority.pinnedRootKeyIds, ...authority.pinnedRootKeyIds] },
+      { ...authority, allowUnpinned: true }
+    ]) {
+      const actual = runOtaDeployer(prepared.input, candidate);
+      expect(actual.installedPackages).toEqual([]);
+      expect(actual.result).toBe("deny"); expect(actual.reasonCode).toBe("trust_verification_failed");
+    }
   });
   it("refuses actual content, records, fleet/model/version and metadata-time mismatches without install effects", () => {
     const original = otaSchema.parse(named("oracle-ota-trusted").oracle.input);

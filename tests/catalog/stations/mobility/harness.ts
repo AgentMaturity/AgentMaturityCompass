@@ -32,7 +32,7 @@ export type FixtureCryptoMode = "valid" | "unsigned" | "unknown_signer" | "revok
 export interface MobilityOracleSpec { kind: "release_check" | "screening_log" | "port_access" | "change_gate" | "ota_deployer" | "vehicle_simulator"; input: unknown }
 
 /** Fixture-only arrangement. Private keys remain in memory; callers cannot pass a TrustContext or use a mode as a verdict. */
-function prepareOta(value: unknown, mode: FixtureCryptoMode) {
+export function prepareOtaFixture(value: unknown, mode: FixtureCryptoMode) {
   // Preserve malformed caller properties for the oracle to reject; no expected result is read here.
   const input = structuredClone(value) as OtaInput;
   const root = generateKeyPairSync("ed25519"), release = generateKeyPairSync("ed25519"), other = generateKeyPairSync("ed25519");
@@ -72,7 +72,7 @@ export function runMobilityOracle(spec: MobilityOracleSpec, fixtureCrypto?: { mo
     case "screening_log": return runScreeningLog(spec.input);
     case "port_access": return runPortAccess(spec.input);
     case "change_gate": return runChangeGate(spec.input);
-    case "ota_deployer": { const prepared = prepareOta(spec.input, fixtureCrypto?.mode ?? "valid"); return runOtaDeployer(prepared.input, prepared.authority); }
+    case "ota_deployer": { const prepared = prepareOtaFixture(spec.input, fixtureCrypto?.mode ?? "valid"); return runOtaDeployer(prepared.input, prepared.authority); }
     case "vehicle_simulator": return runVehicleSimulator(spec.input);
   }
 }
