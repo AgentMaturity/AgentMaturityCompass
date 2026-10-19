@@ -375,16 +375,16 @@ export interface FamilyReview {
 }
 
 const FAMILY_FLAGS: Partial<Record<ComplianceFramework, readonly string[]>> = {
-  HHS_HTI_1: ["At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing. The HTI-5 proposed rule "
-    + "(90 FR 60970, 2025-12-29) proposes removing the §170.315(b)(11) source-attribute and risk-management requirements. "
-    + "On 2026-10-18 the eCFR showed no amendment to §170.315 after 2025-10-01, so (b)(11) was still in the CFR then."],
-  CO_AI_ACT: ["SB26-189 re-verified 2026-10-18: the bill page lists it as law (signed 2026-05-14, Session Laws ch. 131), and every "
-    + "quoted clause matches the final act text (leg.colorado.gov bill file 116432). Its duties apply from 2027-01-01; "
-    + "re-verify before publishing."],
+  HHS_HTI_1: ["At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing. "
+    + "The recorded HTI-5 proposal reference requires re-verification. The 2026-10-19 source requests did not establish "
+    + "current eCFR text or proposed/final rule status."],
+  CO_AI_ACT: ["The SB26-189 publisher page and act were captured on 2026-10-19. The page lists a signed act dated 2026-05-14. "
+    + "Its quotations require case or page-layout reconciliation and remain unverified under the source-text policy. "
+    + "Pinpoint, commencement and current-law applicability review remain pending; re-verify before publishing."],
   KR_AI_BASIC_ACT: ["Article text comes from the KLRI English reference translation, not an official publisher, and the Korean text "
     + "governs. The Art. 31-35 pinpoints were not verified against an official text; re-verify before publishing."],
   ISO_42001: ["ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "
-    + "\"unverified: source unreachable\". Its three categories are listed, never evaluated or counted. The ISO 42006 "
+    + "\"unverified: source unreachable\". Its three mapping IDs stay NOT_EVALUATED even after a display-category rename; the original category also stays descoped. The ISO 42006 "
     + "category is an AMC signal, not a clause mapping."]
 };
 

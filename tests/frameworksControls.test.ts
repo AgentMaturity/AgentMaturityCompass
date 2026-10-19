@@ -5,8 +5,9 @@ import { frameworkControls } from "../src/compliance/frameworks/controls.js";
 import { classifyFrameworkString, getFrameworkFamily, normalizeFrameworkName } from "../src/compliance/frameworks.js";
 import { frameworkControlSchema, type FrameworkControl } from "../src/compliance/mappingSchema.js";
 
-// Families the round-2 mappings were applied to; each must carry at least one verified clause.
-const APPLIED_FRAMEWORKS = ["DORA", "NIS2", "NIST_AI_600_1", "NIST_AI_RMF", "CO_AI_ACT", "TX_TRAIGA", "CA_AI_LAWS", "HHS_HTI_1", "HIPAA"];
+// Current source-text decisions: six families have supported text; three remain wholly unverified.
+const TEXT_VERIFIED_FRAMEWORKS = ["NIS2", "NIST_AI_600_1", "NIST_AI_RMF", "TX_TRAIGA", "CA_AI_LAWS", "HIPAA"];
+const UNVERIFIED_FRAMEWORKS = ["DORA", "CO_AI_ACT", "HHS_HTI_1"];
 
 describe("clause-level framework controls", () => {
   test("every control passes the schema: source url, retrievedAt, verified, paraphrase flag", () => {
@@ -38,26 +39,37 @@ describe("clause-level framework controls", () => {
     expect(frameworkControls.filter((row) => !isSharedOfficialUrl(row.sourceUrl)).map((row) => row.controlId)).toEqual([]);
   });
 
-  test.each(APPLIED_FRAMEWORKS)("%s has at least one verified control", (framework) => {
+  test.each(TEXT_VERIFIED_FRAMEWORKS)("%s has current source-text-verified controls", (framework) => {
     expect(frameworkControls.some((row) => row.framework === framework && row.verified)).toBe(true);
   });
 
-  test("no framework carries controls without a verified one", () => {
-    const frameworks = new Set(frameworkControls.map((row) => row.framework));
-    for (const framework of frameworks) {
-      expect(frameworkControls.some((row) => row.framework === framework && row.verified), framework).toBe(true);
+  test.each(UNVERIFIED_FRAMEWORKS)("%s retains only unverified controls with reasons", (framework) => {
+    const rows = frameworkControls.filter((row) => row.framework === framework);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(row.verified, row.controlId).toBe(false);
+      expect(row.unverifiedReason?.trim().length, row.controlId).toBeGreaterThan(0);
     }
   });
 
-  test("per-framework control and verified counts (apply/frameworks/counts.json, 2026-10-04)", () => {
+  test("source-text decisions cover every family and preserve retrieval provenance", () => {
+    const frameworks = [...new Set(frameworkControls.map((row) => row.framework))].sort();
+    expect(frameworks).toEqual([...TEXT_VERIFIED_FRAMEWORKS, ...UNVERIFIED_FRAMEWORKS].sort());
+    for (const row of frameworkControls) {
+      if (row.verified) expect(row.retrievedAt, row.controlId).toBe("2026-10-19");
+      else expect(["2026-10-03", "2026-10-04"], row.controlId).toContain(row.retrievedAt);
+    }
+  });
+
+  test("per-framework controls and current source-text-verified counts (2026-10-19)", () => {
     const counts: Record<string, [number, number]> = {};
     for (const row of frameworkControls) {
       const [total, verified] = counts[row.framework] ?? [0, 0];
       counts[row.framework] = [total + 1, verified + (row.verified ? 1 : 0)];
     }
     expect(counts).toEqual({
-      DORA: [56, 55], NIS2: [89, 89], NIST_AI_600_1: [12, 12], NIST_AI_RMF: [49, 49], CO_AI_ACT: [11, 11],
-      TX_TRAIGA: [10, 10], CA_AI_LAWS: [15, 15], HHS_HTI_1: [19, 19], HIPAA: [29, 29],
+      DORA: [56, 0], NIS2: [89, 25], NIST_AI_600_1: [12, 10], NIST_AI_RMF: [49, 49], CO_AI_ACT: [11, 0],
+      TX_TRAIGA: [10, 10], CA_AI_LAWS: [15, 5], HHS_HTI_1: [19, 0], HIPAA: [29, 13],
     });
   });
 

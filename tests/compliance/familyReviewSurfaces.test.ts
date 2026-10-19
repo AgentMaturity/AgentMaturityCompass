@@ -12,7 +12,7 @@ import { familyReview } from "../../src/compliance/frameworks.js";
 import { initWorkspace } from "../../src/workspace.js";
 
 /**
- * P1-45: the experimental, unreviewed status and the family flags (HTI-1 at risk, Colorado re-verified) travel with every
+ * P1-45: the experimental, unreviewed status and the family flags (HTI-1 at risk, Colorado source-context review pending) travel with every
  * compliance surface as an additive `familyReview` field, not only in the single-report Markdown.
  */
 
