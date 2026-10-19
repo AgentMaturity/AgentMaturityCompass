@@ -69,10 +69,14 @@ function validateReply(reply: unknown, invocation: WindowsPrototypeRequest & { r
   const transport = transportSchema.safeParse(reply);
   if (!transport.success) return result("status-invalid", "synthetic_example");
   const received = transport.data.statusBytes;
-  if (received === null || received === undefined || received.byteLength === 0) return result("status-missing", "synthetic_example");
-  if (received.byteLength > 64_000) return result("status-invalid", "synthetic_example");
+  if (received === null || received === undefined) return result("status-missing", "synthetic_example");
+  const size = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Uint8Array.prototype), "byteLength")!.get!.call(received) as number;
+  if (size === 0) return result("status-missing", "synthetic_example");
+  if (size > 64_000) return result("status-invalid", "synthetic_example");
   // Copy the status channel once before decoding; never trust later mutations of the fake reply.
-  const captured = Buffer.from(received);
+  const captured = Buffer.alloc(size);
+  Uint8Array.prototype.set.call(captured, received);
+  if (captured.length > 64_000) return result("status-invalid", "synthetic_example");
   const text = captured.toString("utf8");
   if (!Buffer.from(text, "utf8").equals(captured)) return result("status-invalid", "synthetic_example");
   let value: unknown;
