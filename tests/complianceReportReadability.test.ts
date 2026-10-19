@@ -131,7 +131,10 @@ describe("compliance report readability", () => {
     const hti1 = complianceReportToMarkdown({ ...fixtureReport(), framework: "HHS_HTI_1" });
     expect(hti1).toContain(experimental);
     expect(hti1).toContain("- Flag: At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing.");
-    expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" })).toContain("SB26-189 re-verified 2026-10-18");
+    const colorado = complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" });
+    expect(colorado).toContain("SB26-189 publisher page and act were captured on 2026-10-19");
+    expect(colorado).toContain("remain unverified under the source-text policy");
+    expect(colorado).toContain("current-law applicability review remain pending");
     // A report from an older version with a framework this build does not know still says experimental.
     expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "RETIRED_FRAMEWORK" })).toContain(experimental);
   });

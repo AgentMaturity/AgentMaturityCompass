@@ -63,7 +63,9 @@ describe("family review status", () => {
 
   test("Colorado records the retrieval date of the SB26-189 text and asks for re-verification", () => {
     const flags = familyReview("CO_AI_ACT").flags.join(" ");
-    expect(flags).toContain("SB26-189 re-verified 2026-10-18");
+    expect(flags).toContain("SB26-189 publisher page and act were captured on 2026-10-19");
+    expect(flags).toContain("remain unverified under the source-text policy");
+    expect(flags).toContain("current-law applicability review remain pending");
     expect(flags).toContain("re-verify before publishing");
     const sources = builtInComplianceMappings.filter((row) => row.framework === "CO_AI_ACT").flatMap((row) => row.sources ?? []);
     expect(new Set(sources.map((source) => source.retrievedAt))).toEqual(new Set(["2026-10-04"]));
