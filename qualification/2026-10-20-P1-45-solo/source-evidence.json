@@ -1,0 +1,1354 @@
+{
+ "item": "P1-45",
+ "state": "PROPOSED_CURRENT_SOURCE_REVIEW_CONTENT_NOT_QUALIFICATION",
+ "sourceSnapshot": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+ "int": "8132127925426c41fb3c25402f1615ca23019f11",
+ "finalQualifiedHead": null,
+ "experimental": true,
+ "expertSignOff": null,
+ "legalApplicabilityApproval": false,
+ "reverify": true,
+ "inputs": {
+  "sourceObservations": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/source-quote-match-observations-h3d5740-v1.json",
+   "sha256": "0bc24705e67fd3b61b0aed82d71f6c13777a672b817290abd5adb2143d29ff66",
+   "bytes": 469549
+  },
+  "rootSourceTextPolicy": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/root-current-source-text-verification-policy-before-edits-v1.json",
+   "sha256": "15af5ea11c6da70cb2bbc781fe58b94a20e753518dfb9056a00efe4dd94aacac",
+   "bytes": 347101
+  },
+  "textExtractionIndex": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/index.json",
+   "sha256": "a80a6adeb5ffeaf0ea202b5d58a835137938ce09501c151a31a536027c803d1d",
+   "bytes": 28583
+  },
+  "sourceQuoteContext": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/source-quote-context-and-fallback-h3d5740-v2.json",
+   "sha256": "3784d6771f7f59590dd7c7db496b13df32c9fb591e027e7b8b5e70af795c7352",
+   "bytes": 135892
+  },
+  "initialOwnerInventory": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/regulatory-source-review-inventory-owner-ba8202-v1.json",
+   "sha256": "9fa8dc1da1a980e1eecda5c652b8fac8d4f76cae593699e4ed378646d30c84c5",
+   "bytes": 467011
+  }
+ },
+ "sourceQuoteVerificationCounts": {
+  "total": 290,
+  "sourceTextVerified": 112,
+  "unverified": 178,
+  "strictRawOrWhitespace": 82,
+  "ligatureOnlyContiguous": 30,
+  "unavailableCitedSource": 148,
+  "remainingEditorialCaseLayoutPending": 30
+ },
+ "method": {
+  "strictRaw": 15,
+  "whitespaceOnly": 67,
+  "ligatureOnly": 30,
+  "ligatures": {
+   "actualChangedCharacters": [
+    "ﬀ",
+    "ﬁ",
+    "ﬂ",
+    "ﬃ"
+   ],
+   "method": "Unicode NFKC expansion of only ﬁ/ﬀ/ﬂ/ﬃ plus whitespace collapse; no casefold, punctuation, hyphen, footer, footnote or editorial-gap deletion",
+   "sourceText": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/09.txt",
+    "sha256": "e2db91a3d2891cd6bc4395cd6cea107d191f6e976b174665bf027e2061900d68",
+    "bytes": 206681
+   },
+   "derivedSourceSha256": "5ecc56a2354c4bb44ebf977289f76820d14f36faf5e2f25938d9d90aece252d8"
+  },
+  "acceptedTransformationsOnly": [
+   "DISCLOSED_NFKC_LIGATURE_CONTIGUOUS_TEXT",
+   "EXACT_RAW_CONTIGUOUS_TEXT",
+   "WHITESPACE_ONLY_CONTIGUOUS_TEXT"
+  ],
+  "notAccepted": "No casefold, punctuation change, hyphen/footer/footnote deletion or editorial gap omission. Diagnostic candidate matches remain false. The one paraphrase remains false.",
+  "scope": "Source inclusion only. Pinpoint, current consolidated law, commencement, applicability, rationale overlap and expert approval remain open."
+ },
+ "urls": 28,
+ "capturedHttp200": 8,
+ "unavailable": 20,
+ "mappingSourceDeclarationsHistorical": {
+  "DORA_TEXT": {
+   "title": "Regulation (EU) 2022/2554 (DORA), OJ L 333, 27.12.2022 — EU Publications Office",
+   "url": "https://publications.europa.eu/resource/celex/32022R2554",
+   "retrievedAt": "2026-10-03",
+   "sourceLine": 14
+  },
+  "NIS2_TEXT": {
+   "title": "Directive (EU) 2022/2555 (NIS 2 Directive), OJ L 333, 27.12.2022 — EU Publications Office",
+   "url": "https://publications.europa.eu/resource/celex/32022L2555",
+   "retrievedAt": "2026-10-03",
+   "sourceLine": 19
+  },
+  "HTI1_CFR_TEXT": {
+   "title": "45 CFR 170.315(b)(11) Decision support interventions — eCFR, point-in-time 2026-10-01",
+   "url": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-D/part-170/subpart-C/section-170.315",
+   "retrievedAt": "2026-10-03",
+   "sourceLine": 24
+  },
+  "HTI1_RULE": {
+   "title": "HTI-1 final rule, 89 FR 1192 (2024-01-09), effective 2024-02-08",
+   "url": "https://www.federalregister.gov/documents/2024/01/09/2023-28857/health-data-technology-and-interoperability-certification-program-updates-algorithm-transparency-and",
+   "retrievedAt": "2026-10-03",
+   "sourceLine": 29
+  },
+  "NIST_AI_600_1_TEXT": {
+   "title": "NIST AI 600-1, AI RMF: Generative Artificial Intelligence Profile (July 2024), doi:10.6028/NIST.AI.600-1",
+   "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 35
+  },
+  "CO_SB26_189_ACT": {
+   "title": "Colorado SB26-189 final act (2026-05-12), C.R.S. 6-1-1701 to 6-1-1709; takes effect 2027-01-01",
+   "url": "https://leg.colorado.gov/bill_files/116432/download",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 40
+  },
+  "CO_SB26_189_STATUS": {
+   "title": "Colorado General Assembly, SB26-189 bill page (signed act 2026-05-14)",
+   "url": "https://leg.colorado.gov/bills/sb26-189",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 45
+  },
+  "TX_HB149_TEXT": {
+   "title": "Texas HB 149 (89R) enrolled, Bus. & Com. Code ch. 552; takes effect 2026-01-01",
+   "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 50
+  },
+  "CA_SB53_TEXT": {
+   "title": "California SB 53 (2025), chaptered 2025-09-29, B&P §22757.10 et seq.",
+   "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 55
+  },
+  "CA_AB2013_TEXT": {
+   "title": "California AB 2013 (2024), ch. 817, Civ. Code §3110-3111",
+   "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2013",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 60
+  },
+  "CA_CCPA_ADMT_TEXT": {
+   "title": "CPPA approved regulations text (CCPA updates, cybersecurity audits, risk assessments, ADMT), 11 CCR Art. 11 §7200-7222; OAL-approved 2025-09-22",
+   "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 65
+  },
+  "KR_AI_ACT_KLRI": {
+   "title": "Framework Act on the Development of AI and the Creation of a Foundation for Trust, Act No. 20676 as amended by Act No. 21311 — KLRI English reference translation (Korean text governs)",
+   "url": "https://elaw.klri.re.kr/eng_mobile/viewer.do?hseq=73499&type=part&key=18",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 70
+  },
+  "KR_AI_ACT_LAW_GO_KR": {
+   "title": "National Law Information Center (law.go.kr) English record: Law No. 20676, enacted 2025-01-21, effective 2026-01-22 (header only; article text read from KLRI)",
+   "url": "https://www.law.go.kr/LSW/lsInfoP.do?chrClsCd=010203&lsiSeq=268543&urlMode=engLsInfoR&viewCls=engLsInfoR",
+   "retrievedAt": "2026-10-04",
+   "sourceLine": 75
+  }
+ },
+ "sources": [
+  {
+   "index": 0,
+   "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:21:58.955Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/00.body.bin",
+    "sha256": "82b55443766cdd0ec090a32e40b0e10e1becf81123c303ec43517e142215e3ed",
+    "bytes": 220243
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/00.txt",
+    "sha256": "e8bb373bec5cf06472c8054417d56a6b9f3f5aee7f508fc9b7a471cb7be0fb91",
+    "bytes": 39372
+   },
+   "extractor": {
+    "method": "Python standard-library HTMLParser, convert_charrefs; script/style text excluded; UTF-8 strict",
+    "scope": "No external resources loaded and no response code executed"
+   },
+   "controlIds": [
+    "TX-552.051(b)-(e)",
+    "TX-552.051(f)",
+    "TX-552.052",
+    "TX-552.053",
+    "TX-552.054(b)",
+    "TX-552.055",
+    "TX-552.056(b)-(c)",
+    "TX-552.057",
+    "TX-552.103(b)",
+    "TX-552.105(e)"
+   ],
+   "mappingIds": [
+    "tx_traiga_ag_documentation",
+    "tx_traiga_behavioral_manipulation",
+    "tx_traiga_consumer_disclosure",
+    "tx_traiga_unlawful_discrimination"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 10,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 1,
+   "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:00.263Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/01.body.bin",
+    "sha256": "7a34306cebf12ae9050490568b1d7ed532cfd38dc6ed8c7c3dc40afb23328650",
+    "bytes": 666571
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/01.txt",
+    "sha256": "8e88c599d6be4db7aa724a4e25414e6d97cd39680d561fd28d3e8d95bccf05cd",
+    "bytes": 307836
+   },
+   "extractor": {
+    "command": [
+     "/opt/homebrew/bin/pdftotext",
+     "-layout",
+     "-",
+     "-"
+    ],
+    "input": "same verified source bytes through stdin",
+    "timeoutSeconds": 20,
+    "claim": "Text extraction only, not a legal/pinpoint correctness check",
+    "exit": 0,
+    "stderr": {
+     "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/01-pdftotext-stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   "controlIds": [
+    "CA-CCPA-7150(b)(3)",
+    "CA-CCPA-7157",
+    "CA-CCPA-7200",
+    "CA-CCPA-7220",
+    "CA-CCPA-7221",
+    "CA-CCPA-7222"
+   ],
+   "mappingIds": [
+    "ca_ccpa_admt_access",
+    "ca_ccpa_admt_human_appeal",
+    "ca_ccpa_admt_pre_use_notice"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 5,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 2,
+   "url": "https://elaw.klri.re.kr/eng_mobile/viewer.do?hseq=73499&type=part&key=18",
+   "fetchStatus": "unavailable",
+   "httpStatus": null,
+   "fetchError": {
+    "code": "NONOFFICIAL_SOURCE_REFUSED_BEFORE_DNS"
+   },
+   "fetchedAt": null,
+   "body": null,
+   "text": null,
+   "extractor": null,
+   "controlIds": [],
+   "mappingIds": [
+    "kr_ai_act_art31_transparency",
+    "kr_ai_act_art32_safety",
+    "kr_ai_act_art34_operator_measures",
+    "kr_ai_act_art35_impact_assessment"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 3,
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202402690",
+   "fetchStatus": "unavailable",
+   "httpStatus": 202,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:03.037Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/03.body.bin",
+    "sha256": "5af510e706a25f3c5e3fa34798e7d6c62ff87fb9729bdde4cee52947f41f2da9",
+    "bytes": 2035
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "NIS2-IR2690-ANNEX-1.1",
+    "NIS2-IR2690-ANNEX-1.2",
+    "NIS2-IR2690-ANNEX-10.1",
+    "NIS2-IR2690-ANNEX-10.2",
+    "NIS2-IR2690-ANNEX-10.3",
+    "NIS2-IR2690-ANNEX-10.4",
+    "NIS2-IR2690-ANNEX-11.1",
+    "NIS2-IR2690-ANNEX-11.2",
+    "NIS2-IR2690-ANNEX-11.3",
+    "NIS2-IR2690-ANNEX-11.4",
+    "NIS2-IR2690-ANNEX-11.5",
+    "NIS2-IR2690-ANNEX-11.6",
+    "NIS2-IR2690-ANNEX-11.7",
+    "NIS2-IR2690-ANNEX-12.1",
+    "NIS2-IR2690-ANNEX-12.2",
+    "NIS2-IR2690-ANNEX-12.3",
+    "NIS2-IR2690-ANNEX-12.4",
+    "NIS2-IR2690-ANNEX-12.5",
+    "NIS2-IR2690-ANNEX-13.1",
+    "NIS2-IR2690-ANNEX-13.2",
+    "NIS2-IR2690-ANNEX-13.3",
+    "NIS2-IR2690-ANNEX-2.1",
+    "NIS2-IR2690-ANNEX-2.2",
+    "NIS2-IR2690-ANNEX-2.3",
+    "NIS2-IR2690-ANNEX-3.1",
+    "NIS2-IR2690-ANNEX-3.2",
+    "NIS2-IR2690-ANNEX-3.3",
+    "NIS2-IR2690-ANNEX-3.4",
+    "NIS2-IR2690-ANNEX-3.5",
+    "NIS2-IR2690-ANNEX-3.6",
+    "NIS2-IR2690-ANNEX-4.1",
+    "NIS2-IR2690-ANNEX-4.2",
+    "NIS2-IR2690-ANNEX-4.3",
+    "NIS2-IR2690-ANNEX-5.1",
+    "NIS2-IR2690-ANNEX-5.2",
+    "NIS2-IR2690-ANNEX-6.1",
+    "NIS2-IR2690-ANNEX-6.10",
+    "NIS2-IR2690-ANNEX-6.2",
+    "NIS2-IR2690-ANNEX-6.3",
+    "NIS2-IR2690-ANNEX-6.4",
+    "NIS2-IR2690-ANNEX-6.5",
+    "NIS2-IR2690-ANNEX-6.6",
+    "NIS2-IR2690-ANNEX-6.7",
+    "NIS2-IR2690-ANNEX-6.8",
+    "NIS2-IR2690-ANNEX-6.9",
+    "NIS2-IR2690-ANNEX-7",
+    "NIS2-IR2690-ANNEX-8.1",
+    "NIS2-IR2690-ANNEX-8.2",
+    "NIS2-IR2690-ANNEX-9",
+    "NIS2-IR2690-ART1",
+    "NIS2-IR2690-ART10",
+    "NIS2-IR2690-ART11",
+    "NIS2-IR2690-ART12",
+    "NIS2-IR2690-ART13",
+    "NIS2-IR2690-ART14",
+    "NIS2-IR2690-ART16",
+    "NIS2-IR2690-ART2",
+    "NIS2-IR2690-ART3",
+    "NIS2-IR2690-ART4",
+    "NIS2-IR2690-ART5",
+    "NIS2-IR2690-ART6",
+    "NIS2-IR2690-ART7",
+    "NIS2-IR2690-ART8",
+    "NIS2-IR2690-ART9"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 64,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 4,
+   "url": "https://leg.colorado.gov/bill_files/116432/download",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:04.544Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/04.body.bin",
+    "sha256": "902740b73dcbaf0fc5bb967551325cd042fee8b508ae38e5c1e36e1873ff383a",
+    "bytes": 208936
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/04.txt",
+    "sha256": "652e3524887679ffda58b2357ef04acebb7922586d0b7c07100ece30f0a49072",
+    "bytes": 40880
+   },
+   "extractor": {
+    "command": [
+     "/opt/homebrew/bin/pdftotext",
+     "-layout",
+     "-",
+     "-"
+    ],
+    "input": "same verified source bytes through stdin",
+    "timeoutSeconds": 20,
+    "claim": "Text extraction only, not a legal/pinpoint correctness check",
+    "exit": 0,
+    "stderr": {
+     "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/04-pdftotext-stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   "controlIds": [
+    "CO-6-1-1701(2),(5),(13)",
+    "CO-6-1-1702(1)",
+    "CO-6-1-1702(2)",
+    "CO-6-1-1702(4)",
+    "CO-6-1-1703",
+    "CO-6-1-1704(1)-(2)",
+    "CO-6-1-1704(3)",
+    "CO-6-1-1704(8)",
+    "CO-6-1-1705(1)",
+    "CO-6-1-1707(1)",
+    "CO-6-1-1708(3)(c)"
+   ],
+   "mappingIds": [
+    "co_admt_deployer_notice",
+    "co_admt_developer_documentation",
+    "co_admt_human_review",
+    "co_admt_record_keeping"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 11,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 5,
+   "url": "https://leg.colorado.gov/bills/sb26-189",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:06.214Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/05.body.bin",
+    "sha256": "95efebfc94aba91a87680a3c8cd74a9c6cfd73c7dae130a5a0090f51eb572b6c",
+    "bytes": 123414
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/05.txt",
+    "sha256": "9b901173ae2b2ef657e06a063ba3eebc3921e3862d29a314e85560d3d1ac591c",
+    "bytes": 11488
+   },
+   "extractor": {
+    "method": "Python standard-library HTMLParser, convert_charrefs; script/style text excluded; UTF-8 strict",
+    "scope": "No external resources loaded and no response code executed"
+   },
+   "controlIds": [],
+   "mappingIds": [
+    "co_admt_deployer_notice",
+    "co_admt_developer_documentation",
+    "co_admt_human_review",
+    "co_admt_record_keeping"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 6,
+   "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2013",
+   "fetchStatus": "unavailable",
+   "httpStatus": 403,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:06.953Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/06.body.bin",
+    "sha256": "9c64aa480dc9774674567a489eeaabe5598b0b210aae6dc93435ef6c85606a8c",
+    "bytes": 5698
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [],
+   "mappingIds": [
+    "ca_ab2013_training_data"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 7,
+   "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53",
+   "fetchStatus": "unavailable",
+   "httpStatus": 403,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:07.080Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/07.body.bin",
+    "sha256": "7196d5ef1b8767afd7943227a1da8a41eb4d64f0dd7cfbe429f68f517f1c49c4",
+    "bytes": 5692
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "CA-SB53-22757.12(a)",
+    "CA-SB53-22757.12(b)",
+    "CA-SB53-22757.12(c)",
+    "CA-SB53-22757.12(d)",
+    "CA-SB53-22757.12(e)",
+    "CA-SB53-22757.12(f)",
+    "CA-SB53-22757.13(c)",
+    "CA-SB53-LAB-1107.1(e)"
+   ],
+   "mappingIds": [
+    "ca_sb53_critical_incident_reporting",
+    "ca_sb53_frontier_framework",
+    "ca_sb53_transparency_report"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 8,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 8,
+   "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=3111.",
+   "fetchStatus": "unavailable",
+   "httpStatus": 403,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:07.126Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/08.body.bin",
+    "sha256": "8d9f0667185eabb2e13dfbf3406d20692d825039e2411973e2a726df142d4255",
+    "bytes": 5768
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "CA-AB2013-CIV-3111"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 9,
+   "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:08.131Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/09.body.bin",
+    "sha256": "6e73620ab6b64e90ef2c04bf0e0d6246185a2f4b1b13cab0df494496cff89b6a",
+    "bytes": 1174643
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/09.txt",
+    "sha256": "e2db91a3d2891cd6bc4395cd6cea107d191f6e976b174665bf027e2061900d68",
+    "bytes": 206681
+   },
+   "extractor": {
+    "command": [
+     "/opt/homebrew/bin/pdftotext",
+     "-layout",
+     "-",
+     "-"
+    ],
+    "input": "same verified source bytes through stdin",
+    "timeoutSeconds": 20,
+    "claim": "Text extraction only, not a legal/pinpoint correctness check",
+    "exit": 0,
+    "stderr": {
+     "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/09-pdftotext-stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   "controlIds": [
+    "NIST-AI-600-1-GV-1.1",
+    "NIST-AI-600-1-GV-1.2",
+    "NIST-AI-600-1-GV-1.3",
+    "NIST-AI-600-1-GV-1.4",
+    "NIST-AI-600-1-GV-1.5",
+    "NIST-AI-600-1-GV-1.6",
+    "NIST-AI-600-1-GV-1.7",
+    "NIST-AI-600-1-GV-2.1",
+    "NIST-AI-600-1-GV-3.2",
+    "NIST-AI-600-1-GV-4.1",
+    "NIST-AI-600-1-GV-4.2",
+    "NIST-AI-600-1-GV-4.3",
+    "NIST-AI-600-1-GV-5.1",
+    "NIST-AI-600-1-GV-6.1",
+    "NIST-AI-600-1-GV-6.2",
+    "NIST-AI-600-1-MG-1.3",
+    "NIST-AI-600-1-MG-2.2",
+    "NIST-AI-600-1-MG-2.3",
+    "NIST-AI-600-1-MG-2.4",
+    "NIST-AI-600-1-MG-3.1",
+    "NIST-AI-600-1-MG-3.2",
+    "NIST-AI-600-1-MG-4.1",
+    "NIST-AI-600-1-MG-4.2",
+    "NIST-AI-600-1-MG-4.3",
+    "NIST-AI-600-1-MP-1.1",
+    "NIST-AI-600-1-MP-1.2",
+    "NIST-AI-600-1-MP-2.1",
+    "NIST-AI-600-1-MP-2.2",
+    "NIST-AI-600-1-MP-2.3",
+    "NIST-AI-600-1-MP-3.4",
+    "NIST-AI-600-1-MP-4.1",
+    "NIST-AI-600-1-MP-5.1",
+    "NIST-AI-600-1-MP-5.2",
+    "NIST-AI-600-1-MS-1.1",
+    "NIST-AI-600-1-MS-1.3",
+    "NIST-AI-600-1-MS-2.10",
+    "NIST-AI-600-1-MS-2.11",
+    "NIST-AI-600-1-MS-2.12",
+    "NIST-AI-600-1-MS-2.13",
+    "NIST-AI-600-1-MS-2.2",
+    "NIST-AI-600-1-MS-2.3",
+    "NIST-AI-600-1-MS-2.5",
+    "NIST-AI-600-1-MS-2.6",
+    "NIST-AI-600-1-MS-2.7",
+    "NIST-AI-600-1-MS-2.8",
+    "NIST-AI-600-1-MS-2.9",
+    "NIST-AI-600-1-MS-3.2",
+    "NIST-AI-600-1-MS-3.3",
+    "NIST-AI-600-1-MS-4.2",
+    "NIST-AI-600-1-R2.1",
+    "NIST-AI-600-1-R2.10",
+    "NIST-AI-600-1-R2.11",
+    "NIST-AI-600-1-R2.12",
+    "NIST-AI-600-1-R2.2",
+    "NIST-AI-600-1-R2.3",
+    "NIST-AI-600-1-R2.4",
+    "NIST-AI-600-1-R2.5",
+    "NIST-AI-600-1-R2.6",
+    "NIST-AI-600-1-R2.7",
+    "NIST-AI-600-1-R2.8",
+    "NIST-AI-600-1-R2.9"
+   ],
+   "mappingIds": [
+    "nist600_confabulation",
+    "nist600_data_privacy",
+    "nist600_information_integrity",
+    "nist600_information_security",
+    "nist600_value_chain"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 59,
+   "controlsUnverified": 2,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 10,
+   "url": "https://publications.europa.eu/resource/celex/32022L2555",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:09.697Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/10.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [],
+   "mappingIds": [
+    "nis2_art20_governance",
+    "nis2_art21_2a_risk_policies",
+    "nis2_art21_2b_incident_handling",
+    "nis2_art21_2c_business_continuity",
+    "nis2_art21_2d_supply_chain",
+    "nis2_art21_2e_secure_development",
+    "nis2_art21_2f_effectiveness",
+    "nis2_art21_2i_access_control",
+    "nis2_art23_reporting"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 11,
+   "url": "https://publications.europa.eu/resource/celex/32022R2554",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:10.368Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/11.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "DORA-10(1)",
+    "DORA-10(2)",
+    "DORA-11(1)",
+    "DORA-11(6)",
+    "DORA-12(1)-(2)",
+    "DORA-12(6)",
+    "DORA-13(2)",
+    "DORA-14(1)",
+    "DORA-16(1)",
+    "DORA-17(1)-(2)",
+    "DORA-17(3)(b)",
+    "DORA-17(3)(e)",
+    "DORA-18(1)",
+    "DORA-19(1)",
+    "DORA-19(3)",
+    "DORA-19(4)",
+    "DORA-24(1)",
+    "DORA-24(4)",
+    "DORA-24(5)-(6)",
+    "DORA-25(1)",
+    "DORA-26(1)",
+    "DORA-27(1)",
+    "DORA-28(1)",
+    "DORA-28(3)",
+    "DORA-28(4)",
+    "DORA-28(8)",
+    "DORA-29(1)",
+    "DORA-30(2)",
+    "DORA-30(3)",
+    "DORA-5(1)",
+    "DORA-5(2)",
+    "DORA-5(3)",
+    "DORA-5(4)",
+    "DORA-6(1)",
+    "DORA-6(5)",
+    "DORA-6(8)",
+    "DORA-7",
+    "DORA-8(1)",
+    "DORA-8(4)",
+    "DORA-8(5)",
+    "DORA-9(1)",
+    "DORA-9(4)(c)",
+    "DORA-9(4)(d)",
+    "DORA-9(4)(e)"
+   ],
+   "mappingIds": [
+    "dora_art10_detection",
+    "dora_art11_response_recovery",
+    "dora_art17_incident_management",
+    "dora_art19_major_incident_reporting",
+    "dora_art24_25_resilience_testing",
+    "dora_art28_third_party_risk",
+    "dora_art5_governance",
+    "dora_art8_identification",
+    "dora_art9_protection_prevention"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 44,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 12,
+   "url": "https://publications.europa.eu/resource/celex/32024R1772",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:11.038Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/12.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2024/1772-Art8"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 13,
+   "url": "https://publications.europa.eu/resource/celex/32024R1773",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:11.624Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/13.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2024/1773-Art9"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 14,
+   "url": "https://publications.europa.eu/resource/celex/32024R1774",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:12.319Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/14.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2024/1774-Art12",
+    "RTS-2024/1774-Art17",
+    "RTS-2024/1774-Art20",
+    "RTS-2024/1774-Art21",
+    "RTS-2024/1774-Art23"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 5,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 15,
+   "url": "https://publications.europa.eu/resource/celex/32024R2956",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:12.994Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/15.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "ITS-2024/2956-Art3"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 16,
+   "url": "https://publications.europa.eu/resource/celex/32025R0301",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:13.746Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/16.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2025/301-Art5"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 17,
+   "url": "https://publications.europa.eu/resource/celex/32025R0302",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:14.416Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/17.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "ITS-2025/302-Art1"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 18,
+   "url": "https://publications.europa.eu/resource/celex/32025R0532",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:15.092Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/18.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2025/532-Art3"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 19,
+   "url": "https://publications.europa.eu/resource/celex/32025R1190",
+   "fetchStatus": "unavailable",
+   "httpStatus": 303,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:15.754Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/19.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "RTS-2025/1190"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 20,
+   "url": "https://publications.europa.eu/resource/cellar/9b84d482-85bd-11ed-9887-01aa75ed71a1.0006.01/DOC_1",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:16.386Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/20.body.bin",
+    "sha256": "20d29e9c5300ae1095530996f04731311bf82bb7d4d6a7a0102cd0f075755cf3",
+    "bytes": 1326245
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/20.txt",
+    "sha256": "638366128e3e85690223691e4d475233efc4a2d34e80e96b7dfe807d2dddbb4a",
+    "bytes": 331572
+   },
+   "extractor": {
+    "command": [
+     "/opt/homebrew/bin/pdftotext",
+     "-layout",
+     "-",
+     "-"
+    ],
+    "input": "same verified source bytes through stdin",
+    "timeoutSeconds": 20,
+    "claim": "Text extraction only, not a legal/pinpoint correctness check",
+    "exit": 0,
+    "stderr": {
+     "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/20-pdftotext-stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   "controlIds": [
+    "NIS2-ART20-1",
+    "NIS2-ART20-2",
+    "NIS2-ART21-1",
+    "NIS2-ART21-2-CHAPEAU",
+    "NIS2-ART21-2a",
+    "NIS2-ART21-2b",
+    "NIS2-ART21-2c",
+    "NIS2-ART21-2d",
+    "NIS2-ART21-2e",
+    "NIS2-ART21-2f",
+    "NIS2-ART21-2g",
+    "NIS2-ART21-2h",
+    "NIS2-ART21-2i",
+    "NIS2-ART21-2j",
+    "NIS2-ART21-3",
+    "NIS2-ART21-4",
+    "NIS2-ART23-1",
+    "NIS2-ART23-2",
+    "NIS2-ART23-3",
+    "NIS2-ART23-4a",
+    "NIS2-ART23-4b",
+    "NIS2-ART23-4c",
+    "NIS2-ART23-4d",
+    "NIS2-ART23-4e",
+    "NIS2-ART32-6"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 25,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 21,
+   "url": "https://www.ecfr.gov/api/versioner/v1/full/2026-10-01/title-45.xml?part=170&section=170.315",
+   "fetchStatus": "unavailable",
+   "httpStatus": 406,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:17.661Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/21.body.bin",
+    "sha256": "ed46cb97b5421e9d7f2fd72ca81c3da59d8d26518689980713a3a75ee74fe460",
+    "bytes": 171
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "HTI1-170.315(b)(11)(i)",
+    "HTI1-170.315(b)(11)(ii)(A)",
+    "HTI1-170.315(b)(11)(ii)(B)",
+    "HTI1-170.315(b)(11)(ii)(C)",
+    "HTI1-170.315(b)(11)(iii)(A)",
+    "HTI1-170.315(b)(11)(iii)(B)",
+    "HTI1-170.315(b)(11)(iv)(A)",
+    "HTI1-170.315(b)(11)(iv)(B)(1)-(2)",
+    "HTI1-170.315(b)(11)(iv)(B)(3)",
+    "HTI1-170.315(b)(11)(iv)(B)(4)-(6)",
+    "HTI1-170.315(b)(11)(iv)(B)(7)",
+    "HTI1-170.315(b)(11)(iv)(B)(8)-(9)",
+    "HTI1-170.315(b)(11)(v)(A)",
+    "HTI1-170.315(b)(11)(v)(B)",
+    "HTI1-170.315(b)(11)(vi)(A)",
+    "HTI1-170.315(b)(11)(vi)(B)",
+    "HTI1-170.315(b)(11)(vi)(C)"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 17,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 22,
+   "url": "https://www.ecfr.gov/api/versioner/v1/full/2026-10-01/title-45.xml?part=170&section=170.402",
+   "fetchStatus": "unavailable",
+   "httpStatus": 406,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:18.300Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/22.body.bin",
+    "sha256": "ed46cb97b5421e9d7f2fd72ca81c3da59d8d26518689980713a3a75ee74fe460",
+    "bytes": 171
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "ONC-170.402(b)(4)"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 23,
+   "url": "https://www.ecfr.gov/api/versioner/v1/full/2026-10-01/title-45.xml?part=170&section=170.523",
+   "fetchStatus": "unavailable",
+   "httpStatus": 406,
+   "fetchError": {
+    "code": "HTTP_STATUS_NON_200"
+   },
+   "fetchedAt": "2026-10-19T19:22:18.932Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/23.body.bin",
+    "sha256": "ed46cb97b5421e9d7f2fd72ca81c3da59d8d26518689980713a3a75ee74fe460",
+    "bytes": 171
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [
+    "ONC-170.523(f)(1)(xxi)"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 1,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 24,
+   "url": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-D/part-170/subpart-C/section-170.315",
+   "fetchStatus": "unavailable",
+   "httpStatus": 302,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:19.567Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/24.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [],
+   "mappingIds": [
+    "hti1_dsi_feedback",
+    "hti1_dsi_governance",
+    "hti1_dsi_risk_analysis",
+    "hti1_dsi_risk_mitigation",
+    "hti1_dsi_source_attribute_access",
+    "hti1_dsi_source_attributes"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 25,
+   "url": "https://www.federalregister.gov/documents/2024/01/09/2023-28857/health-data-technology-and-interoperability-certification-program-updates-algorithm-transparency-and",
+   "fetchStatus": "unavailable",
+   "httpStatus": 302,
+   "fetchError": {
+    "code": "REDIRECT_NOT_FOLLOWED"
+   },
+   "fetchedAt": "2026-10-19T19:22:20.294Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/25.body.bin",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "text": null,
+   "extractor": null,
+   "controlIds": [],
+   "mappingIds": [
+    "hti1_dsi_feedback",
+    "hti1_dsi_governance",
+    "hti1_dsi_risk_analysis",
+    "hti1_dsi_risk_mitigation",
+    "hti1_dsi_source_attribute_access",
+    "hti1_dsi_source_attributes"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 26,
+   "url": "https://www.federalregister.gov/documents/full_text/html/2025/01/06/2024-30983.html",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:21.010Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/26.body.bin",
+    "sha256": "224c009f7536b8f75b08325ab5340602260f71126d34a2f871c54b506bcf2e21",
+    "bytes": 1904050
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/26.txt",
+    "sha256": "88756e17f9f2912c307b7bfb83f613b1931964cc259e08b7ef1bbf0e4d9fa5d5",
+    "bytes": 947554
+   },
+   "extractor": {
+    "method": "Python standard-library HTMLParser, convert_charrefs; script/style text excluded; UTF-8 strict",
+    "scope": "No external resources loaded and no response code executed"
+   },
+   "controlIds": [
+    "NPRM-164.308(a)(1)",
+    "NPRM-164.308(a)(10)",
+    "NPRM-164.308(a)(11)",
+    "NPRM-164.308(a)(12)",
+    "NPRM-164.308(a)(13)",
+    "NPRM-164.308(a)(14)",
+    "NPRM-164.308(a)(2)",
+    "NPRM-164.308(a)(3)",
+    "NPRM-164.308(a)(4)",
+    "NPRM-164.308(a)(5)",
+    "NPRM-164.308(a)(6)",
+    "NPRM-164.308(a)(7)",
+    "NPRM-164.308(a)(8)",
+    "NPRM-164.308(a)(9)",
+    "NPRM-164.308(b)",
+    "NPRM-164.310",
+    "NPRM-164.312(a)",
+    "NPRM-164.312(b)",
+    "NPRM-164.312(c)",
+    "NPRM-164.312(d)",
+    "NPRM-164.312(e)",
+    "NPRM-164.312(f)",
+    "NPRM-164.312(g)",
+    "NPRM-164.312(h)",
+    "NPRM-164.312(i)",
+    "NPRM-164.312(j)",
+    "NPRM-164.314(a)",
+    "NPRM-164.316",
+    "NPRM-preamble-AI"
+   ],
+   "mappingIds": [],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 13,
+   "controlsUnverified": 16,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  },
+  {
+   "index": 27,
+   "url": "https://www.law.go.kr/LSW/lsInfoP.do?chrClsCd=010203&lsiSeq=268543&urlMode=engLsInfoR&viewCls=engLsInfoR",
+   "fetchStatus": "fetched_raw_unverified",
+   "httpStatus": 200,
+   "fetchError": null,
+   "fetchedAt": "2026-10-19T19:22:22.447Z",
+   "body": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-fetch-attempts/official-roster-h3d5740-v1/27.body.bin",
+    "sha256": "2ae1e5be6f2105a905ec25434dfbf8e61df2cb59064ef213862cc60b50ee4334",
+    "bytes": 143052
+   },
+   "text": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/official-source-text-extraction-v1/27.txt",
+    "sha256": "cbc3c819776dae76c4ce8be2c42d62e463cdeb068f512aa747393eea4f8ca645",
+    "bytes": 3583
+   },
+   "extractor": {
+    "method": "Python standard-library HTMLParser, convert_charrefs; script/style text excluded; UTF-8 strict",
+    "scope": "No external resources loaded and no response code executed"
+   },
+   "controlIds": [],
+   "mappingIds": [
+    "kr_ai_act_art31_transparency",
+    "kr_ai_act_art32_safety",
+    "kr_ai_act_art34_operator_measures",
+    "kr_ai_act_art35_impact_assessment"
+   ],
+   "humanSignOff": null,
+   "controlsSourceTextVerified": 0,
+   "controlsUnverified": 0,
+   "bodyOrHttpSuccessIsQuoteOrLegalApproval": false,
+   "expertSignOff": null,
+   "reverify": true
+  }
+ ],
+ "oldQualification": {
+  "ownerHead": "ba8202b8a3f70396c7184263fda7a92a2445b8cd",
+  "currentPreservationAudit": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-native-generation-output-audit-defb42-v1.json",
+   "sha256": "9cbd558ef3c0b7ede71b8c8c24b3cf306381355c0a2c4f7414be9f939ea4b0b7",
+   "bytes": 69468
+  },
+  "earlierPolicyAudit": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-source-text-policy-v2-static-audit-20f1fa-v1.json",
+   "sha256": "94535dcc7766a83ac6e63c78a8ecf98d702381388e90b2f907de15771d45671b",
+   "bytes": 40346
+  },
+  "rule": "The six existing qualification/2026-10-18-P1-45 files stay unchanged. They are historical, not a current290b9 execution or fresh-source receipt."
+ },
+ "humanOpen": [
+  "D-08 named experts and legal/current-applicability review for every framework/link.",
+  "Licensed ISO copies; ISO42005 three stable IDs stay descoped and ISO42006 remains an AMC signal.",
+  "Korean official-language Article31–35 pinpoint review; KLRI is an unread reference outside the official fetch policy.",
+  "HTI-1 current eCFR/HTI-5 status, Colorado source-context/current-law/applicability, CCPA punctuation/pinpoints and remaining quote-context diagnostics."
+ ],
+ "executionOrQualificationClaim": false
+}

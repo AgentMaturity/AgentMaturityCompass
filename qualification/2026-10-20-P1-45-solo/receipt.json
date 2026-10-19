@@ -1,0 +1,168 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-45",
+ "date": "2026-10-20",
+ "commit": "87c99c9a2b559c71344d4356eb5841e1bbb3860f",
+ "branch": "codex/p1-45-solo-final",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS-26.6.2-arm64-arm-64bit",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 31655
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 27595
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 40630
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 3290
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 1144
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 806
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 2146
+  },
+  {
+   "cmd": "npm run -s check:citations",
+   "exit": 0,
+   "durationMs": 752
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 2145
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 755
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 601
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1013
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 711
+  },
+  {
+   "cmd": "npm run -s check:qualification",
+   "exit": 0,
+   "durationMs": 1571
+  },
+  {
+   "cmd": "npm run -s check:catalog-currency",
+   "exit": 0,
+   "durationMs": 821
+  },
+  {
+   "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+   "exit": 0,
+   "durationMs": 1306
+  },
+  {
+   "cmd": "npm run -s check:catalog-admission",
+   "exit": 0,
+   "durationMs": 2655
+  },
+  {
+   "cmd": "npm run -s check:industry-guides",
+   "exit": 0,
+   "durationMs": 830
+  },
+  {
+   "cmd": "npm run -s check:regulatory-calendar",
+   "exit": 0,
+   "durationMs": 627
+  },
+  {
+   "cmd": "npm run -s check:clean-source",
+   "exit": 0,
+   "durationMs": 59659
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 1073
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 3618
+  },
+  {
+   "cmd": "npm run -s release:notes -- --check",
+   "exit": 0,
+   "durationMs": 608
+  }
+ ],
+ "tests": null,
+ "artifacts": [
+  {
+   "path": "review-mappings.json",
+   "sha256": "e957dc960589ce9f0fda3b4bb3d311152a056c20ee9e33de0fb469136588a92c"
+  },
+  {
+   "path": "review-links.json",
+   "sha256": "6e7dc9845faf12a0df2f7fe1dc16804036bed32590eb9514c8ce7c6a349cf391"
+  },
+  {
+   "path": "review-controls.json",
+   "sha256": "0a8e6358f1e8be7d891b6444e44c9e1f7c5b632751487e617792ca69d7b5656b"
+  },
+  {
+   "path": "source-evidence.json",
+   "sha256": "b9ef0c9b0dfed8982d80a25cb2916925d7505f5d38e5e1ab35cbb6f9932d0e37"
+  },
+  {
+   "path": "checks.json",
+   "sha256": "97bfd69dbf6a6b6772b94a5a4ff2a4c595e24eef92705e0c60e12bb8065b404f"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "65508f75825686a3b3aad575eb4aa69bbe330928cf2faefc9acde0d4f4665978"
+  },
+  {
+   "path": "README.md",
+   "sha256": "0084b40d54aab3985949941c10a09b460cfabd77bf807f65e9d3017162a65c64"
+  },
+  {
+   "path": "review.json",
+   "sha256": "0ca435ac0236ab69ffa6c79efaf6d0cc1591b77442d96950f5da6d58170eeeac"
+  },
+  {
+   "path": "inputs.json",
+   "sha256": "08041b8972b4b82db19201992f14c4dba1bdc08e2e44cbe55e04f67d6d90cf85"
+  }
+ ],
+ "notes": "Preparatory only, not ready. Commands are exactly23 ordinary H checks, not release:gate/full. tests:null because restored100/100 ran at G=e848550aa3d44a5d7c87a6c18181abd0ccdcf05f, focused228/228 at D=defb42d7eee5e2c88f23891462739c058d8691a1; scopes overlap, are not summed and are not borrowed into H. The14-buffer baseline-only successor bridge is source continuity, not a new execution. Actual15 mutants caused29 intended AssertionError occurrences with exact restoration. Review snapshot S=290b9ba4cd49d7a8009343f294971eaa474af5e7;112 quotation-text-only/178 unverified, all experimental/reverify, expert/human/legal approval absent. Final Q/full/classification, separate gate, native validation and landing remain pending. Historical six-file packet preserved; no self-hash."
+}
