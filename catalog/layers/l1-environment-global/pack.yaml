@@ -1,0 +1,40 @@
+# Experimental and unreviewed P3-16 draft. JSON syntax is valid YAML.
+# Existing catalog licence retained; D-04 and per-domain stewardship remain unresolved.
+{
+  "id": "overlay.environment",
+  "version": "0.1.0",
+  "layer": 1,
+  "title": "Environment overlay draft: energy, utilities, water and supply chains",
+  "stations": [
+    "environment"
+  ],
+  "jurisdictions": [
+    "US",
+    "EU",
+    "IN"
+  ],
+  "compilerCompat": "^0.1.0",
+  "publisher": "AgentMaturity (agent-maturity-compass)",
+  "maintainers": [
+    {
+      "name": "Sid",
+      "role": "maintainer"
+    }
+  ],
+  "licence": "MIT",
+  "support": "experimental",
+  "controls": [
+    "L1-ENV-01",
+    "L1-ENV-02",
+    "L1-ENV-03",
+    "L1-ENV-04",
+    "L1-ENV-05",
+    "L1-ENV-06"
+  ],
+  "stewardship": {
+    "partner": null,
+    "updatePlan": null,
+    "triageTargetDays": null,
+    "coverageDoc": "docs/catalog/environment/README.md"
+  }
+}

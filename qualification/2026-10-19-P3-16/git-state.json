@@ -1,0 +1,10 @@
+{
+  "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+  "branch": "codex/p3-16-environment-overlay",
+  "statusPorcelain": "",
+  "logIntToHead": "49cd72a24 fix(catalog): keep Environment schemas private and refresh draft pin (P3-16)\nc182570f6 test(catalog): state Environment starter facts (P3-16)\n941be849b docs(catalog): integrate Environment guide and dependency truth (P3-16)\n9880ff347 merge: consume current int for Environment draft (P3-16)\n799d13dd9 feat(catalog): draft Environment overlay and synthetic oracles (P3-16)\n92e1e22f0 test(catalog): specify experimental Environment overlay (P3-16)",
+  "qualificationCommit": null,
+  "nativeValidation": "Not run at assembly; root records the subsequent command and measured result off-tree and in the handoff."
+}
