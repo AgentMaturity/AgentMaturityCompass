@@ -184,7 +184,7 @@
         "ENV-STS-18",
         "environment-deep-03"
       ],
-      "limit": "The spec reporting drill remains pending. Existing F4 IDs nis2-23-4a-early-warning, nis2-23-4b-incident-notification and nis2-23-4d-final-report provide clock definitions/arithmetic only. The final deadline is one calendar month from incident notification, not 30 days from awareness. P2-30 L1-TECH-07 is not integrated on the CCA base and offers at most a partial 24-hour local drill; vendor-risk,72-hour and final-report delivery remain open."
+      "limit": "The full reporting drill remains pending. Existing F4 IDs nis2-23-4a-early-warning, nis2-23-4b-incident-notification and nis2-23-4d-final-report provide clock definitions/arithmetic only. The final deadline is one calendar month from incident notification, not 30 days from awareness. P2-30 L1-TECH-07 source is now integrated and supplies only a partial 24-hour synthetic drill; these Environment-only profiles do not select its Technology scope, and vendor-risk, 72-hour and final-report delivery remain open."
     },
     {
       "id": "ai_act_reporting_pending",
@@ -199,7 +199,7 @@
         "ENV-MM-16",
         "environment-deep-17"
       ],
-      "limit": "P2-30 L1-TECH-02 reuse awaits integration into this CCA-based clone. Its early-warning fixture cannot establish all CRA 24-hour/72-hour/final stages, Single Reporting Platform delivery, manufacturer scope or legal applicability."
+      "limit": "P2-30 L1-TECH-02 source is now integrated. These Environment-only profiles do not select its Technology scope, and its early-warning fixture cannot establish all CRA 24-hour/72-hour/final stages, Single Reporting Platform delivery, manufacturer scope or legal applicability. Composed-profile binding and the full reporting remainder remain pending."
     },
     {
       "id": "questionnaire_and_versions",
@@ -408,7 +408,7 @@
       },
       "disposition": "pending_dependency",
       "target": "L1-ENV-04",
-      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter is not integrated on the CCA base, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
+      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter remains unavailable in the rechecked integration, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
       "mappingLimit": "recall_and_fda_records",
       "dependency": "P2-27",
       "maximumQuestionnaireLevel": "L1",
@@ -517,7 +517,7 @@
       },
       "disposition": "pending_dependency",
       "target": "L1-ENV-04",
-      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter is not integrated on the CCA base, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
+      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter remains unavailable in the rechecked integration, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
       "mappingLimit": "recall_and_fda_records",
       "dependency": "P2-27",
       "maximumQuestionnaireLevel": "L1",
@@ -554,7 +554,7 @@
       },
       "disposition": "pending_dependency",
       "target": "L1-ENV-04",
-      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter is not integrated on the CCA base, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
+      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter remains unavailable in the rechecked integration, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
       "mappingLimit": "recall_and_fda_records",
       "dependency": "P2-27",
       "maximumQuestionnaireLevel": "L1",
@@ -1131,9 +1131,9 @@
       },
       "disposition": "reused_control_pending",
       "target": "L1-TECH-02",
-      "reason": "Retains the spec CRA reuse intent; Technology control integration and the remaining reporting stages, platform delivery and legal scope are pending.",
+      "reason": "Retains the spec CRA reuse intent. L1-TECH-02 source is integrated, but composed-profile selection and the remaining reporting stages, platform delivery and legal scope remain pending; no full CRA result is established.",
       "mappingLimit": "cra_reuse_pending",
-      "dependency": "P2-30",
+      "dependency": "Composed Environment/Technology profile and remaining CRA reporting stages",
       "maximumQuestionnaireLevel": "L1",
       "automaticPass": false
     },
@@ -2104,9 +2104,9 @@
       },
       "disposition": "reporting_drill_pending",
       "target": "L1-TECH-07",
-      "reason": "The spec full NIS2 drill is pending. Existing F4 arithmetic and a future partial Technology24-hour drill do not establish the complete vendor-risk or 24-hour/72-hour/calendar-month reporting path.",
+      "reason": "The full NIS2 drill remains pending. L1-TECH-07 source is integrated, but the Environment-only profiles do not select its Technology scope; its partial 24-hour synthetic drill does not establish vendor-risk, 72-hour or calendar-month reporting and delivery.",
       "mappingLimit": "nis2_drill_pending",
-      "dependency": "P2-30 plus external reporting drill",
+      "dependency": "Composed Technology scope and complete external NIS2 reporting drill",
       "maximumQuestionnaireLevel": "L1",
       "automaticPass": false
     },
@@ -2159,9 +2159,9 @@
       },
       "disposition": "reporting_drill_pending",
       "target": "L1-TECH-07",
-      "reason": "The spec full NIS2 drill is pending. Existing F4 arithmetic and a future partial Technology24-hour drill do not establish the complete vendor-risk or 24-hour/72-hour/calendar-month reporting path.",
+      "reason": "The full NIS2 drill remains pending. L1-TECH-07 source is integrated, but the Environment-only profiles do not select its Technology scope; its partial 24-hour synthetic drill does not establish vendor-risk, 72-hour or calendar-month reporting and delivery.",
       "mappingLimit": "nis2_drill_pending",
-      "dependency": "P2-30 plus external reporting drill",
+      "dependency": "Composed Technology scope and complete external NIS2 reporting drill",
       "maximumQuestionnaireLevel": "L1",
       "automaticPass": false
     },
@@ -2341,7 +2341,7 @@
       },
       "disposition": "pending_dependency",
       "target": "L1-ENV-04",
-      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter is not integrated on the CCA base, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
+      "reason": "Retains the partial recall cross-reference; the required P2-27 adapter remains unavailable in the rechecked integration, so dependent execution stays not evaluated. FDA-request record production is a separate open requirement.",
       "mappingLimit": "recall_and_fda_records",
       "dependency": "P2-27",
       "maximumQuestionnaireLevel": "L1",
@@ -2414,11 +2414,233 @@
       },
       "disposition": "reused_control_pending",
       "target": "L1-TECH-02",
-      "reason": "Retains the spec CRA reuse intent; Technology control integration and the remaining reporting stages, platform delivery and legal scope are pending.",
+      "reason": "Retains the spec CRA reuse intent. L1-TECH-02 source is integrated, but composed-profile selection and the remaining reporting stages, platform delivery and legal scope remain pending; no full CRA result is established.",
       "mappingLimit": "cra_reuse_pending",
-      "dependency": "P2-30",
+      "dependency": "Composed Environment/Technology profile and remaining CRA reporting stages",
       "maximumQuestionnaireLevel": "L1",
       "automaticPass": false
     }
-  ]
+  ],
+  "dependencyRecheck": {
+    "integratedIntRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "candidateMergeCommitReportedByCoordinator": "9880ff347",
+    "method": "Read-only inspection of merged source bytes and current paths. Merge identity is coordinator-supplied; this recheck ran no Git, Node, compiler, fixture, test, network or source-retrieval command.",
+    "originalSourceInventoryRetained": true,
+    "inventorySourceContinuity": [
+      {
+        "path": "src/domains/packs/stations/environment.ts",
+        "sha256": "c6fc46d1bec773867a6ae32f6d4397e615d17b15e06d83e662d7ac7df1800594",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/deep/environment.ts",
+        "sha256": "19ebb15ea8c74f27b7b26813df2c87d5aec7b07f2c304fea5463caca0f79a4a0",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "matchesOriginalInventoryBytes": true
+      },
+      {
+        "path": "src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "matchesOriginalInventoryBytes": true
+      }
+    ],
+    "technology": {
+      "item": "P2-30",
+      "sourceAvailability": "integrated",
+      "pack": {
+        "path": "catalog/layers/l1-technology-global/pack.yaml",
+        "sha256": "286c55d4828ffca1c79bd190439452aa8fb1660a2edd8fc7f865b3239f8eaf26",
+        "bytes": 676
+      },
+      "controls": [
+        {
+          "controlId": "L1-TECH-01",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+          "sha256": "8676a859a1058655f7b8aea9e0e15e10ed5c086de1632525f8a8e3e5c98be789",
+          "bytes": 6123
+        },
+        {
+          "controlId": "L1-TECH-02",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-02.yaml",
+          "sha256": "04fedabf1219137ed191e8f27689eaa81fca8d9b493725f21cd14b9eae75279d",
+          "bytes": 6946
+        },
+        {
+          "controlId": "L1-TECH-03",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-03.yaml",
+          "sha256": "a3b95d49190bb873bbd19d56a5af02fbb035942b0fc32df3d206f328f5a17ff3",
+          "bytes": 4183
+        },
+        {
+          "controlId": "L1-TECH-04",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+          "sha256": "4bd9fce707e56a16155dadb9fd54ff05971082eb51124a2769384d060e24255b",
+          "bytes": 5578
+        },
+        {
+          "controlId": "L1-TECH-05",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-05.yaml",
+          "sha256": "b242d67dbfb3c3f7655f93575598d88c71bcae5cc8c64cdc25e3a8daabac70ea",
+          "bytes": 6137
+        },
+        {
+          "controlId": "L1-TECH-06",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-06.yaml",
+          "sha256": "4cb2364b86a36a989297b0d59fd84fbe2888cb6a9eedb7fb424dd867ecd554e7",
+          "bytes": 5562
+        },
+        {
+          "controlId": "L1-TECH-07",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-07.yaml",
+          "sha256": "1ec0251d580269cfa807a1029326bdef766cd3a351589be0331071b42bdba424",
+          "bytes": 6248
+        },
+        {
+          "controlId": "L1-TECH-08",
+          "sourceAvailability": "present",
+          "path": "catalog/layers/l1-technology-global/controls/L1-TECH-08.yaml",
+          "sha256": "6097bdd81111f99557edf98b268760a8a0b5422c17501794bce12208f683155f",
+          "bytes": 5685
+        }
+      ],
+      "euRegister": {
+        "path": "catalog/registers/eu.json",
+        "sha256": "0974645a2aebe3be519286ee212dcfa1994403afe291fd830cb8756095b05ccb",
+        "bytes": 11129
+      },
+      "guideFragmentHook": {
+        "path": "scripts/gen-industry-guides.mts",
+        "sha256": "94da0175811e67e57aa2e9cbf1c8aa6074a913cc6cacfdb7ff9e30477bd993d0",
+        "bytes": 32513,
+        "locator": "stationGuide optional textOf docs/catalog/${station}/guide-section.md, before appendix",
+        "sourceAvailable": true,
+        "generationOrDriftCheckExecutedByRecheck": false
+      },
+      "coverageLimit": "Source presence is not production enforcement, independent review or complete CRA/NIS2 notice coverage. L1-TECH-02 and L1-TECH-07 retain partial synthetic early-warning drills; no composed profile is added here."
+    },
+    "profileContinuity": [
+      {
+        "path": "docs/catalog/environment/profile.grid-operations.json",
+        "sha256": "284c1d6720f7fedf70a79bbd096962c345ef357fde6a7870464db91ee7ff84dd",
+        "bytes": 2230,
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.energy-utilities-water"
+        ],
+        "technologyScopeDeclared": false
+      },
+      {
+        "path": "docs/catalog/environment/profile.grid-operations-in.json",
+        "sha256": "bdaafa5c1ade4c3be170aac2d267f16dcbcd0f2e82fbb241a35e2c2c5bc27fd1",
+        "bytes": 2222,
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.energy-utilities-water"
+        ],
+        "technologyScopeDeclared": false
+      },
+      {
+        "path": "docs/catalog/environment/profile.food-lot-release.json",
+        "sha256": "0a8c071f6a00b7ed62dfbea8b767dfcd1b187c89f8358c28c254e30d7372bc17",
+        "bytes": 2227,
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.food-textiles-manufacturing"
+        ],
+        "technologyScopeDeclared": false
+      }
+    ],
+    "pendingOwnerDependencies": [
+      {
+        "item": "P3-09",
+        "state": "pending",
+        "clockTable": {
+          "path": "src/incidents/regulatoryClocksTable.ts",
+          "sha256": "db18f8e60c1ce1f1b21060491a391c85159e1d4e2740ddaa797c514572f49d41",
+          "bytes": 36400
+        },
+        "registeredCeaClockPresent": false,
+        "limit": "CEA clocks, capacity/legal applicability and separate-order commencement remain unresolved; current Environment wrapper stays not evaluated."
+      },
+      {
+        "item": "P2-27",
+        "state": "pending",
+        "expectedOwnerPathsAbsent": [
+          "tests/fixtures/assurance/env",
+          "src/assurance/executed"
+        ],
+        "limit": "No owner recall fixture/API is bound by the Environment wrapper; synthetic closure does not establish recall delivery."
+      },
+      {
+        "item": "P2-26/P1-76",
+        "state": "pending",
+        "producerCatalog": {
+          "path": "catalog/producers.yaml",
+          "sha256": "36fd054cb2c3e29549db022cf3ae3410b9244c25ab7a856430c0ec33e5ea5db9",
+          "bytes": 10227
+        },
+        "producerStatuses": {
+          "amc.killSwitch": {
+            "status": "planned",
+            "plannedBy": "P2-26"
+          },
+          "amc.providerOutage.safeState": {
+            "status": "planned",
+            "plannedBy": "P1-76"
+          }
+        },
+        "limit": "Live safe-state and kill-switch producer integration and a human hazard review remain absent from this draft."
+      },
+      {
+        "item": "P2-11",
+        "state": "pending",
+        "profilePathAbsent": "catalog/jurisdictions/eu/profiles.json",
+        "limit": "Dated EU profile and actual legal scope remain unresolved."
+      }
+    ],
+    "existingNativeComposition": {
+      "path": "src/catalog/compiler/mergeStations.ts",
+      "sha256": "8658ac6dd9a1a2e8e70965c000f042be53548cc6c8dd8627530396e470e0ca30",
+      "bytes": 7253
+    },
+    "executionStatus": "Static dependency availability only; actual compiled-policy, guide generation and qualification outcomes require root measurements.",
+    "primarySourceReadsThisRecheck": false
+  }
 }
