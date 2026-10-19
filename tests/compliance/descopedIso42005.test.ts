@@ -8,6 +8,7 @@ import { generateComplianceReport, initComplianceMaps } from "../../src/complian
 import { generateCoverageMatrix } from "../../src/compliance/complianceMatrix.js";
 import { complianceReportToMarkdown } from "../../src/compliance/complianceReport.js";
 import { openLedger } from "../../src/ledger/ledger.js";
+import type { ComplianceMapping } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEventType } from "../../src/types.js";
 import { initWorkspace } from "../../src/workspace.js";
 
@@ -31,16 +32,18 @@ afterEach(() => {
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
 
-function workspaceWithBoundEvidence(mappingIds: string[]): string {
+function workspaceWithBoundEvidence(mappingIds: string[], customMappings?: readonly ComplianceMapping[]): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-iso42005-descoped-"));
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "iso42005-descoped-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-  initComplianceMaps(workspace);
+  const mappings = customMappings ?? builtInComplianceMappings;
+  if (customMappings === undefined) initComplianceMaps(workspace);
+  else initComplianceMaps(workspace, { complianceMaps: { version: 1, mappings: [...customMappings] } });
   const ledger = openLedger(workspace);
   try {
     for (const id of mappingIds) {
-      const mapping = builtInComplianceMappings.find((row) => row.id === id)!;
+      const mapping = mappings.find((row) => row.id === id)!;
       for (const requirement of mapping.evidenceRequirements) {
         if (requirement.type !== "requires_evidence_event") continue;
         for (const eventType of requirement.eventTypes as EvidenceEventType[]) {
@@ -59,6 +62,33 @@ function workspaceWithBoundEvidence(mappingIds: string[]): string {
 }
 
 describe("ISO/IEC 42005 descope in the compliance report", () => {
+  // Synthetic custom IDs isolate the existing category fallback from the three stable-ID guards; no licensed-source proof is supplied.
+  test("synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated", () => {
+    const customIds = DESCOPED.map((id) => `synthetic_custom_${id}`);
+    const mappings = builtInComplianceMappings.map((mapping) => DESCOPED.includes(mapping.id)
+      ? { ...mapping, id: `synthetic_custom_${mapping.id}` } : mapping);
+    const workspace = workspaceWithBoundEvidence([...customIds, "iso42006_conformity_evidence_package"], mappings);
+    const out = generateComplianceReport({ workspace, framework: "ISO_42001", window: "14d", agentId: AGENT });
+    expect(out.configTrusted).toBe(true);
+    expect(out.configReason).toBeNull();
+    expect(out.familyReview).toMatchObject({ status: "experimental", expertSignOff: null });
+    expect(out.categories.filter((row) => DESCOPED.includes(row.id))).toEqual([]);
+    expect(out.categories.find((row) => row.id === "iso42006_conformity_evidence_package")!.result).toBe("pass");
+    for (const id of customIds) {
+      const row = out.categories.find((entry) => entry.id === id)!;
+      expect(row.category).toBe("ISO 42005 Impact Assessment");
+      expect({ status: row.status, result: row.result, descoped: row.descoped })
+        .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", descoped: REASON });
+      expect(row.notEvaluatedReasons).toEqual([REASON]);
+      expect(row.admitted).toEqual([]);
+    }
+    const counted = out.categories.length - customIds.length;
+    const { satisfied, partial, missing, unknown, notEvaluated } = out.coverage;
+    expect(satisfied + partial + missing + unknown + notEvaluated).toBe(counted);
+    expect(out.coverage.satisfied).toBe(1);
+    expect(out.coverage.score).toBe(Number((1 / counted).toFixed(4)));
+  }, 300_000);
+
   // Display text changes cannot supply the unavailable source text for these three mapping IDs.
   test("stable iso42005 mapping IDs stay descoped under signed display-category renames", () => {
     const workspace = workspaceWithBoundEvidence([...DESCOPED, "iso42006_conformity_evidence_package"]);

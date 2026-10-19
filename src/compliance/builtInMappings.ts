@@ -493,7 +493,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "iso42006_conformity_evidence_package",
     framework: "ISO_42001",
     category: "ISO 42006 Conformity Evidence",
-    description: "Certification-ready, machine-readable audit evidence packages are generated and verifiable.",
+    description: "Signals from control-bound artifact, audit or test events and the listed audit-absence checks; no certification-readiness, ISO/IEC 42006 conformity or evidence-package-content determination is made.",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -852,7 +852,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "euai_art73_incident_reporting",
     framework: "EU_AI_ACT",
     category: "Art. 73 Incident Reporting",
-    description: "Serious incidents detected, reported to authorities within required timelines, and closed with evidence-backed remediation.",
+    description: "Signals from control-bound audit or tool-action events and the listed execution/lease audit-absence checks. They do not establish serious-incident classification, submission to authorities, reporting deadlines or evidence-backed closure.",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -1141,7 +1141,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "gdpr_art33_34_breach_notification",
     framework: "GDPR",
     category: "Art. 33-34 Breach Notification",
-    description: "Personal data breaches detected, documented, and notified to supervisory authority and data subjects within required timelines.",
+    description: "Signals from control-bound audit or tool-action events and the listed exfiltration audit-absence check. They do not verify that a breach was detected, that a notification was delivered to an authority or data subject, or its timing or required content.",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -1731,7 +1731,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "hipaa_breach_notification",
     framework: "HIPAA",
     category: "Breach Notification Rule §164.400-414",
-    description: "Breach discovery, notification to individuals and HHS, and content of breach notifications for AI-related PHI incidents.",
+    description: "Signals from control-bound audit or metric events and the listed exfiltration audit-absence check. They do not verify breach discovery, notification to individuals or HHS, notification content or discovery-to-notification timing.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "metric"], minObservedRatio: 0.5 },
       { type: "requires_no_audit", auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED"] }
@@ -1839,7 +1839,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "sox_audit_trail",
     framework: "SOX",
     category: "Audit Trail and Evidence Retention",
-    description: "Tamper-evident audit trails, evidence retention for 7+ years, and reconstructability for AI agent actions affecting financial reporting.",
+    description: "Signals from control-bound audit events and the listed governance/authorization audit-absence checks. They do not verify a seven-year or longer retention period, storage/expiry policy or long-term reconstructability.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.8 },
       { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
