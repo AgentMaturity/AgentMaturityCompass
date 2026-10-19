@@ -93,7 +93,7 @@ export const crosswalkLinkSchema = z
     signOffId: z.string().trim().min(1).optional()
   })
   .strict()
-  .refine(() => true,
+  .refine((link) => link.relation !== "equivalent" || link.signOffId !== undefined,
     { message: "an equivalent link needs a named expert's sign-off id (D-08)" });
 
 // One clause of an official text (src/compliance/frameworks/controls.ts). verified means the text was
