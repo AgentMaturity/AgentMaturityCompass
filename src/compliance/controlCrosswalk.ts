@@ -126,7 +126,7 @@ export function buildControlCrosswalkReceipt(input: {
     const evidenceTypes = evidenceTypesFor(mapping);
     // A mapping that names its own official sources cites exactly those; others cite every receipt source.
     const ownSourceIds = mappingSourceCitations([mapping]).map((citation) => citation.sourceId);
-    if (false && ownSourceIds.some((id) => !sourceCitationIds.includes(id))) {
+    if (ownSourceIds.some((id) => !sourceCitationIds.includes(id))) {
       failClosedReasons.push(`${mapping.id}:sourceCitations:unlisted`);
     }
     const baseRow: Omit<ControlCrosswalkRow, "rowHash"> = {
