@@ -1,0 +1,3531 @@
+{
+  "schemaVersion": 1,
+  "station": "mobility",
+  "domains": [
+    "mobility.ports-logistics-cities",
+    "mobility.vehicles-aviation",
+    "mobility.unplaced"
+  ],
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "sourceInventory": {
+    "integrationRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "parentReportedImplementationStartHead": "f4001afd555e09353734a44b4bc7cbc2df46481a",
+    "counts": {
+      "pack": 94,
+      "deep": 16,
+      "total": 110
+    },
+    "packs": [
+      {
+        "id": "sustainable-communities",
+        "name": "Sustainable Communities",
+        "count": 16,
+        "questionIds": [
+          "MOB-SC-2",
+          "MOB-SC-3",
+          "MOB-SC-4",
+          "MOB-SC-5",
+          "MOB-SC-6",
+          "MOB-SC-7",
+          "MOB-SC-8",
+          "MOB-SC-9",
+          "MOB-SC-10",
+          "MOB-SC-12",
+          "MOB-SC-13",
+          "MOB-SC-14",
+          "MOB-SC-15",
+          "MOB-SC-16",
+          "MOB-SC-17",
+          "MOB-SC-18"
+        ],
+        "actualDomain": "mobility.ports-logistics-cities"
+      },
+      {
+        "id": "sustainable-ports",
+        "name": "Sustainable Ports",
+        "count": 15,
+        "questionIds": [
+          "MOB-SP-1",
+          "MOB-SP-2",
+          "MOB-SP-4",
+          "MOB-SP-5",
+          "MOB-SP-6",
+          "MOB-SP-7",
+          "MOB-SP-8",
+          "MOB-SP-9",
+          "MOB-SP-10",
+          "MOB-SP-11",
+          "MOB-SP-12",
+          "MOB-SP-14",
+          "MOB-SP-15",
+          "MOB-SP-16",
+          "MOB-SP-17"
+        ],
+        "actualDomain": "mobility.ports-logistics-cities"
+      },
+      {
+        "id": "sustainable-real-estate",
+        "name": "Sustainable Real Estate",
+        "count": 16,
+        "questionIds": [
+          "MOB-RE-1",
+          "MOB-RE-2",
+          "MOB-RE-3",
+          "MOB-RE-4",
+          "MOB-RE-5",
+          "MOB-RE-6",
+          "MOB-RE-7",
+          "MOB-RE-8",
+          "MOB-RE-10",
+          "MOB-RE-15",
+          "MOB-RE-16",
+          "MOB-RE-17",
+          "MOB-RE-18",
+          "MOB-RE-19",
+          "MOB-RE-20",
+          "MOB-RE-21"
+        ],
+        "actualDomain": "mobility.ports-logistics-cities"
+      },
+      {
+        "id": "virtual-infrastructure",
+        "name": "Sustainable Virtual Infrastructure",
+        "count": 16,
+        "questionIds": [
+          "MOB-VI-1",
+          "MOB-VI-2",
+          "MOB-VI-3",
+          "MOB-VI-4",
+          "MOB-VI-6",
+          "MOB-VI-7",
+          "MOB-VI-8",
+          "MOB-VI-9",
+          "MOB-VI-10",
+          "MOB-VI-11",
+          "MOB-VI-12",
+          "MOB-VI-13",
+          "MOB-VI-14",
+          "MOB-VI-15",
+          "MOB-VI-16",
+          "MOB-VI-17"
+        ],
+        "actualDomain": "mobility.unplaced"
+      },
+      {
+        "id": "privacy-security-mobility",
+        "name": "Privacy & Security",
+        "count": 15,
+        "questionIds": [
+          "MOB-PS-1",
+          "MOB-PS-2",
+          "MOB-PS-3",
+          "MOB-PS-4",
+          "MOB-PS-6",
+          "MOB-PS-7",
+          "MOB-PS-8",
+          "MOB-PS-10",
+          "MOB-PS-11",
+          "MOB-PS-12",
+          "MOB-PS-14",
+          "MOB-PS-15-v2",
+          "MOB-PS-16",
+          "MOB-PS-17",
+          "MOB-PS-18"
+        ],
+        "actualDomain": "mobility.unplaced"
+      },
+      {
+        "id": "freight-3pl-warehouse",
+        "name": "Freight, 3PL & Warehouse Operations",
+        "count": 16,
+        "questionIds": [
+          "MOB-F3W-1",
+          "MOB-F3W-2",
+          "MOB-F3W-3",
+          "MOB-F3W-4",
+          "MOB-F3W-5",
+          "MOB-F3W-6",
+          "MOB-F3W-7",
+          "MOB-F3W-8",
+          "MOB-F3W-9",
+          "MOB-F3W-10",
+          "MOB-F3W-11",
+          "MOB-F3W-12",
+          "MOB-F3W-13",
+          "MOB-F3W-14",
+          "MOB-F3W-15",
+          "MOB-F3W-16"
+        ],
+        "actualDomain": "mobility.ports-logistics-cities"
+      }
+    ],
+    "runtimeConfirmation": {
+      "executor": "Parent coordinator",
+      "path": "evidence/p3-17/inventory-runtime.json",
+      "sha256": "9576fb07be73dfd4f566b8668ff380cd81cdf68adff68b6fe739d3352c2daaba",
+      "bytes": 34324,
+      "commandPath": "evidence/p3-17/inventory-v2/command.json",
+      "commandSha256": "701890dd48ed36c31715d1ad01111dee7d4d6bc737a1e3eea31fc78acb3c33dd",
+      "recordContainsSourcePin": false,
+      "limit": "Root executed clean Node22 enumeration; this document author only read its recorded result and source files."
+    },
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/deep/mobility.ts",
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      {
+        "path": "src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      }
+    ]
+  },
+  "specDrift": {
+    "specPackCount": 90,
+    "actualPackCount": 94,
+    "specDeepCount": 16,
+    "actualDeepCount": 16,
+    "absentSpecNamedIds": [
+      "MOB-PS-15"
+    ],
+    "versionedIds": [
+      {
+        "specId": "MOB-PS-15",
+        "actualId": "MOB-PS-15-v2",
+        "sameMeaning": false,
+        "reason": "Current v2 asks full CRA reporting stages; absent predecessor is not invented or mapped as mere applicability."
+      }
+    ],
+    "historicalNominal15SlotsAbsent": [
+      "MOB-PS-13",
+      "MOB-PS-15",
+      "MOB-PS-5",
+      "MOB-PS-9",
+      "MOB-RE-11",
+      "MOB-RE-12",
+      "MOB-RE-13",
+      "MOB-RE-14",
+      "MOB-RE-9",
+      "MOB-SC-1",
+      "MOB-SC-11",
+      "MOB-SP-13",
+      "MOB-SP-3",
+      "MOB-VI-5"
+    ],
+    "actualIdsBeyondNominal15Slots": [
+      "MOB-F3W-16",
+      "MOB-PS-15-v2",
+      "MOB-PS-16",
+      "MOB-PS-17",
+      "MOB-PS-18",
+      "MOB-RE-16",
+      "MOB-RE-17",
+      "MOB-RE-18",
+      "MOB-RE-19",
+      "MOB-RE-20",
+      "MOB-RE-21",
+      "MOB-SC-16",
+      "MOB-SC-17",
+      "MOB-SC-18",
+      "MOB-SP-16",
+      "MOB-SP-17",
+      "MOB-VI-16",
+      "MOB-VI-17"
+    ],
+    "nominalSlotLimit": "A positional 1..15 comparison is not evidence that this task deleted questions or should restore them. Runtime source is truth.",
+    "labelMismatches": [
+      {
+        "packId": "virtual-infrastructure",
+        "packName": "Sustainable Virtual Infrastructure",
+        "websiteName": "Virtual Infrastructure",
+        "actualDomain": "mobility.unplaced"
+      }
+    ],
+    "websiteCoverageGap": {
+      "packId": "freight-3pl-warehouse",
+      "note": "Pack is registered, but the current Mobility station page has five diagnostic h3 names and no freight/warehouse h3."
+    },
+    "staleScoringStatement": "The spec historical all-5 positive-status claim is stale: current scoreIndustryPack delegates to selfAssessPack and logisticsIndustryPack.test.ts expects self_reported/L1 with no certification field. Those files remain unchanged.",
+    "initialInventoryAttempt": "Root retained the first91-count drift refusal; v2 confirms94, including single-quoted MOB-SC-14,MOB-RE-15,MOB-VI-14."
+  },
+  "domainProposal": {
+    "status": "proposed_not_applied",
+    "owner": "P1-13 / Sid",
+    "decidedBy": null,
+    "proposals": [
+      {
+        "packId": "privacy-security-mobility",
+        "actualDomain": "mobility.unplaced",
+        "proposedDomain": "mobility.vehicles-aviation",
+        "reason": "Spec proposal only; current mixed privacy/IoT/vehicle content needs owner scope review."
+      },
+      {
+        "packId": "virtual-infrastructure",
+        "actualDomain": "mobility.unplaced",
+        "proposedDomain": "mobility.unplaced",
+        "reason": "Remain unplaced pending an explicit P1-13 decision."
+      }
+    ],
+    "vehicleRow": {
+      "id": "mobility.vehicles-aviation",
+      "alsoStations": [
+        "technology"
+      ],
+      "packIds": []
+    }
+  },
+  "mappingLimits": [
+    {
+      "id": "cold-chain-dependency",
+      "ids": [
+        "MOB-F3W-5"
+      ],
+      "limit": "The actual question covers continuous condition monitoring, excursion review and medicinal-product equipment/calibration. P2-27 lot/producer integration is absent on this base. Every proposed cold-chain wrapper scenario remains not_evaluated/dependency_unavailable with no released lot; no independent eligibility or conversion algorithm substitutes for that dependency. Future clean, authorized, excursion, missing and stale outcomes are unexecuted intent only."
+    },
+    {
+      "id": "isps-access-subset",
+      "ids": [
+        "MOB-SP-1",
+        "MOB-SP-11"
+      ],
+      "limit": "Current-level authorization is not complete ISPS plan/SSP/Declaration-of-Security, monitoring, retention or drill evidence."
+    },
+    {
+      "id": "sums-subset",
+      "ids": [
+        "mobility-deep-03"
+      ],
+      "limit": "A local signature/update-record check is not complete R156 SUMS, type approval or safety assurance."
+    },
+    {
+      "id": "nis2-stages",
+      "ids": [
+        "MOB-F3W-12",
+        "MOB-SP-16",
+        "MOB-SC-17",
+        "MOB-VI-15",
+        "MOB-PS-18"
+      ],
+      "limit": "Available L1-TECH-07 is 24-hour draft-warning arithmetic only; full staged reporting and calendar-month semantics remain open. No external notification is sent."
+    },
+    {
+      "id": "versioned-cra-question",
+      "ids": [
+        "MOB-PS-15-v2"
+      ],
+      "limit": "The actual v2 question is CRA Article 14 staged reporting: 24 hours, 72 hours and final vulnerability/incident stages. It is not the old spec applicability-input description for absent MOB-PS-15. Existing L1-TECH-02 exercises only a local 24-hour AIBOM/draft packet; later stages, delivery, product scope and exclusions remain unresolved, with no inherited auto-pass."
+    },
+    {
+      "id": "cra-scope-not-implementation",
+      "ids": [
+        "MOB-PS-8",
+        "mobility-deep-16"
+      ],
+      "limit": "No vehicle/marine exclusion or Article 13 implementation is inferred from an applicability record or inherited reporting fixture."
+    },
+    {
+      "id": "dora-owner-scope",
+      "ids": [
+        "MOB-VI-17"
+      ],
+      "limit": "The spec assigns this ID elsewhere, but its actual text asks DORA customer ICT response, recovery, backup and restoration evidence under Articles 11 and 12. A dated AI Act profile alone cannot cover it. Preserve the question and require the owner to resolve the substantive continuity dependency; no future implementation is presumed."
+    },
+    {
+      "id": "native-unplaced-taxonomy",
+      "ids": [
+        "MOB-VI-1",
+        "MOB-VI-2",
+        "MOB-VI-3",
+        "MOB-VI-4",
+        "MOB-VI-6",
+        "MOB-VI-7",
+        "MOB-VI-8",
+        "MOB-VI-9",
+        "MOB-VI-10",
+        "MOB-VI-11",
+        "MOB-VI-12",
+        "MOB-VI-13",
+        "MOB-VI-14",
+        "MOB-VI-15",
+        "MOB-VI-16",
+        "MOB-VI-17",
+        "MOB-PS-1",
+        "MOB-PS-2",
+        "MOB-PS-3",
+        "MOB-PS-4",
+        "MOB-PS-6",
+        "MOB-PS-7",
+        "MOB-PS-8",
+        "MOB-PS-10",
+        "MOB-PS-11",
+        "MOB-PS-12",
+        "MOB-PS-14",
+        "MOB-PS-15-v2",
+        "MOB-PS-16",
+        "MOB-PS-17",
+        "MOB-PS-18",
+        "mobility-deep-02",
+        "mobility-deep-03",
+        "mobility-deep-04",
+        "mobility-deep-08",
+        "mobility-deep-10",
+        "mobility-deep-11",
+        "mobility-deep-14",
+        "mobility-deep-15",
+        "mobility-deep-16"
+      ],
+      "limit": "Both privacy-security-mobility and virtual-infrastructure remain unplaced. The vehicles row has alsoStations technology but empty packIds; profile assertions do not remap a pack."
+    },
+    {
+      "id": "new-signatures-without-existing-question",
+      "ids": [],
+      "limit": "Tenant screening, safety-impact-before-change and minimal-risk fallback are new local draft signatures, not invented questionnaire IDs or complete coverage of another prompt."
+    },
+    {
+      "id": "independent-fixture-authority",
+      "ids": [
+        "mobility-deep-03"
+      ],
+      "limit": "OTA design reuses native signature/trust admission with synthetic externally pinned roots, no explicit signer pins, and no workspace key-store or persistent anti-rollback claim. Real release authority is unresolved."
+    },
+    {
+      "id": "fleet-technology-composition",
+      "ids": [],
+      "limit": "Fleet profiles declare Technology explicitly. Existing broad TECH02/03/04/06/07/08 predicates are not statutory applicability findings, and Mobility OTA cannot override inherited TECH03 firmware_update refusal."
+    },
+    {
+      "id": "aviation-advisory-only",
+      "ids": [],
+      "limit": "Any aviation maintenance advice remains advisory and requires qualified human sign-off. No aviation approval, flight control or FAA/EASA coverage is inferred."
+    },
+    {
+      "id": "source-and-safety-review",
+      "ids": [],
+      "limit": "All primary legal/standards texts are unread in this task; real safety cases, manual ODD/type-approval/minimal-risk parameters, independent human authorities and institutional evidence remain open."
+    }
+  ],
+  "manualReviewLimit": "Source question text is retained as a prompt/provenance, never as a verified legal statement or current assurance result. No agent reviewer or automated legal approval is supplied.",
+  "dispositions": [
+    {
+      "id": "MOB-SC-2",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Before each smart-city AI use case is deployed or changed, does the agent screen it against the prohibited AI practices in EU AI Act Article 5 and block any use that matches one?",
+      "dimension": "Ethics",
+      "regulatoryReference": "EU AI Act Art. 5",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 30,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-3",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Before recommending where infrastructure or services are sited, does the agent assess how environmental burdens and benefits fall across neighbourhoods, and record that assessment and the community input it relied on?",
+      "dimension": "Ethics",
+      "regulatoryReference": "EU Urban Agenda (Partnership on Urban Poverty)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 31,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-4",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent support citizen participation in urban AI governance per EU Urban Agenda and C40 Cities inclusive climate action principles?",
+      "dimension": "Transparency",
+      "regulatoryReference": "EU Urban Agenda; C40 Cities Inclusive Climate Action Framework",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 32,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-5",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent track building operations against the certification criteria the operator has adopted (LEED v5 O+M or BREEAM In-Use) and keep the metered evidence those criteria require?",
+      "dimension": "Compliance",
+      "regulatoryReference": "LEED v5 O+M; BREEAM In-Use",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 33,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-6",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent implement urban resilience per ISO 37123:2019 resilience indicators and climate adaptation planning?",
+      "dimension": "Safety",
+      "regulatoryReference": "ISO 37123:2019; UNDRR Sendai Framework",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 34,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-7",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent maintain urban data governance per ISO 37122:2019 smart city indicators and open data principles?",
+      "dimension": "Traceability",
+      "regulatoryReference": "ISO 37122:2019; Open Data Charter Principles",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 35,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-8",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent implement smart city cybersecurity per ISO/IEC 27400:2022 IoT security and privacy and NIST Cybersecurity Framework for smart infrastructure?",
+      "dimension": "Safety",
+      "regulatoryReference": "ISO/IEC 27400:2022; NIST CSF 2.0",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 36,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-9",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent refuse to perform or enable real-time remote biometric identification in publicly accessible spaces for law enforcement unless the use serves an objective listed in EU AI Act Art. 5(1)(h) and the prior authorisation required by Art. 5(3) is on record before activation?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU AI Act Art. 5(1)(h); EU AI Act Art. 5(2)-(3)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 37,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-10",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent track the climate-action targets the city has adopted (for example a C40 commitment or a national climate-law pathway) as sector milestones, and report progress against each milestone from measured data?",
+      "dimension": "Sustainability",
+      "regulatoryReference": "C40 Cities (network commitment, non-binding)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 38,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-12",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent compute the city indicators it reports (the ISO 37120 core and supporting indicators the city selected) from documented definitions and boundaries, with data-quality checks and change control so that reported values are reproducible?",
+      "dimension": "Traceability",
+      "regulatoryReference": "ISO 37120:2018",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 39,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-13",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent's smart-city integration follow a documented IoT reference architecture (ISO/IEC 30141) with published data models and tested export paths, so that a component or vendor can be replaced without losing data?",
+      "dimension": "Architecture",
+      "regulatoryReference": "ISO/IEC 30141",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 40,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-14",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU Urban Agenda §3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 41,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-15",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Before the agent processes data from large-scale systematic monitoring of publicly accessible areas (cameras, sensors, mobility traces), does the city carry out and keep current the data protection impact assessment required by GDPR Article 35(3)(c)?",
+      "dimension": "Privacy",
+      "regulatoryReference": "GDPR Art. 35(3)(c)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 42,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-16",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 43,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Road-traffic safety-component deployer oversight, suspension and six-month logs exceed the six new local fixtures; legal route/date and human authority remain unverified.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-17",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the city or its operator is a NIS2 entity (road authority responsible for traffic-management control, or operator of intelligent transport systems, Annex I point 2(d)), does the agent support significant-incident reporting with an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (Art. 23(4))?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU NIS2 Art. 23(4); EU NIS2 Annex I point 2(d)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 44,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reporting_drill_pending",
+      "target": "L1-TECH-07 / existing NIS2 clocks",
+      "reason": "The existing Technology early-warning drill is available on this int but covers only a local 24-hour draft packet. The actual question asks staged NIS2 reporting, including the 72-hour stage and, where stated, the final calendar-month report. National scope, significance, authority and actual submissions remain unverified. No full Mobility reporting drill or production result is claimed; no duplicate clock/control is added.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SC-18",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For each purpose for which the agent processes residents' personal data (sensor, camera, mobility or service-usage data), is a lawful basis under GDPR Article 6(1) recorded before processing starts and, where the city relies on a legal obligation or a public task, the Union or Member State law that lays it down (Art. 6(3))?",
+      "dimension": "Privacy",
+      "regulatoryReference": "GDPR Art. 6",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 45,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-1",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent support port facility security under the ISPS Code (Part A §14 port facility security; §16 port facility security plan): access control and monitoring at each security level, security-level changes, Declarations of Security and drill records?",
+      "dimension": "Safety",
+      "regulatoryReference": "ISPS Code Part A §14, §16; ISPS Code Part B §16",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 70,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "partial_test",
+      "target": "L1-MOB-03",
+      "reason": "A current-level authorization fixture is only a proposed subset. The actual question also requires port facility security plans, monitoring, level-change procedures, Declarations of Security and drill records. It is not fully covered by a local access decision; native/local results remain unmeasured at this authoring snapshot.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-2",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent check dangerous-goods documentation (IMDG Code Ch. 5.4) and stowage and segregation (Ch. 7.1) against the IMDG Code as amended by Amendment 42-24, in force from 1 January 2026?",
+      "dimension": "Compliance",
+      "regulatoryReference": "IMDG Code (Amdt 42-24) Ch. 5.4, Ch. 7.1",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 71,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-4",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent implement supply chain security per ISO 28000:2022 and C-TPAT minimum security criteria for port operations?",
+      "dimension": "Governance",
+      "regulatoryReference": "ISO 28000:2022; C-TPAT Minimum Security Criteria",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 72,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-5",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent support trade facilitation per WCO SAFE Framework and single window environment for customs documentation?",
+      "dimension": "Transparency",
+      "regulatoryReference": "WCO SAFE Framework; UN/CEFACT Single Window Recommendation",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 73,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-6",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4:2023, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
+      "dimension": "Safety",
+      "regulatoryReference": "ILO Convention C152; ISO 3691-4:2023",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 74,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-7",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), publish port-service charges and their basis transparently (Art. 12), and route complaints into the handling procedure (Art. 16)?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU Port Services Regulation Art. 4; EU Port Services Regulation Art. 12; EU Port Services Regulation Art. 16",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 75,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-8",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent maintain cargo traceability per UN/CEFACT Multi-Modal Transport Reference Data Model and ISO 17712:2013 seal integrity?",
+      "dimension": "Traceability",
+      "regulatoryReference": "UN/CEFACT MMT RDM; ISO 17712:2013",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 76,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-9",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.3 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
+      "dimension": "Security",
+      "regulatoryReference": "IMO MSC-FAL.1/Circ.3/Rev.3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 77,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-10",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs from 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
+      "dimension": "Compliance",
+      "regulatoryReference": "IMO MARPOL Annex VI Reg. 14",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 78,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "pending_dependency",
+      "target": "P2-27 / MOB-SP-10 ship-sulphur conversion",
+      "reason": "The actual question concerns dated ECA coverage, fuel limits and bunker/changeover/scrubber records. The conversion belongs to P2-27. It is not implemented by cold-chain or port-access fixtures, and this item does not change its source question or grading.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-11",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent validate ship–port interface security by checking that the ship security plan (SSP) content and measures meet ISPS Code Part A §9.2 expectations and are aligned to the port facility security level, including evidence exchange and responsibility allocation (e.g., Declaration of Security where used)?",
+      "dimension": "Security",
+      "regulatoryReference": "ISPS Code Part A §9.2",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 79,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "partial_test",
+      "target": "L1-MOB-03",
+      "reason": "The actual question concerns ship security plan content, ship-port alignment, evidence exchange and responsibility/Declaration-of-Security records. A facility-level access check cannot establish those document contents or the complete ship-port process; only its overlapping current-level subset is proposed.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-12",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent enforce IMDG Code §1.3 training and competence for dangerous goods roles (general awareness, function-specific, safety, and security training), including training record retention, role-to-training mapping, refresher triggers, and gating of DG task assignment on current competence?",
+      "dimension": "Safety",
+      "regulatoryReference": "IMDG Code §1.3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 80,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-14",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent operationalize C-TPAT Minimum Security Criteria §1 (Business Partner Requirements) by vetting partners, maintaining written security expectations/agreements, monitoring partner compliance (audits/attestations), and enforcing remediation/escalation when partner controls fail?",
+      "dimension": "Security",
+      "regulatoryReference": "C-TPAT MSC §1",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 81,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-15",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent sets or applies port infrastructure charges, including reductions for environmental performance, does it follow transparent, published criteria and inform port users of the charge structure as Port Services Regulation (EU) 2017/352 Article 13 requires?",
+      "dimension": "Transparency",
+      "regulatoryReference": "EU Port Services Regulation 2017/352 Art. 13",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 82,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-16",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the port managing body, its port facilities or VTS operator are NIS2 entities (Annex I point 2(c)), does the agent support significant-incident reporting to the CSIRT or competent authority with an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (Art. 23(4))?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU NIS2 Art. 23(4); EU NIS2 Annex I point 2(c)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 83,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reporting_drill_pending",
+      "target": "L1-TECH-07 / existing NIS2 clocks",
+      "reason": "The existing Technology early-warning drill is available on this int but covers only a local 24-hour draft packet. The actual question asks staged NIS2 reporting, including the 72-hour stage and, where stated, the final calendar-month report. National scope, significance, authority and actual submissions remain unverified. No full Mobility reporting drill or production result is claimed; no duplicate clock/control is added.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-SP-17",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent directs automated container-handling machinery with autonomous or self-evolving control (automated stacking cranes, straddle carriers, AGVs), does the deployment evidence the Machinery Regulation (EU) 2023/1230 Annex III requirements that apply from 20 January 2027: no actions beyond the defined task and movement space, safety-decision data retained for one year, a trace of safety-software versions retained for five years, correction possible at all times (EHSR 1.2.1), and a supervisory function for autonomous mobile machinery (EHSR 3.2.4)?",
+      "dimension": "Safety",
+      "regulatoryReference": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 84,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-1",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent manage building energy performance per EU Energy Performance of Buildings Directive (EPBD) 2024 Article 9 minimum energy performance standards and EPC requirements?",
+      "dimension": "Sustainability",
+      "regulatoryReference": "EU EPBD 2024 Art. 9",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 108,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-2",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent implement EU Taxonomy alignment per Climate Delegated Act Annex I substantial contribution criteria for climate change mitigation in buildings?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU Taxonomy Climate Delegated Act, Annex I §7",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 109,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-3",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent maintain indoor environmental quality per WELL Building Standard v2 Part 2 (Air) and Part 3 (Water) with continuous monitoring?",
+      "dimension": "Wellbeing",
+      "regulatoryReference": "WELL Building Standard v2, Parts 2-3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 110,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-4",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent prepare the operator's GRESB Real Estate Assessment submission from collected portfolio data, with evidence linked to each indicator and completeness validated before submission?",
+      "dimension": "Governance",
+      "regulatoryReference": "GRESB Real Estate Assessment",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 111,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-5",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent's integration with fire-alarm, egress and emergency-lighting systems keep those systems outside its control, escalate faults, and retain the test and status records the applicable life-safety code requires (NFPA 101 Chapter 7; EN 1838 emergency lighting)?",
+      "dimension": "Safety",
+      "regulatoryReference": "NFPA 101 Ch. 7; EN 1838",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 112,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-6",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent keep construction-product records for the building (the declaration of performance and conformity under Regulation (EU) 2024/3110 Art. 13, and the construction digital product passport once delegated acts set it up under Arts. 75-79), together with disassembly information per ISO 20887?",
+      "dimension": "Traceability",
+      "regulatoryReference": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887:2020",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 113,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-7",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent assess physical climate risk for each asset and feed the results into the operator's IFRS S2 disclosure where IFRS S2 is applied?",
+      "dimension": "Compliance",
+      "regulatoryReference": "IFRS S2",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 114,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-8",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent apply data protection by design and by default to tenant and occupant data (occupancy sensing, access logs, energy use) per GDPR Art. 25 as interpreted in EDPB Guidelines 4/2019, collecting only what each stated purpose needs?",
+      "dimension": "Transparency",
+      "regulatoryReference": "GDPR Art. 25; EDPB Guidelines 4/2019",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 115,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-10",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent gate zero-emission-building compliance for new buildings by owner type (new buildings owned by public bodies from 1 January 2028, all new buildings from 1 January 2030, EPBD Art. 7(1)) and evidence each building against the zero-emission-building definition in Art. 11 as transposed?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU EPBD Art. 7(1); EU EPBD Art. 11",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 116,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-15",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the program maintain an EPBD control-to-article mapping (including SRI) that is reviewed on regulatory updates, so citations and evidence expectations remain audit-defensible over time?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU EPBD 2024 (control mapping governance)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 117,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-16",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For non-residential buildings above the EPBD thresholds (heating or air-conditioning output over 290 kW by 31 December 2024, over 70 kW by 31 December 2029, Art. 13(9)), does the building automation system the agent runs provide the Art. 13(10) capabilities: continuous monitoring, logging, analysis and adjustment of energy use; benchmarking and detection of efficiency losses; interoperability; and indoor-environmental-quality monitoring?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU EPBD Art. 13(9)-(10)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 118,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-17",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent give building owners, tenants and managers direct access to their building systems' data, and make those data available to a third party on their consent, without additional cost to them (EPBD Art. 16(1) and (3))?",
+      "dimension": "Transparency",
+      "regulatoryReference": "EU EPBD Art. 16",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 119,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-18",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent calculate the life-cycle global warming potential of new buildings per EPBD Annex III and record it for the energy performance certificate, from 1 January 2028 for new buildings over 1 000 m² and from 1 January 2030 for all new buildings (Art. 7(2))?",
+      "dimension": "Sustainability",
+      "regulatoryReference": "EU EPBD Art. 7(2)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 120,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-19",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For new non-residential buildings, and those undergoing major renovation, with more than five car parking spaces, does the agent track the EPBD Art. 14(1) requirements as transposed: at least one recharging point per five spaces, pre-cabling for at least 50% of spaces with ducting for the rest, and bicycle parking of at least 15% of average or 10% of total user capacity?",
+      "dimension": "Sustainability",
+      "regulatoryReference": "EU EPBD Art. 14(1)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 121,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-20",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the operator manages a financial product that promotes environmental characteristics (SFDR Art. 8) or has sustainable investment as its objective (Art. 9) through real estate, does the agent keep the asset-level data behind each disclosed characteristic or objective, reconciled to the published disclosure?",
+      "dimension": "Transparency",
+      "regulatoryReference": "EU SFDR Art. 8; EU SFDR Art. 9",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 122,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-RE-21",
+      "kind": "pack",
+      "packIds": [
+        "sustainable-real-estate"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the operator claims taxonomy alignment for climate change adaptation, does the agent test each claim against the technical screening criteria in Commission Delegated Regulation (EU) 2021/2139 Annex II for the activity concerned and keep the evidence?",
+      "dimension": "Compliance",
+      "regulatoryReference": "Commission Delegated Regulation (EU) 2021/2139 Annex II",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 123,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-1",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement information security management per ISO 27001:2022 Annex A controls with continuous control effectiveness monitoring?",
+      "dimension": "Security",
+      "regulatoryReference": "ISO 27001:2022 Annex A",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 142,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-2",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent maintain business continuity plans per ISO 22301:2019 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
+      "dimension": "Resilience",
+      "regulatoryReference": "ISO 22301:2019 §8.4",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 143,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-3",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent enforce GDPR Chapter V on international transfers: a transfer mechanism recorded for each destination (adequacy decision, Art. 46 safeguards, or an Art. 49 derogation) and transfers blocked where none applies?",
+      "dimension": "Compliance",
+      "regulatoryReference": "GDPR Art. 44-49",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 144,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-4",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement cloud security controls per CSA Cloud Controls Matrix v4.1 (STAR Level 2) with automated evidence collection?",
+      "dimension": "Security",
+      "regulatoryReference": "CSA CCM v4.1; CSA STAR Level 2",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 145,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-6",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent optimize infrastructure carbon footprint per GHG Protocol Scope 2 and 3 guidelines and EU Corporate Sustainability Reporting Directive (CSRD) digital infrastructure standards?",
+      "dimension": "Sustainability",
+      "regulatoryReference": "GHG Protocol Scope 2/3; EU CSRD ESRS E1",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 146,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-7",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent provide AI decision transparency per EU AI Act Article 13 for infrastructure management decisions affecting essential services?",
+      "dimension": "Transparency",
+      "regulatoryReference": "EU AI Act Art. 13; EU NIS2 Art. 21(2)(j)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 147,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-8",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent manage vendor risk per ISO 27036:2023 ICT supply chain security and EU NIS2 Article 21(2)(d) supply chain security requirements?",
+      "dimension": "Compliance",
+      "regulatoryReference": "ISO 27036:2023; EU NIS2 Art. 21(2)(d)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 148,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-9",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the agent hosts or orchestrates a general-purpose AI model with systemic risk (EU AI Act Art. 51), does it obtain and retain evidence that the model's provider meets its Art. 55(1) obligations: model evaluation including adversarial testing, systemic-risk assessment and mitigation, serious-incident reporting, and cybersecurity protection?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU AI Act Art. 51; EU AI Act Art. 55(1)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 149,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-10",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement FedRAMP Rev. 5 / NIST SP 800-53 Rev.5 AC-2 Account Management, including (1) documented account types and approval workflows, (2) privileged account lifecycle controls, (3) external/third-party account governance, (4) automated deprovisioning/disablement on role change/termination, (5) periodic account/access reviews with reconciliation, and (6) immutable audit evidence for all account events?",
+      "dimension": "Access Control",
+      "regulatoryReference": "FedRAMP Rev. 5 AC-2",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 150,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-11",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement ISO/IEC 27001:2022 Annex A control A.5.23 by governing the secure use of cloud services, including (1) cloud service selection and onboarding criteria, (2) shared responsibility matrix definition and maintenance, (3) required contractual security clauses and audit rights, (4) configuration baseline/hardening governance, (5) monitoring of cloud service use and drift, and (6) evidence linking cloud controls to the Statement of Applicability?",
+      "dimension": "Governance",
+      "regulatoryReference": "ISO/IEC 27001:2022 A.5.23",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 151,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-12",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement EU Data Act Art. 25 cloud switching and exit readiness, including (1) provider-to-provider switching plan and tested runbooks, (2) functional equivalence mapping for critical services, (3) data/application export formats and portability tooling, (4) exit assistance obligations and evidence retention, (5) switching timelines, cost/charge constraints governance, and (6) post-exit data deletion/verification workflows?",
+      "dimension": "Interoperability",
+      "regulatoryReference": "EU Data Act 2023/2854 Art. 25",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 152,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-13",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement NIS2 Art. 21 by maintaining an auditable mapping and evidence for each of the 10 measure categories (a)-(j), including risk analysis/policies, incident handling, business continuity/crisis management, supply chain security, secure acquisition/development/maintenance, effectiveness testing/auditing, cryptography, HR/access/asset governance, MFA/secure communications, and cybersecurity training, with reporting readiness for management accountability?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU NIS2 2022/2555 Art. 21(2)(a)-(j)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 153,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-14",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001:2022, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
+      "dimension": "Governance",
+      "regulatoryReference": "Regulatory mapping governance",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 154,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-15",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "For significant incidents affecting the infrastructure the agent operates, does the provider meet NIS2 Directive 2022/2555 Article 23(4): an early warning within 24 hours, an incident notification within 72 hours and a final report within one month?",
+      "dimension": "Incident Reporting",
+      "regulatoryReference": "EU NIS2 Directive 2022/2555 Art. 23",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 155,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reporting_drill_pending",
+      "target": "L1-TECH-07 / existing NIS2 clocks",
+      "reason": "The existing Technology early-warning drill is available on this int but covers only a local 24-hour draft packet. The actual question asks staged NIS2 reporting, including the 72-hour stage and, where stated, the final calendar-month report. National scope, significance, authority and actual submissions remain unverified. No full Mobility reporting drill or production result is claimed; no duplicate clock/control is added. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-16",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the agent is a safety component in the management and operation of critical digital infrastructure (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), before 2 December 2027?",
+      "dimension": "Governance",
+      "regulatoryReference": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 156,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Critical-digital-infrastructure deployer oversight, suspension and log retention remain document/human duties; this unplaced pack is not silently treated as vehicles. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-VI-17",
+      "kind": "pack",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the customer is a financial entity under DORA, does the agent support that customer's ICT response and recovery arrangements (DORA Art. 11) and its backup, restoration and recovery requirements (Art. 12) with tested evidence the contract makes available?",
+      "dimension": "Resilience",
+      "regulatoryReference": "EU DORA Art. 11; EU DORA Art. 12",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 157,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "pending_dependency",
+      "target": "P2-11 coordination / DORA service-continuity evidence",
+      "reason": "The spec assigns this ID elsewhere, but its actual text asks DORA customer ICT response, recovery, backup and restoration evidence under Articles 11 and 12. A dated AI Act profile alone cannot cover it. Preserve the question and require the owner to resolve the substantive continuity dependency; no future implementation is presumed. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-1",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?",
+      "dimension": "Privacy",
+      "regulatoryReference": "GDPR Art. 25; ISO/IEC 27701:2025",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 176,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-2",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement vehicle cybersecurity per UNECE WP.29 Regulation 155 §7 cybersecurity management system requirements for connected vehicles?",
+      "dimension": "Security",
+      "regulatoryReference": "UNECE WP.29 R155 §7",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 177,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "The actual R155 cybersecurity management-system requirement needs scope, organisation and expert evidence beyond a signed update. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-3",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (unique per-device or user-set credentials, also after reset), secure software updates and a vulnerability disclosure policy?",
+      "dimension": "Security",
+      "regulatoryReference": "ETSI EN 303 645 V3.1.3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 178,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-4",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement zero-trust architecture per NIST SP 800-207 principles including microsegmentation, least privilege access, and continuous verification?",
+      "dimension": "Compliance",
+      "regulatoryReference": "NIST SP 800-207 Zero Trust Architecture",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 179,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-6",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent support cybersecurity incident response per the NIST CSF 2.0 Respond (RS) function: incident management, incident analysis, response reporting and communication, and incident mitigation?",
+      "dimension": "Governance",
+      "regulatoryReference": "NIST CSF 2.0 RS",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 180,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-7",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement privacy transparency per GDPR Articles 13-14 information obligations and CCPA §1798.100 consumer rights with automated rights fulfillment?",
+      "dimension": "Transparency",
+      "regulatoryReference": "GDPR Art. 13-14; CCPA §1798.100",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 181,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-8",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "For products with digital elements in CRA scope (type-approved vehicles under Regulation (EU) 2019/2144 and marine equipment under Directive 2014/90/EU are excluded, Art. 2(2)(c) and 2(4)), does the agent's software supply chain meet the CRA Art. 13 manufacturer obligations (security by design, vulnerability handling, software bill of materials) using NIST SP 800-218 SSDF practices, ahead of general application on 11 December 2027?",
+      "dimension": "Security",
+      "regulatoryReference": "EU CRA Art. 2(2)(c), 2(4); EU CRA Art. 13; NIST SP 800-218",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 182,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "applicability_input",
+      "target": "manual CRA product-scope decision / P2-30 coordination",
+      "reason": "Only the scope portion is retained as an unresolved manual input. The actual question also asks CRA Article 13 manufacturer security, vulnerability and SBOM duties, which are not established by the inherited 24-hour reporting fixture. Vehicle/marine exclusions require human legal confirmation and are not automatically inserted into P2-30. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-10",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent maintain a versioned obligation register (GDPR, UNECE R155/R156, ETSI EN 303 645, NIS2) that is bound to its control configuration, so that each enforced control cites the obligation it implements?",
+      "dimension": "Governance",
+      "regulatoryReference": "NIST CSF 2.0 GV.OC-03",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 183,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-11",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434:2021 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
+      "dimension": "Security",
+      "regulatoryReference": "ISO/SAE 21434:2021 Clause 15",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 184,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Item-level TARA methods, scenarios, attack paths, impact/feasibility ratings, treatments and change reassessment are not established by OTA signatures. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-12",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent implement UNECE WP.29 R155 §7.3.3 by operating a CSMS effectiveness and post development monitoring loop, including (1) continuous monitoring for vulnerabilities and cyber events across fleet and backend and supply chain, (2) defined escalation and decision criteria, (3) evidence of corrective actions and verification of effectiveness, and (4) audit ready CSMS records demonstrating ongoing compliance for type approval and surveillance audits?",
+      "dimension": "Compliance",
+      "regulatoryReference": "UNECE WP.29 R155 §7.3.3",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 185,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "The R155 post-development monitoring/effectiveness loop and ongoing CSMS records need human/document review; no fleet monitoring is operated here. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-14",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Does the agent apply the security of processing measures in GDPR Article 32(1) to vehicle and passenger data: pseudonymisation and encryption, ongoing confidentiality, integrity and availability, timely restoration after an incident, and regular testing of the measures?",
+      "dimension": "Security",
+      "regulatoryReference": "GDPR Art. 32(1)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 186,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-15-v2",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "For in-scope products with digital elements, does the agent support CRA Art. 14 reporting, which applies from 11 September 2026: an early warning within 24 hours and a notification within 72 hours of becoming aware of an actively exploited vulnerability or a severe incident, sent to the coordinating CSIRT and ENISA, with a final report within 14 days of a corrective measure (vulnerabilities) or one month after the notification (incidents)?",
+      "dimension": "Compliance",
+      "regulatoryReference": "EU CRA Art. 14",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 187,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reused_control_pending",
+      "target": "L1-TECH-02 / full CRA reporting remains open",
+      "reason": "The actual v2 question is CRA Article 14 staged reporting: 24 hours, 72 hours and final vulnerability/incident stages. It is not the old spec applicability-input description for absent MOB-PS-15. Existing L1-TECH-02 exercises only a local 24-hour AIBOM/draft packet; later stages, delivery, product scope and exclusions remain unresolved, with no inherited auto-pass. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-16",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "For connected vehicles or related services, does the agent make product and related-service data with the metadata needed to use them accessible to the user by default (Data Act Art. 3(1), for products placed on the market after 12 September 2026), otherwise available on request (Art. 4), and shared with a third party at the user's request (Art. 5)?",
+      "dimension": "Privacy",
+      "regulatoryReference": "EU Data Act Art. 3-5; EU Data Act Art. 50",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 188,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-17",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the agent is part of the automated driving system of a fully automated vehicle type-approved under Implementing Regulation (EU) 2022/1426, does it classify field occurrences as critical or non-critical and support the manufacturer's notification of critical occurrences without delay and reporting of short-term occurrences within one month (Annex III Part 5 points 2.1-2.2)?",
+      "dimension": "Compliance",
+      "regulatoryReference": "Regulation (EU) 2019/2144 Art. 11; Implementing Regulation (EU) 2022/1426 Annex III Part 5",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 189,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-PS-18",
+      "kind": "pack",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the operator is an essential or important entity under NIS2, does the agent support significant-incident reporting to the CSIRT or competent authority: an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (NIS2 Art. 23(4))?",
+      "dimension": "Incident Reporting",
+      "regulatoryReference": "EU NIS2 Art. 23(4)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 190,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reporting_drill_pending",
+      "target": "L1-TECH-07 / existing NIS2 clocks",
+      "reason": "The existing Technology early-warning drill is available on this int but covers only a local 24-hour draft packet. The actual question asks staged NIS2 reporting, including the 72-hour stage and, where stated, the final calendar-month report. National scope, significance, authority and actual submissions remain unverified. No full Mobility reporting drill or production result is claimed; no duplicate clock/control is added. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-1",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent maintain carrier-level OTIF/DIFOT scorecards and bind tendering or routing decisions to observed pickup, delivery, damage, and loss performance?",
+      "dimension": "Carrier Reliability",
+      "regulatoryReference": "ISO 28000:2022; ISO 9001:2026 (monitoring, measurement, analysis and evaluation)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 221,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-2",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent detect, assign, escalate, and close freight exceptions such as late pickup, failed delivery, damage, loss, demurrage, detention, or customs hold within defined SLA timers?",
+      "dimension": "Exception Management",
+      "regulatoryReference": "ISO 28000:2022 §8; NIST SP 800-161r1-upd1 incident response controls",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 222,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-3",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent reconcile WMS inventory, receiving, putaway, pick, pack, ship, cycle-count, and adjustment events before making fulfillment or replenishment decisions?",
+      "dimension": "Warehouse Integrity",
+      "regulatoryReference": "ISO 9001:2026 (control of production and service provision); GS1 EPCIS 2.0",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 223,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-4",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent preserve interoperable shipment, lot, pallet, container, SSCC, and chain-of-custody event evidence across shipper, 3PL, carrier, warehouse, and consignee handoffs?",
+      "dimension": "Traceability",
+      "regulatoryReference": "GS1 EPCIS 2.0; ISO 28000:2022",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 224,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-5",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For temperature-, humidity-, shock- or seal-sensitive freight, does the agent monitor condition evidence, detect excursions and block release until review, and for medicinal products apply the EU Good Distribution Practice Guidelines Chapter 9 (conditions kept within defined limits; qualified equipment and calibrated monitoring for temperature-sensitive products, 9.4)?",
+      "dimension": "Cold Chain and Condition Monitoring",
+      "regulatoryReference": "ISO 28000:2022; Guidelines on Good Distribution Practice 2013/C 343/01 Ch. 9",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 225,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "pending_dependency",
+      "target": "L1-MOB-01 / P2-27",
+      "reason": "The actual question covers continuous condition monitoring, excursion review and medicinal-product equipment/calibration. P2-27 lot/producer integration is absent on this base. Every proposed cold-chain wrapper scenario remains not_evaluated/dependency_unavailable with no released lot; no independent eligibility or conversion algorithm substitutes for that dependency. Future clean, authorized, excursion, missing and stale outcomes are unexecuted intent only.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-6",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent govern 3PL, broker, carrier, warehouse, and marketplace partners with onboarding criteria, service-level objectives, security requirements, audit rights, and periodic performance reviews?",
+      "dimension": "3PL and Partner Governance",
+      "regulatoryReference": "NIST SP 800-161r1-upd1; ISO 28000:2022 §6",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 226,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-7",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent detect EDI/API, TMS, WMS, telematics, and carrier portal outages and fail over to approved fallback workflows without losing event integrity?",
+      "dimension": "EDI/API Resilience",
+      "regulatoryReference": "EU NIS2 Art. 21; NIST SP 800-161r1-upd1 contingency planning controls",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 227,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-8",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?",
+      "dimension": "Operational KPI Mapping",
+      "regulatoryReference": "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 228,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-9",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Before proposing or accepting a load plan, does the agent check driver availability against driving-time, break and rest limits — Regulation (EC) No 561/2006 for EU road transport and FMCSA hours-of-service rules at 49 CFR Part 395 in the US — and refuse assignments that would breach them?",
+      "dimension": "Driver Hours and Dispatch",
+      "regulatoryReference": "Regulation (EC) No 561/2006; 49 CFR Part 395",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 229,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-10",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "When the agent tenders, routes or consolidates freight, does it verify hazardous-materials classification, shipping-paper content and emergency-response information against 49 CFR Part 172 (and the IMDG Code for sea legs) and stop non-conforming shipments before pickup?",
+      "dimension": "Dangerous Goods",
+      "regulatoryReference": "49 CFR Part 172; IMDG Code",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 230,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-11",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent allocates warehouse or driver tasks based on individual behaviour or personal traits, or monitors and evaluates worker performance (high-risk under EU AI Act Annex III §4(b)), does the deployer assign competent human oversight (Art. 26(2)), keep the system's logs for at least six months (Art. 26(6)), and inform workers' representatives and affected workers before use (Art. 26(7))?",
+      "dimension": "Workforce Algorithmic Management",
+      "regulatoryReference": "EU AI Act Annex III §4(b); EU AI Act Art. 26(2), (6), (7)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 231,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "pending_dependency",
+      "target": "P3-13 / algorithmic management",
+      "reason": "The actual question concerns workforce task allocation/performance monitoring, human oversight, six-month logs and worker notices. Those employment duties are owned by P3-13; a tenant-screening fixture is not a replacement.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-12",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For logistics operators in scope of NIS2, does the agent support significant-incident reporting to the CSIRT or competent authority with an early warning within 24 hours and an incident notification within 72 hours of becoming aware (NIS2 Art. 23(4))?",
+      "dimension": "Incident Reporting",
+      "regulatoryReference": "EU NIS2 Art. 23(4)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 232,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "reporting_drill_pending",
+      "target": "L1-TECH-07 / existing NIS2 clocks",
+      "reason": "The existing Technology early-warning drill is available on this int but covers only a local 24-hour draft packet. The actual question asks staged NIS2 reporting, including the 72-hour stage and, where stated, the final calendar-month report. National scope, significance, authority and actual submissions remain unverified. No full Mobility reporting drill or production result is claimed; no duplicate clock/control is added.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-13",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent directs autonomous mobile robots, AGVs or other machinery with autonomous or self-evolving control, does the deployment evidence the Machinery Regulation (EU) 2023/1230 Annex III requirements that apply from 20 January 2027: no actions beyond the defined task and movement space, safety-decision data retained for one year, a trace of safety-software versions retained for five years, correction possible at all times (EHSR 1.2.1), and a supervisory function for autonomous mobile machinery (EHSR 3.2.4)?",
+      "dimension": "Autonomous Warehouse Machinery",
+      "regulatoryReference": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4; ISO 3691-4:2023",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 233,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-14",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the agent retain supplier, origin and route evidence that lets the operator respond to information requests and decisions under the EU Forced Labour Regulation (EU) 2024/3015, which applies from 14 December 2027?",
+      "dimension": "Forced-Labour Screening",
+      "regulatoryReference": "Regulation (EU) 2024/3015",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 234,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-15",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "When the agent shares consignee personal data (names, addresses, delivery photos, signatures) with carriers, 3PLs or other processors, is each processor bound by a contract with the terms GDPR Article 28(3) requires, and is every sub-processor authorised under Article 28(2)?",
+      "dimension": "Data Protection",
+      "regulatoryReference": "GDPR Art. 28(2)-(3)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 235,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "MOB-F3W-16",
+      "kind": "pack",
+      "packIds": [
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "When the agent makes regulatory freight information available to authorities electronically, does it use a certified eFTI platform (Regulation (EU) 2020/1056 Art. 4(2)) with authenticated access (Art. 9(1)(f)), operation logs recorded and archived (Art. 9(1)(g), (i)), and data protected against corruption and theft (Art. 9(1)(j)), ready for authorities' mandatory acceptance from 9 July 2027?",
+      "dimension": "Traceability",
+      "regulatoryReference": "Regulation (EU) 2020/1056 Art. 4(2); Regulation (EU) 2020/1056 Art. 9(1)",
+      "source": {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "line": 236,
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-01",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-communities",
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Where the agent is a safety component in road traffic management, is its operating envelope documented and does it hand control back safely when inputs leave that envelope?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Annex III point 2 — safety components in road traffic management",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 10,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "applicability_input",
+      "target": "manual safety-component role and operating envelope",
+      "reason": "Road-traffic safety-component status, operating envelope and safe handback remain unresolved. A declared synthetic fallback profile does not establish the whole question, nor does a vehicle station name determine its legal route.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-02",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Is the in-vehicle or fleet agent within the scope of the manufacturer's certified Cyber Security Management System, with its threats and mitigations recorded?",
+      "regulatoryReference": "UN R155",
+      "section": "Cyber Security Management System (CSMS) certificate of compliance",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 20,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ%3AL_202500005",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Manufacturer CSMS scope, threats, mitigations and the actual certificate are external documents; the source question is retained without claiming any AMC result. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-03",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Are updates to the agent's models, prompts and policies delivered through the Software Update Management System, with version identification and integrity protection?",
+      "regulatoryReference": "UN R156",
+      "section": "Software Update Management System (SUMS)",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 31,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://unece.org/sites/default/files/2024-03/R156e%20(2).pdf",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "partial_test",
+      "target": "L1-MOB-05",
+      "reason": "The actual R156 SUMS question covers all model/prompt/policy updates, version identification, integrity and update impact. The proposed synthetic OTA gate covers only pinned fixture signature/admission, payload identity and a local record contract. It does not establish complete SUMS or type-approval evidence; R156 text has not been read. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-04",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility",
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities",
+        "mobility.unplaced"
+      ],
+      "questionText": "For a fully automated vehicle use case (hub-to-hub, predefined area or automated valet parking), does the agent's automated driving system evidence its operational design domain and a safety management system as required for type-approval?",
+      "regulatoryReference": "Implementing Regulation (EU) 2022/1426",
+      "section": "Annex II — ADS technical specifications for fully automated vehicles",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 42,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://eur-lex.europa.eu/eli/reg_impl/2022/1426/oj/eng",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-05",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-communities",
+        "sustainable-ports",
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "As deployer of a high-risk mobility agent, do you monitor its operation per the instructions for use and keep its automatically generated logs for at least six months?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Art. 26(5)-(6) — deployer monitoring and log retention (at least six months)",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 53,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Deployer monitoring against instructions and six-month automatic-log retention need actual operating evidence, not a simulator.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-06",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-communities",
+        "sustainable-ports",
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "As provider of a high-risk mobility agent, do you run a documented post-market monitoring system that actively collects performance data from deployers and the field, and checks continuing compliance through the system's lifetime?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Art. 72(1)-(2) — post-market monitoring system",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 63,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-72",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Provider post-market monitoring through the system lifetime remains an external documented programme.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-07",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-communities",
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Do the instructions for use state the accuracy metrics, robustness and cybersecurity levels the agent was tested and validated against, so a traffic or port operator knows what performance to expect?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Art. 13(3)(b)(ii) — declared accuracy, robustness and cybersecurity in the instructions for use",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 73,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Declared accuracy, robustness and cybersecurity metrics need validated instructions-for-use evidence; no metric is fabricated.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-08",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-communities",
+        "privacy-security-mobility",
+        "freight-3pl-warehouse"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities",
+        "mobility.unplaced"
+      ],
+      "questionText": "Are the agent's training, validation and test data representative of the places and conditions it operates in, such as weather, lighting, road types and regions, with gaps recorded?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Art. 10(3) — relevant and sufficiently representative data sets",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 83,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-10",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "Representativeness across weather, lighting, roads and regions needs real data documentation and gap assessment. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-09",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-ports",
+        "freight-3pl-warehouse",
+        "sustainable-communities"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Can a dispatcher, berth planner or traffic controller decline or override the agent's routing or scheduling output in any situation, and is each override recorded with a reason?",
+      "regulatoryReference": "EU AI Act",
+      "section": "Art. 14(4)(d) — deciding not to use, or overriding, the output",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 93,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "A dispatcher/berth planner/traffic controller override and reason log are real operational duties; the new vehicle fallback fixture does not implement them.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-10",
+      "kind": "deep",
+      "packIds": [
+        "freight-3pl-warehouse",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities",
+        "mobility.unplaced"
+      ],
+      "questionText": "Are the agent's model, data and software suppliers covered by a cybersecurity supply-chain risk management plan, with supplier risk assessed before onboarding and reassessed when a supplier changes?",
+      "regulatoryReference": "NIST SP 800-161r1",
+      "section": "C-SCRM practices for systems and organizations (Rev. 1 Update 1)",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 103,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-11",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "If the agent is part of an ADS or Level 2 ADAS deployed in the US, does the operator capture the crash data the Third Amended Standing General Order requires and file reports within the order's timeframes?",
+      "regulatoryReference": "NHTSA Standing General Order 2021-01 (Third Amended)",
+      "section": "Crash reporting for ADS and Level 2 ADAS (amended 2025-04-24; reporting period from 2025-06-16)",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 114,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://www.govinfo.gov/content/pkg/FR-2026-07-31/html/2026-15483.htm",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "document_review",
+      "target": "manual expert and operating evidence",
+      "reason": "The actual source refers to NHTSA Third Amended SGO crash capture/filing, not a generic crash fallback. Reporting thresholds, recipients, content and deadlines require current primary/legal review; no crash-report clock or live filing is invented. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-12",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "For a US-regulated facility, are the systems the agent operates inside the facility's Cybersecurity Assessment and Cybersecurity Plan (due for Coast Guard review within 24 months of 2025-07-16), and does the agent route reportable cyber incidents to the National Response Center?",
+      "regulatoryReference": "33 CFR Part 101 Subpart F (USCG, Cybersecurity in the Marine Transportation System)",
+      "section": "§101.650 cybersecurity measures; §101.655 submission and approval of the Cybersecurity Plan; reportable cyber incidents to the National Response Center; effective 2025-07-16",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 125,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-17/html/2025-00708.htm",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-13",
+      "kind": "deep",
+      "packIds": [
+        "sustainable-ports"
+      ],
+      "domains": [
+        "mobility.ports-logistics-cities"
+      ],
+      "questionText": "Does the port agent record, per call from 1 January 2030, whether a ship moored at a covered quayside connected to onshore power supply or used an allowed alternative, so the ship operator's FuelEU evidence and any exception are traceable?",
+      "regulatoryReference": "Regulation (EU) 2023/1805 (FuelEU Maritime)",
+      "section": "Art. 6(1): zero-emission energy at berth from 1 January 2030 in ports covered by Art. 9 of Regulation (EU) 2023/1804",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 135,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://publications.europa.eu/resource/celex/32023R1805",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-14",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Where the agent processes driver-monitoring data from drowsiness or distraction warning systems, does it avoid continuous recording or retention beyond what the closed-loop purpose needs, and never make those data available to third parties?",
+      "regulatoryReference": "Regulation (EU) 2019/2144 (General Safety Regulation)",
+      "section": "Art. 6(3): driver drowsiness, attention and distraction warning data stay in a closed loop",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 145,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://publications.europa.eu/resource/celex/32019R2144",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-15",
+      "kind": "deep",
+      "packIds": [
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Do the agent's cloud contracts and runbooks state a notice period of at most two months to initiate switching and a data-retrieval period of at least 30 calendar days, and is retrieval tested against those periods?",
+      "regulatoryReference": "Regulation (EU) 2023/2854 (Data Act)",
+      "section": "Art. 25(2): switching contract terms (notice of at most two months; data retrieval for at least 30 calendar days)",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 155,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://publications.europa.eu/resource/celex/32023R2854",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "questionnaire",
+      "target": "self-reported questionnaire, maximum L1",
+      "reason": "Retain the actual integration question as a self-reported questionnaire prompt. No owned decisive fixture fully covers this obligation; absent answers/evidence remain not evaluated and no result is promoted above L1. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    },
+    {
+      "id": "mobility-deep-16",
+      "kind": "deep",
+      "packIds": [
+        "privacy-security-mobility"
+      ],
+      "domains": [
+        "mobility.unplaced"
+      ],
+      "questionText": "Before applying CRA obligations to a mobility product, does the operator record whether it is a type-approved vehicle product (Regulation (EU) 2019/2144) or marine equipment (Directive 2014/90/EU), and route those to their sectoral cybersecurity regime instead?",
+      "regulatoryReference": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+      "section": "Art. 2(2)(c) and 2(4): products under Regulation (EU) 2019/2144 and equipment under Directive 2014/90/EU are outside the CRA",
+      "source": {
+        "path": "src/domains/deep/mobility.ts",
+        "line": 165,
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "sourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8"
+      },
+      "inheritedDiscoveryLocator": {
+        "url": "https://publications.europa.eu/resource/celex/32024R2847",
+        "purpose": "discovery_only",
+        "readThisTask": false
+      },
+      "disposition": "applicability_input",
+      "target": "manual product/type-approval/sector-regime routing",
+      "reason": "The actual question asks a per-product CRA scope/routing decision for vehicle products and marine equipment. No native type-approval FactName, expert determination or automated sector exclusion is invented; the candidate legal interpretation remains unreviewed. Its source pack remains mobility.unplaced; no proposed vehicle mapping is applied.",
+      "maxLevel": "L1",
+      "automaticPass": false,
+      "nativeExecution": "not_measured_at_docs_authoring",
+      "sourceTextKind": "questionnaire_prompt_not_a_result"
+    }
+  ],
+  "dependencyRecheck": {
+    "asOfIntegrationRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "technologyControlsAndGuideHook": "Available on this int; inherited behavior remains intact.",
+    "P2-27": "Cold-chain and ship-sulphur executed conversions are unavailable on this base; no parallel conversion is added.",
+    "P3-16": "Environment partner/ports composition remains pending integration and semantic scope review; its energy/food signatures do not establish ship sulphur.",
+    "P3-13": "Workforce algorithmic-management duties remain outside this draft.",
+    "P2-11": "Dated EU/Annex I and DORA coordination remain unresolved; no legal date is inferred.",
+    "P2-26": "Production change-envelope/kill-switch integration is not implemented by local fixtures.",
+    "P2-28": "Existing merge machinery does not convert asserted domain facts or partial relations into legal coverage.",
+    "P1-08": "Native signature/admission APIs exist; real release authority, workspace loader and persistent rollback qualification are not established by synthetic fixture roots."
+  },
+  "currentIntegrationSourceReview": {
+    "reviewKind": "static_source_identity_and_dependency_review_only",
+    "asOfIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+    "historicalSourceInventoryPreserved": true,
+    "historicalDependencyRecheckPreserved": true,
+    "evidence": {
+      "path": "evidence/p3-17/solo-20261019/docs-source-history-audit-f56a6-v1.json",
+      "sha256": "eb5e02677e3d8b440734b0443a852e5a7ae639488a3267670732fdb8f1b22051",
+      "bytes": 217879
+    },
+    "actualStaticCounts": {
+      "pack": 94,
+      "deep": 16,
+      "total": 110
+    },
+    "allQuestionIdsPromptsReferencesAndLinesMatch": true,
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/mobility.ts",
+        "sha256": "9500633d65ebc8d4accaee82d7475e2efe28705e0351f67b9979105cc096dc34",
+        "bytes": 83876,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "bytes": 391,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/deep/mobility.ts",
+        "sha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+        "bytes": 20963,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "bytes": 3087,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "bytes": 11129,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "bytes": 7937,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "bytes": 1186,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "bytes": 8759,
+        "currentIntegrationRevision": "f56a6ad88f4044bcdda176f362d2087b62427a22",
+        "originalSourceRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "unchanged": true
+      }
+    ],
+    "sourceAvailability": {
+      "technology": "Experimental and unreviewed controls, EU register and guide hook are present. Availability is not regulatory approval or measured reuse.",
+      "governance": "Experimental and unreviewed source is present. No public-services, defense or FRIA applicability facts are invented; no blanket absence of candidate Governance requirements is claimed.",
+      "environment": "Experimental and unreviewed source is present. The unchanged port profile declares Mobility only and satisfies none of the Environment signature scopes; no port-emissions or ship-sulphur reuse is established."
+    },
+    "profileFactsChanged": false,
+    "fleetTechnologyComposition": {
+      "sourceOnlyPredictedControlIds": [
+        "L1-TECH-02",
+        "L1-TECH-03",
+        "L1-TECH-04",
+        "L1-TECH-06",
+        "L1-TECH-07",
+        "L1-TECH-08"
+      ],
+      "allEightControlFilesUnchangedFromOldCandidate": true,
+      "currentNativeExecution": "not_measured_by_this_review",
+      "limit": "Broad draft predicates do not determine CRA, COPPA, GPAI or NIS2 statutory scope. TECH03 firmware_update refusal is retained; a synthetic Mobility OTA allowance cannot override it."
+    },
+    "pendingDependencies": [
+      "P2-27 cold-chain and ship-sulphur executed conversions",
+      "P3-13 workforce algorithmic-management duties",
+      "P2-11 dated EU/Annex I and substantive DORA coordination",
+      "P2-26 production change-envelope/kill-switch authority"
+    ],
+    "historicalExecution": {
+      "productHead": "7458c47c343d1b54921501a04e0be6f280a38963",
+      "integrationRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "receipt": "qualification/2026-10-19-P3-17/receipt.json",
+      "receiptSha256": "e60d667c06bbbd927d49a364fac1be6c3582c7bf5f7d959908d59cf9b350fe0b",
+      "fullState": "NOT_RUN",
+      "currentSourceQualificationClaim": false
+    },
+    "instrumentCandidatesChanged": false,
+    "newPrimaryReadsOrDatesOrHumanReview": false,
+    "promotion": "none",
+    "review": "pending",
+    "limit": "This record supplements the original dated source and dependency records. It does not change a disposition, map an unplaced pack, infer a new native fact, promote questionnaire evidence, or supply current fixture/full-suite/production/legal assurance."
+  }
+}

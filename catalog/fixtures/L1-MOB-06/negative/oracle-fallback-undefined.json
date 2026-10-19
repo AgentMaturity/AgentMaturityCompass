@@ -1,0 +1,88 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-06",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-fleet-software-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "vehicle_simulator",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-fleet-software-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-06",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "vehicleId": "vehicle-1",
+        "crashAt": "2026-10-18T11:59:57.000Z",
+        "profile": null,
+        "trajectory": [
+          {
+            "binding": {
+              "tenantId": "mobility-fixture-tenant",
+              "workspaceId": "mobility-fixture-workspace",
+              "deploymentId": "mobility-fleet-software-fixture",
+              "agentId": "mobility-fixture-agent",
+              "controlId": "L1-MOB-06",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "vehicleId": "vehicle-1",
+            "at": "2026-10-18T11:59:57.000Z",
+            "speedMps": 10,
+            "insideSafeArea": false,
+            "controller": "agent"
+          },
+          {
+            "binding": {
+              "tenantId": "mobility-fixture-tenant",
+              "workspaceId": "mobility-fixture-workspace",
+              "deploymentId": "mobility-fleet-software-fixture",
+              "agentId": "mobility-fixture-agent",
+              "controlId": "L1-MOB-06",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "vehicleId": "vehicle-1",
+            "at": "2026-10-18T11:59:58.000Z",
+            "speedMps": 0,
+            "insideSafeArea": true,
+            "controller": "independent_fallback"
+          }
+        ]
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "minimal_risk_profile_unavailable"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}
