@@ -1,0 +1,980 @@
+{
+  "station": "education",
+  "domain": "education.schools-skills",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "sourceInventory": {
+    "state": "runtime_inventory_confirmed_by_root",
+    "integrationRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+    "packQuestions": 87,
+    "deepQuestions": 16,
+    "totalQuestions": 103,
+    "generatedEducationDeepQuestions": 0,
+    "generatedDeepAssessment": "Static inspection finds 16 literal Education deep records and no Education generator. Root runtime inventory confirms 16 deep IDs, exactly matching this source inventory; generators for other stations are outside the Education count.",
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/education.ts",
+        "sha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/deep/education.ts",
+        "sha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      },
+      {
+        "path": "src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "sourceRevisionReportedByParent": "0462326f3590c78697675f007b0afca78b455ef8"
+      }
+    ],
+    "packs": [
+      {
+        "packId": "k12-pm3",
+        "packName": "K-12 Education",
+        "websiteName": "K-12 Education",
+        "questionCount": 19,
+        "ids": [
+          "EDU-K12-1",
+          "EDU-K12-2",
+          "EDU-K12-3",
+          "EDU-K12-4",
+          "EDU-K12-5",
+          "EDU-K12-6",
+          "EDU-K12-23",
+          "EDU-K12-7",
+          "EDU-K12-8",
+          "EDU-K12-9",
+          "EDU-K12-10",
+          "EDU-K12-11",
+          "EDU-K12-12",
+          "EDU-K12-13",
+          "EDU-K12-16",
+          "EDU-K12-17",
+          "EDU-K12-18",
+          "EDU-K12-20",
+          "EDU-K12-22"
+        ]
+      },
+      {
+        "packId": "higher-education",
+        "packName": "Higher Education",
+        "websiteName": "Higher Education",
+        "questionCount": 19,
+        "ids": [
+          "EDU-HE-1",
+          "EDU-HE-3",
+          "EDU-HE-4",
+          "EDU-HE-5",
+          "EDU-HE-6",
+          "EDU-HE-7",
+          "EDU-HE-8",
+          "EDU-HE-21",
+          "EDU-HE-9",
+          "EDU-HE-10",
+          "EDU-HE-11",
+          "EDU-HE-12",
+          "EDU-HE-13",
+          "EDU-HE-15",
+          "EDU-HE-16",
+          "EDU-HE-17",
+          "EDU-HE-18",
+          "EDU-HE-19",
+          "EDU-HE-20"
+        ]
+      },
+      {
+        "packId": "skills-training",
+        "packName": "Skills & Vocational Training",
+        "websiteName": "Skills & Vocational",
+        "questionCount": 15,
+        "ids": [
+          "EDU-ST-1",
+          "EDU-ST-2",
+          "EDU-ST-3",
+          "EDU-ST-4",
+          "EDU-ST-5",
+          "EDU-ST-6",
+          "EDU-ST-7",
+          "EDU-ST-8",
+          "EDU-ST-10",
+          "EDU-ST-11",
+          "EDU-ST-12",
+          "EDU-ST-13",
+          "EDU-ST-14",
+          "EDU-ST-15",
+          "EDU-ST-16"
+        ]
+      },
+      {
+        "packId": "specialized-education",
+        "packName": "Specialized Education",
+        "websiteName": "Specialized Education",
+        "questionCount": 18,
+        "ids": [
+          "EDU-SE-1",
+          "EDU-SE-2",
+          "EDU-SE-3",
+          "EDU-SE-4",
+          "EDU-SE-5",
+          "EDU-SE-18",
+          "EDU-SE-6",
+          "EDU-SE-7",
+          "EDU-SE-8",
+          "EDU-SE-17",
+          "EDU-SE-9",
+          "EDU-SE-10",
+          "EDU-SE-11",
+          "EDU-SE-12",
+          "EDU-SE-13",
+          "EDU-SE-14",
+          "EDU-SE-15",
+          "EDU-SE-16"
+        ]
+      },
+      {
+        "packId": "differently-abled",
+        "packName": "Differently Abled Education",
+        "websiteName": "Differently Abled",
+        "questionCount": 16,
+        "ids": [
+          "EDU-DA-1",
+          "EDU-DA-2",
+          "EDU-DA-3",
+          "EDU-DA-4",
+          "EDU-DA-5",
+          "EDU-DA-6",
+          "EDU-DA-7",
+          "EDU-DA-8",
+          "EDU-DA-9",
+          "EDU-DA-10",
+          "EDU-DA-11",
+          "EDU-DA-12",
+          "EDU-DA-13",
+          "EDU-DA-14",
+          "EDU-DA-15",
+          "EDU-DA-16"
+        ]
+      }
+    ],
+    "runtimeConfirmation": {
+      "executedBy": "root coordinating agent, not the documentation subagent",
+      "evidencePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/inventory-runtime.json",
+      "sha256": "02390dee9022db3aa93d4a90267c25d19bb43ee5c91608c234d6421c9e6ce761",
+      "recordedAt": "2026-10-18T20:55:46.949Z",
+      "sourceHead": "0462326f3590c78697675f007b0afca78b455ef8",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+      "nodeVersion": "v22.23.3",
+      "statusBefore": "",
+      "statusAfter": "",
+      "packQuestions": 87,
+      "deepQuestions": 16,
+      "totalUnique": 103,
+      "exactIdsMatchDispositions": true
+    }
+  },
+  "specDrift": {
+    "specPackQuestions": 83,
+    "actualPackQuestions": 87,
+    "packDelta": 4,
+    "packCountDrift": [
+      {
+        "packId": "higher-education",
+        "spec": 18,
+        "actual": 19
+      },
+      {
+        "packId": "specialized-education",
+        "spec": 15,
+        "actual": 18
+      }
+    ],
+    "specDeepQuestions": 16,
+    "actualDeepQuestions": 16,
+    "absentDispositionTargetIds": [],
+    "labelMismatches": [
+      {
+        "packId": "skills-training",
+        "packName": "Skills & Vocational Training",
+        "websiteName": "Skills & Vocational"
+      },
+      {
+        "packId": "differently-abled",
+        "packName": "Differently Abled Education",
+        "websiteName": "Differently Abled"
+      }
+    ],
+    "strategyAliases": [
+      "K-12",
+      "Skills",
+      "Specialized"
+    ],
+    "domainId": "education.schools-skills",
+    "questionnaireCountActual": 52,
+    "questionnaireCountSpecDerived": 48,
+    "questionnaireCountNote": "The spec old total99 implies 48 questionnaire items; the actual 103 inventory has 52. The spec phrase other 46 pack plus 2 deep is historical."
+  },
+  "mappingLimits": [
+    {
+      "ids": [
+        "EDU-K12-13",
+        "education-deep-02"
+      ],
+      "target": "L1-EDU-01",
+      "limit": "Exact teacher approval tests one grade write only. EDU-K12-13 also asks for lifecycle risk management, dataset governance, logs and technical documentation; education-deep-02 also requires cohort accuracy and override evidence. Those remain unsupported by that fixture."
+    },
+    {
+      "ids": [
+        "EDU-K12-10"
+      ],
+      "target": "L1-EDU-02",
+      "limit": "The proposed capability gate addresses emotion inference under Art. 5(1)(f). It does not test exploitation of age or disability vulnerabilities under Art. 5(1)(b), the wider prohibited-practice screen or approved medical/safety exceptions."
+    },
+    {
+      "ids": [
+        "EDU-K12-2",
+        "EDU-K12-11",
+        "EDU-K12-16",
+        "EDU-HE-10",
+        "EDU-HE-15",
+        "education-deep-04",
+        "education-deep-05",
+        "education-deep-09",
+        "education-deep-13"
+      ],
+      "target": "L1-EDU-03",
+      "limit": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "ids": [
+        "EDU-K12-8",
+        "EDU-HE-16",
+        "EDU-SE-8",
+        "EDU-DA-2",
+        "education-deep-14"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "ids": [
+        "EDU-DA-5"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "An HTML checker does not test ETSI EN 301 549 assistive-technology interoperability or diverse physical input/output modalities."
+    },
+    {
+      "ids": [
+        "EDU-DA-9",
+        "EDU-DA-14"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "These actual questions concern WCAG 2.2 added criteria and accessible authentication. A WCAG 2.1 checker does not establish their coverage; leave the additional 2.2 checks and manual assessment open."
+    },
+    {
+      "ids": [
+        "EDU-SE-10",
+        "EDU-DA-12"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "These actual questions concern Revised Section 508, including WCAG 2.0 and software/electronic-content requirements and an accessibility conformance report. A WCAG 2.1 automated HTML result is partial evidence only."
+    },
+    {
+      "ids": [
+        "EDU-SE-17"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "An automated output check does not publish the accessibility statement or implement the feedback/request mechanism asked by this actual question."
+    },
+    {
+      "ids": [
+        "EDU-DA-11"
+      ],
+      "target": "L1-EDU-04",
+      "limit": "Contrast checks may give a local HTML observation; release-wide contrast coverage, remediation and audit records remain separate duties."
+    },
+    {
+      "ids": [
+        "EDU-K12-1",
+        "EDU-SE-18"
+      ],
+      "target": "L1-TECH-04",
+      "limit": "The available experimental, unreviewed COPPA draft addresses separate third-party-disclosure consent. The actual questions ask consent before collection, use or disclosure, and EDU-K12-1 also asks renewed consent after material changes. The draft covers neither those broader obligations nor a production consent adapter; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "ids": [
+        "EDU-K12-17",
+        "education-deep-06"
+      ],
+      "target": "L1-TECH-04",
+      "limit": "The available experimental, unreviewed COPPA draft still needs purpose-bound separate consent, recipient/integral-disclosure determinations and withdrawal evidence. No consent or learner-age fact is asserted as observed here; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "ids": [
+        "EDU-HE-18"
+      ],
+      "target": "L1-GOV-02",
+      "limit": "The available experimental, unreviewed FRIA activation draft cannot establish a complete, human-reviewed Art. 27 assessment or its legal applicability to an institution. These Education profiles do not select L1-GOV-02; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "ids": [
+        "EDU-K12-23",
+        "EDU-HE-5",
+        "EDU-HE-17",
+        "EDU-HE-20",
+        "EDU-SE-5",
+        "EDU-DA-7",
+        "education-deep-08",
+        "education-deep-15"
+      ],
+      "target": "Layer 0",
+      "limit": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    }
+  ],
+  "dispositions": [
+    {
+      "id": "EDU-K12-1",
+      "disposition": "reused_control",
+      "target": "L1-TECH-04",
+      "reason": "The available experimental, unreviewed COPPA draft addresses separate third-party-disclosure consent. The actual questions ask consent before collection, use or disclosure, and EDU-K12-1 also asks renewed consent after material changes. The draft covers neither those broader obligations nor a production consent adapter; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "id": "EDU-K12-2",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "EDU-K12-3",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-4",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-5",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-6",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-23",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-K12-7",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-K12-8",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "id": "EDU-K12-9",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-10",
+      "disposition": "test",
+      "target": "L1-EDU-02",
+      "reason": "The proposed capability gate addresses emotion inference under Art. 5(1)(f). It does not test exploitation of age or disability vulnerabilities under Art. 5(1)(b), the wider prohibited-practice screen or approved medical/safety exceptions."
+    },
+    {
+      "id": "EDU-K12-11",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "EDU-K12-12",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-13",
+      "disposition": "test",
+      "target": "L1-EDU-01",
+      "reason": "Exact teacher approval tests one grade write only. EDU-K12-13 also asks for lifecycle risk management, dataset governance, logs and technical documentation; education-deep-02 also requires cohort accuracy and override evidence. Those remain unsupported by that fixture."
+    },
+    {
+      "id": "EDU-K12-16",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "EDU-K12-17",
+      "disposition": "reused_control",
+      "target": "L1-TECH-04",
+      "reason": "The available experimental, unreviewed COPPA draft still needs purpose-bound separate consent, recipient/integral-disclosure determinations and withdrawal evidence. No consent or learner-age fact is asserted as observed here; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "id": "EDU-K12-18",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-20",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-K12-22",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-HE-1",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-HE-3",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-4",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-5",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-HE-6",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-7",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-8",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-HE-21",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-9",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-HE-10",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "EDU-HE-11",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-12",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-13",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-HE-15",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "EDU-HE-16",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "id": "EDU-HE-17",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-HE-18",
+      "disposition": "reused_control",
+      "target": "L1-GOV-02",
+      "reason": "The available experimental, unreviewed FRIA activation draft cannot establish a complete, human-reviewed Art. 27 assessment or its legal applicability to an institution. These Education profiles do not select L1-GOV-02; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "id": "EDU-HE-19",
+      "disposition": "test",
+      "target": "L1-EDU-02",
+      "reason": "The local capability gate addresses emotion inference under Art. 5(1)(f). It does not establish institution-wide disablement, release/configuration-drift coverage, or a documented medical/safety exception and approval. Those broader parts of the actual question remain unevaluated."
+    },
+    {
+      "id": "EDU-HE-20",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-ST-1",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-2",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-3",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-4",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-5",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-6",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-7",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-8",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-10",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-11",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-12",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-13",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-ST-14",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-ST-15",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "EDU-ST-16",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-1",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-2",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-3",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-4",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-5",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-SE-18",
+      "disposition": "reused_control",
+      "target": "L1-TECH-04",
+      "reason": "The available experimental, unreviewed COPPA draft addresses separate third-party-disclosure consent. The actual questions ask consent before collection, use or disclosure, and EDU-K12-1 also asks renewed consent after material changes. The draft covers neither those broader obligations nor a production consent adapter; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "id": "EDU-SE-6",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-7",
+      "disposition": "reused_control",
+      "target": "L1-TECH-01",
+      "reason": "The experimental, unreviewed synthetic-output marking target is available after P2-30 integration. Education-specific applicability, actual deployment marking, detectability and evaluated reuse remain pending; these profiles do not assert publishes_synthetic_content."
+    },
+    {
+      "id": "EDU-SE-8",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "id": "EDU-SE-17",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "An automated output check does not publish the accessibility statement or implement the feedback/request mechanism asked by this actual question."
+    },
+    {
+      "id": "EDU-SE-9",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-10",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "These actual questions concern Revised Section 508, including WCAG 2.0 and software/electronic-content requirements and an accessibility conformance report. A WCAG 2.1 automated HTML result is partial evidence only."
+    },
+    {
+      "id": "EDU-SE-11",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-12",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-13",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-14",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-15",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-SE-16",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-1",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-2",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "id": "EDU-DA-3",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-4",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-5",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "An HTML checker does not test ETSI EN 301 549 assistive-technology interoperability or diverse physical input/output modalities."
+    },
+    {
+      "id": "EDU-DA-6",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-7",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "EDU-DA-8",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-9",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "These actual questions concern WCAG 2.2 added criteria and accessible authentication. A WCAG 2.1 checker does not establish their coverage; leave the additional 2.2 checks and manual assessment open."
+    },
+    {
+      "id": "EDU-DA-10",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-11",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Contrast checks may give a local HTML observation; release-wide contrast coverage, remediation and audit records remain separate duties."
+    },
+    {
+      "id": "EDU-DA-12",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "These actual questions concern Revised Section 508, including WCAG 2.0 and software/electronic-content requirements and an accessibility conformance report. A WCAG 2.1 automated HTML result is partial evidence only."
+    },
+    {
+      "id": "EDU-DA-13",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-14",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "These actual questions concern WCAG 2.2 added criteria and accessible authentication. A WCAG 2.1 checker does not establish their coverage; leave the additional 2.2 checks and manual assessment open."
+    },
+    {
+      "id": "EDU-DA-15",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "EDU-DA-16",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "education-deep-01",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "education-deep-02",
+      "disposition": "test",
+      "target": "L1-EDU-01",
+      "reason": "Exact teacher approval tests one grade write only. EDU-K12-13 also asks for lifecycle risk management, dataset governance, logs and technical documentation; education-deep-02 also requires cohort accuracy and override evidence. Those remain unsupported by that fixture."
+    },
+    {
+      "id": "education-deep-03",
+      "disposition": "test",
+      "target": "L1-EDU-02",
+      "reason": "The local capability gate addresses emotion inference under Art. 5(1)(f). It does not establish institution-wide disablement, release/configuration-drift coverage, or a documented medical/safety exception and approval. Those broader parts of the actual question remain unevaluated."
+    },
+    {
+      "id": "education-deep-04",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "education-deep-05",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "education-deep-06",
+      "disposition": "reused_control",
+      "target": "L1-TECH-04",
+      "reason": "The available experimental, unreviewed COPPA draft still needs purpose-bound separate consent, recipient/integral-disclosure determinations and withdrawal evidence. No consent or learner-age fact is asserted as observed here; Education-specific applicability and evaluated reuse remain pending."
+    },
+    {
+      "id": "education-deep-07",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "education-deep-08",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "education-deep-09",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "education-deep-10",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "education-deep-11",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "The actual question requires institution-specific policy, risk, review or oversight records. No signed human-reviewed records are supplied; retain a named review duty rather than turn a questionnaire answer into observed evidence."
+    },
+    {
+      "id": "education-deep-12",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    },
+    {
+      "id": "education-deep-13",
+      "disposition": "test",
+      "target": "L1-EDU-03",
+      "reason": "This is a proposed boundary wrapper for the P2-27 two-institution fixture, which is absent. It must give not_evaluated without that dependency. It does not establish an actual FERPA exception, emergency threat rationale, de-identification result, studies agreement, school direct-control contract, redisclosure rule or IDEA access record."
+    },
+    {
+      "id": "education-deep-14",
+      "disposition": "test",
+      "target": "L1-EDU-04",
+      "reason": "Automated WCAG 2.1 A/AA checks of one synthetic HTML lesson cover only automatable checks. Interfaces, mobile apps, contracted material, diverse learning modalities, assistive-technology testing, legal scope and entity deadlines require separate evidence and manual assessment."
+    },
+    {
+      "id": "education-deep-15",
+      "disposition": "layer0",
+      "target": "Layer 0",
+      "reason": "Routing to Layer 0 is an ownership disposition. It does not establish student notices, explanation accessibility, individual explanations, content safety or a legally sufficient log-retention period."
+    },
+    {
+      "id": "education-deep-16",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain the actual question as an experimental self-reported questionnaire item, capped at L1. This draft adds no decisive control or production evidence for its full wording."
+    }
+  ]
+}

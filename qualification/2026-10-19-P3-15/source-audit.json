@@ -1,0 +1,2582 @@
+{
+  "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "changedPaths": [
+    ".changeset/education-overlay.md",
+    "catalog/CHANGELOG.md",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-contradictory.json",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-cross-tenant.json",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-empty.json",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-replayed.json",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-stale.json",
+    "catalog/fixtures/L1-EDU-01/negative/evidence-violation.json",
+    "catalog/fixtures/L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+    "catalog/fixtures/L1-EDU-01/negative/oracle-missing-approval.json",
+    "catalog/fixtures/L1-EDU-01/negative/oracle-prompt-only.json",
+    "catalog/fixtures/L1-EDU-01/negative/oracle-wrong-grade.json",
+    "catalog/fixtures/L1-EDU-01/positive/evidence-valid.json",
+    "catalog/fixtures/L1-EDU-01/positive/oracle-teacher-approval.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-contradictory.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-cross-tenant.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-empty.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-replayed.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-stale.json",
+    "catalog/fixtures/L1-EDU-02/negative/evidence-violation.json",
+    "catalog/fixtures/L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+    "catalog/fixtures/L1-EDU-02/negative/oracle-emotion-call.json",
+    "catalog/fixtures/L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+    "catalog/fixtures/L1-EDU-02/negative/oracle-unclassified-capability.json",
+    "catalog/fixtures/L1-EDU-02/positive/evidence-valid.json",
+    "catalog/fixtures/L1-EDU-02/positive/oracle-summary-no-affect.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-contradictory.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-cross-tenant.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-empty.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-replayed.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-stale.json",
+    "catalog/fixtures/L1-EDU-03/negative/evidence-violation.json",
+    "catalog/fixtures/L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+    "catalog/fixtures/L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+    "catalog/fixtures/L1-EDU-03/positive/evidence-valid.json",
+    "catalog/fixtures/L1-EDU-03/positive/oracle-p227-exception-pending.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-contradictory.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-cross-tenant.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-empty.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-replayed.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-stale.json",
+    "catalog/fixtures/L1-EDU-04/negative/evidence-violation.json",
+    "catalog/fixtures/L1-EDU-04/negative/oracle-checker-unavailable.json",
+    "catalog/fixtures/L1-EDU-04/negative/oracle-form-label-missing.json",
+    "catalog/fixtures/L1-EDU-04/negative/oracle-image-alt-missing.json",
+    "catalog/fixtures/L1-EDU-04/positive/evidence-valid.json",
+    "catalog/fixtures/L1-EDU-04/positive/oracle-accessible-lesson.json",
+    "catalog/layers/l1-education-global/controls/L1-EDU-01.yaml",
+    "catalog/layers/l1-education-global/controls/L1-EDU-02.yaml",
+    "catalog/layers/l1-education-global/controls/L1-EDU-03.yaml",
+    "catalog/layers/l1-education-global/controls/L1-EDU-04.yaml",
+    "catalog/layers/l1-education-global/pack.yaml",
+    "catalog/vocabulary.yaml",
+    "docs/catalog/education/README.md",
+    "docs/catalog/education/dispositions.json",
+    "docs/catalog/education/guide-section.md",
+    "docs/catalog/education/instruments.json",
+    "docs/catalog/education/profile.grading-assistant-eu.json",
+    "docs/catalog/education/profile.grading-assistant.json",
+    "docs/catalog/education/promotion.yaml",
+    "docs/releases/2.0.0.md",
+    "tests/catalog/stations/education/accessibilityCheck.ts",
+    "tests/catalog/stations/education/compiledPolicy.test.ts",
+    "tests/catalog/stations/education/exportLog.ts",
+    "tests/catalog/stations/education/fixtures.test.ts",
+    "tests/catalog/stations/education/gradebook.ts",
+    "tests/catalog/stations/education/harness.ts",
+    "tests/catalog/stations/education/overlay.test.ts",
+    "tests/catalog/stations/education/protocol.ts",
+    "tests/catalog/stations/education/toolCapabilityLog.ts",
+    "tests/compilerStationDefaults.test.ts"
+  ],
+  "sourceFiles": [
+    {
+      "path": ".changeset/education-overlay.md",
+      "sha256": "37229b304434931c8de8a407ff951122acbffc952cf3835f1a7ee256facd8c11"
+    },
+    {
+      "path": "catalog/CHANGELOG.md",
+      "sha256": "ad936dddfbceaa684dbd5d7038cc42d68b576ab75b4a1ebe06ce7c300b61b319"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-contradictory.json",
+      "sha256": "8933872a5b6c6027c7e59631ab3c26373b90b46d758ca90048b4fbf4c3fcefb8"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-cross-tenant.json",
+      "sha256": "9b0b06a702e887d689c9b7ce4d642099a5535ba328f84e3468acadf8eac8dd41"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-empty.json",
+      "sha256": "5acec42d7cb1f674c9a7edd7223bc9d85db23053aa001d597676f0c01dc6fb82"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-replayed.json",
+      "sha256": "2cec48a84a109cb4dcd96b2ac3126c177c77606273c5995706dc47c746893fca"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-stale.json",
+      "sha256": "86ef77ab1045ca21438d80217e496ee0a9581597e9cd25165172b58ecb006725"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/evidence-violation.json",
+      "sha256": "fbe2c10f88dcd960477e81ddee257e55befe8b70e3f857522e0c2781c38f2e31"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+      "sha256": "c32b0c44e5f8f62cbd41fadbc733a9b5451e47e6f5b2258cdaca286cfa9376b4"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/oracle-missing-approval.json",
+      "sha256": "20dcdc0d57166dc50be4a563cab902e2438c3d670edfa716d1e3aca0b7934274"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/oracle-prompt-only.json",
+      "sha256": "108432c23de91047727050f91af34513ec7983d87d926a739c7a869be7973f23"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/negative/oracle-wrong-grade.json",
+      "sha256": "5017501e7eabacf41647a747cc02a694292c6b0a0e451628d1449ffee7c92cfc"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/positive/evidence-valid.json",
+      "sha256": "1a6477dd1e6929100109a0e0b5c6369ce579b3d293b4be2fb909dae7f5f12f70"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-01/positive/oracle-teacher-approval.json",
+      "sha256": "67d1372d0857ba80847c98348241a2f0e0ef4c4f7727be2da65100b686b3f5d2"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-contradictory.json",
+      "sha256": "d15c9407fb7cc01b97a10df0e42583b2d69899777a45e09e5ee4db476303fc6c"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-cross-tenant.json",
+      "sha256": "7fd187e998fd9eedaa3fa5bf0e67daa145b120b9461e253736a3fd28800b8b3c"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-empty.json",
+      "sha256": "a2166d714a66bfda491e54160c33fc3dbe845643a10d7ef5d815878971b8758e"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-replayed.json",
+      "sha256": "9b5c35277b08f2f0e6b31881117eb647c3858d29812ada2519eb57d00aff2aac"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-stale.json",
+      "sha256": "e7c1dae39096f2e8be81d06bf6d56130b70ef0fd7d19ff7c60e6a54569b59612"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/evidence-violation.json",
+      "sha256": "ef0d965775e64f731675ce27b730112aa98339dfecf30ad4de2e1c2852194ef4"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+      "sha256": "1a890c3bafde004185ecd0d5803c05e439ceaee7dd37abe36152baa793acc127"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/oracle-emotion-call.json",
+      "sha256": "25fdb1c680d3c704b191275a3b9266fad2228c65ad7666098d0374a5d04ace54"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+      "sha256": "b2accfd71692f8cb829dd063cb34b0c01e27bd14ec1ab7d8f2cca53d91d4fcbd"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/negative/oracle-unclassified-capability.json",
+      "sha256": "7ebb4f3dc89398e2c0390ea3ec37b565bb44fdd32b8769e6d902a4165dca6af4"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/positive/evidence-valid.json",
+      "sha256": "59641bd475f6c37cf398fa43516bb669f3f81cd89f1b25cc42d90a20b0d2c08f"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-02/positive/oracle-summary-no-affect.json",
+      "sha256": "044ddaa4a69417c27c04e768be94ae716e4cf85a7e2055cf6642fc4a1b45f920"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-contradictory.json",
+      "sha256": "58a16868a9f2d64e7e4ecab4d6515548754e461451fcefb556e9bda6ae003786"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-cross-tenant.json",
+      "sha256": "d14b9c13640c460f5690b308c2f4c8014a9b5eba52f755b016b8c6c20bb78a0e"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-empty.json",
+      "sha256": "8d85f2c90844588832f4aba35517629ded074157b29bd560f60ffaeafbd46d82"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-replayed.json",
+      "sha256": "182a5d426fb5ba2df225c7e00447ca8ba93c6802fa4c09a1d847046f8f91081f"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-stale.json",
+      "sha256": "5582500a8c25f1e7320abc57f3394d12f0f70e54f46d7904538097f045f714df"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/evidence-violation.json",
+      "sha256": "395b8c9ec8b4240442773d9125f471bdb6104ad8cc5c72182b7a91e71d97a3c7"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+      "sha256": "7de87f5fffe2ce18db2cda4b0095df4eb362d0e69e271b2eb2b906a33ddd983f"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+      "sha256": "fc2c503d9a8e47fb00fa5d7eb5af5d55e6b99fcfa1ba9f1359fb215ec5f98da3"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/positive/evidence-valid.json",
+      "sha256": "e64dc0e30dbe3130b8aa206b4c20a1fde5728482ebbebeb6823211ac47c7d327"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-03/positive/oracle-p227-exception-pending.json",
+      "sha256": "fde430576212d45098aedcad1c0368ffe8ba3af0eb2c99b39ac3f9d270b4238a"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-contradictory.json",
+      "sha256": "9a3cff1da10e88ea4938efe2c80f086b59ddd72053b5e2ec1c428dd07e3353ea"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-cross-tenant.json",
+      "sha256": "4535cf660b92decf85299693c130a69f74c934e24e70f3c6be0cea0ab1a59ff8"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-empty.json",
+      "sha256": "3e383a27316b97996cdfaf30bbbbf0b1ee2421180595ca1d55b081991667abe6"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-replayed.json",
+      "sha256": "d6afe4271d52415d4be85690289b1a02018e87fb1d4e00fd5de1d1f346bf8d2d"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-stale.json",
+      "sha256": "dc1cadd59ff06b43b94e38a30db233ba89ad8a9540bbfd65d0f5ecfbced283a1"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/evidence-violation.json",
+      "sha256": "825ca6126a80270e9a7780cd0f03a83440904ca0df01030cbf9440d1d11afa55"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/oracle-checker-unavailable.json",
+      "sha256": "1749d0ec87c171903ca541963286a4c6c214f0ffdbba83b117c8e676581fe098"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/oracle-form-label-missing.json",
+      "sha256": "3a42cef3ea23aeb7d3bd78620007c5324945f36ff457000d0c42e52dbeec0d89"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/negative/oracle-image-alt-missing.json",
+      "sha256": "1d412cd92979052b594360b3489eec39b51a2ff824232739b5302c55a8651ac7"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/positive/evidence-valid.json",
+      "sha256": "77045d7c54080e0e47594c3875cc47bfb6615263697a5f53a435fa3f1327191b"
+    },
+    {
+      "path": "catalog/fixtures/L1-EDU-04/positive/oracle-accessible-lesson.json",
+      "sha256": "3779ac0fdc37b09229576be01327daafb459b4cd92af8f21b6700d506e177919"
+    },
+    {
+      "path": "catalog/layers/l1-education-global/controls/L1-EDU-01.yaml",
+      "sha256": "5c1750bb8434de5e360c9f1b8856a758fa033ef3780e5b9029e7ef8b278c7bc8"
+    },
+    {
+      "path": "catalog/layers/l1-education-global/controls/L1-EDU-02.yaml",
+      "sha256": "e179764983d67c6e83e76ec73e4144c6e9f0d0b059e9f789c8129545c5118d63"
+    },
+    {
+      "path": "catalog/layers/l1-education-global/controls/L1-EDU-03.yaml",
+      "sha256": "a9229fa03ead5b14853c0acc6da4010626765e767ac6f5833e02d71211bb92aa"
+    },
+    {
+      "path": "catalog/layers/l1-education-global/controls/L1-EDU-04.yaml",
+      "sha256": "005dc361b2e6d60c3cc51d4f6ba2989300de81c8d1fedb8fc1929cc7e93b6dbc"
+    },
+    {
+      "path": "catalog/layers/l1-education-global/pack.yaml",
+      "sha256": "312731bad75fac8fa6d6cded61833bf84b26e1670ee12bfb02f61b4c111877b5"
+    },
+    {
+      "path": "catalog/vocabulary.yaml",
+      "sha256": "6b9aa736a1400203abb6f92cd846027e8ad9bd6190fb4aa1f0b167d637bb3955"
+    },
+    {
+      "path": "docs/catalog/education/README.md",
+      "sha256": "be113f870f40efdc9f0505a6844092d2399db2b684142033aa1bb9bec2b23bc5"
+    },
+    {
+      "path": "docs/catalog/education/dispositions.json",
+      "sha256": "a21815d675b511aa1fa9c4961c861bcec6bac7f04f4e585ec5bac3a6df13ebe2"
+    },
+    {
+      "path": "docs/catalog/education/guide-section.md",
+      "sha256": "0ab20cb2736f14f67dcace9629860236033ee989f957b4f617645319372f069e"
+    },
+    {
+      "path": "docs/catalog/education/instruments.json",
+      "sha256": "7621747d77cfd8342314831e6c3b3465f3bddc6c0fce43cc4a75278b2cea151d"
+    },
+    {
+      "path": "docs/catalog/education/profile.grading-assistant-eu.json",
+      "sha256": "fa33d085b4d3b791c68976cdb12a6e66165b31c4dbadeb5b02c0be42d723d118"
+    },
+    {
+      "path": "docs/catalog/education/profile.grading-assistant.json",
+      "sha256": "53091dcb2f0dccd0a67d5d6e948be62485e18df8c1d65d96f2f9407a8f6289df"
+    },
+    {
+      "path": "docs/catalog/education/promotion.yaml",
+      "sha256": "2ff406246c69a20d2d768a276e37e5df2cfbcd1f1be4f3d9aa02da1228ae36a9"
+    },
+    {
+      "path": "docs/releases/2.0.0.md",
+      "sha256": "f6cce921ef181e7104b805da3205574bb0f90b358216a2073f55ed750a68a3e5"
+    },
+    {
+      "path": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "sha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a"
+    },
+    {
+      "path": "tests/catalog/stations/education/compiledPolicy.test.ts",
+      "sha256": "b54a5ba65d6401ffda3aceff845e333f3c7c8833931c589f8ad20c3271c35b34"
+    },
+    {
+      "path": "tests/catalog/stations/education/exportLog.ts",
+      "sha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa"
+    },
+    {
+      "path": "tests/catalog/stations/education/fixtures.test.ts",
+      "sha256": "8ccff17699e9782dd11e90cc73f050210a493ad4805f3cfe2a763c7db8159f99"
+    },
+    {
+      "path": "tests/catalog/stations/education/gradebook.ts",
+      "sha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b"
+    },
+    {
+      "path": "tests/catalog/stations/education/harness.ts",
+      "sha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f"
+    },
+    {
+      "path": "tests/catalog/stations/education/overlay.test.ts",
+      "sha256": "9c294de2bd6b7cfb6fba0681c60009538b14eb35bfc04c803915456ee7f36784"
+    },
+    {
+      "path": "tests/catalog/stations/education/protocol.ts",
+      "sha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446"
+    },
+    {
+      "path": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "sha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06"
+    },
+    {
+      "path": "tests/compilerStationDefaults.test.ts",
+      "sha256": "ba375dce3352263b5b69cb9af0c058d7f401787e1a62e734ce65661947a28340"
+    }
+  ],
+  "boundary": {
+    "recordedAt": "2026-10-18T21:30:48.630268+00:00",
+    "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+    "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+    "inventorySourceRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+    "inventoryCount": {
+      "pack": 87,
+      "deep": 16,
+      "unique": 103
+    },
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/education.ts",
+        "sha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/deep/education.ts",
+        "sha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      },
+      {
+        "path": "src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "matchesRecordedInventory": true,
+        "matchesCurrentInt": true
+      }
+    ],
+    "ownSrcDelta": false,
+    "trackedFileDeletion": false,
+    "everyF2PolicyAssertionBytesPreserved": true,
+    "historicalP146PlanDigestsPreserved": true,
+    "educationOnlyUpdatedPlanRecord": "final-case-probes/a625ee5cae3cde551701f7c9cfed33a4f142480f/attempt-2/catalog-probe.json#educationGolden",
+    "statusPorcelain": ""
+  },
+  "initialVocabAndAppendAudit": {
+    "recordedAt": "2026-10-18T21:08:23.245Z",
+    "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+    "int": "0462326f3590c78697675f007b0afca78b455ef8",
+    "statusPorcelain": "",
+    "changedPaths": [
+      ".changeset/education-overlay.md",
+      "catalog/CHANGELOG.md",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-contradictory.json",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-cross-tenant.json",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-empty.json",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-replayed.json",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-stale.json",
+      "catalog/fixtures/L1-EDU-01/negative/evidence-violation.json",
+      "catalog/fixtures/L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+      "catalog/fixtures/L1-EDU-01/negative/oracle-missing-approval.json",
+      "catalog/fixtures/L1-EDU-01/negative/oracle-prompt-only.json",
+      "catalog/fixtures/L1-EDU-01/negative/oracle-wrong-grade.json",
+      "catalog/fixtures/L1-EDU-01/positive/evidence-valid.json",
+      "catalog/fixtures/L1-EDU-01/positive/oracle-teacher-approval.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-contradictory.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-cross-tenant.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-empty.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-replayed.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-stale.json",
+      "catalog/fixtures/L1-EDU-02/negative/evidence-violation.json",
+      "catalog/fixtures/L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+      "catalog/fixtures/L1-EDU-02/negative/oracle-emotion-call.json",
+      "catalog/fixtures/L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+      "catalog/fixtures/L1-EDU-02/negative/oracle-unclassified-capability.json",
+      "catalog/fixtures/L1-EDU-02/positive/evidence-valid.json",
+      "catalog/fixtures/L1-EDU-02/positive/oracle-summary-no-affect.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-contradictory.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-cross-tenant.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-empty.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-replayed.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-stale.json",
+      "catalog/fixtures/L1-EDU-03/negative/evidence-violation.json",
+      "catalog/fixtures/L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+      "catalog/fixtures/L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+      "catalog/fixtures/L1-EDU-03/positive/evidence-valid.json",
+      "catalog/fixtures/L1-EDU-03/positive/oracle-p227-exception-pending.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-contradictory.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-cross-tenant.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-empty.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-replayed.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-stale.json",
+      "catalog/fixtures/L1-EDU-04/negative/evidence-violation.json",
+      "catalog/fixtures/L1-EDU-04/negative/oracle-checker-unavailable.json",
+      "catalog/fixtures/L1-EDU-04/negative/oracle-form-label-missing.json",
+      "catalog/fixtures/L1-EDU-04/negative/oracle-image-alt-missing.json",
+      "catalog/fixtures/L1-EDU-04/positive/evidence-valid.json",
+      "catalog/fixtures/L1-EDU-04/positive/oracle-accessible-lesson.json",
+      "catalog/layers/l1-education-global/controls/L1-EDU-01.yaml",
+      "catalog/layers/l1-education-global/controls/L1-EDU-02.yaml",
+      "catalog/layers/l1-education-global/controls/L1-EDU-03.yaml",
+      "catalog/layers/l1-education-global/controls/L1-EDU-04.yaml",
+      "catalog/layers/l1-education-global/pack.yaml",
+      "catalog/vocabulary.yaml",
+      "docs/catalog/education/README.md",
+      "docs/catalog/education/dispositions.json",
+      "docs/catalog/education/guide-section.md",
+      "docs/catalog/education/instruments.json",
+      "docs/catalog/education/profile.grading-assistant-eu.json",
+      "docs/catalog/education/profile.grading-assistant.json",
+      "docs/catalog/education/promotion.yaml",
+      "docs/releases/2.0.0.md",
+      "tests/catalog/stations/education/accessibilityCheck.ts",
+      "tests/catalog/stations/education/compiledPolicy.test.ts",
+      "tests/catalog/stations/education/exportLog.ts",
+      "tests/catalog/stations/education/fixtures.test.ts",
+      "tests/catalog/stations/education/gradebook.ts",
+      "tests/catalog/stations/education/harness.ts",
+      "tests/catalog/stations/education/overlay.test.ts",
+      "tests/catalog/stations/education/protocol.ts",
+      "tests/catalog/stations/education/toolCapabilityLog.ts"
+    ],
+    "ownSrcDelta": false,
+    "trackedFileDeletion": false,
+    "catalogManifestUnchanged": true,
+    "priorChangelogPreserved": true,
+    "appendedChangelogBlocks": 1,
+    "vocabulary": [
+      {
+        "key": "stations",
+        "priorCount": 7,
+        "currentCount": 7,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "jurisdictions",
+        "priorCount": 8,
+        "currentCount": 9,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "roles",
+        "priorCount": 2,
+        "currentCount": 2,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "entityTypes",
+        "priorCount": 5,
+        "currentCount": 8,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "riskClasses",
+        "priorCount": 0,
+        "currentCount": 0,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "useCases",
+        "priorCount": 7,
+        "currentCount": 13,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "dataClasses",
+        "priorCount": 0,
+        "currentCount": 2,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "domains",
+        "priorCount": 0,
+        "currentCount": 1,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "ownerRoles",
+        "priorCount": 4,
+        "currentCount": 4,
+        "priorValuesAndOrderPreserved": true
+      },
+      {
+        "key": "frameworks",
+        "priorCount": 3,
+        "currentCount": 3,
+        "priorValuesAndOrderPreserved": true
+      }
+    ],
+    "files": [
+      {
+        "path": ".changeset/education-overlay.md",
+        "sha256": "37229b304434931c8de8a407ff951122acbffc952cf3835f1a7ee256facd8c11"
+      },
+      {
+        "path": "catalog/CHANGELOG.md",
+        "sha256": "ad936dddfbceaa684dbd5d7038cc42d68b576ab75b4a1ebe06ce7c300b61b319"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-contradictory.json",
+        "sha256": "8933872a5b6c6027c7e59631ab3c26373b90b46d758ca90048b4fbf4c3fcefb8"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-cross-tenant.json",
+        "sha256": "9b0b06a702e887d689c9b7ce4d642099a5535ba328f84e3468acadf8eac8dd41"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-empty.json",
+        "sha256": "5acec42d7cb1f674c9a7edd7223bc9d85db23053aa001d597676f0c01dc6fb82"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-replayed.json",
+        "sha256": "2cec48a84a109cb4dcd96b2ac3126c177c77606273c5995706dc47c746893fca"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-stale.json",
+        "sha256": "86ef77ab1045ca21438d80217e496ee0a9581597e9cd25165172b58ecb006725"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/evidence-violation.json",
+        "sha256": "fbe2c10f88dcd960477e81ddee257e55befe8b70e3f857522e0c2781c38f2e31"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+        "sha256": "c32b0c44e5f8f62cbd41fadbc733a9b5451e47e6f5b2258cdaca286cfa9376b4"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/oracle-missing-approval.json",
+        "sha256": "20dcdc0d57166dc50be4a563cab902e2438c3d670edfa716d1e3aca0b7934274"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/oracle-prompt-only.json",
+        "sha256": "108432c23de91047727050f91af34513ec7983d87d926a739c7a869be7973f23"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/negative/oracle-wrong-grade.json",
+        "sha256": "5017501e7eabacf41647a747cc02a694292c6b0a0e451628d1449ffee7c92cfc"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/positive/evidence-valid.json",
+        "sha256": "1a6477dd1e6929100109a0e0b5c6369ce579b3d293b4be2fb909dae7f5f12f70"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-01/positive/oracle-teacher-approval.json",
+        "sha256": "67d1372d0857ba80847c98348241a2f0e0ef4c4f7727be2da65100b686b3f5d2"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-contradictory.json",
+        "sha256": "d15c9407fb7cc01b97a10df0e42583b2d69899777a45e09e5ee4db476303fc6c"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-cross-tenant.json",
+        "sha256": "7fd187e998fd9eedaa3fa5bf0e67daa145b120b9461e253736a3fd28800b8b3c"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-empty.json",
+        "sha256": "a2166d714a66bfda491e54160c33fc3dbe845643a10d7ef5d815878971b8758e"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-replayed.json",
+        "sha256": "9b5c35277b08f2f0e6b31881117eb647c3858d29812ada2519eb57d00aff2aac"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-stale.json",
+        "sha256": "e7c1dae39096f2e8be81d06bf6d56130b70ef0fd7d19ff7c60e6a54569b59612"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/evidence-violation.json",
+        "sha256": "ef0d965775e64f731675ce27b730112aa98339dfecf30ad4de2e1c2852194ef4"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+        "sha256": "1a890c3bafde004185ecd0d5803c05e439ceaee7dd37abe36152baa793acc127"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/oracle-emotion-call.json",
+        "sha256": "25fdb1c680d3c704b191275a3b9266fad2228c65ad7666098d0374a5d04ace54"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+        "sha256": "b2accfd71692f8cb829dd063cb34b0c01e27bd14ec1ab7d8f2cca53d91d4fcbd"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/negative/oracle-unclassified-capability.json",
+        "sha256": "7ebb4f3dc89398e2c0390ea3ec37b565bb44fdd32b8769e6d902a4165dca6af4"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/positive/evidence-valid.json",
+        "sha256": "59641bd475f6c37cf398fa43516bb669f3f81cd89f1b25cc42d90a20b0d2c08f"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-02/positive/oracle-summary-no-affect.json",
+        "sha256": "044ddaa4a69417c27c04e768be94ae716e4cf85a7e2055cf6642fc4a1b45f920"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-contradictory.json",
+        "sha256": "58a16868a9f2d64e7e4ecab4d6515548754e461451fcefb556e9bda6ae003786"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-cross-tenant.json",
+        "sha256": "d14b9c13640c460f5690b308c2f4c8014a9b5eba52f755b016b8c6c20bb78a0e"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-empty.json",
+        "sha256": "8d85f2c90844588832f4aba35517629ded074157b29bd560f60ffaeafbd46d82"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-replayed.json",
+        "sha256": "182a5d426fb5ba2df225c7e00447ca8ba93c6802fa4c09a1d847046f8f91081f"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-stale.json",
+        "sha256": "5582500a8c25f1e7320abc57f3394d12f0f70e54f46d7904538097f045f714df"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/evidence-violation.json",
+        "sha256": "395b8c9ec8b4240442773d9125f471bdb6104ad8cc5c72182b7a91e71d97a3c7"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+        "sha256": "7de87f5fffe2ce18db2cda4b0095df4eb362d0e69e271b2eb2b906a33ddd983f"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+        "sha256": "fc2c503d9a8e47fb00fa5d7eb5af5d55e6b99fcfa1ba9f1359fb215ec5f98da3"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/positive/evidence-valid.json",
+        "sha256": "e64dc0e30dbe3130b8aa206b4c20a1fde5728482ebbebeb6823211ac47c7d327"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-03/positive/oracle-p227-exception-pending.json",
+        "sha256": "fde430576212d45098aedcad1c0368ffe8ba3af0eb2c99b39ac3f9d270b4238a"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-contradictory.json",
+        "sha256": "9a3cff1da10e88ea4938efe2c80f086b59ddd72053b5e2ec1c428dd07e3353ea"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-cross-tenant.json",
+        "sha256": "4535cf660b92decf85299693c130a69f74c934e24e70f3c6be0cea0ab1a59ff8"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-empty.json",
+        "sha256": "3e383a27316b97996cdfaf30bbbbf0b1ee2421180595ca1d55b081991667abe6"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-replayed.json",
+        "sha256": "d6afe4271d52415d4be85690289b1a02018e87fb1d4e00fd5de1d1f346bf8d2d"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-stale.json",
+        "sha256": "dc1cadd59ff06b43b94e38a30db233ba89ad8a9540bbfd65d0f5ecfbced283a1"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/evidence-violation.json",
+        "sha256": "825ca6126a80270e9a7780cd0f03a83440904ca0df01030cbf9440d1d11afa55"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/oracle-checker-unavailable.json",
+        "sha256": "1749d0ec87c171903ca541963286a4c6c214f0ffdbba83b117c8e676581fe098"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/oracle-form-label-missing.json",
+        "sha256": "3a42cef3ea23aeb7d3bd78620007c5324945f36ff457000d0c42e52dbeec0d89"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/negative/oracle-image-alt-missing.json",
+        "sha256": "1d412cd92979052b594360b3489eec39b51a2ff824232739b5302c55a8651ac7"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/positive/evidence-valid.json",
+        "sha256": "77045d7c54080e0e47594c3875cc47bfb6615263697a5f53a435fa3f1327191b"
+      },
+      {
+        "path": "catalog/fixtures/L1-EDU-04/positive/oracle-accessible-lesson.json",
+        "sha256": "3779ac0fdc37b09229576be01327daafb459b4cd92af8f21b6700d506e177919"
+      },
+      {
+        "path": "catalog/layers/l1-education-global/controls/L1-EDU-01.yaml",
+        "sha256": "5c1750bb8434de5e360c9f1b8856a758fa033ef3780e5b9029e7ef8b278c7bc8"
+      },
+      {
+        "path": "catalog/layers/l1-education-global/controls/L1-EDU-02.yaml",
+        "sha256": "e179764983d67c6e83e76ec73e4144c6e9f0d0b059e9f789c8129545c5118d63"
+      },
+      {
+        "path": "catalog/layers/l1-education-global/controls/L1-EDU-03.yaml",
+        "sha256": "a9229fa03ead5b14853c0acc6da4010626765e767ac6f5833e02d71211bb92aa"
+      },
+      {
+        "path": "catalog/layers/l1-education-global/controls/L1-EDU-04.yaml",
+        "sha256": "005dc361b2e6d60c3cc51d4f6ba2989300de81c8d1fedb8fc1929cc7e93b6dbc"
+      },
+      {
+        "path": "catalog/layers/l1-education-global/pack.yaml",
+        "sha256": "312731bad75fac8fa6d6cded61833bf84b26e1670ee12bfb02f61b4c111877b5"
+      },
+      {
+        "path": "catalog/vocabulary.yaml",
+        "sha256": "6b9aa736a1400203abb6f92cd846027e8ad9bd6190fb4aa1f0b167d637bb3955"
+      },
+      {
+        "path": "docs/catalog/education/README.md",
+        "sha256": "be113f870f40efdc9f0505a6844092d2399db2b684142033aa1bb9bec2b23bc5"
+      },
+      {
+        "path": "docs/catalog/education/dispositions.json",
+        "sha256": "a21815d675b511aa1fa9c4961c861bcec6bac7f04f4e585ec5bac3a6df13ebe2"
+      },
+      {
+        "path": "docs/catalog/education/guide-section.md",
+        "sha256": "0ab20cb2736f14f67dcace9629860236033ee989f957b4f617645319372f069e"
+      },
+      {
+        "path": "docs/catalog/education/instruments.json",
+        "sha256": "7621747d77cfd8342314831e6c3b3465f3bddc6c0fce43cc4a75278b2cea151d"
+      },
+      {
+        "path": "docs/catalog/education/profile.grading-assistant-eu.json",
+        "sha256": "fa33d085b4d3b791c68976cdb12a6e66165b31c4dbadeb5b02c0be42d723d118"
+      },
+      {
+        "path": "docs/catalog/education/profile.grading-assistant.json",
+        "sha256": "53091dcb2f0dccd0a67d5d6e948be62485e18df8c1d65d96f2f9407a8f6289df"
+      },
+      {
+        "path": "docs/catalog/education/promotion.yaml",
+        "sha256": "2ff406246c69a20d2d768a276e37e5df2cfbcd1f1be4f3d9aa02da1228ae36a9"
+      },
+      {
+        "path": "docs/releases/2.0.0.md",
+        "sha256": "796dc2890fe688edd5446d6a57580df44cae0ce61470d8d3ac9fe54f2235ba78"
+      },
+      {
+        "path": "tests/catalog/stations/education/accessibilityCheck.ts",
+        "sha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a"
+      },
+      {
+        "path": "tests/catalog/stations/education/compiledPolicy.test.ts",
+        "sha256": "46c323c59cb9dba5b07666d589cc3ce334ade1a45fd964de76810d5a398c66bf"
+      },
+      {
+        "path": "tests/catalog/stations/education/exportLog.ts",
+        "sha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa"
+      },
+      {
+        "path": "tests/catalog/stations/education/fixtures.test.ts",
+        "sha256": "8ccff17699e9782dd11e90cc73f050210a493ad4805f3cfe2a763c7db8159f99"
+      },
+      {
+        "path": "tests/catalog/stations/education/gradebook.ts",
+        "sha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b"
+      },
+      {
+        "path": "tests/catalog/stations/education/harness.ts",
+        "sha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f"
+      },
+      {
+        "path": "tests/catalog/stations/education/overlay.test.ts",
+        "sha256": "9c294de2bd6b7cfb6fba0681c60009538b14eb35bfc04c803915456ee7f36784"
+      },
+      {
+        "path": "tests/catalog/stations/education/protocol.ts",
+        "sha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446"
+      },
+      {
+        "path": "tests/catalog/stations/education/toolCapabilityLog.ts",
+        "sha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06"
+      }
+    ]
+  },
+  "generatedCountOutputs": {
+    "recordedAt": "2026-10-18T21:43:02.365385+00:00",
+    "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+    "statusBefore": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+    "statusAfter": "",
+    "restoredOnlyOwnGeneratedOutputs": true,
+    "files": [
+      {
+        "path": "CONTRIBUTING.md",
+        "generatedSha256": "0e13125f369f8a2d2a303f2d0875ad0d6bbd80dbfc369129f8c5defdefe9f0de",
+        "generatedBytes": 19504,
+        "committedSha256": "49a5b00c6f361f07cf31ea11414fa1f60905cb6aa7fbe9820e0d84749acb9571",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/CONTRIBUTING.md"
+      },
+      {
+        "path": "README.md",
+        "generatedSha256": "49582c87d73e4b8afe795a682c0e9d8daa42670f6493ccb03c5fcba4ddbbddee",
+        "generatedBytes": 63199,
+        "committedSha256": "bf7bc4639eff9b893cc515de4098af54e7668e36706f912c2bf68cff08b0e8ce",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/README.md"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "generatedSha256": "0c4a3f6330ba4ac471a4534aa1611ce865ad2b7cd9ce028c3be690cad22e48e9",
+        "generatedBytes": 3075,
+        "committedSha256": "517279d327bb9d95206afcdb5564ef9f51373bf191f174eb8cfa62251e3536ab",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/docs/content/reddit-launch-drafts.md"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "generatedSha256": "c2da06fd0c63b3fcef220fcca4625c546f0e98dec8e0fb2379bb290d200eb665",
+        "generatedBytes": 1951,
+        "committedSha256": "502cd92f28c1fb91a92b282ec37bf9a4835b39afa8ae04c252bc5eb1f3a041e9",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/docs/content/show-hn-draft.md"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "generatedSha256": "96150be631a7e07e323b6a9ce7842ab6c6e42ffa12c808eeefa2dfa7cf3ac43c",
+        "generatedBytes": 3880,
+        "committedSha256": "ec500b265c9ad51e14c3cd43b3d06d5bf55d35058f8b13e3f4a1cfb144e116c8",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/docs/internal/competitive-landscape.md"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "generatedSha256": "56fcba5f067128961662f4f01aad32e56b42cfb81314f9e972ffd8ed26252dea",
+        "generatedBytes": 2489,
+        "committedSha256": "57c3596b23c37959cb8da9eecb95b616160b5a0e11f1e1e6de72fa90fe531e2e",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/docs/internal/mirofish-simulation-council.md"
+      },
+      {
+        "path": "website/i18n.js",
+        "generatedSha256": "ee174ce233afb0bc12a5af5e2736eaae259baabb26097ebd2883595d16fcb9e0",
+        "generatedBytes": 44169,
+        "committedSha256": "b321052f9788542e048c88ae842ba5d141d29e925e2840ab098528bceb807435",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/website/i18n.js"
+      },
+      {
+        "path": "website/index.html",
+        "generatedSha256": "1d670951b6c2793570f9f80446af8b76377defa4fec9d5920238a1d9f65483ca",
+        "generatedBytes": 44277,
+        "committedSha256": "64c85620f9c709340bea1ec8ad25eb41fca6aa0090dae645422ba8196f321a10",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/website/index.html"
+      },
+      {
+        "path": "website/lite.html",
+        "generatedSha256": "72e2cc3dd8502ab82e90e0ef679e7b616ac3b6b97a9331b9b9664f204b45aa30",
+        "generatedBytes": 11197,
+        "committedSha256": "c82aee11676a87bdd2d99a3d4694b660e2ffb384850811d014f9e90c6647ba54",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/website/lite.html"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "generatedSha256": "c187bd1e9ba3291b869e16c50e882c0f3cf8a79398524276a55a87c39a652aa7",
+        "generatedBytes": 108269,
+        "committedSha256": "986d1dd48dbd96bb9d9d8c1317b2fad0c3cce3c3d158c0b7a7e43807bc61018a",
+        "archivePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/generated-counts/a625ee5cae3cde551701f7c9cfed33a4f142480f/whitepaper/AMC_WHITEPAPER_v1.md"
+      }
+    ]
+  },
+  "historical": {
+    "tddRed": {
+      "recordedAt": "2026-10-18T20:58:59.205617+00:00",
+      "head": "874aa26bbfdf06ac0909b2620f6a948805b39899",
+      "headAfter": "874aa26bbfdf06ac0909b2620f6a948805b39899",
+      "int": "0462326f3590c78697675f007b0afca78b455ef8",
+      "branch": "codex/p3-15-education-overlay",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+      "node": "v22.23.3",
+      "pnpm": "10.33.0",
+      "cmd": "npx vitest run tests/catalog/stations/education/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/tdd-red-report.json",
+      "exit": 1,
+      "durationMs": 9273,
+      "statusBefore": "",
+      "statusAfter": "",
+      "rawLogSha256": "75b686884f20b1c7dbb1fb9734cb06201bcb27db7f58d210f6df95000156589b",
+      "reportSha256": "3a504c0090ec0e715f68d5ff59ce11d2a0c7c89b3a81bde38a2f9027e5000022",
+      "tests": {
+        "numTotalTests": 6,
+        "numPassedTests": 0,
+        "numFailedTests": 6,
+        "numPendingTests": 0
+      }
+    },
+    "initialImplementationChecks": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 190273,
+        "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "headAfter": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/focused-report.json tests/catalog/stations/education",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 17059,
+        "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "headAfter": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/focused-report.json",
+        "jsonReportSha256": "06f58ef375515976e9716fdfb3bce9c9c3d0c0a3031091c93436f5dfec458f44",
+        "jsonReportBytes": 66733,
+        "reportedTests": {
+          "numTotalTests": 118,
+          "numPassedTests": 106,
+          "numFailedTests": 12,
+          "numPendingTests": 0
+        },
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/focused.log",
+        "rawLogSha256": "bd6ffa9d2d2b1a64f6b44acee04583c1e5eb6b5d3e13ea502d5960d2c0d1a210",
+        "rawLogBytes": 3768
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 74644,
+        "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "headAfter": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 123729,
+        "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "headAfter": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 7939,
+        "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "headAfter": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/initial-checks/f34245de282d8fd0c0c234ad0a1fb21c631b0845/raw/checks/lint.log",
+        "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+        "rawLogBytes": 200
+      }
+    ],
+    "stationDefaultsRed": {
+      "head": "f34245de282d8fd0c0c234ad0a1fb21c631b0845",
+      "int": "0462326f3590c78697675f007b0afca78b455ef8",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+      "node": "v22.23.3",
+      "statusBefore": "",
+      "statusAfter": "",
+      "startedAt": "2026-10-18T21:11:58.219357+00:00",
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/compilerStationDefaults.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/station-defaults-red/report.json"
+      ],
+      "exit": 1,
+      "durationMs": 11753,
+      "rawSha256": "062fd8040a9f38c14ff2cd42dc0963e68371256c84c5880ef77c204a79ea8500",
+      "reportSha256": "ed6a7ac493298ad5958f38d6a022b34e2f7d13c63c9e712d6681ce13485b4390",
+      "tests": {
+        "numTotalTests": 14,
+        "numPassedTests": 13,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/tests/compilerStationDefaults.test.ts",
+          "fullName": "P1-46: the compiled plan holds F2's station-profile rules for every station golden: education",
+          "failureMessages": [
+            "AssertionError: expected { status: 'ready', \u2026(6) } to deeply equal { status: 'ready', \u2026(6) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/tests/compilerStationDefaults.test.ts:68:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ]
+    },
+    "preOwnerMergeChecks": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 89096,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/focused-report.json tests/catalog/stations/education tests/catalog/catalogLoader.test.ts tests/catalog/controlRecordSchema.test.ts tests/catalog/citations.test.ts tests/catalog/lockfile.test.ts tests/catalog/predicate.test.ts tests/usRegister.test.ts tests/catalog/compiler/unknown.test.ts tests/compilerStationDefaults.test.ts tests/catalog/evidence/decisive.test.ts tests/catalog/admission/checker.test.ts tests/catalog/admission/gatedLoads.test.ts tests/catalog/governance/promotion.test.ts tests/catalog/governance/currency.test.ts tests/catalog/governance/reverify.test.ts tests/catalog/governance/changelogGuard.test.ts tests/industryPacksEducation.test.ts tests/deepIndustryPacksStations.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/wealthOverlay.test.ts",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 101694,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/focused-report.json",
+        "jsonReportSha256": "963ca2ad8dd9541000cf66c22fe9d1987d6d165599205209a9a557c78d49d861",
+        "jsonReportBytes": 183488,
+        "reportedTests": {
+          "numTotalTests": 480,
+          "numPassedTests": 479,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/focused.log",
+        "rawLogSha256": "ab8afbb6d3000cdcb3529642f5e7d75a0f1c5feb00ace801ceb834e7ea73fb30",
+        "rawLogBytes": 3068
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 132032,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 171052,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 7149,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/lint.log",
+        "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+        "rawLogBytes": 200
+      },
+      {
+        "name": "counts-before-regeneration",
+        "cmd": "npm run -s check:counts",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 2537,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/counts-before-regeneration.log",
+        "rawLogSha256": "4d04f5629abf2732dd824e5c8dac96da8bc7cacad68ee88358c852600f7ac7ea",
+        "rawLogBytes": 1228
+      },
+      {
+        "name": "gen-counts",
+        "cmd": "node scripts/gen-counts.mjs --write",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1755,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/gen-counts.log",
+        "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+        "rawLogBytes": 20
+      },
+      {
+        "name": "counts",
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1905,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/counts.log",
+        "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "rawLogBytes": 81
+      },
+      {
+        "name": "docs-drift",
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1547,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/docs-drift.log",
+        "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+        "rawLogBytes": 121
+      },
+      {
+        "name": "industry-guides",
+        "cmd": "npm run -s check:industry-guides",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1737,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/industry-guides.log",
+        "rawLogSha256": "36f964b128d1dc1432e5e7f58ebe43cae68b12981a1d24b7f246f6bb13e89208",
+        "rawLogBytes": 116
+      },
+      {
+        "name": "regulatory-calendar",
+        "cmd": "npm run -s check:regulatory-calendar",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1370,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/regulatory-calendar.log",
+        "rawLogSha256": "979a39b3eceb5cc87e8b07e5ad3a2b26c0660f097b6a7700ef0028585e62d000",
+        "rawLogBytes": 129
+      },
+      {
+        "name": "freeze",
+        "cmd": "pnpm check:freeze -- --base-ref int",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 5666,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "0462326f3590c78697675f007b0afca78b455ef8",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/freeze.log",
+        "rawLogSha256": "5bd02a4f71434209571f57704518670f3a0a5634615834b4a2c7dd85362b2177",
+        "rawLogBytes": 269
+      },
+      {
+        "name": "architecture-boundaries",
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 5178,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/architecture-boundaries.log",
+        "rawLogSha256": "c536aa17bf836809d2081438f283f36a20fd4ae050316ac7822535c5abf208fc",
+        "rawLogBytes": 100131
+      },
+      {
+        "name": "gates",
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1317,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/gates.log",
+        "rawLogSha256": "f22387e54e88e6c975a51126038c2239583b4f30194eeb584c70338cff3bb96b",
+        "rawLogBytes": 659
+      },
+      {
+        "name": "schemas",
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1856,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/schemas.log",
+        "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+        "rawLogBytes": 65
+      },
+      {
+        "name": "api-ref",
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 965,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/api-ref.log",
+        "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "rawLogBytes": 42
+      },
+      {
+        "name": "threat-model",
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1001,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/threat-model.log",
+        "rawLogSha256": "799fb57f6cb36a876a5287a38bb174d6ed896f9740111e769d33396f7acf84ae",
+        "rawLogBytes": 113
+      },
+      {
+        "name": "citations",
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1302,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/citations.log",
+        "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+        "rawLogBytes": 373
+      },
+      {
+        "name": "qualification",
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 3665,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/qualification.log",
+        "rawLogSha256": "d1b295aa0997800a5b61b3b3f974587b797a2244bba47cd9b0f0cd106009c1b2",
+        "rawLogBytes": 65
+      },
+      {
+        "name": "release-notes",
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 945,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/release-notes.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "catalog-admission",
+        "cmd": "npm run -s check:catalog-admission",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 3373,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/catalog-admission.log",
+        "rawLogSha256": "d64a725f037d5f8617158344e81c0a4f2bca5542ba32055927a7d94994dc8232",
+        "rawLogBytes": 3367
+      },
+      {
+        "name": "catalog-currency",
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1406,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/catalog-currency.log",
+        "rawLogSha256": "de694251bbed9a0e9dedc7fc6ab2e574aa9d5058631c08d94a9d7a311c245284",
+        "rawLogBytes": 161
+      },
+      {
+        "name": "catalog-changelog",
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 3638,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "0462326f3590c78697675f007b0afca78b455ef8",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/catalog-changelog.log",
+        "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702",
+        "rawLogBytes": 98
+      },
+      {
+        "name": "catalog-changelog-main",
+        "cmd": "node scripts/check-catalog-changelog.mjs",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1593,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/catalog-changelog-main.log",
+        "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702",
+        "rawLogBytes": 98
+      },
+      {
+        "name": "duplicates",
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 3347,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/duplicates.log",
+        "rawLogSha256": "3ada79f89d9067158d8fbcf8e30a8e20cd89a3de973f8536e43bae3b06876f67",
+        "rawLogBytes": 193
+      },
+      {
+        "name": "dead-code",
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 10018,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/dead-code.log",
+        "rawLogSha256": "a362028058232fe7f5db8b48f146a8c0f50b70f93b9fd1200cf989ccbc4591d9",
+        "rawLogBytes": 192
+      },
+      {
+        "name": "clean-source",
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 200396,
+        "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "headAfter": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+        "int": "0462326f3590c78697675f007b0afca78b455ef8",
+        "intAfter": "0462326f3590c78697675f007b0afca78b455ef8",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+        "before": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "7cb1050b303d9244d60fe2bcd5937c9f4093af2c",
+          "int": "0462326f3590c78697675f007b0afca78b455ef8",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/7cb1050b303d9244d60fe2bcd5937c9f4093af2c/raw/checks/clean-source.log",
+        "rawLogSha256": "647d8f5cd31d481971037ee6520a25b00041591f7bf35fdaf0c2dd54a24bc9c6",
+        "rawLogBytes": 792
+      }
+    ],
+    "preCommitEnumDiagnostic": {
+      "recordedAt": "2026-10-18T21:05:13.202759+00:00",
+      "kind": "dirty-precommit-native-diagnostic-not-qualification",
+      "command": "node --input-type=module -e <loadCatalog/buildCatalogLock/validateCatalog>",
+      "exit": 1,
+      "head": "874aa26bbfdf06ac0909b2620f6a948805b39899",
+      "cause": "buildCatalogLock refused four catalog load errors: evidenceClass cross-tenant is not native cross_tenant. No validation result/lock emitted.",
+      "paths": [
+        "catalog/fixtures/L1-EDU-01/negative/evidence-cross-tenant.json",
+        "catalog/fixtures/L1-EDU-02/negative/evidence-cross-tenant.json",
+        "catalog/fixtures/L1-EDU-03/negative/evidence-cross-tenant.json",
+        "catalog/fixtures/L1-EDU-04/negative/evidence-cross-tenant.json"
+      ],
+      "qualification": false
+    },
+    "failedRepeatProbe": {
+      "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+      "node": "v22.23.3",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+      "statusBefore": "",
+      "statusAfter": "",
+      "command": [
+        "pnpm",
+        "exec",
+        "tsx",
+        "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/probe-education-final.mts",
+        "a625ee5cae3cde551701f7c9cfed33a4f142480f"
+      ],
+      "startedAt": "2026-10-18T21:29:23.746523+00:00",
+      "durationMs": 7123,
+      "exit": 1,
+      "rawLogSha256": "b92f34ad83e29c5e507e2aba8d1a91f0e485cd77cfdb8112e54a20eb96834f1f",
+      "probeSourceSha256": "c37cf22d73ef8b92eacb390a4e0e4fe441a3e092b7d9a8e98ecfaaf0ea81809d"
+    },
+    "mutationCloneBootstrap": {
+      "recordedAt": "2026-10-18T21:33:37.050879+00:00",
+      "wrapperExit": 1,
+      "failedCommand": [
+        "git",
+        "rev-parse",
+        "int"
+      ],
+      "failedCommandExit": 128,
+      "reason": "Fresh clone initially had only the checked-out task branch, no local int ref. Root created int at exact ccaabe07f before any mutation. First installer raw output preserved; its exit/duration were not emitted before wrapper failed, so they are not claimed.",
+      "installerLogSha256": "cb08befb74149056e1133954018d75110bdb7032bd540ab1117273d6f76011cb",
+      "sourceChanged": false
+    },
+    "note": "Historical failures are preserved at their actual source pins. They are not baseline classifications or current passes."
+  },
+  "mutationIndependentAudit": {
+    "recordedAt": "2026-10-18T21:38:16.422870+00:00",
+    "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+    "rawSummarySha256": "f0863a2ed3bcad92e23c6a3c07a7192bbe23e01861a52f95e24d3507d83b7704",
+    "summaryBytes": 97299,
+    "mutations": 20,
+    "intendedAssertionKills": 20,
+    "setupImportTimeoutKills": 0,
+    "initialGreen": {
+      "numTotalTests": 118,
+      "numPassedTests": 118,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "restoredGreen": {
+      "numTotalTests": 118,
+      "numPassedTests": 118,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "mutationCloneStatusPorcelain": "",
+    "sourceFiles": [
+      {
+        "path": "tests/catalog/stations/education/protocol.ts",
+        "sha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/gradebook.ts",
+        "sha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/toolCapabilityLog.ts",
+        "sha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/exportLog.ts",
+        "sha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/accessibilityCheck.ts",
+        "sha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/harness.ts",
+        "sha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/fixtures.test.ts",
+        "sha256": "8ccff17699e9782dd11e90cc73f050210a493ad4805f3cfe2a763c7db8159f99",
+        "candidateEqualsRestoredMutationClone": true
+      },
+      {
+        "path": "tests/catalog/stations/education/compiledPolicy.test.ts",
+        "sha256": "b54a5ba65d6401ffda3aceff845e333f3c7c8833931c589f8ad20c3271c35b34",
+        "candidateEqualsRestoredMutationClone": true
+      }
+    ],
+    "hashFieldClarification": {
+      "rawField": "initialGreenReportSha256",
+      "actuallyReferences": "candidate broader focused report:481/480/1 overall, all118 own Education tests passed",
+      "sha256": "d1cbd679c990b637aa92ea59189b2164af6ce052fb38df803bdbe4640e6c0790",
+      "isolatedInitialGreenReportSha256": "b062a3708e51babecbeef39cda4cd6241a4e30d0c3ceb0d1e7e325096f672a7c",
+      "isolatedRestoredGreenReportSha256": "67a60e0837df7e648b7ca627c27307d565efd35748620c6fa24db3f091ae0e85",
+      "rawSummaryPreserved": true
+    }
+  },
+  "mutationHashFieldClarification": {
+    "rawField": "initialGreenReportSha256",
+    "actuallyReferences": "candidate broader focused report:481/480/1 overall, all118 own Education tests passed",
+    "sha256": "d1cbd679c990b637aa92ea59189b2164af6ce052fb38df803bdbe4640e6c0790",
+    "isolatedInitialGreenReportSha256": "b062a3708e51babecbeef39cda4cd6241a4e30d0c3ceb0d1e7e325096f672a7c",
+    "isolatedRestoredGreenReportSha256": "67a60e0837df7e648b7ca627c27307d565efd35748620c6fa24db3f091ae0e85",
+    "rawSummaryPreserved": true
+  },
+  "mutationSetup": {
+    "recordedAt": "2026-10-18T21:33:39.390057+00:00",
+    "root": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625",
+    "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+    "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15-mutations-a625",
+    "command": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 2752,
+    "rawLogSha256": "c7a25fa1d6c88dbe604a906468729228751934564534f6095d078da52350a772",
+    "statusAfter": ""
+  },
+  "truthLimits": {
+    "support": "experimental",
+    "review": "pending",
+    "promotion": "none",
+    "primarySourceReadsThisTask": false,
+    "legalReview": null,
+    "instrumentCandidates": 15,
+    "questionInventory": {
+      "pack": 87,
+      "deep": 16,
+      "unique": 103
+    },
+    "reuse": "Pending; no duplicated FERPA/COPPA/FRIA control",
+    "profiles": "All native nonnull facts asserted; Education-only domain fact, incomplete Technology scope; riskClass null",
+    "localPlanDigest": "Fixed synthetic token binds only the local reference protocol. The compiled adapter uses actual plan.digest and runtimePolicy.policyDigest; no local oracle result enters production evidence."
+  }
+}

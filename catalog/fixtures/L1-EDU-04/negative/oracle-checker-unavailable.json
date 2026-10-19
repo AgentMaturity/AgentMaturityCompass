@@ -1,0 +1,51 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-EDU-04",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "education-fixture-tenant",
+      "workspaceId": "education-fixture-workspace",
+      "deploymentId": "education-grading-assistant-us-fixture",
+      "agentId": "education-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "educationOracle": {
+      "kind": "accessibility",
+      "input": {
+        "context": {
+          "tenantId": "education-fixture-tenant",
+          "workspaceId": "education-fixture-workspace",
+          "deploymentId": "education-grading-assistant-us-fixture",
+          "agentId": "education-fixture-agent",
+          "controlId": "L1-EDU-04",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "checkerEnabled": false,
+        "html": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Synthetic adding lesson</title><style>body{color:#000;background:#fff;font-family:Arial,sans-serif}input,button{color:#000;background:#fff}</style></head><body><main><h1>Synthetic lesson: adding</h1><p>Add two and three. This lesson contains synthetic fixture content only.</p><form><label for=\"answer\">Your answer</label><input id=\"answer\" type=\"text\"><button type=\"button\">Check answer</button></form></main></body></html>"
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "checker_unavailable"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

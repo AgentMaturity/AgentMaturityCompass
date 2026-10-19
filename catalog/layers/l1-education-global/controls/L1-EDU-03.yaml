@@ -1,0 +1,185 @@
+# Experimental and unreviewed P3-15 content. JSON syntax is valid YAML; no production outcome is supplied.
+{
+  "id": "L1-EDU-03",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "education-record-export",
+  "stations": [
+    "education"
+  ],
+  "title": "Require the established institution-scoped record-export exception",
+  "statement": "An education-record export must use the established institution, class, role and exception boundary; unavailable authority or dependency does not authorize export.",
+  "riskRationale": "A teacher's request does not establish access to another institution's or class's records, or a lawful disclosure exception.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "education"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "education.schools-skills"
+          ]
+        },
+        {
+          "fact": "jurisdictions",
+          "includesAny": [
+            "US"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "k12_institution",
+            "higher_education_institution",
+            "training_provider"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "education_records_export"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+      "No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment."
+    ],
+    "exclusions": []
+  },
+  "citations": [
+    {
+      "key": "education-ferpa-records",
+      "registerId": null,
+      "instrument": "Family Educational Rights and Privacy Act",
+      "clause": "34 CFR §99.31(a)(1), school officials with legitimate educational interest; other disclosure exceptions unverified here",
+      "edition": "Candidate locator from the existing Education deep question; no current primary-text edition verified",
+      "jurisdiction": "US",
+      "statusType": "binding-now",
+      "superseded": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "dateNote": "Dates unresolved pending primary-text verification and a named privacy assessor.",
+      "url": "https://studentprivacy.ed.gov/faq/under-ferpa-may-educational-agency-or-institution-disclose-education-records-any-its-employees",
+      "retrieval": {
+        "state": "unverified",
+        "reason": "Official FAQ discovery locator copied from src/domains/deep/education.ts#education-deep-04. No primary text fetched, read or hashed for P3-15; no matching S5 FERPA identity exists on this base."
+      },
+      "appliesWhen": {
+        "fact": "jurisdictions",
+        "includesAny": [
+          "US"
+        ]
+      },
+      "legalReview": null,
+      "note": "Re-verification required. This candidate citation neither establishes federal-funding applicability nor supplies a school-official contract, disclosure exception or P2-27 authorization fixture."
+    }
+  ],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "egress"
+    ],
+    "mechanism": "Draft egress boundary only. The actual P2-27 FERPA adapter is absent; current fixtures refuse export with not_evaluated. No production authorization, exception determination or export interception is installed.",
+    "parameters": [],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L1-EDU-03-T1",
+      "type": "runtime_enforced",
+      "oracle": {
+        "kind": "external_observer",
+        "observes": "Only the eventual P2-27 two-institution record-store and export log can establish an authorized export. The current narrow wrapper records refusal and dependency_unavailable with no exported record."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-EDU-03/positive/evidence-valid.json",
+          "L1-EDU-03/positive/oracle-p227-exception-pending.json"
+        ],
+        "negative": [
+          "L1-EDU-03/negative/evidence-stale.json",
+          "L1-EDU-03/negative/evidence-replayed.json",
+          "L1-EDU-03/negative/evidence-contradictory.json",
+          "L1-EDU-03/negative/evidence-cross-tenant.json",
+          "L1-EDU-03/negative/evidence-empty.json",
+          "L1-EDU-03/negative/evidence-violation.json",
+          "L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+          "L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json"
+        ]
+      },
+      "passCriteria": "The P2-27 adapter is absent. All current local export cases are not evaluated and produce no export; intended future allow/deny cases remain unexecuted metadata, not FERPA results.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-EDU-03-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "dpo"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

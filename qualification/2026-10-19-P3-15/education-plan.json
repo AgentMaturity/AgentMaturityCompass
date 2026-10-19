@@ -1,0 +1,158 @@
+{
+  "profile": "station-education",
+  "asOf": "2026-10-12T00:00:00Z",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.0",
+    "digest": "sha256:6046d0c643083cca7470b594299189ab57539b5fabdef3152b8aa6d4af54927a"
+  },
+  "status": "ready",
+  "digest": "sha256:6f80c24a848a6aad39a5ac607a3880124546d4423e20664d0c85741dd35b843a",
+  "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430",
+  "educationRequirements": [
+    {
+      "controlId": "L1-EDU-01",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+      "layer": 1,
+      "applicability": "not_applicable",
+      "reasons": [
+        "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+        "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+        "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+        "predicate: useCases includesAny [\"education_grading\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+      ],
+      "missingFacts": [],
+      "exclusion": {
+        "reason": "applicability predicate is false",
+        "source": "predicate",
+        "exceptionId": null
+      },
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:education",
+        "jurisdiction:US"
+      ]
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+      "layer": 1,
+      "applicability": "not_applicable",
+      "reasons": [
+        "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+        "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], reviewed)",
+        "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+        "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+        "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+      ],
+      "missingFacts": [],
+      "exclusion": {
+        "reason": "applicability predicate is false",
+        "source": "predicate",
+        "exceptionId": null
+      },
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:education",
+        "jurisdiction:US"
+      ]
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+      "layer": 1,
+      "applicability": "not_applicable",
+      "reasons": [
+        "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+        "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], reviewed)",
+        "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+        "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+        "predicate: useCases includesAny [\"education_records_export\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+      ],
+      "missingFacts": [],
+      "exclusion": {
+        "reason": "applicability predicate is false",
+        "source": "predicate",
+        "exceptionId": null
+      },
+      "citationsInScope": [
+        "education-ferpa-records"
+      ],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:education",
+        "jurisdiction:US"
+      ]
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+      "layer": 1,
+      "applicability": "not_applicable",
+      "reasons": [
+        "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+        "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+        "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+        "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+        "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+        "predicate: useCases includesAny [\"education_generated_lesson\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+      ],
+      "missingFacts": [],
+      "exclusion": {
+        "reason": "applicability predicate is false",
+        "source": "predicate",
+        "exceptionId": null
+      },
+      "citationsInScope": [
+        "education-wcag21-operator-policy"
+      ],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:education",
+        "jurisdiction:US"
+      ]
+    }
+  ],
+  "priorHistoricalEducation": {
+    "profile": "station-education",
+    "status": "ready",
+    "digest": "sha256:70f26ca4b4e65937d425d38873e5ef9009480bcdf6c2e2eebf1571eb88c1b7df",
+    "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430"
+  },
+  "historicalArtifact": {
+    "path": "qualification/2026-10-18-P1-46/plan-digests.json",
+    "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7",
+    "preserved": true
+  },
+  "note": "Regenerated Education-only plan record. The historical P1-46 receipt and every other station record are preserved. No active serialized Education golden is read by tests/catalog/compiler/golden.test.ts; that test uses an isolated finance fixture."
+}
