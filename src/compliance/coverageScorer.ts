@@ -31,6 +31,6 @@ export function coverageScore(categories: ComplianceCategoryResult[]): Complianc
   return {
     ...counts,
     evaluated,
-    score: evaluated === 0 ? null : Number((counts.satisfied / categories.length).toFixed(4))
+    score: evaluated === 0 ? null : Number(((counts.satisfied + counts.unknown * 0.25) / categories.length).toFixed(4))
   };
 }
