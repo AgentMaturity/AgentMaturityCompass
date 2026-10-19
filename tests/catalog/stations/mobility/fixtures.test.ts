@@ -330,4 +330,124 @@ describe("Mobility synthetic local reference oracles (P3-17)", () => {
     refused(runVehicleSimulator({ ...original, profile: { ...original.profile, maxResponseMs: Number.MAX_SAFE_INTEGER + 1 } }));
     refused(runVehicleSimulator({ ...original, trajectory: original.trajectory.map(sample => ({ ...sample, insideSafeArea: "true" })) }));
   });
+  it("rejects invalid bounded duration contracts", () => {
+    const zero = fallbackSchema.parse(named("oracle-fallback-on-time").oracle.input);
+    zero.profile!.maxResponseMs = 0;
+    // With the duration contract removed, this complete trajectory qualifies at the crash instant.
+    zero.trajectory = [{ ...zero.trajectory[1]!, at: zero.crashAt }];
+    const actual = runVehicleSimulator(zero);
+    expect(actual.deploymentReleases).toEqual([]);
+    expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("invalid_input");
+    // Other invalid primitives can be independently refused by arithmetic; test their schema contract directly.
+    for (const maxResponseMs of [0, -1, 0.5, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1]) {
+      const input = fallbackSchema.parse(named("oracle-fallback-on-time").oracle.input);
+      input.profile!.maxResponseMs = maxResponseMs;
+      expect(fallbackSchema.safeParse(input).success).toBe(false);
+    }
+  });
+  it("rejects consistently malformed illustrative plan digests", () => {
+    const input = mapObjects(portSchema.parse(named("oracle-port-level-2").oracle.input), object => {
+      if ("tenantId" in object && "controlId" in object) object.planDigest = "not-a-sha256-digest";
+    });
+    const actual = runPortAccess(input);
+    expect(actual.openedRequests).toEqual([]);
+    expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("invalid_input");
+    expect(portSchema.safeParse(input).success).toBe(false);
+  });
+  it("rejects consistently malformed control versions", () => {
+    const input = mapObjects(portSchema.parse(named("oracle-port-level-2").oracle.input), object => {
+      if ("tenantId" in object && "controlId" in object) object.controlVersion = "malformed-version";
+    });
+    const actual = runPortAccess(input);
+    expect(actual.openedRequests).toEqual([]);
+    expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("invalid_input");
+    expect(portSchema.safeParse(input).success).toBe(false);
+  });
+  it("refuses duplicate port event and request identities", () => {
+    for (const scenario of ["event", "request"] as const) {
+      const input = portSchema.parse(named("oracle-port-level-2").oracle.input);
+      const first = input.events.find(event => event.kind === "access_request")!;
+      if (first.kind !== "access_request") throw new Error("Fixture has no access request");
+      const second = structuredClone(first);
+      second.at = "2026-10-18T11:59:30.000Z";
+      if (scenario === "event") second.requestId += "-second";
+      else second.eventId += "-second";
+      input.events.push(second);
+      const actual = runPortAccess(input);
+      expect(actual.openedRequests).toEqual([]);
+      expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("invalid_input");
+    }
+  });
+  it("refuses a foreign initial security record with a valid event stream", () => {
+    for (const scenario of ["binding", "facility"] as const) {
+      const input = portSchema.parse(named("oracle-port-level-2").oracle.input);
+      if (scenario === "binding") input.initialSecurity!.binding.workspaceId += "-foreign";
+      else input.initialSecurity!.facilityId += "-foreign";
+      const actual = runPortAccess(input);
+      expect(actual.openedRequests).toEqual([]);
+      expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("invalid_input");
+    }
+  });
+  it("refuses a mismatched proposer or change binding", () => {
+    for (const scenario of ["proposer", "change-binding"] as const) {
+      const input = changeSchema.parse(named("oracle-change-bound-approval").oracle.input);
+      if (scenario === "proposer") input.proposerId = "another-proposing-agent";
+      else input.change.binding.workspaceId += "-foreign";
+      const actual = runChangeGate(input);
+      expect(actual.mergeReleases).toEqual([]);
+      expect(actual.result).toBe("fail"); expect(actual.reasonCode).toBe("change_binding_mismatch");
+    }
+  });
+  it("refuses analysis and approval for another exact change", () => {
+    for (const record of ["analysis", "approval"] as const) for (const field of ["binding", "changeId"] as const) {
+      const input = changeSchema.parse(named("oracle-change-bound-approval").oracle.input);
+      if (field === "binding") input[record]!.binding.workspaceId += "-foreign";
+      else input[record]!.changeId += "-foreign";
+      const actual = runChangeGate(input);
+      expect(actual.mergeReleases).toEqual([]);
+      expect(actual.result).toBe("fail"); expect(actual.reasonCode).toBe("change_record_binding_mismatch");
+    }
+  });
+  it("refuses whitespace-only current impact text", () => {
+    const input = changeSchema.parse(named("oracle-change-bound-approval").oracle.input);
+    input.analysis!.impactSummary = " \t\u00a0";
+    const actual = runChangeGate(input);
+    expect(actual.mergeReleases).toEqual([]);
+    expect(actual.result).toBe("fail"); expect(actual.reasonCode).toBe("analysis_incomplete");
+  });
+  it("refuses an OTA package without target inventory", () => {
+    const prepared = prepareOtaFixture(named("oracle-ota-trusted").oracle.input, "valid");
+    prepared.input.fleet = null;
+    const actual = runOtaDeployer(prepared.input, prepared.authority);
+    expect(actual.installedPackages).toEqual([]);
+    expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("fleet_unavailable");
+  });
+  it("reports future metadata as an explicit package-time refusal", () => {
+    const input = otaSchema.parse(named("oracle-ota-trusted").oracle.input);
+    input.package.metadata.createdAt = "2026-10-18T12:00:00.001Z";
+    const prepared = prepareOtaFixture(input, "valid");
+    const actual = runOtaDeployer(prepared.input, prepared.authority);
+    expect(actual.installedPackages).toEqual([]); expect(actual.result).toBe("deny");
+    // Diagnostic contract only: native issuer admission independently refuses this future signing claim.
+    expect(actual.reasonCode).toBe("package_time_invalid");
+  });
+  it("refuses a foreign fallback profile with valid own trajectory", () => {
+    for (const scenario of ["binding", "vehicle"] as const) {
+      const input = fallbackSchema.parse(named("oracle-fallback-on-time").oracle.input);
+      if (scenario === "binding") input.profile!.binding.workspaceId += "-foreign";
+      else input.profile!.vehicleId += "-foreign";
+      const actual = runVehicleSimulator(input);
+      expect(actual.deploymentReleases).toEqual([]);
+      expect(actual.result).toBe("fail"); expect(actual.reasonCode).toBe("minimal_risk_profile_mismatch");
+    }
+  });
+  it("refuses computed fallback deadline overflow from a schema-valid duration", () => {
+    const input = fallbackSchema.parse(named("oracle-fallback-on-time").oracle.input);
+    input.profile!.maxResponseMs = Number.MAX_SAFE_INTEGER;
+    expect(fallbackSchema.safeParse(input).success).toBe(true);
+    const actual = runVehicleSimulator(input);
+    expect(actual.deploymentReleases).toEqual([]);
+    expect(actual.result).toBe("not_evaluated"); expect(actual.reasonCode).toBe("minimal_risk_time_invalid");
+  });
+
 });
