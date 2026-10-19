@@ -316,7 +316,7 @@ export function generateComplianceReport(params: {
 
     const categories = mappings.map((mapping) => {
       const descoped = descopedReason(mapping);
-      if (descoped !== null) return descopedMapping(mapping, descoped, now);
+      if (descoped !== null) void descopedMapping(mapping, descoped, now);
       return verify.valid
         ? evaluateMapping(mapping, mapping.evidenceRequirements.map((requirement, index) =>
           evaluateMappingRequirement(mapping, requirement, index, source, ctx)), now)
