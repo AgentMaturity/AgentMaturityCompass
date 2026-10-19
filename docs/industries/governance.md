@@ -47,9 +47,9 @@ Run one with `amc domain pack run --pack <id>` [C9]. The command requires the in
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C17], resolved by `normalizeFrameworkName` [C18]; an unresolved name is rejected [C19]. Of the 69 framework strings above (station and packs together):
 
-- 2 resolve as written: `FedRAMP` → `FEDRAMP`, `GDPR` → `GDPR`.
-- 2 resolve only after spaces and hyphens are replaced with `_`: `NIST AI RMF` → `NIST_AI_RMF`, `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects them.
-- 65 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 17 resolve as written: `NIST AI RMF` → `NIST_AI_RMF`, `EU AI Act` → `EU_AI_ACT`, `FedRAMP` → `FEDRAMP`, `GDPR` → `GDPR`, `GDPR Art. 6/9/22` → `GDPR`, `EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)` → `EU_AI_ACT`, `EU AI Act Art. 5; Annex III point 1(a)/5(a)` → `EU_AI_ACT`, `EU AI Act Art. 5(1)(a)-(b) (manipulation, exploitation of vulnerabilities); Annex III point 8(b) (influencing elections)` → `EU_AI_ACT`, `GDPR Art. 9(2)(d) (political opinion data)` → `GDPR`, `EU AI Act Art. 5(1)(a)-(b); Annex III 8(b)` → `EU_AI_ACT`, `EU GDPR Art. 9(2)(d)` → `GDPR`, `GDPR Art. 6(1)(e) (public task)` → `GDPR`, `EU AI Act Art. 5, Art. 50(4)` → `EU_AI_ACT`, `GDPR Art. 6(1)(e)` → `GDPR`, `EU AI Act Art. 50(4)` → `EU_AI_ACT`, `EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86` → `EU_AI_ACT`, `EU AI Act Annex III point 5(a)` → `EU_AI_ACT`.
+- None resolves only after replacing spaces and hyphens with `_`.
+- 52 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C20] and the key dates of the sourced register [C21].
 
@@ -111,7 +111,7 @@ No output above was produced for this guide. Each row names the function that pr
 ## Known gaps at this commit
 
 - The registry's `questionCount` for this station is 6; the station has 5 packs and 91 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
-- 65 of 69 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- 52 of 69 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - The packs' 45 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C86]; 0 resolve to no record and 17 to a record marked unverified, so those cannot show whether they are current.
 - `amc domain assurance` invokes no agent, so its result is always not evaluated (see Assurance packs).
 - Pack results from `amc domain pack run` are self-assessments capped at L1 (see Sector packs).

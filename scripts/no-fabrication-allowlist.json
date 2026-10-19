@@ -7,6 +7,18 @@
       "reason": "Negation: the caveat says the exports are 'not certified' GRC implementations."
     },
     {
+      "file": "src/compliance/frameworks/controls/dora.ts",
+      "rule": "R4",
+      "phrase": "certified or bound by codes of conduct",
+      "reason": "Verbatim quote of DORA Art. 27(1) on TLPT testers; official text, not an AMC result (P1-45)."
+    },
+    {
+      "file": "src/compliance/frameworks/controls/hhsHti1Hipaa.ts",
+      "rule": "R4",
+      "phrase": "Health IT Modules certified to",
+      "reason": "Verbatim quote of 45 CFR 170.402(b)(4) (ONC certification of Health IT Modules); official text, not an AMC result (P1-45)."
+    },
+    {
       "file": "src/domains/packs/stations/environment.ts",
       "rule": "R4",
       "phrase": "ISO 22000 certified traceability",

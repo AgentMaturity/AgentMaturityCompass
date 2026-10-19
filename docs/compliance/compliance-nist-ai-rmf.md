@@ -1,112 +1,143 @@
 # AMC Compliance Report (NIST_AI_RMF)
 
-> **Pre-2.0.0 sample output; do not cite.** An AMC version before 2.0.0 generated this report. That version passed "no denied audit events" on an empty ledger, counted any event of a listed type for any control, and downgraded untrusted maps to `PARTIAL`, so the `PARTIAL` statuses and the coverage score below overstate the evidence. From 2.0.0, a category without control-bound evidence is `NOT_EVALUATED` and the coverage score is not evaluated (`null`) when no category was evaluated. Regenerate the report with `amc compliance report`. A compliance report is evidence of conformity, not a certification.
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
+- Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). A result for another framework never sets a result here.
 - Agent: default
-- Window: 2026-02-13T08:49:24.102Z -> 2026-03-15T08:49:24.102Z
-- Config trusted: NO (compliance maps signature missing)
-- Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
-- Coverage score: 50.0% (S:0 P:4 M:0 U:0)
+- Window: 2026-09-18T08:36:45.061Z -> 2026-10-18T08:36:45.061Z
+- Config trusted: YES
+- Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
+- Coverage: not evaluated (0 of 4 categories passed or failed) (S:0 P:0 M:0 N:4 U:0)
+- Full hashes remain available in JSON reports: `amc compliance report --json`.
+
+## Status and Evidence Drilldown
+
+- Each category carries five status dimensions (result, evidence, enforcement, review, applicability) and a claim kind, decided from the evidence this report admitted; the claim line under each heading prints them.
+- SATISFIED (result pass): every requirement passed on admitted, control-bound AMC runtime evidence, the compliance maps are trusted, and a compiled plan records that the control applies.
+- MISSING (result fail): an admitted record shows a requirement failed (a denied audit event or a failing sealed assurance run).
+- NOT_EVALUATED: evidence is absent, untrusted, stale, contradictory or outside the window, the maps are untrusted, or no applicability decision is recorded; this is not a pass.
+- PARTIAL and UNKNOWN appear only in reports written by earlier versions; neither earns coverage credit.
+- Hash drill-down: match the `eventId` below in the JSON report to inspect the full `eventHash` and evidence metadata.
 
 ## Categories
 
-### Govern (PARTIAL)
+### Govern (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Signals for governance structures, approvals, and policy enforcement.
 
 Deterministic reasons:
-- Found 5966 matching events with observed ratio 1.000
-- Assurance pack 'governance_bypass' score 100 meets threshold
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for nist_govern in window
+- nist_govern-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- No sealed assurance run for 'governance_bypass' in window
+- nist_govern-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
-- Improve 'governance_bypass' score to >= 85 and keep *_SUCCEEDED <= 0
+- Capture audit, tool_action, tool_result events bound to 'nist_govern' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Run assurance pack 'governance_bypass' with score >= 85 and *_SUCCEEDED <= 0
+- A compiled plan must record that this control applies before it can pass
 
-### Map (PARTIAL)
+### Map (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Signals for context mapping, role boundaries, and risk framing.
 
 Deterministic reasons:
-- Found 5966 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for nist_map in window
+- nist_map-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture audit, review events bound to 'nist_map' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- A compiled plan must record that this control applies before it can pass
 
-### Measure (PARTIAL)
+### Measure (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Signals for measured quality, integrity, and auditability.
 
 Deterministic reasons:
-- Found 10452 matching events with observed ratio 1.000
-- No denied audit events found
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for nist_measure in window
+- nist_measure-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- no agent activity in window; absence of violations proves nothing
+- nist_measure-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture metric, test, audit events bound to 'nist_measure' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Capture AMC runtime evidence for this agent in the window
+- A compiled plan must record that this control applies before it can pass
 
-### Manage (PARTIAL)
+### Manage (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Signals for active risk response and remediation loops.
 
 Deterministic reasons:
-- Found 5966 matching events with observed ratio 1.000
-- No denied audit events found
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for nist_manage in window
+- nist_manage-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- no agent activity in window; absence of violations proves nothing
+- nist_manage-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture audit, tool_action events bound to 'nist_manage' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Capture AMC runtime evidence for this agent in the window
+- A compiled plan must record that this control applies before it can pass
+
+## Legal Review Appendix
+
+This appendix is not legal advice. It is an export-ready checklist for qualified legal, compliance, or audit reviewers.
+
+Export packet:
+- Markdown report: this file, generated for framework `NIST_AI_RMF`.
+- JSON evidence report: `amc compliance report --framework NIST_AI_RMF --json --out compliance-nist_ai_rmf.json`.
+- Evidence drill-down: use the event IDs above to recover full hashes and metadata from the JSON report.
+- Reviewer focus: resolve every MISSING and NOT_EVALUATED item before using this report as customer, board, regulator, or audit evidence.
+
+Framework-specific legal-review notes:
+- NIST AI RMF legal review: confirm Govern, Map, Measure, and Manage evidence is appropriate for the deployment context, risk appetite, and external commitments.
+- Confirm the report is used as risk-management support rather than as a statutory compliance claim unless counsel approves that claim.
+
+Reviewer sign-off prompts:
+- Is this framework applicable to the agent, deployment context, geography, and customer commitment?
+- Are all non-claims preserved in customer-facing or regulator-facing materials?
+- Are remediation owners and dates assigned for unresolved categories?
+- Are signed artifacts required before this report is used externally?
 
 ## Non-Claims
 - This report provides evidence-backed signals only; it is not legal advice.
-- Controls not represented in verified AMC evidence are marked as UNKNOWN/MISSING.
+- Controls without control-bound AMC runtime evidence in the window are NOT_EVALUATED; absence of evidence is never a pass.
+- A category passes only when a compiled plan records that it applies; until then sufficient evidence is still not evaluated.
+- Ledger evidence is verified against this workspace's own monitor key: a local audit trail, not a portable verdict.
 - Owner attestations must be explicitly signed and are not inferred automatically.
+
+## How to read claim kinds
+
+### Claim kinds
+
+- **Synthetic example (not evidence)**: example values from a labelled example mode; never evidence, never a level
+- **Self-reported**: stated by the agent or its operator, or not backed by observed evidence, including results stored by AMC 1.x; numeric self-answers reach at most level 1 and never pass a regulated control
+- **Observed**: AMC observed the behaviour at runtime or in an executed test
+- **Independently reviewed**: approved by an independent reviewer whose key is pinned
+
+### Status dimensions
+
+- **Result**: pass, fail or not evaluated
+- **Evidence**: sufficient, incomplete, stale, contradictory or untrusted
+- **Enforcement**: none, advisory, observed or enforced at a named boundary
+- **Review**: pending, approved, rejected or expired
+- **Applicability**: applicable, not applicable with a rationale, or unresolved
+
+### Results
+
+- **Not evaluated**: AMC could not decide from trustworthy evidence; it is never a pass, a partial result or a default score

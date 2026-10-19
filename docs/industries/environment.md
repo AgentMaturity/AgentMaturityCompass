@@ -48,8 +48,8 @@ Run one with `amc domain pack run --pack <id>` [C9]. The command requires the in
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C17], resolved by `normalizeFrameworkName` [C18]; an unresolved name is rejected [C19]. Of the 85 framework strings above (station and packs together):
 
-- None resolves as written.
-- 1 resolves only after spaces and hyphens are replaced with `_`: `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects it.
+- 1 resolves as written: `EU AI Act` → `EU_AI_ACT`.
+- None resolves only after replacing spaces and hyphens with `_`.
 - 84 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C20] and the key dates of the sourced register [C21].
