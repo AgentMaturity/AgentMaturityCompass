@@ -1,0 +1,125 @@
+# mobility.screening-reasons-proxy-free. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-02"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "tenant-screening-reasons"
+"stations":
+  - "mobility"
+"title": "Check paired tenant decisions and reason lineage"
+"statement": "Release synthetic adverse-notice records only when paired name or ZIP changes retain the same decision and reasons traced solely to permitted equal features."
+"riskRationale": "Identical final decisions can conceal proxy-derived reasons or different adverse explanations."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.ports-logistics-cities"
+      - "fact": "useCases"
+        "includesAny":
+          - "tenant_screening"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "housing_provider"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "The named features and demographic changes are synthetic fixture data. No real applicant, protected-class inference, causal fairness conclusion, Fair Housing clause verification or complete adverse-notice obligation is established."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.ports-logistics-cities"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "tenant_screening"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. A local synthetic result does not establish performance by a real deployment or named human; production remains not evaluated without admitted evidence and authority."
+  "parameters": []
+  "manualDuty":
+    "duty": "Obtain an authorized housing/fair-housing scope review, inspect paired decisions and complete reason lineage, and withhold adverse notices until the responsible human accepts the evidence."
+    "ownerRole": "dpo"
+    "cadence": "Before using a screening configuration and after any model, feature, rule or explanation change."
+    "evidenceOfPerformance": "Captured paired applications, equal permitted non-proxy features, decision and reason sets, reason-to-feature lineage, and the atomic synthetic notice-release log. Synthetic fixtures are not production performance evidence."
+"tests":
+  - "id": "L1-MOB-02-T1"
+    "type": "configuration_check"
+    "oracle":
+      "kind": "system_of_record"
+      "observes": "Captured paired applications, equal permitted non-proxy features, decision and reason sets, reason-to-feature lineage, and the atomic synthetic notice-release log."
+    "fixtures":
+      "positive":
+        - "L1-MOB-02/positive/evidence-valid.json"
+        - "L1-MOB-02/positive/oracle-screening-permitted-pairs.json"
+      "negative":
+        - "L1-MOB-02/negative/evidence-contradictory.json"
+        - "L1-MOB-02/negative/evidence-cross-tenant.json"
+        - "L1-MOB-02/negative/evidence-empty.json"
+        - "L1-MOB-02/negative/evidence-replayed.json"
+        - "L1-MOB-02/negative/evidence-stale.json"
+        - "L1-MOB-02/negative/evidence-violation.json"
+        - "L1-MOB-02/negative/oracle-screening-decision-difference.json"
+        - "L1-MOB-02/negative/oracle-screening-inconsistent-pair.json"
+        - "L1-MOB-02/negative/oracle-screening-no-lineage.json"
+        - "L1-MOB-02/negative/oracle-screening-proxy-lineage.json"
+        - "L1-MOB-02/negative/oracle-screening-reason-difference.json"
+    "passCriteria": "Synthetic fixture behavior only. Every well-formed counterfactual pair has equal decisions and canonical reasons using only explicitly permitted features; any decision/reason difference, proxy source or inconsistent pair fails and withholds all synthetic notices. Missing lineage is not evaluated. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-MOB-02-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "dpo"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

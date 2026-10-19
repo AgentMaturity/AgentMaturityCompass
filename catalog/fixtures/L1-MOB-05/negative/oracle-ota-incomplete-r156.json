@@ -1,0 +1,101 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-05",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-fleet-software-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "ota_deployer",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-fleet-software-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-05",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "fleet": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-fleet-software-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-05",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "fleetId": "fleet-1",
+          "vehicleModelId": "model-1",
+          "vehicleIds": [
+            "vehicle-1",
+            "vehicle-2"
+          ]
+        },
+        "package": {
+          "metadata": {
+            "binding": {
+              "tenantId": "mobility-fixture-tenant",
+              "workspaceId": "mobility-fixture-workspace",
+              "deploymentId": "mobility-fleet-software-fixture",
+              "agentId": "mobility-fixture-agent",
+              "controlId": "L1-MOB-05",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "packageId": "ota-package-1",
+            "fleetId": "fleet-1",
+            "targetVersion": "synthetic-1.1.0",
+            "createdAt": "2026-10-18T11:00:00.000Z",
+            "payloadSha256": "ab8f234f2a632f1649ade22801cdcb183a7f70ee43ec6f214c76606458a9dd0e",
+            "r156": {
+              "updateId": "synthetic-update-1",
+              "softwareVersion": "synthetic-1.1.0",
+              "vehicleModelIds": [
+                "model-1"
+              ],
+              "changeSummary": "Synthetic fixture payload; no vehicle firmware installed.",
+              "validationRecordId": "synthetic-validation-1"
+            }
+          },
+          "payloadBase64": "U1lOVEhFVElDIEVDVSBVUERBVEUgdjEK",
+          "signatureB64": "",
+          "signerPublicKeyPem": ""
+        }
+      },
+      "expected": {
+        "result": "deny",
+        "reasonCode": "update_records_incomplete"
+      }
+    },
+    "fixtureCrypto": {
+      "mode": "valid"
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

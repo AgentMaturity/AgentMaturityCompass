@@ -67,6 +67,12 @@ describe("Mobility experimental catalog overlay (P3-17)", () => {
     const path = "docs/catalog/mobility/instruments.json";
     expect(existsSync(path), path).toBe(true);
     const data = JSON.parse(read(path)) as { instruments: Array<{ id: string; market: string; status: string; reverify: boolean; source: { readThisTask: boolean } }> };
+    expect(data.instruments.map((row) => row.id).slice().sort()).toEqual([
+      "us-fair-housing-act", "us-nhtsa-sgo-av-framework", "us-fmvss", "us-faa",
+      "eu-nis2", "eu-eidas2", "eu-port-services", "eu-epbd", "eu-gsr", "eu-ads-ir", "eu-efti",
+      "unece-r155", "unece-r156", "eu-ai-act", "easa-npa-2025-07", "isps", "marpol", "imdg",
+      "iso-21434", "intl-iso-pas-8800"
+    ].sort());
     const markets = ["US", "EU", "RoW", "Standard"];
     const ranks = data.instruments.map((row) => markets.indexOf(row.market));
     expect(ranks.length).toBeGreaterThan(0);
@@ -87,11 +93,13 @@ describe("Mobility experimental catalog overlay (P3-17)", () => {
       expect(profile.primaryStation).toMatchObject({ value: "mobility", provenance: "asserted", reviewedBy: null });
       expect(profile.riskClass).toMatchObject({ value: null, reviewedBy: null });
       const plan = compilePlan({ catalog, profile, asOf: "2026-10-19T00:00:00Z" });
-      expect(plan.requirements.some((row) => row.controlId.startsWith("L1-MOB-"))).toBe(true);
+      expect(plan.requirements.some((row) => row.controlId.startsWith("L1-MOB-") && row.applicability === "applicable")).toBe(true);
       if (name === "fleet-software") {
         expect(profile.stations.value?.slice().sort()).toEqual(["mobility", "technology"]);
         expect(profile.domains.value).toEqual(expect.arrayContaining(["mobility.vehicles-aviation", "technology.platforms-data"]));
-        expect(plan.requirements.some((row) => row.controlId.startsWith("L1-TECH-"))).toBe(true);
+        expect(plan.requirements.filter((row) => row.controlId.startsWith("L1-TECH-") && row.applicability === "applicable").map((row) => row.controlId).sort()).toEqual([
+          "L1-TECH-02", "L1-TECH-03", "L1-TECH-04", "L1-TECH-06", "L1-TECH-07", "L1-TECH-08"
+        ]);
       }
     }
   });

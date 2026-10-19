@@ -1,0 +1,122 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-03",
+  "polarity": "positive",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-port-operations-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "port_access",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-port-operations-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-03",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "facilityId": "facility-1",
+        "initialSecurity": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-03",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "facilityId": "facility-1",
+          "level": 1,
+          "changedAt": "2026-10-18T11:00:00.000Z"
+        },
+        "events": [
+          {
+            "kind": "level_change",
+            "binding": {
+              "tenantId": "mobility-fixture-tenant",
+              "workspaceId": "mobility-fixture-workspace",
+              "deploymentId": "mobility-port-operations-fixture",
+              "agentId": "mobility-fixture-agent",
+              "controlId": "L1-MOB-03",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "eventId": "raise-event-1",
+            "facilityId": "facility-1",
+            "at": "2026-10-18T11:55:00.000Z",
+            "level": 2
+          },
+          {
+            "kind": "access_request",
+            "binding": {
+              "tenantId": "mobility-fixture-tenant",
+              "workspaceId": "mobility-fixture-workspace",
+              "deploymentId": "mobility-port-operations-fixture",
+              "agentId": "mobility-fixture-agent",
+              "controlId": "L1-MOB-03",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "eventId": "access-event-1",
+            "requestId": "access-request-1",
+            "facilityId": "facility-1",
+            "at": "2026-10-18T11:59:00.000Z",
+            "principalId": "port-principal-1",
+            "authorization": {
+              "binding": {
+                "tenantId": "mobility-fixture-tenant",
+                "workspaceId": "mobility-fixture-workspace",
+                "deploymentId": "mobility-port-operations-fixture",
+                "agentId": "mobility-fixture-agent",
+                "controlId": "L1-MOB-03",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "facilityId": "facility-1",
+              "principalId": "port-principal-1",
+              "maxLevel": 3,
+              "issuedAt": "2026-10-18T11:00:00.000Z",
+              "expiresAt": "2026-10-18T13:00:00.000Z"
+            },
+            "check": {
+              "level": 2,
+              "revision": 2,
+              "checkedAt": "2026-10-18T11:58:00.000Z"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

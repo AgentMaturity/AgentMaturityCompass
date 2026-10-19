@@ -1,0 +1,91 @@
+{
+  "profileVersion": 1,
+  "profileId": "mobility-fleet-software",
+  "deployment": {
+    "tenantId": "mobility-fixture-tenant",
+    "workspaceId": "mobility-fixture-workspace",
+    "deploymentId": "mobility-fleet-software-fixture",
+    "agentIds": [
+      "mobility-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "mobility",
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "mobility",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "mobility.vehicles-aviation",
+      "technology.platforms-data"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "provider",
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "vehicle_software_provider",
+      "fleet_operator"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "vehicle_safety_change",
+      "vehicle_ota_update",
+      "vehicle_fallback_drill"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "vehicle_software_artifacts"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

@@ -1,0 +1,28 @@
+"id": "overlay.mobility"
+"version": "0.1.0"
+"layer": 1
+"title": "Mobility operator-policy overlay (experimental and unreviewed)"
+"stations":
+  - "mobility"
+"jurisdictions":
+  - "US"
+  - "EU"
+"compilerCompat": "^0.1.0"
+"publisher": "AgentMaturity (agent-maturity-compass)"
+"maintainers":
+  - "name": "Sid"
+    "role": "maintainer"
+"licence": "MIT"
+"support": "experimental"
+"controls":
+  - "L1-MOB-01"
+  - "L1-MOB-02"
+  - "L1-MOB-03"
+  - "L1-MOB-04"
+  - "L1-MOB-05"
+  - "L1-MOB-06"
+"stewardship":
+  "partner": null
+  "updatePlan": null
+  "triageTargetDays": null
+  "coverageDoc": "docs/catalog/mobility/README.md"
