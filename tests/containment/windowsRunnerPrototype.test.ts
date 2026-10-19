@@ -97,6 +97,11 @@ describe("P2-14 cut-first Windows prototype boundary", () => {
       refused(await exercise(f), "status-invalid"); expect(f.events).toEqual(["run", "cleanup"]);
     }
   });
+  test("invalid UTF-8 status bytes cannot complete the simulation", async () => {
+    const f = fixture(reply => ({ ...reply,
+      statusBytes: Buffer.concat([Buffer.from(reply.statusBytes!), Buffer.from([0xff])]) }));
+    refused(await exercise(f), "status-invalid"); expect(f.events).toEqual(["run", "cleanup"]);
+  });
   test("oversized status refuses before successful parsing", async () => {
     const f = fixture(reply => ({ ...reply, statusBytes: Buffer.concat([Buffer.from(reply.statusBytes!), Buffer.alloc(64_001, 32)]) }));
     refused(await exercise(f), "status-invalid"); expect(f.events).toEqual(["run", "cleanup"]);
