@@ -120,6 +120,27 @@ describe("Mobility synthetic local reference oracles (P3-17)", () => {
       const actual = runScreeningLog(input); expect(actual.result).toBe("fail"); expect(actual.noticeReleases).toEqual([]);
     }
   });
+  it("refuses whitespace-equivalent ZIP proxy lineage before releasing any notice", () => {
+    for (const featureId of ["ZIP Code", "ZIP\u00a0Code", "ZIP\u202fCode"]) {
+      const input = screeningSchema.parse(named("oracle-screening-permitted-pairs").oracle.input);
+      input.pairs = [input.pairs[0]!];
+      input.permittedFeatureIds = [featureId];
+      for (const application of [input.pairs[0]!.baseline, input.pairs[0]!.counterfactual]) {
+        application.features = [{ featureId, value: 10001 }];
+        application.reasons = [{ code: "postal_area", sourceFeatureIds: [featureId] }];
+      }
+      const actual = runScreeningLog(input);
+      expect(actual.noticeReleases).toEqual([]);
+      expect(actual.result).toBe("fail");
+    }
+  });
+  it("keeps the unsigned OTA install log empty despite native candidate admission", () => {
+    const actual = runMobilityOracle({ kind: "ota_deployer", input: named("oracle-ota-trusted").oracle.input }, { mode: "unsigned" });
+    expect(actual.installedPackages).toEqual([]);
+    expect(actual.result).toBe("deny");
+    expect(actual.integrity).toBe(false);
+    expect(actual.admission?.status).toBe("admitted");
+  });
   it("holds every adverse notice until all paired applications and lineage have passed", () => {
     const input = screeningSchema.parse(named("oracle-screening-permitted-pairs").oracle.input);
     const bad = screeningSchema.parse(named("oracle-screening-proxy-lineage").oracle.input).pairs[1]!;
