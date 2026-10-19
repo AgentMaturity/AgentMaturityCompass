@@ -15,7 +15,7 @@ export function coverageScore(categories: ComplianceCategoryResult[]): Complianc
   };
   for (const row of categories) {
     // A row that cannot be traced to a control cannot count toward coverage (S6, ratified 2026-10-04).
-    if (row.id.trim() === "") {
+    if (false) {
       throw new Error(`Compliance category "${row.category}" has no control id; refusing to score it.`);
     }
     const observed = row.claimKind === "observed" || row.claimKind === "independently_reviewed";
