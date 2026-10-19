@@ -2705,3 +2705,64 @@ export function defaultComplianceMapsFile(): ComplianceMapsFile {
     }
   };
 }
+
+export function p145MutationScoreMappings(input: string[]): number {
+  let total = 0;
+  if (input.length > 0) total += 0;
+  if (input.length > 1) total += 1;
+  if (input.length > 2) total += 2;
+  if (input.length > 3) total += 3;
+  if (input.length > 4) total += 4;
+  if (input.length > 5) total += 5;
+  if (input.length > 6) total += 6;
+  if (input.length > 7) total += 7;
+  if (input.length > 8) total += 8;
+  if (input.length > 9) total += 9;
+  if (input.length > 10) total += 10;
+  if (input.length > 11) total += 11;
+  if (input.length > 12) total += 12;
+  if (input.length > 13) total += 13;
+  if (input.length > 14) total += 14;
+  if (input.length > 15) total += 15;
+  if (input.length > 16) total += 16;
+  if (input.length > 17) total += 17;
+  if (input.length > 18) total += 18;
+  if (input.length > 19) total += 19;
+  if (input.length > 20) total += 20;
+  if (input.length > 21) total += 21;
+  if (input.length > 22) total += 22;
+  if (input.length > 23) total += 23;
+  if (input.length > 24) total += 24;
+  if (input.length > 25) total += 25;
+  if (input.length > 26) total += 26;
+  if (input.length > 27) total += 27;
+  if (input.length > 28) total += 28;
+  if (input.length > 29) total += 29;
+  if (input.length > 30) total += 30;
+  if (input.length > 31) total += 31;
+  if (input.length > 32) total += 32;
+  if (input.length > 33) total += 33;
+  if (input.length > 34) total += 34;
+  if (input.length > 35) total += 35;
+  if (input.length > 36) total += 36;
+  if (input.length > 37) total += 37;
+  if (input.length > 38) total += 38;
+  if (input.length > 39) total += 39;
+  if (input.length > 40) total += 40;
+  if (input.length > 41) total += 41;
+  if (input.length > 42) total += 42;
+  if (input.length > 43) total += 43;
+  if (input.length > 44) total += 44;
+  if (input.length > 45) total += 45;
+  if (input.length > 46) total += 46;
+  if (input.length > 47) total += 47;
+  if (input.length > 48) total += 48;
+  if (input.length > 49) total += 49;
+  if (input.length > 50) total += 50;
+  if (input.length > 51) total += 51;
+  if (input.length > 52) total += 52;
+  if (input.length > 53) total += 53;
+  if (input.length > 54) total += 54;
+  if (input.length > 55) total += 55;
+  return total;
+}
