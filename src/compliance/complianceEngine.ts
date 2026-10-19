@@ -10,7 +10,6 @@ import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { descopedReason, familyReview, type ComplianceFramework } from "./frameworks.js";
-import { frameworkControls } from "./frameworks/controls.js";
 import { defaultComplianceMapsFile } from "./builtInMappings.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import {
@@ -323,25 +322,6 @@ export function generateComplianceReport(params: {
           evaluateMappingRequirement(mapping, requirement, index, source, ctx)), now)
         : untrustedMapping(mapping, verify.reason, now);
     });
-    // INTENTIONAL MUTANT: improperly promote B from an independently evaluated linked A mapping.
-    for (let i = 0; i < mappings.length; i += 1) {
-      const mapping = mappings[i]!;
-      const linkedIds = new Set(frameworkControls.flatMap((control) =>
-        control.mappings.some((link) => link.mappingId === mapping.id)
-          ? control.mappings.map((link) => link.mappingId) : []));
-      for (const other of maps.complianceMaps.mappings.filter((row) =>
-        row.framework !== params.framework && linkedIds.has(row.id))) {
-        const linked = evaluateMapping(other, other.evidenceRequirements.map((requirement, index) =>
-          evaluateMappingRequirement(other, requirement, index, source, ctx)), now);
-        if (linked.result !== "pass") continue;
-        categories[i] = { ...categories[i]!, status: linked.status, result: linked.result,
-          evidence: linked.evidence, dimensions: linked.dimensions, claimKind: linked.claimKind,
-          claimReasons: linked.claimReasons, notEvaluatedReasons: linked.notEvaluatedReasons,
-          reasons: linked.reasons, evidenceRefs: linked.evidenceRefs, admitted: linked.admitted,
-          rejected: linked.rejected, neededToSatisfy: linked.neededToSatisfy };
-        break;
-      }
-    }
 
     const trustCounts = {
       observed: 0,
