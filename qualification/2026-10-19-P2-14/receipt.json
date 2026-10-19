@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-14",
+  "date": "2026-10-19",
+  "commit": "760bf885a4f601a1786912dbc687dc245d123d0f",
+  "branch": "codex/p2-14-windows-runner",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not Windows/CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 34377
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/formal-checks/760bf885a4f601a1786912dbc687dc245d123d0f/raw/checks/focused-report.json tests/containment/windowsRunnerPrototype.test.ts tests/nativeShellPlatformGate.test.ts tests/nativeShellComposition.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts tests/sandboxConfinement.test.ts",
+      "exit": 0,
+      "durationMs": 38243
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 29456
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 44523
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3269
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 826
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 662
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 689
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 478
+    },
+    {
+      "cmd": "pnpm check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 4382
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1956
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 542
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 865
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 470
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 469
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 585
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1632
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 468
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 1518
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 676
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 1116
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 661
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 990
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3562
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 65683
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "adb7305b0de13ac76ef5abc006e331e036b8d79166ad0be77ce23f77b3d55149"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "1f6e9e9123b53adbfe33b8b0c14727ca1a4936436cb4b62c252c05c9a016f513"
+    },
+    {
+      "path": "decision.json",
+      "sha256": "dcfe0fc1f498070c09b4b963cd5979abdefc2cee29f924ee980612e613c462a0"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "d5c7dc21d9ed24d05b6aa5e10a7ac44349e5c74145afe66085cc09e611af4a50"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "b8146346f08779dbbccad806d40731aa794a81ad84cd8afc03eb2bedfecba403"
+    },
+    {
+      "path": "source-audit.json",
+      "sha256": "d257584dabc98f4b3dd35126b07b9721aceb38bfb8db8528a5c7d680e558d298"
+    },
+    {
+      "path": "tdd.json",
+      "sha256": "e2b1211d0e915b82a0d050b9fe177fd0f1cfdc7062d2cb4f7204f6c99be5aa8f"
+    }
+  ],
+  "notes": "Initial cut-first draft; no native Windows enablement or measurement. Full NOT_RUN/tests null; main ENTRY_COUNT remains failed/reproduced clean-int; other checks pass. Sid/primary-source/Windows host proof pending. Native validation not run at assembly; root records later result off-tree."
+}
