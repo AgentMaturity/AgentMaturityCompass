@@ -161,9 +161,9 @@ describe("amc init --regulated (P1-40)", () => {
     expect(compiled.requirements.map((r: { controlId: string }) => r.controlId).sort()).toEqual(expect.arrayContaining(layer0));
     expect(plan!.unresolved.length).toBeGreaterThan(0);
     // Layer 0 waits for useCases and jurisdictions. Wealth adds stations because an unknown station may include
-    // wealth; the Technology overlay also waits for domains (P2-30).
+    // wealth; Technology adds domains (P2-30), and Mobility adds entityTypes and roles (P3-17).
     const facts = new Set(plan!.unresolved.flatMap((r) => r.missingFacts));
-    expect(facts).toEqual(new Set(["useCases", "jurisdictions", "stations", "domains"]));
+    expect(facts).toEqual(new Set(["useCases", "jurisdictions", "stations", "domains", "entityTypes", "roles"]));
     // The SDK page names exactly the facts this plan waits for.
     const page = readFileSync(join(import.meta.dirname, "..", "docs", "sdk", "TYPESCRIPT_SDK.md"), "utf8").replace(/\s+/g, " ");
     const stated = /plan stays blocked until you state (.+?) in the profile/.exec(page)?.[1] ?? "";

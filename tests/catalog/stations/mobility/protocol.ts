@@ -11,7 +11,17 @@ const binding = z.object({ tenantId: identifier, workspaceId: identifier, deploy
   controlId: z.enum(["L1-MOB-01", "L1-MOB-02", "L1-MOB-03", "L1-MOB-04", "L1-MOB-05", "L1-MOB-06"]),
   controlVersion: z.string().regex(/^\d+\.\d+\.\d+$/), planDigest: digest }).strict();
 const contextFor = (controlId: z.infer<typeof binding>["controlId"]) => binding.refine(value => value.controlId === controlId);
-export type Binding = z.infer<typeof binding>;
+type Binding = z.infer<typeof binding>;
+export function sameBinding(expected: Binding, actual: Binding): boolean {
+  return expected.tenantId === actual.tenantId && expected.workspaceId === actual.workspaceId
+    && expected.deploymentId === actual.deploymentId && expected.agentId === actual.agentId
+    && expected.controlId === actual.controlId && expected.controlVersion === actual.controlVersion
+    && expected.planDigest === actual.planDigest;
+}
+export function unique(values: readonly string[]): boolean { return new Set(values).size === values.length; }
+export function completeText(...values: unknown[]): boolean {
+  return values.every(value => typeof value === "string" && value.trim().length > 0);
+}
 export interface LocalOutcome {
   result: "allow" | "deny" | "pass" | "fail" | "not_evaluated";
   reasonCode: string;

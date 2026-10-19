@@ -108,7 +108,7 @@ has `.amc` (`--force` deletes it first). Budgets are the signed defaults.
 
 The regulated plan is experimental. The Layer 0 controls are agent-drafted and not independently reviewed (decision
 D-08 is open), and a plan is evidence-of-conformity planning, never a compliance claim. The starter profile states no
-deployment fact, so the plan stays blocked until you state `domains`, `jurisdictions`, `stations` and `useCases` in the profile.
+deployment fact, so the plan stays blocked until you state `domains`, `entityTypes`, `jurisdictions`, `roles`, `stations` and `useCases` in the profile.
 Layer 0 waits for `useCases` and `jurisdictions`. The Wealth overlay adds `stations` because an unknown station may
 include `wealth`; the Technology overlay also waits for `domains` (P2-30). `amc init --regulated` prints the facts it waits for. Activation
 then follows docs/catalog/COMPILER.md: `amc catalog compile --profile <profile> --request-review`, approval by two
