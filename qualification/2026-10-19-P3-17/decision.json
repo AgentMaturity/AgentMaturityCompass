@@ -1,0 +1,91 @@
+{
+  "sourceHead": "7458c47c343d1b54921501a04e0be6f280a38963",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "state": "EXPERIMENTAL_DRAFT",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "directHumanProof": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/user-directives.json",
+    "sha256": "3bc656b8ab8c302818484f8d56b8083792fe2e9cde441f4941883c4389ef5120",
+    "bytes": 2598
+  },
+  "directives": [
+    {
+      "questionToolCall": "call_9d7d890df93f4d3091f46596730cab25",
+      "question": "P2-30’s focused checks pass, but host load above 380 has stalled full qualification. How should I proceed?",
+      "exactHumanAnswer": "Prepare remaining draft handoffs with full-suite checks explicitly pending",
+      "applies": "Initial remaining draft handoffs only; record full NOT_RUN/tests null, not pass or qualified."
+    },
+    {
+      "questionToolCall": "call_1e421f56c09d4c85aa736702cbfb7ecc",
+      "question": "P1-34 requires a unique catalog version for each content change. The prepared patch bumps catalog/catalog.yaml from 0.1.0 to 0.1.1 and updates only P2-30’s appended changelog entry; both guard checks pass in a pure proposal. The brief restricts shared files to appended own rows. Should I apply this version bump for each overlay draft, or leave version bumps to Claude at landing?",
+      "exactHumanAnswer": "Leave version bumps to Claude at landing; hand off drafts with that check pending",
+      "applies": "No own catalog manifest bump in this initial Mobility draft; actual guard failures remain explicit and an owner version ref is required."
+    },
+    {
+      "questionToolCall": "call_c0951fff91b545f78b7adb9aaec3ddf8",
+      "question": "The new required int merge changes only catalog/CHANGELOG.md; a concrete merge-tree proposal confirms every other tracked file is byte-identical. Your earlier instruction requires the full suite on final HEAD. After this run finishes, should I repeat it on the merged commit, or retain this measured run with byte-equivalence evidence and rerun the changelog checks?",
+      "exactHumanAnswer": "Repeat the full suite on merged HEAD (current policy)",
+      "applies": "Final merged product HEAD requires a new actual full suite; no byte-equivalence substitution or scoped-test total as full."
+    }
+  ],
+  "pendingOwnerLandingBundle": {
+    "review": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/owner-version-bundle-7458c/patch-review.json",
+      "sha256": "0f4c6b09f369096a9758c08fbd91608a6b2ba9b352719df6086f69c9bc667356",
+      "bytes": 5250
+    },
+    "patch": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/owner-version-bundle-7458c/owner-catalog-bump.patch",
+      "sha256": "4d3f7ec4a9b274b42b6475fb9369663cc29b021d4ffadf286d2fc1e84d3185f0",
+      "bytes": 3974
+    },
+    "applied": false,
+    "applyCheck": {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/owner-version-apply-check-7458c/command.json",
+        "sha256": "f452f5b22f5b28b102c70869c3a10b7d6abfe30eca97c1dc6e94b8b9746c0de3",
+        "bytes": 1445
+      },
+      "state": "MEASURED_APPLY_CHECK_ONLY",
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/owner-version-bundle-7458c/owner-catalog-bump.patch"
+      ],
+      "exit": 0,
+      "applied": false
+    },
+    "limit": "Concrete unapplied proposal only. Claude applies or recomputes against landing int. Proposed guard is not current source pass."
+  },
+  "fullSuite": {
+    "state": "NOT_RUN",
+    "command": null,
+    "exit": null,
+    "durationMs": null,
+    "totals": null,
+    "reason": "Authorized initial draft only. Final merged-HEAD full suite with two workers remains required; no equivalence shortcut."
+  },
+  "nativeQualificationValidation": {
+    "state": "NOT_RUN_AT_ASSEMBLY",
+    "exit": null,
+    "followup": "This snapshot precedes its own native validation. Root records the subsequent command and measured result off-tree and in the handoff."
+  },
+  "humanOpen": [
+    "D-14/D-10 maritime/port security, fair housing and automotive safety experts",
+    "independent human review and sign-offs",
+    "P1-29 partner per assigned domain and funded stewardship",
+    "D-04 licence and Sid promotion decision",
+    "primary-source/legal review and vehicle/port/housing applicability",
+    "manual operating envelope, ODD/MRC and safety case",
+    "P2-27 cold-chain allow/deny integration"
+  ],
+  "limits": [
+    "No fresh primary reads, third-party contact, production outcome or legal determination.",
+    "Both unplaced pack mappings remain source truth; no owner taxonomy change is implied.",
+    "Inherited TECH03 firmware_update refusal is not overridden by Mobility local OTA allowance.",
+    "No catalog bump, full qualification or real release authority is claimed."
+  ]
+}
