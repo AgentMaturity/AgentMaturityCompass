@@ -59,6 +59,32 @@ function workspaceWithBoundEvidence(mappingIds: string[]): string {
 }
 
 describe("ISO/IEC 42005 descope in the compliance report", () => {
+  // Display text changes cannot supply the unavailable source text for these three mapping IDs.
+  test("stable iso42005 mapping IDs stay descoped under signed display-category renames", () => {
+    const workspace = workspaceWithBoundEvidence([...DESCOPED, "iso42006_conformity_evidence_package"]);
+    const mappings = builtInComplianceMappings.map((mapping) => DESCOPED.includes(mapping.id)
+      ? { ...mapping, category: `Synthetic renamed display category for ${mapping.id}` } : mapping);
+    // Only display text changes; reuse the native schema/signature path for custom maps.
+    initComplianceMaps(workspace, { complianceMaps: { version: 1, mappings } });
+    const out = generateComplianceReport({ workspace, framework: "ISO_42001", window: "14d", agentId: AGENT });
+    expect(out.configTrusted).toBe(true);
+    expect(out.configReason).toBeNull();
+    expect(out.categories.find((row) => row.id === "iso42006_conformity_evidence_package")!.result).toBe("pass");
+    for (const id of DESCOPED) {
+      const row = out.categories.find((entry) => entry.id === id)!;
+      expect(row.category).toBe(`Synthetic renamed display category for ${id}`);
+      expect({ status: row.status, result: row.result, descoped: row.descoped })
+        .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", descoped: REASON });
+      expect(row.notEvaluatedReasons).toEqual([REASON]);
+      expect(row.admitted).toEqual([]);
+    }
+    const counted = out.categories.length - DESCOPED.length;
+    const { satisfied, partial, missing, unknown, notEvaluated } = out.coverage;
+    expect(satisfied + partial + missing + unknown + notEvaluated).toBe(counted);
+    expect(out.coverage.satisfied).toBe(1);
+    expect(out.coverage.score).toBe(Number((1 / counted).toFixed(4)));
+  }, 300_000);
+
   test("the three iso42005 categories are listed, never evaluated and never counted, even with passing evidence", () => {
     const workspace = workspaceWithBoundEvidence([...DESCOPED, "iso42006_conformity_evidence_package"]);
     const out = generateComplianceReport({ workspace, framework: "ISO_42001", window: "14d", agentId: AGENT });
