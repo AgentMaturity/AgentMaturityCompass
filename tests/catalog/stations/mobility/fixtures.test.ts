@@ -157,7 +157,10 @@ describe("Mobility synthetic local reference oracles (P3-17)", () => {
       for (const application of [input.pairs[1]!.baseline, input.pairs[1]!.counterfactual]) application.pairId = pair.pairId;
     }
     if (scenario === "application") pair.counterfactual.applicationId = pair.baseline.applicationId;
-    if (scenario === "feature") input.permittedFeatureIds.push("additional-fixture-feature");
+    if (scenario === "feature") {
+      input.permittedFeatureIds.push("additional-fixture-feature");
+      input.pairs = [pair];
+    }
     for (const application of [pair.baseline, pair.counterfactual]) {
       if (scenario === "reason") application.reasons!.push(structuredClone(application.reasons![0]!));
       if (scenario === "feature") application.features.push(structuredClone(application.features[0]!));
