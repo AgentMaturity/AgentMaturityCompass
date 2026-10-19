@@ -1,0 +1,192 @@
+{
+  "sourceHead": "408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+  "int": "52ad3c66e9b122fc8044851c334057c672e52834",
+  "branch": "codex/p3-15-solo-final",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019",
+  "statusPorcelain": "",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "freeze": {
+    "state": "FROZEN_PRODUCT_SOURCE_NOT_FULL_QUALIFIED",
+    "at": "2026-10-19T11:51:59.828911+00:00",
+    "sourceHead": "408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+    "int": "52ad3c66e9b122fc8044851c334057c672e52834",
+    "candidateClone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019",
+    "mutationClone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6",
+    "wholeCleanBoth": true,
+    "sourceHashes": [
+      {
+        "path": "tests/catalog/stations/education/accessibilityCheck.ts",
+        "sha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+        "bytes": 4987
+      },
+      {
+        "path": "tests/catalog/stations/education/compiledPolicy.test.ts",
+        "sha256": "db432476cd197ef861048644f4a0ff7aaf75d0830e4f246a94db69c9146b7e00",
+        "bytes": 9096
+      },
+      {
+        "path": "tests/catalog/stations/education/exportLog.ts",
+        "sha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa",
+        "bytes": 948
+      },
+      {
+        "path": "tests/catalog/stations/education/fixtures.test.ts",
+        "sha256": "71986ea50f92397088a9b33f68f513387d1fe8a0fa811f3e28647cd1ebe72c45",
+        "bytes": 15829
+      },
+      {
+        "path": "tests/catalog/stations/education/gradebook.ts",
+        "sha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+        "bytes": 2402
+      },
+      {
+        "path": "tests/catalog/stations/education/harness.ts",
+        "sha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f",
+        "bytes": 4615
+      },
+      {
+        "path": "tests/catalog/stations/education/overlay.test.ts",
+        "sha256": "a7ef77800faaae9de2db5eef94278a8108134e6cf5b0c83f111141a1dad01b7c",
+        "bytes": 6430
+      },
+      {
+        "path": "tests/catalog/stations/education/protocol.ts",
+        "sha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+        "bytes": 2215
+      },
+      {
+        "path": "tests/catalog/stations/education/toolCapabilityLog.ts",
+        "sha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+        "bytes": 2521
+      }
+    ],
+    "checksIndex": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/check-20261019T114437-acdb3aec/checks.json",
+      "sha256": "4c436c1a9037d7c28b03e2919b28550c0fcdb915e311bcbf48bee342e6a62df1",
+      "bytes": 9192
+    },
+    "focusedCommand": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/focused-final-product/command.json",
+      "sha256": "9a24e32efeb17a61c2c2a12964a04ad4536d90a09e2fa11c4bb9bdfb37058e67",
+      "bytes": 1984
+    },
+    "focusedReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/focused-final-product-report.json",
+      "sha256": "977fc979e9b4a310072c21cfe170e8000cd29086c3227e0c6b5a4fa475c4da7c",
+      "bytes": 700851
+    },
+    "ownReadinessCommand": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/mutation-readiness-green/command.json",
+      "sha256": "52be61bd4ab7b93e6f790a6cdada3c1bed6d2f86a642f81325db0eadef9316f0",
+      "bytes": 1681
+    },
+    "ownReadinessReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/mutation-readiness-green-report.json",
+      "sha256": "d713020cea1054af4ce31d428cc86882241e32d338d08a1605811ae9e6e76b51",
+      "bytes": 55764
+    },
+    "caseProbe": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/catalog-probe-408e6.json",
+      "sha256": "f579171bcc41dcda08403c4894e9f7cc8827c573c1d962df17d697437051efd1",
+      "bytes": 139606
+    },
+    "limits": "Actual own126 measured in the separate fresh clone at identical committed source. Main candidate focused1716 contains same126. Mutation initial/restored must independently pass. No full measurement or promotion claim."
+  },
+  "bytePreservation": {
+    "sourceHead": "408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+    "int": "52ad3c66e9b122fc8044851c334057c672e52834",
+    "historicalPacketBytePreserved": [
+      {
+        "path": "qualification/2026-10-19-P3-15/README.md",
+        "sha256": "f3ea116815516e150f9f325aff5603f75b78421388882e11e0b318a40e0664f3",
+        "bytes": 7479
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/case-command.json",
+        "sha256": "fa5a4a58bf441122a53957bcdb9f5672183cd6b4ffe7e8a387d43b4de0c04c88",
+        "bytes": 1020
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/case-results.json",
+        "sha256": "47ba7f32d546e7fdb658a67bff3662f9923ef8b07965eeaa36a3ce8895380139",
+        "bytes": 96447
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/checks.json",
+        "sha256": "2f5f284b06e9698635c0357b5352ed2d5244ac510e94c222f856a9e42ca2a4df",
+        "bytes": 79809
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/decisions.json",
+        "sha256": "22c0d913f671e198de306ec24846452fafda9c272664b0b0b8ca99260c52b85f",
+        "bytes": 2239
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/education-plan.json",
+        "sha256": "5cdc21607eb20344998859c1c19499c2a263f5e2a35d13c0fa3e763e64d46afd",
+        "bytes": 9079
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/git-state.json",
+        "sha256": "dbae9f8ca7dcc103314403f44e07582a739362d25c34b0900419513f956dc5cc",
+        "bytes": 706
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/mutations.json",
+        "sha256": "f0863a2ed3bcad92e23c6a3c07a7192bbe23e01861a52f95e24d3507d83b7704",
+        "bytes": 97299
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/receipt.json",
+        "sha256": "85187332f70643dc3ae30f91570be4473b85bd8f3702237979b3a1077285b4a5",
+        "bytes": 16319
+      },
+      {
+        "path": "qualification/2026-10-19-P3-15/source-audit.json",
+        "sha256": "1c4b16136cecdd9cefa585e4cf9c89c04e49bc0b5c7964ad0b0eb8bb30c34a84",
+        "bytes": 146394
+      }
+    ],
+    "sevenOtherGuidesBytePreserved": [
+      {
+        "path": "docs/industries/README.md",
+        "sha256": "b0641c21aba195c62cc2997d1b3cbe3de15e2f6ba9c252caf2e9cb8a75429280",
+        "bytes": 4666
+      },
+      {
+        "path": "docs/industries/environment.md",
+        "sha256": "93f4afdd966803b1a4fc16d9190a15cbaa8a7301e37ca97ff891c8336ea97630",
+        "bytes": 23667
+      },
+      {
+        "path": "docs/industries/health.md",
+        "sha256": "99c46742f717d1f4ff84413952701dfef8b163547da11936a61fd8c5e7e4779b",
+        "bytes": 23890
+      },
+      {
+        "path": "docs/industries/wealth.md",
+        "sha256": "f7b9f6a5e8020a78f7822a7424fb123de9dcc43dd17605dfc177473e21f291c4",
+        "bytes": 22765
+      },
+      {
+        "path": "docs/industries/technology.md",
+        "sha256": "f122e485f2707102632f25c46f3e904a53ac3d912af5bff65202b8fdb84de4ef",
+        "bytes": 23961
+      },
+      {
+        "path": "docs/industries/mobility.md",
+        "sha256": "558c5ced9a4cfe0ef1d5f893c389c9397f1cba7bfe367837cfdf3685340b9a5c",
+        "bytes": 22367
+      },
+      {
+        "path": "docs/industries/governance.md",
+        "sha256": "90fc1364760b53cd1e01a10f7db6e0ea20cc09f5bf6db4a0412c91e69a2f014f",
+        "bytes": 26411
+      }
+    ],
+    "ordinaryChecks": "23 independently replayed command/raw references, clean408e6beforeafter, all exit0; full notrun",
+    "scope": "Root technical byte/measurement audit only; no content/legal/promotion approval."
+  },
+  "remaining": "Commit this metadata packet to obtain finalQ, then rerun23 ordinary checks and the full suite once on exactQ. Keep final completion receipt and failure classifications off-tree; no later source commit or byte-equivalence waiver."
+}

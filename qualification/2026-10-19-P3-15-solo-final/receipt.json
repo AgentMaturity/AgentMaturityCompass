@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-15",
+  "date": "2026-10-19",
+  "commit": "408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+  "branch": "codex/p3-15-solo-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 34708
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 29008
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 44428
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4575
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 4529
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1484
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref 52ad3c66e9b122fc8044851c334057c672e52834",
+      "exit": 0,
+      "durationMs": 1751
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 337
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1742
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 217
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 178
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 589
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 299
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1654
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 434
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref 52ad3c66e9b122fc8044851c334057c672e52834",
+      "exit": 0,
+      "durationMs": 862
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 1717
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 411
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 275
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 75834
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 896
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3548
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 198
+    },
+    {
+      "cmd": "npx --no-install vitest run tests/catalog tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/stationTaxonomy.test.ts tests/industryPacksEducation.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/focused-final-product-report.json",
+      "exit": 0,
+      "durationMs": 111291
+    },
+    {
+      "cmd": "node node_modules/tsx/dist/cli.mjs /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/probe-education-408e6.mts 408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+      "exit": 0,
+      "durationMs": 3043
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/compiledPolicy.test.ts tests/catalog/stations/education/fixtures.test.ts tests/catalog/stations/education/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/initial-green/report.json",
+      "exit": 0,
+      "durationMs": 5154
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/compiledPolicy.test.ts tests/catalog/stations/education/fixtures.test.ts tests/catalog/stations/education/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/restored-green/report.json",
+      "exit": 0,
+      "durationMs": 4446
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires approval for the exact grade value' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/01-grade-exact-value/report.json",
+      "exit": 1,
+      "durationMs": 662
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses an emotion-inference capability before execution' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/02-emotion-capability-refusal/report.json",
+      "exit": 1,
+      "durationMs": 657
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'compares every subject, control, version and plan binding field' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/03-shared-context-binding/report.json",
+      "exit": 1,
+      "durationMs": 663
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses writes when the approval store is unavailable' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/04-approval-store-availability/report.json",
+      "exit": 1,
+      "durationMs": 853
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires an issued, unexpired approval with a nonempty time window' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/05-approval-expiry/report.json",
+      "exit": 1,
+      "durationMs": 676
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the same student, assessment, request and authorized teacher' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/06-teacher-authority/report.json",
+      "exit": 1,
+      "durationMs": 672
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the registry and capability log, and binds both registry and calls' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/07-capability-log-availability/report.json",
+      "exit": 1,
+      "durationMs": 661
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the registry and capability log, and binds both registry and calls' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/08-capability-registry-availability/report.json",
+      "exit": 1,
+      "durationMs": 659
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires a uniquely registered capability class and exact tool version' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/09-capability-resolution/report.json",
+      "exit": 1,
+      "durationMs": 668
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires a uniquely registered capability class and exact tool version' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/10-tool-version-binding/report.json",
+      "exit": 1,
+      "durationMs": 675
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'does not invent a FERPA permission adapter or accept an availability claim' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/11-missing-ferpa-dependency/report.json",
+      "exit": 1,
+      "durationMs": 659
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'rejects impossible or lossy timestamps: .*0001Z' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/12-utc-precision/report.json",
+      "exit": 1,
+      "durationMs": 665
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'never treats string availability flags as authority' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/13-strict-availability-boolean/report.json",
+      "exit": 1,
+      "durationMs": 675
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'keeps synthetic checker-summary units separate from browser observations' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/14-axe-violation-classifier/report.json",
+      "exit": 1,
+      "durationMs": 660
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'keeps synthetic checker-summary units separate from browser observations' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/15-axe-incomplete-or-no-rules/report.json",
+      "exit": 1,
+      "durationMs": 692
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'L1-EDU-04/negative/oracle-checker-unavailable\\.json' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/16-checker-disabled-fails-open/report.json",
+      "exit": 1,
+      "durationMs": 678
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'L1-EDU-04/negative/oracle-image-alt-missing\\.json' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/17-actual-axe-violations-binding/report.json",
+      "exit": 1,
+      "durationMs": 1442
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'does not treat an empty rendered document as a generated lesson' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/18-empty-rendered-lesson/report.json",
+      "exit": 1,
+      "durationMs": 971
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses external resources without sending a network request' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/19-external-resource-result/report.json",
+      "exit": 1,
+      "durationMs": 999
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern 'refuses a fixture subject outside the actual compiled deployment' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/20-compiled-subject-profile-binding/report.json",
+      "exit": 1,
+      "durationMs": 1983
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Education\\ synthetic\\ reference\\ protocols,\\ never\\ institution\\ or\\ production\\ results\\ gradebook\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Education\\ synthetic\\ reference\\ protocols,\\ never\\ institution\\ or\\ production\\ results\\ capability\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Education\\ synthetic\\ reference\\ protocols,\\ never\\ institution\\ or\\ production\\ results\\ export\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Education\\ synthetic\\ reference\\ protocols,\\ never\\ institution\\ or\\ production\\ results\\ accessibility\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/21-expected-control-context/report.json",
+      "exit": 1,
+      "durationMs": 664
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-mutations-408e6/node_modules/vitest/vitest.mjs run tests/catalog/stations/education/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern '(?:Education\\ actual\\ compiled\\ policy\\ and\\ evidence\\ admission\\ \\(P3\\-15\\)\\ refuses\\ a\\ not\\-applicable\\ requirement\\ despite\\ a\\ matching\\ compiled\\ subject)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/408e680bc13beee5a2d5117db9f20b1f9e2a2c52/solo-22-v1/mutations/22-compiled-not-applicable-requirement/report.json",
+      "exit": 1,
+      "durationMs": 1808
+    }
+  ],
+  "tests": {
+    "total": 1716,
+    "passed": 1716,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.json",
+      "sha256": "5226862b2a89aebab3b74732415d1df2eaa06bcb9cb8ae65b2d276f63da77b82"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "f579171bcc41dcda08403c4894e9f7cc8827c573c1d962df17d697437051efd1"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "55bf5022791496bf0e60261b94769ce163e13559c9ebfd83dd0d30db78f013d8"
+    },
+    {
+      "path": "inventory.json",
+      "sha256": "249aa929f758d4a10a5473a2029a3d6ea9ab907d186bf7824b66e527ffb16c8a"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "4c4e2d48a52f98995d3074c954c109787ece73c5996750b9aea1fc34d2f65ca8"
+    },
+    {
+      "path": "decisions.json",
+      "sha256": "60957c14b3ea797b27a2cb43b3b73b88cf6f6b6d6777a7c013737385321afe11"
+    },
+    {
+      "path": "README.md",
+      "sha256": "5b07f63f1301a1eab19cc18d9efdeaf1af2504afde5b58a096b5998071256cdb"
+    }
+  ],
+  "notes": "Preparation receipt for clean product 408e6 only. tests is the actual focused 1716/1716 measurement, including 126 Education tests; it is not full-suite qualification. All 23 ordinary checks passed. All 22 intentional guard variants failed by25 native AssertionErrors and restored byte-exact, with initial/restored126 GREEN; their nonzero commands are expected negative evidence.45 native envelopes give41 not_evaluated/4fail/0pass;17 separate synthetic observations give2allow/5deny/7not_evaluated/1pass/2fail. All 6 Education+7 Technology empty-production probes are not_evaluated/none. Actual automated Axe4.13.0/Playwright1.62.1/Chromium151.0.7922.34 observations cover only synthetic HTML; manual WCAG is unperformed.103 IDs=87pack+16deep;15 instruments remain unverified. Experimental/unreviewed/promotion none. Full suite on the future receipt-bearing finalQ remains NOT_RUN at assembly and must run before landing. Actual finalQ totals, every failure/skip classification and all final checks will be in a separately validated completion receipt under evidence/p3-15/solo-20261019 and linked in RESERVATIONS.md, without another source commit. Historical packets and diagnostics are preserved."
+}
