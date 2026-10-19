@@ -49,3 +49,25 @@ describe("guide citations survive unrelated edits (P1-42 review)", () => {
       .toThrow(/export function mintReceipt/);
   });
 });
+
+describe("station-owned overlay guide sections", () => {
+  const file = "docs/catalog/technology/guide-section.md";
+  const real = (path: string) => readFileSync(join(process.cwd(), path), "utf8");
+  const missing = () => Object.assign(new Error("No station-owned section"), { code: "ENOENT" });
+
+  test("includes Technology prose once before its appendix and leaves every other guide unchanged", () => {
+    const baseline = renderGuides((path) => { if (path === file) throw missing(); return real(path); });
+    const prose = "## Experimental catalog overlay\n\nSynthetic overlay regression marker.\n";
+    const withSection = renderGuides((path) => path === file ? prose : real(path));
+    const marker = "## Verification appendix\n";
+    expect(withSection.get("technology.md")).toBe(baseline.get("technology.md")!.replace(marker, `${prose}\n${marker}`));
+    for (const [name, md] of baseline) {
+      if (name !== "technology.md") expect(withSection.get(name), name).toBe(md);
+    }
+  });
+
+  test("does not suppress a station-owned section read error other than ENOENT", () => {
+    const denied = Object.assign(new Error("Station-owned section is unreadable"), { code: "EACCES" });
+    expect(() => renderGuides((path) => { if (path === file) throw denied; return real(path); })).toThrow(denied);
+  });
+});

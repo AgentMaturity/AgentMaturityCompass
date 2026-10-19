@@ -1,0 +1,190 @@
+{
+  "issue": "P2-30",
+  "purpose": "Reproduce the public Docs MCP edge failure on unchanged integration baseline",
+  "sourceComparison": {
+    "recordedAt": "2026-10-18T09:25:39.716Z",
+    "baselineRevision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "candidateRevision": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+    "comparisons": [
+      {
+        "path": "tests/publicDocsGraph.test.ts",
+        "baselineSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+        "frozenCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+        "identical": true
+      },
+      {
+        "path": "docs/MCP_SERVER.md",
+        "baselineSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+        "frozenCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+        "identical": true
+      },
+      {
+        "path": "docs/MCP_INDUSTRY_PACKS.md",
+        "baselineSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+        "frozenCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+        "identical": true
+      },
+      {
+        "path": "website/docs/docs.js",
+        "baselineSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+        "frozenCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+        "identical": true
+      }
+    ],
+    "originalFullRunFailure": " FAIL  tests/publicDocsGraph.test.ts > AMC public Docs graph > every local guide edge resolves to another promoted guide\nAssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n\n- Expected\n+ Received\n\n- []\n+ [\n+   {\n+     \"href\": \"MCP_INDUSTRY_PACKS.md\",\n+     \"source\": \"MCP_SERVER\",\n+     \"target\": \"MCP_INDUSTRY_PACKS\",\n+   },\n+ ]\n\n ❯ tests/publicDocsGraph.test.ts:70:21\n     68|     }\n     69|\n     70|     expect(defects).toEqual([]);\n       |                     ^\n     71|   });\n     72|\n\n"
+  },
+  "install": {
+    "command": [
+      "pnpm",
+      "install",
+      "--offline",
+      "--frozen-lockfile"
+    ],
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+    "startedAt": "2026-10-18T09:24:52.110Z",
+    "finishedAt": "2026-10-18T09:24:59.405Z",
+    "exitCode": 0,
+    "signal": null,
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/install-offline.log",
+    "logSha256": "11fa85f1f7a242e4c90cc1230caf4f398b34a4c8cf4fc421336e2406a6ab8490",
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "status": ""
+  },
+  "test": {
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/publicDocsGraph.test.ts",
+      "--maxWorkers=1",
+      "--no-file-parallelism",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph-report.json"
+    ],
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+    "startedAt": "2026-10-18T09:25:14.414Z",
+    "finishedAt": "2026-10-18T09:25:18.675Z",
+    "exitCode": 1,
+    "signal": null,
+    "before": {
+      "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+      "status": ""
+    },
+    "after": {
+      "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+      "status": ""
+    },
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph.log",
+    "logSha256": "e05db0ce02fb1e4357c988832875b47ce168a4742d3e504f359ef399fd8b85fa",
+    "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/publicDocsGraph-report.json",
+    "totals": {
+      "tests": 6,
+      "passed": 5,
+      "failed": 1,
+      "pending": 0
+    },
+    "failures": [
+      {
+        "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/publicDocsGraph.test.ts",
+        "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "duration": 138.31754199999995,
+        "messages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Only tests/publicDocsGraph.test.ts executed",
+    "No build",
+    "No network install fallback required",
+    "No source or test edits",
+    "No full suite"
+  ],
+  "conclusion": "The same MCP_SERVER to MCP_INDUSTRY_PACKS edge assertion fails on clean integration baseline dc416268d with all four source inputs byte-identical to frozen candidate 0b9525b.",
+  "performanceBaseline": {
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/performance/sessionSpine.performance.test.ts",
+      "--maxWorkers=1",
+      "--no-file-parallelism",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance-report.json"
+    ],
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+    "startedAt": "2026-10-18T09:28:14.651Z",
+    "finishedAt": "2026-10-18T09:29:15.401Z",
+    "exitCode": 1,
+    "signal": null,
+    "before": {
+      "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+      "status": ""
+    },
+    "after": {
+      "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+      "status": ""
+    },
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance.log",
+    "logSha256": "b57dddd111d863f44398bcb255b046426462b1eb979d1ff810e359a796017829",
+    "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance-report.json",
+    "totals": {
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "pending": 0
+    },
+    "throughput": [
+      {
+        "kind": "content",
+        "displayedEventsPerSecond": 43,
+        "measuredEventsPerSecond": 42.63577799888038,
+        "requiredExclusiveMinimum": 150
+      }
+    ],
+    "measurementLimit": "Unchanged tests emit numeric throughput only when the throughput assertion fails; a pass proves the >150 floor without exposing the exact measured value.",
+    "tests": [
+      {
+        "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts",
+        "name": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+        "status": "failed",
+        "duration": 39262.714916,
+        "messages": [
+          "AssertionError: content throughput 43 ev/s: expected 42.63577799888038 to be greater than 150\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts:86:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      },
+      {
+        "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts",
+        "name": "session spine throughput control-plane events (no blob) sustain the floor and do not degrade super-linearly",
+        "status": "passed",
+        "duration": 10405.073750000003,
+        "messages": []
+      }
+    ],
+    "throughputNote": "One content measurement; the verbose log prints the same failed assertion twice.",
+    "sourceComparison": {
+      "recordedAt": "2026-10-18T09:29:31.693Z",
+      "baselineRevision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+      "candidateRevision": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+      "path": "tests/performance/sessionSpine.performance.test.ts",
+      "baselineSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+      "frozenCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+      "identical": true
+    }
+  },
+  "additionalConclusion": "The unchanged content-throughput test also fails on clean integration baseline dc416268d at 42.63577799888038 events/second against the unchanged >150 floor. Its test source is byte-identical to frozen candidate 0b9525b. This run does not identify why throughput is low."
+}

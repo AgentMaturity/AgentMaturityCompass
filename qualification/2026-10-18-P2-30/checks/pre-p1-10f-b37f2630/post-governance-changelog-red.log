@@ -1,0 +1,5 @@
+Catalog changelog guard: GOV_CHANGELOG_ENTRY_COUNT; see docs/catalog/GOVERNANCE.md.
+This change calls for this entry at the end of catalog/CHANGELOG.md (fill in each reason, and review record ids for reviewed or qualified content):
+```amc-catalog-change
+{"catalog":{"digest":"sha256:a0d444a921339053fb0cbc61aaf30f18dcd5ebc2d0d46fc0371dee8a8b79a95b","id":"amc.catalog","version":"0.1.0"},"controls":[{"change":"added","id":"L1-TECH-01","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-02","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-03","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-04","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-05","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-06","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-07","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"},{"change":"added","id":"L1-TECH-08","reason":"<why>","reviewRecordIds":[],"version":"0.1.0"}],"entryVersion":1}
+```

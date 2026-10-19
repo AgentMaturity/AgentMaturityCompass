@@ -35,6 +35,8 @@ dataClasses:
   - ot_telemetry
   - food_traceability_records
 domains:
+  # P2-30 Technology domain from STATION_DOMAINS; own additive block.
+  - technology.platforms-data
   # P3-16 Environment: exact native P1-13 domain IDs.
   - environment.energy-utilities-water
   - environment.food-textiles-manufacturing

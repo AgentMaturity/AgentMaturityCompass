@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ProtectedDataClass } from "../../vault/dataClassification.js";
 import { nonEmpty, sha256HexSchema } from "./common.js";
 
-const PROTECTED_DATA_CLASSES = ["phi", "pii", "card_number", "bank_account", "credential"] as const satisfies readonly ProtectedDataClass[];
+export const PROTECTED_DATA_CLASSES = ["phi", "pii", "card_number", "bank_account", "credential"] as const satisfies readonly ProtectedDataClass[];
 true satisfies ([ProtectedDataClass] extends [(typeof PROTECTED_DATA_CLASSES)[number]] ? true : false);
 
 /**

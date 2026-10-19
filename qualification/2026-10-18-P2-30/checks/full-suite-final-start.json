@@ -1,0 +1,97 @@
+{
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "int": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+  "timeUtc": "2026-10-18T11:43:33.958254+00:00",
+  "statusBeforeRun": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+  "workingTreeClean": false,
+  "allowedGeneratedOutputPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "generatedOutputInputs": [
+    {
+      "path": "README.md",
+      "sha256": "a6fe298b16f03318b06d6fcc61c63ebc0dba7c122a3e88d018fd8269b4cc4fe8"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "db544d2085b6bc7803c24b137e5dff5231b3eb3061ffb716e7caf18a41294fc6"
+    },
+    {
+      "path": "website/i18n.js",
+      "sha256": "96891ea2f8fc0b9532d4a9e0fedec8b0b575cf9aaaeb7a3608a78f4862751c9b"
+    },
+    {
+      "path": "website/index.html",
+      "sha256": "6bccb7059cdfd8a214f42efff9de104d8e1d6d94d40c2295275c2aaf0cb65a8c"
+    },
+    {
+      "path": "website/lite.html",
+      "sha256": "b94016aa0925df3d07da5fd98d4390c3ae0216b13911c259e6058f248f05e37a"
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "sha256": "42ff0c5e638365939c79df3dea5e5dc8666a6042e9b992ee378b08f1cc0fafb0"
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "sha256": "c8da090837bf8e0536bdf2738997be87227f705f289403ab5deb4349b00ff2ba"
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "sha256": "288c791fba4fcc31ce45a463d8e1a3585d76058fa1a1ce90fe237e65b2978f01"
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "sha256": "a2e228a374e828bea2b58f743a2601cf77e5ff7c0ef09fb2711af5b3cde6922e"
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "sha256": "c7b613f90e3cc318f3186a2227cb22fd6382730c33b21003ed978a2d722b7c32"
+    }
+  ],
+  "statusPorcelain": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/inventory-drift.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+  "committedImplementationSourceAtStart": true,
+  "nonFullCheckFailuresAtStart": [
+    {
+      "name": "catalog-changelog-main",
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 661,
+      "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main-authoritative-ref.log",
+      "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+      "rawLogBytes": 6921,
+      "baseRefAtExecution": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "priorAttempts": [
+        {
+          "name": "catalog-changelog-main",
+          "cmd": "node scripts/check-catalog-changelog.mjs",
+          "exit": 1,
+          "durationMs": 509,
+          "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main.log",
+          "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+          "rawLogBytes": 6921,
+          "baseRefAtExecution": "ebfa106dc45a853fc15f36e8d5312b499fc01806"
+        }
+      ],
+      "refCorrection": "Mirrors Claude clone refs/remotes/origin/main; no product bytes or HEAD changed."
+    }
+  ],
+  "nonFullCheckFailurePolicy": "The default-main changelog entry-count failure is expected until 7fccbbfa consolidates at the final main merge, per the recorded coordinator decision; its assertion and exit are retained. The int-relative check and every other required check passed. The guard and existing entries are unchanged.",
+  "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-b88f0fb934605ba528ad517eef797a5b891ee843",
+  "generatedOutputPolicy": "Required regenerated count outputs remain uncommitted and hashed. publicStatsDrift.test.ts compares them with the actual test-file inventory; reverting them to old HEAD counts would create artificial failures. No other uncommitted source or test input is admitted.",
+  "policy": "One measured full-suite run on final source; no all-green claim required. Four workers on a 12 logical CPU host; no test budgets or assertions changed."
+}

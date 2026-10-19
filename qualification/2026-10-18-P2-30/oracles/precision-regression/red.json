@@ -1,0 +1,25 @@
+{
+  "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "sourceStatus": " M tests/catalog/stations/technology/fixtures.test.ts\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1",
+    "-t",
+    "binds the NIS2 local warning to its own clock, incident, UTC awareness and typed draft fields"
+  ],
+  "node": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "startedAtUtc": "2026-10-18T10:10:17.791433+00:00",
+  "durationSeconds": 3.84,
+  "exitCode": 1,
+  "guardStillMatchesHead": true,
+  "guardSha256": "0dafd84f6323a92d82cb2ff97d65626348e5c88a0a056644aa58f968b866db53",
+  "testSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/red.log",
+  "logSha256": "f588c7ea6a5a60be612ed9ca34db42ec96924b92b4534eae3f532c01481320be",
+  "intendedFailureVerified": true
+}

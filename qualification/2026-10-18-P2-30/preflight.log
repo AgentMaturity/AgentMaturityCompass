@@ -1,0 +1,8 @@
+{
+  "status": "blocked_before_implementation",
+  "layoutRejections": 6,
+  "actualPackQuestions": 75,
+  "actualDeepQuestions": 0,
+  "baselineCatalogErrors": 0,
+  "receipt": "qualification/2026-10-18-P2-30/preflight.json"
+}

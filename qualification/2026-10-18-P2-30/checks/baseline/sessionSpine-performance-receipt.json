@@ -1,0 +1,76 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/performance/sessionSpine.performance.test.ts",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=verbose",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance-report.json"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+  "startedAt": "2026-10-18T09:28:14.651Z",
+  "finishedAt": "2026-10-18T09:29:15.401Z",
+  "exitCode": 1,
+  "signal": null,
+  "before": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "status": ""
+  },
+  "after": {
+    "head": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "status": ""
+  },
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance.log",
+  "logSha256": "b57dddd111d863f44398bcb255b046426462b1eb979d1ff810e359a796017829",
+  "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline/sessionSpine-performance-report.json",
+  "totals": {
+    "tests": 2,
+    "passed": 1,
+    "failed": 1,
+    "pending": 0
+  },
+  "throughput": [
+    {
+      "kind": "content",
+      "displayedEventsPerSecond": 43,
+      "measuredEventsPerSecond": 42.63577799888038,
+      "requiredExclusiveMinimum": 150
+    }
+  ],
+  "measurementLimit": "Unchanged tests emit numeric throughput only when the throughput assertion fails; a pass proves the >150 floor without exposing the exact measured value.",
+  "tests": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts",
+      "name": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+      "status": "failed",
+      "duration": 39262.714916,
+      "messages": [
+        "AssertionError: content throughput 43 ev/s: expected 42.63577799888038 to be greater than 150\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts:86:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/performance/sessionSpine.performance.test.ts",
+      "name": "session spine throughput control-plane events (no blob) sustain the floor and do not degrade super-linearly",
+      "status": "passed",
+      "duration": 10405.073750000003,
+      "messages": []
+    }
+  ],
+  "throughputNote": "One content measurement; the verbose log prints the same failed assertion twice.",
+  "sourceComparison": {
+    "recordedAt": "2026-10-18T09:29:31.693Z",
+    "baselineRevision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "candidateRevision": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+    "path": "tests/performance/sessionSpine.performance.test.ts",
+    "baselineSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+    "frozenCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+    "identical": true
+  }
+}

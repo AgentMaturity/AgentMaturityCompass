@@ -1,0 +1,226 @@
+{
+  "status": "blocked_before_implementation",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+  "branch": "codex/p2-30-technology-overlay",
+  "head": "b9866b0fa29d2efdb7a8f8c176cdf12e1af959d0",
+  "int": "b9866b0fa29d2efdb7a8f8c176cdf12e1af959d0",
+  "statusPorcelain": "?? qualification/2026-10-18-P2-30/",
+  "trackedDiff": "",
+  "baselineCatalogDigest": "sha256:99a7cf3f9c9fde698da2f4a8845e5c417ab3d0116b04d6ecd99f682d9aa81fba",
+  "baselineCatalogErrors": [],
+  "requestedLayoutRejections": [
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "fixtures/technology/L1-TECH-01/positive/valid.json",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    },
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "instruments/us-ftc-act.yaml",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    },
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "stations/technology/overlay.yaml",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    },
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "stations/technology/profile.platform-agent.json",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    },
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "stations/technology/promotion.yaml",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    },
+    {
+      "code": "CAT_STRAY_FILE",
+      "severity": "error",
+      "file": "stations/technology/question-dispositions.yaml",
+      "controlId": null,
+      "path": "",
+      "message": "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"
+    }
+  ],
+  "packMetadataErrors": [
+    {
+      "code": "unrecognized_keys",
+      "keys": [
+        "instruments",
+        "profiles",
+        "promotion"
+      ],
+      "path": [],
+      "message": "Unrecognized keys: \"instruments\", \"profiles\", \"promotion\""
+    }
+  ],
+  "fixturePathErrors": [
+    {
+      "origin": "string",
+      "code": "invalid_format",
+      "format": "regex",
+      "pattern": "/^L[0-3][A-Z0-9-]*\\/(positive|negative)\\/[A-Za-z0-9][A-Za-z0-9._-]*\\.json$/",
+      "path": [
+        "tests",
+        0,
+        "fixtures",
+        "positive",
+        0
+      ],
+      "message": "must be <controlId>/<positive|negative>/<name>.json"
+    },
+    {
+      "code": "custom",
+      "path": [
+        "tests"
+      ],
+      "message": "a mandatory enforced control needs a test with at least one positive and one negative fixture",
+      "params": {
+        "code": "CAT_SCHEMA"
+      }
+    }
+  ],
+  "questions": {
+    "specPackCount": 77,
+    "actualPackCount": 75,
+    "specDeepCount": 16,
+    "actualDeepCount": 0,
+    "deepStationApiPresent": false,
+    "packQuestionIds": [
+      "TECH-CI-1",
+      "TECH-CI-2",
+      "TECH-CI-3",
+      "TECH-CI-4",
+      "TECH-CI-5",
+      "TECH-CI-6",
+      "TECH-CI-7",
+      "TECH-CI-8",
+      "TECH-CI-9",
+      "TECH-CI-10",
+      "TECH-CI-11",
+      "TECH-CI-12",
+      "TECH-CI-13",
+      "TECH-CI-14",
+      "TECH-CI-15",
+      "TECH-NE-1",
+      "TECH-NE-2",
+      "TECH-NE-3",
+      "TECH-NE-4",
+      "TECH-NE-5",
+      "TECH-NE-6",
+      "TECH-NE-7",
+      "TECH-NE-8",
+      "TECH-NE-9",
+      "TECH-NE-10",
+      "TECH-NE-11",
+      "TECH-NE-12",
+      "TECH-NE-13",
+      "TECH-NE-14",
+      "TECH-NE-15",
+      "TECH-OS-1",
+      "TECH-OS-2",
+      "TECH-OS-3",
+      "TECH-OS-4",
+      "TECH-OS-5",
+      "TECH-OS-6",
+      "TECH-OS-7",
+      "TECH-OS-8",
+      "TECH-OS-9",
+      "TECH-OS-10",
+      "TECH-OS-11",
+      "TECH-OS-12",
+      "TECH-OS-13",
+      "TECH-OS-14",
+      "TECH-OS-15",
+      "TECH-INF-1",
+      "TECH-INF-2",
+      "TECH-INF-3",
+      "TECH-INF-4",
+      "TECH-INF-5",
+      "TECH-INF-6",
+      "TECH-INF-7",
+      "TECH-INF-8",
+      "TECH-INF-9",
+      "TECH-INF-10",
+      "TECH-INF-11",
+      "TECH-INF-12",
+      "TECH-INF-13",
+      "TECH-INF-14",
+      "TECH-INF-15",
+      "TECH-PP-1",
+      "TECH-PP-2",
+      "TECH-PP-3",
+      "TECH-PP-4",
+      "TECH-PP-5",
+      "TECH-PP-6",
+      "TECH-PP-7",
+      "TECH-PP-8",
+      "TECH-PP-9",
+      "TECH-PP-10",
+      "TECH-PP-11",
+      "TECH-PP-12",
+      "TECH-PP-13",
+      "TECH-PP-14",
+      "TECH-PP-15"
+    ],
+    "absentDispositionIds": [
+      "TECH-CI-16",
+      "TECH-CI-17",
+      "TECH-CI-18",
+      "TECH-OS-16",
+      "TECH-OS-17",
+      "TECH-OS-18",
+      "TECH-OS-20",
+      "TECH-INF-17",
+      "TECH-PP-16",
+      "TECH-PP-20"
+    ],
+    "differingMeanings": [
+      {
+        "id": "TECH-CI-15"
+      },
+      {
+        "id": "TECH-PP-15"
+      }
+    ]
+  },
+  "absentSpecPaths": [
+    "src/domains/packs/stations/technology.ts",
+    "src/domains/deep/technology.ts",
+    "docs/industries/technology.md",
+    "tests/industryGuides.test.ts",
+    "tests/deepIndustryPacksStations.test.ts"
+  ],
+  "reservedDependencies": [
+    {
+      "path": "src/catalog/schema.ts",
+      "reason": "Strict P1-09 schema rejects ancillary overlay metadata and station-prefixed fixture references; P2-30 prohibits editing it."
+    },
+    {
+      "path": "src/catalog/loader.ts",
+      "reason": "Requested station, instrument and nested fixture paths are outside the admitted tree."
+    },
+    {
+      "path": "src/catalog/validate.ts",
+      "reason": "Control membership requires layers/<pack>/controls and fixtures require <controlId>/<polarity>."
+    }
+  ],
+  "oracleOrFixtureClaims": "not evaluated; no Technology overlay, signature oracle or enforcement result was implemented",
+  "durationMs": 506
+}

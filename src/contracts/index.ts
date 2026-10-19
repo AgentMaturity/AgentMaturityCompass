@@ -32,6 +32,7 @@ import { a4TransitionV1Schema } from "./v1/a4Transition.js";
 import { a4ValueClaimV1Schema } from "./v1/a4ValueClaim.js";
 import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
+import { detokenizationReceiptV1Schema } from "./v1/detokenizationReceipt.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
 import { redactionReceiptV1Schema } from "./v1/redactionReceipt.js";
@@ -56,6 +57,7 @@ export * from "./v1/a4Transition.js";
 export * from "./v1/a4ValueClaim.js";
 export * from "./v1/authorizationRecord.js";
 export * from "./v1/controlResult.js";
+export * from "./v1/detokenizationReceipt.js";
 export * from "./v1/evidenceEvent.js";
 export * from "./v1/receipt.js";
 export * from "./v1/redactionReceipt.js";
@@ -75,6 +77,8 @@ export const CONTRACTS = {
   "authorization-record": { title: "AMC Authorization Record", schema: authorizationRecordV1Schema },
   // P2-02: one audit row per redaction before a session row is committed.
   "redaction-receipt": { title: "AMC Redaction Receipt", schema: redactionReceiptV1Schema },
+  // P2-02: one release of restored values to a processor, the receipt of a PROTECTED_DATA_DETOKENIZED ops row.
+  "detokenization-receipt": { title: "AMC Detokenization Receipt", schema: detokenizationReceiptV1Schema },
   "control-result": { title: "AMC Control Result", schema: controlResultV1Schema },
   "claim-envelope": { title: "AMC Claim Envelope", schema: claimEnvelopeSchema },
   "scoped-attestation": { title: "AMC Scoped Attestation", schema: scopedAttestationV1Schema },

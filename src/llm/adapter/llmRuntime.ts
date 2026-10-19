@@ -65,7 +65,7 @@ import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 import { detectProtectedRequest, type ProtectedDataDetection } from "../../dataflow/detectors.js";
 import { openTokenLookup } from "../../dataflow/tokenVault.js";
 import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
-import { loadProcessorRegistrySnapshot } from "../../dataflow/processorRegistry.js";
+import { protectedDataOptedIn } from "../../dataflow/processorRegistry.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -226,20 +226,32 @@ export class LlmRuntime {
       assertRequest: (request) => {
         assertRequestCapabilities(route.capabilities, request);
         // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.
-        // The workspace is read per use and never fabricated: a session without one reads as an invalid registry, not a missing one.
-        if (loadProcessorRegistrySnapshot(this.init.session.workspace).state === "missing") return;
+        // Latched like redaction, so a registry removed mid-process refuses (registry_missing) instead of skipping admission.
+        // The workspace is read per use and never fabricated: a session without one counts as opted in and refuses.
+        const workspace = this.init.session.workspace;
+        if (!protectedDataOptedIn(workspace)) return;
         // A detector refusal (over-long leaf, excessive nesting, unsupported shape) is a typed refusal, not an untyped error.
         // Tokens this workspace issued (committed rows hold them) are skipped; token-shaped text it did not issue is scanned.
         let detection: ProtectedDataDetection;
-        const tokens = openTokenLookup(this.init.session.workspace);
-        try { detection = detectProtectedRequest(request, tokens.issued); } catch { throw new DataFlowRefused("detector_invalid"); } finally { tokens.close(); }
-        if (detection.classes.length === 0) return;
-        const admission = admitProtectedModelRequest(this.init.session.workspace, route.providerId, route.baseUrl, detection);
+        let phiToken = false;
+        const tokens = openTokenLookup(workspace);
+        // Detection asks `issued` about every token-shaped match in the request, so this sees every issued PHI token.
+        const issued = (token: string): boolean => {
+          const known = tokens.issued(token);
+          phiToken ||= known && token.startsWith("[[amc:phi:");
+          return known;
+        };
+        try { detection = detectProtectedRequest(request, issued); } catch { throw new DataFlowRefused("detector_invalid"); } finally { tokens.close(); }
+        // A fully tokenized PHI request, or a run purpose that allows PHI, still needs a BAA route: the rest of the text may be PHI.
+        const admission = admitProtectedModelRequest(workspace, route.providerId, route.baseUrl, detection, phiToken ? ["phi"] : []);
+        if (admission.reason === "no_protected_data") return;
+        const declaredClasses = admission.classes.filter(value => !detection.classes.includes(value));
         const evidence = {
           classes: [...detection.classes],
           counts: { ...detection.counts },
           detectorSetDigest: detection.detectorSetDigest,
-          processorId: admission.processorId
+          processorId: admission.processorId,
+          ...(declaredClasses.length > 0 ? { declaredClasses } : {})
         };
         try {
           this.init.session.recordProjectedEvidence({
@@ -251,6 +263,8 @@ export class LlmRuntime {
           throw new DataFlowRefused("audit_failed");
         }
         if (!admission.allowed) throw new DataFlowRefused(admission.reason);
+        // ponytail: admission runs at prepare only; requestRetry streams right after prepare. Add a dispatch recheck if a
+        // caller ever waits between them.
       },
       ...(this.init.encoders !== undefined ? { encoders: this.init.encoders } : {})
     });

@@ -22,6 +22,8 @@ export interface ProcessorRecordV1 {
   readonly processorId: string;
   readonly legalName: string;
   readonly contracts: readonly ProcessorContractV1[];
+  /** P2-01 destination IDs (.amc/residency/destinations.yaml) this processor operates; only egress there may restore tokens. */
+  readonly destinationIds?: readonly string[];
 }
 
 export interface ProcessorBindingV1 {
@@ -38,6 +40,8 @@ export interface ProcessorRegistryV1 {
   readonly processors: readonly ProcessorRecordV1[];
   readonly purposes: readonly PurposePolicyV1[];
   readonly bindings: readonly ProcessorBindingV1[];
+  /** The purpose every tool call in this workspace serves (P2-02 step 8). Operator data only. Absent: nothing is restorable. */
+  readonly runPurpose?: string;
 }
 
 export type ProcessorRegistryFailure = "workspace_invalid" | "registry_unreadable" | "signature_missing" | "signature_invalid" | "schema_invalid";
@@ -76,14 +80,16 @@ const contractSchema = z.strictObject({ kind: z.enum(["BAA", "DPA", "other"]), r
   if (contract.expires !== null && contract.expires <= contract.effective)
     context.addIssue({ code: "custom", path: ["expires"], message: "expiry must follow effective date" });
 });
-const processorSchema = z.strictObject({ processorId: term, legalName: declaration, contracts: z.array(contractSchema).min(1).max(64) });
+const processorSchema = z.strictObject({ processorId: term, legalName: declaration, contracts: z.array(contractSchema).min(1).max(64),
+  destinationIds: terms.optional() });
 const purposeSchema = z.strictObject({ purposeId: term, allowedDataClasses: classes, allowedTools: terms, allowedProcessors: terms });
 const bindingSchema = z.strictObject({ providerId: term,
   baseUrl: z.string().refine(value => normalizeProcessorRouteBaseUrl(value) !== null).transform(value => normalizeProcessorRouteBaseUrl(value)!),
   processorId: term, purposeId: term });
 
 export const processorRegistrySchema = z.strictObject({ schemaVersion: z.literal("amc.dataflow-processors/v1"), experimental: z.literal(true),
-  processors: z.array(processorSchema).max(256), purposes: z.array(purposeSchema).max(256), bindings: z.array(bindingSchema).max(1024)
+  processors: z.array(processorSchema).max(256), purposes: z.array(purposeSchema).max(256), bindings: z.array(bindingSchema).max(1024),
+  runPurpose: term.optional()
 }).superRefine((registry, context) => {
   const processorIds = registry.processors.map(row => row.processorId);
   const purposeIds = registry.purposes.map(row => row.purposeId);
@@ -91,6 +97,10 @@ export const processorRegistrySchema = z.strictObject({ schemaVersion: z.literal
   for (const [field, ids] of [["processors", processorIds], ["purposes", purposeIds], ["bindings", bindings]] as const) {
     if (new Set(ids).size !== ids.length) context.addIssue({ code: "custom", path: [field], message: "duplicate identity or route binding" });
   }
+  const owned = registry.processors.flatMap(row => row.destinationIds ?? []);
+  if (new Set(owned).size !== owned.length) context.addIssue({ code: "custom", path: ["processors"], message: "a destination has one processor" });
+  if (registry.runPurpose !== undefined && !purposeIds.includes(registry.runPurpose))
+    context.addIssue({ code: "custom", path: ["runPurpose"], message: "unknown run purpose" });
   for (const purpose of registry.purposes) {
     if (purpose.allowedProcessors.some(id => !processorIds.includes(id)))
       context.addIssue({ code: "custom", path: ["purposes"], message: "unknown processor reference" });

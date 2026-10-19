@@ -1,0 +1,71 @@
+{
+  "sourceHead": "158d4387b75831598cea037fdf97046805c9602d",
+  "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "existingUsEntriesPreserved": true,
+  "appendedUsEntryIds": [
+    "technology-us-ftc-proposed-accuracy",
+    "technology-us-tcpa",
+    "us-coppa-third-party-consent",
+    "us-ccpa-admt"
+  ],
+  "decisions": "RESERVATIONS.md section 7fccbbfa → Codex: P2-30 unblocked — map the spec paths onto the implemented catalog tree (2026-10-18)",
+  "deviations": [
+    "Canonical layers/controls/fixtures and law-as-data registers replace pre-schema paths; ancillary metadata is in docs/catalog/technology/.",
+    "Current inventory follows the P1-42 source on int577aa797:97 pack and16 deep questions,113 unique dispositions. Both split data files and registry wrappers are hashed in inventory-drift.json; prior75/0 evidence remains historical.",
+    "All six restored P1-42 ids are required in the actual source inventory and exact disposition set; no temporary absence tolerance remains.",
+    "FTC Act, India IT Rules, DoT candidate rules, IEC 62443 and SOC 2 lack matching S5 records. They remain unverified metadata; no unrelated law substitutes for them.",
+    "Law-as-data grammar requires candidate source URLs; no retrieval hash or date is claimed. Metadata-only unsourced records keep null URLs/dates.",
+    "MIT is inherited from the implemented catalog and P1-18 pack pending D-04; no licence change is made from an old issue assertion.",
+    "P1-42 now supplies the generated Technology guide and deep/station tests. The documentation agent owns bounded generator integration for the experimental overlay section; a manual append is not used.",
+    "Local oracle outcomes are synthetic. Actual evaluateControl/compiled-profile results are separate; missing production evidence remains not_evaluated and none.",
+    "Questionnaire fixture contracts omit policyDigest and do not establish receipt-bound runtime enforcement; the actual compiled digest is used by evaluation context.",
+    "New US register rows required station-scoped corrections to existing Wealth/register tests. All original strategy rows, validation guards and protected jurisdiction profiles remain intact.",
+    "D-14 reviewer, P1-29 partner, external review request, promotion, landing and publication remain with Sid or Claude; no third-party contact, merge into int/main or push occurred."
+  ],
+  "state": "reconciled_current_source_uncommitted_unqualified",
+  "recordedAtUtc": "2026-10-18T11:28:55.918Z",
+  "previousVersion": {
+    "sourceHead": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+    "integrationBase": "7bc90f3245e5232c936a3912beb730f0237c5b2d",
+    "backupPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/p1-42-integration/pre-apply-2026-10-18T11-27-55.526Z/qualification/2026-10-18-P2-30/implementation-deviations.json",
+    "sha256": "8ea275de1eff9f2abdb368de349dfd9e92744beb22d0f3ca07f42eaad2900559"
+  },
+  "questionMappingLimits": [
+    {
+      "id": "TECH-CI-15-v2",
+      "issue": "Current marking question must replace old GPAI-documentation mapping; integrator documentation is now CI-16."
+    },
+    {
+      "id": "TECH-INF-9-v2",
+      "issue": "Visible deployer disclosure differs from machine-readable signature verification. Recommend questionnaire/L1 until a dedicated disclosure effect is observed."
+    },
+    {
+      "id": "TECH-INF-13",
+      "issue": "Actual notice duty differs from consent. Recommend questionnaire/L1 rather than a consent-test disposition."
+    },
+    {
+      "id": "technology-deep-03",
+      "issue": "Full GPAI model-provider duties exceed the integrator-doc control; only a partial document-review relation is proposed."
+    },
+    {
+      "id": "technology-deep-06",
+      "issue": "Actual deep-fake deployer disclosure is not established by the marking signature oracle; recommend questionnaire/L1."
+    },
+    {
+      "id": "technology-deep-16",
+      "issue": "Actual retention/deletion question is not a consent test. Propose only document_review of the written retention duty, with deletion effects explicitly unobserved."
+    },
+    {
+      "id": "TECH-PP-15-v2",
+      "issue": "SBOM production is different from the synthetic AIBOM prerequisite; keep questionnaire/L1."
+    },
+    {
+      "id": "TECH-PP-20",
+      "issue": "Component due diligence is broader than an inventory prerequisite; keep questionnaire/L1."
+    },
+    {
+      "id": "TECH-CI-18",
+      "issue": "Actual human override/stop duty is Layer 0 oversight, not the spec’s older adversarial-testing label."
+    }
+  ]
+}

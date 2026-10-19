@@ -1,0 +1,23 @@
+{
+  "name": "full-suite-final",
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "headAfter": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+  "exit": 1,
+  "durationMs": 3029397,
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log",
+  "rawLogSha256": "7aa2e52dd9a85581449e69f9cc5921e9e303ad9e9191cc9c034bfb0e192f7ed5",
+  "rawLogBytes": 188239,
+  "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+  "jsonReportSha256": "fd9c1133c1fc691c5700322431f22936675eda19e661f983432873eecfeaca23",
+  "statusAfterTests": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+  "generatedOutputsUnchangedByTests": true,
+  "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-b88f0fb934605ba528ad517eef797a5b891ee843",
+  "exception": null,
+  "reportedTests": {
+    "numTotalTests": 25435,
+    "numPassedTests": 25418,
+    "numFailedTests": 10,
+    "numPendingTests": 7
+  }
+}
