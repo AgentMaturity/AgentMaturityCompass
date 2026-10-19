@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /** Local synthetic protocols only. No schema supplies legal applicability, physical authority or production evidence. */
-export const identifier = z.string().min(1).max(512).refine(value => value === value.trim() && !/\p{Cc}/u.test(value));
+const identifier = z.string().min(1).max(512).refine(value => value === value.trim() && !/\p{Cc}/u.test(value));
 export const utcTime = z.iso.datetime().regex(/T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/);
-export const bindingSchema = z.object({ tenantId: identifier, workspaceId: identifier, deploymentId: identifier,
+const bindingSchema = z.object({ tenantId: identifier, workspaceId: identifier, deploymentId: identifier,
   agentId: identifier, controlId: z.string().regex(/^L1-ENV-0[1-6]$/), controlVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   planDigest: z.string().regex(/^sha256:[a-f0-9]{64}$/) }).strict();
 export type Binding = z.infer<typeof bindingSchema>;
