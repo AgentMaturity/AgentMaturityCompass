@@ -395,7 +395,10 @@ export class LLMJudge {
     let reasoning: string;
     let model = template.defaultModel;
 
-    if (this.config.mode === 'llm' && this.config.apiEndpoint && this.config.apiKey) {
+    if (this.config.mode === 'llm') {
+      if (!this.config.apiEndpoint || !this.config.apiKey) {
+        throw new Error('llm mode unavailable: both an API endpoint and key must be configured');
+      }
       if (!this.config.judgeAdapter) {
         throw new Error('llm mode requested but no judge adapter is configured');
       }
@@ -461,7 +464,7 @@ export class LLMJudge {
       reasoning: sim.reasoning,
       judgePrompt,
       model: template.defaultModel,
-      mode: this.config.mode,
+      mode: 'simulated',
       timestamp: Date.now(),
     };
   }

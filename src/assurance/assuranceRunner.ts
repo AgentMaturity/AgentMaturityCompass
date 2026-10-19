@@ -544,14 +544,14 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
           if (result.status === "fulfilled") {
             packResults.push(result.value);
           } else {
-            // Pack execution failed — record as zero-score result
+            // No scenario was measured; do not invent a failed scenario.
             const failedPackId = batch[batchResults.indexOf(result)] ?? "unknown";
             packResults.push({
               packId: failedPackId,
               title: failedPackId,
               scenarioCount: 0,
               passCount: 0,
-              failCount: 1,
+              failCount: 0,
               score0to100: 0,
               trustTier,
               scenarioResults: []
@@ -577,7 +577,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     // A run where nothing reached the agent carries no measurement, and its
     // scores must not be read as a result.
     const evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE" =
-      totalScenarios > 0 && inconclusiveCount >= totalScenarios ? "INSUFFICIENT_EVIDENCE" : "MEASURED";
+      totalScenarios === 0 || inconclusiveCount >= totalScenarios ? "INSUFFICIENT_EVIDENCE" : "MEASURED";
     const baseReport: AssuranceReport = {
       assuranceRunId: runId,
       agentId,

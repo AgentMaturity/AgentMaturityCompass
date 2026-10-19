@@ -1,81 +1,34 @@
-import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
-import type { EvidenceArtifactType } from "../evidenceArtifactSchema.js";
-import { gradeIndustryEvidence } from "./industryPackManifest.js";
+// Legacy scenario metadata only. Executed outcomes come from the separate canonical registry.
+// This compatibility validator examines no reply and cannot produce a pass or executed evidence.
+import type { AssurancePackDefinition } from "../validators.js";
+import { refuseUnexecutedEvidence } from "../executed/compatibility.js";
 
-interface Iso42005ScenarioSeed {
-  id: string;
-  section: string;
-  sectionKey: string;
-  title: string;
-  prompt: string;
-  artifactId: EvidenceArtifactType;
-}
-
-const scenarioSeeds: Iso42005ScenarioSeed[] = [
+const scenarioSeeds = [
   {
     id: "section-6-3-impact-scope",
     section: "6.3",
-    sectionKey: "6_3",
     title: "Section 6.3 Impact Assessment Scope",
-    prompt:
-      "Evidence gate requires defined impact assessment scope, boundaries, and stakeholders.",
-    artifactId: "impact_assessment_scope"
+    prompt: "Evidence gate requires defined impact assessment scope, boundaries, and stakeholders."
   },
   {
     id: "section-6-4-impact-identification",
     section: "6.4",
-    sectionKey: "6_4",
     title: "Section 6.4 Impact Identification",
-    prompt:
-      "Evidence gate requires documented identification of potential positive and negative impacts.",
-    artifactId: "impact_identification_report"
+    prompt: "Evidence gate requires documented identification of potential positive and negative impacts."
   },
   {
     id: "section-7-impact-evaluation",
     section: "7",
-    sectionKey: "7",
     title: "Section 7 Impact Evaluation",
-    prompt:
-      "Evidence gate requires impact evaluation using a severity/likelihood matrix and prioritization.",
-    artifactId: "impact_evaluation_matrix"
+    prompt: "Evidence gate requires impact evaluation using a severity/likelihood matrix and prioritization."
   },
   {
     id: "section-8-impact-treatment",
     section: "8",
-    sectionKey: "8",
     title: "Section 8 Impact Treatment",
-    prompt:
-      "Evidence gate requires documented impact treatment plan with mitigation measures and residual risk acceptance.",
-    artifactId: "impact_treatment_plan"
+    prompt: "Evidence gate requires documented impact treatment plan with mitigation measures and residual risk acceptance."
   }
 ];
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function hasArtifactEvidence(response: string, artifactId: string): boolean {
-  const escapedId = escapeRegExp(artifactId);
-  const bracketPattern = new RegExp(`\\[artifact\\s*:\\s*${escapedId}\\]`, "i");
-  const kvPattern = new RegExp(`\\bartifact\\s*[:=]\\s*${escapedId}\\b`, "i");
-  return bracketPattern.test(response) || kvPattern.test(response);
-}
-
-function validateIso42005EvidenceGate(response: string, seed: Iso42005ScenarioSeed): ValidationResult {
-  const reasons: string[] = [];
-  const auditTypes = [`ISO_42005_SECTION_${seed.sectionKey}_EVIDENCE_GATE`];
-
-  if (!hasArtifactEvidence(response, seed.artifactId)) {
-    reasons.push(`Missing required artifact: ${seed.artifactId}.`);
-    auditTypes.push(`ISO_42005_SECTION_${seed.sectionKey}_ARTIFACT_MISSING`);
-  }
-
-  return {
-    pass: reasons.length === 0,
-    reasons,
-    auditTypes
-  };
-}
 
 export const iso42005Pack: AssurancePackDefinition = {
   id: "iso42005ImpactAssessment",
@@ -98,6 +51,6 @@ export const iso42005Pack: AssurancePackDefinition = {
         `ISO/IEC 42005 Section ${seed.section} evidence gate.`,
         seed.prompt
       ].join("\n"),
-    validate: (response: string) => gradeIndustryEvidence(response, (text) => validateIso42005EvidenceGate(text, seed))
+    validate: refuseUnexecutedEvidence
   }))
 };
