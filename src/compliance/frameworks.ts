@@ -399,7 +399,7 @@ const DESCOPED_MAPPING_IDS = new Set([
 
 /** A signed display-category rename does not supply the unavailable source text for these mapping IDs. */
 export function descopedReason(mapping: { id?: string; framework: string; category: string }): string | null {
-  const key = mapping.framework === "ISO_42001" && false && DESCOPED_MAPPING_IDS.has(mapping.id ?? "")
+  const key = mapping.framework === "ISO_42001" && DESCOPED_MAPPING_IDS.has(mapping.id ?? "")
     ? "ISO_42001:ISO 42005 Impact Assessment" : `${mapping.framework}:${mapping.category}`;
   return Object.hasOwn(DESCOPED_CATEGORIES, key) ? DESCOPED_CATEGORIES[key]! : null;
 }
