@@ -4,7 +4,7 @@
 
 - Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). A result for another framework never sets a result here.
 - Agent: default
-- Window: 2026-09-18T08:36:34.544Z -> 2026-10-18T08:36:34.544Z
+- Window: 2026-09-19T19:53:29.940Z -> 2026-10-19T19:53:29.940Z
 - Config trusted: YES
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage: not evaluated (0 of 13 categories passed or failed) (S:0 P:0 M:0 N:13 U:0)
@@ -231,7 +231,7 @@ What would make this SATISFIED?
 
 **Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
-Personal data breaches detected, documented, and notified to supervisory authority and data subjects within required timelines.
+Signals from control-bound audit or tool-action events and the listed exfiltration audit-absence check. They do not verify that a breach was detected, that a notification was delivered to an authority or data subject, or its timing or required content.
 
 Deterministic reasons:
 - no control-bound evidence for gdpr_art33_34_breach_notification in window

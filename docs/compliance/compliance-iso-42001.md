@@ -3,9 +3,9 @@
 **Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 - Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). A result for another framework never sets a result here.
-- Flag: ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "unverified: source unreachable". Its three categories are listed, never evaluated or counted. The ISO 42006 category is an AMC signal, not a clause mapping.
+- Flag: ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "unverified: source unreachable". Its three mapping IDs stay NOT_EVALUATED even after a display-category rename; the original category also stays descoped. The ISO 42006 category is an AMC signal, not a clause mapping.
 - Agent: default
-- Window: 2026-09-18T08:36:39.355Z -> 2026-10-18T08:36:39.355Z
+- Window: 2026-09-19T19:53:32.472Z -> 2026-10-19T19:53:32.472Z
 - Config trusted: YES
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage: not evaluated (0 of 8 categories passed or failed) (S:0 P:0 M:0 N:8 U:0)
@@ -190,7 +190,7 @@ What would make this SATISFIED?
 
 **Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
-Certification-ready, machine-readable audit evidence packages are generated and verifiable.
+Signals from control-bound artifact, audit or test events and the listed audit-absence checks; no certification-readiness, ISO/IEC 42006 conformity or evidence-package-content determination is made.
 
 Deterministic reasons:
 - no control-bound evidence for iso42006_conformity_evidence_package in window

@@ -4,7 +4,7 @@
 
 - Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). A result for another framework never sets a result here.
 - Agent: default
-- Window: 2026-09-18T08:36:50.197Z -> 2026-10-18T08:36:50.197Z
+- Window: 2026-09-19T19:53:39.949Z -> 2026-10-19T19:53:39.949Z
 - Config trusted: YES
 - Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
 - Coverage: not evaluated (0 of 5 categories passed or failed) (S:0 P:0 M:0 N:5 U:0)
