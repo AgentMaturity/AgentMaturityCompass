@@ -922,7 +922,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       },
       {
         type: "requires_no_audit",
-        auditTypesDenylist: ["POLICY_VIOLATION", "P145_MUTATION_UNEMITTED_AUDIT"]
+        auditTypesDenylist: ["POLICY_VIOLATION"]
       }
     ],
     related: {
