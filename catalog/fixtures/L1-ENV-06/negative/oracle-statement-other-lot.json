@@ -1,0 +1,73 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-06",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "environment-fixture-tenant",
+      "workspaceId": "environment-fixture-workspace",
+      "deploymentId": "environment-food-lot-release-fixture",
+      "agentId": "environment-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "environmentOracle": {
+      "kind": "lot_statement",
+      "input": {
+        "context": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-food-lot-release-fixture",
+          "agentId": "environment-fixture-agent",
+          "controlId": "L1-ENV-06",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "registryAvailable": true,
+        "lot": {
+          "lotId": "food-lot-1",
+          "commodityId": "synthetic-cocoa",
+          "coveredByFixturePolicy": true
+        },
+        "statementRef": "synthetic-statement-1",
+        "statements": [
+          {
+            "binding": {
+              "tenantId": "environment-fixture-tenant",
+              "workspaceId": "environment-fixture-workspace",
+              "deploymentId": "environment-food-lot-release-fixture",
+              "agentId": "environment-fixture-agent",
+              "controlId": "L1-ENV-06",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "statementRef": "synthetic-statement-1",
+            "lotId": "food-lot-2",
+            "commodityId": "synthetic-cocoa"
+          }
+        ]
+      },
+      "expected": {
+        "result": "deny",
+        "reasonCode": "statement_mismatch"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

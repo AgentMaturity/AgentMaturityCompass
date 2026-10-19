@@ -1,0 +1,153 @@
+# Experimental and unreviewed P3-16 content. JSON syntax is valid YAML.
+# Local synthetic observations never supply a production evidence verdict.
+{
+  "id": "L1-ENV-05",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "stale-sensor-is-unknown",
+  "stations": [
+    "environment"
+  ],
+  "title": "Refuse the local release gate when required sensor data is unknown",
+  "statement": "Before a local sensor-gate release decision, require every configured sensor and unit, fresh and gap-free timestamps and readings within the explicit fixture limits; stale or unknown data refuses release.",
+  "riskRationale": "Choosing a convenient fresh value can conceal stale intervals, missing readings or known breaches. Test ranges cannot validate a real HACCP plan.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "environment"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "environment.food-textiles-manufacturing"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "food_facility"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "food_lot_release"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+      "Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them."
+    ],
+    "exclusions": []
+  },
+  "citations": [],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "tool_pipeline"
+    ],
+    "mechanism": "Draft tool-pipeline boundary only; the test-local protocol is not installed as a production enforcement hook. Actual available evidence is self-reported and cannot pass this control.",
+    "parameters": [],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L1-ENV-05-T1",
+      "type": "runtime_enforced",
+      "oracle": {
+        "kind": "system_of_record",
+        "observes": "The synthetic timestamped feed and sensor-gate decision log; all window, gap, age and range parameters are operator fixture values."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-ENV-05/positive/evidence-valid.json",
+          "L1-ENV-05/positive/oracle-fresh-in-range.json"
+        ],
+        "negative": [
+          "L1-ENV-05/negative/evidence-stale.json",
+          "L1-ENV-05/negative/evidence-replayed.json",
+          "L1-ENV-05/negative/evidence-contradictory.json",
+          "L1-ENV-05/negative/evidence-cross-tenant.json",
+          "L1-ENV-05/negative/evidence-empty.json",
+          "L1-ENV-05/negative/evidence-violation.json",
+          "L1-ENV-05/negative/oracle-reading-out-of-range.json",
+          "L1-ENV-05/negative/oracle-stale-reading.json",
+          "L1-ENV-05/negative/oracle-reading-gap.json",
+          "L1-ENV-05/negative/oracle-feed-unavailable.json"
+        ]
+      },
+      "passCriteria": "Only complete fresh in-range data may allow the synthetic sensor gate. Fresh out-of-range data denies; stale, gap, contradictory, future or unavailable readings remain not evaluated and refuse release. No final food-safety decision or production producer is supplied.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-ENV-05-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "head_of_qa"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

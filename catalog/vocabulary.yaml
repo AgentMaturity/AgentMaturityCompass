@@ -2,10 +2,18 @@
 # Seeded by P1-09 for L0-IDN-01, extended by P1-14 for the Layer 0 baseline and by P1-18 for the US register and the
 # Wealth overlay; add terms with the content that needs them.
 stations: [education, environment, health, wealth, technology, mobility, governance]
-jurisdictions: [US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU]
+jurisdictions: [
+  US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU,
+  # P3-16 Environment: candidate India drill scope; legal capacity and commencement unresolved.
+  IN
+]
 # EU AI Act roles.
 roles: [provider, deployer]
-entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, bank, eu_financial_entity]
+entityTypes: [
+  hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, bank, eu_financial_entity,
+  # P3-16 Environment: asserted fixture entity categories, not verified asset classifications.
+  bulk_electric_system_operator, water_system_operator, power_generator, food_facility
+]
 riskClasses: []
 useCases:
   - consequential_decision_about_people
@@ -15,8 +23,21 @@ useCases:
   - publishes_synthetic_content
   - credit_decision
   - employment_decision
-dataClasses: []
-domains: []
+  # P3-16 Environment: declared synthetic operator-policy use cases.
+  - plant_setpoint_change
+  - model_outage_drill
+  - power_incident_reporting
+  - food_recall
+  - food_lot_release
+  - lot_due_diligence
+dataClasses:
+  # P3-16 Environment: declared fixture data categories.
+  - ot_telemetry
+  - food_traceability_records
+domains:
+  # P3-16 Environment: exact native P1-13 domain IDs.
+  - environment.energy-utilities-water
+  - environment.food-textiles-manufacturing
 ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
 # atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).
