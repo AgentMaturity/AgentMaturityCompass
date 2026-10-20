@@ -94,6 +94,25 @@
       },
       "passCriteria": "All current recall wrapper cases are not evaluated. Synthetic closure on ingredient, product and shipment nodes does not replace the missing P2-27 fixture/API. FDA 24-hour records production is a distinct unmet requirement, not a recall-completion deadline.",
       "attempts": 1
+    },
+    {
+      "id": "L1-ENV-04-T-P227-RECALL",
+      "type": "drill",
+      "oracle": {
+        "kind": "system_of_record",
+        "observes": "Actual synthetic recall records and independently traversed held ingredient/product/shipment genealogy."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-ENV-04/positive/p227-complete-genealogy-recall.json"
+        ],
+        "negative": [
+          "L1-ENV-04/negative/p227-missed-shipment-recall.json",
+          "L1-ENV-04/negative/p227-incomplete-genealogy.json"
+        ]
+      },
+      "passCriteria": "The source-owned recall graph closure includes each affected lot; a completed recall that misses a shipment fails. Incomplete genealogy remains unknown. No notification delivery or statutory recall completion is attested. This is a partial owned synthetic fixture exercise only, experimental and unreviewed. Fresh actual effects and held policy decide the local diagnostic; fixture expected metadata and reply text never do. A captured known unsafe effect fails even if a later state is unknown. Missing policy, input, boundary or invocation remains not_evaluated. Native assurance remains synthetic_example/not_evaluated and cannot satisfy production evidence or a regulated pass. Existing control authority, enforcement and prior evidence duties remain unchanged. Per-case synthetic drill only; no adversarial attack-rate claim is made.",
+      "attempts": 1
     }
   ],
   "evidence": [

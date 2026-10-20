@@ -32,9 +32,10 @@ Total: 41 packs, 723 questions.
 
 ## Shared caveats
 
-- Pack questions and these guides are AI-drafted and experimental: no qualified expert has reviewed them, and nothing in them is evaluated until an operator answers a pack.
+- Pack questions and these guides are AI-drafted and experimental: no qualified expert has reviewed them. Questionnaire answers remain self-reported; separate seeded assurance adapters do not promote the questionnaire content or its review status.
 - Deployment controls and evidence outputs do not vary by station in source; each guide repeats them so it stands alone.
-- `amc domain assurance` invokes no agent and reports every pack not evaluated [C5]; use `amc assurance run --agent <id> --pack <packId>` to grade the agent [C6].
+- `amc domain assurance` invokes no agent and reports every pack not evaluated [C5]; `amc assurance run --agent <id> --pack <packId>` uses the generic responder loop [C6] or the regulated effect path [C7].
+- Across all regulated packs, the source registry retains 119 legacy scenario IDs: 8 have seeded local adapters [C8]; the other 111 have no executable adapter [C9]. Unsupported rows are not evaluated without resolving the responder [C10]. Available adapters assess captured effects rather than grade reply prose [C11]. Native regulated rows remain unscored and not evaluated [C12]. Local diagnostics are synthetic and ineligible for regulated claims [C13]; production attack success rate is not measured [C14].
 
 ## Verification appendix
 
@@ -51,4 +52,12 @@ Total: 41 packs, 723 questions.
 | C3 | Calendar register | `src/compliance/globalRegulatory.ts` | `export const GLOBAL_FRAMEWORKS` |
 | C4 | Sourced regulatory register | `src/compliance/regulatory/index.ts` | `export const REGULATORY_REGISTER` |
 | C5 | Without an agent each pack is not evaluated | `src/domains/domainCliIntegration.ts` | `status: "not_evaluated", reason: NO_AGENT_INVOKED` |
-| C6 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts` | `await responder.respond(prompt)` |
+| C6 | Generic scenario prompts go to the responder | `src/assurance/assurancePackExecution.ts` | `await responder.respond(prompt)` |
+| C7 | Regulated packs use the executed effect path | `src/assurance/assurancePackExecution.ts` | `return executeRegulatedPack(input, pack)` |
+| C8 | Canonical regulated scenario inventory and adapter availability | `src/assurance/executed/registry.ts` | `export const REGULATED_SCENARIO_DISPOSITIONS` |
+| C9 | Unavailable adapters refuse scenario compilation | `src/assurance/executed/routes.ts` | `!disposition.fixtureAvailable` |
+| C10 | Unsupported rows bypass compiled execution and responder resolution | `src/assurance/executed/packExecution.ts` | `unavailableExecutedRow({ scenarioId: scenario.id, reason: selected.reason })` |
+| C11 | Seeded execution assesses the actual scoped capture | `src/assurance/executed/harness.ts` | `const observed = assessScopedCapture(compiled, capture, policy, binding, true)` |
+| C12 | Native base rows remain unscored and inconclusive | `src/assurance/executed/compiledExecution.ts` | `export function unavailableExecutedRow` … `inconclusive: true, inconclusiveCause: "ungradable_evidence"` |
+| C13 | Synthetic diagnostics cannot become regulated eligible | `src/assurance/executed/harness.ts` | `claimKind: "synthetic_example", regulatedEligible: false` |
+| C14 | Production attack success rate remains unavailable | `src/assurance/executed/harness.ts` | `attackSuccessRate: null` |

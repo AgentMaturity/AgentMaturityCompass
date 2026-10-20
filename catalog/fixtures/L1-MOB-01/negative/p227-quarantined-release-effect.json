@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "MOB-F3W-5",
+      "environmentId": "cold-chain-excursion-v1",
+      "caseId": "p227-quarantined-release-effect"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "unauthorized_effect"
+  }
+}

@@ -58,7 +58,11 @@ export interface JudgeInput {
   alternativeOutput?: string;
 }
 
+import { evaluateRegulatedJudgment, type RegulatedJudgeEvaluation } from "../assurance/judges/regulatedJudgeEvaluation.js";
+
 export interface JudgeResult {
+  /** Legacy score/adapter output never constitutes calibrated regulated evidence. */
+  regulatedEligible?: false;
   judgeId: string;
   templateId: string;
   templateName: string;
@@ -80,6 +84,7 @@ export interface JudgeResult {
 }
 
 export interface PairwiseResult {
+  regulatedEligible?: false;
   judgeId: string;
   templateId: string;
   /** Which output won: 'a', 'b', or 'tie' */
@@ -377,6 +382,13 @@ export class LLMJudge {
     return [...this.templates.values()];
   }
 
+  /** Regulated evidence uses the private native call/calibration capabilities; no legacy adapter score. */
+  async evaluateRegulated(input: RegulatedJudgeEvaluation) {
+    if (this.config.mode !== "llm") return { state: "not_evaluated" as const,
+      claimKind: "synthetic_example" as const, reasons: ["SIMULATED_JUDGE_NOT_ADMISSIBLE"] };
+    return evaluateRegulatedJudgment(input);
+  }
+
   /** Evaluate using a specific template */
   async evaluate(templateId: string, input: JudgeInput): Promise<JudgeResult> {
     const template = this.templates.get(templateId);
@@ -395,7 +407,10 @@ export class LLMJudge {
     let reasoning: string;
     let model = template.defaultModel;
 
-    if (this.config.mode === 'llm' && this.config.apiEndpoint && this.config.apiKey) {
+    if (this.config.mode === 'llm') {
+      if (!this.config.apiEndpoint || !this.config.apiKey) {
+        throw new Error('llm mode unavailable: both an API endpoint and key must be configured');
+      }
       if (!this.config.judgeAdapter) {
         throw new Error('llm mode requested but no judge adapter is configured');
       }
@@ -424,6 +439,7 @@ export class LLMJudge {
     const rubricLevel = template.rubric.criteria.find(c => c.score === rawScore)?.label ?? 'Unknown';
 
     const result: JudgeResult = {
+      regulatedEligible: false,
       judgeId: randomUUID(),
       templateId: template.id,
       templateName: template.name,
@@ -453,6 +469,7 @@ export class LLMJudge {
     const sim = simulatePairwise(input);
 
     return {
+      regulatedEligible: false,
       judgeId: randomUUID(),
       templateId: 'pairwise',
       winner: sim.winner,
@@ -461,7 +478,7 @@ export class LLMJudge {
       reasoning: sim.reasoning,
       judgePrompt,
       model: template.defaultModel,
-      mode: this.config.mode,
+      mode: 'simulated',
       timestamp: Date.now(),
     };
   }
@@ -526,6 +543,7 @@ export class LLMJudge {
       alternativeOutput: inputB.output,
     });
     return {
+      regulatedEligible: false,
       judgeId: randomUUID(),
       templateId: 'pairwise',
       winner: (sim.winner === "tie" ? "tie" : sim.winner.toUpperCase()) as PairwiseResult["winner"],

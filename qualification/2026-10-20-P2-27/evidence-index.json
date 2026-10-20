@@ -1,0 +1,75 @@
+{
+  "scope": "Native raw logs/reports remain outside Git under this item evidence directory. Scoped runs overlap and are not summed.",
+  "artifacts": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-required23-v1/summary.json",
+      "sha256": "e1ace46efccfb08ffd2adeaf3a886455a3cb6a3cc0c191b482c77faac6c22120",
+      "bytes": 108913
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-focused149-v1/summary.json",
+      "sha256": "a3b506df79341e8fbaeab296b4fdb66f2e59053bda4bd16f9e55b113d7b7fb1c",
+      "bytes": 165446
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-extra-doc-checks-v1/summary.json",
+      "sha256": "a1a8cb500dcaf23436559f67fb0f4245db1bc9e7bcbd0416cd38080a8fe65302",
+      "bytes": 99477
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/catalog-and-cli-ne-presentation-corrections-green-v1/summary.json",
+      "sha256": "3bd2ccf9bdbfe1058ed14b20e4087d044c8a6111726f8d152b9e2e133cea7043",
+      "bytes": 111919
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/post-cli-mutations-restoration-green-v1/summary.json",
+      "sha256": "08a83815523a12acfbed07932c80e1cdc691d0e279832cceffd9ec46dff1ef6c",
+      "bytes": 99590
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/native-built-public-doc-assets-v2.json",
+      "sha256": "177dfebab42dee88d8ec64ee156a432dedef3fcb2448688ab9e137ebc9f1fbbd",
+      "bytes": 1567
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cold-installed-cli-option-contracts-v1/summary.json",
+      "sha256": "0d90d69f9d61a71c15217980fa2726c24d71dfb9b7141bc37a901e7b29ac1fe0",
+      "bytes": 3811
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/operator-calibration-private-draft-red-v1/summary.json",
+      "sha256": "afc39b5d9de5bb563dee7188b5034a53a1d1accc4612019f9b86b3ea0ed5ed13",
+      "bytes": 105806
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-options-red-calibration-draft-first-green-v1/summary.json",
+      "sha256": "3a0e144745cd151ed83b9414fcc3fc6d1a008950e0ca409c3316d417ecffdc88",
+      "bytes": 107077
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-options-and-native-private-draft-green-v1/summary.json",
+      "sha256": "a72bf531b92030251dc1b9320891dee14946afc0b86aaf0a26333ada177a7637",
+      "bytes": 107613
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-ne-presentation-red-v1/summary.json",
+      "sha256": "d08a3d5423b15cc57bcd67842216e2f698c5e95a2d5313d825fa94d7ed970561",
+      "bytes": 108603
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-integration-adversarial-static-review-v18.json",
+      "sha256": "f9f2eeb4a9abf56fb9db0e1a78a1b0a1e4c48c00109b01659395d3ed92f17238",
+      "bytes": 23993
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-receipt-design-v3/manifest-final.json",
+      "sha256": "bad199ed7a6ea2e0d20489fc3be8ee63176d0c0cce969cd9f2aa267384a98b8f",
+      "bytes": 36356
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-full-suite-root-reviewed-v1.py",
+      "sha256": "35fa2d9f5a16a3a155a8eb1bc492e25563a44d55045fac4c5a6b292c03eaa5d6",
+      "bytes": 12956
+    }
+  ]
+}

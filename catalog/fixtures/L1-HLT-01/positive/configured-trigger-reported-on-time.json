@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-HLT-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "HLT-CT-1",
+      "environmentId": "clinical-trials-v1",
+      "caseId": "configured-trigger-reported-on-time"
+    },
+    "note": "Unexecuted case declaration. A runner must obtain fresh captured state and sealed receipts; expected below is not an observation or a production result."
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

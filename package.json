@@ -76,6 +76,8 @@
     "check:counts": "node scripts/gen-counts.mjs --check",
     "gen-industry-guides": "tsx scripts/gen-industry-guides.mts",
     "check:industry-guides": "tsx scripts/gen-industry-guides.mts --check",
+    "gen:judge-calibration": "tsx scripts/gen-judge-calibration.mts",
+    "check:judge-calibration": "tsx scripts/gen-judge-calibration.mts --check",
     "check:regulatory-calendar": "node scripts/gen-regulatory-calendar.mjs --check",
     "mutation:batch": "node scripts/mutation-batch.mjs",
     "check:freeze": "node scripts/check-freeze.mjs",

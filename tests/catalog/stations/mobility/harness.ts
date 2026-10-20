@@ -7,6 +7,7 @@ import { evaluateControl } from "../../../../src/catalog/evidence/evaluate.js";
 import type { EvaluationContext, EvidenceItem } from "../../../../src/catalog/evidence/types.js";
 import { loadCatalog, type LoadedCatalog } from "../../../../src/catalog/loader.js";
 import type { ControlRecord, FixtureEnvelope } from "../../../../src/catalog/types.js";
+import { partitionFixtureDeclarations } from "../../executedDeclarations.js";
 import { ed25519KeyId, signTrustList, type TrustList } from "../../../../src/trust/trustList.js";
 import { canonicalize } from "../../../../src/utils/json.js";
 import { sha256Hex } from "../../../../src/utils/hash.js";
@@ -84,10 +85,11 @@ export function mobilityHarness() {
     return { profile, plan: compilePlan({ profile, catalog, asOf: "2026-10-19T00:00:00.000Z" }) };
   });
   const controls = MOBILITY_IDS.map(id => { const control = catalog.controls.get(id); if (!control) throw new Error("Mobility control " + id + " is absent"); return control; });
-  const fixtures = controls.flatMap((control): MobilityFixture[] => [...new Set(control.tests.flatMap(test => [...test.fixtures.positive, ...test.fixtures.negative]))].map(ref => {
+  const referencedFixtures = controls.flatMap((control): MobilityFixture[] => [...new Set(control.tests.flatMap(test => [...test.fixtures.positive, ...test.fixtures.negative]))].map(ref => {
     const envelope = catalog.fixtures.get(ref)?.envelope; if (!envelope) throw new Error("Mobility fixture " + ref + " did not load"); return { ref, control, envelope };
   }));
-  return { catalog, plans, controls, fixtures };
+  const { fixtures, declarations } = partitionFixtureDeclarations(catalog, referencedFixtures);
+  return { catalog, plans, controls, fixtures, declarations };
 }
 function context(catalog: LoadedCatalog, compiled: MobilityPlan, control: ControlRecord, setup: EvidenceSetup): EvaluationContext {
   const requirement = compiled.plan.requirements.find(row => row.controlId === control.id);

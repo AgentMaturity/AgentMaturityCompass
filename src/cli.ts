@@ -207,6 +207,8 @@ import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeAppl
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
+import { assuranceSarifEntries, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
+import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
@@ -11007,7 +11009,7 @@ assurance
     console.log(`sig=${out.sigPath}`);
   });
 
-assurance
+withExecutedAssuranceOptions(assurance
   .command("run")
   .description("Run assurance pack(s) with deterministic validation")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -11023,24 +11025,10 @@ assurance
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
   .option("--model <modelId>", "model id of the agent under test (or set AMC_ASSURANCE_MODEL)")
-  .option("--no-sign", "skip vault/artifact signing (packs still run)")
+  .option("--no-sign", "skip vault/artifact signing (packs still run)"))
   .action(
-    async (opts: {
-      agent?: string;
-      scope?: "workspace" | "node" | "agent";
-      id?: string;
-      pack?: string;
-      format: string;
-      verbose: boolean;
-      all: boolean;
-      demo: boolean;
-      mode: "supervise" | "sandbox";
-      window: string;
-      windowDays?: string;
-      out?: string;
-      model?: string;
-      sign: boolean; // Commander inverts --no-sign to sign=false
-    }) => {
+    async (opts: AssuranceRunCliOptions) => {
+      const executedSelection = selectExecutedAssuranceOptions(opts);
       // Non-TTY detection: assurance run needs agent ID. If missing and non-interactive, exit cleanly.
       if (!process.stdin.isTTY && !opts.demo && !opts.all && !opts.pack && !opts.id && !opts.agent && !activeAgent(program)) {
         console.error(chalk.red("This command requires an interactive terminal or explicit --agent/--id flags in non-interactive mode."));
@@ -11091,10 +11079,11 @@ assurance
       let report: Awaited<ReturnType<typeof runAssurance>>;
       try {
         report = await runAssurance({
+          ...executedSelection,
           workspace: process.cwd(),
           agentId: opts.id ?? opts.agent ?? activeAgent(program),
           packId: opts.pack,
-          packIds: demoPackIds,
+          packIds: demoPackIds ?? executedSelection.packIds,
           runAll: opts.all,
           mode: opts.mode,
           window: opts.window,
@@ -11119,20 +11108,7 @@ assurance
       const claim = assuranceClaim(report, true);
       // SARIF output
       if (opts.format === "sarif") {
-        const sarifRules = (report.packResults ?? []).map((p, i) => ({
-          id: p.packId,
-          name: p.title,
-          shortDescription: { text: `AMC Assurance Pack: ${p.title}` },
-          properties: { score: p.score0to100, pass: p.passCount, fail: p.failCount }
-        }));
-        const sarifResults = (report.packResults ?? []).flatMap(p =>
-          p.scenarioResults.map(s => ({
-            ruleId: p.packId,
-            level: s.pass ? ("note" as const) : ("error" as const),
-            message: { text: `${s.title}: ${s.pass ? "PASS" : "FAIL"} — ${s.reasons.join("; ")}` },
-            properties: { scenarioId: s.scenarioId, score: s.score0to100, category: s.category }
-          }))
-        );
+        const { rules: sarifRules, results: sarifResults } = assuranceSarifEntries(report.packResults ?? []);
         const sarif = {
           $schema: "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
           version: "2.1.0",
@@ -11154,24 +11130,21 @@ assurance
       }
       console.log(`TrustTier: ${report.trustTier}`);
       console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
-      console.log(`Overall score: ${report.overallScore0to100.toFixed(2)}`);
+      console.log(`Overall score: ${renderAssuranceOverallScore(report)}`);
 
       // Per-pack breakdown
       if (report.packResults && report.packResults.length > 0) {
         console.log("");
         console.log(chalk.bold("  Pack Results:"));
         for (const pack of report.packResults) {
-          const passIcon = pack.failCount === 0 ? chalk.green("✓") : chalk.red("✗");
-          const scoreColor = pack.score0to100 >= 70 ? chalk.green : pack.score0to100 >= 40 ? chalk.yellow : chalk.red;
-          console.log(`  ${passIcon} ${chalk.hex('#4AEF79')(pack.packId.padEnd(30))} ${scoreColor(pack.score0to100.toFixed(0).padStart(3))}%  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail  (${pack.scenarioCount} scenarios)`);
+          console.log(renderAssurancePackLine(pack));
         }
         console.log("");
-        const totalPass = report.packResults.reduce((s, p) => s + p.passCount, 0);
-        const totalFail = report.packResults.reduce((s, p) => s + p.failCount, 0);
-        console.log(chalk.gray(`  Total: ${totalPass + totalFail} scenarios — ${chalk.green(String(totalPass))} passed, ${chalk.red(String(totalFail))} failed`));
+        console.log(renderAssuranceTotalLine(report.packResults));
         const rerunCommand = [
           "amc assurance run",
           demoPackIds ? "--demo" : opts.all ? "--all" : opts.pack ? `--pack ${opts.pack}` : "",
+          ...executedRerunFlags(opts),
           noSign ? "--no-sign" : "",
           "--verbose"
         ].filter(Boolean).join(" ");
@@ -11187,8 +11160,7 @@ assurance
           for (const pack of report.packResults) {
             console.log(`\n  ${chalk.bold.cyan(pack.packId)} (${pack.title ?? pack.packId})`);
             for (const s of (pack as any).scenarioResults ?? []) {
-              const icon = s.pass ? chalk.green("✓") : chalk.red("✗");
-              console.log(`    ${icon} ${s.title ?? s.scenarioId}`);
+              console.log(renderAssuranceScenarioHeading(s));
               if (s.payload) console.log(chalk.gray(`      Payload: ${typeof s.payload === "string" ? s.payload.substring(0, 120) : JSON.stringify(s.payload).substring(0, 120)}`));
               if (s.reasons?.length) {
                 for (const r of s.reasons) console.log(chalk.gray(`      → ${r}`));
