@@ -80,7 +80,7 @@ export {
   removeDelegationEdge,
   listDelegationEdges,
   detectCycles,
-  computeTrustComposition,
+  computeTrustComposition, generateTrustCompositionReportAsync,
   saveTrustCompositionReport,
   renderTrustCompositionMarkdown,
   verifyCrossAgentReceipts

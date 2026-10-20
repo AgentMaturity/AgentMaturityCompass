@@ -162,9 +162,7 @@ import {
   addDelegationEdge,
   removeDelegationEdge,
   listDelegationEdges,
-  computeTrustComposition,
-  saveTrustCompositionReport,
-  renderTrustCompositionMarkdown,
+  generateTrustCompositionReportAsync,
   verifyCrossAgentReceipts,
   type DelegationEdge
 } from "./fleet/trustComposition.js";
@@ -14975,12 +14973,9 @@ fleet
       reports.push(report);
     }
 
-    const trustReport = computeTrustComposition(workspace, reports, { noSign });
-    const reportPath = saveTrustCompositionReport(workspace, trustReport);
-    const markdown = renderTrustCompositionMarkdown(trustReport);
+    const { report: trustReport, reportPath } = await generateTrustCompositionReportAsync(workspace, reports, { noSign, markdownFile: opts.output || undefined });
 
     if (opts.output) {
-      writeFileAtomic(resolve(workspace, opts.output), markdown, 0o644);
       console.log(chalk.green(`Trust composition report (markdown): ${opts.output}`));
     }
 

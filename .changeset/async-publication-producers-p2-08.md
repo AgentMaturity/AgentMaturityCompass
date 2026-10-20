@@ -17,3 +17,5 @@ Verify report seals against artifact-purpose history, preserving explicit authen
 Publish outcome reports through checked asynchronous artifact signing in the CLI and Studio. Preserve report bytes and scoring, recheck current authority and exact inputs/destinations, and expose truthful partial publication if a later file or log write fails.
 
 Refuse explicit no-sign mode before asynchronous outcome report signing and final publication.
+
+Route maintained fleet trust-report CLI and the added SDK producer through checked asynchronous raw-digest signing, preserving the report wire, explicit unsigned mode and synchronous compatibility. Refuse changed configuration, output preimages and original signing authority before publication.
