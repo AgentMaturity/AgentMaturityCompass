@@ -1,36 +1,34 @@
-import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
-import { appendFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { z } from "zod";
 import { getPublicKeyHistory } from "../crypto/keys.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { entryInclusionProof, entryLeafHash, entryTreeRoot, MERKLE_ALGORITHMS, verifyEntryInclusion, type MerkleAlgorithm } from "./merkle.js";
-import { appendLeafToFrontier, buildFrontierFromEntryHashes, frontierRoot, type MerkleFrontier } from "./merkleFrontier.js";
+import { entryInclusionProof, entryLeafHash, entryTreeRoot, verifyEntryInclusion, type MerkleAlgorithm } from "./merkle.js";
+import { merkleRootRowSchema, merkleMigrationSchema, rootSignatureSchema, type MerkleMigrationRecord } from "./merkleRows.js";
+export type { MerkleMigrationRecord } from "./merkleRows.js";
+import { prepareMerkle, preparedRootSignature, publishPreparedMerkle, type TransparencyMerkleUpdate } from "./preparedMerkle.js";
+export type { TransparencyMerkleUpdate } from "./preparedMerkle.js";
+import { captureTransparencyState, publishTransparencyState, stateBytes, withTransparencyPublicationLock, workspaceLogPath } from "./workspacePublication.js";
 import {
   clearMerklePendingMarker,
-  frontierResumeBlocker,
-  leavesFileBytes,
-  readMerkleFrontierState,
   readMerklePendingMarker,
   TransparencyMerkleLagError,
-  writeMerkleFrontierState,
   writeMerklePendingMarker
 } from "./merkleIndexState.js";
 import {
   merkleCurrentRootPath,
   merkleCurrentRootSigPath,
-  merkleLeavesPath,
   merkleMigrationPath,
   merkleMigrationSigPath,
-  merkleRootsPath,
-  transparencyMerkleDir
+  merkleRootsPath
 } from "./merklePaths.js";
 import { transparencyEntrySchema, transparencySealSchema } from "./logSchema.js";
 import { merkleProofPayloadSchema, merkleProofSignatureSchema, type MerkleProofPayload } from "./proofSchema.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { verifyWorkspaceLogSignature, type WorkspaceLogKind } from "./workspaceSignature.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type PublicAnchoring, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { latestAnchorFiles, verifyBundledAnchor } from "./anchors/anchor.js";
@@ -55,41 +53,6 @@ export const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
 };
 
 
-const merkleLeafRowSchema = z.object({
-  v: z.literal(1),
-  index: z.number().int().min(0),
-  entryHash: z.string().length(64),
-  leafHash: z.string().length(64)
-});
-
-const merkleRootRowSchema = z.object({
-  v: z.literal(1),
-  ts: z.number().int(),
-  leafCount: z.number().int().min(0),
-  root: z.string().length(64),
-  lastEntryHash: z.string().default(""),
-  /** P1-26: absent means amc-legacy-v1. */
-  algorithm: z.enum(MERKLE_ALGORITHMS).optional()
-});
-
-/** P1-26: signed once, when `rebuild --algorithm rfc9162-sha256` migrates a legacy log. */
-const merkleMigrationSchema = z.strictObject({
-  v: z.literal(1),
-  ts: z.number().int(),
-  legacyRoot: z.string().length(64),
-  rfc9162Root: z.string().length(64),
-  leafCount: z.number().int().min(0),
-  lastEntryHash: z.string()
-});
-export type MerkleMigrationRecord = z.infer<typeof merkleMigrationSchema>;
-
-const rootSignatureSchema = z.object({
-  digestSha256: z.string().length(64),
-  signature: z.string().min(1),
-  signedTs: z.number().int(),
-  signer: z.literal("auditor"),
-  envelope: signatureEnvelopeSchema.optional()
-});
 
 function transparencyDir(workspace: string): string {
   return join(workspace, ".amc", "transparency");
@@ -111,31 +74,13 @@ function readTransparencyEntryHashes(workspace: string): string[] {
   return lines.map((line) => transparencyEntrySchema.parse(JSON.parse(line) as unknown).hash);
 }
 
-/** Writes `row` as JSON and its MERKLE_ROOT signature (over the file's sha256) next to it. */
-function writeSignedRow(workspace: string, rootPath: string, sigPath: string, row: object): void {
-  writeFileAtomic(rootPath, JSON.stringify(row, null, 2), 0o644);
-  const digest = sha256Hex(readFileSync(rootPath));
-  const signed = signDigestWithPolicy({
-    workspace,
-    kind: "MERKLE_ROOT",
-    digestHex: digest
-  });
-  const signature = {
-    digestSha256: digest,
-    signature: signed.signature,
-    signedTs: signed.signedTs,
-    signer: "auditor" as const,
-    envelope: signed.envelope
-  };
-  writeFileAtomic(sigPath, JSON.stringify(signature, null, 2), 0o644);
-}
 
 /**
  * Reads a signed row and checks its signature over the bytes it parsed (one read, so no swap in between). `row` is
  * null when a file is missing or the row does not parse; `errors` lists every failed check. The keys are the
- * workspace's own auditor keys, so this is a local audit trail only; portable verdicts use P0-09 pinned trust.
+ * workspace's exact artifact purpose or authenticated historical notary admission; portable verdicts use P0-09 pinned trust.
  */
-function readSignedRow<T>(workspace: string, path: string, sigPath: string, schema: z.ZodType<T>, label: string): { row: T | null; errors: string[] } {
+function readSignedRow<T>(workspace: string, path: string, sigPath: string, schema: z.ZodType<T>, label: string, kind: WorkspaceLogKind): { row: T | null; errors: string[] } {
   if (!pathExists(path) || !pathExists(sigPath)) {
     return { row: null, errors: [`${label} or signature missing`] };
   }
@@ -154,13 +99,8 @@ function readSignedRow<T>(workspace: string, path: string, sigPath: string, sche
     if (sig.digestSha256 !== digest) {
       errors.push(`${label} signature digest mismatch`);
     } else {
-      const verified = verifySignedDigest({
-        workspace,
-        digestHex: digest,
-        signed: {
-          signature: sig.signature,
-          envelope: sig.envelope
-        }
+      const verified = verifyWorkspaceLogSignature(workspace, kind, digest, {
+        signature: sig.signature, envelope: sig.envelope
       });
       if (!verified) {
         errors.push(`${label} signature invalid`);
@@ -172,8 +112,9 @@ function readSignedRow<T>(workspace: string, path: string, sigPath: string, sche
   return { row, errors };
 }
 
-function readSignedCurrentRoot(workspace: string): { row: z.infer<typeof merkleRootRowSchema> | null; errors: string[] } {
-  return readSignedRow(workspace, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "merkle root");
+/** Internal shared writer/verifier read; not exported by the root SDK. */
+export function readSignedCurrentRoot(workspace: string): { row: z.infer<typeof merkleRootRowSchema> | null; errors: string[] } {
+  return readSignedRow(workspace, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "merkle root", "MERKLE_ROOT");
 }
 
 /** The hash of the log's last entry ("" when empty), or null when the last line does not parse. */
@@ -196,7 +137,7 @@ function logTailHash(workspace: string): string | null {
  */
 function sealedTreeAlgorithm(workspace: string): MerkleAlgorithm | null {
   const { row, errors } = readSignedRow(workspace, join(transparencyDir(workspace), "log.seal.json"),
-    join(transparencyDir(workspace), "log.seal.sig"), transparencySealSchema, "transparency seal");
+    join(transparencyDir(workspace), "log.seal.sig"), transparencySealSchema, "transparency seal", "TRANSPARENCY_ROOT");
   return row !== null && errors.length === 0 && row.lastHash === logTailHash(workspace) ? row.merkleAlgorithm ?? "amc-legacy-v1" : null;
 }
 
@@ -226,49 +167,7 @@ function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
 
-function merkleLeafLine(entryHash: string, index: number, algorithm: MerkleAlgorithm): string {
-  return JSON.stringify(
-    merkleLeafRowSchema.parse({
-      v: 1,
-      index,
-      entryHash,
-      leafHash: entryLeafHash(algorithm, entryHash)
-    })
-  );
-}
 
-/**
- * Appends one row to a JSONL index.
- *
- * `appendFileSync` rather than read-whole-then-write-whole: both leaves.jsonl
- * and roots.jsonl gain exactly one row per transparency append, and rewriting
- * them in full was ~150 KB of pointless I/O per append at only 400 entries.
- * The transparency log itself has always been written this way.
- */
-function appendIndexRow(path: string, line: string): void {
-  ensureDir(dirname(path));
-  appendFileSync(path, `${line}\n`, "utf8");
-}
-
-function publishRoot(params: {
-  workspace: string;
-  leafCount: number;
-  root: string;
-  lastEntryHash: string;
-  algorithm: MerkleAlgorithm;
-}): z.infer<typeof merkleRootRowSchema> {
-  const row = merkleRootRowSchema.parse({
-    v: 1,
-    ts: Date.now(),
-    leafCount: params.leafCount,
-    root: params.root,
-    lastEntryHash: params.lastEntryHash,
-    algorithm: params.algorithm
-  });
-  appendIndexRow(merkleRootsPath(params.workspace), JSON.stringify(row));
-  writeSignedRow(params.workspace, merkleCurrentRootPath(params.workspace), merkleCurrentRootSigPath(params.workspace), row);
-  return row;
-}
 
 /**
  * Recomputes the whole tree from log.jsonl.
@@ -289,27 +188,17 @@ export function rebuildTransparencyMerkle(workspace: string): {
   currentRootPath: string;
   currentRootSigPath: string;
 } {
+  const before = captureTransparencyState(workspace);
   const algorithm = currentTreeAlgorithm(workspace);
-  ensureDir(transparencyMerkleDir(workspace));
-  const entryHashes = readTransparencyEntryHashes(workspace);
-  const root = entryTreeRoot(algorithm, entryHashes);
-  const lastEntryHash = entryHashes[entryHashes.length - 1] ?? "";
-  const leavesText = entryHashes.map((entryHash, index) => merkleLeafLine(entryHash, index, algorithm)).join("\n");
-  writeFileAtomic(merkleLeavesPath(workspace), leavesText.length > 0 ? `${leavesText}\n` : "", 0o644);
-
-  writeMerkleFrontierState({
-    workspace,
-    frontier: buildFrontierFromEntryHashes(entryHashes, algorithm),
-    leafCount: entryHashes.length,
-    lastEntryHash,
-    root
+  const plan = prepareMerkle({ workspace, algorithm, log: stateBytes(before, workspaceLogPath(workspace)), rebuild: true });
+  const signed = signDigestWithPolicy({ workspace, kind: "MERKLE_ROOT", digestHex: plan.digest });
+  const signature = preparedRootSignature(plan, signed);
+  publishTransparencyState(workspace, before, () => {
+    publishPreparedMerkle(workspace, plan, signature); clearMerklePendingMarker(workspace);
   });
-  publishRoot({ workspace, leafCount: entryHashes.length, root, lastEntryHash, algorithm });
-  // The root now provably covers the whole log, so any recorded lag is repaired.
-  clearMerklePendingMarker(workspace);
   return {
-    leafCount: entryHashes.length,
-    root,
+    leafCount: plan.update.leafCount,
+    root: plan.update.root,
     algorithm,
     currentRootPath: merkleCurrentRootPath(workspace),
     currentRootSigPath: merkleCurrentRootSigPath(workspace)
@@ -322,6 +211,7 @@ export function rebuildTransparencyMerkle(workspace: string): {
  * as rfc9162-sha256 and rebuilds the index (transparencyMerkleRebuildCli does both).
  */
 export function writeMerkleMigrationRecord(workspace: string): { path: string; sha256: string; record: MerkleMigrationRecord } {
+  const before = captureTransparencyState(workspace);
   if (currentTreeAlgorithm(workspace) !== "amc-legacy-v1") {
     throw new Error("this log already grows the rfc9162-sha256 tree");
   }
@@ -335,8 +225,14 @@ export function writeMerkleMigrationRecord(workspace: string): { path: string; s
     leafCount: entryHashes.length, lastEntryHash: entryHashes[entryHashes.length - 1] ?? ""
   });
   const path = merkleMigrationPath(workspace);
-  writeSignedRow(workspace, path, merkleMigrationSigPath(workspace), record);
-  return { path, sha256: sha256Hex(readFileSync(path)), record };
+  const bytes = Buffer.from(JSON.stringify(record, null, 2)), digest = sha256Hex(bytes);
+  const signed = signDigestWithPolicy({ workspace, kind: "MERKLE_ROOT", digestHex: digest });
+  const signature = JSON.stringify(rootSignatureSchema.parse({ digestSha256: digest, signature: signed.signature,
+    signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope }), null, 2);
+  publishTransparencyState(workspace, before, () => {
+    writeFileAtomic(path, bytes, 0o644); writeFileAtomic(merkleMigrationSigPath(workspace), signature, 0o644);
+  });
+  return { path, sha256: digest, record };
 }
 
 export interface TransparencyMerkleVerification {
@@ -357,7 +253,7 @@ function verifyMerkleMigration(workspace: string, entryHashes: readonly string[]
   if (!pathExists(merkleMigrationPath(workspace))) {
     return null;
   }
-  const signed = readSignedRow(workspace, merkleMigrationPath(workspace), merkleMigrationSigPath(workspace), merkleMigrationSchema, "merkle migration record");
+  const signed = readSignedRow(workspace, merkleMigrationPath(workspace), merkleMigrationSigPath(workspace), merkleMigrationSchema, "merkle migration record", "MERKLE_ROOT");
   errors.push(...signed.errors);
   const record = signed.row;
   if (record === null) {
@@ -664,79 +560,11 @@ export function ensureTransparencyMerkleInitialized(workspace: string): void {
 }
 
 /**
- * What the update actually did. `mode: "rebuild"` with a non-null `reason` is
- * the audit trail for a resume that could not be trusted — the root is still
- * correct, but something about the cached frontier did not add up, and a silent
- * fallback is how an O(n) regression (or a tampered cache) hides forever.
- */
-export interface TransparencyMerkleUpdate {
-  readonly mode: "incremental" | "rebuild";
-  readonly reason: string | null;
-  readonly leafCount: number;
-  readonly root: string;
-}
-
-function applyIncrementalAppend(params: {
-  workspace: string;
-  entryHash: string;
-  prevEntryHash: string;
-  algorithm: MerkleAlgorithm;
-}): TransparencyMerkleUpdate | null {
-  const state = readMerkleFrontierState(params.workspace);
-  if (!state) {
-    return null;
-  }
-  const { algorithm } = params;
-  const blocker = frontierResumeBlocker({
-    state,
-    expectedPrevEntryHash: params.prevEntryHash,
-    leavesBytes: leavesFileBytes(params.workspace),
-    algorithm
-  });
-  if (blocker !== null) {
-    return { mode: "rebuild", reason: blocker, leafCount: 0, root: "" };
-  }
-  const frontier: MerkleFrontier = appendLeafToFrontier(state.frontier, params.entryHash, algorithm);
-  const leafCount = state.leafCount + 1;
-  const root = frontierRoot(frontier, algorithm);
-  appendIndexRow(merkleLeavesPath(params.workspace), merkleLeafLine(params.entryHash, state.leafCount, algorithm));
-  // Publish before advancing the resume state, so the frontier only ever
-  // describes a root that is actually signed on disk. If signing fails here the
-  // frontier stays behind, its recorded leaves.jsonl size no longer matches, and
-  // the next append rebuilds rather than resuming from a state whose root was
-  // never published.
-  publishRoot({ workspace: params.workspace, leafCount, root, lastEntryHash: params.entryHash, algorithm });
-  writeMerkleFrontierState({
-    workspace: params.workspace,
-    frontier,
-    leafCount,
-    lastEntryHash: params.entryHash,
-    root
-  });
-  return { mode: "incremental", reason: null, leafCount, root };
-}
-
-/**
- * Advances the signed Merkle root to cover a transparency entry that has just
- * been written to log.jsonl.
- *
- * Two properties this owes its caller.
- *
- * INCREMENTAL: the common case touches O(log n) hashes and appends one row to
- * each index file. It used to re-parse the entire log twice and rewrite both
- * index files in full on every append, which made append cost grow linearly
- * with log length (measured on this machine over 400 appends: 2.59 -> 4.47
- * ms/append then, a flat ~1.95 ms/append now).
- *
- * FAIL-LOUD: if the root cannot be advanced, this throws
- * `TransparencyMerkleLagError` after recording a pending marker on disk. The
- * previous behaviour — catch, console.error, report success — let the signed
- * root freeze while the log kept growing, and inclusion proofs are generated
- * from the log rather than from the signed root, so the exporter would keep
- * issuing proofs against a root nobody ever signed. Throwing does not widen the
- * append's failure surface as much as it looks: the seal write earlier in
- * `appendTransparencyEntry` already signs, so a broken trust config or an
- * unreachable notary throws before this point.
+ * Advances an already-written entry with the existing incremental frontier or repair rebuild.
+ * Signing is prepared before the common lock. Since this API's line already exists, preparation
+ * or publication failure records pending state and throws TransparencyMerkleLagError.
+ * Healthy resume computes O(log n) hashes and appends one leaf/history row; no performance result
+ * or cross-file crash atomicity is implied by the new publication lock.
  */
 export function updateTransparencyMerkleAfterAppend(
   workspace: string,
@@ -744,27 +572,25 @@ export function updateTransparencyMerkleAfterAppend(
   appended: { entryHash: string; prevEntryHash: string; algorithm?: MerkleAlgorithm }
 ): TransparencyMerkleUpdate {
   try {
-    const incremental = applyIncrementalAppend({
-      workspace,
-      entryHash: appended.entryHash,
-      prevEntryHash: appended.prevEntryHash,
-      algorithm: appended.algorithm ?? currentTreeAlgorithm(workspace)
+    const before = captureTransparencyState(workspace);
+    const plan = prepareMerkle({ workspace, algorithm: appended.algorithm ?? currentTreeAlgorithm(workspace),
+      log: stateBytes(before, workspaceLogPath(workspace)), append: { ...appended, alreadyLogged: true }, resumeRoot: readSignedCurrentRoot(workspace) });
+    const signed = signDigestWithPolicy({ workspace, kind: "MERKLE_ROOT", digestHex: plan.digest });
+    const signature = preparedRootSignature(plan, signed);
+    return publishTransparencyState(workspace, before, () => {
+      try { publishPreparedMerkle(workspace, plan, signature); clearMerklePendingMarker(workspace); return plan.update; }
+      catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        const pendingRecorded = writeMerklePendingMarker({ workspace, entryHash: appended.entryHash, reason });
+        throw new TransparencyMerkleLagError({ entryHash: appended.entryHash, pendingRecorded, reason, cause: error });
+      }
     });
-    const result = incremental ?? { mode: "rebuild" as const, reason: "no usable merkle frontier state", leafCount: 0, root: "" };
-    if (result.mode === "incremental") {
-      clearMerklePendingMarker(workspace);
-      return result;
-    }
-    const rebuilt = rebuildTransparencyMerkle(workspace);
-    clearMerklePendingMarker(workspace);
-    return { mode: "rebuild", reason: result.reason, leafCount: rebuilt.leafCount, root: rebuilt.root };
   } catch (error) {
+    if (error instanceof TransparencyMerkleLagError) throw error;
     const reason = error instanceof Error ? error.message : String(error);
-    const pendingRecorded = writeMerklePendingMarker({
-      workspace,
-      entryHash: appended.entryHash,
-      reason
-    });
+    const pendingRecorded = withTransparencyPublicationLock(workspace, () => writeMerklePendingMarker({
+      workspace, entryHash: appended.entryHash, reason
+    }));
     throw new TransparencyMerkleLagError({
       entryHash: appended.entryHash,
       pendingRecorded,

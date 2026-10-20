@@ -19,3 +19,7 @@ Publish outcome reports through checked asynchronous artifact signing in the CLI
 Refuse explicit no-sign mode before asynchronous outcome report signing and final publication.
 
 Route maintained fleet trust-report CLI and the added SDK producer through checked asynchronous raw-digest signing, preserving the report wire, explicit unsigned mode and synchronous compatibility. Refuse changed configuration, output preimages and original signing authority before publication.
+
+Prepare workspace transparency signatures before the common short publication lock, verify exact predecessor and original authorities before append, authenticate the legacy frontier resume root, and await the BOM log handoff with truthful partial-publication errors.
+
+Restrict local transparency seal, Merkle-root and migration admission to the correct purpose or authenticated notary history, and authenticate the same seal bytes that were parsed.

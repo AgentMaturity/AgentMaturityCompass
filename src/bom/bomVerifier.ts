@@ -6,7 +6,7 @@ import { getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { maturityBomSchema, type MaturityBom } from "./bomSchema.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy, signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { boundProviderKey } from "../keys/keyset.js";
@@ -79,7 +79,7 @@ export function signBomFile(params: {
 class BomTransparencyPublicationError extends Error {
   readonly code = "BOM_TRANSPARENCY_PUBLICATION_INCOMPLETE";
   constructor(readonly sigFile: string, cause: unknown) {
-    super("BOM signature is published; synchronous transparency publication is incomplete", { cause });
+    super("BOM signature is published; transparency publication is incomplete", { cause });
     this.name = "BomTransparencyPublicationError";
   }
 }
@@ -111,7 +111,7 @@ export async function signBomFileAsync(params: Parameters<typeof signBomFile>[0]
   const signature = bomSignatureSchema.parse({ v: 1, bomSha256: prepared.digest, signature: signed.signature,
     signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope });
   const sidecarBytes = JSON.stringify(signature, null, 2);
-  const published = locked(() => {
+  const assertCurrent = (expectedSidecar: Buffer | null): void => {
     beforePublish?.(); assertOwnerMode(workspace, "bom sign");
     assertPolicySignerCurrent(workspace, descriptor);
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("BOM signing policy changed while signing was prepared");
@@ -123,17 +123,21 @@ export async function signBomFileAsync(params: Parameters<typeof signBomFile>[0]
     }
     if (!readFileSync(inputFile).equals(prepared.bytes)) throw new Error("BOM input changed while signing was prepared");
     const currentSidecar = optionalBytes(sigFile);
-    if (prepared.sidecar === null ? currentSidecar !== null : currentSidecar === null || !currentSidecar.equals(prepared.sidecar)) {
+    if (expectedSidecar === null ? currentSidecar !== null : currentSidecar === null || !currentSidecar.equals(expectedSidecar)) {
       throw new Error("BOM signature destination changed while signing was prepared");
     }
     if (bomFilesAlias(inputFile, sigFile)) throw new Error("BOM signature destination must differ from its input");
+  };
+  const published = locked(() => {
+    assertCurrent(prepared.sidecar);
     writeFileAtomic(sigFile, sidecarBytes, 0o644);
     return { sigFile, signature };
   });
-  // The existing log remains synchronous and runs outside the signature lock; failures do not roll back its sidecar.
+  // The sidecar is already published. The log awaits outside its lock and cannot roll it back on refusal/I/O failure.
   try {
-    appendTransparencyEntry({ workspace, type: "BOM_SIGNED", agentId: prepared.bom.agentId,
-      artifact: { kind: "bom", sha256: signature.bomSha256, id: prepared.bom.runId } });
+    await appendTransparencyEntryAsync({ workspace, type: "BOM_SIGNED", agentId: prepared.bom.agentId,
+      artifact: { kind: "bom", sha256: signature.bomSha256, id: prepared.bom.runId } },
+    { beforeCommit: () => locked(() => assertCurrent(Buffer.from(sidecarBytes))) });
   } catch (error) { throw new BomTransparencyPublicationError(sigFile, error); }
   return published;
 }

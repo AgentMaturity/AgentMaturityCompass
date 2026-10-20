@@ -6,9 +6,14 @@ import { getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { currentTreeAlgorithm, updateTransparencyMerkleAfterAppend } from "./merkleIndexStore.js";
+import { currentTreeAlgorithm, readSignedCurrentRoot } from "./merkleIndexStore.js";
+import { prepareMerkle, preparedRootSignature, publishPreparedMerkle } from "./preparedMerkle.js";
+import { clearMerklePendingMarker, TransparencyMerkleLagError, writeMerklePendingMarker } from "./merkleIndexState.js";
+import { captureTransparencyState, publishTransparencyState, stateBytes, workspaceLogPath } from "./workspacePublication.js";
+export { appendTransparencyEntryAsync } from "./asyncWorkspaceAppend.js";
 import type { MerkleAlgorithm } from "./merkle.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { verifyWorkspaceLogSignature } from "./workspaceSignature.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
@@ -69,12 +74,8 @@ function appendLine(path: string, line: string): void {
  * across a crash), so the chosen `prev` is byte-identical to the whole-file read
  * it replaces. Mirrors `lastBlobIndexHash` in the blob store.
  */
-function lastTransparencyEntryHash(workspace: string): string {
-  const path = transparencyLogPath(workspace);
-  if (!pathExists(path)) {
-    return "";
-  }
-  const text = readUtf8(path);
+function lastTransparencyEntryHash(bytes: Buffer | null): string {
+  const text = bytes?.toString("utf8") ?? "";
   let end = text.length;
   while (end > 0 && (text[end - 1] === "\n" || text[end - 1] === "\r")) end -= 1;
   if (end === 0) return "";
@@ -96,8 +97,7 @@ function readEntries(workspace: string): TransparencyEntry[] {
 }
 
 /** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
-function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): void {
-  ensureDir(transparencyDir(workspace));
+function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): { bytes: Buffer; signature: Buffer } {
   const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
   const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
   const seal = transparencySealSchema.parse({
@@ -107,9 +107,7 @@ function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleA
     signerFingerprint,
     merkleAlgorithm
   });
-  const sealPath = transparencySealPath(workspace);
-  writeFileAtomic(sealPath, JSON.stringify(seal, null, 2), 0o644);
-  const digest = sha256Hex(readFileSync(sealPath));
+  const bytes = Buffer.from(JSON.stringify(seal, null, 2)), digest = sha256Hex(bytes);
   const signed = signDigestWithPolicy({
     workspace,
     kind: "TRANSPARENCY_ROOT",
@@ -122,7 +120,7 @@ function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleA
     signer: "auditor",
     envelope: signed.envelope
   });
-  writeFileAtomic(transparencySealSigPath(workspace), JSON.stringify(sig, null, 2), 0o644);
+  return { bytes, signature: Buffer.from(JSON.stringify(sig, null, 2)) };
 }
 
 export function initTransparencyLog(workspace: string): {
@@ -130,13 +128,16 @@ export function initTransparencyLog(workspace: string): {
   sealPath: string;
   sealSigPath: string;
 } {
-  ensureDir(transparencyDir(workspace));
-  if (!pathExists(transparencyLogPath(workspace))) {
-    writeFileAtomic(transparencyLogPath(workspace), "", 0o644);
-  }
-  if (!pathExists(transparencySealPath(workspace)) || !pathExists(transparencySealSigPath(workspace))) {
-    writeSeal(workspace, "", currentTreeAlgorithm(workspace));
-  }
+  const before = captureTransparencyState(workspace), log = stateBytes(before, workspaceLogPath(workspace));
+  const seal = !pathExists(transparencySealPath(workspace)) || !pathExists(transparencySealSigPath(workspace))
+    ? prepareSeal(workspace, "", currentTreeAlgorithm(workspace)) : null;
+  publishTransparencyState(workspace, before, () => {
+    if (log === null) writeFileAtomic(transparencyLogPath(workspace), "", 0o644);
+    if (seal !== null) {
+      writeFileAtomic(transparencySealPath(workspace), seal.bytes, 0o644);
+      writeFileAtomic(transparencySealSigPath(workspace), seal.signature, 0o644);
+    }
+  });
   return {
     logPath: transparencyLogPath(workspace),
     sealPath: transparencySealPath(workspace),
@@ -157,9 +158,11 @@ export function appendTransparencyEntry(params: {
   };
 }): TransparencyEntry {
   initTransparencyLog(params.workspace);
+  const before = captureTransparencyState(params.workspace);
   // Read before the line lands, while the seal still covers the log's last entry (P1-26).
   const merkleAlgorithm = currentTreeAlgorithm(params.workspace);
-  const prev = lastTransparencyEntryHash(params.workspace);
+  const log = stateBytes(before, workspaceLogPath(params.workspace));
+  const prev = lastTransparencyEntryHash(log);
   const payload = {
     v: 1 as const,
     ts: Date.now(),
@@ -177,20 +180,23 @@ export function appendTransparencyEntry(params: {
     ...payload,
     hash
   });
-  appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
-  writeSeal(params.workspace, entry.hash, merkleAlgorithm);
-  // Not wrapped in a try/catch. The Merkle root is part of what an append
-  // promises: inclusion proofs are generated from the log, so a root that stops
-  // advancing means the exporter keeps issuing proofs against a root nobody
-  // signed. This used to be caught and console.error'd, which reported an
-  // append as fully successful while the published root silently froze — the
-  // exact failure P2.4 exists to remove. On failure the store records a pending
-  // marker (so the lag survives this process) and throws
-  // TransparencyMerkleLagError, whose message states that the log line landed.
-  updateTransparencyMerkleAfterAppend(params.workspace, {
-    entryHash: entry.hash,
-    prevEntryHash: entry.prev,
-    algorithm: merkleAlgorithm
+  // Crypto preparation precedes the lock and the line. A crypto refusal is uncommitted; I/O after the line is not.
+  const seal = prepareSeal(params.workspace, entry.hash, merkleAlgorithm);
+  const plan = prepareMerkle({ workspace: params.workspace, algorithm: merkleAlgorithm, log,
+    append: { entryHash: entry.hash, prevEntryHash: entry.prev }, resumeRoot: readSignedCurrentRoot(params.workspace) });
+  const signedRoot = signDigestWithPolicy({ workspace: params.workspace, kind: "MERKLE_ROOT", digestHex: plan.digest });
+  const rootSignature = preparedRootSignature(plan, signedRoot);
+  publishTransparencyState(params.workspace, before, () => {
+    appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
+    try {
+      writeFileAtomic(transparencySealPath(params.workspace), seal.bytes, 0o644);
+      writeFileAtomic(transparencySealSigPath(params.workspace), seal.signature, 0o644);
+      publishPreparedMerkle(params.workspace, plan, rootSignature); clearMerklePendingMarker(params.workspace);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      const pendingRecorded = writeMerklePendingMarker({ workspace: params.workspace, entryHash: entry.hash, reason });
+      throw new TransparencyMerkleLagError({ entryHash: entry.hash, pendingRecorded, reason, cause: error });
+    }
   });
   return entry;
 }
@@ -239,22 +245,18 @@ export function verifyTransparencyLog(workspace: string): {
     errors.push("seal or seal signature missing");
   } else {
     try {
-      const seal = transparencySealSchema.parse(JSON.parse(readUtf8(sealPath)) as unknown);
+      const sealBytes = readFileSync(sealPath);
+      const seal = transparencySealSchema.parse(JSON.parse(sealBytes.toString("utf8")) as unknown);
       if (seal.lastHash !== prev) {
         errors.push(`seal lastHash mismatch: expected ${prev}, found ${seal.lastHash}`);
       }
       const sig = transparencySealSignatureSchema.parse(JSON.parse(readUtf8(sealSigPath)) as unknown);
-      const digest = sha256Hex(readFileSync(sealPath));
+      const digest = sha256Hex(sealBytes);
       if (digest !== sig.digestSha256) {
         errors.push("seal signature digest mismatch");
       } else {
-        const valid = verifySignedDigest({
-          workspace,
-          digestHex: digest,
-          signed: {
-            signature: sig.signature,
-            envelope: sig.envelope
-          }
+        const valid = verifyWorkspaceLogSignature(workspace, "TRANSPARENCY_ROOT", digest, {
+          signature: sig.signature, envelope: sig.envelope
         });
         if (!valid) {
           errors.push("seal signature verification failed");

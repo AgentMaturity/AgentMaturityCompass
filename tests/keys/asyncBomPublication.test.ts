@@ -22,6 +22,7 @@ import { loadTrustConfig, trustConfigPath, trustConfigSigPath, trustConfigSchema
 import { initWorkspace } from "../../src/workspace.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { transparencyLogPath, transparencySealPath } from "../../src/transparency/logChain.js";
+import { merkleCurrentRootPath } from "../../src/transparency/merklePaths.js";
 import { pinnedTrust, workspaceKeyTrust } from "../helpers/trustContext.js";
 import { postDirectApiRegistry } from "../helpers/postDirectApiRegistry.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
@@ -95,8 +96,12 @@ describe("BOM awaitable policy publication", () => {
       signedTs: now, signer: { type: "VAULT", attestationLevel: "SOFTWARE" } } };
     const sync = bom.signBomFile({ ...f.params, outputSigFile: "sync.sig" }); expect(readFileSync(sync.sigFile, "utf8")).toBe(JSON.stringify(expected, null, 2));
     const spy = vi.spyOn(f.provider, "sign"); await positive(f);
-    expect(readFileSync(f.sigFile, "utf8")).toBe(JSON.stringify(expected, null, 2)); expect(spy).toHaveBeenCalledTimes(1);
-    expect(Buffer.from(spy.mock.calls[0]![1])).toEqual(Buffer.from(digest, "hex")); expect(readFileSync(f.input)).toEqual(f.bytes);
+    expect(readFileSync(f.sigFile, "utf8")).toBe(JSON.stringify(expected, null, 2)); expect(spy).toHaveBeenCalledTimes(3);
+    expect(spy.mock.calls.map(([ref, bytes]) => ({ ref, hex: Buffer.from(bytes).toString("hex") }))).toEqual([
+      { ref: { provider: "file", id: "artifact-seal" }, hex: digest },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) }
+    ]); expect(readFileSync(f.input)).toEqual(f.bytes);
   });
 
   test.each(["same path", "hardlink"] as const)("refuses a BOM input/output %s before Sign and preserves the actual input", async alias => {
@@ -247,20 +252,19 @@ describe("BOM awaitable policy publication", () => {
     writeFileSync(f.input, f.bytes); await positive(f);
   });
 
-  test("reports a published sidecar truthfully when the actual synchronous transparency signer then fails", async () => {
-    const f = fixture(), actualWrite = files.writeFileAtomic; let transparencyLockPresent: boolean | undefined;
+  test("reports a published sidecar truthfully when async transparency preparation refuses before any log write", async () => {
+    const f = fixture(), actualWrite = files.writeFileAtomic, beforeLog = readFileSync(transparencyLogPath(f.workspace));
     const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((file, bytes, mode) => {
-      if (file === transparencySealPath(f.workspace)) transparencyLockPresent = existsSync(join(dirname(f.sigFile), ".bom-signature.lock"));
       actualWrite(file, bytes, mode);
       if (file === f.sigFile) { lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); }
     });
     try {
       await expect(bom.signBomFileAsync(f.params)).rejects.toMatchObject({ code: "BOM_TRANSPARENCY_PUBLICATION_INCOMPLETE", sigFile: f.sigFile, cause: expect.any(Error) });
-      expect(existsSync(f.sigFile)).toBe(true); expect(transparencyLockPresent).toBe(false);
+      expect(existsSync(f.sigFile)).toBe(true); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
       expect(existsSync(join(dirname(f.sigFile), ".bom-signature.lock"))).toBe(false);
       const signature = JSON.parse(readFileSync(f.sigFile, "utf8")) as bom.BomSignature;
       expect(verify(null, Buffer.from(sha256Hex(f.bytes), "hex"), f.pem, Buffer.from(signature.signature, "base64"))).toBe(true);
-      // The log may have partially changed. No unchanged-log or automatic recovery claim is made here.
+      // Sign-first refusal does not claim a committed log entry. Actual post-line I/O lag has separate real controls.
     } finally { spy.mockRestore(); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
   });
 
@@ -280,6 +284,44 @@ describe("BOM awaitable policy publication", () => {
     const f = fixture(), spy = vi.spyOn(f.provider, "sign");
     const result = await postDirectApiRegistry(f.workspace, "/api/v1/bom/sign", { inputFile: "bom.json", outputSigFile: "bom.sig", revalidateAuthority: true });
     expect(result.status).toBe(200); expect(spy).not.toHaveBeenCalled(); verified(f);
+  });
+
+  test.each(["input", "sidecar", "mode"] as const)("rechecks actual %s after both log signatures while retaining its already-published BOM sidecar", async changed => {
+    const f = fixture(), actual = f.provider.sign.bind(f.provider), entered = deferred(), release = deferred(); let calls = 0;
+    const spy = vi.spyOn(f.provider, "sign").mockImplementation(async (ref, bytes) => {
+      const signature = await actual(ref, bytes); if (++calls === 3) { entered.resolve(); await release.promise; } return signature;
+    });
+    const beforeLog = readFileSync(transparencyLogPath(f.workspace)), pending = bom.signBomFileAsync(f.params), outcome = pending.then(() => null, error => error);
+    const replacement = Buffer.from("owned replacement after sidecar publication");
+    try {
+      expect(await Promise.race([entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      const ownSidecar = readFileSync(f.sigFile); verified(f);
+      expect(existsSync(join(dirname(f.sigFile), ".bom-signature.lock"))).toBe(false);
+      expect(existsSync(join(f.workspace, ".amc/transparency/.workspace-transparency.lock"))).toBe(false);
+      if (changed === "input") writeFileSync(f.input, JSON.stringify({ ...f.value, agentName: "Owned edit during log Sign" }));
+      if (changed === "sidecar") writeFileSync(f.sigFile, replacement); if (changed === "mode") setMode(f.workspace, "agent");
+      release.resolve(); expect(await outcome).toMatchObject({ code: "BOM_TRANSPARENCY_PUBLICATION_INCOMPLETE", sigFile: f.sigFile, cause: expect.any(Error) });
+      expect(spy).toHaveBeenCalledTimes(3); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
+      expect(readFileSync(f.sigFile)).toEqual(changed === "sidecar" ? replacement : ownSidecar);
+    } finally { release.resolve(); await Promise.allSettled([pending]); writeFileSync(f.input, f.bytes); setMode(f.workspace, "owner"); }
+    spy.mockRestore(); await positive(f);
+  });
+
+  test("the trusted native route rechecks a real tracked credential after sidecar publication during the final log Sign", async () => {
+    const f = fixture(), session = createTrackedSession({ workspace: f.workspace, userId: "owned-log-owner", username: "owned", roles: ["OWNER"], authSource: "WORKSPACE_ROUTER" });
+    const current = () => verifyTrackedSessionToken({ workspace: f.workspace, token: session.token }).ok;
+    const actual = f.provider.sign.bind(f.provider), entered = deferred(), release = deferred(); let calls = 0;
+    const spy = vi.spyOn(f.provider, "sign").mockImplementation(async (ref, bytes) => {
+      const signature = await actual(ref, bytes); if (++calls === 3) { entered.resolve(); await release.promise; } return signature;
+    });
+    const beforeLog = readFileSync(transparencyLogPath(f.workspace)), pending = postOwnedRoute(f, current);
+    try {
+      expect(await Promise.race([entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      verified(f); revokeSessionByToken({ workspace: f.workspace, token: session.token }); expect(current()).toBe(false); release.resolve();
+      const result = await pending; expect(result.status).toBe(401); expect(result.body).toContain("authenticated authority changed");
+      expect(spy).toHaveBeenCalledTimes(3); verified(f); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
+    } finally { release.resolve(); await Promise.allSettled([pending]); }
+    spy.mockRestore(); const next = await postOwnedRoute(f, () => true); expect(next.status).toBe(200); verified(f);
   });
 });
 
@@ -304,5 +346,9 @@ test.skipIf(process.platform === "win32")("compiled BOM CLI uses the maintained 
   const result = await spawnOwnedNode([resolve(repo, "dist/cli.js"), "bom", "sign", "--in", "bom.json", "--out", "bom.sig"], { cwd: f.workspace, env }).wait(30_000);
   expect(result.error).toBeUndefined(); expect(result.signal).toBeNull(); expect(result.code, result.stderr).toBe(0); verified(f);
   const calls = readFileSync(requests, "utf8").trim().split("\n").filter(Boolean).map(line => JSON.parse(line));
-  expect(calls).toEqual([{ ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(f.bytes) }]);
+  expect(calls).toEqual([
+    { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(f.bytes) },
+    { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+    { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) }
+  ]);
 }, 60_000);

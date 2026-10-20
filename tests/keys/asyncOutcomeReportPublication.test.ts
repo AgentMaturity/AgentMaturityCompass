@@ -187,16 +187,18 @@ describe("actual awaitable outcome-report artifact publication", () => {
     await positive(f);
   });
 
-  test("retains both published files and native cause when synchronous transparency fails after releasing the report lock", async () => {
-    const f = fixture(), actualWrite = files.writeFileAtomic; let logLock: boolean | undefined;
+  test("retains both published files and native cause when sign-first transparency refuses before a log write", async () => {
+    const f = fixture(), actualWrite = files.writeFileAtomic, beforeLog = readFileSync(transparencyLogPath(f.workspace)); let sealWriterReached = false;
     const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
-      if (path === transparencySealPath(f.workspace)) logLock = existsSync(join(f.workspace, ".outcome-report.lock"));
+      if (path === transparencySealPath(f.workspace)) sealWriterReached = true;
       actualWrite(path, bytes, mode); if (path === f.mdPath) { lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); }
     });
     try {
       await expect(reports.runOutcomeReportAsync(f.params)).rejects.toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath, f.mdPath], cause: expect.any(Error) });
       verified(f); expect(readFileSync(f.mdPath, "utf8")).toBe(reports.renderOutcomeReportMarkdown(verified(f)));
-      expect(logLock).toBe(false); expect(existsSync(join(f.workspace, ".outcome-report.lock"))).toBe(false);
+      expect(sealWriterReached).toBe(false); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
+      expect(existsSync(join(f.workspace, ".outcome-report.lock"))).toBe(false);
+      expect(existsSync(join(f.workspace, ".amc/transparency/.workspace-transparency.lock"))).toBe(false);
     } finally { spy.mockRestore(); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
   });
 
