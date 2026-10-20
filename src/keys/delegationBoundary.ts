@@ -1,14 +1,38 @@
 import Database from "better-sqlite3";
 import { join } from "node:path";
+import { openLedger } from "../ledger/ledger.js";
+import { readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
+import { readSessionRecords } from "../persistence/jsonl/sessionRecords.js";
+import { verifySessionRecords } from "../persistence/sessionRecordVerification.js";
 import { readCheckpointChain, readLegacyCheckpointPrefixForKeyMigration } from "../time/checkpoint.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { assertKeysetComplete, boundProviderKey } from "./keyset.js";
-import type { OperationalGrant } from "./operationalDelegation.js";
+import { verifyOperationalRows, type OperationalGrant } from "./operationalDelegation.js";
 import type { DelegationScope } from "./delegationScope.js";
 import { withDelegationUseLock } from "./delegationUsage.js";
-import { readOperationalLedgerContext } from "./operationalLedgerReader.js";
+import { localLedgerRowKeys, readOperationalLedgerContext } from "./operationalLedgerReader.js";
+import { KeyProviderError } from "./provider.js";
+
+/** Read every actual lifecycle record, including sealed sessions without events; never infer records from row IDs. */
+function firstBindingSessionProblems(workspace: string): string[] {
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  const errors: string[] = [];
+  try {
+    ledger = openLedger(workspace, { readonly: true });
+    const keys = localLedgerRowKeys(workspace);
+    const sqlite = ledger.getAllSessions(), jsonl = [...readSessionRecords(workspace).values()];
+    for (const record of [...sqlite, ...jsonl]) {
+      const hash = record.session_final_event_hash !== null, signature = record.session_seal_sig !== null;
+      if (hash !== signature || (hash && record.ended_ts === null)) errors.push("first provider binding has a malformed session seal state");
+    }
+    verifySessionRecords(ledger.getAllEvents(), sqlite, keys, errors);
+    verifySessionRecords(readEventRows(workspace), jsonl, keys, errors);
+  } catch { errors.push("first provider binding session records are unreadable or unauthenticated"); }
+  finally { try { ledger?.close(); } catch { errors.push("first provider binding session records could not be closed"); } }
+  return errors;
+}
 
 /** Capture heads from the very prefix whose row preimages/signatures were verified, never a later unchecked reread. */
 export function captureDelegationScope(workspace: string, previous: OperationalGrant | null, capturedVaultDelegate?: string): DelegationScope {
@@ -18,6 +42,14 @@ export function captureDelegationScope(workspace: string, previous: OperationalG
     const outcomes = verified.rows["sqlite-outcome"];
     const jsonl = verified.rows["jsonl-evidence"];
     const bound = boundProviderKey(workspace, "ledger-row");
+    // A new provider binding deliberately has no role-import fallback. Check the same actual rows under that
+    // prospective rule before signing, and again inside final publication's existing shared lock/SQL transaction.
+    if (bound === null && verifyOperationalRows([], verified.rows, localLedgerRowKeys(workspace), workspaceSelfTrust(workspace)).errors.length) {
+      throw new KeyProviderError("KEY_DELEGATION_INVALID", "file", "first provider binding requires a prefix verified by exact ledger-row purpose history; imported role-only signers are unsupported");
+    }
+    if (bound === null && firstBindingSessionProblems(workspace).length) {
+      throw new KeyProviderError("KEY_DELEGATION_INVALID", "file", "first provider binding requires actual session records and seals verified by exact ledger-row purpose history");
+    }
     const migration = bound !== null && bound.binding.delegationSha256 === undefined;
     if (migration && capturedVaultDelegate === undefined) throw new Error("v1 provider migration needs the owner's captured vault ledger key");
     const checkpoint = (migration ? readLegacyCheckpointPrefixForKeyMigration(workspace, capturedVaultDelegate!)

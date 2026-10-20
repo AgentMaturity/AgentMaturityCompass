@@ -1,6 +1,6 @@
 import { openLedger, type EvidenceLedgerReader } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPublicKeyHistory, getPublicKeyPem } from "../crypto/keys.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
 import type { EvidenceEvent, OutcomeEvent } from "../types.js";
@@ -30,12 +30,20 @@ function outcome(row: OutcomeEvent, errors: string[]): DelegationRow {
   return { id: row.outcome_event_id, ts: row.ts, hash: row.event_hash, previousHash: row.prev_event_hash, signature: row.signature, metaJson: row.meta_json };
 }
 
-/** Provider issuers never become raw legacy row keys; pre-P1-08 workspaces retain their existing role history. */
-export function legacyLedgerRowKeys(workspace: string): string[] {
+/** Exact local purpose history; the pre-P1-08 branch retains its existing role-history behavior. Internal only. */
+export function localLedgerRowKeys(workspace: string): string[] {
   if (!keysetDeclared(workspace)) return getPublicKeyHistory(workspace, "monitor");
   const current = getSigningPublicKeyPem(workspace, "ledger-row");
   const history = readHistory(workspace, "ledger-row", current);
   return [...new Set([...(history?.entries.map(entry => entry.publicKeyPem) ?? []), current])];
+}
+
+/** Only unbound legacy rows/seals retain explicitly imported monitor history; provider issuers never become raw row keys. */
+export function legacyLedgerRowKeys(workspace: string): string[] {
+  const local = localLedgerRowKeys(workspace);
+  if (!keysetDeclared(workspace) || boundProviderKey(workspace, "ledger-row") !== null) return local;
+  const history = readHistory(workspace, "monitor", getPublicKeyPem(workspace, "monitor"));
+  return [...new Set([...local, ...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? [])])];
 }
 
 function outcomeRows(ledger: EvidenceLedgerReader): OutcomeEvent[] {

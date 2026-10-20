@@ -1,11 +1,11 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { verifyHexDigestAny } from "../../src/crypto/keys.js";
+import { addPublicKeyToHistory, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { signingKeyId, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
-import { AntiRollbackError } from "../../src/keys/highWater.js";
+import { AntiRollbackError, highWaterPath, workspaceScope } from "../../src/keys/highWater.js";
 import { keysetPaths } from "../../src/keys/keyset.js";
 import { KeyProviderError, signChecked, type KeyProvider } from "../../src/keys/provider.js";
 import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
@@ -76,7 +76,97 @@ function kms(fail?: string) {
 }
 const isCode = (code: string) => (error: unknown) => error instanceof KeyProviderError && error.code === code;
 
+function importedLedgerFixture(root: string) {
+  const imported = generateKeyPairSync("ed25519"), pem = imported.publicKey.export({ type: "spki", format: "pem" }).toString();
+  const privatePem = imported.privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+  // This normal owner API signs source='imported' inside the role envelope; it does not grant a modern purpose.
+  addPublicKeyToHistory(root, "monitor", pem, "imported");
+  expect(getPurposeKeyHistory(root, "ledger-row")).not.toContain(pem);
+  const providerPem = sealKey.publicKey.export({ type: "spki", format: "pem" }).toString();
+  const trust = withPins(workspaceKeyTrust(root), [pem, providerPem].map(publicKeyPem => ({ keyId: signingKeyId(publicKeyPem)!,
+    purposes: ["ledger-row"] as const, origin: "owned independent legacy/import and candidate-provider operator pins" })));
+  const ledger = openLedger(root), sessionId = "owned-imported-first-bind";
+  try {
+  ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "owned-imported-first-bind", binarySha256: "a".repeat(64) });
+  const id = ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "audit", payload: "owned import compatibility", inline: true });
+  ledger.sealSession(sessionId);
+  const row = ledger.getEventById(id)!, session = ledger.getAllSessions().find(value => value.session_id === sessionId)!;
+  const tail = ledger.db.prepare("SELECT event_hash FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1").get(sessionId) as { event_hash: string };
+  expect(session.session_final_event_hash).toBe(tail.event_hash);
+  const writer = signHexDigest(row.event_hash, privatePem), seal = signHexDigest(tail.event_hash, privatePem);
+  expect(verifyHexDigestAny(row.event_hash, writer, [pem])).toBe(true);
+  expect(verifyHexDigestAny(tail.event_hash, seal, [pem])).toBe(true);
+  ledger.db.exec("DROP TRIGGER protect_evidence_immutable"); // Only this owned imported-prefix fixture permits replacement.
+  ledger.db.exec("DROP TRIGGER protect_sessions_sealed_immutable");
+  const setWriter = ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?");
+  const setSeal = ledger.db.prepare("UPDATE sessions SET session_seal_sig = ? WHERE session_id = ?");
+  return { ledger, row, session, trust, useImported: () => { setWriter.run(writer, row.id); setSeal.run(seal, sessionId); },
+    useImportedRows: () => { setWriter.run(writer, row.id); },
+    restore: () => { setWriter.run(row.writer_sig, row.id); setSeal.run(session.session_seal_sig, sessionId); } };
+  } catch (error) { ledger.close(); throw error; }
+}
+function bindingPublicationState(root: string) {
+  const paths = [keysetPaths(root).keyset, keysetPaths(root).pending, join(root, ".amc/keys/ledger-row-provider.pub"),
+    join(root, ".amc/keys/delegations/ledger-row.json"), join(root, ".amc/keys/ledger-row_history.json"),
+    join(root, ".amc/keys/monitor_history.json"), join(root, ".amc/transparency/log.jsonl")];
+  const marks = existsSync(highWaterPath()) ? (JSON.parse(readFileSync(highWaterPath(), "utf8")) as { entries: Record<string, unknown> }).entries : {};
+  const inventory = (path: string): unknown => existsSync(path) ? readdirSync(path, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))
+    .map(entry => [entry.name, entry.isDirectory() ? inventory(join(path, entry.name)) : sha256Hex(readFileSync(join(path, entry.name)))]) : null;
+  return { bytes: paths.map(path => existsSync(path) ? sha256Hex(readFileSync(path)) : null),
+    ownedMarks: Object.fromEntries(Object.entries(marks).filter(([key]) => key.includes(workspaceScope(root))).sort(([a], [b]) => a.localeCompare(b))),
+    archives: inventory(join(root, ".amc/keys/delegations")), statements: inventory(join(root, ".amc/keys/statements")) };
+}
+
 describe("purpose keys held by key providers (P2-08)", () => {
+  it("an actual owner-imported legacy prefix stays valid unbound and first provider binding refuses before any provider request or publication", async () => {
+    const root = workspace(), f = importedLedgerFixture(root), { fake, provider } = kms();
+    try {
+      f.useImportedRows(); expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+      configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+      const before = bindingPublicationState(root), requests = fake.requests.length;
+      await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider })).rejects.toSatisfy(isCode("KEY_DELEGATION_INVALID"));
+      expect(fake.requests).toHaveLength(requests);
+      expect(bindingPublicationState(root)).toEqual(before);
+      expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+      f.restore();
+      const bound = await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+      expect(bound.delegationSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+      f.useImported();
+      const afterBinding = verifyLedgerIntegrity(root, { trust: f.trust });
+      expect(afterBinding.ok).toBe(false);
+      expect(afterBinding.errors).toContain(`Event ${f.row.id} writer signature invalid`);
+      expect(afterBinding.errors).toContain(`Session ${f.session.session_id} seal signature invalid`);
+    } finally { try { f.restore(); } finally { f.ledger.close(); } }
+  });
+
+  it("a same-head imported signature substituted during actual delegation Sign is refused by final prospective cutover verification", async () => {
+    const root = workspace(), f = importedLedgerFixture(root), { provider } = kms();
+    let release!: () => void, entered!: () => void, paused = false;
+    const gate = new Promise<void>(resolve => { release = resolve; }), reached = new Promise<void>(resolve => { entered = resolve; });
+    const slow: KeyProvider = { ...provider, sign: async (ref, bytes) => {
+      if (!paused && Buffer.from(bytes).subarray(0, 22).toString() === "AMC_KEY_DELEGATION_V2\0") { paused = true; entered(); await gate; }
+      return provider.sign(ref, bytes);
+    } };
+    let operation: Promise<unknown> | undefined;
+    try {
+      expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+      configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+      const before = bindingPublicationState(root);
+      operation = bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: slow });
+      await Promise.race([reached, operation.then(() => { throw new Error("actual bind completed before its delegation signing wait"); },
+        () => { throw new Error("actual bind refused before its delegation signing wait"); })]);
+      f.useImportedRows();
+      expect(f.ledger.getEventById(f.row.id)!.event_hash).toBe(f.row.event_hash);
+      expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+      release();
+      await expect(operation).rejects.toSatisfy(isCode("KEY_DELEGATION_INVALID"));
+      expect(bindingPublicationState(root)).toEqual(before);
+      f.restore();
+      await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider })).resolves.toMatchObject({ purpose: "ledger-row" });
+      expect(verifyLedgerIntegrity(root, { trust: f.trust }).ok).toBe(true);
+    } finally { release(); if (operation) await operation.catch(() => undefined); try { f.restore(); } finally { f.ledger.close(); } }
+  });
   it("file-provider signing preserves vault refusals across the async boundary", async () => {
     const root = workspace();
     const provider = fileKeyProvider(root);

@@ -22,7 +22,7 @@ import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { merkleCurrentRootPath } from "../transparency/merklePaths.js";
 import type { PublicAnchoring } from "../trust/verifierReport.js";
 import { loadTrustContext, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
-import { legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
+import { localLedgerRowKeys } from "../keys/operationalLedgerReader.js";
 import { readOperationalDelegationState } from "../keys/operationalDelegationState.js";
 import { verifyOperationalCheckpoints, type DelegationCheckpoint } from "../keys/operationalDelegation.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
@@ -96,7 +96,7 @@ export function readCheckpointChain(workspace: string, trust?: TrustContext): Ve
   const { chain, authority } = readCheckpointFiles(workspace);
   if (chain.length === 0 && state === null) return [];
   const errors = verifyOperationalCheckpoints(state?.chain ?? [], authority,
-    legacyLedgerRowKeys(workspace), trust ?? loadTrustContext({}));
+    localLedgerRowKeys(workspace), trust ?? loadTrustContext({}));
   if (errors.length) throw new Error(`ledger checkpoint authority invalid: ${errors.slice(0, 3).join("; ")}`);
   return chain;
 }
@@ -120,7 +120,7 @@ export function readLegacyCheckpointPrefixForKeyMigration(workspace: string, cap
   const verdict = verifyDelegation(bytes, { issuerPublicKeyPems: [bound.publicKeyPem], at: new Date(signed.delegation.notBefore) });
   if (!verdict.valid) return fail();
   const { chain, authority } = readCheckpointFiles(workspace);
-  const errors = verifyOperationalCheckpoints([], authority, legacyLedgerRowKeys(workspace), workspaceSelfTrust(workspace));
+  const errors = verifyOperationalCheckpoints([], authority, localLedgerRowKeys(workspace), workspaceSelfTrust(workspace));
   if (errors.length) return fail();
   return chain;
 }

@@ -8,6 +8,7 @@ import type { KmsCall } from "../../src/keys/providers/awsKms.js";
 import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
 import { bindPurposeProviderKey } from "../../src/keys/purposeProviders.js";
 import { getSigningKey } from "../../src/keys/purposeKeys.js";
+import { addPublicKeyToHistory, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { lowS, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
 import { signChecked } from "../../src/keys/provider.js";
 import { sha256Hex } from "../../src/utils/hash.js";
@@ -77,6 +78,20 @@ const store = (root: string, sequence: number, file: unknown) => writeFileSync(f
 const N = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n;
 
 describe("operational provider checkpoint routing and epoch admission", () => {
+  it("explicit unbound monitor-role import does not add checkpoint signing authority", async () => {
+    const root = workspace();
+    await checkpointLedger(root, trust(root));
+    const original = load(root, 1), imported = fakeKey("ed25519"), pem = publicPem(imported);
+    addPublicKeyToHistory(root, "monitor", pem, "imported");
+    expect(readCheckpointChain(root, trust(root))).toHaveLength(1);
+    const signature = signHexDigest(original.sha256, imported.privateKey.export({ type: "pkcs8", format: "pem" }).toString());
+    expect(verifyHexDigestAny(original.sha256, signature, [pem])).toBe(true);
+    try {
+      store(root, 1, { ...original, signature });
+      expect(() => readCheckpointChain(root, trust(root))).toThrow(/signature invalid for its authorized epoch/);
+    } finally { store(root, 1, original); }
+    expect(readCheckpointChain(root, trust(root))).toHaveLength(1);
+  });
   it("keeps unbound Ed25519 checkpoint signature and JSON byte shape", async () => {
     const root = workspace();
     expect((await checkpointLedger(root, trust(root))).status).toBe("pending");

@@ -239,6 +239,8 @@ export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurp
   if (selected === null || selected.provider === "file") throw new Error(`keys.refs.${local} names no provider key; nothing to bind`);
   const ref = Object.freeze({ ...selected, provider: selected.provider });
   if (opts.provider !== undefined && opts.provider.id !== ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `keys.refs.${local} names a ${ref.provider} key`);
+  // Fail an unsupported legacy cutover before even describing or signing with the selected provider.
+  if (local === "ledger-row" && oldProvider === null) captureDelegationScope(workspace, null, publicKeyFromPrivate(payload.keys["ledger-row"]!.privateKeyPem));
   const provider = opts.provider ?? loadKeyProvider(workspace, ref.provider);
   const description = pinnedDescription(await attempt(ref.provider, "describe", () => provider.describe({ ...ref })), unsigned);
   if (!sameRef(description.ref, ref)) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the described key ref is not the selected signed-config ref");

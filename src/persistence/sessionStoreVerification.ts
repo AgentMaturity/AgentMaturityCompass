@@ -35,6 +35,7 @@ import { join } from "node:path";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
 import { legacyLedgerRowKeys, operationalSessionProblems } from "../keys/operationalLedgerReader.js";
 import { boundProviderKey } from "../keys/keyset.js";
+import { verifySessionRecords } from "./sessionRecordVerification.js";
 import { admitKey } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
@@ -87,8 +88,12 @@ export function verifyMonitorTrustRoot(
 ): StoredSessionTrustRoot {
   let monitorFingerprint: string | null = null;
   let rootPem: string | null = null;
+  // Unknown binding state stays strict; only a positively unbound local key may retain integrity without a pin.
+  let providerBound = true;
   try {
-    rootPem = boundProviderKey(workspace, "ledger-row")?.publicKeyPem ?? getPublicKeyPem(workspace, "monitor");
+    const binding = boundProviderKey(workspace, "ledger-row");
+    providerBound = binding !== null;
+    rootPem = binding?.publicKeyPem ?? getPublicKeyPem(workspace, "monitor");
     monitorFingerprint = sha256Hex(Buffer.from(rootPem, "utf8"));
   } catch {
     // No monitor key at all. The per-event signature checks below report the
@@ -108,7 +113,8 @@ export function verifyMonitorTrustRoot(
   }
   const admission = trust ? admitKey({ publicKeyPem: rootPem,
     purpose: "ledger-row", signature: "session ledger root", context: trust }) : null;
-  if (admission !== null && admission.status !== "admitted") errors.push(`trust root: ledger issuer ${admission.status}`);
+  if (admission !== null && admission.status !== "admitted"
+    && (providerBound || admission.status !== "not-pinned")) errors.push(`trust root: ledger issuer ${admission.status}`);
   const independentlyAdmitted = admission?.status === "admitted" && admission.source !== "workspace-self";
   return { anchored: Boolean(expected) || independentlyAdmitted, monitorFingerprint, expectedFingerprint: expected };
 }
@@ -226,44 +232,6 @@ function verifySessionEnvelopeChains(rows: readonly EvidenceEvent[], errors: str
   }
 }
 
-function verifySessionRecords(
-  rows: readonly EvidenceEvent[],
-  records: readonly SessionRecord[],
-  workspace: string,
-  errors: string[]
-): void {
-  const byId = new Map(records.map((record) => [record.session_id, record]));
-  const lastHashBySession = new Map<string, string>();
-  for (const event of rows) {
-    lastHashBySession.set(event.session_id, event.event_hash);
-    if (!byId.has(event.session_id)) {
-      errors.push(`Event ${event.id} references missing session ${event.session_id}`);
-    }
-  }
-  const monitorKeys = legacyLedgerRowKeys(workspace);
-  for (const record of records) {
-    if (record.session_final_event_hash === null) {
-      continue;
-    }
-    // The seal must name the session's ACTUAL last event. Checking only the
-    // signature would let a sealer commit to any hash it liked and still
-    // produce a valid-looking seal over it.
-    const last = lastHashBySession.get(record.session_id);
-    if (last !== undefined && last !== record.session_final_event_hash) {
-      errors.push(
-        `Session ${record.session_id} seal names ${record.session_final_event_hash.slice(0, 16)}… ` +
-          `but its last event is ${last.slice(0, 16)}…`
-      );
-    }
-    if (
-      record.session_seal_sig === null ||
-      !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, monitorKeys)
-    ) {
-      errors.push(`Session ${record.session_id} seal signature invalid`);
-    }
-  }
-}
-
 /**
  * Verify a stored session log.
  *
@@ -286,7 +254,7 @@ export function verifyStoredSessionEvents(
   try { validateSurfaceCompactions(workspace, rows, { trust: options.trust }); }
   catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   if (options.sessionRecords !== undefined) {
-    verifySessionRecords(rows, options.sessionRecords, workspace, errors);
+    verifySessionRecords(rows, options.sessionRecords, legacyLedgerRowKeys(workspace), errors);
   }
   return { ok: errors.length === 0, errors, trustRoot };
 }
@@ -307,6 +275,6 @@ export function verifyStoredSessionEventMetadata(
   errors.push(...operationalSessionProblems(workspace, rows, options.trust));
   verifyGlobalChainAndSignatures(rows, workspace, errors, false);
   verifySessionEnvelopeChains(rows, errors);
-  if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, workspace, errors);
+  if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, legacyLedgerRowKeys(workspace), errors);
   return { ok: errors.length === 0, errors, trustRoot };
 }

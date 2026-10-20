@@ -6,7 +6,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { envelopeForExecutedTest } from "../../src/claims/eligibility/adapters/results.js";
 import { verifyEvidenceBundle } from "../../src/bundles/bundle.js";
-import { addPublicKeyToHistory, getPublicKeyPem, verifyKeyHistoryChain } from "../../src/crypto/keys.js";
+import { addPublicKeyToHistory, getPublicKeyHistory, getPublicKeyPem, getSigningKey, signHexDigest, verifyHexDigestAny, verifyKeyHistoryChain } from "../../src/crypto/keys.js";
+import { getPurposeKeyHistory, getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
+import { rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { verifySignedDigest } from "../../src/crypto/signing/signer.js";
 import type { SignedDigest } from "../../src/crypto/signing/signerTypes.js";
 import { openLedger, verifyLedgerIntegrity } from "../../src/ledger/ledger.js";
@@ -400,6 +402,60 @@ describe("P1-35 synthetic migration source contracts", () => {
       expect(f.facts.attestedSignatureRefused).toBe(true); expect(refused).toBe(true);
       expect(f.facts.logUnchanged).toBe(true); expect(f.facts.receiptsUnchanged).toBe(true);
       expect(changed(before, snapshot(f.root, paths))).toEqual([]);
+    });
+  });
+});
+
+describe("P2-08 unbound legacy monitor compatibility boundaries", () => {
+  test("a real rotated receipt key and an unauthenticated imported-source flag cannot authenticate unbound ledger rows or session seals", async () => {
+    await owned("unbound-receipt-and-source-flag-negative", true, f => {
+      rotatePurposeKeys({ workspace: f.root, purposes: ["receipt"] });
+      const receiptPem = getSigningPublicKeyPem(f.root, "receipt"), receiptKey = getSigningKey(f.root, "receipt"), trust = ownTrust(f.root);
+      expect(getPublicKeyHistory(f.root, "monitor")).toContain(receiptPem);
+      expect(getPurposeKeyHistory(f.root, "ledger-row")).not.toContain(receiptPem);
+      const ledger = openLedger(f.root), sessionId = "owned-receipt-purpose-negative";
+      try {
+        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "owned-legacy-negative", binarySha256: "0".repeat(64) });
+        const id = ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "artifact", payload: "owned receipt-purpose negative", inline: true });
+        ledger.sealSession(sessionId);
+        const row = ledger.getAllEvents().find(event => event.id === id), session = ledger.getAllSessions().find(item => item.session_id === sessionId);
+        if (!row || !session?.session_seal_sig) throw new Error("Owned negative has no actual sealed event");
+        const positive = verifyLedgerIntegrity(f.root, { trust }); expect(positive.ok).toBe(true);
+        const receiptSignature = signHexDigest(row.event_hash, receiptKey);
+        const receiptRawValid = verifyHexDigestAny(row.event_hash, receiptSignature, [receiptPem]); expect(receiptRawValid).toBe(true);
+        const tail = ledger.db.prepare("SELECT event_hash FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1").get(sessionId) as { event_hash: string };
+        expect(session.session_final_event_hash).toBe(tail.event_hash);
+        const receiptSealSignature = signHexDigest(tail.event_hash, receiptKey);
+        const receiptSealRawValid = verifyHexDigestAny(tail.event_hash, receiptSealSignature, [receiptPem]); expect(receiptSealRawValid).toBe(true);
+        const rolePath = join(f.root, ".amc/keys/monitor_history.json"), aliasPath = join(f.root, ".amc/keys/monitor_ed25519.pub");
+        const roleBefore = readFileSync(rolePath), aliasBefore = readFileSync(aliasPath);
+        // Manufacture only this owned adversarial database; normal writers retain their immutable trigger.
+        ledger.db.exec("DROP TRIGGER protect_evidence_immutable");
+        ledger.db.exec("DROP TRIGGER protect_sessions_sealed_immutable");
+        const setWriter = ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?");
+        const setSeal = ledger.db.prepare("UPDATE sessions SET session_seal_sig = ? WHERE session_id = ?");
+        try {
+          setWriter.run(receiptSignature, row.id); setSeal.run(receiptSealSignature, sessionId);
+          const wrongPurpose = verifyLedgerIntegrity(f.root, { trust });
+          expect(wrongPurpose.ok).toBe(false);
+          expect(wrongPurpose.errors).toContain(`Event ${row.id} writer signature invalid`);
+          expect(wrongPurpose.errors).toContain(`Session ${sessionId} seal signature invalid`);
+          const forged = JSON.parse(roleBefore.toString("utf8")) as { entries: Array<{ publicKeyPem: string; source?: string }> };
+          const entry = forged.entries.find(item => item.publicKeyPem === receiptPem);
+          if (!entry || entry.source === "imported") throw new Error("Owned receipt rotation did not create a distinct local history entry");
+          entry.source = "imported"; writeFileSync(rolePath, JSON.stringify(forged, null, 2));
+          const forgedHistory = verifyKeyHistoryChain(f.root, "monitor"); expect(forgedHistory.ok).toBe(false);
+          const flagOnly = verifyLedgerIntegrity(f.root, { trust }); expect(flagOnly.ok).toBe(false);
+          writeFileSync(rolePath, roleBefore); writeFileSync(aliasPath, receiptPem);
+          const wrongAlias = verifyLedgerIntegrity(f.root, { trust }); expect(wrongAlias.ok).toBe(false);
+          Object.assign(f.facts, { receiptRawValid, receiptSealRawValid, positiveBefore: positive.ok, wrongPurposeRefused: !wrongPurpose.ok,
+            unauthenticatedSourceRefused: !forgedHistory.ok && !flagOnly.ok, wrongAliasRefused: !wrongAlias.ok });
+        } finally {
+          writeFileSync(rolePath, roleBefore); writeFileSync(aliasPath, aliasBefore);
+          setWriter.run(row.writer_sig, row.id); setSeal.run(session.session_seal_sig, sessionId);
+        }
+        const repaired = verifyLedgerIntegrity(f.root, { trust }); expect(repaired.ok).toBe(true); f.facts.repairedPositive = repaired.ok;
+      } finally { ledger.close(); }
     });
   });
 });
