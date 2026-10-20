@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-27",
+  "date": "2026-10-20",
+  "commit": "d8381b6daccc1ef3a9c011f8b953c323babe34d5",
+  "branch": "codex/p2-27-publication-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 32520
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 27603
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 42082
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4260
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 720
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 389
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 1656
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 317
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1694
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 208
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 171
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 563
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 276
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1203
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 404
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 893
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2503
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 539
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 225
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 57633
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1549
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3527
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 185
+    },
+    {
+      "cmd": "npm run -s build:pages",
+      "exit": 0,
+      "durationMs": 261
+    },
+    {
+      "cmd": "npm run -s check:judge-calibration",
+      "exit": 0,
+      "durationMs": 353
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/advancedAdversarial.test.ts tests/adversarialAlignmentProbes.test.ts tests/adversarialPacksGap.test.ts tests/adversarialRobustnessPack.test.ts tests/antiGaming.test.ts tests/apiClaimLabels.test.ts tests/apiRouterResponseParity.test.ts tests/apiRouters.test.ts tests/approvalTheaterPack.test.ts tests/architectureBoundaries.test.ts tests/assertionQuality.test.ts tests/assurance/agentAsProxy.test.ts tests/assurance/awesomeAgentsGapPacks.test.ts tests/assurance/cliPresentation.test.ts tests/assurance/economicAmplification.test.ts tests/assurance/executed/calibrationArithmetic.test.ts tests/assurance/executed/calibrationAuthority.test.ts tests/assurance/executed/calibrationDocs.test.ts tests/assurance/executed/catalogCases.test.ts tests/assurance/executed/cliOptions.test.ts tests/assurance/executed/evidence.test.ts tests/assurance/executed/harness.test.ts tests/assurance/executed/judgeCalibration.test.ts tests/assurance/executed/judgeModeBoundary.test.ts tests/assurance/executed/llmApiLegacyDispatch.test.ts tests/assurance/executed/packRetirement.test.ts tests/assurance/executed/runnerBoundary.test.ts tests/assurance/executed/runnerReplay.test.ts tests/assurance/executed/semantic.test.ts tests/assurance/industryPackAnchors.test.ts tests/assurance/industryPackFailClosed.test.ts tests/assurance/industryPackManifest.test.ts tests/assurance/mcpSecurityResilience.test.ts tests/assurance/overthinkingDetection.test.ts tests/assurance/piiDetectionLeakage.test.ts tests/assurance/zombieAgentPersistence.test.ts tests/assuranceAgentResponder.test.ts tests/assuranceGradingQualification.test.ts tests/assuranceLab.test.ts tests/assuranceReportProvenance.test.ts tests/assuranceRunNoSign.test.ts tests/assuranceRunnerInconclusiveQualification.test.ts tests/assuranceScenarioContextParity.test.ts tests/assuranceSessionQualification.test.ts tests/assuranceUnificationMigration.test.ts tests/assuranceV1ArtifactChain.test.ts tests/attest/bundleAttestation.test.ts tests/bloomBehavioralPacks.test.ts tests/catalog/admission/checker.test.ts tests/catalog/admission/gatedLoads.test.ts tests/catalog/catalogLoader.test.ts tests/catalog/citations.test.ts tests/catalog/compiler/cli.test.ts tests/catalog/compiler/crosswalk.test.ts tests/catalog/compiler/determinism.test.ts tests/catalog/compiler/diff.test.ts tests/catalog/compiler/golden.test.ts tests/catalog/compiler/merge.test.ts tests/catalog/compiler/outputPath.test.ts tests/catalog/compiler/predicate.test.ts tests/catalog/compiler/unknown.test.ts tests/catalog/controlRecordSchema.test.ts tests/catalog/evidence/decisive.test.ts tests/catalog/governance/changelogGuard.test.ts tests/catalog/governance/currency.test.ts tests/catalog/governance/promotion.test.ts tests/catalog/governance/reverify.test.ts tests/catalog/governance/reviewRecord.test.ts tests/catalog/l0/catalogLoads.test.ts tests/catalog/l0/data.test.ts tests/catalog/l0/evidenceFixtures.test.ts tests/catalog/l0/fixtureCoverage.test.ts tests/catalog/l0/identity.test.ts tests/catalog/l0/inventory.test.ts tests/catalog/l0/logging.test.ts tests/catalog/l0/monitoring.test.ts tests/catalog/l0/oversight.test.ts tests/catalog/l0/tools.test.ts tests/catalog/lockfile.test.ts tests/catalog/predicate.test.ts tests/catalog/stations/education/compiledPolicy.test.ts tests/catalog/stations/education/fixtures.test.ts tests/catalog/stations/education/overlay.test.ts tests/catalog/stations/environment/compiledPolicy.test.ts tests/catalog/stations/environment/fixtures.test.ts tests/catalog/stations/environment/overlay.test.ts tests/catalog/stations/governance/compiledPolicy.test.ts tests/catalog/stations/governance/fixtures.test.ts tests/catalog/stations/governance/overlay.test.ts tests/catalog/stations/mobility/compiled.test.ts tests/catalog/stations/mobility/fixtures.test.ts tests/catalog/stations/mobility/overlay.test.ts tests/catalog/stations/technology/fixtures.test.ts tests/catalog/stations/technology/overlay.test.ts tests/catalog/types.test.ts tests/checkNoFabrication.test.ts tests/claims/d03Gates.test.ts tests/claims/evidenceProvenance.test.ts tests/claims/evidenceProvenanceQualification.test.ts tests/commercialAgent.test.ts tests/compilerStationDefaults.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/mappingPackRefs.test.ts tests/diagnostic/evidenceEmitterRegistry.test.ts tests/diagnostic/levelCumulative.test.ts tests/diagnostic/runtimeEvidenceEndToEnd.test.ts tests/diagnosticAssuranceCoverage.test.ts tests/dogfoodMaturityEvidence.test.ts tests/domain-registry.test.ts tests/domainCliIntegration.test.ts tests/domainExampleMode.test.ts tests/domainRegistry.test.ts tests/educationFERPAPack.test.ts tests/environmentalInfraPack.test.ts tests/evalImportersInterop.test.ts tests/evidenceAgentFilterQualification.test.ts tests/evidenceGatingCorrection.test.ts tests/excessiveAgencyUnintentional.test.ts tests/financialSOXPack.test.ts tests/gap0626AdversarialRegression.test.ts tests/gap0981CtiThinkerAdversarialRegressionBoundary.test.ts tests/gap1236PromptfooAdversarialRegressionBoundary.test.ts tests/gap1237PromptInjectionReviewAdversarialRegressionBoundary.test.ts tests/gap1240PromptfooDuplicateAdversarialRegressionBoundary.test.ts tests/gap1243GiskardAdversarialRegressionBoundary.test.ts tests/gap3619ApprovalLatencySloBoundary.test.ts tests/gap3626EscalationQualityScoringBoundary.test.ts tests/gapClosure.test.ts tests/genCountsSemantics.test.ts tests/governanceNISTRMFPack.test.ts tests/industryAssuranceFixtures.test.ts tests/industryAssurancePacksHealth.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/informationExtractionPack.test.ts tests/ingestAttestation.test.ts tests/mappingSources.test.ts tests/mcpClaimLabels.test.ts tests/mcpComplianceSafety.test.ts tests/migration/legacyRelabel.test.ts tests/mobilityFunctionalSafetyPack.test.ts tests/multiTurnDeepEval.test.ts tests/multiTurnSafetyPack.test.ts tests/nativeEvidenceTrustTier.test.ts tests/noAmcOsReads.test.ts tests/noFabricatedAttribution.test.ts tests/noFabricatedDomainResults.test.ts tests/operationalDisciplinePack.test.ts tests/parallelAssurance.test.ts tests/pathScorersNotEvaluated.test.ts tests/promptwareKillChain.test.ts tests/publicDocsArtifact.test.ts tests/publicDocsGraph.test.ts tests/publicPlaygroundBrand.test.ts tests/publicStatsDrift.test.ts tests/publishedCountsAccuracy.test.ts tests/realtimeVoiceSafetyPack.test.ts tests/regulatedExamples.test.ts tests/regulatoryAssurancePacks.test.ts tests/regulatoryCurrencyRegister.test.ts tests/regulatoryReadiness.test.ts tests/researchExodusPacks.test.ts tests/sbomSupplyChainPack.test.ts tests/score/failSecureGovernance.test.ts tests/score/kernelSandboxMaturity.test.ts tests/score/monitorBypassResistance.test.ts tests/score/owaspLLMCoverage.test.ts tests/securityStarterPack.test.ts tests/simulationPacks.test.ts tests/standaloneApi.test.ts tests/starterProfiles.test.ts tests/studioClaimLabels.test.ts tests/supplyChainIntegrityCoverage.test.ts tests/technologyGDPRSOCPack.test.ts tests/trust/embeddedKeyForgery.test.ts tests/trustTierWriteGuard.test.ts tests/trustTierWriteValidation.test.ts tests/wealthManagementMiFIDPack.test.ts --maxWorkers=1 --reporter=verbose --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-focused-v1/report.json",
+      "exit": 1,
+      "durationMs": 594997
+    }
+  ],
+  "tests": {
+    "total": 5040,
+    "passed": 5039,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "BLOCKERS.md",
+      "sha256": "96b54057eab9eb0a0c288ad9eccc12cb6a91b333310b4436ea9a44868a79bd27"
+    },
+    {
+      "path": "README.md",
+      "sha256": "8c4d32f81e4003d411fdaea1fc7d74589b9e3b0357a425d72d2e0c6114a16de2"
+    },
+    {
+      "path": "acceptance-matrix.json",
+      "sha256": "3c55f96df09dd4c8a59e4e29f47973e59cd230b7d670fa373360533ac0787801"
+    },
+    {
+      "path": "baseline-failure.json",
+      "sha256": "3194fa9113aeb4e13e118a25075ea513bb04c59e4a878f7e86f0f0408ca825bb"
+    },
+    {
+      "path": "evidence-index.json",
+      "sha256": "5652067cce332f1c77e6ce60db1edb33aea2d80c9f9ff883baf5a99edd52af61"
+    },
+    {
+      "path": "full-suite-protocol.json",
+      "sha256": "066db1d05eb4529cad47769066a0a0ff25138522e2cba91c7ec713930c28c3a3"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "5cd30abea41291f79aee6e256bc930398c95637875527552513a453f66e3ac44"
+    },
+    {
+      "path": "mutation-results.json",
+      "sha256": "242c9f569a8815c965c36c3dac2931edb5bba48ddfbb75ef29452f8fe87ec9c1"
+    },
+    {
+      "path": "per-scenario-outcomes.json",
+      "sha256": "1f52bc6ba7bee40ed21efbfc4cb3ca85c42a34f6a0097536ee1642d25bd53cb6"
+    },
+    {
+      "path": "required-checks.json",
+      "sha256": "95a17dd050312ddbcaa7c9abf7b242fc109e9d5fefe8a13327fda787b87ef1b1"
+    },
+    {
+      "path": "source-manifest.json",
+      "sha256": "15e92516dc0368ab4c505483b80bc270ee31aabfea4e7d2987583ae96847ceb6"
+    }
+  ],
+  "notes": "Local macOS arm64, not CI. Actual clean-H4 prerequisites only. All23 required checks and both documentation checks passed. Focused179 has one exact existing baseline Docs graph failure. Q4 final full is pending and must be recorded externally against actual final HEAD. No all-green, final qualification, human approval, real-model measured rates, public publication or landing claim. Historical failed and interrupted runs, all prior qualification and mutation survivor remain preserved. Six human requirements are distinct from technical gaps. Synthetic native rows remain NE/null tier and production ASR null."
+}
