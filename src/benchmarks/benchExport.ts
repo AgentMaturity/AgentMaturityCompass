@@ -1,6 +1,6 @@
 import { randomUUID, createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { lstatSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { getSigningKey, getPublicKeyHistory, signHexDigest } from "../crypto/keys.js";
@@ -13,6 +13,9 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { benchmarkSchema, type BenchmarkArtifact } from "./benchSchema.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 
 interface BenchSignature {
   digestSha256: string;
@@ -44,7 +47,7 @@ function hashAgentId(agentId: string): string {
   return createHash("sha256").update(agentId).digest("hex").slice(0, 24);
 }
 
-export function exportBenchmarkArtifact(params: {
+export interface BenchmarkExportInput {
   workspace: string;
   agentId?: string;
   runId: string;
@@ -53,10 +56,9 @@ export function exportBenchmarkArtifact(params: {
   publisherContact?: string;
   publicAgentId?: string | null;
   notes?: string | null;
-}): {
-  outFile: string;
-  bench: BenchmarkArtifact;
-} {
+}
+
+function prepareBenchmarkArtifact(params: BenchmarkExportInput) {
   const workspace = params.workspace;
   const agentId = resolveAgentId(workspace, params.agentId);
   const run = loadRunReport(workspace, params.runId, agentId);
@@ -112,6 +114,11 @@ export function exportBenchmarkArtifact(params: {
     },
     notes: params.notes ?? null
   });
+  return { workspace, agentId, bench };
+}
+
+export function exportBenchmarkArtifact(params: BenchmarkExportInput): { outFile: string; bench: BenchmarkArtifact } {
+  const { workspace, agentId, bench } = prepareBenchmarkArtifact(params);
 
   const tmp = mkdtempSync(join(tmpdir(), "amc-bench-"));
   const outFile = resolve(workspace, params.outFile);
@@ -151,4 +158,72 @@ export function exportBenchmarkArtifact(params: {
     outFile,
     bench
   };
+}
+
+type BenchmarkFileState = { bytes: Buffer; mode: number } | null;
+function benchmarkFileState(path: string): BenchmarkFileState {
+  try {
+    const stat = lstatSync(path);
+    if (!stat.isFile()) throw new Error("benchmark input or output must be a regular file");
+    return { bytes: readFileSync(path), mode: stat.mode & 0o777 };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw new Error("benchmark input or output is not a readable regular file");
+  }
+}
+function sameBenchmarkFile(a: BenchmarkFileState, b: BenchmarkFileState): boolean {
+  return a === null ? b === null : b !== null && a.mode === b.mode && a.bytes.equals(b.bytes);
+}
+
+/** Maintained awaitable producer. The raw four-field signature wire and direct artifact purpose remain unchanged. */
+export async function exportBenchmarkArtifactAsync(input: BenchmarkExportInput, options: { beforePublish?: () => void } = {}): Promise<{ outFile: string; bench: BenchmarkArtifact }> {
+  const params = { ...input }, beforePublish = options.beforePublish, workspace = params.workspace;
+  const assertSigningAllowed = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize benchmark signing"); };
+  beforePublish?.(); assertSigningAllowed();
+  const captured = capturePurposePublication(workspace, "artifact-seal");
+  const agentId = resolveAgentId(workspace, params.agentId), paths = getAgentPaths(workspace, agentId), pathRef = JSON.stringify(paths);
+  const reportsDir = join(paths.reportsDir, "assurance"), outFile = resolve(workspace, params.outFile);
+  const inputFiles = [...new Set([join(paths.runsDir, `${params.runId}.json`), join(workspace, ".amc", "runs", `${params.runId}.json`),
+    paths.agentConfig, join(workspace, "amc-bom.json")])];
+  const readInputs = () => {
+    if (JSON.stringify(getAgentPaths(workspace, agentId)) !== pathRef) throw new Error("benchmark input references changed while preparing");
+    const reports = pathExists(reportsDir) ? readdirSync(reportsDir).filter(name => name.endsWith(".json")).sort().map(name => join(reportsDir, name)) : [];
+    return new Map([...inputFiles, ...reports].map(path => [path, benchmarkFileState(path)] as const));
+  };
+  const original = readInputs(), outputBefore = benchmarkFileState(outFile);
+  if (original.has(outFile)) throw new Error("benchmark output cannot replace a source input");
+  const assertInputsCurrent = () => {
+    const current = readInputs();
+    if (current.size !== original.size || [...original].some(([path, value]) => !current.has(path) || !sameBenchmarkFile(value, current.get(path)!))) {
+      throw new Error("benchmark inputs changed while preparing");
+    }
+  };
+  const prepared = prepareBenchmarkArtifact({ ...params, agentId });
+  if (prepared.bench.run.runId !== params.runId) throw new Error("benchmark run reference does not match the requested record");
+  assertInputsCurrent();
+  const bench = prepared.bench, bytes = Buffer.from(JSON.stringify(bench, null, 2), "utf8"), digest = sha256Hex(bytes);
+  const tmp = mkdtempSync(join(tmpdir(), "amc-bench-async-"));
+  try {
+    const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"));
+    assertInputsCurrent();
+    const content = join(tmp, "content"), archive = join(tmp, "prepared.amcbench");
+    ensureDir(join(content, "public-keys"));
+    writeFileAtomic(join(content, "bench.json"), bytes, 0o644);
+    const signature: BenchSignature = { digestSha256: digest, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" };
+    writeFileAtomic(join(content, "bench.sig"), JSON.stringify(signature, null, 2), 0o644);
+    writeFileAtomic(join(content, "public-keys", "auditor.pub"), signed.publicKeyPem, 0o644);
+    runTarCreate(content, archive);
+    const archiveBytes = readFileSync(archive), archiveMode = lstatSync(archive).mode & 0o777;
+    withControlFileLock({ root: dirname(outFile), name: `benchmark-export-${sha256Hex(outFile).slice(0, 24)}`, operation: () => {
+      beforePublish?.(); assertSigningAllowed();
+      assertPurposePublicationCurrent(workspace, captured, signed);
+      assertInputsCurrent();
+      if (!sameBenchmarkFile(outputBefore, benchmarkFileState(outFile))) throw new Error("benchmark output changed while preparing");
+      writeFileAtomic(outFile, archiveBytes, outputBefore?.mode ?? archiveMode);
+    } });
+    // Preserve the synchronous log contract; it may throw after publication. Hash the actual bytes this call wrote.
+    appendTransparencyEntry({ workspace, type: "BENCHMARK_EXPORTED", agentId,
+      artifact: { kind: "amcbench", sha256: sha256Hex(archiveBytes), id: bench.benchId } });
+    return { outFile, bench };
+  } finally { rmSync(tmp, { recursive: true, force: true }); }
 }

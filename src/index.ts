@@ -611,7 +611,7 @@ export { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 export { predictBudgetPressure } from "./simulator/budgetsWhatIf.js";
 export { predictGovernorPermissions } from "./simulator/governorWhatIf.js";
 export { predictCiGateOutcome } from "./simulator/ciGateWhatIf.js";
-export { exportBenchmarkArtifact } from "./benchmarks/benchExport.js";
+export { exportBenchmarkArtifact, exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
 export { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 export { ingestBenchmarks } from "./benchmarks/benchImport.js";
 export { listImportedBenchmarks } from "./benchmarks/benchStore.js";

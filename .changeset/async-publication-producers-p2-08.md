@@ -9,3 +9,5 @@ Issue assurance certificates through the existing checked asynchronous policy si
 Add maintained asynchronous BOM signing for direct callers and the CLI, preserving existing sidecar bytes and the synchronous SDK. Check current authority and exact file preimages immediately before publication, refuse input/output file aliases, and report a later synchronous transparency failure with the published sidecar and original cause. HTTP activation requires trusted caller revalidation; reserved registry forwarding remains pending.
 
 Issue adapter capability receipts through checked asynchronous signing in maintained CLI and direct SDK paths. Preserve v1 signed bytes and synchronous compatibility, check captured adapter inputs and final authority, and keep HTTP async activation conditional on trusted caller revalidation.
+
+Export benchmarks through an awaitable maintained producer and CLI, preserving signed archive bytes and the synchronous SDK. Recheck actual input files, destination and current authority before publication; keep HTTP activation conditional on trusted caller revalidation.

@@ -341,7 +341,7 @@ import { registerCatalogCommands } from "./catalog/catalogCli.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/approvalPolicyEngine.js";
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
-import { exportBenchmarkArtifact } from "./benchmarks/benchExport.js";
+import { exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
 import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
@@ -17718,15 +17718,16 @@ benchmark
   .requiredOption("--out <file.amcbench>", "output benchmark artifact")
   .option("--publisher <org>", "publisher org")
   .option("--public-agent-id <id>", "public agent id override")
-  .action((opts: { agent: string; run: string; out: string; publisher?: string; publicAgentId?: string }) => {
-    const out = exportBenchmarkArtifact({
-      workspace: process.cwd(),
+  .action(async (opts: { agent: string; run: string; out: string; publisher?: string; publicAgentId?: string }) => {
+    const workspace = process.cwd();
+    const out = await exportBenchmarkArtifactAsync({
+      workspace,
       agentId: opts.agent,
       runId: opts.run,
       outFile: opts.out,
       publisherOrgName: opts.publisher,
       publicAgentId: opts.publicAgentId ?? null
-    });
+    }, { beforePublish: () => assertOwnerMode(workspace, "benchmark export") });
     console.log(chalk.green(`Benchmark exported: ${out.outFile}`));
   });
 
