@@ -334,7 +334,7 @@ import { driftCheckCli, driftReportCli, freezeLiftCli, freezeStatusCli } from ".
 import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
-import { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
+import { signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";
 import { registerApprovalCliCommands } from "./approvals/approvalCliCommands.js";
 import { registerActionCliCommands } from "./actions/actionCliCommands.js";
 import { registerCatalogCommands } from "./catalog/catalogCli.js";
@@ -16443,8 +16443,8 @@ bom
   .command("sign")
   .requiredOption("--in <file>", "input BOM JSON")
   .requiredOption("--out <file>", "signature output file")
-  .action((opts: { in: string; out: string }) => {
-    const signed = signBomFile({
+  .action(async (opts: { in: string; out: string }) => {
+    const signed = await signBomFileAsync({
       workspace: process.cwd(),
       inputFile: opts.in,
       outputSigFile: opts.out

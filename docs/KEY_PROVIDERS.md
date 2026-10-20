@@ -163,6 +163,8 @@ Audit-packet generation awaits the checked artifact-purpose signer and rechecks 
 
 Assurance-certificate issuance awaits the existing checked policy signer. It keeps the original certificate, envelope, latest-copy and hash formats, and verifies/parses the captured assurance-policy bytes from one read. The policy body/signature, run and findings must remain byte-identical through preparation; packaged run/findings hashes use those captured bytes. The original signer and complete trust policy are rechecked after awaits and before archive publication. Synchronous transparency publication remains a separate integration limit.
 
+BOM signing has a maintained asynchronous direct API and CLI path. It preserves the default Ed25519 sidecar and independently admitted verification contract. The producer captures caller paths and exact input/destination bytes, signs outside the short sidecar lock, then checks current owner mode, selected signer, complete trust policy, committed purpose generation and file preimages after the trusted final callback. Same-file, hardlink and input-symlink aliases of the signature output are refused before Sign and before publication. The optional HTTP callback is supplied by trusted dispatch code only; absent callback retains the existing synchronous route. Registry forwarding for this new callback remains reserved and pending. Synchronous transparency publication occurs after the sidecar is written and its lock released. A later log failure reports BOM_TRANSPARENCY_PUBLICATION_INCOMPLETE with the published sigFile and original cause; the sidecar is retained, with no automatic rollback or recovery claim.
+
 ## Notary `KEY_PROVIDER` backend
 
 In the notary's `notary.yaml`:

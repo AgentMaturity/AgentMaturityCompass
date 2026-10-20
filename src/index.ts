@@ -574,7 +574,7 @@ export { initBudgets, verifyBudgetsConfigSignature, evaluateBudgetStatus, resetB
 export { driftCheckCli, driftReportCli, freezeStatusCli, freezeLiftCli } from "./drift/driftCli.js";
 export { initAlertsConfig, verifyAlertsConfigSignature, sendTestAlert } from "./drift/alerts.js";
 export { generateBom } from "./bom/bomGenerator.js";
-export { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
+export { signBomFile, signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";
 export {
   createApprovalForIntent,
   decideApprovalForIntent,
