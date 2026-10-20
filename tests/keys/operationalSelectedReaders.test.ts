@@ -47,7 +47,7 @@ async function fixture() {
   const root = mkdtempSync(join(tmpdir(), "amc-selected-reader-")), workspace = join(root, "workspace");
   const f: (typeof fixtures)[number] = { root, workspace }; fixtures.push(f);
   vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
-  vi.stubEnv("AMC_LEDGER_SQLITE_SYNCHRONOUS", "FULL"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+  vi.stubEnv("AMC_LEDGER_SQLITE_SYNCHRONOUS", "FULL"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   const key = fakeKey("p256"), id = AWS_ARN("selected-reader"), transport = awsFake({ [id]: key });
   const provider = awsKmsProvider(transport.call), description = await provider.describe({ provider: "aws-kms", id });
