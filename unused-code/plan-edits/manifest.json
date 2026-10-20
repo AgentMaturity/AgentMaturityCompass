@@ -430,6 +430,13 @@
       "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
     },
     {
+      "path": "src/pairing/pairingApi.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/pairing/pairingApi.ts.landed",
+      "sha256": "9fabef38494baa090d30775430a2260ed9830ff3920c27b3dac65306e92ef3d8"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
