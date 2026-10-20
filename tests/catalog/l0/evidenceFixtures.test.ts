@@ -35,6 +35,26 @@ describe("Layer 0 evidence fixtures through evaluateControl (P1-11)", () => {
     expect(new Set(fixtures.map((f) => f.control.id))).toEqual(new Set(controls.map((c) => c.id)));
   });
 
+  it.each(["L1-HLT-01", "L1-MOB-07", "L1-WLT-01"])("optional synthetic objective %s stays neutral, unreviewed and manual through native admission", controlId => {
+    const control = catalog.controls.get(controlId)!;
+    expect(control).toMatchObject({ mandatory: false, binding: { kind: "manual", points: [] },
+      applicability: { predicate: { not: { always: true } } }, review: { status: "pending" } });
+    const fixture = fixtures.find(row => row.control.id === controlId && row.ref.endsWith("/evidence-synthetic-no-observed-tier.json"));
+    expect(fixture).toBeDefined();
+    const setup = fixture!.envelope.setup as unknown as EvidenceSetup;
+    expect(setup.plan.applicability).toBe("applicable");
+    expect(setup.items).toHaveLength(1);
+    expect(setup.items[0]).toMatchObject({ verdict: "neutral", producerId: "amc.assurance.executed",
+      provenance: { verified: true, producerId: "amc.assurance.executed", trustTier: null } });
+    const result = evaluate(setup, controlId);
+    expect(result.admitted).toEqual([]);
+    expect(result.rejected.map(row => row.reason)).toEqual(["producer_unverified"]);
+    expect(result.dimensions.result).toBe("not_evaluated");
+    expect(result.dimensions.enforcement.state).toBe("none");
+    expect(result.dimensions.review).toBe("pending");
+    expect(result.claimKind).toBe("self_reported");
+  });
+
   for (const f of fixtures) {
     it(`${f.ref} gives ${f.envelope.expected.result}${f.envelope.expected.reasonCode ? ` (${f.envelope.expected.reasonCode})` : ""}`, () => {
       const result = evaluate(f.envelope.setup as unknown as EvidenceSetup, f.control.id);

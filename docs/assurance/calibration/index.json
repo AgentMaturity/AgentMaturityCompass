@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "state": "not_evaluated",
+  "measurement": "not measured; real human labels, expert policy and an authorized model run are unavailable",
+  "humanLabels": "pending",
+  "expertMinimumAndTolerances": "pending",
+  "sidPublicationApproval": "pending",
+  "calibrations": []
+}

@@ -1,0 +1,121 @@
+{
+  "state": "native_H2_all_scoped_captures_clean_before_after_Q2_unknown",
+  "head": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+  "branch": "codex/p2-27-landing-final",
+  "baseInt": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-landing-20261020",
+  "parentNativeLaunch": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-required23-v1/launch.json",
+    "sha256": "128d0276607f4749c7bf4228da22753c06cb342af1fba6252ec2da740eb0f541",
+    "bytes": 54622
+  },
+  "statusPorcelainAtParentLaunch": "",
+  "workingTreeLiterallyCleanAtParentLaunch": true,
+  "currentGitStateVerifiedByChild": false,
+  "generatedCounts": [
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "28f7784c52bd3c49e61814af75ea8ae8c78d6602804c7bb175086d4d9bf05427",
+      "bytes": 19504
+    },
+    {
+      "path": "README.md",
+      "sha256": "f27d616ba2a4e53c43fb9bd26cbcd245eb48a775f564606cb1cceacaf53c0e26",
+      "bytes": 63199
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "sha256": "57728d2e7573ab0213c1dc007a19e8c0dda4611d167c872d94c17df8040d73a0",
+      "bytes": 3075
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "sha256": "946e1ba190aa415c533619454933ad2cbea51d8042bad6a21b7205f16c77811d",
+      "bytes": 1951
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "sha256": "39d978e7ccce3d371d3739f78df36a8fe61343ae7652f66d27de637e7d6817af",
+      "bytes": 3880
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "sha256": "a66c360447c22c1f7b90e14acd578d0d41a2c81505e3a8e2e9bebe2b0fd779e0",
+      "bytes": 2489
+    },
+    {
+      "path": "website/i18n.js",
+      "sha256": "0713643d7434e8e9e0a29886cbf213ac95e46ff2ebf391c06be0fa64f0d3bb40",
+      "bytes": 44169
+    },
+    {
+      "path": "website/index.html",
+      "sha256": "9eccb1b8c354f67c3cc5461976f482a037ec7fbf3124d85ace9430dbd0c2cc17",
+      "bytes": 44277
+    },
+    {
+      "path": "website/lite.html",
+      "sha256": "50a8a7ed22dbd80653f7ecc8ac577c0afb6767f856e3858ebefb85041e6ea1b2",
+      "bytes": 11197
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "sha256": "cffac1e70e679c3d596e2ee0b40192a5f1fb65f3b4101795a766de6ee807ecca",
+      "bytes": 108269
+    }
+  ],
+  "generatedCountDisposition": "Ten native regenerated outputs are committed in landing H2 per parent assignment and match actual H2 launch/current bytes. No working-only count exception, index flag, source discard or clone cleanup is proposed.",
+  "originalRun": {
+    "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020",
+    "qualificationCommit": "e89880b4b7f0bd44784a414db02b72aecf05f8bb",
+    "prefix": "qualification/2026-10-20-P2-27/",
+    "preserved": true,
+    "interimFullInterruption": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/interim-full-e89880-intentional-interruption-v1.json",
+      "sha256": "c0162677887dc52a0a4e111b94026ff798549932958d36039f2c206b2db89419",
+      "bytes": 794
+    }
+  },
+  "nextQualificationCommit": {
+    "sha": null,
+    "soleParent": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+    "addExactlyPrefix": "qualification/2026-10-20-P2-27-landing/",
+    "files": 12,
+    "productChangesAllowed": false,
+    "oldQualificationEditsAllowed": false
+  },
+  "rootMustVerifyBeforeFreeze": [
+    "Native HEAD/branch/int and clean status on R2.",
+    "Exactly12 new metadata paths under the landing prefix; no product changes or old qualification edits.",
+    "All 185 selected product/count file bytes match the final snapshot; no hidden index flags or generated working diffs."
+  ],
+  "nativePathScope": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/product-h2-path-scope-manifest-v1.json",
+    "sha256": "d99dc713946781d97e11e01e3b24fdab401c8fa39399fff6b95931a46a5feb09",
+    "bytes": 46001
+  },
+  "nativeRequired23": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-required23-v1/summary.json",
+    "sha256": "d95015369eb683de10744104fc96ff4379a654f65dd4921cdef869afc04c52eb",
+    "bytes": 116227
+  },
+  "nativeExtraDocs": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-extra-doc-checks-v1/summary.json",
+    "sha256": "a69ffac90671340126b3e0a6a9a544c516933caf5aea7781d154c4b2692f20aa",
+    "bytes": 106459
+  },
+  "nativeD15": "native needs-snapshot.mjs int returned none, exit 0 during this read-only preflight",
+  "nativeCleanBeforeAndAfter": true,
+  "nativeCleanScope": "Actual H2 required23, extraDocs and focused149 all recorded identical clean before/after source snapshots. Final Q2 does not yet exist; root must admit it independently.",
+  "nativeFocused149": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/summary.json",
+    "sha256": "961f1894ce715e9ad6d9819fe679caea8dd623c6ede4457f908670c6646109c9",
+    "bytes": 173149
+  },
+  "nativeEnvironment": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/native-landing-environment-and-presence-admission-v1.json",
+    "sha256": "00445951c7bc880a711586bcaa034914afd78c7430749f0663c67686b6eb3642",
+    "bytes": 547
+  },
+  "qualificationCommit": null
+}

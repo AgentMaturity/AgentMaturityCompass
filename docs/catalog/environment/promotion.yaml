@@ -1,0 +1,81 @@
+schemaVersion: 1
+station: environment
+support: experimental
+review: pending
+promotion: none
+approvedBy: null
+sidPromotionApproval: null
+experts:
+  gridCybersecurity: null
+  foodSafety: null
+expertRecruitmentOwner: null
+expertDecision: D-14
+recruitmentRoute: D-10
+partners:
+  environment.energy-utilities-water: null
+  environment.food-textiles-manufacturing: null
+partnerRoute: P1-29
+signoffs:
+  domainLead: null
+  legalReviewer: null
+  riskOwner: null
+manualHazardAssessor: null
+stewardship:
+  owner: null
+  funding: null
+  updatePlan: null
+  triageTargetDays: null
+  coverageDoc: docs/catalog/environment/README.md
+licenceDecision: D-04
+nativeCheckerResult: null
+admissionCriteria:
+  - criterion: 1
+    name: "Manifest and reproducible digest"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native manifest/lock reproducibility and compatibility checks have not been executed by this docs task."
+  - criterion: 2
+    name: "Citations"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "Primary texts unread; retrieval unverified; independent credentialed legal review absent."
+  - criterion: 3
+    name: "Applicability"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native predicate/vocabulary checks and real asset/capacity/write-scope assessment remain unmeasured."
+  - criterion: 4
+    name: "Binding"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native enforcement-point/manual-duty validation remains unmeasured; live dependencies are pending."
+  - criterion: 5
+    name: "Tests"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native oracle/type validation and fixture execution results must come from root."
+  - criterion: 6
+    name: "Negative fixtures"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "All negative classes and false-pass counts await native execution; no kill or green count is invented."
+  - criterion: 7
+    name: "Evidence contracts"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Producer availability, binding, freshness, sampling and invalidation checks await native execution."
+  - criterion: 8
+    name: "Unknown facts fail closed"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Unknown-profile and missing-evidence execution checks await native outcomes."
+  - criterion: 9
+    name: "Sign-offs"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "No distinct human domain lead, legal reviewer and risk owner; expert and Sid decisions remain open."
+  - criterion: 10
+    name: "Stewardship"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "Both domain partners, funded update ownership, triage target and real coverage evidence remain open."

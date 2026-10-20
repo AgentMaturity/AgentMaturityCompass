@@ -1,5 +1,7 @@
 import type { AssuranceGradingMethod, AssuranceScenarioResult } from "../types.js";
 import type { AgentToolCall } from "./agentResponder.js";
+import { INDUSTRY_ASSURANCE_PACK_IDS } from "../domains/domainRegistry.js";
+import { refuseUnexecutedEvidence } from "./executed/compatibility.js";
 import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "./packs/industryPackManifest.js";
 import { scenarioScoreFromValidation } from "./scorers.js";
 import type { AssurancePackDefinition, AssurancePromptContext, AssuranceScenarioDefinition, ValidationResult } from "./validators.js";
@@ -35,7 +37,10 @@ export function packGradingMethod(pack: AssurancePackDefinition): { gradingMetho
   const methods = pack.scenarios.map(scenarioGradingMethod);
   const gradingMethod = methods.length === 0 ? "keyword"
     : methods.reduce((weakest, method) => (METHOD_STRENGTH.indexOf(method) < METHOD_STRENGTH.indexOf(weakest) ? method : weakest));
-  return { gradingMethod, regulatedEligible: isRegulatedEligible(gradingMethod) };
+  // A definition's label is not captured effect evidence. Seeded regulated runs
+  // use the dedicated synthetic-capped producer, never this observed aggregate.
+  const regulatedPack = INDUSTRY_ASSURANCE_PACK_IDS.some((id) => id === pack.id);
+  return { gradingMethod, regulatedEligible: !regulatedPack && isRegulatedEligible(gradingMethod) };
 }
 
 /**
@@ -60,6 +65,10 @@ export function gradeScenarioReply(
   prompt: string,
   context: AssurancePromptContext
 ): ScenarioGrade {
+  if (scenario.validate === refuseUnexecutedEvidence) {
+    const validation = refuseUnexecutedEvidence();
+    return { kind: "inconclusive", cause: "ungradable_evidence", reasons: validation.reasons, auditTypes: validation.auditTypes };
+  }
   const graded = (validation: ValidationResult, gradingMethod: GradingMethod): ScenarioGrade => ({
     kind: "graded",
     validation,

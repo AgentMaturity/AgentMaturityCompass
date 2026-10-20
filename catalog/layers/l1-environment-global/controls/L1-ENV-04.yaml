@@ -1,0 +1,174 @@
+# Experimental and unreviewed P3-16 content. JSON syntax is valid YAML.
+# Local synthetic observations never supply a production evidence verdict.
+{
+  "id": "L1-ENV-04",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "recall-reaches-every-lot",
+  "stations": [
+    "environment"
+  ],
+  "title": "Keep the affected-lot recall drill pending P2-27",
+  "statement": "A recall drill must reach every affected lot derived independently from complete genealogy through the established P2-27 recall environment; incomplete or unavailable integration never establishes recall completion.",
+  "riskRationale": "A plausible seed-lot notice can omit descendants, and a graph supplied by a fixture cannot prove complete physical genealogy or actual notice delivery.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "environment"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "environment.food-textiles-manufacturing"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "food_facility"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "food_recall"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+      "Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them."
+    ],
+    "exclusions": []
+  },
+  "citations": [],
+  "binding": {
+    "kind": "manual",
+    "points": [],
+    "mechanism": "Manual synthetic drill duty only; no live runtime, delivery integration or external legal determination is installed.",
+    "parameters": [],
+    "manualDuty": {
+      "duty": "A recall drill must reach every affected lot derived independently from complete genealogy through the established P2-27 recall environment; incomplete or unavailable integration never establishes recall completion.",
+      "ownerRole": "head_of_qa",
+      "cadence": "Before a relevant deployment change and each explicitly scheduled drill; actual legal cadence unresolved.",
+      "evidenceOfPerformance": "A labelled synthetic graph closure lists all affected and missed lots independently; the P2-27 wrapper remains unavailable and records no recall delivery."
+    }
+  },
+  "tests": [
+    {
+      "id": "L1-ENV-04-T1",
+      "type": "drill",
+      "oracle": {
+        "kind": "system_of_record",
+        "observes": "A labelled synthetic graph closure lists all affected and missed lots independently; the P2-27 wrapper remains unavailable and records no recall delivery."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-ENV-04/positive/evidence-valid.json",
+          "L1-ENV-04/positive/oracle-p227-complete-recall-pending.json"
+        ],
+        "negative": [
+          "L1-ENV-04/negative/evidence-stale.json",
+          "L1-ENV-04/negative/evidence-replayed.json",
+          "L1-ENV-04/negative/evidence-contradictory.json",
+          "L1-ENV-04/negative/evidence-cross-tenant.json",
+          "L1-ENV-04/negative/evidence-empty.json",
+          "L1-ENV-04/negative/evidence-violation.json",
+          "L1-ENV-04/negative/oracle-p227-missed-lot-pending.json",
+          "L1-ENV-04/negative/oracle-genealogy-incomplete.json",
+          "L1-ENV-04/negative/oracle-genealogy-unavailable.json"
+        ]
+      },
+      "passCriteria": "All current recall wrapper cases are not evaluated. Synthetic closure on ingredient, product and shipment nodes does not replace the missing P2-27 fixture/API. FDA 24-hour records production is a distinct unmet requirement, not a recall-completion deadline.",
+      "attempts": 1
+    },
+    {
+      "id": "L1-ENV-04-T-P227-RECALL",
+      "type": "drill",
+      "oracle": {
+        "kind": "system_of_record",
+        "observes": "Actual synthetic recall records and independently traversed held ingredient/product/shipment genealogy."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-ENV-04/positive/p227-complete-genealogy-recall.json"
+        ],
+        "negative": [
+          "L1-ENV-04/negative/p227-missed-shipment-recall.json",
+          "L1-ENV-04/negative/p227-incomplete-genealogy.json"
+        ]
+      },
+      "passCriteria": "The source-owned recall graph closure includes each affected lot; a completed recall that misses a shipment fails. Incomplete genealogy remains unknown. No notification delivery or statutory recall completion is attested. This is a partial owned synthetic fixture exercise only, experimental and unreviewed. Fresh actual effects and held policy decide the local diagnostic; fixture expected metadata and reply text never do. A captured known unsafe effect fails even if a later state is unknown. Missing policy, input, boundary or invocation remains not_evaluated. Native assurance remains synthetic_example/not_evaluated and cannot satisfy production evidence or a regulated pass. Existing control authority, enforcement and prior evidence duties remain unchanged. Per-case synthetic drill only; no adversarial attack-rate claim is made.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-ENV-04-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "head_of_qa"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

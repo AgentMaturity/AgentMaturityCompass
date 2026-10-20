@@ -1,0 +1,1347 @@
+{
+  "schemaVersion": 1,
+  "item": "P3-14",
+  "receiptSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+  "integrationBase": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+  "pendingUpdatedIntIntegration": {
+    "reportedShortRevision": "7628a2b01",
+    "state": "NOT_MERGED_OR_MEASURED_FOR_THIS_HANDOFF",
+    "instruction": "Keep this draft pinned to 1aedd/int8b. Merge when the P2-30 landing is posted; then full-suite qualification and ready v2."
+  },
+  "inventory": {
+    "originalInventory": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/docs/inventory.json",
+      "sha256": "3f3a31e12ec0385b1f6dc6a6ed5576a8517040ca42cff55e9a6e2d412d90c10a",
+      "bytes": 156890
+    },
+    "originalPin": "227d1da6fa0185f00049d2a82efe55cc10108848",
+    "counts": {
+      "packs": 5,
+      "packQuestions": 91,
+      "deepQuestions": 56,
+      "total": 147,
+      "unique": 147
+    },
+    "sourceEquivalence": [
+      {
+        "path": "src/domains/packs/stations/governance.ts",
+        "sha256": "575d78040abf28e9955f85ab4dd1a50d2da8c6486dd431076deb27480c6057b5",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "575d78040abf28e9955f85ab4dd1a50d2da8c6486dd431076deb27480c6057b5",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "575d78040abf28e9955f85ab4dd1a50d2da8c6486dd431076deb27480c6057b5",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/deep/governance.ts",
+        "sha256": "892ed66cc0a9615590248fc6d336769a72f31fa517ce85838d34ea9b050f45af",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "892ed66cc0a9615590248fc6d336769a72f31fa517ce85838d34ea9b050f45af",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "892ed66cc0a9615590248fc6d336769a72f31fa517ce85838d34ea9b050f45af",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+        "currentSourceRevision": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "currentSourceSha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "currentIntRevision": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "currentIntSha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "equivalenceMeaning": "Only these source bytes match the original inventory pin; no test reexecution is inferred."
+      }
+    ],
+    "actualDispositionIds": [
+      "GOV-DCR-1",
+      "GOV-DCR-2",
+      "GOV-DCR-3",
+      "GOV-DCR-4",
+      "GOV-DCR-5",
+      "GOV-DCR-6",
+      "GOV-DCR-7",
+      "GOV-DCR-8",
+      "GOV-DCR-9",
+      "GOV-DCR-10",
+      "GOV-DCR-11",
+      "GOV-DCR-12",
+      "GOV-DCR-13",
+      "GOV-DCR-14",
+      "GOV-DCR-15",
+      "GOV-DCR-16",
+      "GOV-DCR-17",
+      "GOV-DCR-18",
+      "GOV-DD-1",
+      "GOV-DD-2",
+      "GOV-DD-3",
+      "GOV-DD-4",
+      "GOV-DD-5",
+      "GOV-DD-6",
+      "GOV-DD-7",
+      "GOV-DD-8",
+      "GOV-DD-9",
+      "GOV-DD-10",
+      "GOV-DD-11",
+      "GOV-DD-12",
+      "GOV-DD-13",
+      "GOV-DD-14",
+      "GOV-DD-15",
+      "GOV-DD-16",
+      "GOV-DD-17",
+      "GOV-DD-18",
+      "GOV-DD-19",
+      "GOV-DD-20",
+      "GOV-PL-1",
+      "GOV-PL-2",
+      "GOV-PL-3",
+      "GOV-PL-4",
+      "GOV-PL-5",
+      "GOV-PL-6",
+      "GOV-PL-7",
+      "GOV-PL-8",
+      "GOV-PL-9",
+      "GOV-PL-10",
+      "GOV-PL-11",
+      "GOV-PL-12",
+      "GOV-PL-13",
+      "GOV-PL-14",
+      "GOV-PL-15",
+      "GOV-PL-16",
+      "GOV-PL-17",
+      "GOV-PL-18",
+      "GOV-CS-1",
+      "GOV-CS-2",
+      "GOV-CS-3",
+      "GOV-CS-4-v2",
+      "GOV-CS-5",
+      "GOV-CS-6",
+      "GOV-CS-7",
+      "GOV-CS-8",
+      "GOV-CS-9",
+      "GOV-CS-10",
+      "GOV-CS-11",
+      "GOV-CS-12",
+      "GOV-CS-13",
+      "GOV-CS-14",
+      "GOV-CS-15",
+      "GOV-CS-16",
+      "GOV-PPC-1",
+      "GOV-PPC-2",
+      "GOV-PPC-3",
+      "GOV-PPC-4",
+      "GOV-PPC-5",
+      "GOV-PPC-6",
+      "GOV-PPC-7",
+      "GOV-PPC-8",
+      "GOV-PPC-9",
+      "GOV-PPC-10",
+      "GOV-PPC-11",
+      "GOV-PPC-12",
+      "GOV-PPC-13",
+      "GOV-PPC-14",
+      "GOV-PPC-15",
+      "GOV-PPC-16",
+      "GOV-PPC-17",
+      "GOV-PPC-18",
+      "GOV-PPC-19",
+      "gov-fedramp-auth-01",
+      "gov-deep-51",
+      "gov-deep-52",
+      "gov-deep-53",
+      "gov-deep-54",
+      "gov-deep-55",
+      "gov-deep-56",
+      "gov-deep-02",
+      "gov-deep-03",
+      "gov-deep-04",
+      "gov-deep-05",
+      "gov-deep-06",
+      "gov-deep-07",
+      "gov-deep-08",
+      "gov-deep-09",
+      "gov-deep-10",
+      "gov-deep-11",
+      "gov-deep-12",
+      "gov-deep-13",
+      "gov-deep-14",
+      "gov-deep-15",
+      "gov-deep-16",
+      "gov-deep-17",
+      "gov-deep-18",
+      "gov-deep-19",
+      "gov-deep-20",
+      "gov-deep-21",
+      "gov-deep-22",
+      "gov-deep-23",
+      "gov-deep-24",
+      "gov-deep-25",
+      "gov-deep-26",
+      "gov-deep-27",
+      "gov-deep-28",
+      "gov-deep-29",
+      "gov-deep-30",
+      "gov-deep-31",
+      "gov-deep-32",
+      "gov-deep-33",
+      "gov-deep-34",
+      "gov-deep-35",
+      "gov-deep-36",
+      "gov-deep-37",
+      "gov-deep-38",
+      "gov-deep-39",
+      "gov-deep-40",
+      "gov-deep-41",
+      "gov-deep-42",
+      "gov-deep-43",
+      "gov-deep-44",
+      "gov-deep-45",
+      "gov-deep-46",
+      "gov-deep-47",
+      "gov-deep-48",
+      "gov-deep-49",
+      "gov-deep-50"
+    ],
+    "specDrift": {
+      "packQuestions": {
+        "specExpected": 75,
+        "actual": 91,
+        "delta": 16
+      },
+      "handWrittenDeepQuestions": {
+        "specExpected": 7,
+        "actual": 7
+      },
+      "generatedDeepQuestions": {
+        "actual": 49,
+        "state": "active_on_pinned_source",
+        "note": "Included in exact coverage; no retirement or source edit is inferred."
+      },
+      "absentSpecIds": [
+        "GOV-CS-4"
+      ],
+      "retiredIds": [
+        {
+          "oldId": "GOV-CS-4",
+          "newId": "GOV-CS-4-v2",
+          "reason": "Current source keys the revised human-oversight question to the versioned ID."
+        }
+      ],
+      "actualIdsWithoutDisposition": [],
+      "extraDispositionIds": [],
+      "labelMismatches": [
+        {
+          "ids": [
+            "GOV-CS-4-v2"
+          ],
+          "target": "L1-GOV-01",
+          "reason": "The actual question concerns named competent human oversight and the ability to disregard, override, reverse or stop an output. A synthetic identity-bound decision for one benefit case tests only part of that scope."
+        },
+        {
+          "ids": [
+            "GOV-CS-15",
+            "gov-deep-51"
+          ],
+          "target": "L1-GOV-01",
+          "reason": "The notice question does not itself require a particular caseworker decision. The deep question also requires deployer-controlled logs retained for six months; a case decision and notice fixture does not prove that retention."
+        },
+        {
+          "ids": [
+            "GOV-CS-9",
+            "GOV-PPC-19",
+            "gov-deep-52"
+          ],
+          "target": "L1-GOV-02",
+          "reason": "A machine can check the six declared elements, reviewer-reference presence, notification evidence and order of dates. It cannot assess the FRIA content, establish lawful applicability or supply a human assessor."
+        },
+        {
+          "ids": [
+            "GOV-PPC-16"
+          ],
+          "target": "L1-GOV-03",
+          "reason": "A canary egress fixture does not establish the full vendor contract, agency consent, model and data portability, knowledge transfer, licensing, pricing or an exercised exit plan."
+        },
+        {
+          "ids": [
+            "GOV-CS-16",
+            "GOV-DCR-15",
+            "gov-deep-53"
+          ],
+          "target": "L1-GOV-05",
+          "reason": "A timely route to an authorized human tests delivery and authority only. It does not establish the substantive explanation of the actual decision, legal eligibility or the contents of the response."
+        },
+        {
+          "ids": [
+            "GOV-CS-1"
+          ],
+          "target": "P3-15",
+          "reason": "The question includes WCAG 2.1 AA, channel coverage, keyboard focus and an accessibility statement. The later WCAG output check is a pending dependency, not evidence for that complete scope."
+        },
+        {
+          "ids": [
+            "GOV-CS-13"
+          ],
+          "target": "P3-15",
+          "reason": "The question separates federal Section 508 WCAG 2.0 A/AA from state and local ADA duties. A generic later WCAG check does not establish equivalence, jurisdiction, dates or those legal duties."
+        },
+        {
+          "ids": [
+            "GOV-DD-4",
+            "GOV-PL-15",
+            "gov-deep-54"
+          ],
+          "target": "L1-TECH-01",
+          "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice."
+        },
+        {
+          "ids": [
+            "GOV-PPC-14"
+          ],
+          "target": "document_review",
+          "reason": "Accountability, an oversight rationale, separation of recommendations from final decisions and a bidder contest route require document and human review. No simulator substitutes for those records."
+        }
+      ],
+      "packNameNote": "The current pack label is Public and Private Collaboration; P1-13 maps its website label Public & Private Collaboration to governance.public-services. No name is changed."
+    },
+    "dispositionKinds": {
+      "questionnaire": 129,
+      "layer0": 1,
+      "test": 10,
+      "reuse_pending": 6,
+      "document_review": 1
+    },
+    "instrumentCount": 20,
+    "sourceReadClaims": false,
+    "ownedDocumentReferences": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/README.md",
+        "sha256": "a58d8d9215d5d47263f08b346561116088aefc1bbf8692f5e061c6e3ce7ac19c",
+        "bytes": 10083
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/dispositions.json",
+        "sha256": "d93c1b31b5bd940617a232ada7f2c62bc5d163664d45bc7ce9c7f1d34a8388b9",
+        "bytes": 75006
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/guide-section.md",
+        "sha256": "621d13ef6ea49ec937d03456ec060bc1b7e1990642248b087b5f6beeeed39a71",
+        "bytes": 2693
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/instruments.json",
+        "sha256": "bb12ccbd9a94b8e5613f0ab09b90b729e7dca52454bc531d32e1250dbb355c37",
+        "bytes": 18124
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/profile.benefits-caseworker.json",
+        "sha256": "2aea1515d26841c0d157d32eda743481af0427108a026f2cdb21b9e822727b66",
+        "bytes": 2546
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/profile.defense-analyst.json",
+        "sha256": "878d9c072bc66222873c93a4b11d6bc0a15d9cd979e53dbe49e7328ce7f3a417",
+        "bytes": 2358
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/profile.legal-drafting.json",
+        "sha256": "a1aa8abd52fe58f541042ea4a505b02f11d586d1e602d53df2e080ead659fb33",
+        "bytes": 2342
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/docs/catalog/governance/promotion.yaml",
+        "sha256": "80b48917b72770c9942d0d1825bc44d5c4267d3828e9badd1a22f8db7486a75a",
+        "bytes": 2341
+      }
+    ]
+  },
+  "localGuardMutations": {
+    "count": 19,
+    "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+    "reference": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/mutations.json",
+      "sha256": "bb96af3ea428b5ab659062c2ecf37787adc9dcde4a0fbc568083fa550c04b38b",
+      "bytes": 107136
+    },
+    "pointer": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-current.json",
+      "sha256": "b7e4dd7325732ed32ce52d9a7c1e52ad14464a1a77a41095f9afdeb1b0d30892",
+      "bytes": 552
+    },
+    "executionBinding": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/execution-binding.json",
+      "sha256": "681467e43d480c3147f50a9e95edf1d89d28013ddcb05b94381538578ba0ad93",
+      "bytes": 8745
+    },
+    "sourcePinLimitation": "The mutation sourceHead fields are the measured batch-start HEAD. The same HEAD was observed after the batch; no whole-repository per-subprocess HEAD sampling was done. Earlier GREEN/typecheck ran at the prior pin.",
+    "currentReexecutionClaim": false,
+    "mutations": [
+      {
+        "name": "shared-binding",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "exact tenant/workspace/agent/deployment/control/version/plan identity",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/protocol.ts",
+        "originalSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "mutatedSha256": "c71ac0967f4e60110d66ec6fdff6c41b79ec2b5eaf39b6024f9885a4b1b6bd03",
+        "restoredSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding-report.json"
+        ],
+        "durationMs": 1038,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 83,
+          "numFailedTests": 6,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding.log",
+          "sha256": "b79b728ae797bc66502d8ef29e253818265ad1e3b531ba77f47ab2c07b571c56",
+          "bytes": 157
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding-report.json",
+          "sha256": "e4ae29a6b08f477d1810fc041aea5d54628573864b234ed84b3e59fc43b27e29",
+          "bytes": 48542
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) compares every subject/control/version/plan binding field",
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires an actual same-case authorized decision, not the prompt or agent recommendation",
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology",
+          "Governance synthetic reference protocols (not production enforcement or legal review) captures actual seeded body bytes only for contracted inference, atomically",
+          "Governance synthetic reference protocols (not production enforcement or legal review) uses only the ten explicitly synthetic registered IDs and blocks unknown filing",
+          "Governance synthetic reference protocols (not production enforcement or legal review) classifies CUI from the source store despite no marking; binds document and boundary before capture"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "utc-precision",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "UTC timestamps retain at most millisecond precision",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/protocol.ts",
+        "originalSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "mutatedSha256": "b5159bc4d087370aa184bb8ba37d08418bbbf3f7259b022c18dcb5cc5baf8014",
+        "restoredSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision-report.json"
+        ],
+        "durationMs": 1067,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision.log",
+          "sha256": "dfc501af59324b63ed2255e2b2646a380de2ab7aae161c90fedd60043218dff1",
+          "bytes": 156
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision-report.json",
+          "sha256": "172b6e5fa3eec87d7490fbef4430dd31740a01ce74da34e2a4d6976653241a89",
+          "bytes": 43738
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects lossy/impossible UTC time 2026-10-18T12:00:00.0001Z",
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "nonblank-fields",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "nonblank six local FRIA draft fields",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/protocol.ts",
+        "originalSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "mutatedSha256": "a3eaff8a079e7a7c09a57d670dda830ebc9b5b4713256c47d7bd935ccb8b2303",
+        "restoredSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields-report.json"
+        ],
+        "durationMs": 834,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields.log",
+          "sha256": "11051be814b84f4c28537bcf8c97c2d6d8b81183bf2b66caf351a6fa2f24e1d5",
+          "bytes": 158
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields-report.json",
+          "sha256": "e457c85f564ce969e39d963cc79175341936ee3e27334844d892ef6f91522864",
+          "bytes": 42514
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "canonical-endpoint",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "canonical credential/query/fragment-free HTTPS endpoints",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/protocol.ts",
+        "originalSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "mutatedSha256": "59832e46bd96ea27bb9063b48b076fa5ce9eb4cd57cf78309340928660c3bc9b",
+        "restoredSha256": "13684bcd7bab48758bcd08563362867a83dc004b3f9ac7a4c7699d66355767ec",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint-report.json"
+        ],
+        "durationMs": 886,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 84,
+          "numFailedTests": 5,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint.log",
+          "sha256": "9dd0c5869abd7578905d73f72f8fd9bec764b5c216e0999dfc89b54e7ff0ef7c",
+          "bytes": 161
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint-report.json",
+          "sha256": "0bea043aab7855c28e2b5e55da132172802109cf84db95e2d73e2e87c9094162",
+          "bytes": 47238
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects a malformed endpoint even when both request and configured endpoint agree: http://inference.fixture.invalid/v1",
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects a malformed endpoint even when both request and configured endpoint agree: https://u:p@inference.fixture.invalid/v1",
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects a malformed endpoint even when both request and configured endpoint agree: https://inference.fixture.invalid/v1?training=1",
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects a malformed endpoint even when both request and configured endpoint agree: https://inference.fixture.invalid/a/../v1",
+          "Governance synthetic reference protocols (not production enforcement or legal review) rejects a malformed endpoint even when both request and configured endpoint agree: https://inference.fixture.invalid/v1#x"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "case-human-record",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "same-case authorized human decision and nonfuture decision",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/caseSystem.ts",
+        "originalSha256": "0d02df0e40f1ef52afece62332d5708f85a89fde19efa9bc53799128720f391a",
+        "mutatedSha256": "c0645828ef549c0f54083557e718a174455bb61ea003bf76b196714a26451331",
+        "restoredSha256": "0d02df0e40f1ef52afece62332d5708f85a89fde19efa9bc53799128720f391a",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record-report.json"
+        ],
+        "durationMs": 785,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record.log",
+          "sha256": "66197cf1da5497b40e2f947aa2c68adac009553eb8d6966ae470209e42bec6e0",
+          "bytes": 160
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record-report.json",
+          "sha256": "dec6ea16e8e944ea0715acdc9246c5588d08fa451981473f1323f3dd3cce99ca",
+          "bytes": 43706
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires an actual same-case authorized decision, not the prompt or agent recommendation",
+          "Governance synthetic reference protocols (not production enforcement or legal review) binds the disclosure and appeal notice; refuses a future human decision"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "case-notice",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "same-case AI disclosure and expected appeal route",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/caseSystem.ts",
+        "originalSha256": "0d02df0e40f1ef52afece62332d5708f85a89fde19efa9bc53799128720f391a",
+        "mutatedSha256": "ae5aaf88b76311ea10be3f643b8143ba6ebde80b7ee28dab279b499951ff516d",
+        "restoredSha256": "0d02df0e40f1ef52afece62332d5708f85a89fde19efa9bc53799128720f391a",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice-report.json"
+        ],
+        "durationMs": 829,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice.log",
+          "sha256": "b612a4d06b98003e5e3adb8151a7ea321dc8ce21ed577a48e74490a189dabbce",
+          "bytes": 154
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice-report.json",
+          "sha256": "94b4d0a495a44786362ebe976ae8c1993ec2369d5e83b0a1f12ea42fc9689fb6",
+          "bytes": 43763
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) binds the disclosure and appeal notice; refuses a future human decision",
+          "Canonical Governance oracle envelopes remain empty production evidence 1/negative/oracle-missing-appeal.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "activation-signature",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "actual activation bytes and pinned authority verification",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/activationLog.ts",
+        "originalSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "mutatedSha256": "714549cb670ac9909d326c16f7f467783d381500591fd368207582bf151ff608",
+        "restoredSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature-report.json"
+        ],
+        "durationMs": 815,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature.log",
+          "sha256": "81b4d5e9abb9d6af60c782a286015937612f7b90d85c4fb5095359a0e24f4179",
+          "bytes": 163
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature-report.json",
+          "sha256": "f140194d71d5b90acfdb7a2cc24946189fd9a49ed4beacbf4c4d10bb582e7183",
+          "bytes": 42524
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) verifies activation bytes against the independently pinned fixture authority"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "fria-assessor",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "authorized local draft assessor approval",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/activationLog.ts",
+        "originalSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "mutatedSha256": "8e90a30d9d87d21e287a82d848df574d33f0c89d77d33fb1497c4831803059df",
+        "restoredSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor-report.json"
+        ],
+        "durationMs": 772,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor.log",
+          "sha256": "2275d2ef2a8058cce7adb6318e93d1b2eb5983a311b717ffb8d9fbe15ddc645c",
+          "bytes": 156
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor-report.json",
+          "sha256": "792e244c49f25238e795d235b47fe307a1d8eabee58473aa15836fc40dbd5113",
+          "bytes": 42518
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "fria-authority",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "authority notification identity",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/activationLog.ts",
+        "originalSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "mutatedSha256": "c5fcc729ef2b8cfc52a5d81fb32281dc14376831ebfc6ef299b5734cb46237ae",
+        "restoredSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority-report.json"
+        ],
+        "durationMs": 783,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority.log",
+          "sha256": "1ca243d0abfadd123d190ecd6da50eec84b514c9b2e91c7131e8303d1c6d77d1",
+          "bytes": 157
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority-report.json",
+          "sha256": "9d070eb8f7720dddec1794872a6872c6179ba321af0eaea6b157dd93bf0aa2da",
+          "bytes": 42519
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "fria-dates-ignored",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "required mutation: before-use FRIA approval/notification chronology",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/activationLog.ts",
+        "originalSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "mutatedSha256": "011fecc0132de4d0b36920f1090064e1b7ae2541c534176af08875e9f6113c79",
+        "restoredSha256": "668bb38ee881b7d27e86fa01bf0fd6d21d7b95075b3be0cd6a505c241f25c059",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored-report.json"
+        ],
+        "durationMs": 851,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored.log",
+          "sha256": "877c5261968c65c1a0c494e552dfa12a0b37e3be4aa3379df829bc321fd6e935",
+          "bytes": 161
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored-report.json",
+          "sha256": "49162a243f704693d6f35977640e8c9b7a3245c3cb84e457b3e94bf73aad730c",
+          "bytes": 43754
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires all six local draft FRIA fields, an authorized approval, notification and strict pre-use chronology",
+          "Canonical Governance oracle envelopes remain empty production evidence 2/negative/oracle-fria-late.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "canary-observed",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "actual seeded canaries observed in captured request bodies",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/egressCapture.ts",
+        "originalSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "mutatedSha256": "de0799fc560e4b9fa286dc90a97aa132d402e78d31f500c13be01f4d318dbb92",
+        "restoredSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed-report.json"
+        ],
+        "durationMs": 794,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed.log",
+          "sha256": "c3b8bcb77b82b39df0af489ee24852492132ecbc865f67d1a5fe577557c1febc",
+          "bytes": 158
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed-report.json",
+          "sha256": "2782fc197df8e6dd07c6c85d12c810eb1265ce963a309d57c9ff3fe6b04c92bb",
+          "bytes": 42520
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) captures actual seeded body bytes only for contracted inference, atomically"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "canary-egress",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "atomic inference-only exact endpoint/no-training contract window",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/egressCapture.ts",
+        "originalSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "mutatedSha256": "945fe4f31629de4d8d37bf004d52cd7947983ba77cc155cba945d9a3afbe01b3",
+        "restoredSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress-report.json"
+        ],
+        "durationMs": 996,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 84,
+          "numFailedTests": 5,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress.log",
+          "sha256": "1608c420d2c1abd501deac28dda9c25397ecbd10f920d70cbdaba9fc1a0fbcc7",
+          "bytes": 156
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress-report.json",
+          "sha256": "e5133d24a8dfbc4e0347a24cf4b45d93bf041c04ed97fd2e6e1e632483c3aa44",
+          "bytes": 47410
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) captures actual seeded body bytes only for contracted inference, atomically",
+          "Governance synthetic reference protocols (not production enforcement or legal review) refuses endpoint ambiguity https://inference.fixture.invalid.evil/v1",
+          "Canonical Governance oracle envelopes remain empty production evidence 3/negative/oracle-telemetry-purpose.json",
+          "Canonical Governance oracle envelopes remain empty production evidence 3/negative/oracle-training-purpose.json",
+          "Canonical Governance oracle envelopes remain empty production evidence 3/negative/oracle-unlisted-endpoint.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "cui-classification",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "strongest source-store or document CUI classification",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/egressCapture.ts",
+        "originalSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "mutatedSha256": "17947e4bd5caed2850e945eeb20e068db3fbfc3f657b2bc48b9d5384842c25b9",
+        "restoredSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification-report.json"
+        ],
+        "durationMs": 1052,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification.log",
+          "sha256": "3f48c8c5f5d6c2c3fab063b75fb27f15bf7d4064043c448cc9b2b74a6e44aca1",
+          "bytes": 161
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification-report.json",
+          "sha256": "f903fe1b3ff0b33a322ef1c3e8ee230175bc9d90917c4f145d84816f836404eb",
+          "bytes": 42528
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) classifies CUI from the source store despite no marking; binds document and boundary before capture"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "cui-boundary",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "resource identity and exact CUI boundary endpoint",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/egressCapture.ts",
+        "originalSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "mutatedSha256": "249df946c46bdb2568307fb233b1b72d1d1186297c1158687675cd924066a74f",
+        "restoredSha256": "2335512d1225ebc0d17cfd3924962e3bd321327ef9b9e98016883d9454220196",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary-report.json"
+        ],
+        "durationMs": 819,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 86,
+          "numFailedTests": 3,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary.log",
+          "sha256": "de1a85a7e4afd0e3ba5c1f97518cbab728d67bdeecbfdf02cc5f4951e1165d56",
+          "bytes": 155
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary-report.json",
+          "sha256": "5999142639b4f3e0683921667695540be7f39dc5bd683a912272f0d1cb9efd87",
+          "bytes": 44986
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) classifies CUI from the source store despite no marking; binds document and boundary before capture",
+          "Canonical Governance oracle envelopes remain empty production evidence 6/negative/oracle-public-endpoint.json",
+          "Canonical Governance oracle envelopes remain empty production evidence 6/negative/oracle-unmarked-cui-store.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "unknown-citation-accepted",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "required mutation: unknown synthetic citation refusal",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/citationRegistry.ts",
+        "originalSha256": "62bcf1daa2a9a03765d6f2b28c03dd0f213d3b0d1091a2fcd6bcb535673b1603",
+        "mutatedSha256": "18c2085b58f84ac77fccb9c85b9b0f9fef7ab922e53455c541daf43b5693e43b",
+        "restoredSha256": "62bcf1daa2a9a03765d6f2b28c03dd0f213d3b0d1091a2fcd6bcb535673b1603",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted-report.json"
+        ],
+        "durationMs": 811,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted.log",
+          "sha256": "d89aeaaf6fa49f564ef8c28441c4d1db321116090e6905cb2d7a50a3f2f69466",
+          "bytes": 168
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted-report.json",
+          "sha256": "9674325b8372c3391dc37e9d4034c95185382a974153fb4e9e5165366f638d04",
+          "bytes": 43753
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) uses only the ten explicitly synthetic registered IDs and blocks unknown filing",
+          "Canonical Governance oracle envelopes remain empty production evidence 4/negative/oracle-unknown-citation.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "explanation-human",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "actual human route rather than auto-reply",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/requestRouter.ts",
+        "originalSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "mutatedSha256": "07ffe7b22d5d46d47911043107a3642d4be7d73d4dc3c46881aa01a87e849fc3",
+        "restoredSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human-report.json"
+        ],
+        "durationMs": 873,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human.log",
+          "sha256": "6ddac00fddbf1ce3140ca1f800d6abd452f73bb4dde9df580287b626201d0497",
+          "bytes": 160
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human-report.json",
+          "sha256": "138ee0f8417f1d07b2c5a99f19842505acfafe70be184057e5c7d5c85a4144d3",
+          "bytes": 42563
+        },
+        "failedAssertionNames": [
+          "Canonical Governance oracle envelopes remain empty production evidence 5/negative/oracle-auto-reply.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "explanation-identity",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "same request and case identity",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/requestRouter.ts",
+        "originalSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "mutatedSha256": "35758ac65df43bedb16f7dccc77ea38855f73c74675babdb453c0607f6523ea6",
+        "restoredSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity-report.json"
+        ],
+        "durationMs": 897,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity.log",
+          "sha256": "023cf50980a34b36a9bfcc7b0cb181748b1dac990769aee917464c8d19eccdc2",
+          "bytes": 163
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity-report.json",
+          "sha256": "43433943832c8ab73afb8af6c8b9561dd13c556e3a9bfe528ccd8cf3a0a1be02",
+          "bytes": 42510
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires a same-request human route by an authorized reviewer within the inclusive synthetic window"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "explanation-reviewer",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "authorized reviewer identity",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/requestRouter.ts",
+        "originalSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "mutatedSha256": "0069dcf7d4ab18c01bfa91bca43d712c377bc2d0d75fa14af14085d9d01b54dd",
+        "restoredSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer-report.json"
+        ],
+        "durationMs": 875,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 88,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer.log",
+          "sha256": "bc7abcc48ea4cc455829b1561a653965dbb1b62eeac619e32ad32d3726d25b04",
+          "bytes": 163
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer-report.json",
+          "sha256": "16b4d216039348596813e7a1692d1e6697de8662f396fa0a8ef14b90ba688c88",
+          "bytes": 42553
+        },
+        "failedAssertionNames": [
+          "Canonical Governance oracle envelopes remain empty production evidence 5/negative/oracle-unauthorized-reviewer.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      },
+      {
+        "name": "explanation-window",
+        "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+        "guard": "nonfuture ordered routing within inclusive synthetic window",
+        "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/requestRouter.ts",
+        "originalSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "mutatedSha256": "97bd80103564cd87a506b83771c0514462d50bcd45dcfdb43dc26ba438e5cd51",
+        "restoredSha256": "c587f5881ef705e09617cea7589e30c0a2ef31c2bde8c9a621c60c3a7dd92e11",
+        "exactByteRestore": true,
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/fixtures.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window-report.json"
+        ],
+        "durationMs": 893,
+        "exitCode": 1,
+        "counts": {
+          "numTotalTests": 89,
+          "numPassedTests": 87,
+          "numFailedTests": 2,
+          "numPendingTests": 0
+        },
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window.log",
+          "sha256": "3034bb04206481992a578835742ba3b14099d2706f4dec4980daab8671168b36",
+          "bytes": 161
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window-report.json",
+          "sha256": "0415d9bacfbbd8fe7274c2b57250d04a036e96e970174411b38a7fe679497139",
+          "bytes": 43758
+        },
+        "failedAssertionNames": [
+          "Governance synthetic reference protocols (not production enforcement or legal review) requires a same-request human route by an authorized reviewer within the inclusive synthetic window",
+          "Canonical Governance oracle envelopes remain empty production evidence 5/negative/oracle-late-route.json"
+        ],
+        "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+      }
+    ],
+    "restored": {
+      "sourceHead": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "exitCode": 0,
+      "durationMs": 841,
+      "counts": {
+        "numTotalTests": 89,
+        "numPassedTests": 89,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/restored-green.log",
+      "logSha256": "6196078134ba1b5db819d311b303d62e6c1cbc8da2ae29dadd44ee0faac9570a",
+      "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/restored-green-report.json",
+      "reportSha256": "8b5ce865f7677d842776ce415023fe7b493974988df20211ec02051f02a6fe55",
+      "exactAllOwnFilesRestored": true
+    }
+  },
+  "currentAdapterMutation": {
+    "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+    "reference": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/adapter-mutation.json",
+      "sha256": "21fb2d4d0cb57331801c923eb5cc3a2cd5bf96124ac9baa788f958e3588a3956",
+      "bytes": 11070
+    },
+    "initialCounts": {
+      "numTotalTests": 75,
+      "numPassedTests": 75,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "mutationCounts": {
+      "numTotalTests": 75,
+      "numPassedTests": 74,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "restoredCounts": {
+      "numTotalTests": 75,
+      "numPassedTests": 75,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "exactByteRestore": true,
+    "originalSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+    "mutatedSha256": "8fdbf2980cd45c4b31d4bc5bbe2a248a37257ecc6216ace4aa9e216531ed1698",
+    "restoredSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+    "defaultBudgetsAndAssertions": true
+  },
+  "sourceAndHumanLimits": [
+    "Experimental and unreviewed; promotion none.",
+    "20 instruments unverified with reverify true; no source read, legal review, dates or approvals invented.",
+    "The citation corpus is ten synthetic IDs plus one unknown ID, not ten real authoritative cases; criterion remains OPEN.",
+    "D-14 expert names through D-10, P1-29 partners, D-04 licence, stewardship and independent human sign-offs remain pending.",
+    "Guide hook, L1-TECH-01 reuse, EU register and final merged-HEAD full suite remain pending.",
+    "A4 scope_changed/P3-23 FRIA note is an integration requirement, not an A4 execution claim.",
+    "No third-party contact, push, deployment, credential use, landing merge or tracked deletion."
+  ],
+  "versionDeferralInterpretationCorrection": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/version-deferral-interpretation-correction.json",
+    "sha256": "60ea0d8e6fc597a94d149fdfc6d00fa007011d2f823ad96fbdf2e9c40934b2c1",
+    "bytes": 1974
+  },
+  "ownChangelogAppend": {
+    "sourceHead": "1aedd197c1821d9c4f750073c33e22431ff62137",
+    "previousSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+    "path": "catalog/CHANGELOG.md",
+    "inheritedBytes": 12756,
+    "inheritedSha256": "df43e1b4021de112c8cfe2fe8974ac9ed074e698ef42f81c0b1dc35c9d226105",
+    "inheritedPrefixPreservedExactly": true,
+    "appendedLineCount": 8,
+    "appendedSuffixSha256": "6160b0be552c9346c1105f0f208e6632f00884e580abcbc1811ab81dc395d063",
+    "currentSha256": "db03c789cf0ec18eadb512157489e671afb5ee1fc84100206b4d93e3c0923a37",
+    "entry": {
+      "catalog": {
+        "digest": "sha256:4c626dc5ba2c8fe3fae7cc5a3700edf6fe279249c3590495cca52e3c721c99c9",
+        "id": "amc.catalog",
+        "version": "0.1.0"
+      },
+      "controls": [
+        {
+          "change": "added",
+          "id": "L1-GOV-01",
+          "reason": "P3-14: experimental, unreviewed local caseworker decision protocol; production enforcement not evaluated.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        },
+        {
+          "change": "added",
+          "id": "L1-GOV-02",
+          "reason": "P3-14: experimental, unreviewed FRIA-before-activation fixture; no legal review or FRIA quality assessment.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        },
+        {
+          "change": "added",
+          "id": "L1-GOV-03",
+          "reason": "P3-14: experimental, unreviewed vendor-training canary protocol; full vendor contract assessment remains open.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        },
+        {
+          "change": "added",
+          "id": "L1-GOV-04",
+          "reason": "P3-14: experimental, unreviewed citation filing protocol with synthetic cases; real authoritative corpus pending.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        },
+        {
+          "change": "added",
+          "id": "L1-GOV-05",
+          "reason": "P3-14: experimental, unreviewed human explanation routing fixture; explanation quality not evaluated.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        },
+        {
+          "change": "added",
+          "id": "L1-GOV-06",
+          "reason": "P3-14: experimental, unreviewed synthetic CUI boundary protocol; no CMMC phase or production coverage claim.",
+          "reviewRecordIds": [],
+          "version": "0.1.0"
+        }
+      ],
+      "entryVersion": 1
+    },
+    "versionBump": "Deferred to Claude at landing; existing entries remain unchanged."
+  }
+}

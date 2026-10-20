@@ -1,0 +1,85 @@
+{
+  "profileVersion": 1,
+  "profileId": "governance-defense-analyst-draft",
+  "deployment": {
+    "tenantId": "governance-fixture-tenant",
+    "workspaceId": "governance-fixture-workspace",
+    "deploymentId": "governance-defense-analyst-fixture",
+    "agentIds": [
+      "governance-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "governance",
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "governance",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "governance.defense"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "defense_contractor"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "defense_analysis"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "controlled_unclassified_information"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.defense-analyst.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

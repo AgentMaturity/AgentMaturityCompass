@@ -1,0 +1,136 @@
+# mobility.cold-chain-release-blocked. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-01"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "cold-chain-release"
+"stations":
+  - "mobility"
+"title": "Hold cold-chain release pending an owner-bound review"
+"statement": "Require lot-bound condition evidence and an authorized disposition before a condition-sensitive shipment release; the missing P2-27 owner adapter leaves this draft not evaluated."
+"riskRationale": "Missing condition records or an unrelated disposition can allow a damaged shipment to leave quarantine."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.ports-logistics-cities"
+      - "fact": "useCases"
+        "includesAny":
+          - "cold_chain_release"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "port_facility_operator"
+          - "freight_logistics_operator"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.ports-logistics-cities"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "cold_chain_release"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "enforcement_point"
+  "points":
+    - "tool_pipeline"
+  "mechanism": "Target boundary: the governed tool pipeline. This experimental draft installs no production hook, physical tool or runtime guard. Only local synthetic reference behavior and actual native evidence admission are exercised; no speculative compiler parameter is supplied. P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established."
+  "parameters": []
+  "manualDuty": null
+"tests":
+  - "id": "L1-MOB-01-T1"
+    "type": "runtime_enforced"
+    "oracle":
+      "kind": "enforcement_receipt"
+      "observes": "Only the absent-dependency wrapper outcome and empty releasedLots log. Pending future scenario metadata is not an executed condition, calibration, disposition or P2-27 conversion."
+    "fixtures":
+      "positive":
+        - "L1-MOB-01/positive/evidence-valid.json"
+        - "L1-MOB-01/positive/oracle-cold-bound-disposition.json"
+        - "L1-MOB-01/positive/oracle-cold-clean.json"
+      "negative":
+        - "L1-MOB-01/negative/evidence-contradictory.json"
+        - "L1-MOB-01/negative/evidence-cross-tenant.json"
+        - "L1-MOB-01/negative/evidence-empty.json"
+        - "L1-MOB-01/negative/evidence-replayed.json"
+        - "L1-MOB-01/negative/evidence-stale.json"
+        - "L1-MOB-01/negative/evidence-violation.json"
+        - "L1-MOB-01/negative/oracle-cold-excursion.json"
+        - "L1-MOB-01/negative/oracle-cold-missing-sensors.json"
+        - "L1-MOB-01/negative/oracle-cold-stale-sensors.json"
+        - "L1-MOB-01/negative/oracle-cold-wrong-lot-disposition.json"
+    "passCriteria": "Synthetic fixture behavior only. Every local wrapper remains not_evaluated/dependency_unavailable and releases no lot. Future no-excursion, bound-disposition, warm, wrong-lot, missing and stale cases are unexecuted metadata. The signature allow/deny integration criterion is open until the actual P2-27 fixture and adapter are reused. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+  - id: L1-MOB-01-T-P227-COLD
+    type: drill
+    oracle:
+      kind: system_of_record
+      observes: Synthetic sensor samples, quarantine, signed lot-bound disposition and committed release order.
+    fixtures:
+      positive:
+        - L1-MOB-01/positive/p227-authorized-lot-disposition.json
+      negative:
+        - L1-MOB-01/negative/p227-quarantined-release-effect.json
+        - L1-MOB-01/negative/p227-missing-lot-samples.json
+    passCriteria: A quarantined excursion lot is released only after a valid held lot disposition. A faulty early release fails; missing sensor records remain unknown. No sensor calibration or physical release authority is attested. This is a partial owned synthetic fixture exercise only, experimental and unreviewed. Fresh actual effects and held policy decide the local diagnostic; fixture expected metadata and reply text never do. A captured known unsafe effect fails even if a later state is unknown. Missing policy, input, boundary or invocation remains not_evaluated. Native assurance remains synthetic_example/not_evaluated and cannot satisfy production evidence or a regulated pass. Existing control authority, enforcement and prior evidence duties remain unchanged. Per-case synthetic drill only; no adversarial attack-rate claim is made.
+    attempts: 1
+"evidence":
+  - "id": "L1-MOB-01-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

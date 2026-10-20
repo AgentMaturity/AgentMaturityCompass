@@ -55,12 +55,18 @@ const EVERY_STATION = {
   notExecutable: ["DATA_EXPORT", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY"],
   execTicket: ["DATA_EXPORT", "DEPLOY", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY", "WRITE_HIGH"]
 };
-/** Wealth and Technology have Layer 1 overlays; each overlay stays within its station's profile. */
-const WEALTH_OVERLAY = Array.from({ length: 15 }, (_, i) => `L1-WLT-US-${String(i + 1).padStart(2, "0")}`);
+/** Station overlays list every requirement row, including explicitly not-applicable controls; the Governance defense row is also scoped to Technology. */
+const WEALTH_OVERLAY = ["L1-WLT-01", ...Array.from({ length: 15 }, (_, i) => `L1-WLT-US-${String(i + 1).padStart(2, "0")}`)];
+const HEALTH_OVERLAY = ["L1-HLT-01"];
+const EDUCATION_OVERLAY = ["L1-EDU-01", "L1-EDU-02", "L1-EDU-03", "L1-EDU-04"];
+const GOVERNANCE_OVERLAY = ["L1-GOV-01", "L1-GOV-02", "L1-GOV-03", "L1-GOV-04", "L1-GOV-05", "L1-GOV-06"];
 const TECHNOLOGY_OVERLAY = [
   "L1-TECH-01", "L1-TECH-02", "L1-TECH-03", "L1-TECH-04",
   "L1-TECH-05", "L1-TECH-06", "L1-TECH-07", "L1-TECH-08"
 ];
+const MOBILITY_OVERLAY = ["L1-MOB-01", "L1-MOB-02", "L1-MOB-03", "L1-MOB-04", "L1-MOB-05", "L1-MOB-06", "L1-MOB-07"];
+
+const ENVIRONMENT_OVERLAY = Array.from({ length: 6 }, (_, i) => `L1-ENV-${String(i + 1).padStart(2, "0")}`);
 
 describe("P1-46: the compiled plan holds F2's station-profile rules for every station", () => {
   test("seven stations", () => {
@@ -69,8 +75,29 @@ describe("P1-46: the compiled plan holds F2's station-profile rules for every st
 
   test.each(listDomainIds().sort())("golden: %s", (station) => {
     const plan = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
-    const overlayControls = station === "wealth" ? WEALTH_OVERLAY : station === "technology" ? TECHNOLOGY_OVERLAY : [];
+    const overlayControls = station === "wealth" ? WEALTH_OVERLAY : station === "technology" ? ["L1-GOV-06", ...TECHNOLOGY_OVERLAY]
+      : station === "governance" ? GOVERNANCE_OVERLAY : station === "education" ? EDUCATION_OVERLAY : station === "environment" ? ENVIRONMENT_OVERLAY : station === "mobility" ? MOBILITY_OVERLAY : station === "health" ? HEALTH_OVERLAY : [];
     expect(f2View(plan)).toEqual({ ...EVERY_STATION, overlayControls });
+  });
+
+  test.each([
+    { station: "health", controlId: "L1-HLT-01" },
+    { station: "mobility", controlId: "L1-MOB-07" },
+    { station: "wealth", controlId: "L1-WLT-01" }
+  ])("disabled optional $controlId remains listed but inactive for $station", ({ station, controlId }) => {
+    const plan = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
+    expect(catalog.controls.get(controlId)).toMatchObject({ mandatory: false,
+      applicability: { predicate: { not: { always: true } } },
+      binding: { kind: "manual", points: [], parameters: [] } });
+    expect(plan.requirements.find(row => row.controlId === controlId)).toMatchObject({
+      controlId, applicability: "not_applicable", mandatory: false, missingFacts: [],
+      exclusion: { reason: "applicability predicate is false", source: "predicate", exceptionId: null }
+    });
+    expect(plan.evidencePlan.tests.map(row => row.controlId)).not.toContain(controlId);
+    expect(plan.evidencePlan.evidenceRequests.map(row => row.controlId)).not.toContain(controlId);
+    expect(plan.evidencePlan.manualDuties.map(row => row.controlId)).not.toContain(controlId);
+    expect(plan.evidencePlan.releaseGates.map(row => row.controlId)).not.toContain(controlId);
+    expect(plan.unsupported.map(row => row.controlId)).not.toContain(controlId);
   });
 });
 

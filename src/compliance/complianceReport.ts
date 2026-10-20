@@ -2,7 +2,11 @@ import { dirname, resolve } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { envelopeForComplianceCategory, envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
+import { familyReview, normalizeFrameworkName } from "./frameworks.js";
 import type { ComplianceReportJson } from "./mappingSchema.js";
+
+/** How every compliance surface states the review status (P1-45). */
+export const EXPERIMENTAL_LINE = "experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).";
 
 function shortEvidenceHash(hash: string): string {
   if (hash.length <= 20) {
@@ -52,6 +56,9 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push("");
   lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceReport(report, report.ts)), "report"));
   lines.push("");
+  const framework = normalizeFrameworkName(report.framework);
+  lines.push(`- Mappings: ${EXPERIMENTAL_LINE} A result for another framework never sets a result here.`);
+  for (const flag of report.familyReview?.flags ?? (framework ? familyReview(framework).flags : [])) lines.push(`- Flag: ${flag}`);
   lines.push(`- Agent: ${report.agentId}`);
   if (report.station) lines.push(`- Station: ${report.station} (only mappings tagged with this station)`);
   lines.push(`- Window: ${new Date(report.windowStartTs).toISOString()} -> ${new Date(report.windowEndTs).toISOString()}`);
@@ -63,9 +70,12 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
     `- Trust coverage: OBSERVED ${(report.trustTierCoverage.observed * 100).toFixed(1)}% | ATTESTED ${(report.trustTierCoverage.attested * 100).toFixed(1)}% | SELF_REPORTED ${(report.trustTierCoverage.selfReported * 100).toFixed(1)}%`
   );
   const counts = `S:${report.coverage.satisfied} P:${report.coverage.partial} M:${report.coverage.missing} N:${report.coverage.notEvaluated} U:${report.coverage.unknown}`;
+  const counted = report.categories.filter((row) => row.descoped === undefined).length;
+  const descoped = report.categories.length - counted;
   lines.push(report.coverage.score === null
-    ? `- Coverage: not evaluated (0 of ${report.categories.length} categories passed or failed) (${counts})`
+    ? `- Coverage: not evaluated (0 of ${counted} categories passed or failed) (${counts})`
     : `- Coverage score: ${(report.coverage.score * 100).toFixed(1)}% (${counts})`);
+  if (descoped > 0) lines.push(`- Descoped: ${descoped} categories are listed but not evaluated or counted (licensed text unavailable).`);
   lines.push("- Full hashes remain available in JSON reports: `amc compliance report --json`.");
   lines.push("");
   lines.push("## Status and Evidence Drilldown");

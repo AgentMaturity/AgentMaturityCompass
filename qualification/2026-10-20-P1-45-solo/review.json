@@ -1,0 +1,7829 @@
+{
+ "item": "P1-45",
+ "state": "PREPARATORY_CURRENT_PRODUCT_REVIEW_NOT_READY",
+ "sourceSnapshot": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+ "int": "8132127925426c41fb3c25402f1615ca23019f11",
+ "knownByteAndTreeEquivalentHead": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+ "equivalence": {
+  "proof": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/summary.json",
+   "sha256": "d6486438ce48e7b50c6e17e50c4121a4604f636bf4af4b3cebda6db7d89ff346",
+   "bytes": 9212
+  },
+  "initialTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+  "finalTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+  "exactSourceRestoration": true,
+  "scope": "Recorded whole-tree and exact source restoration equivalence; the technical/content review was performed at290b9, not represented as a new source read or a new legal review at e848."
+ },
+ "finalQualifiedHead": null,
+ "checks": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/required-checks-87c99-v1/summary.json",
+  "sha256": "cd66f1693c8c1f562c9c3445ab779bba5ca771916d934cab51eb976967f4a09c",
+  "bytes": 11389
+ },
+ "fullResult": null,
+ "ready": false,
+ "experimental": true,
+ "humanApproval": null,
+ "expertSignOff": null,
+ "legalApplicabilityApproval": false,
+ "rationaleReview": "agent-drafted, unreviewed",
+ "reverify": true,
+ "purpose": "Exhaustive P1-45 review.json index required by the acceptance criteria; follows exact existing review artifact rows without claiming expert or current-law review.",
+ "priorContentProposal": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/manifest.json",
+  "sha256": "f48734b99f900cd3b77c28d95c984805c6e2737729c6477410de144e86dc2410",
+  "bytes": 7454
+ },
+ "artifacts": [
+  {
+   "path": "README.md",
+   "sha256": "0084b40d54aab3985949941c10a09b460cfabd77bf807f65e9d3017162a65c64",
+   "bytes": 4287,
+   "proposalBytes": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/README.md",
+    "sha256": "be5ab43e4349bbd8c344d454a851b0eb2295600690ffbb0fbf0c36a1dab06376",
+    "bytes": 3068
+   },
+   "currentBytesScope": "Current preparatory README; proposalBytes remains immutable earlier provenance, not the current README bytes."
+  },
+  {
+   "path": "review-mappings.json",
+   "sha256": "e957dc960589ce9f0fda3b4bb3d311152a056c20ee9e33de0fb469136588a92c",
+   "bytes": 272948,
+   "proposalBytes": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/review-mappings.json",
+    "sha256": "e957dc960589ce9f0fda3b4bb3d311152a056c20ee9e33de0fb469136588a92c",
+    "bytes": 272948
+   }
+  },
+  {
+   "path": "review-links.json",
+   "sha256": "6e7dc9845faf12a0df2f7fe1dc16804036bed32590eb9514c8ce7c6a349cf391",
+   "bytes": 448103,
+   "proposalBytes": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/review-links.json",
+    "sha256": "6e7dc9845faf12a0df2f7fe1dc16804036bed32590eb9514c8ce7c6a349cf391",
+    "bytes": 448103
+   }
+  },
+  {
+   "path": "review-controls.json",
+   "sha256": "0a8e6358f1e8be7d891b6444e44c9e1f7c5b632751487e617792ca69d7b5656b",
+   "bytes": 402650,
+   "proposalBytes": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/review-controls.json",
+    "sha256": "0a8e6358f1e8be7d891b6444e44c9e1f7c5b632751487e617792ca69d7b5656b",
+    "bytes": 402650
+   }
+  },
+  {
+   "path": "source-evidence.json",
+   "sha256": "b9ef0c9b0dfed8982d80a25cb2916925d7505f5d38e5e1ab35cbb6f9932d0e37",
+   "bytes": 45372,
+   "proposalBytes": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/qualification-content-proposal-v1/source-evidence.json",
+    "sha256": "b9ef0c9b0dfed8982d80a25cb2916925d7505f5d38e5e1ab35cbb6f9932d0e37",
+    "bytes": 45372
+   }
+  }
+ ],
+ "counts": {
+  "mappingIds": 149,
+  "controlIds": 290,
+  "currentLinks": 338,
+  "removedLinkTombstones": 3,
+  "currentLinkedControls": 181,
+  "sourceTextSupportedControls": 112,
+  "unverifiedControls": 178,
+  "humanSignOffs": 0
+ },
+ "mappingReviewIndex": [
+  {
+   "id": "soc2_security",
+   "framework": "SOC2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/0"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "soc2_availability",
+   "framework": "SOC2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/1"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "soc2_confidentiality",
+   "framework": "SOC2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/2"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "soc2_processing_integrity",
+   "framework": "SOC2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/3"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "soc2_privacy",
+   "framework": "SOC2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/4"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist_govern",
+   "framework": "NIST_AI_RMF",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/5"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist_map",
+   "framework": "NIST_AI_RMF",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/6"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist_measure",
+   "framework": "NIST_AI_RMF",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/7"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist_manage",
+   "framework": "NIST_AI_RMF",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/8"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_4_context",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/9"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_5_leadership",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/10"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_6_planning",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/11"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_7_support",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/12"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_8_operation",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/13"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_9_performance_evaluation",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/14"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42001_clause_10_improvement",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/15"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42005_scope_and_stakeholders",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/16"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42005_severity_likelihood_uncertainty",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/17"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42005_mitigation_traceability",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/18"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso42006_conformity_evidence_package",
+   "framework": "ISO_42001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/19"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso_access_control",
+   "framework": "ISO_27001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/20"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso_logging_monitoring",
+   "framework": "ISO_27001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/21"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso_incident_management",
+   "framework": "ISO_27001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/22"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso_supplier_security",
+   "framework": "ISO_27001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/23"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "iso_risk_management",
+   "framework": "ISO_27001",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/24"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art9_risk_management",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/25"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art10_data_governance",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/26"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art11_technical_documentation",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/27"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art12_record_keeping",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/28"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art13_transparency",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/29"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art14_human_oversight",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/30"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art15_accuracy_robustness",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/31"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art17_quality_management",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/32"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art27_fria",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/33"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art72_post_market_monitoring",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/34"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art73_incident_reporting",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/35"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "euai_art86_right_to_explanation",
+   "framework": "EU_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/36"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_lawfulness_fairness_transparency",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/37"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_purpose_limitation",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/38"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_data_minimisation",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/39"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_accuracy",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/40"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_storage_limitation",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/41"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_integrity_confidentiality",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/42"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art5_accountability",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/43"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art6_lawful_basis",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/44"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art15_22_data_subject_rights",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/45"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art25_data_protection_by_design",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/46"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art32_security_of_processing",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/47"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art33_34_breach_notification",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/48"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "gdpr_art35_dpia",
+   "framework": "GDPR",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/49"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_reconnaissance",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/50"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_supply_chain_compromise",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/51"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_prompt_injection",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/52"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_model_evasion",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/53"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_llm_jailbreak",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/54"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_data_exfiltration",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/55"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_cost_harvesting",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/56"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "atlas_model_access_control",
+   "framework": "MITRE_ATLAS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/57"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api1_bola",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/58"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api2_broken_auth",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/59"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api3_bopla",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/60"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api4_resource_consumption",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/61"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api5_bfla",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/62"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api6_sensitive_flows",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/63"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api7_ssrf",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/64"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api8_misconfiguration",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/65"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api9_inventory",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/66"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "owasp_api10_unsafe_consumption",
+   "framework": "OWASP_API_TOP10",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/67"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_administrative_safeguards",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/68"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_technical_safeguards",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/69"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_physical_safeguards",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/70"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_organizational_requirements",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/71"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_policies_documentation",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/72"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_privacy_rule",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/73"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_access_to_phi",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/74"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_accounting_disclosures",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/75"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_administrative_requirements",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/76"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hipaa_breach_notification",
+   "framework": "HIPAA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/77"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_section_302",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/78"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_section_404",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/79"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_itgc_access",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/80"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_itgc_change_management",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/81"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_itgc_operations",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/82"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_segregation_of_duties",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/83"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_audit_trail",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/84"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_financial_integrity",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/85"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "sox_program_development",
+   "framework": "SOX",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/86"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_access_control",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/87"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_audit_accountability",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/88"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_assessment_authorization",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/89"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_config_management",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/90"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_contingency_planning",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/91"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_identification_authentication",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/92"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_incident_response",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/93"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_risk_assessment",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/94"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_system_communications",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/95"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "fedramp_system_integrity",
+   "framework": "FEDRAMP",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/96"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "pci_dss_access_control",
+   "framework": "PCI_DSS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/97"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "pci_dss_audit_logging",
+   "framework": "PCI_DSS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/98"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "pci_dss_secure_dev",
+   "framework": "PCI_DSS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/99"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "pci_dss_vulnerability_mgmt",
+   "framework": "PCI_DSS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/100"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art5_governance",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/101"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art8_identification",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/102"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art9_protection_prevention",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/103"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art10_detection",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/104"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art11_response_recovery",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/105"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art17_incident_management",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/106"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art19_major_incident_reporting",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/107"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art24_25_resilience_testing",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/108"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "dora_art28_third_party_risk",
+   "framework": "DORA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/109"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art20_governance",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/110"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2a_risk_policies",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/111"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2b_incident_handling",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/112"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2c_business_continuity",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/113"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2d_supply_chain",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/114"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2e_secure_development",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/115"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2f_effectiveness",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/116"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art21_2i_access_control",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/117"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nis2_art23_reporting",
+   "framework": "NIS2",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/118"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_feedback",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/119"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_source_attributes",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/120"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_source_attribute_access",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/121"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_risk_analysis",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/122"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_risk_mitigation",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/123"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "hti1_dsi_governance",
+   "framework": "HHS_HTI_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/124"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist600_confabulation",
+   "framework": "NIST_AI_600_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/125"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist600_data_privacy",
+   "framework": "NIST_AI_600_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/126"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist600_information_integrity",
+   "framework": "NIST_AI_600_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/127"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist600_information_security",
+   "framework": "NIST_AI_600_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/128"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "nist600_value_chain",
+   "framework": "NIST_AI_600_1",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/129"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "co_admt_developer_documentation",
+   "framework": "CO_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/130"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "co_admt_record_keeping",
+   "framework": "CO_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/131"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "co_admt_deployer_notice",
+   "framework": "CO_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/132"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "co_admt_human_review",
+   "framework": "CO_AI_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/133"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "tx_traiga_consumer_disclosure",
+   "framework": "TX_TRAIGA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/134"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "tx_traiga_behavioral_manipulation",
+   "framework": "TX_TRAIGA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/135"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "tx_traiga_unlawful_discrimination",
+   "framework": "TX_TRAIGA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/136"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "tx_traiga_ag_documentation",
+   "framework": "TX_TRAIGA",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/137"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_sb53_frontier_framework",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/138"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_sb53_transparency_report",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/139"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_sb53_critical_incident_reporting",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/140"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_ab2013_training_data",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/141"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_ccpa_admt_pre_use_notice",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/142"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_ccpa_admt_human_appeal",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/143"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "ca_ccpa_admt_access",
+   "framework": "CA_AI_LAWS",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/144"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "kr_ai_act_art31_transparency",
+   "framework": "KR_AI_BASIC_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/145"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "kr_ai_act_art32_safety",
+   "framework": "KR_AI_BASIC_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/146"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "kr_ai_act_art34_operator_measures",
+   "framework": "KR_AI_BASIC_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/147"
+   },
+   "humanSignOff": null
+  },
+  {
+   "id": "kr_ai_act_art35_impact_assessment",
+   "framework": "KR_AI_BASIC_ACT",
+   "review": {
+    "artifact": "review-mappings.json",
+    "pointer": "/rows/148"
+   },
+   "humanSignOff": null
+  }
+ ],
+ "controlReviewIndex": [
+  {
+   "controlId": "DORA-5(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/0"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-5(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/1"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-5(3)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/2"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-5(4)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/3"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-6(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/4"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-6(5)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/5"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-6(8)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/6"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-7",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/7"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/8"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(4)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/9"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(5)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/10"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/11"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(c)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/12"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(d)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/13"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(e)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/14"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-10(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/15"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-10(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/16"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-11(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/17"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-11(6)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/18"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-12(1)-(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/19"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-12(6)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/20"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-13(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/21"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-14(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/22"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-16(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/23"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(1)-(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/24"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(3)(b)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/25"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(3)(e)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/26"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-18(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/27"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1772-Art8",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/28"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-19(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/29"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-19(3)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/30"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-19(4)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/31"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2025/301-Art5",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/32"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ITS-2025/302-Art1",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/33"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/34"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(4)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/35"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(5)-(6)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/36"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-25(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/37"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-26(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/38"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2025/1190",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/39"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-27(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/40"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/41"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(3)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/42"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ITS-2024/2956-Art3",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/43"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(4)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/44"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(8)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/45"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-29(1)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/46"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-30(2)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/47"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-30(3)",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/48"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1773-Art9",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/49"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2025/532-Art3",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/50"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art12",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/51"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art17",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/52"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art20",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/53"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art21",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/54"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art23",
+   "framework": "DORA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/55"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART20-1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/56"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART20-2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/57"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/58"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2-CHAPEAU",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/59"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2a",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/60"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2b",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/61"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2c",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/62"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2d",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/63"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2e",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/64"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2f",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/65"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2g",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/66"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2h",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/67"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2i",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/68"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2j",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/69"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/70"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/71"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/72"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/73"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/74"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4a",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/75"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4b",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/76"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4c",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/77"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4d",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/78"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4e",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/79"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART32-6",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/80"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/81"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/82"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/83"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/84"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART5",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/85"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART6",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/86"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART7",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/87"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART8",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/88"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART9",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/89"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART10",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/90"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART11",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/91"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART12",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/92"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART13",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/93"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART14",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/94"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART16",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/95"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-1.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/96"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-1.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/97"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/98"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/99"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/100"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/101"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/102"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/103"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/104"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.5",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/105"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.6",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/106"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/107"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/108"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/109"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/110"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/111"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/112"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/113"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/114"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/115"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.5",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/116"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.6",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/117"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.7",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/118"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.8",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/119"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.9",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/120"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.10",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/121"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-7",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/122"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-8.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/123"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-8.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/124"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-9",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/125"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-10.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/126"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-10.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/127"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-10.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/128"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-10.4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/129"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/130"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/131"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/132"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/133"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.5",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/134"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.6",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/135"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.7",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/136"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/137"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/138"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/139"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.4",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/140"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.5",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/141"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-13.1",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/142"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-13.2",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/143"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-13.3",
+   "framework": "NIS2",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/144"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(i)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/145"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(ii)(A)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/146"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(ii)(B)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/147"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(ii)(C)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/148"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iii)(A)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/149"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iii)(B)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/150"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(A)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/151"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(1)-(2)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/152"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(3)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/153"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(4)-(6)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/154"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(7)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/155"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(8)-(9)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/156"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(v)(A)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/157"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(v)(B)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/158"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(A)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/159"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(B)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/160"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(C)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/161"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ONC-170.402(b)(4)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/162"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ONC-170.523(f)(1)(xxi)",
+   "framework": "HHS_HTI_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/163"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(1)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/164"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(2)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/165"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(3)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/166"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(4)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/167"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(5)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/168"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(6)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/169"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(7)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/170"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(8)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/171"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(9)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/172"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(10)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/173"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(11)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/174"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(12)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/175"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(13)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/176"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(14)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/177"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(b)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/178"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.310",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/179"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(a)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/180"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(b)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/181"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(c)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/182"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(d)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/183"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(e)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/184"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(f)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/185"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(g)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/186"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(h)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/187"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(i)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/188"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(j)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/189"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.314(a)",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/190"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.316",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/191"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-preamble-AI",
+   "framework": "HIPAA",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/192"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.1",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/193"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.2",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/194"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.3",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/195"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.4",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/196"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.5",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/197"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.6",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/198"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.7",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/199"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.8",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/200"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/201"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.10",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/202"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.11",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/203"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.12",
+   "framework": "NIST_AI_600_1",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/204"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/205"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/206"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/207"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.4",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/208"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.5",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/209"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.6",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/210"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.7",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/211"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-2.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/212"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-3.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/213"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/214"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/215"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/216"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-5.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/217"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/218"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/219"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-1.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/220"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-1.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/221"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/222"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/223"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/224"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-3.4",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/225"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-4.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/226"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-5.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/227"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-5.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/228"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-1.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/229"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-1.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/230"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/231"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/232"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.5",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/233"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.6",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/234"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/235"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.8",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/236"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.9",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/237"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.10",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/238"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.11",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/239"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.12",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/240"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.13",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/241"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-3.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/242"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-3.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/243"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-4.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/244"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-1.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/245"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/246"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/247"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.4",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/248"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/249"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/250"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.1",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/251"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.2",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/252"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "framework": "NIST_AI_RMF",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/253"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1701(2),(5),(13)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/254"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(1)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/255"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(2)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/256"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(4)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/257"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1703",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/258"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(1)-(2)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/259"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(3)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/260"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(8)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/261"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1705(1)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/262"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1707(1)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/263"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1708(3)(c)",
+   "framework": "CO_AI_ACT",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/264"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.051(b)-(e)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/265"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.051(f)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/266"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.052",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/267"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.053",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/268"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.054(b)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/269"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.055",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/270"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.056(b)-(c)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/271"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.057",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/272"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.103(b)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/273"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.105(e)",
+   "framework": "TX_TRAIGA",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/274"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(a)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/275"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(b)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/276"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(c)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/277"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(d)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/278"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(e)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/279"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(f)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/280"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.13(c)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/281"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-LAB-1107.1(e)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/282"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-AB2013-CIV-3111",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/283"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7200",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/284"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7220",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/285"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7221",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/286"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7222",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": false,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/287"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7150(b)(3)",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/288"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7157",
+   "framework": "CA_AI_LAWS",
+   "nativeVerifiedSourceTextOnly": true,
+   "review": {
+    "artifact": "review-controls.json",
+    "pointer": "/rows/289"
+   },
+   "humanSignOff": null
+  }
+ ],
+ "currentLinkReviewIndex": [
+  {
+   "controlId": "DORA-5(1)",
+   "mappingId": "dora_art5_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/0"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-5(2)",
+   "mappingId": "dora_art5_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/1"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-6(1)",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/2"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(1)",
+   "mappingId": "dora_art8_identification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/3"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(4)",
+   "mappingId": "dora_art8_identification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/4"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(4)",
+   "mappingId": "owasp_api9_inventory",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/5"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(5)",
+   "mappingId": "dora_art8_identification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/6"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-8(5)",
+   "mappingId": "dora_art28_third_party_risk",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/7"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(1)",
+   "mappingId": "dora_art9_protection_prevention",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/8"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(c)",
+   "mappingId": "dora_art9_protection_prevention",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/9"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(c)",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/10"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(d)",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/11"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(e)",
+   "mappingId": "sox_itgc_change_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/12"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-9(4)(e)",
+   "mappingId": "fedramp_config_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/13"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-10(1)",
+   "mappingId": "dora_art10_detection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/14"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-10(2)",
+   "mappingId": "dora_art10_detection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/15"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-11(1)",
+   "mappingId": "dora_art11_response_recovery",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/16"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-11(1)",
+   "mappingId": "fedramp_contingency_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/17"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-11(6)",
+   "mappingId": "dora_art11_response_recovery",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/18"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-13(2)",
+   "mappingId": "dora_art17_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/19"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-13(2)",
+   "mappingId": "iso42001_clause_10_improvement",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/20"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-16(1)",
+   "mappingId": "dora_art9_protection_prevention",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/21"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-16(1)",
+   "mappingId": "dora_art10_detection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/22"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-16(1)",
+   "mappingId": "dora_art11_response_recovery",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/23"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(1)-(2)",
+   "mappingId": "dora_art17_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/24"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(1)-(2)",
+   "mappingId": "iso42001_clause_10_improvement",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/25"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-17(3)(b)",
+   "mappingId": "dora_art17_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/26"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-19(1)",
+   "mappingId": "dora_art19_major_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/27"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-19(4)",
+   "mappingId": "dora_art19_major_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/28"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(1)",
+   "mappingId": "dora_art24_25_resilience_testing",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/29"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(5)-(6)",
+   "mappingId": "dora_art24_25_resilience_testing",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/30"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-24(5)-(6)",
+   "mappingId": "nis2_art21_2e_secure_development",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/31"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-25(1)",
+   "mappingId": "dora_art24_25_resilience_testing",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/32"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(1)",
+   "mappingId": "dora_art28_third_party_risk",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/33"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(1)",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/34"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(4)",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/35"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "DORA-28(4)",
+   "mappingId": "dora_art28_third_party_risk",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/36"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1773-Art9",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/37"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art12",
+   "mappingId": "euai_art12_record_keeping",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/38"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art12",
+   "mappingId": "sox_audit_trail",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/39"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art12",
+   "mappingId": "iso_logging_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/40"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art17",
+   "mappingId": "sox_itgc_change_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/41"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art17",
+   "mappingId": "sox_segregation_of_duties",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/42"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art20",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/43"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art21",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/44"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art21",
+   "mappingId": "sox_segregation_of_duties",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/45"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art21",
+   "mappingId": "dora_art9_protection_prevention",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/46"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "RTS-2024/1774-Art23",
+   "mappingId": "dora_art10_detection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/47"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART20-1",
+   "mappingId": "nis2_art20_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/48"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-1",
+   "mappingId": "nis2_art21_2a_risk_policies",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/49"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-1",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/50"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2a",
+   "mappingId": "nis2_art21_2a_risk_policies",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/51"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2a",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/52"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2b",
+   "mappingId": "nis2_art21_2b_incident_handling",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/53"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2b",
+   "mappingId": "iso_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/54"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2c",
+   "mappingId": "nis2_art21_2c_business_continuity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/55"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2c",
+   "mappingId": "fedramp_contingency_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/56"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2d",
+   "mappingId": "nis2_art21_2d_supply_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/57"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2d",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/58"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2e",
+   "mappingId": "nis2_art21_2e_secure_development",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/59"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2e",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/60"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2f",
+   "mappingId": "nis2_art21_2f_effectiveness",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/61"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2i",
+   "mappingId": "nis2_art21_2i_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/62"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2i",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/63"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-2j",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/64"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-3",
+   "mappingId": "nis2_art21_2d_supply_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/65"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART21-4",
+   "mappingId": "iso42001_clause_10_improvement",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/66"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-1",
+   "mappingId": "nis2_art23_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/67"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4a",
+   "mappingId": "nis2_art23_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/68"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4b",
+   "mappingId": "nis2_art23_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/69"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-ART23-4d",
+   "mappingId": "nis2_art23_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/70"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ART2",
+   "mappingId": "nis2_art21_2a_risk_policies",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/71"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-1.1",
+   "mappingId": "nis2_art21_2a_risk_policies",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/72"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-1.2",
+   "mappingId": "nis2_art20_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/73"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-1.2",
+   "mappingId": "sox_segregation_of_duties",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/74"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.1",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/75"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.1",
+   "mappingId": "nis2_art21_2a_risk_policies",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/76"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-2.2",
+   "mappingId": "nis2_art21_2f_effectiveness",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/77"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.1",
+   "mappingId": "nis2_art21_2b_incident_handling",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/78"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.1",
+   "mappingId": "iso_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/79"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.2",
+   "mappingId": "iso_logging_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/80"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.2",
+   "mappingId": "fedramp_audit_accountability",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/81"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.2",
+   "mappingId": "pci_dss_audit_logging",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/82"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.5",
+   "mappingId": "fedramp_incident_response",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/83"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.5",
+   "mappingId": "nis2_art21_2b_incident_handling",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/84"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-3.6",
+   "mappingId": "dora_art17_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/85"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.1",
+   "mappingId": "nis2_art21_2c_business_continuity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/86"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.1",
+   "mappingId": "fedramp_contingency_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/87"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-4.2",
+   "mappingId": "nis2_art21_2c_business_continuity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/88"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.1",
+   "mappingId": "nis2_art21_2d_supply_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/89"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.1",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/90"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.2",
+   "mappingId": "nis2_art21_2d_supply_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/91"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-5.2",
+   "mappingId": "dora_art8_identification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/92"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.1",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/93"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.2",
+   "mappingId": "nis2_art21_2e_secure_development",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/94"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.2",
+   "mappingId": "pci_dss_secure_dev",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/95"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.3",
+   "mappingId": "fedramp_config_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/96"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.4",
+   "mappingId": "sox_itgc_change_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/97"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.5",
+   "mappingId": "nis2_art21_2e_secure_development",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/98"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.5",
+   "mappingId": "fedramp_risk_assessment",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/99"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.5",
+   "mappingId": "pci_dss_vulnerability_mgmt",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/100"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.7",
+   "mappingId": "fedramp_system_communications",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/101"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-6.10",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/102"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-7",
+   "mappingId": "nis2_art21_2f_effectiveness",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/103"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.1",
+   "mappingId": "nis2_art21_2i_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/104"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.1",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/105"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.2",
+   "mappingId": "fedramp_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/106"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.2",
+   "mappingId": "pci_dss_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/107"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.2",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/108"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.3",
+   "mappingId": "nis2_art21_2i_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/109"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.5",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/110"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-11.6",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/111"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIS2-IR2690-ANNEX-12.4",
+   "mappingId": "dora_art8_identification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/112"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(ii)(A)",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/113"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(ii)(C)",
+   "mappingId": "hti1_dsi_feedback",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/114"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iii)(B)",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/115"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iii)(B)",
+   "mappingId": "hti1_dsi_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/116"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(1)-(2)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/117"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(1)-(2)",
+   "mappingId": "euai_art11_technical_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/118"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(3)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/119"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(3)",
+   "mappingId": "euai_art13_transparency",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/120"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(4)-(6)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/121"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(4)-(6)",
+   "mappingId": "euai_art10_data_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/122"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(7)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/123"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(7)",
+   "mappingId": "nist_measure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/124"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(8)-(9)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/125"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(8)-(9)",
+   "mappingId": "hti1_dsi_risk_mitigation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/126"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(B)(8)-(9)",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/127"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(v)(A)",
+   "mappingId": "hti1_dsi_source_attribute_access",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/128"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(v)(B)",
+   "mappingId": "hti1_dsi_source_attribute_access",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/129"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(A)",
+   "mappingId": "hti1_dsi_risk_analysis",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/130"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(A)",
+   "mappingId": "euai_art9_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/131"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(B)",
+   "mappingId": "hti1_dsi_risk_mitigation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/132"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(B)",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/133"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(C)",
+   "mappingId": "hti1_dsi_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/134"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(vi)(C)",
+   "mappingId": "iso42001_clause_8_operation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/135"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ONC-170.402(b)(4)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/136"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "ONC-170.402(b)(4)",
+   "mappingId": "hti1_dsi_risk_mitigation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/137"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(2)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/138"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(2)",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/139"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(3)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/140"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(3)",
+   "mappingId": "euai_art17_quality_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/141"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(4)",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/142"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(5)",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/143"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(5)",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/144"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(7)",
+   "mappingId": "iso_logging_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/145"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(7)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/146"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(9)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/147"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(10)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/148"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(10)",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/149"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(12)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/150"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(12)",
+   "mappingId": "fedramp_incident_response",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/151"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(13)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/152"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(13)",
+   "mappingId": "fedramp_contingency_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/153"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(b)",
+   "mappingId": "hipaa_organizational_requirements",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/154"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(b)",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/155"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(a)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/156"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(a)",
+   "mappingId": "iso_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/157"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(a)",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/158"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(c)",
+   "mappingId": "fedramp_config_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/159"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(d)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/160"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(d)",
+   "mappingId": "iso_logging_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/161"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(e)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/162"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(f)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/163"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(f)",
+   "mappingId": "fedramp_identification_authentication",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/164"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(g)",
+   "mappingId": "hipaa_technical_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/165"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(h)",
+   "mappingId": "pci_dss_vulnerability_mgmt",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/166"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.312(h)",
+   "mappingId": "fedramp_risk_assessment",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/167"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.314(a)",
+   "mappingId": "hipaa_organizational_requirements",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/168"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.314(a)",
+   "mappingId": "hipaa_breach_notification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/169"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.316",
+   "mappingId": "hipaa_policies_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/170"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-preamble-AI",
+   "mappingId": "hipaa_administrative_safeguards",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/171"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-preamble-AI",
+   "mappingId": "hipaa_privacy_rule",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/172"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.2",
+   "mappingId": "soc2_processing_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/173"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.2",
+   "mappingId": "gdpr_art5_accuracy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/174"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.2",
+   "mappingId": "nist600_confabulation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/175"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.3",
+   "mappingId": "atlas_llm_jailbreak",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/176"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.4",
+   "mappingId": "gdpr_art5_integrity_confidentiality",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/177"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.4",
+   "mappingId": "atlas_data_exfiltration",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/178"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.4",
+   "mappingId": "soc2_confidentiality",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/179"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.4",
+   "mappingId": "nist600_data_privacy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/180"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.7",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/181"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.8",
+   "mappingId": "nist600_information_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/182"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "atlas_prompt_injection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/183"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "atlas_llm_jailbreak",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/184"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "atlas_model_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/185"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "soc2_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/186"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "fedramp_risk_assessment",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/187"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.9",
+   "mappingId": "nist600_information_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/188"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.12",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/189"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.12",
+   "mappingId": "atlas_supply_chain_compromise",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/190"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.12",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/191"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-R2.12",
+   "mappingId": "nist600_value_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/192"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.1",
+   "mappingId": "nist_govern",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/193"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.1",
+   "mappingId": "gdpr_art5_accountability",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/194"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.2",
+   "mappingId": "nist_govern",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/195"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.2",
+   "mappingId": "iso42001_clause_5_leadership",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/196"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.3",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/197"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.3",
+   "mappingId": "euai_art9_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/198"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.4",
+   "mappingId": "nist_govern",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/199"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.4",
+   "mappingId": "iso42001_clause_6_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/200"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.5",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/201"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.5",
+   "mappingId": "iso42001_clause_9_performance_evaluation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/202"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-1.6",
+   "mappingId": "owasp_api9_inventory",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/203"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-2.1",
+   "mappingId": "iso42001_clause_5_leadership",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/204"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-2.1",
+   "mappingId": "nist_govern",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/205"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-3.2",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/206"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-3.2",
+   "mappingId": "nist_govern",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/207"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.1",
+   "mappingId": "iso42001_clause_5_leadership",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/208"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.2",
+   "mappingId": "iso42005_scope_and_stakeholders",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/209"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.2",
+   "mappingId": "euai_art27_fria",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/210"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.3",
+   "mappingId": "iso_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/211"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.3",
+   "mappingId": "euai_art73_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/212"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-4.3",
+   "mappingId": "fedramp_incident_response",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/213"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-5.1",
+   "mappingId": "euai_art86_right_to_explanation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/214"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.1",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/215"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.1",
+   "mappingId": "atlas_supply_chain_compromise",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/216"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.1",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/217"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.2",
+   "mappingId": "fedramp_contingency_planning",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/218"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.2",
+   "mappingId": "soc2_availability",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/219"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.2",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/220"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-GV-6.2",
+   "mappingId": "nist600_value_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/221"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-1.1",
+   "mappingId": "nist_map",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/222"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-1.1",
+   "mappingId": "iso42001_clause_4_context",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/223"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-1.1",
+   "mappingId": "iso42005_scope_and_stakeholders",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/224"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.1",
+   "mappingId": "nist_map",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/225"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.1",
+   "mappingId": "euai_art11_technical_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/226"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.2",
+   "mappingId": "euai_art13_transparency",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/227"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.2",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/228"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.3",
+   "mappingId": "nist_measure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/229"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.3",
+   "mappingId": "soc2_processing_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/230"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-2.3",
+   "mappingId": "atlas_model_evasion",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/231"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-3.4",
+   "mappingId": "iso42001_clause_7_support",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/232"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-4.1",
+   "mappingId": "atlas_supply_chain_compromise",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/233"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-4.1",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/234"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-4.1",
+   "mappingId": "atlas_data_exfiltration",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/235"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-5.1",
+   "mappingId": "iso42005_severity_likelihood_uncertainty",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/236"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-5.1",
+   "mappingId": "euai_art9_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/237"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MP-5.2",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/238"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-1.1",
+   "mappingId": "nist_measure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/239"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-1.1",
+   "mappingId": "iso42001_clause_9_performance_evaluation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/240"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-1.1",
+   "mappingId": "nist600_information_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/241"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.2",
+   "mappingId": "nist600_data_privacy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/242"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.3",
+   "mappingId": "nist_measure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/243"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.3",
+   "mappingId": "soc2_processing_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/244"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.3",
+   "mappingId": "fedramp_assessment_authorization",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/245"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.5",
+   "mappingId": "soc2_processing_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/246"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.5",
+   "mappingId": "gdpr_art5_accuracy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/247"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.5",
+   "mappingId": "nist_measure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/248"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.5",
+   "mappingId": "nist600_confabulation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/249"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.6",
+   "mappingId": "euai_art15_accuracy_robustness",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/250"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.6",
+   "mappingId": "atlas_llm_jailbreak",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/251"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.6",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/252"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "atlas_prompt_injection",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/253"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "atlas_llm_jailbreak",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/254"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "atlas_data_exfiltration",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/255"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "atlas_model_access_control",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/256"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "euai_art15_accuracy_robustness",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/257"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "fedramp_risk_assessment",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/258"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "nist600_information_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/259"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.7",
+   "mappingId": "nist600_value_chain",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/260"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.8",
+   "mappingId": "euai_art12_record_keeping",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/261"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.8",
+   "mappingId": "euai_art13_transparency",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/262"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.8",
+   "mappingId": "iso42006_conformity_evidence_package",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/263"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.9",
+   "mappingId": "euai_art86_right_to_explanation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/264"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.10",
+   "mappingId": "atlas_data_exfiltration",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/265"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.10",
+   "mappingId": "gdpr_art5_integrity_confidentiality",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/266"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.10",
+   "mappingId": "gdpr_art5_data_minimisation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/267"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-2.10",
+   "mappingId": "soc2_privacy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/268"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-3.2",
+   "mappingId": "iso_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/269"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-3.3",
+   "mappingId": "euai_art86_right_to_explanation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/270"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-3.3",
+   "mappingId": "gdpr_art15_22_data_subject_rights",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/271"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-4.2",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/272"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MS-4.2",
+   "mappingId": "iso42001_clause_9_performance_evaluation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/273"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-1.3",
+   "mappingId": "iso42005_mitigation_traceability",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/274"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-1.3",
+   "mappingId": "euai_art9_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/275"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-1.3",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/276"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.2",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/277"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.2",
+   "mappingId": "soc2_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/278"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.2",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/279"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.3",
+   "mappingId": "iso_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/280"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.3",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/281"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.4",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/282"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-2.4",
+   "mappingId": "nist_manage",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/283"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.1",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/284"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.1",
+   "mappingId": "atlas_supply_chain_compromise",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/285"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.2",
+   "mappingId": "iso_supplier_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/286"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.2",
+   "mappingId": "fedramp_system_integrity",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/287"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-3.2",
+   "mappingId": "atlas_supply_chain_compromise",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/288"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.1",
+   "mappingId": "euai_art72_post_market_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/289"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.1",
+   "mappingId": "iso_logging_monitoring",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/290"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.1",
+   "mappingId": "soc2_availability",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/291"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.1",
+   "mappingId": "nist600_confabulation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/292"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.2",
+   "mappingId": "iso42001_clause_10_improvement",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/293"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "mappingId": "euai_art73_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/294"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "mappingId": "iso_incident_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/295"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "mappingId": "fedramp_incident_response",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/296"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "mappingId": "gdpr_art33_34_breach_notification",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/297"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NIST-AI-600-1-MG-4.3",
+   "mappingId": "nist600_information_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/298"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(1)",
+   "mappingId": "co_admt_developer_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/299"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(1)",
+   "mappingId": "euai_art13_transparency",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/300"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(2)",
+   "mappingId": "sox_itgc_change_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/301"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(4)",
+   "mappingId": "co_admt_record_keeping",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/302"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1702(4)",
+   "mappingId": "sox_audit_trail",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/303"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1703",
+   "mappingId": "co_admt_record_keeping",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/304"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1703",
+   "mappingId": "euai_art12_record_keeping",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/305"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(1)-(2)",
+   "mappingId": "tx_traiga_consumer_disclosure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/306"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(3)",
+   "mappingId": "co_admt_deployer_notice",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/307"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1704(3)",
+   "mappingId": "euai_art86_right_to_explanation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/308"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1705(1)",
+   "mappingId": "co_admt_human_review",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/309"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1705(1)",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/310"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1705(1)",
+   "mappingId": "gdpr_art5_accuracy",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/311"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CO-6-1-1707(1)",
+   "mappingId": "tx_traiga_unlawful_discrimination",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/312"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.051(b)-(e)",
+   "mappingId": "tx_traiga_consumer_disclosure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/313"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.051(f)",
+   "mappingId": "tx_traiga_consumer_disclosure",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/314"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.052",
+   "mappingId": "tx_traiga_behavioral_manipulation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/315"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.052",
+   "mappingId": "atlas_llm_jailbreak",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/316"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.056(b)-(c)",
+   "mappingId": "tx_traiga_unlawful_discrimination",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/317"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.103(b)",
+   "mappingId": "tx_traiga_ag_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/318"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.103(b)",
+   "mappingId": "euai_art11_technical_documentation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/319"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.105(e)",
+   "mappingId": "nist600_information_security",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/320"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "TX-552.105(e)",
+   "mappingId": "nist600_confabulation",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/321"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(a)",
+   "mappingId": "ca_sb53_frontier_framework",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/322"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(a)",
+   "mappingId": "euai_art9_risk_management",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/323"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(c)",
+   "mappingId": "ca_sb53_transparency_report",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/324"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.12(d)",
+   "mappingId": "ca_sb53_frontier_framework",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/325"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.13(c)",
+   "mappingId": "ca_sb53_critical_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/326"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-SB53-22757.13(c)",
+   "mappingId": "euai_art73_incident_reporting",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/327"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-AB2013-CIV-3111",
+   "mappingId": "ca_ab2013_training_data",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/328"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-AB2013-CIV-3111",
+   "mappingId": "euai_art10_data_governance",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/329"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7220",
+   "mappingId": "ca_ccpa_admt_pre_use_notice",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/330"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7220",
+   "mappingId": "gdpr_art5_lawfulness_fairness_transparency",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/331"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7221",
+   "mappingId": "ca_ccpa_admt_human_appeal",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/332"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7221",
+   "mappingId": "euai_art14_human_oversight",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/333"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7222",
+   "mappingId": "ca_ccpa_admt_access",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/334"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7222",
+   "mappingId": "gdpr_art15_22_data_subject_rights",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/335"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7150(b)(3)",
+   "mappingId": "gdpr_art35_dpia",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/336"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "CA-CCPA-7150(b)(3)",
+   "mappingId": "iso42005_scope_and_stakeholders",
+   "relation": "partial",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/rows/337"
+   },
+   "humanSignOff": null
+  }
+ ],
+ "removedLinkIndex": [
+  {
+   "controlId": "NPRM-164.310",
+   "mappingId": "hipaa_physical_safeguards",
+   "state": "REMOVED_REFUTED_LINK_CONTROL_AND_MAPPING_RETAINED",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/removedLinkTombstones/0"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "NPRM-164.308(a)(11)",
+   "mappingId": "hipaa_administrative_safeguards",
+   "state": "REMOVED_REFUTED_LINK_CONTROL_AND_MAPPING_RETAINED",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/removedLinkTombstones/1"
+   },
+   "humanSignOff": null
+  },
+  {
+   "controlId": "HTI1-170.315(b)(11)(iv)(A)",
+   "mappingId": "hti1_dsi_source_attributes",
+   "state": "REMOVED_REFUTED_LINK_CONTROL_AND_MAPPING_RETAINED",
+   "review": {
+    "artifact": "review-links.json",
+    "pointer": "/removedLinkTombstones/2"
+   },
+   "humanSignOff": null
+  }
+ ],
+ "sourceEvidence": {
+  "artifact": "source-evidence.json",
+  "scope": "28 exact current capture/extraction records;112 support only bounded quotation text,178 remain unresolved/unavailable, not disproved. No pinpoint/rationale/applicability approval is inferred."
+ },
+ "limits": [
+  "The content review at S=290b9 and exact restoration at G=e848 are separate source-continuity observations. H=87c99 is a baseline-metadata-only successor, not whole-tree-equivalent to G; no fresh source-text or legal review at H is inferred.",
+  "Every relative artifact path resolves within this off-tree preparatory packet. proposalBytes preserves the exact earlier proposal provenance; checks.json, mutations.json and the preparatory receipt.json now exist. Final metadata Q and its completed full/classification records remain pending.",
+  "The review may refute a relation and retain its control/mapping. The three removed relations are tombstones, never counted among338 or relabelled conflicting.",
+  "Source data headers retain the original2026-10-18 inputs origin. No header or source edit is needed or proposed."
+ ],
+ "currentPreparatoryProductHead": "87c99c9a2b559c71344d4356eb5841e1bbb3860f",
+ "currentProductBridge": {
+  "reviewSnapshot": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+  "exactTreeRestoredAt": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+  "treeProof": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/summary.json",
+   "sha256": "d6486438ce48e7b50c6e17e50c4121a4604f636bf4af4b3cebda6db7d89ff346",
+   "bytes": 9212
+  },
+  "currentPreparatoryProductHead": "87c99c9a2b559c71344d4356eb5841e1bbb3860f",
+  "baselineMetadataOnlySuccessorProof": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-native-data-duplicate-fingerprint-refresh-audit-87c99-v1.json",
+   "sha256": "ec5174577dbcda59fb0023d0fc997957593ac9469e806065b0b71306fb414c3b",
+   "bytes": 18146
+  },
+  "successorOnlyChangedPath": "scripts/quality/source-quality-baseline.json",
+  "sourceOrTestBuffersChanged": false,
+  "source14ImmutableIndex": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/mutation-input-source-290b9-v1/index.json",
+   "sha256": "d6d825987bea8c340689af77cfc2b0027df9219acdcb0d4d99b1e1b4f1ef1165",
+   "bytes": 4973
+  },
+  "wholeTreeEqualityBetweenGAndH": false,
+  "freshReadOrLegalReviewAtSuccessor": false
+ },
+ "ordinaryProductChecks": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/required-checks-87c99-v1/summary.json",
+  "sha256": "cd66f1693c8c1f562c9c3445ab779bba5ca771916d934cab51eb976967f4a09c",
+  "bytes": 11389
+ },
+ "ordinaryProductChecksIndependentAudit": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-required23-current-H-audit-87c99-v1.json",
+  "sha256": "76ac4479ce18c1beb5d510c0a87e3307fb4d7ed37f5f2b24fbc9c1cad899de55",
+  "bytes": 56185
+ },
+ "scopedMutationSummary": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/summary.json",
+  "sha256": "d6486438ce48e7b50c6e17e50c4121a4604f636bf4af4b3cebda6db7d89ff346",
+  "bytes": 9212
+ },
+ "scopedMutationIndependentAudit": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-current-15-mutation-proof-audit-290b9-v2.json",
+  "sha256": "d248dc9696c47cff7db12dab6dd4b8d7b4115386d0fc81d2fdd4fa4ef3db3a8a",
+  "bytes": 40813
+ },
+ "baselineSuccessorAudit": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-native-data-duplicate-fingerprint-refresh-audit-87c99-v1.json",
+  "sha256": "ec5174577dbcda59fb0023d0fc997957593ac9469e806065b0b71306fb414c3b",
+  "bytes": 18146
+ },
+ "actualNoopLocalIntIntegration": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/pre-final-int-noop-merge-87c99-v1/summary.json",
+  "sha256": "c513b404cc6c63508bf3b813a9aa7bc9f218dd694d381c9bc4361603574ac963",
+  "bytes": 2240
+ },
+ "releaseGate": {
+  "state": "PENDING_SEPARATE_FROM_ORDINARY23",
+  "result": null
+ }
+}

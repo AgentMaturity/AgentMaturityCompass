@@ -123,6 +123,22 @@ describe("compliance report readability", () => {
     expect(diff.categoryDeltas).toEqual([{ id: "eu-ai-act-art-9", before: "NOT_EVALUATED", after: "UNKNOWN" }]);
   });
 
+  test("labels every family's mappings experimental and prints the family's currency flags (P1-45)", () => {
+    const experimental = "- Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).";
+    const euAiAct = complianceReportToMarkdown(fixtureReport());
+    expect(euAiAct).toContain(experimental);
+    expect(euAiAct).not.toContain("- Flag:");
+    const hti1 = complianceReportToMarkdown({ ...fixtureReport(), framework: "HHS_HTI_1" });
+    expect(hti1).toContain(experimental);
+    expect(hti1).toContain("- Flag: At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing.");
+    const colorado = complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" });
+    expect(colorado).toContain("SB26-189 publisher page and act were captured on 2026-10-19");
+    expect(colorado).toContain("remain unverified under the source-text policy");
+    expect(colorado).toContain("current-law applicability review remain pending");
+    // A report from an older version with a framework this build does not know still says experimental.
+    expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "RETIRED_FRAMEWORK" })).toContain(experimental);
+  });
+
   test("keeps the UX audit aligned with current compliance report readability", () => {
     const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 

@@ -93,6 +93,9 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
         // Paid and target-dependent steps fail closed instead of producing a score.
         expect(readJson(join(out, "pack-run-gate.json")).error).toBe("industry_packs_locked");
         const gate = summary.steps.find((s: { id: string }) => s.id === "assurance-gate");
+        const gatePackFlag = gate.argv.indexOf("--pack");
+        expect(gate.argv).toContain("--pack");
+        expect(gate.argv[gatePackFlag + 1]).toBe("injection");
         expect(gate.exitCode).toBe(2);
 
         // The stub turn is recorded, verified, and exported with its hash chain.

@@ -1,0 +1,232 @@
+{
+ "checks": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 272256,
+   "atCommit": "75b276175",
+   "tail": [
+    "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp"
+   ]
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 169215,
+   "atCommit": "75b276175",
+   "tail": []
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 139213,
+   "atCommit": "75b276175",
+   "tail": []
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 8040,
+   "atCommit": "75b276175",
+   "tail": [
+    "Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.",
+    "check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 12; 16 random marker(s); 0 pending entries."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 1797,
+   "atCommit": "75b276175",
+   "tail": [
+    "Published source counts match the repository; this check does not execute tests."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 846,
+   "atCommit": "75b276175",
+   "tail": [
+    "Docs drift check passed (336 files scanned; truth claims and commands checked in 249 public files; 4 logged exceptions)."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 4273,
+   "atCommit": "75b276175",
+   "tail": [
+    "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":632}"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 5467,
+   "atCommit": "75b276175",
+   "tail": [
+    "  \"prefixBranchCount\": 2,",
+    "  \"failures\": []",
+    "}"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 720,
+   "atCommit": "75b276175",
+   "tail": [
+    "| L5 | 0 | 0 | 264 |",
+    "11 registered emitters, 4 evidence maps, 281 literal audit emissions classified, 9 evaluated gate requirements checked.",
+    "check:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1156,
+   "atCommit": "75b276175",
+   "tail": [
+    "gen-spec-schemas: 41 schemas current; 80 contract fixtures agree"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 431,
+   "atCommit": "75b276175",
+   "tail": [
+    "docs/API_REFERENCE.md matches the source."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 601,
+   "atCommit": "75b276175",
+   "tail": [
+    "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-45/docs/security/channel-map.json)"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:qualification",
+   "exit": 0,
+   "durationMs": 821,
+   "atCommit": "75b276175",
+   "tail": [
+    "Qualification receipts valid: 34 receipt(s) under qualification."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 2305,
+   "atCommit": "75b276175",
+   "tail": [
+    "{\"scan\":\"duplicates\",\"baseline\":1223,\"current\":1244,\"new\":0,\"stale\":0,\"accepted\":21}",
+    "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 10041,
+   "atCommit": "75b276175",
+   "tail": [
+    "{\"scan\":\"dead-code\",\"baseline\":2703,\"current\":2718,\"new\":0,\"stale\":0,\"accepted\":15}",
+    "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:citations",
+   "exit": 0,
+   "durationMs": 791,
+   "atCommit": "75b276175",
+   "tail": [
+    "  CIT003 pack-reference: findings=0 zero-tolerance=0 baseline=0",
+    "  CIT004 record-incomplete: findings=620 zero-tolerance=0 baseline=620",
+    "  CIT005 status-type: findings=0 zero-tolerance=0 baseline=0"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:regulatory-currency",
+   "exit": 0,
+   "durationMs": 378,
+   "atCommit": "75b276175",
+   "tail": [
+    "entries=183 verified=108 unverified=75 asOf=2026-10-18"
+   ]
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 1234,
+   "atCommit": "42f5ec2d1",
+   "tail": [
+    "Published source counts match the repository; this check does not execute tests."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 617,
+   "atCommit": "42f5ec2d1",
+   "tail": [
+    "Docs drift check passed (336 files scanned; truth claims and commands checked in 249 public files; 4 logged exceptions)."
+   ]
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 2769,
+   "atCommit": "42f5ec2d1",
+   "tail": [
+    "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":632}"
+   ]
+  },
+  {
+   "cmd": "npm run -s release:notes -- --check",
+   "exit": 0,
+   "durationMs": 285,
+   "atCommit": "42f5ec2d1",
+   "tail": []
+  },
+  {
+   "cmd": "npx vitest run <9 P1-45 test files> against int sources (src/compliance restored from int 3c23d1c50, RED)",
+   "exit": 1,
+   "durationMs": 16410,
+   "atCommit": "f49c47e8d^ tree with int sources",
+   "tail": [
+    "Tests 107 failed | 25 passed (132)"
+   ]
+  },
+  {
+   "cmd": "npx vitest run <9 P1-45 test files> (GREEN)",
+   "exit": 0,
+   "durationMs": 12211.643798828125,
+   "atCommit": "42f5ec2d1",
+   "tail": [
+    "183 passed of 183 in 9 files"
+   ]
+  },
+  {
+   "cmd": "npx vitest run <94 related test files: git grep of the changed compliance modules, pack and citation code>",
+   "exit": 0,
+   "durationMs": 132244.83227539062,
+   "atCommit": "75b276175",
+   "tail": [
+    "1451 passed of 1451 in 94 files"
+   ]
+  },
+  {
+   "cmd": "python3 mutate.py (10 mutations, one per guard; scratch script)",
+   "exit": 0,
+   "durationMs": null,
+   "atCommit": "2568794f5",
+   "tail": [
+    "killed 10 of 10"
+   ]
+  }
+ ]
+}

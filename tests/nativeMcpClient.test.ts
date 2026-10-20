@@ -12,6 +12,7 @@ import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { openActionJournal } from "../src/actions/actionJournal.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 
 // A genuine separate stdio process speaking JSON-RPC. No shared dist, SDK
 // server implementation, network connection or provider credentials are used.
@@ -207,6 +208,22 @@ describe("native MCP pinned stdio integration", () => {
     await fixture.mount();
     const second = await fixture.call("lookup", { query: "fixture" });
     expect(second.outcome).toBe("DENIED"); expect(String(second.content)).toContain(`blocked_by_unreconciled:${blocking[0]}`);
+    expect(fixture.calls()).toHaveLength(1);
+  });
+  test("P2-02: a stdio call carrying a token has no destination to restore to, so it is refused before tools/call", async () => {
+    const fixture = setup({ tools: [tool()] }, undefined, "WRITE_HIGH");
+    // A bound record whose purpose is the signed run purpose: the refusal is the missing destination, not the purpose.
+    initProcessorRegistry(fixture.workspace, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+      processors: [{ processorId: "proc-chart", legalName: "Fixture Chart Processor",
+        contracts: [{ kind: "BAA", reference: "BAA-CHART-1", effective: "2026-01-01", expires: null, dataClasses: ["phi"] }] }],
+      purposes: [{ purposeId: "chart-lookup", allowedDataClasses: ["phi"], allowedTools: [nativeMcpToolName("fixture", "lookup")],
+        allowedProcessors: ["proc-chart"] }],
+      bindings: [], runPurpose: "chart-lookup" });
+    await fixture.mount();
+    const refused = await fixture.call("lookup", { query: "[[amc:phi:0123456789abcdef]]" });
+    expect(refused).toMatchObject({ outcome: "ERROR", content: "Protected data egress refused: processor_not_allowlisted" });
+    expect(fixture.calls(), "the stdio log shows no tools/call").toEqual([]);
+    expect((await fixture.call("lookup", { query: "fixture" })).outcome).toBe("OK");
     expect(fixture.calls()).toHaveLength(1);
   });
   test("output schema validation precedes secret redaction", async () => {

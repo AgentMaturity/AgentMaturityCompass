@@ -1,0 +1,341 @@
+{
+  "actualRuns": [
+    {
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-red/command.json",
+        "sha256": "378493f620ad2579664c25ddbdea40f7a914acc80ba167f1e1268c2775877a4a",
+        "bytes": 1540
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-red-report.json",
+        "sha256": "a9820e8181e7255e1da976f572ad8457ce2b6b7e50cff6f3e1f437db2718b3a2",
+        "bytes": 28461
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-red/raw.log",
+        "sha256": "4eafcace46c6f914a38ac5c96a5209870fba4741a7b4c50c7b8b9b7da3a1a166",
+        "bytes": 20983
+      },
+      "sourceHead": "ec0bd1c8de16d3d4f22d79756b31654a95b8a531",
+      "exit": 1,
+      "durationMs": 2084,
+      "native": {
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 0,
+          "numFailedTests": 21,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "failedAssertions": [
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary real host entry always refuses and has no API or platform override",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:46:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary missing or malformed fake API refuses before run",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:51:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary unavailable and malformed availability answers do not launch",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:57:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary availability exceptions have bounded public reasons",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:62:39\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:74:20\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary complete nonzero simulated exits are distinct from a native exit",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:80:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary missing launcher status cannot complete the simulation",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:87:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary malformed JSON, strict fields and type confusion refuse",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:93:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary oversized status refuses before successful parsing",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:102:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary status for another child refuses with all other bindings valid",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:107:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary status for another valid policy digest refuses",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:111:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary status for another invocation nonce refuses",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:115:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary replaying a previous otherwise matching status refuses on the new nonce",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete' }\n(7 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:120:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary invalid transport child identities and exit values refuse without coercion",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:128:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary a different valid launcher exit cannot authenticate status exit zero",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:133:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary stdout cannot substitute for the separate launcher status channel",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:137:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary run exceptions clean partial fake resources without leaking errors",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:141:39\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary cleanup failure overrides both valid and invalid status without tree proof",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:148:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary validating the response uses a frozen snapshot, not mutable caller inputs",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete' }\n(7 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:160:38\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary fake enforcement claims never fabricate a native receipt or fallback",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:166:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "suiteErrors": [],
+        "nativeRunErrors": {},
+        "rawRunErrors": [],
+        "fileStatuses": {
+          "failed": 1
+        }
+      }
+    },
+    {
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-green/command.json",
+        "sha256": "27d9a1bc37a5d4e930351a8cb269d4f71fb39be2096559f39eea7a519622d02f",
+        "bytes": 1542
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-green-report.json",
+        "sha256": "8e06c46df6f0949f82c3c52222c9034cc6e13dfd68dc115dea38df1cdbde71cc",
+        "bytes": 8284
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-green/raw.log",
+        "sha256": "fed0c1d45e35231431ecaf0ffd35b7ce115504d1f19385a813f9f7ea30cc5d59",
+        "bytes": 403
+      },
+      "sourceHead": "371459593f80555002a48795ca5b30ae22b56600",
+      "exit": 0,
+      "durationMs": 1269,
+      "native": {
+        "counts": {
+          "numTotalTests": 22,
+          "numPassedTests": 22,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "failedAssertions": [],
+        "suiteErrors": [],
+        "nativeRunErrors": {},
+        "rawRunErrors": [],
+        "fileStatuses": {
+          "passed": 1
+        }
+      }
+    },
+    {
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/status-cap-red/command.json",
+        "sha256": "06f9245a348b07364eb05a0d72f7deefd33756db7999d28cb2a3064945a5d83a",
+        "bytes": 1541
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/status-cap-red-report.json",
+        "sha256": "c32c035f1abd5cff3a6324992aa7c9b6857efcdd0ed8d3e10b8c57891bead787",
+        "bytes": 9309
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/status-cap-red/raw.log",
+        "sha256": "c88cbe4482b3346e21bac9dcd3bb63e81da71cd198e731aac0fce6a8b6b0f264",
+        "bytes": 1541
+      },
+      "sourceHead": "46eb8cdae6a94b58398a36a3bcf6f04c395256a6",
+      "exit": 1,
+      "durationMs": 1306,
+      "native": {
+        "counts": {
+          "numTotalTests": 22,
+          "numPassedTests": 21,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "failedAssertions": [
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts",
+            "fullName": "P2-14 cut-first Windows prototype boundary shadowed status byteLength cannot bypass the captured-byte cap",
+            "failureMessages": [
+              "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/tests/containment/windowsRunnerPrototype.test.ts:110:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "suiteErrors": [],
+        "nativeRunErrors": {},
+        "rawRunErrors": [],
+        "fileStatuses": {
+          "failed": 1
+        }
+      }
+    },
+    {
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-final-green/command.json",
+        "sha256": "a41211446bbe0e68f1414c3970940b55c5fb1929fb08723b56cbe2f754b87cea",
+        "bytes": 1554
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-final-green-report.json",
+        "sha256": "91da69c7e86824aa11d44218303b87109c797ef805356965a826830bee30b155",
+        "bytes": 8625
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-final-green/raw.log",
+        "sha256": "0322a432a3efe718f8788356db2a89ad343df9135e09ea76626255417b7f87af",
+        "bytes": 411
+      },
+      "sourceHead": "f85bf7f905806771459a57039d3aac323a6e18ac",
+      "exit": 0,
+      "durationMs": 1210,
+      "native": {
+        "counts": {
+          "numTotalTests": 23,
+          "numPassedTests": 23,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "failedAssertions": [],
+        "suiteErrors": [],
+        "nativeRunErrors": {},
+        "rawRunErrors": [],
+        "fileStatuses": {
+          "passed": 1
+        }
+      }
+    },
+    {
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-private-green/command.json",
+        "sha256": "d8c9e2f976fa99efa7c8ee8e3e7813635bbef7968128e9b45f9464e67de086f4",
+        "bytes": 1557
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-private-green-report.json",
+        "sha256": "36411dd2009d07cf823210cdc5799104ce4e6e6c7028c470bbb6b4d0e690598e",
+        "bytes": 8622
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/prototype-private-green/raw.log",
+        "sha256": "33b2db07358aac592e8a580bf4ddf2b05eff3b4d05b988a927e90a51a26b2849",
+        "bytes": 413
+      },
+      "sourceHead": "760bf885a4f601a1786912dbc687dc245d123d0f",
+      "exit": 0,
+      "durationMs": 942,
+      "native": {
+        "counts": {
+          "numTotalTests": 23,
+          "numPassedTests": 23,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "failedAssertions": [],
+        "suiteErrors": [],
+        "nativeRunErrors": {},
+        "rawRunErrors": [],
+        "fileStatuses": {
+          "passed": 1
+        }
+      }
+    }
+  ],
+  "limit": "All five TDD runs retain their actual pins. Historical f85 GREEN23 is not current760 GREEN23; earlier21/22 totals are not final/broader/full totals."
+}

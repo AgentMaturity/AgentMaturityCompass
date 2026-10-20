@@ -1,0 +1,85 @@
+{
+  "profileVersion": 1,
+  "profileId": "mobility-tenant-screening",
+  "deployment": {
+    "tenantId": "mobility-fixture-tenant",
+    "workspaceId": "mobility-fixture-workspace",
+    "deploymentId": "mobility-tenant-screening-fixture",
+    "agentIds": [
+      "mobility-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "mobility",
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "mobility"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "mobility.ports-logistics-cities"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "housing_provider"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "tenant_screening",
+      "consequential_decision_about_people"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "tenant_application_records"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

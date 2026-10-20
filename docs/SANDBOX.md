@@ -251,6 +251,12 @@ reach the network. The gateway forward proxy uses the same host decision
 connection and connects only to an address it checked. This is available on macOS; on Linux a signed `egress` is
 refused until the relay in ADR-008 is reviewed and built.
 
+### Windows runner prototype (P2-14)
+
+The native Windows shell remains refused, including unsafe opt-ins. The cut-first Windows runner prototype is standalone and unregistered; it does not add a native backend or Windows shell permission. Its fake token/launcher API exercises protocol and refusal logic only. Even a valid fake result reports `confined:false`, has no enforcement object, does not prove tree exit and carries no real command exit.
+
+Live Windows containment is **not measured: no Windows host**. The proposed research note and ADR017 require Sid review, read Microsoft primary sources and real Windows escape evidence before any enablement decision. This is a no-go for enablement on present evidence, not a conclusion that a Windows boundary is impossible. Existing Linux/macOS and platform qualification results do not qualify this prototype as a Windows boundary.
+
 ## Command
 
 ```bash

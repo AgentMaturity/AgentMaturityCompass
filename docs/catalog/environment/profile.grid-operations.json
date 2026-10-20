@@ -1,0 +1,88 @@
+{
+  "profileVersion": 1,
+  "profileId": "environment-grid-operations",
+  "deployment": {
+    "tenantId": "environment-fixture-tenant",
+    "workspaceId": "environment-fixture-workspace",
+    "deploymentId": "environment-grid-operations-us-fixture",
+    "agentIds": [
+      "environment-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "environment",
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "environment",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "environment.energy-utilities-water",
+      "technology.platforms-data"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "bulk_electric_system_operator",
+      "water_system_operator"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "plant_setpoint_change",
+      "model_outage_drill"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "ot_telemetry"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

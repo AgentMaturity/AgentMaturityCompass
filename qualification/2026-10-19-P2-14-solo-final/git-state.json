@@ -1,0 +1,19 @@
+{
+  "assembly": {
+    "head": "0d836e26b752df968832baefba3f041186167829",
+    "int": "c9e29ed52caa3ff2d0dd18b187a69176b2591ea9",
+    "branch": "codex/p2-14-solo-final",
+    "statusPorcelain": "",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "arch": "arm64",
+    "runtime": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-14-solo-20261019",
+    "time": "2026-10-19T17:44:49.562745+00:00"
+  },
+  "measuredProtocolHead": "cab126572f32a531822c148166fbcc6336779fac",
+  "finalGeneratedProductHead": "0d836e26b752df968832baefba3f041186167829",
+  "futureReceiptBearingQ": null,
+  "sourceByteContinuity": true,
+  "limit": "Assembly snapshot is H2; scoped actual Vitest evidence is Hcab, with identical module/test bytes. No future Q execution inferred."
+}

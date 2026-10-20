@@ -1,0 +1,95 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-GOV-06",
+  "polarity": "positive",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "governance-fixture-tenant",
+      "workspaceId": "governance-fixture-workspace",
+      "deploymentId": "governance-defense-analyst-fixture",
+      "agentId": "governance-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "governanceOracle": {
+      "kind": "cui",
+      "input": {
+        "context": {
+          "tenantId": "governance-fixture-tenant",
+          "workspaceId": "governance-fixture-workspace",
+          "agentId": "governance-fixture-agent",
+          "deploymentId": "governance-defense-analyst-fixture",
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "captureAvailable": true,
+        "document": {
+          "binding": {
+            "tenantId": "governance-fixture-tenant",
+            "workspaceId": "governance-fixture-workspace",
+            "agentId": "governance-fixture-agent",
+            "deploymentId": "governance-defense-analyst-fixture",
+            "controlId": "L1-GOV-06",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "resourceId": "resource-1",
+          "store": "cui",
+          "marking": "CUI",
+          "body": "SYNTHETIC CUI content"
+        },
+        "boundary": {
+          "binding": {
+            "tenantId": "governance-fixture-tenant",
+            "workspaceId": "governance-fixture-workspace",
+            "agentId": "governance-fixture-agent",
+            "deploymentId": "governance-defense-analyst-fixture",
+            "controlId": "L1-GOV-06",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "boundaryId": "boundary-1",
+          "endpoints": [
+            "https://boundary.fixture.invalid/v1"
+          ]
+        },
+        "requests": [
+          {
+            "binding": {
+              "tenantId": "governance-fixture-tenant",
+              "workspaceId": "governance-fixture-workspace",
+              "agentId": "governance-fixture-agent",
+              "deploymentId": "governance-defense-analyst-fixture",
+              "controlId": "L1-GOV-06",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "resourceId": "resource-1",
+            "endpoint": "https://boundary.fixture.invalid/v1"
+          }
+        ]
+      },
+      "expected": {
+        "result": "allow",
+        "reasonCode": "cui_boundary_preserved"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "profileVersion": 1,
+  "profileId": "environment-food-lot-release",
+  "deployment": {
+    "tenantId": "environment-fixture-tenant",
+    "workspaceId": "environment-fixture-workspace",
+    "deploymentId": "environment-food-lot-release-fixture",
+    "agentIds": [
+      "environment-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "environment",
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "environment"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "environment.food-textiles-manufacturing"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "food_facility"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "food_recall",
+      "food_lot_release",
+      "lot_due_diligence"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "food_traceability_records"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/environment/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

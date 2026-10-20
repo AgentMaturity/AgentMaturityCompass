@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "d8381b6daccc1ef3a9c011f8b953c323babe34d5",
+  "baseInt": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020",
+  "branch": "codex/p2-27-publication-final",
+  "statusAtPreparation": "",
+  "sourceManifest": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/product-h4-exact-source-scope-manifest-v1.json",
+    "sha256": "15e92516dc0368ab4c505483b80bc270ee31aabfea4e7d2987583ae96847ceb6",
+    "bytes": 62557
+  },
+  "futureQ4Rule": "Sole child of H4 adds exactly these12 new qualification files. Actual Q4 is recorded externally after commit.",
+  "q4": null,
+  "noDeletions": true,
+  "noReservedPathEdits": true,
+  "noMainMergeOrPush": true
+}

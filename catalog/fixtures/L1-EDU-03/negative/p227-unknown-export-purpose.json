@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-EDU-03",
+  "polarity": "negative",
+  "evidenceClass": "unknown_applicability",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "edu-vendor-training-use",
+      "environmentId": "ferpa-purpose-unknown-v1",
+      "caseId": "p227-unknown-export-purpose"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "unknown_policy"
+  }
+}

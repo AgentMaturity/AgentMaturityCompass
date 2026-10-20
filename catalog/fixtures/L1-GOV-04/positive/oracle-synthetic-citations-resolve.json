@@ -1,0 +1,76 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-GOV-04",
+  "polarity": "positive",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "governance-fixture-tenant",
+      "workspaceId": "governance-fixture-workspace",
+      "deploymentId": "governance-legal-drafting-fixture",
+      "agentId": "governance-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "governanceOracle": {
+      "kind": "citation",
+      "input": {
+        "context": {
+          "tenantId": "governance-fixture-tenant",
+          "workspaceId": "governance-fixture-workspace",
+          "agentId": "governance-fixture-agent",
+          "deploymentId": "governance-legal-drafting-fixture",
+          "controlId": "L1-GOV-04",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "briefId": "brief-1",
+        "registryAvailable": true,
+        "filing": {
+          "binding": {
+            "tenantId": "governance-fixture-tenant",
+            "workspaceId": "governance-fixture-workspace",
+            "agentId": "governance-fixture-agent",
+            "deploymentId": "governance-legal-drafting-fixture",
+            "controlId": "L1-GOV-04",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "briefId": "brief-1",
+          "tool": "file_brief",
+          "citations": [
+            "SYNTHETIC-GOV-CASE-01",
+            "SYNTHETIC-GOV-CASE-02",
+            "SYNTHETIC-GOV-CASE-03",
+            "SYNTHETIC-GOV-CASE-04",
+            "SYNTHETIC-GOV-CASE-05",
+            "SYNTHETIC-GOV-CASE-06",
+            "SYNTHETIC-GOV-CASE-07",
+            "SYNTHETIC-GOV-CASE-08",
+            "SYNTHETIC-GOV-CASE-09",
+            "SYNTHETIC-GOV-CASE-10"
+          ]
+        }
+      },
+      "expected": {
+        "result": "allow",
+        "reasonCode": "synthetic_citations_resolved"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

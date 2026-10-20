@@ -1,0 +1,590 @@
+{
+  "phase": "PREPARATION_NOT_FINAL_QUALIFICATION",
+  "measuredSourceHead": "cab126572f32a531822c148166fbcc6336779fac",
+  "assembly": {
+    "head": "0d836e26b752df968832baefba3f041186167829",
+    "int": "c9e29ed52caa3ff2d0dd18b187a69176b2591ea9",
+    "branch": "codex/p2-14-solo-final",
+    "statusPorcelain": "",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "arch": "arm64",
+    "runtime": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-14-solo-20261019",
+    "time": "2026-10-19T17:44:49.562745+00:00"
+  },
+  "actualCommands": [
+    {
+      "label": "adoption-absence-red",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/adoption-red-v1/command.json",
+        "sha256": "334bb328f33b653c37ea3dc540da545d3fe95827fd2052ca1543089ea3822a65",
+        "bytes": 1881
+      },
+      "cmd": "npx vitest run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/adoption-red-v1/native.json",
+      "exit": 1,
+      "durationMs": 2180
+    },
+    {
+      "label": "focused-six-files-green",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/product-focused-green-v1/command.json",
+        "sha256": "55f371455d1acf6cad525a56e843ad8145ad49869683710c26fbe54fb3817d38",
+        "bytes": 1776
+      },
+      "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/product-focused-green-v1/native.json tests/containment/windowsRunnerPrototype.test.ts tests/nativeShellPlatformGate.test.ts tests/nativeShellComposition.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts tests/sandboxConfinement.test.ts",
+      "exit": 0,
+      "durationMs": 36811
+    },
+    {
+      "label": "product-build",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/commands/cab126572f32a531822c148166fbcc6336779fac/build-before-owner-generation/result.json",
+        "sha256": "dfe6c70e10aae428aab89efd7b4b00a13817fc365adcfe60e378e62965dacf73",
+        "bytes": 22299
+      },
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 36584
+    },
+    {
+      "label": "stale-count-inventory-before-generation",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/commands/cab126572f32a531822c148166fbcc6336779fac/counts-before-owner-generation/result.json",
+        "sha256": "c9a4b348073c9f621413237a07dd6e30368bde204e9a1ff40bc1f624c5d31772",
+        "bytes": 22303
+      },
+      "cmd": "npm run -s check:counts",
+      "exit": 1,
+      "durationMs": 1190
+    },
+    {
+      "label": "owner-generation-quality-dead-code-shrink",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/quality-dead-code-shrink/command.json",
+        "sha256": "520df1b5f882c0df2e9289717962a1eddc6068d5c4a0d7e4ac7570b4a3d219f8",
+        "bytes": 2902
+      },
+      "cmd": "npm run -s quality:baseline -- dead-code --shrink",
+      "exit": 0,
+      "durationMs": 3787
+    },
+    {
+      "label": "owner-generation-api-ref-check",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/api-ref-check/command.json",
+        "sha256": "9d73a85b68746b4624fc60eaae2551ce812d5792225b95dea12a1a95b4d01b0f",
+        "bytes": 2844
+      },
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 416
+    },
+    {
+      "label": "owner-generation-release-notes",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/release-notes/command.json",
+        "sha256": "b5f27108e935d67a70faca0cbafc49bdaf2ac944fa4ade550df9512499780243",
+        "bytes": 2844
+      },
+      "cmd": "npm run -s release:notes",
+      "exit": 0,
+      "durationMs": 460
+    },
+    {
+      "label": "owner-generation-schemas",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/schemas/command.json",
+        "sha256": "931cfecd69f0910ed6f2344ccb86763907e3631db74f5d8ebae0178c29452308",
+        "bytes": 2236
+      },
+      "cmd": "npm run -s gen:schemas",
+      "exit": 0,
+      "durationMs": 774
+    },
+    {
+      "label": "owner-generation-schema-preflight",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/schema-preflight/command.json",
+        "sha256": "b8518e14b3a7a64024c6c3ab96c3807d1af306fc81d1156a6db2a1e3b9faa235",
+        "bytes": 2537
+      },
+      "cmd": "node --input-type=module -e 'import {pathToFileURL} from '\"'\"'node:url'\"'\"';const {publishedSchemas}=await import(pathToFileURL(process.cwd()+'\"'\"'/dist/contracts/index.js'\"'\"'));console.log(JSON.stringify(['\"'\"'spec/schemas/index.json'\"'\"',...publishedSchemas().map(x=>'\"'\"'spec/schemas/'\"'\"'+(x.name.startsWith('\"'\"'v2/'\"'\"')?x.name:'\"'\"'v1/'\"'\"'+x.name))]));'",
+      "exit": 0,
+      "durationMs": 510
+    },
+    {
+      "label": "owner-generation-cli-inventory",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/cli-inventory/command.json",
+        "sha256": "6fa666b448c3bfd387a3fb821cf592db19b688e2e53c9f64d28989e8ce89bb4e",
+        "bytes": 2307
+      },
+      "cmd": "node dist/cli.js commands --markdown --out docs/CLI_COMMAND_INVENTORY.md",
+      "exit": 0,
+      "durationMs": 1353
+    },
+    {
+      "label": "owner-generation-question-bank",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/question-bank/command.json",
+        "sha256": "a3ac6c2d3ce4a819c1cdd5b051626de559e8c6e2efe65dc1ebb4de788cd5405e",
+        "bytes": 2247
+      },
+      "cmd": "node scripts/gen-question-bank-export.mjs",
+      "exit": 0,
+      "durationMs": 400
+    },
+    {
+      "label": "owner-generation-industry-guides",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/industry-guides/command.json",
+        "sha256": "7155b68acb0a010fbb33939fb9b594be076da398479d35ece449f2e1fb7e2c5f",
+        "bytes": 2854
+      },
+      "cmd": "npm run -s gen-industry-guides",
+      "exit": 0,
+      "durationMs": 1215
+    },
+    {
+      "label": "owner-generation-quality-duplicates-shrink",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/quality-duplicates-shrink/command.json",
+        "sha256": "f46499c9c6d46e609fcfea632c6e639f59e40ae246b1825c4992b92afeae7cb8",
+        "bytes": 2904
+      },
+      "cmd": "npm run -s quality:baseline -- duplicates --shrink",
+      "exit": 0,
+      "durationMs": 1779
+    },
+    {
+      "label": "owner-generation-counts",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/counts/command.json",
+        "sha256": "e40315b587d83e153158ec6e4f2b7a8a9b17bfdbd1c93a0a796b766b55d19c7f",
+        "bytes": 2541
+      },
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 833
+    },
+    {
+      "label": "fresh-mutation-clone-initial-own-green",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/initial-green/command.json",
+        "sha256": "36e4d8957de76e7e4aa1b9a8613d5ceae7963dd904c31776e9ca555979ca43fe",
+        "bytes": 3448
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/initial-green/report.json",
+      "exit": 0,
+      "durationMs": 1491
+    },
+    {
+      "label": "fresh-mutation-clone-restored-own-green",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/restored-green/command.json",
+        "sha256": "68ec2a80de615ea1982fc341f89c1ad698b06ac75d1192bcaf646f3a87f92c20",
+        "bytes": 3450
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/restored-green/report.json",
+      "exit": 0,
+      "durationMs": 428
+    },
+    {
+      "label": "mutant-actual-host-entry-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/01-actual-host-entry-refusal/command.json",
+        "sha256": "8805a720787706cf3e63ee7455b85ff3bbe2a2c6b213573f5b006292845c3e81",
+        "bytes": 4529
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:real\\ host\\ entry\\ always\\ refuses\\ and\\ has\\ no\\ API\\ or\\ platform\\ override)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/01-actual-host-entry-refusal/report.json",
+      "exit": 1,
+      "durationMs": 428
+    },
+    {
+      "label": "mutant-request-strict-shape",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/02-request-strict-shape/command.json",
+        "sha256": "3681ce125508fc0a0e05725294f042990017e8923cb99faa4634c667c37e102f",
+        "bytes": 4476
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/02-request-strict-shape/report.json",
+      "exit": 1,
+      "durationMs": 440
+    },
+    {
+      "label": "mutant-request-argv-shape-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/03-request-argv-shape-family/command.json",
+        "sha256": "d7a6f9b164b086b1b08cfac4cb8cf7fa6c16b8d50ffe417ce80647e45036f434",
+        "bytes": 4491
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/03-request-argv-shape-family/report.json",
+      "exit": 1,
+      "durationMs": 420
+    },
+    {
+      "label": "mutant-argument-nul-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/04-argument-nul-refusal/command.json",
+        "sha256": "048a6714351d2ee91a5d56fff371ac095f311eeb196e4b9d76ed67e5f38badf3",
+        "bytes": 4476
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/04-argument-nul-refusal/report.json",
+      "exit": 1,
+      "durationMs": 438
+    },
+    {
+      "label": "mutant-request-nonempty-cwd",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/05-request-nonempty-cwd/command.json",
+        "sha256": "eb610102ca974e7924a9276225694be4549c45b69f40698021f22ee58946a1fe",
+        "bytes": 4476
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/05-request-nonempty-cwd/report.json",
+      "exit": 1,
+      "durationMs": 420
+    },
+    {
+      "label": "mutant-digest-shape-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/06-digest-shape-family/command.json",
+        "sha256": "0e42616021cee560458ace7c6fa73948956e101bcb8774f430d8de96c72ff3dc",
+        "bytes": 4473
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/06-digest-shape-family/report.json",
+      "exit": 1,
+      "durationMs": 525
+    },
+    {
+      "label": "mutant-api-object-availability",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/07-api-object-availability/command.json",
+        "sha256": "98977f91ed0c55be8f28a5a799b2ed2c72619844cc1f2f3da8df8f95832f4208",
+        "bytes": 4479
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:missing\\ or\\ malformed\\ fake\\ API\\ refuses\\ before\\ run)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/07-api-object-availability/report.json",
+      "exit": 1,
+      "durationMs": 426
+    },
+    {
+      "label": "mutant-api-method-shape",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/08-api-method-shape/command.json",
+        "sha256": "6f151a03265d1b8c0ff5155a54f1fb330a7645152850f7f3b16f8e5c0502e3c8",
+        "bytes": 4459
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:missing\\ or\\ malformed\\ fake\\ API\\ refuses\\ before\\ run)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/08-api-method-shape/report.json",
+      "exit": 1,
+      "durationMs": 430
+    },
+    {
+      "label": "mutant-api-prerequisite-verdict",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/09-api-prerequisite-verdict/command.json",
+        "sha256": "8ade5d02c17894f1560e7342a03d02441e24c171f1e4507c3344d89e4956c5c0",
+        "bytes": 4506
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:unavailable\\ and\\ malformed\\ availability\\ answers\\ do\\ not\\ launch)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/09-api-prerequisite-verdict/report.json",
+      "exit": 1,
+      "durationMs": 424
+    },
+    {
+      "label": "mutant-api-prerequisite-exception",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/10-api-prerequisite-exception/command.json",
+        "sha256": "0e7bea06d0ad52eb845afc636908f0c22e5d504768022628c058c62260011052",
+        "bytes": 4490
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:availability\\ exceptions\\ have\\ bounded\\ public\\ reasons)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/10-api-prerequisite-exception/report.json",
+      "exit": 1,
+      "durationMs": 434
+    },
+    {
+      "label": "mutant-request-outer-freeze",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/11-request-outer-freeze/command.json",
+        "sha256": "b13818192764002aa9e32c353abcc1bd7c01056d6e47dccd5649953e0050f3c1",
+        "bytes": 4519
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/11-request-outer-freeze/report.json",
+      "exit": 1,
+      "durationMs": 432
+    },
+    {
+      "label": "mutant-request-argv-freeze",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/12-request-argv-freeze/command.json",
+        "sha256": "be9ccc0d2815d2fd88589ce71e519c724ebd2fc5d70336f0775c4e9c5b3e8479",
+        "bytes": 4517
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/12-request-argv-freeze/report.json",
+      "exit": 1,
+      "durationMs": 439
+    },
+    {
+      "label": "mutant-request-owned-copy",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/13-request-owned-copy/command.json",
+        "sha256": "4047bdb86ff8256f386f0c1802e2cd8dd24f9631f8d44ae0484e784f6281ca68",
+        "bytes": 4513
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/13-request-owned-copy/report.json",
+      "exit": 1,
+      "durationMs": 425
+    },
+    {
+      "label": "mutant-fresh-invocation-nonce",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/14-fresh-invocation-nonce/command.json",
+        "sha256": "83a8f9cc3d2e0a4e3976d707f19c951858890fd4065c30f32d101719e9506b5e",
+        "bytes": 4529
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:replaying\\ a\\ previous\\ otherwise\\ matching\\ status\\ refuses\\ on\\ the\\ new\\ nonce)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/14-fresh-invocation-nonce/report.json",
+      "exit": 1,
+      "durationMs": 432
+    },
+    {
+      "label": "mutant-transport-child-numeric-contract",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/15-transport-child-numeric-contract/command.json",
+        "sha256": "1ec775198ca01da337d1b83fe6dd723576a7ad0cb091d950ac079707a07fa7a4",
+        "bytes": 4551
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:invalid\\ transport\\ child\\ identities\\ and\\ exit\\ values\\ refuse\\ without\\ coercion)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/15-transport-child-numeric-contract/report.json",
+      "exit": 1,
+      "durationMs": 430
+    },
+    {
+      "label": "mutant-exit-numeric-contract",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/16-exit-numeric-contract/command.json",
+        "sha256": "a81c8d0d7c343c8979f63759f58cb5485333b243886591570ad551937ba73042",
+        "bytes": 4510
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:invalid\\ transport\\ child\\ identities\\ and\\ exit\\ values\\ refuse\\ without\\ coercion)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/16-exit-numeric-contract/report.json",
+      "exit": 1,
+      "durationMs": 563
+    },
+    {
+      "label": "mutant-mandatory-missing-launcher-status",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/17-mandatory-missing-launcher-status/command.json",
+        "sha256": "d1d1bf2ffe49c190f7dd39a6288d88f07c246990f23366ed439d4b8aba7e4205",
+        "bytes": 6298
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:missing\\ launcher\\ status\\ cannot\\ complete\\ the\\ simulation|stdout\\ cannot\\ substitute\\ for\\ the\\ separate\\ launcher\\ status\\ channel|fake\\ enforcement\\ claims\\ never\\ fabricate\\ a\\ native\\ receipt\\ or\\ fallback)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/17-mandatory-missing-launcher-status/report.json",
+      "exit": 1,
+      "durationMs": 425
+    },
+    {
+      "label": "mutant-empty-launcher-status",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/18-empty-launcher-status/command.json",
+        "sha256": "f5021471df4cf8668de1d5fda6a217dbb4fc63f8748626576df971b9656f2e8a",
+        "bytes": 4483
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:missing\\ launcher\\ status\\ cannot\\ complete\\ the\\ simulation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/18-empty-launcher-status/report.json",
+      "exit": 1,
+      "durationMs": 432
+    },
+    {
+      "label": "mutant-status-byte-cap-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/19-status-byte-cap-family/command.json",
+        "sha256": "5521d2b47126d6c0246188b1bf5423682f7e8a962825f52f1882aeb6d035d267",
+        "bytes": 5358
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:oversized\\ status\\ refuses\\ before\\ successful\\ parsing|shadowed\\ status\\ byteLength\\ cannot\\ bypass\\ the\\ captured\\-byte\\ cap)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/19-status-byte-cap-family/report.json",
+      "exit": 1,
+      "durationMs": 435
+    },
+    {
+      "label": "mutant-utf8-refusal-result",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/20-utf8-refusal-result/command.json",
+        "sha256": "8df827c3bc7c56448ac44238e1247b88e845cc309ac15f2fa3128f353e736839",
+        "bytes": 4487
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:invalid\\ UTF\\-8\\ status\\ bytes\\ cannot\\ complete\\ the\\ simulation)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/20-utf8-refusal-result/report.json",
+      "exit": 1,
+      "durationMs": 434
+    },
+    {
+      "label": "mutant-malformed-json-promotion",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/21-malformed-json-promotion/command.json",
+        "sha256": "4a2610f5d54dbbddc0066e2858b73a1b98c53a72eb96caa3758e7444bf5c1342",
+        "bytes": 4496
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/21-malformed-json-promotion/report.json",
+      "exit": 1,
+      "durationMs": 426
+    },
+    {
+      "label": "mutant-status-strict-fields",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/22-status-strict-fields/command.json",
+        "sha256": "954ff3dff24d423eb1285117e5dc468d0dc746d5bb097a0bdbf012b2b289debd",
+        "bytes": 4485
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/22-status-strict-fields/report.json",
+      "exit": 1,
+      "durationMs": 454
+    },
+    {
+      "label": "mutant-status-version",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/23-status-version/command.json",
+        "sha256": "4981d90d2b29b534cb31c985886a679f3201dc59a08e57f6b8c897f86129193e",
+        "bytes": 4466
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/23-status-version/report.json",
+      "exit": 1,
+      "durationMs": 420
+    },
+    {
+      "label": "mutant-status-child-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/24-status-child-binding/command.json",
+        "sha256": "99bb53de70e1a05841e05dcb671bcf9cdfc1c118fc286c4f13b909c6a63e0643",
+        "bytes": 4503
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:status\\ for\\ another\\ child\\ refuses\\ with\\ all\\ other\\ bindings\\ valid)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/24-status-child-binding/report.json",
+      "exit": 1,
+      "durationMs": 425
+    },
+    {
+      "label": "mutant-status-policy-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/25-status-policy-binding/command.json",
+        "sha256": "dd31c98cff808eb637dc4d7da6f6dd8e53c7ee3c0daee25c31c98e5e1a9f5195",
+        "bytes": 4468
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:status\\ for\\ another\\ valid\\ policy\\ digest\\ refuses)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/25-status-policy-binding/report.json",
+      "exit": 1,
+      "durationMs": 424
+    },
+    {
+      "label": "mutant-status-invocation-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/26-status-invocation-binding/command.json",
+        "sha256": "262c9419187f6e02e1d7c6f9aedaed1c36838ffa37b2f0a0c5ee5bc6a5e194b4",
+        "bytes": 5374
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:status\\ for\\ another\\ invocation\\ nonce\\ refuses|replaying\\ a\\ previous\\ otherwise\\ matching\\ status\\ refuses\\ on\\ the\\ new\\ nonce)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/26-status-invocation-binding/report.json",
+      "exit": 1,
+      "durationMs": 427
+    },
+    {
+      "label": "mutant-status-exit-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/27-status-exit-binding/command.json",
+        "sha256": "95deec505dc3d4ef2d2fa713ebbec88bc1098aa609050a170b7dbd97a4366d84",
+        "bytes": 4511
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:a\\ different\\ valid\\ launcher\\ exit\\ cannot\\ authenticate\\ status\\ exit\\ zero)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/27-status-exit-binding/report.json",
+      "exit": 1,
+      "durationMs": 427
+    },
+    {
+      "label": "mutant-run-exception-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/28-run-exception-refusal/command.json",
+        "sha256": "64c60d3a1eb6b4c4f0039ce0cdf4bc1fca491d472d0d505093b72b4e76fb153e",
+        "bytes": 4512
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:run\\ exceptions\\ clean\\ partial\\ fake\\ resources\\ without\\ leaking\\ errors)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/28-run-exception-refusal/report.json",
+      "exit": 1,
+      "durationMs": 429
+    },
+    {
+      "label": "mutant-cleanup-call-required",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/29-cleanup-call-required/command.json",
+        "sha256": "8c92aafa1120cf0b9cf6c1dcb3e23eaae46b849f3c58b8d2d3b75fccc93b227c",
+        "bytes": 5321
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup|run\\ exceptions\\ clean\\ partial\\ fake\\ resources\\ without\\ leaking\\ errors)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/29-cleanup-call-required/report.json",
+      "exit": 1,
+      "durationMs": 435
+    },
+    {
+      "label": "mutant-cleanup-failure-propagated",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/30-cleanup-failure-propagated/command.json",
+        "sha256": "5b427013e6115c39ddb0a1e3e381450559def2952a7813760b5c52303d15ee08",
+        "bytes": 4547
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:cleanup\\ failure\\ overrides\\ both\\ valid\\ and\\ invalid\\ status\\ without\\ tree\\ proof)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/30-cleanup-failure-propagated/report.json",
+      "exit": 1,
+      "durationMs": 422
+    },
+    {
+      "label": "mutant-never-confined",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/31-never-confined/command.json",
+        "sha256": "d96b48004183c8acc1bdd5c8d942c9e9c23629c0aee5d9995721264c8faf5ebb",
+        "bytes": 4441
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/31-never-confined/report.json",
+      "exit": 1,
+      "durationMs": 426
+    },
+    {
+      "label": "mutant-never-tree-proven",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/32-never-tree-proven/command.json",
+        "sha256": "fd06e0686eeb4a1c5dd1dec49b57bfcb8fd5dc4a768bc00f867e8c57d22882bb",
+        "bytes": 4451
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/32-never-tree-proven/report.json",
+      "exit": 1,
+      "durationMs": 423
+    },
+    {
+      "label": "mutant-never-native-exit",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/33-never-native-exit/command.json",
+        "sha256": "adbec56ad5eafeca4671a98af7f0718efbc7f2e2fea245faee24231038bfcc14",
+        "bytes": 4425
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/33-never-native-exit/report.json",
+      "exit": 1,
+      "durationMs": 425
+    },
+    {
+      "label": "mutant-always-unmeasured",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/34-always-unmeasured/command.json",
+        "sha256": "5d87107c208de5cefec695aca322896c3c91278cea625ab88b1bdaf7ea027681",
+        "bytes": 4464
+      },
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-solo-mutations-cab12/node_modules/vitest/vitest.mjs run tests/containment/windowsRunnerPrototype.test.ts --maxWorkers=1 --testNamePattern '(?:valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutations/34-always-unmeasured/report.json",
+      "exit": 1,
+      "durationMs": 428
+    }
+  ],
+  "focused": {
+    "numTotalTests": 113,
+    "numPassedTests": 113,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "actualOwnPassed": 23,
+  "fullSuite": {
+    "status": "NOT_RUN_AT_ASSEMBLY",
+    "tests": null
+  },
+  "final23Checks": "NOT_RUN_ON_FUTURE_Q_AT_ASSEMBLY",
+  "initialStagingWarning": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/initial-staging-warning.json",
+    "sha256": "9750f29041e0ebc0cdb9d3961ffb24503e6697adc8cb254f099bdabaa1eb2281",
+    "bytes": 690
+  },
+  "generation": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/summary.json",
+    "sha256": "433352a5d143557fc915cf0b94fd7a92c0eed30ef157ca39d09f9d8f3d3af164",
+    "bytes": 7958
+  }
+}

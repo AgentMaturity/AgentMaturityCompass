@@ -1,0 +1,3086 @@
+{
+  "head": "408e680bc13beee5a2d5117db9f20b1f9e2a2c52",
+  "int": "52ad3c66e9b122fc8044851c334057c672e52834",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15-solo-20261019",
+  "statusBefore": "",
+  "statusPorcelain": "",
+  "evidenceScope": "Test-injected questionnaire provenance and synthetic reference protocols only. No local oracle outcome supplies production evidence or observed enforcement.",
+  "educationGolden": {
+    "profile": "station-education",
+    "asOf": "2026-10-12T00:00:00Z",
+    "catalog": {
+      "id": "amc.catalog",
+      "version": "0.1.3",
+      "digest": "sha256:38f2aae185ea4beeeff4dd768c7614f6347a68a38ccfbc434896d0e36911b07a"
+    },
+    "status": "ready",
+    "digest": "sha256:c61a34f2646dce077127154bd19a5b1463b7177deecc10cd9c08f85502bfddbf",
+    "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430",
+    "educationRequirements": [
+      {
+        "controlId": "L1-EDU-01",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_grading\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-02",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-03",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_records_export\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [
+          "education-ferpa-records"
+        ],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-04",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_generated_lesson\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [
+          "education-wcag21-operator-policy"
+        ],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      }
+    ],
+    "priorHistoricalEducation": {
+      "profile": "station-education",
+      "status": "ready",
+      "digest": "sha256:70f26ca4b4e65937d425d38873e5ef9009480bcdf6c2e2eebf1571eb88c1b7df",
+      "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430"
+    },
+    "historicalArtifact": {
+      "path": "qualification/2026-10-18-P1-46/plan-digests.json",
+      "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7",
+      "preserved": true
+    },
+    "note": "Regenerated Education-only plan record. The historical P1-46 receipt and every other station record are preserved. No active serialized Education golden is read by tests/catalog/compiler/golden.test.ts; that test uses an isolated finance fixture."
+  },
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.3",
+    "digest": "sha256:38f2aae185ea4beeeff4dd768c7614f6347a68a38ccfbc434896d0e36911b07a"
+  },
+  "plans": [
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "digest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "status": "ready",
+      "educationRequirements": [
+        {
+          "controlId": "L1-EDU-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_grading\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_records_export\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-ferpa-records"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_generated_lesson\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-wcag21-operator-policy"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "technologyRequirements": [
+        {
+          "controlId": "L1-TECH-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:34a2b8d347144f6ac2104f9cede084ed61512c7eacf6d16f6742ff5814a17794",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "predicate: useCases includesAny [\"publishes_synthetic_content\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:f02b34503796f46c7f998bd191ba3378f962bfaf319bf8d236b9c2e88034eb00",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: CRA product scope, sector exclusions and reporting applicability require expert confirmation; the fixture's component match does not decide them.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:e3e6df267428682720fbdba2894207c7423b46f745bbb32a57bb2cf834273dda",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:cada1632668eef6b3d0d589d06531ba6b57e958337e2d0c83a0446f25247abff",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: COPPA audience, personal-information and recipient scope require an explicit determination; a station tag is insufficient.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "us-coppa-third-party-consent"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c8cf568f0c40df9d3573b8a5a7fa8c563a32454b9dfa9672875962555a51c7f8",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US-CA\"]: false (value [\"US\"], asserted)",
+            "predicate: useCases includesAny [\"consequential_decision_about_people\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"US-CA\"]: false (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:82ab930253bf8a92755cc6aa9c9faf150594c04089821354d12b1d335d62f638",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-07",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:8d61132aee3b1d4dce9df6b67bd2c09c3338d5edb057ab53450e6e85adc56fbf",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-08",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:12be31422c4cd0485696e70128fc98020a20d51d5bd22f52916d08bfc81865a3",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "technology-ftc-act-section5"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "governanceRequirements": [
+        {
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fc95ac1b4247107df0c10251ab434bba7190e2def46681f8496fc445b8838ef6",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\",\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.defense\"]: false (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"defense_contractor\"]: false (value [\"k12_institution\"], asserted)",
+            "predicate: useCases includesAny [\"defense_analysis\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "predicate: dataClasses includesAny [\"controlled_unclassified_information\"]: false (value [\"children_personal_data\",\"education_records\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-us-cmmc-boundary",
+            "governance-us-dfars-7012-boundary",
+            "governance-us-nist-800-171-boundary"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "runtimePolicyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "digest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "status": "ready",
+      "educationRequirements": [
+        {
+          "controlId": "L1-EDU-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_grading\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-eu-ai-act-emotion"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_records_export\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_generated_lesson\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-wcag21-operator-policy"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        }
+      ],
+      "technologyRequirements": [
+        {
+          "controlId": "L1-TECH-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:34a2b8d347144f6ac2104f9cede084ed61512c7eacf6d16f6742ff5814a17794",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: useCases includesAny [\"publishes_synthetic_content\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "eu-ai-act-art50"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:f02b34503796f46c7f998bd191ba3378f962bfaf319bf8d236b9c2e88034eb00",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: CRA product scope, sector exclusions and reporting applicability require expert confirmation; the fixture's component match does not decide them.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-cra-art14"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:e3e6df267428682720fbdba2894207c7423b46f745bbb32a57bb2cf834273dda",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:cada1632668eef6b3d0d589d06531ba6b57e958337e2d0c83a0446f25247abff",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: COPPA audience, personal-information and recipient scope require an explicit determination; a station tag is insufficient.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c8cf568f0c40df9d3573b8a5a7fa8c563a32454b9dfa9672875962555a51c7f8",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US-CA\"]: false (value [\"EU\"], asserted)",
+            "predicate: useCases includesAny [\"consequential_decision_about_people\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"US-CA\"]: false (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:82ab930253bf8a92755cc6aa9c9faf150594c04089821354d12b1d335d62f638",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-ai-act-gpai"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-07",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:8d61132aee3b1d4dce9df6b67bd2c09c3338d5edb057ab53450e6e85adc56fbf",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-nis2-art23"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-08",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:12be31422c4cd0485696e70128fc98020a20d51d5bd22f52916d08bfc81865a3",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        }
+      ],
+      "governanceRequirements": [
+        {
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fc95ac1b4247107df0c10251ab434bba7190e2def46681f8496fc445b8838ef6",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\",\"technology\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: domains includesAny [\"governance.defense\"]: false (value [\"education.schools-skills\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"defense_contractor\"]: false (value [\"k12_institution\"], asserted)",
+            "predicate: useCases includesAny [\"defense_analysis\"]: false (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)",
+            "predicate: dataClasses includesAny [\"controlled_unclassified_information\"]: false (value [\"children_personal_data\",\"education_records\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU"
+          ]
+        }
+      ],
+      "runtimePolicyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805"
+    }
+  ],
+  "cases": [
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/positive/evidence-valid.json",
+      "fixtureSha256": "1a6477dd1e6929100109a0e0b5c6369ce579b3d293b4be2fb909dae7f5f12f70",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5f75ebc24eda450f9f6535bfe7c8ed76740783d106b3ce1fcd2dfc8bdbea65e2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/positive/oracle-teacher-approval.json",
+      "fixtureSha256": "67d1372d0857ba80847c98348241a2f0e0ef4c4f7727be2da65100b686b3f5d2",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "teacher_approval_bound"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "teacher_approval_bound",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "set_final_grade:synthetic-learner-1:assessment-1:88"
+        ],
+        "refusals": [],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": 88
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-stale.json",
+      "fixtureSha256": "86ef77ab1045ca21438d80217e496ee0a9581597e9cd25165172b58ecb006725",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "789a791c35df7be09227e33253ec213262a99550303314bdf84c5e9c7ae28c70"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "b8e121ffe84b2958c1224d5a36fb7c69e2f65685ba0cae735ce91bb01630b514"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-replayed.json",
+      "fixtureSha256": "2cec48a84a109cb4dcd96b2ac3126c177c77606273c5995706dc47c746893fca",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "f8d504576a1448cd12713dce40ab278a22f65bdfcaa843139ba71ad9e538ee44"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-01-questionnaire-1 was already used for L1-EDU-01|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "66cf25b056df731fbc9ef33b5af030274575a0326192dc135ea91aaa463bdcae"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-contradictory.json",
+      "fixtureSha256": "8933872a5b6c6027c7e59631ab3c26373b90b46d758ca90048b4fbf4c3fcefb8",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "ca283375a1e645af462bd42fa30f1c6ea19a630795103921cb46267ceeda6cf2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "9b0b06a702e887d689c9b7ce4d642099a5535ba328f84e3468acadf8eac8dd41",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "ff32e191ac6b332f72ca4f8565f6e04169e4302a43aace571b04a95174a5159b"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "0056e07b5b0733cf4ed185187bed9728a0c9c6e0bcdc05dec7be2c0849990a3d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-empty.json",
+      "fixtureSha256": "5acec42d7cb1f674c9a7edd7223bc9d85db23053aa001d597676f0c01dc6fb82",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "da48b27ab6469723389b9fb8168130698f572467594aa1a5b4877f920d2ab33d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-violation.json",
+      "fixtureSha256": "fbe2c10f88dcd960477e81ddee257e55befe8b70e3f857522e0c2781c38f2e31",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "8e64caf485f8b606fb42e79c243be78a9b815796c33767722879d4c81e73ad75"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-wrong-grade.json",
+      "fixtureSha256": "5017501e7eabacf41647a747cc02a694292c6b0a0e451628d1449ffee7c92cfc",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_mismatch"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_mismatch",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_mismatch"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-missing-approval.json",
+      "fixtureSha256": "20dcdc0d57166dc50be4a563cab902e2438c3d670edfa716d1e3aca0b7934274",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_missing"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-prompt-only.json",
+      "fixtureSha256": "108432c23de91047727050f91af34513ec7983d87d926a739c7a869be7973f23",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_missing"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+      "fixtureSha256": "c32b0c44e5f8f62cbd41fadbc733a9b5451e47e6f5b2258cdaca286cfa9376b4",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "approval_store_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "approval_store_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_store_unavailable"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/positive/evidence-valid.json",
+      "fixtureSha256": "59641bd475f6c37cf398fa43516bb669f3f81cd89f1b25cc42d90a20b0d2c08f",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "dcdfb9352f528a43f957977fee1389aaf07f3aef245b342e5e867c069a987419"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/positive/oracle-summary-no-affect.json",
+      "fixtureSha256": "044ddaa4a69417c27c04e768be94ae716e4cf85a7e2055cf6642fc4a1b45f920",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "non_affect_capabilities_only"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "non_affect_capabilities_only",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "execute_capability:summary-tool:transcript_summary"
+        ],
+        "refusals": [],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": [
+            {
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "capabilityClass": "transcript_summary",
+              "source": "lecture_transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-stale.json",
+      "fixtureSha256": "e7c1dae39096f2e8be81d06bf6d56130b70ef0fd7d19ff7c60e6a54569b59612",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "f8c74d6eecffc11ea168e816fb84ca22eff8688cbec9f75a1bf4b091b4ea1ae4"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "684465ec7f02785b1792cb7efd2127746f216eecfb6f2b28935ae1217b1c1751"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-replayed.json",
+      "fixtureSha256": "9b5c35277b08f2f0e6b31881117eb647c3858d29812ada2519eb57d00aff2aac",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "415ce22a3275d5453f62d8cd8e64e99ef659bdfd474d6268e33b628866aad9b6"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-02-questionnaire-1 was already used for L1-EDU-02|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-eu-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "f766565adbab0e3259d7220b4606d9a82739af74bc2f07177733068c409340fd"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-contradictory.json",
+      "fixtureSha256": "d15c9407fb7cc01b97a10df0e42583b2d69899777a45e09e5ee4db476303fc6c",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76e77e34e4f73281c5a2b74d47d6724e03118168e3bee46bae4cce1a7b1135c2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "7fd187e998fd9eedaa3fa5bf0e67daa145b120b9461e253736a3fd28800b8b3c",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "43533d143783c38dfb95b286d72ce4e38fab7020c0088d5b0b23035a7eea21ca"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "7779c02ba9c957be0ee17eec5e21589e455aba86d2424ade5c90f027039aca7d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-empty.json",
+      "fixtureSha256": "a2166d714a66bfda491e54160c33fc3dbe845643a10d7ef5d815878971b8758e",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "517c16bd38359dfe166683ea2be63323e8bd202b58e558e38fc41c64b27a9520"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-violation.json",
+      "fixtureSha256": "ef0d965775e64f731675ce27b730112aa98339dfecf30ad4de2e1c2852194ef4",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "1f7551507095693cc7d59ffb8ef4a723c2117d6df166b00065a0cdff71587dd9"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-emotion-call.json",
+      "fixtureSha256": "25fdb1c680d3c704b191275a3b9266fad2228c65ad7666098d0374a5d04ace54",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "emotion_inference_refused"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "emotion-tool",
+              "toolVersion": "1",
+              "source": "classroom_video"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+      "fixtureSha256": "b2accfd71692f8cb829dd063cb34b0c01e27bd14ec1ab7d8f2cca53d91d4fcbd",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "emotion_inference_refused"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "emotion-tool",
+              "toolVersion": "1",
+              "source": "exam_proctoring_stream"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-unclassified-capability.json",
+      "fixtureSha256": "7ebb4f3dc89398e2c0390ea3ec37b565bb44fdd32b8769e6d902a4165dca6af4",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_unresolved"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_unresolved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "capability_unresolved"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+      "fixtureSha256": "1a890c3bafde004185ecd0d5803c05e439ceaee7dd37abe36152baa793acc127",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_log_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_log_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "capability_log_unavailable"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/positive/evidence-valid.json",
+      "fixtureSha256": "e64dc0e30dbe3130b8aa206b4c20a1fde5728482ebbebeb6823211ac47c7d327",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "e6ceb6eb191618a8cad745700b421db71e76c886990ef712e5ec0d890a1d2b7c"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/positive/oracle-p227-exception-pending.json",
+      "fixtureSha256": "fde430576212d45098aedcad1c0368ffe8ba3af0eb2c99b39ac3f9d270b4238a",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "26d8608b3a424c7f24e905da655422c62d911d6e1f82b49e2e45fda6c7661576"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "recorded_exception",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-stale.json",
+      "fixtureSha256": "5582500a8c25f1e7320abc57f3394d12f0f70e54f46d7904538097f045f714df",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "defa487e98679a30c57395fd14da34676d6a0bf3f968ead5b7e98b33a5335003"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "1d3c0bb22902b329309f21ca09c5eff40dff84eeb6b3a970024f93030852c423"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-replayed.json",
+      "fixtureSha256": "182a5d426fb5ba2df225c7e00447ca8ba93c6802fa4c09a1d847046f8f91081f",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "d9c0176563018e56477832f8972f8fefc7adad00738f955968a643fe898ef8de"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-03-questionnaire-1 was already used for L1-EDU-03|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "1fd6a7097bb757932aa0d5e667f8ac2f2e04b8f2f6a4719ee031c7ebb0e8cc52"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-contradictory.json",
+      "fixtureSha256": "58a16868a9f2d64e7e4ecab4d6515548754e461451fcefb556e9bda6ae003786",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9d93e5d304324f03f412c8c90b9a42e3b0bc3a8ed47af819034be4933b213485"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "d14b9c13640c460f5690b308c2f4c8014a9b5eba52f755b016b8c6c20bb78a0e",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "a6c1948e7b5043e54c0b0329133f375133c02011809a314b0ccc6198c6e4158d"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "1f976bc6866731717724b595faa646c49d1df614f52201f646af65441cc2d32e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-empty.json",
+      "fixtureSha256": "8d85f2c90844588832f4aba35517629ded074157b29bd560f60ffaeafbd46d82",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "2fefd9ef572b98bb46f7898f8e55c4665f38a5807a58819159298f5e84bc74ac"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-violation.json",
+      "fixtureSha256": "395b8c9ec8b4240442773d9125f471bdb6104ad8cc5c72182b7a91e71d97a3c7",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ef2a46c29b230d3acf821bda8e6a7040025e92e46e7dcc02bc646ca0e9bf631"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+      "fixtureSha256": "fc2c503d9a8e47fb00fa5d7eb5af5d55e6b99fcfa1ba9f1359fb215ec5f98da3",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "26d8608b3a424c7f24e905da655422c62d911d6e1f82b49e2e45fda6c7661576"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "unauthorized_export",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+      "fixtureSha256": "7de87f5fffe2ce18db2cda4b0095df4eb362d0e69e271b2eb2b906a33ddd983f",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "26d8608b3a424c7f24e905da655422c62d911d6e1f82b49e2e45fda6c7661576"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "registry_unavailable",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/positive/evidence-valid.json",
+      "fixtureSha256": "77045d7c54080e0e47594c3875cc47bfb6615263697a5f53a435fa3f1327191b",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5b2ac28d86437f33607b8f6a63c53dce952a11e01d281059259e53d5046b40a2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/positive/oracle-accessible-lesson.json",
+      "fixtureSha256": "3779ac0fdc37b09229576be01327daafb459b4cd92af8f21b6700d506e177919",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "018dbe220e501e4644555b8cff4337b3bd0f7f4f682e93b396a9b8407b0000d0"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "automated_wcag_no_violations"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "automated_wcag_no_violations",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "357a43fb7d5511d30821f8c9d440755f6f115203331a013957b3566b113e982b",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "image-alt",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "d0d1bfac8596fe2f7a3ce93728d66be8a45ad8327dc903406cf51c79a79f5937"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-stale.json",
+      "fixtureSha256": "dc1cadd59ff06b43b94e38a30db233ba89ad8a9540bbfd65d0f5ecfbced283a1",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "c53d1f8f4a1be156ac15113d901e9bdc1bcfc2ee2b88214daac13ad0eac0a2bb"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "27ea0e7d21a8249e6705bd6eff603bee66d8da21ff4cfa41a8c6a26daed3c4cd"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-replayed.json",
+      "fixtureSha256": "d6afe4271d52415d4be85690289b1a02018e87fb1d4e00fd5de1d1f346bf8d2d",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "4be849228c416cda9538a5790fa1c004f09ff0eda66620791051a87eeb9ace41"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-04-questionnaire-1 was already used for L1-EDU-04|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "e38afab06ea9d3b9bf60ed589c8208c1052bee04f77f7aed450556cf2b1eebaf"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-contradictory.json",
+      "fixtureSha256": "9a3cff1da10e88ea4938efe2c80f086b59ddd72053b5e2ec1c428dd07e3353ea",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "fe41f68ef9fcf4ee4b8a4ea6c757d7ccabab557fa29dfb40bd937a5a65736b82"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "4535cf660b92decf85299693c130a69f74c934e24e70f3c6be0cea0ab1a59ff8",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "7e40af3ef912b29c56f6bf070d8aed48240c478daf00298dfa62ab6a01747c0a"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "8ea4ff5bee33344c7c21da8fe881f1c819816f467f90aec45caeead537a5f310"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-empty.json",
+      "fixtureSha256": "3e383a27316b97996cdfaf30bbbbf0b1ee2421180595ca1d55b081991667abe6",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4bb5a62bfa40aad71093703722414ab53cc4e788d8209c25944679dd8b0666cb"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-violation.json",
+      "fixtureSha256": "825ca6126a80270e9a7780cd0f03a83440904ca0df01030cbf9440d1d11afa55",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "6a979d5f7c3b969ee30d43186b6e9feb3161699e1f34a0325696b61438dd3c59"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-image-alt-missing.json",
+      "fixtureSha256": "1d412cd92979052b594360b3489eec39b51a2ff824232739b5302c55a8651ac7",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "018dbe220e501e4644555b8cff4337b3bd0f7f4f682e93b396a9b8407b0000d0"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "automated_wcag_violation"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "6a4613b2db3f897cb6ee7ccde105ef494076ddb9e31198bab0a8a16b5761e482",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "image-alt",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [
+            {
+              "id": "image-alt",
+              "impact": "critical",
+              "tags": [
+                "cat.text-alternatives",
+                "wcag2a",
+                "wcag111",
+                "section508",
+                "section508.22.a",
+                "TTv5",
+                "TT7.a",
+                "TT7.b",
+                "EN-301-549",
+                "EN-9.1.1.1",
+                "ACT",
+                "RGAAv4",
+                "RGAA-1.1.1"
+              ],
+              "targets": [
+                [
+                  "img"
+                ]
+              ]
+            }
+          ],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "ac7391d74a8c4caa99cc0e80e39591af84bac899445a564722b8c5dc168364e2"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-form-label-missing.json",
+      "fixtureSha256": "3a42cef3ea23aeb7d3bd78620007c5324945f36ff457000d0c42e52dbeec0d89",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "018dbe220e501e4644555b8cff4337b3bd0f7f4f682e93b396a9b8407b0000d0"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "automated_wcag_violation"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "28db156cc241c74dde64207040a58ac7e8c3b4ad953df4f4be6c61b8cd6c1286",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "tags": [
+                "cat.forms",
+                "wcag2a",
+                "wcag412",
+                "section508",
+                "section508.22.n",
+                "TTv5",
+                "TT5.c",
+                "EN-301-549",
+                "EN-9.4.1.2",
+                "ACT",
+                "RGAAv4",
+                "RGAA-11.1.1"
+              ],
+              "targets": [
+                [
+                  "#answer"
+                ]
+              ]
+            }
+          ],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "duplicate-id-aria",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "image-alt",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "9d34b965609abb9f871ef630696079cfdf40a976d7d56eb00f2d49f8f893029b"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-checker-unavailable.json",
+      "fixtureSha256": "1749d0ec87c171903ca541963286a4c6c214f0ffdbba83b117c8e676581fe098",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "018dbe220e501e4644555b8cff4337b3bd0f7f4f682e93b396a9b8407b0000d0"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "checker_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "checker_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "checker_unavailable"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "357a43fb7d5511d30821f8c9d440755f6f115203331a013957b3566b113e982b",
+          "publicationPerformed": false
+        }
+      }
+    }
+  ],
+  "production": [
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-01",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "058cf2215f53a8059454d8e4ba09f33e76476d5754cbca8bc5ae1af173142b1f"
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-03",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "26d8608b3a424c7f24e905da655422c62d911d6e1f82b49e2e45fda6c7661576"
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-04",
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "018dbe220e501e4644555b8cff4337b3bd0f7f4f682e93b396a9b8407b0000d0"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-01",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "7a518dd75d06efe4a970e7b152175e7676664db11a5bd75d1d234085ddfcc85e"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-02",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "9dcf69db612061dc499c8c4baa0249b9d60e2cacb02616a6087d3e6a7fe00bdc"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-04",
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "d7fc0fcc23ef546e64e67cc5e1c11fbfb90a27805a2c48262dfff9778e1ae7af"
+    }
+  ],
+  "technologyProduction": [
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-TECH-03",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:e3e6df267428682720fbdba2894207c7423b46f745bbb32a57bb2cf834273dda",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-us-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-TECH-04",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:cada1632668eef6b3d0d589d06531ba6b57e958337e2d0c83a0446f25247abff",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-us-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-TECH-08",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:12be31422c4cd0485696e70128fc98020a20d51d5bd22f52916d08bfc81865a3",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-us-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:95da68e515f4efea8e925e2407a616a41e5757ab66ef54c9bb5522069d824e90",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-TECH-02",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:f02b34503796f46c7f998bd191ba3378f962bfaf319bf8d236b9c2e88034eb00",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-eu-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-TECH-03",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:e3e6df267428682720fbdba2894207c7423b46f745bbb32a57bb2cf834273dda",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-eu-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-TECH-06",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:82ab930253bf8a92755cc6aa9c9faf150594c04089821354d12b1d335d62f638",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-eu-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-TECH-07",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:8d61132aee3b1d4dce9df6b67bd2c09c3338d5edb057ab53450e6e85adc56fbf",
+      "subject": {
+        "tenantId": "education-fixture-tenant",
+        "workspaceId": "education-fixture-workspace",
+        "deploymentId": "education-grading-assistant-eu-fixture",
+        "agentId": "education-fixture-agent",
+        "subjectId": null
+      },
+      "planDigest": "sha256:a7b5ac0d34db60fd70a98e4d413a450c2791715c47f90f179c65cc40f2dc1696",
+      "policyDigest": "sha256:169e8a6910283e648429bb7731d5b7a14b6eec9eed7c40404896f1d15ea56805",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0
+    }
+  ]
+}

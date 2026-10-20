@@ -10,6 +10,7 @@
 import { ExtendedLLMJudgeEngine, MetricSummary, aggregateMetricsByCategory } from './extendedLLMJudge.js';
 import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 import { incCounter, setGauge, observeHistogram } from '../ops/metrics/metricsRegistry.js';
+import { evaluateRegulatedJudgment, type RegulatedJudgeEvaluation } from "../assurance/judges/regulatedJudgeEvaluation.js";
 
 // ---------------------------------------------------------------------------
 // Test Integration Types
@@ -33,6 +34,8 @@ export interface JudgeTestConfig {
 }
 
 export interface JudgeTestResult {
+  /** Legacy AMC metric averages never constitute calibrated regulated evidence. */
+  regulatedEligible?: false;
   /** Test identifier */
   testId: string;
   /** Judge evaluation results */
@@ -92,6 +95,12 @@ export class AMCJudgeTestRunner {
     });
   }
 
+  /** Shared strict regulated path. ExtendedLLMJudgeEngine metric averages cannot promote this decision. */
+  async evaluateRegulatedTest(input: RegulatedJudgeEvaluation) {
+    if (!this.config.enabled) return { state: "not_evaluated" as const, reasons: ["JUDGE_DISABLED"] };
+    return evaluateRegulatedJudgment(input);
+  }
+
   /**
    * Run LLM-as-Judge evaluation for a single test
    */
@@ -147,6 +156,7 @@ export class AMCJudgeTestRunner {
       const executionTimeMs = Date.now() - startTime;
 
       return {
+        regulatedEligible: false,
         testId: testContext.testId,
         judgeResults,
         categorySummaries,
@@ -291,6 +301,7 @@ export class AMCJudgeTestRunner {
 
   private createEmptyResult(testId: string, startTime: number): JudgeTestResult {
     return {
+      regulatedEligible: false,
       testId,
       judgeResults: [],
       categorySummaries: [],

@@ -183,7 +183,8 @@ describe("compliance fails closed (P0-17)", () => {
       }
       expect(out.coverage.score).toBeNull();
       expect(out.coverage.evaluated).toBe(0);
-      expect(out.coverage.notEvaluated).toBe(out.categories.length);
+      // P1-45: descoped ISO/IEC 42005 categories are listed but left out of coverage.
+      expect(out.coverage.notEvaluated).toBe(out.categories.filter((row) => row.descoped === undefined).length);
       expect(out.coverage.partial).toBe(0);
     }
   });

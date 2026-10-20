@@ -34,6 +34,7 @@ describe("evidenceProducer", () => {
     [{ provenance: "dogfood" }, "synthetic"],
     [{ claimKind: "synthetic_example", source: "bridge" }, "synthetic"],
     [{ source: "dogfood-maturity" }, "synthetic"],
+    [{ source: "assurance.executed" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
     ...["manual", "operator", "feedback.ingest", "user", "inferred", "carried", "numeric_self_answer", "default"]

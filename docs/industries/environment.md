@@ -48,8 +48,8 @@ Run one with `amc domain pack run --pack <id>` [C9]. The command requires the in
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C17], resolved by `normalizeFrameworkName` [C18]; an unresolved name is rejected [C19]. Of the 85 framework strings above (station and packs together):
 
-- None resolves as written.
-- 1 resolves only after spaces and hyphens are replaced with `_`: `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects it.
+- 1 resolves as written: `EU AI Act` → `EU_AI_ACT`.
+- None resolves only after replacing spaces and hyphens with `_`.
 - 84 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C20] and the key dates of the sourced register [C21].
@@ -58,7 +58,7 @@ Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), gener
 
 ### Linked by the station registry
 
-The station's `assurancePacks` field [C22] lists these packs. "Empty-response passes" counts scenarios whose validator passes an empty string; a nonzero count means the pack can pass without the agent producing anything.
+The station's `assurancePacks` field [C22] lists these packs. "Empty-response passes" counts scenarios whose legacy callback passes an empty string. This is a callback diagnostic, not an executed fixture result.
 
 | Pack | Title | Scenarios | Empty-response passes |
 |---|---|---|---|
@@ -72,10 +72,10 @@ Registered packs [C23] whose title contains one of the station's registry framew
 |---|---|---|---|
 | `euAiActArticle` | EU AI Act Article-Level Assurance Pack | 6 | 0 |
 
-### How each command grades
+### How each command runs
 
-- `amc domain assurance --agent <id> --domain environment` [C24] runs the linked packs [C25] without invoking any agent, so every pack is reported not evaluated [C26]. With `--example` it grades a built-in synthetic reply [C27]; that output is a labelled synthetic example and never evidence about the agent.
-- `amc assurance run --agent <id> --pack <packId>` sends each scenario prompt to the agent through its responder and grades the answer; see Evidence outputs below.
+- `amc domain assurance --agent <id> --domain environment` [C24] runs the linked packs [C25] without invoking any agent, so every pack is reported not evaluated [C26]. With `--example` it applies legacy callbacks to a built-in synthetic reply [C27]; that output is a labelled synthetic example and never evidence about the agent.
+- `amc assurance run --agent <id> --pack <packId>` uses reply grading for generic packs and captured-effect execution for available regulated adapters; see Evidence outputs and its synthetic evidence limits below.
 
 ## Deployment controls
 
@@ -100,11 +100,13 @@ None of these controls was executed to write this guide. The table records where
 |---|---|---|
 | Signed receipts | Receipts are minted for LLM requests and responses, tool actions and results, guard checks and accepted wire work, and verified against public keys. | [C66] [C67] [C68] |
 | Tool-call evidence rows | The native toolset records each tool call's evidence row through the session recorder, or appends it to the workspace ledger for a caller without one. | [C69] [C70] |
-| Assurance report | `amc assurance run --agent <id> --pack <packId>` runs a pack against the agent through its responder. | [C71] [C72] [C73] [C74] |
-| Domain report | The domain report builder writes Markdown when given an output path. | [C75] [C76] |
-| Compliance report | `amc compliance report --framework <id>` (alias `comply`) writes a Markdown or JSON report; the Markdown appendix states it is not legal advice. | [C77] [C78] [C79] |
-| Audit binder | `amc audit binder create` produces a signed `.amcaudit` artifact. | [C80] [C81] [C82] |
-| Enterprise audit export | Audit records export as Splunk, Datadog, CloudTrail, Azure, Elasticsearch or syslog payloads. `buildSignedAuditTrail`, despite its name, attaches an integrity hash and a chain hash over the records and no signature. | [C83] [C84] [C85] |
+| Assurance report | `amc assurance run --agent <id> --pack <packId>` dispatches generic packs through the responder loop and regulated packs through seeded effect adapters. | [C71] [C72] [C73] [C74] [C75] |
+| Domain report | The domain report builder writes Markdown when given an output path. | [C76] [C77] |
+| Compliance report | `amc compliance report --framework <id>` (alias `comply`) writes a Markdown or JSON report; the Markdown appendix states it is not legal advice. | [C78] [C79] [C80] |
+| Audit binder | `amc audit binder create` produces a signed `.amcaudit` artifact. | [C81] [C82] [C83] |
+| Enterprise audit export | Audit records export as Splunk, Datadog, CloudTrail, Azure, Elasticsearch or syslog payloads. `buildSignedAuditTrail`, despite its name, attaches an integrity hash and a chain hash over the records and no signature. | [C84] [C85] [C86] |
+
+Across all regulated packs, the source registry retains 119 legacy scenario IDs: 8 have seeded local adapters [C87]; the other 111 have no executable adapter [C88]. Unsupported rows are not evaluated without resolving the responder [C89]. Available adapters assess captured effects rather than grade reply prose [C90]. Native regulated rows remain unscored and not evaluated [C91]. Local diagnostics are synthetic and ineligible for regulated claims [C92]; production attack success rate is not measured [C93].
 
 No output above was produced for this guide. Each row names the function that produces it.
 
@@ -112,10 +114,22 @@ No output above was produced for this guide. Each row names the function that pr
 
 - The registry's `questionCount` for this station is 6; the station has 6 packs and 104 questions, so the field equals the pack count, not the question total. Use the counts in Sector packs.
 - 84 of 85 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
-- The packs' 51 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C86]; 0 resolve to no record and 35 to a record marked unverified, so those cannot show whether they are current.
+- The packs' 51 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C94]; 0 resolve to no record and 35 to a record marked unverified, so those cannot show whether they are current.
 - `amc domain assurance` invokes no agent, so its result is always not evaluated (see Assurance packs).
 - Pack results from `amc domain pack run` are self-assessments capped at L1 (see Sector packs).
 - Pack questions, deep questions and this guide are AI-drafted and experimental: no qualified expert has reviewed them.
+
+## Experimental Environment overlay draft
+
+This section is experimental, not reviewed, not legal advice. Promotion is none. The draft covers `environment.energy-utilities-water` and `environment.food-textiles-manufacturing`; all 121 actual questions (104 pack plus 17 deep) have individual dispositions in `docs/catalog/environment/dispositions.json`. The spec's 97-pack inventory is historical; no absent or retired question is invented.
+
+Six signatures address proposal-only setpoints, a synthetic safe-hold outage drill, pending CEA packets, a pending P2-27 recall wrapper, sensor freshness/configured limits and same-lot statement-reference binding. Local simulator observations are examples, not plant, food-producer or manufacturer outcomes. Missing evidence remains not evaluated; empty production enforcement is none. Native `observed` enforcement-state for questionnaire observations does not upgrade self-reported trust.
+
+Current source-only review against integration `dcec5999b3ae634fd567f9d840252eb0e924eaac` retains all eight historical inventory source hashes. Technology and Governance sources, Technology's EU register additions and the existing optional guide-fragment hook are integrated as experimental and unreviewed. This fragment reuses the hook without a duplicate generator. Both grid profiles declare Environment × Technology, while food remains Environment-only. A coordinator-run filtered check at dirty source based on HEAD `0f2cb453153e54bd28b8cb573b0b22c15809fd4b` measured US Technology03/04/08 applicability; IN grid and food selected none. The current Technology pack excludes IN at pack level, so India composition support remains a gap. CRA02 was not applicable for US grid and absent for the others; none selected NIS207. Three empty Technology production evaluations remained not evaluated with enforcement none and no admitted records. The run passed two selected assertions with 77 filtered out; it is neither a full qualification nor production evidence. No child-audience, publishing, Governance public-service/defense or legal scope is inferred. P3-09 CEA clocks/orders, P2-27 recall, P2-26/P1-76 runtime and P2-11 dated EU scope remain pending. Risk class, capacity, asset/write authority and real safe-state evidence remain unknown; full reporting, human assessment and complete cross-station coverage are open. Governance/FRIA source availability supplies no applicability decision or approval. Generated guide inclusion does not establish those outcomes.
+
+The partial mappings retain human oversight, automation-bias, lifetime logging, HACCP validation, role/geolocation/retention and full-reporting gaps. FDA 24-hour sortable records are a response to an FDA request, not a recall deadline. NIS2 final reporting uses a calendar month from incident notification; existing F4 clock arithmetic is not notice delivery. All 21 instrument candidates are unread/unverified and marked for re-verification; inherited discovery locators are not fresh primary reads.
+
+D-14/D-10's two experts, independent human/legal sign-offs, a partner per domain through P1-29, manual hazard review, stewardship/funding, D-04 licence and Sid's promotion decision remain open. No third-party contact or promotion is established. Detailed scope and unsupported behaviour are in `docs/catalog/environment/README.md`. An A4 catalog-lock change is `scope_changed`, never a fault; any applicable FRIA precedes P3-23's completion gate.
 
 ## Verification appendix
 
@@ -153,7 +167,7 @@ No output above was produced for this guide. Each row names the function that pr
 | C24 | Domain assurance command | `src/cli-domain-product-commands.ts` | `Run domain-specific assurance packs` |
 | C25 | Domain assurance runs the registry's packs | `src/domains/domainCliIntegration.ts` | `export function runDomainAssurance` |
 | C26 | Without an agent each pack is not evaluated | `src/domains/domainCliIntegration.ts` | `status: "not_evaluated", reason: NO_AGENT_INVOKED` |
-| C27 | Example mode grades the built-in reply | `src/domains/domainCliIntegration.ts` | `scenario.validate(EXAMPLE_ASSURANCE_REPLY` |
+| C27 | Example mode invokes legacy callbacks on the built-in reply | `src/domains/domainCliIntegration.ts` | `scenario.validate(EXAMPLE_ASSURANCE_REPLY` |
 | C28 | The native toolset registers the prompt-injection guard | `src/agent/agentToolset.ts` | `registry.guard("prompt-injection"` |
 | C29 | Guards cannot allow; the first denial is named | `src/agent/agentToolset.ts` | `guards cannot allow` |
 | C30 | Prompt-injection guard definition | `src/tools/guards/policyGuards.ts` | `export function promptInjectionGuard` |
@@ -200,16 +214,24 @@ No output above was produced for this guide. Each row names the function that pr
 | C71 | CLI usage names --agent and --pack | `src/cli.ts` | `amc assurance run --agent <id> --pack <packId>` |
 | C72 | CLI calls runAssurance | `src/cli.ts` | `report = await runAssurance({` |
 | C73 | runAssurance definition | `src/assurance/assuranceRunner.ts` | `export async function runAssurance` |
-| C74 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts` | `await responder.respond(prompt)` |
-| C75 | Domain report builder | `src/domains/domainCliIntegration.ts` | `export function buildDomainReportForAgent` |
-| C76 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(outputPath, reportMarkdown)` |
-| C77 | compliance command and comply alias | `src/cli.ts` | `program.command("compliance").alias("comply")` |
-| C78 | Compliance report writer | `src/compliance/complianceReport.ts` | `export function writeComplianceReport` |
-| C79 | Not-legal-advice line | `src/compliance/complianceReport.ts` | `This appendix is not legal advice.` |
-| C80 | Binder create command | `src/cli.ts` | `Create deterministic signed .amcaudit artifact` |
-| C81 | Binder create implementation | `src/audit/auditCli.ts` | `export function auditBinderCreateCli` |
-| C82 | Binder signing | `src/audit/binderSigner.ts` | `export function signBinderJson` |
-| C83 | Export formats | `src/audit/enterpriseAuditExport.ts` | `export type EnterpriseAuditExportFormat` |
-| C84 | Audit trail builder | `src/audit/enterpriseAuditExport.ts` | `export function buildSignedAuditTrail` |
-| C85 | Audit trail integrity is a plain hash | `src/audit/enterpriseAuditExport.ts` | `const integrityHash = sha256Hex(JSON.stringify(sorted));` |
-| C86 | Pack references resolve against the catalogue | `src/domains/packs/regulatorySchema.ts` | `regulatoryReferences: pack.regulatoryBasis.map(toRegulatoryReference)` |
+| C74 | Generic scenario prompts go to the responder | `src/assurance/assurancePackExecution.ts` | `await responder.respond(prompt)` |
+| C75 | Regulated packs use the executed effect path | `src/assurance/assurancePackExecution.ts` | `return executeRegulatedPack(input, pack)` |
+| C76 | Domain report builder | `src/domains/domainCliIntegration.ts` | `export function buildDomainReportForAgent` |
+| C77 | Domain report is written atomically | `src/domains/domainCliIntegration.ts` | `writeFileAtomic(outputPath, reportMarkdown)` |
+| C78 | compliance command and comply alias | `src/cli.ts` | `program.command("compliance").alias("comply")` |
+| C79 | Compliance report writer | `src/compliance/complianceReport.ts` | `export function writeComplianceReport` |
+| C80 | Not-legal-advice line | `src/compliance/complianceReport.ts` | `This appendix is not legal advice.` |
+| C81 | Binder create command | `src/cli.ts` | `Create deterministic signed .amcaudit artifact` |
+| C82 | Binder create implementation | `src/audit/auditCli.ts` | `export function auditBinderCreateCli` |
+| C83 | Binder signing | `src/audit/binderSigner.ts` | `export function signBinderJson` |
+| C84 | Export formats | `src/audit/enterpriseAuditExport.ts` | `export type EnterpriseAuditExportFormat` |
+| C85 | Audit trail builder | `src/audit/enterpriseAuditExport.ts` | `export function buildSignedAuditTrail` |
+| C86 | Audit trail integrity is a plain hash | `src/audit/enterpriseAuditExport.ts` | `const integrityHash = sha256Hex(JSON.stringify(sorted));` |
+| C87 | Canonical regulated scenario inventory and adapter availability | `src/assurance/executed/registry.ts` | `export const REGULATED_SCENARIO_DISPOSITIONS` |
+| C88 | Unavailable adapters refuse scenario compilation | `src/assurance/executed/routes.ts` | `!disposition.fixtureAvailable` |
+| C89 | Unsupported rows bypass compiled execution and responder resolution | `src/assurance/executed/packExecution.ts` | `unavailableExecutedRow({ scenarioId: scenario.id, reason: selected.reason })` |
+| C90 | Seeded execution assesses the actual scoped capture | `src/assurance/executed/harness.ts` | `const observed = assessScopedCapture(compiled, capture, policy, binding, true)` |
+| C91 | Native base rows remain unscored and inconclusive | `src/assurance/executed/compiledExecution.ts` | `export function unavailableExecutedRow` … `inconclusive: true, inconclusiveCause: "ungradable_evidence"` |
+| C92 | Synthetic diagnostics cannot become regulated eligible | `src/assurance/executed/harness.ts` | `claimKind: "synthetic_example", regulatedEligible: false` |
+| C93 | Production attack success rate remains unavailable | `src/assurance/executed/harness.ts` | `attackSuccessRate: null` |
+| C94 | Pack references resolve against the catalogue | `src/domains/packs/regulatorySchema.ts` | `regulatoryReferences: pack.regulatoryBasis.map(toRegulatoryReference)` |

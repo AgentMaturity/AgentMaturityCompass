@@ -1,0 +1,120 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-01",
+  "polarity": "positive",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-port-operations-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "release_check",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-port-operations-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-01",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "lotId": "shipment-1",
+        "inventory": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-01",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotIds": [
+            "shipment-1"
+          ]
+        },
+        "sensor": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-01",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotId": "shipment-1",
+          "unit": "C",
+          "maxAgeMs": 120000,
+          "minimumC": 2,
+          "maximumC": 8,
+          "readings": [
+            {
+              "at": "2026-10-18T11:58:30.000Z",
+              "valueC": 4
+            },
+            {
+              "at": "2026-10-18T11:59:00.000Z",
+              "valueC": 12
+            },
+            {
+              "at": "2026-10-18T11:59:30.000Z",
+              "valueC": 4
+            }
+          ]
+        },
+        "disposition": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-01",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotId": "shipment-1",
+          "dispositionId": "synthetic-disposition-1",
+          "excursionDigest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "actorId": "synthetic-reviewer-1",
+          "action": "release",
+          "createdAt": "2026-10-18T11:59:40.000Z",
+          "expiresAt": "2026-10-18T13:00:00.000Z"
+        }
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      }
+    },
+    "pendingColdChainCases": {
+      "notExecuted": true,
+      "dependency": "P2-27",
+      "intendedResult": "allow",
+      "reason": "Future same-lot disposition scenario; digest is an inert placeholder, authority and binding not evaluated."
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

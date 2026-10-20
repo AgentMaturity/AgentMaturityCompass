@@ -1,0 +1,503 @@
+{
+  "historicalOnly": true,
+  "runs": [
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/overlay-red/command.json",
+        "sha256": "670dc43deb8166ecec78e9448b5b5ae27c2311eb31014d890c4fe570e20e72ab",
+        "bytes": 1534
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility/overlay.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/overlay-red-report.json"
+      ],
+      "exit": 1,
+      "durationMs": 3153,
+      "totals": {
+        "numTotalTests": 6,
+        "numPassedTests": 0,
+        "numFailedTests": 6,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/overlay-red/raw.log",
+        "sha256": "2e558b93bf0271b56f610fc6858a9e8d5676141f482d783505fc25fa395fb33c",
+        "bytes": 5110
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/overlay-red-report.json",
+        "sha256": "07f5535e3362688d51a4f1d0a5cf730420b919f6c2c1af23e7ccf0838e08ab6e",
+        "bytes": 10454
+      },
+      "sourceHeadAtExecution": "f4001afd555e09353734a44b4bc7cbc2df46481a",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) loads six experimental controls through the unchanged native catalog contract"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) disposes all 94 pack and 16 deep questions exactly once without silently placing disputed packs"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) retains all five evidence negatives on every signature"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) orders unverified candidates without inventing source reads or legal review"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) compiles three asserted profiles including actual Mobility and Technology composition"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/overlay.test.ts",
+          "fullName": "Mobility experimental catalog overlay (P3-17) keeps promotion and all three expert relationships pending"
+        }
+      ],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    },
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/helpers-red/command.json",
+        "sha256": "5c898e33079f3239a7d434c92e37df5716ac63167c6e7d740c8c14f4c8cd23ef",
+        "bytes": 1602
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility",
+        "tests/compilerStationDefaults.test.ts",
+        "tests/starterProfiles.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/helpers-red-report.json"
+      ],
+      "exit": 1,
+      "durationMs": 20124,
+      "totals": {
+        "numTotalTests": 184,
+        "numPassedTests": 135,
+        "numFailedTests": 49,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/helpers-red/raw.log",
+        "sha256": "2b67e8ffeccb89a0d528db1a67fb141a92cb07645be03ce967ea44b9041805ad",
+        "bytes": 24101
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/helpers-red-report.json",
+        "sha256": "efce4716213455d230bfb50f259a12d0e23e40b4ce0937eba4d3f6d8d64ba390",
+        "bytes": 141646
+      },
+      "sourceHeadAtExecution": "a85578dee5fc773d8a4885859bbd1c32c1618e50",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/compilerStationDefaults.test.ts",
+          "fullName": "P1-46: the compiled plan holds F2's station-profile rules for every station golden: mobility"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/starterProfiles.test.ts",
+          "fullName": "amc init --regulated (P1-40) compiles and signs a Layer 0 plan, names the facts it waits for and activates nothing"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/positive/oracle-cold-bound-disposition.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/positive/oracle-cold-clean.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/negative/oracle-cold-excursion.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/negative/oracle-cold-missing-sensors.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/negative/oracle-cold-stale-sensors.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-01/negative/oracle-cold-wrong-lot-disposition.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/positive/oracle-screening-permitted-pairs.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-decision-difference.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-inconsistent-pair.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-no-lineage.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-proxy-lineage.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-reason-difference.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/positive/oracle-port-level-1.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/positive/oracle-port-level-2.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/positive/oracle-port-level-3.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/positive/oracle-port-raised-rechecked.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-lower-authorization.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-raised-without-recheck.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-unknown-level.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/positive/oracle-change-bound-approval.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-expired-approval.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-missing-analysis.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-missing-approval.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-unclassified.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-wrong-digest.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/positive/oracle-ota-trusted.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-bad-content.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-bad-signature.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-incomplete-r156.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-invalid-trust.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-revoked-signer.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-trust-unavailable.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-unknown-signer.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-unsigned.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-wrong-purpose.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/positive/oracle-fallback-boundary.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/positive/oracle-fallback-on-time.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/negative/oracle-fallback-late.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/negative/oracle-fallback-not-reached.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/negative/oracle-fallback-undefined.json: synthetic outcome and atomic effects"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) never invents a P2-27 adapter or releases a warm lot under pending scenario metadata"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) refuses both changed reasons and proxy sources even when every paired decision agrees"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) holds every adverse notice until all paired applications and lineage have passed"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) does not open a raised-level gate from a previously checked revision"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) uses actual native release-purpose signature integrity and issuer admission before install"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) does not install with an envelope-supplied trust context or absent, invalid, future or expired trust"
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) accepts the inclusive fallback deadline and refuses one millisecond late"
+        }
+      ],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    },
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/initial-green/command.json",
+        "sha256": "7ae1a4a4461a59bf66c957b84d14ae7e111d615feeea7ffff5335bc8c5fbf6ff",
+        "bytes": 1604
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility",
+        "tests/compilerStationDefaults.test.ts",
+        "tests/starterProfiles.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/initial-green-report.json"
+      ],
+      "exit": 0,
+      "durationMs": 20282,
+      "totals": {
+        "numTotalTests": 184,
+        "numPassedTests": 184,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/initial-green/raw.log",
+        "sha256": "1f547b0cc7bbefb45fcff5cbadc2ccb2d08bf655f702aa604894b152424392ab",
+        "bytes": 732
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/initial-green-report.json",
+        "sha256": "69c882718b4bd33647dd34c1771a1d202eb65112711ceeb646df69df1b1eb308",
+        "bytes": 81502
+      },
+      "sourceHeadAtExecution": "f2c9d7cfc35bc2da0c6047813b0667bb7c0b4075",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    },
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/proxy-boundary-red/command.json",
+        "sha256": "c6e84e91e763723abc91bdfdf081390f5c625afd3fe775c0cb949343bdee7c02",
+        "bytes": 1549
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/proxy-boundary-red-report.json"
+      ],
+      "exit": 1,
+      "durationMs": 2679,
+      "totals": {
+        "numTotalTests": 59,
+        "numPassedTests": 58,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/proxy-boundary-red/raw.log",
+        "sha256": "8558d40c9ef9180fa80142da72e924ae803007e356cd9fd1c1fc859d6a56692f",
+        "bytes": 1284
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/proxy-boundary-red-report.json",
+        "sha256": "c22658a6aee43a213127f003f78107ec4974bdf37c181cf73864481d893a44ab",
+        "bytes": 26200
+      },
+      "sourceHeadAtExecution": "22283987f58656837ca463bfd0e4195db8d34dda",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17/tests/catalog/stations/mobility/fixtures.test.ts",
+          "fullName": "Mobility synthetic local reference oracles (P3-17) refuses whitespace-equivalent ZIP proxy lineage before releasing any notice"
+        }
+      ],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    },
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/reviewed-green/command.json",
+        "sha256": "00f790b49323808d34967c5afbd1b54e0a04b31c1d0e59f1b229bc422e8dcc41",
+        "bytes": 1606
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility",
+        "tests/compilerStationDefaults.test.ts",
+        "tests/starterProfiles.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/reviewed-green-report.json"
+      ],
+      "exit": 0,
+      "durationMs": 19476,
+      "totals": {
+        "numTotalTests": 193,
+        "numPassedTests": 193,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/reviewed-green/raw.log",
+        "sha256": "bd973f7c751285eec17368d425a7771c5ac32dfd050056db29880217289e0656",
+        "bytes": 751
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/reviewed-green-report.json",
+        "sha256": "50fab1c1d7563526d4b0dda6e454777baf744e1e28b843441c82b9fd87b58298",
+        "bytes": 85041
+      },
+      "sourceHeadAtExecution": "596f0b280f24ec833f5fa1e4e7a608a67b6175d3",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    },
+    {
+      "commandRecord": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-fixture-green/command.json",
+        "sha256": "9c84e670396e6c16c4bd7dc111f4c9811159b06514f1762b2dc0c8b8fab7f491",
+        "bytes": 1556
+      },
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/catalog/stations/mobility/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-fixture-green-report.json"
+      ],
+      "exit": 0,
+      "durationMs": 2517,
+      "totals": {
+        "numTotalTests": 66,
+        "numPassedTests": 66,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-fixture-green/raw.log",
+        "sha256": "f5c020f86a9ba77d0ca9581ad9b2b70baf660d5e03eeefbe03b349d24561db1d",
+        "bytes": 500
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-fixture-green-report.json",
+        "sha256": "78b671bb9735b5b93bd050d8f6322de5806d70829f6b32c4e0b13ed389c211db",
+        "bytes": 27748
+      },
+      "sourceHeadAtExecution": "101cd9a8e90b0901f5555afa679a104a3eeef490",
+      "intAtExecution": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "statusBefore": "",
+      "statusAfter": "",
+      "failedAssertionIdentities": [],
+      "suiteOrCollectionErrors": [],
+      "rawRunErrors": [],
+      "limit": "Measured at its original recorded source; not reattributed to the final source or combined with another run."
+    }
+  ],
+  "limit": "The 184/193 historical greens include broader defaults/starter tests. The 596 green included 164 own Mobility tests. The 101cd 66-test fixture run is historical and scoped; it is not the new source own176 or a full-repository suite."
+}

@@ -4338,8 +4338,8 @@
         "label": "GS1 EPCIS 2.0"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "NIS2",
         "instrumentId": "eu-nis2",
         "label": "EU NIS2 2022/2555"
       },
@@ -6623,8 +6623,8 @@
         "label": "ISO/IEC 27001:2022"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "OWASP_API_TOP10",
         "instrumentId": "owasp-api-2023",
         "label": "OWASP API Top 10 2023"
       }
@@ -7300,14 +7300,14 @@
         "label": "ISO 27001:2022"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "SOC2",
         "instrumentId": "soc2",
         "label": "SOC 2 Type II"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "DORA",
         "instrumentId": "eu-dora",
         "label": "EU DORA Art. 9"
       },
@@ -7318,8 +7318,8 @@
         "label": "ISO 22301:2019"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "NIS2",
         "instrumentId": "eu-nis2",
         "label": "EU NIS2 2022/2555"
       },
@@ -8711,8 +8711,8 @@
         "label": "ETSI EN 303 645"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "NIS2",
         "instrumentId": "eu-nis2",
         "label": "EU NIS2 2022/2555"
       },
@@ -9011,8 +9011,8 @@
         "label": "HITECH Act"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "HHS_HTI_1",
         "instrumentId": "us-onc-certification",
         "label": "ONC 45 CFR §170"
       },
@@ -12619,8 +12619,8 @@
         "label": "ISO 27001:2022"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "SOC2",
         "instrumentId": "soc2",
         "label": "SOC 2 Type II"
       },
@@ -12637,8 +12637,8 @@
         "label": "GDPR Art. 44-49"
       },
       {
-        "external": true,
-        "frameworkId": null,
+        "external": false,
+        "frameworkId": "NIS2",
         "instrumentId": "eu-nis2",
         "label": "EU NIS2 2022/2555"
       },

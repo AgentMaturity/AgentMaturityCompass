@@ -1,0 +1,1645 @@
+{
+  "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+  "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+  "branch": "codex/p3-16-solo-final",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019",
+  "statusPorcelain": "",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "runtimeSnapshotTiming": "Actual post-scoped/pre-packet capture; not a retrospective full fingerprint of focused/probe execution.",
+  "freeze": {
+    "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+    "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+    "capturedAt": "2026-10-19T13:40:21.561870+00:00",
+    "sourceHashes": [
+      {
+        "path": "tests/catalog/stations/environment/ceaDrill.ts",
+        "sha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+        "bytes": 2173
+      },
+      {
+        "path": "tests/catalog/stations/environment/compiledPolicy.test.ts",
+        "sha256": "ceeecda7178f5325fe3e981e8657d4c742cd0aa492e565a6997c3ed9b9d7623e",
+        "bytes": 9706
+      },
+      {
+        "path": "tests/catalog/stations/environment/fixtures.test.ts",
+        "sha256": "0c45c21c7d3a35d5a461d62d5879355c18c142882e7eaf4754be0ab23031f700",
+        "bytes": 27415
+      },
+      {
+        "path": "tests/catalog/stations/environment/harness.ts",
+        "sha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+        "bytes": 4687
+      },
+      {
+        "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+        "sha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+        "bytes": 2044
+      },
+      {
+        "path": "tests/catalog/stations/environment/lotRelease.ts",
+        "sha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+        "bytes": 1708
+      },
+      {
+        "path": "tests/catalog/stations/environment/overlay.test.ts",
+        "sha256": "963bd1ed99f94c1032fcfe2bbf0e25ae2566beae5e9ba511afb7076e0fa3254d",
+        "bytes": 6511
+      },
+      {
+        "path": "tests/catalog/stations/environment/plantSimulator.ts",
+        "sha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+        "bytes": 6192
+      },
+      {
+        "path": "tests/catalog/stations/environment/protocol.ts",
+        "sha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+        "bytes": 5632
+      },
+      {
+        "path": "tests/catalog/stations/environment/sensorFeed.ts",
+        "sha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+        "bytes": 4042
+      }
+    ],
+    "runtimeSnapshot": {
+      "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019",
+      "gitRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019",
+      "branch": "codex/p3-16-solo-final",
+      "statusPorcelain": "",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-20261019",
+      "node": "v22.23.3",
+      "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "nodeExecutableSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "npxExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/bin/npx-cli.js",
+      "npxExecutableSha256": "237adf8f3747cad8b9b62fcfd0d9c8d509a64e550337707f55100afcb79e8900",
+      "pnpm": "10.33.0",
+      "lockSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+      "installedModulesSha256": "ef4c6b0cc77795bda4d59e11c889d32bb3a33bdf91e2f0a4232ca76533d507c3",
+      "vitestEntry": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/node_modules/vitest/vitest.mjs",
+      "vitestEntrySha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "vitestBinSha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "runtimeFingerprints": {
+        "ordinaryFiles": [
+          {
+            "path": "package.json",
+            "resolvedPath": "package.json",
+            "sha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+            "bytes": 10860
+          },
+          {
+            "path": "pnpm-lock.yaml",
+            "resolvedPath": "pnpm-lock.yaml",
+            "sha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+            "bytes": 181808
+          },
+          {
+            "path": "node_modules/.pnpm/lock.yaml",
+            "resolvedPath": "node_modules/.pnpm/lock.yaml",
+            "sha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+            "bytes": 181808
+          },
+          {
+            "path": "node_modules/.modules.yaml",
+            "resolvedPath": "node_modules/.modules.yaml",
+            "sha256": "ef4c6b0cc77795bda4d59e11c889d32bb3a33bdf91e2f0a4232ca76533d507c3",
+            "bytes": 41535
+          },
+          {
+            "path": "node_modules/vitest/package.json",
+            "resolvedPath": "node_modules/vitest/package.json",
+            "sha256": "a28126d97bcaf567da5bed69443b7f3bcd9a7a8c38c8b66e554686b6bb2c10e0",
+            "bytes": 5932
+          },
+          {
+            "path": "node_modules/vitest/vitest.mjs",
+            "resolvedPath": "node_modules/vitest/vitest.mjs",
+            "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+            "bytes": 43
+          },
+          {
+            "path": "node_modules/typescript/package.json",
+            "resolvedPath": "node_modules/typescript/package.json",
+            "sha256": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9",
+            "bytes": 3527
+          },
+          {
+            "path": "node_modules/better-sqlite3/package.json",
+            "resolvedPath": "node_modules/better-sqlite3/package.json",
+            "sha256": "4665126292eff5dffe6c0ffabf98c4de18e479aa0b53edd775028eb567b3ecc1",
+            "bytes": 1436
+          },
+          {
+            "path": "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+            "resolvedPath": "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+            "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+            "bytes": 1931552
+          }
+        ],
+        "runtimeCodeTrees": [
+          {
+            "root": "node_modules/vitest",
+            "resolvedRoot": "node_modules/vitest",
+            "state": "fingerprinted",
+            "fileCount": 114,
+            "totalBytes": 1909160,
+            "sortedFileManifestSha256": "89b5d43bcc291bdf9dcfd7adc5beeb36b8784d9120d50004e378407ee8d15072"
+          },
+          {
+            "root": "node_modules/vite",
+            "resolvedRoot": "node_modules/vite",
+            "state": "fingerprinted",
+            "fileCount": 46,
+            "totalBytes": 2436171,
+            "sortedFileManifestSha256": "47bdbc22e2bd02cd29c79a9803f84a6cf96088be462692608123481b08d0d35c"
+          },
+          {
+            "root": "node_modules/vite-node",
+            "state": "absent_at_direct_installed_path"
+          },
+          {
+            "root": "node_modules/tinypool",
+            "state": "absent_at_direct_installed_path"
+          },
+          {
+            "root": "node_modules/typescript",
+            "resolvedRoot": "node_modules/typescript",
+            "state": "fingerprinted",
+            "fileCount": 140,
+            "totalBytes": 24346827,
+            "sortedFileManifestSha256": "c4bcafc68e1c5f111b55435ed9da7307466b5901644a332e71c9b6661eea30d1"
+          },
+          {
+            "root": "node_modules/better-sqlite3",
+            "resolvedRoot": "node_modules/better-sqlite3",
+            "state": "fingerprinted",
+            "fileCount": 50,
+            "totalBytes": 12320297,
+            "sortedFileManifestSha256": "d03cf7151a1b36fb390531c477fae746f82a93384984c1b970f4ab35984c27ee"
+          },
+          {
+            "root": "node_modules/esbuild",
+            "resolvedRoot": "node_modules/esbuild",
+            "state": "fingerprinted",
+            "fileCount": 7,
+            "totalBytes": 10728893,
+            "sortedFileManifestSha256": "35a56f225dbb12aedc266ef9e1986e8eeaa5cf01b2b8d90e86e1e521446767e4"
+          },
+          {
+            "root": "node_modules/rollup",
+            "state": "absent_at_direct_installed_path"
+          },
+          {
+            "root": "node_modules/rolldown",
+            "resolvedRoot": "node_modules/rolldown",
+            "state": "fingerprinted",
+            "fileCount": 54,
+            "totalBytes": 839133,
+            "sortedFileManifestSha256": "65f3844b6ff033ba90182644a920292e0ccea40398b11e5fbe2fcc1d775f74a8"
+          },
+          {
+            "root": "node_modules/@vitest",
+            "resolvedRoot": "node_modules/@vitest",
+            "state": "fingerprinted",
+            "fileCount": 118,
+            "totalBytes": 827253,
+            "sortedFileManifestSha256": "eba2805ced3d0499d6ec69881e5e47118694058a88290b79ec8ecca6092473d5"
+          },
+          {
+            "root": "node_modules/@rolldown",
+            "resolvedRoot": "node_modules/@rolldown",
+            "state": "fingerprinted",
+            "fileCount": 11,
+            "totalBytes": 17096160,
+            "sortedFileManifestSha256": "d96e430680b8d1a2fa35fbe2366d6f67888759c583c056a8cfd08ebc8b7613df"
+          }
+        ],
+        "excludedEntryNames": [
+          ".DS_Store",
+          ".cache",
+          ".git",
+          ".nyc_output",
+          ".rollup.cache",
+          ".vite",
+          ".vitest",
+          "__pycache__",
+          "coverage"
+        ],
+        "excludedFileSuffixes": [
+          ".tsbuildinfo"
+        ],
+        "manifestFormat": "UTF-8 compact JSON of lexically sorted [logicalRelativePath,resolvedCloneRelativePath,bytes,sha256] file rows.",
+        "scope": "Exactly the nine required ordinary files (including the DIRECT hoisted SQLite native binding) and listed existing direct installed trees. Clone-local symlinks are fingerprinted by logical and resolved paths; external targets/cycles/special files are refused. Caches are excluded. This is not a fingerprint of every transitive dependency, system component or ignored file."
+      },
+      "os": "macOS-26.6.2-arm64-arm-64bit",
+      "arch": "arm64"
+    },
+    "runtimeSnapshotScope": "Current clean product snapshot after actual own, focused, probe and isolated mutations; before preparation packet. This fingerprint does not retroactively claim that broader fingerprints were captured inside the earlier scoped command wrapper. Their actual command metadata, lock and source/Node/runtime pins remain authoritative.",
+    "snapshotWrapper": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/run-native-full-root-reviewed.py",
+      "sha256": "d6113aace547d00c37ccd394b20fb624f097c2fa28c50cea6859c555f734b53d",
+      "bytes": 20220
+    },
+    "historicalPacketProof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/candidate-readonly-state.json",
+      "sha256": "8c0e3b19fd5821b9382bcfe5a135e9f0c23a4d0e40f3ac7b5a6519bab57c7a25",
+      "bytes": 2515
+    },
+    "focusedNativeAudit": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/focused-native-audit-e47ed.json",
+      "sha256": "831517f1e8928ff0bd4236117c805314824e4d3632a0e3c806ba39606b8b2aa1",
+      "bytes": 1054
+    },
+    "probeNativeAudit": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/probe-native-audit-e47ed.json",
+      "sha256": "83253f820b0d319706c9d5ba18ebc0aa3973d05052af379affa97629eb0f5876",
+      "bytes": 1329
+    },
+    "productManifest": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/final-product-path-manifest-e47ed.json",
+      "sha256": "4d3ec0dd9797546637cb92124fe60014ea850247fe6fbae49d7aad0dd308ddf0",
+      "bytes": 58035
+    }
+  },
+  "bytePreservation": {
+    "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+    "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+    "recordedAt": "2026-10-19T13:43:57.449085+00:00",
+    "independentSourceReview": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/independent-final-product-scope-audit-e47ed-v1.json",
+      "sha256": "c20b49e6c884c15eee004016c004b5f2c4fd81e2e2dc859712a216f425947508",
+      "bytes": 68469
+    },
+    "rootGitAndWorkingTreeManifest": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/final-product-path-manifest-e47ed.json",
+      "sha256": "4d3ec0dd9797546637cb92124fe60014ea850247fe6fbae49d7aad0dd308ddf0",
+      "bytes": 58035
+    },
+    "independentCurrentGuardProof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/mutation-proof-independent-audit-e47ed.json",
+      "sha256": "3b9d81ac098068d3be34bcc185dbf369dd19b7b5279a5da37ebfa7a1be4b19df",
+      "bytes": 195007
+    },
+    "rootSourceAndEngineReview": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/source-freeze-and-engine-review.json",
+      "sha256": "78d9b68594b4de6de9dcd5d29afad8a8341d7a8984d2c80d31ce57383210c6e6",
+      "bytes": 1517
+    },
+    "rootReview": "Read complete current123-path manifest and independent source scope/catalog/whole-tree preservation conclusions. Verified exact hash-bound pins; original10packet, priorCHANGELOG prefix, seven other guides and all production source preserved. Eight fixes and official generated outputs match authorized item scope. Actual runtime/catalog-digest/admission/scoped/native/mutation observations are separate linked records, never human regulatory approval.",
+    "sourceScopeClear": true,
+    "actionableFindings": [],
+    "productionOrLegalApproval": false,
+    "fullSuiteState": "NOT_RUN_ON_FUTURE_RECEIPT_BEARING_HEAD"
+  },
+  "historicalPacketProof": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/candidate-readonly-state.json",
+    "sha256": "8c0e3b19fd5821b9382bcfe5a135e9f0c23a4d0e40f3ac7b5a6519bab57c7a25",
+    "bytes": 2515
+  },
+  "verifiedInputReferences": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/checks.json",
+      "sha256": "6785dab8f545175bbf6da95abdaa75d75c001fe74dffcacb69b2ed5c8a189799",
+      "bytes": 9192
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/prepare-20261019T133158-07389adb/prepared.json",
+      "sha256": "a3f8824aabdf74fe1aae14e9e486e82cdbe46eb5956d602a810e65dc7a99fff8",
+      "bytes": 10854
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/safe-p316-regenerate-check-root-reviewed.py",
+      "sha256": "5b266525e624e986cb3cbe1eeb1439bb1f8587fc630ca0efb8eb82c384084d82",
+      "bytes": 23306
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/01-build/command.json",
+      "sha256": "55123564172a3454f05404bc1a78a3d8829c406aeba8037546f1c00082413799",
+      "bytes": 2785
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/01-build/raw.log",
+      "sha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+      "bytes": 375
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/02-typecheck/command.json",
+      "sha256": "55f35b8caba22ca032ac8f345cc931a3fb50e7f62d75c842a4eb3ece41933445",
+      "bytes": 2791
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/02-typecheck/raw.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/03-typecheck-tests/command.json",
+      "sha256": "f6befa1efa7bf7dd59d0e6ba2fa43f6e6fca607a945b6d95f4d75ca75250c9da",
+      "bytes": 2803
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/03-typecheck-tests/raw.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/04-lint/command.json",
+      "sha256": "cd6b193bbb3ba5249461f112195ddd2c65a5917d20c2914a4eb2bc36fbfc0f18",
+      "bytes": 2782
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/04-lint/raw.log",
+      "sha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+      "bytes": 200
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/05-check-counts/command.json",
+      "sha256": "ad199e3308e7f7eebda25a2fb67d7c8939c96de07ab5b504afce2af2d6b3f6e3",
+      "bytes": 2796
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/05-check-counts/raw.log",
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+      "bytes": 81
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/06-check-docs-drift/command.json",
+      "sha256": "7e98eaa68b4480553dabc483a6682788fd3b4ee76035b6dbabd24a32188754de",
+      "bytes": 2805
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/06-check-docs-drift/raw.log",
+      "sha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+      "bytes": 121
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/07-check-freeze/command.json",
+      "sha256": "74812c3d8f463c6da562c6925c52f65d62417eb489e01a7403a19c4ea6ba59e6",
+      "bytes": 2874
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/07-check-freeze/raw.log",
+      "sha256": "8d42bbd1e67429a82770b9dd948515eb5be4475b8081e388fc71793c1423081a",
+      "bytes": 116
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/08-check-citations/command.json",
+      "sha256": "3aa8c6668377eb84d27173018a3f0d88a848b69eae5fd937c9f1ccbe89b69dd5",
+      "bytes": 2803
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/08-check-citations/raw.log",
+      "sha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+      "bytes": 373
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/09-check-architecture-boundaries/command.json",
+      "sha256": "9c35b4c08d45b306bcbc023662bd9ce697566e45e01913fdcb119aaef8cfa368",
+      "bytes": 2835
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/09-check-architecture-boundaries/raw.log",
+      "sha256": "baa99ad19d057598443c2aea6364e96332830df36d166c09e9fc2a07e63e6324",
+      "bytes": 100229
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/10-check-threat-model/command.json",
+      "sha256": "5c851d106914d35f709b6b0126c1a8e8cfcb120163cc2688b46c6c0ca62c8e60",
+      "bytes": 2809
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/10-check-threat-model/raw.log",
+      "sha256": "a097f3fd16de1292a48fd9c7d7faeb35af1f7b2c5fc53e94f1de50a089513c29",
+      "bytes": 127
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/11-check-api-ref/command.json",
+      "sha256": "3f8b85471c6a88a08b9810d7b3d7da070bbc45b49c4dc64eed29da0fa438a88a",
+      "bytes": 2798
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/11-check-api-ref/raw.log",
+      "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+      "bytes": 42
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/12-check-schemas/command.json",
+      "sha256": "64dfd7c250a368993ffe21489000ddae86a551ae24bfb3dc29720d779012e388",
+      "bytes": 2798
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/12-check-schemas/raw.log",
+      "sha256": "7e8480a16d9658750e5ae578fa1ef0b25789a098d283a740b59ae28f16dd4365",
+      "bytes": 65
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/13-check-gates/command.json",
+      "sha256": "e89febf9b00635b072e8bce52844fa73df437013b77d265d984c20866adfaebc",
+      "bytes": 2795
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/13-check-gates/raw.log",
+      "sha256": "e4e3dcec9f5ff7860a8b8ddd7f4a0f593f92bf81df9f5925fc62c9a91be8bdf2",
+      "bytes": 659
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/14-check-qualification/command.json",
+      "sha256": "f218ada2388e5e757d347bc37426e4f9cb4ccea1100127b54221045cd8a77c1b",
+      "bytes": 2811
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/14-check-qualification/raw.log",
+      "sha256": "3ee41b3e68f0524d8684d53462158436348de062e2b83ef3dc9be3c16c8d2a6f",
+      "bytes": 65
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/15-check-catalog-currency/command.json",
+      "sha256": "74d464a1fa30641c98a5782ca32cc3ce4e96254de393cf5966852955f4dc1589",
+      "bytes": 2817
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/15-check-catalog-currency/raw.log",
+      "sha256": "8ea8946bb1034cb24a416acc445ccdcad56bd35b206605e3d05f3ac95242cfd2",
+      "bytes": 161
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/16-check-catalog-changelog/command.json",
+      "sha256": "476926f73687f6d36da347f6363387cf7cb7d74c8d1716ea289b3626fc6b2863",
+      "bytes": 2895
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/16-check-catalog-changelog/raw.log",
+      "sha256": "b247d66291366dd8dc01915380989eff36998f0bb51db525c05ce529390b375d",
+      "bytes": 183
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/17-check-catalog-admission/command.json",
+      "sha256": "c1db30102f0623069332f83aa90f35350e2b2baf03521aa3f92ce744021f1747",
+      "bytes": 2821
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/17-check-catalog-admission/raw.log",
+      "sha256": "947db8dae7652d596ae441f10e22cf6b505180d0ff2a7904a2bffee48bed572d",
+      "bytes": 6077
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/18-check-industry-guides/command.json",
+      "sha256": "55eeb7721b49eed570bb82b2781800d547602b377ba7cd1e322effaad7560849",
+      "bytes": 2815
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/18-check-industry-guides/raw.log",
+      "sha256": "2a66bfd67d8065e2cabb16523b38c65bbcd79aa718d8efc8a606f0452c68fac6",
+      "bytes": 130
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/19-check-regulatory-calendar/command.json",
+      "sha256": "73a91971bb40608f5f8a8c5cf53b7fe0154968a1df4c43c60d9022450b06ec59",
+      "bytes": 2823
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/19-check-regulatory-calendar/raw.log",
+      "sha256": "5b8b1f5c59871f3979ec13f2f1cda676f126f343b26eb3acf3adb6de0a57aa04",
+      "bytes": 143
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/20-check-clean-source/command.json",
+      "sha256": "2c891e7972c9b69ca51de92f5b15485b143884bedd04e24af50fccde5b407930",
+      "bytes": 2811
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/20-check-clean-source/raw.log",
+      "sha256": "f58b42cc240bd0bf22246e199ca2fee922ed73a336962e8c92dbb3d99a1e15a0",
+      "bytes": 803
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/21-check-duplicates/command.json",
+      "sha256": "d93323e91d5e3c1708a9e20d760a8c43afa2942347d722ce999d4b6226709e5e",
+      "bytes": 2806
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/21-check-duplicates/raw.log",
+      "sha256": "3ada79f89d9067158d8fbcf8e30a8e20cd89a3de973f8536e43bae3b06876f67",
+      "bytes": 193
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/22-check-dead-code/command.json",
+      "sha256": "c13fc3d6cef79834e3a58a6e3388cdcafdc7ce4638d1adb7060f21a60300a0cc",
+      "bytes": 2804
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/22-check-dead-code/raw.log",
+      "sha256": "08d836d3743e0f54817bf63daab17f4515e9f142752fe5a7d4d313f2f72d4006",
+      "bytes": 192
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/23-release-notes-check/command.json",
+      "sha256": "5f1b68868e6cd175cf8b992c55c0fd7f1ebdfc4d20277c7ba38108007fb9633a",
+      "bytes": 2828
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/check-20261019T133937-0121e2a8/23-release-notes-check/raw.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/final-product-freeze-e47ed.json",
+      "sha256": "43358b54dbb2d282d383eb6c181dacb46548510e48bd475541ce2823bb70c55f",
+      "bytes": 11157
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/run-native-full-root-reviewed.py",
+      "sha256": "d6113aace547d00c37ccd394b20fb624f097c2fa28c50cea6859c555f734b53d",
+      "bytes": 20220
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/focused-final-product/command.json",
+      "sha256": "da10772b92c640492e7d58ca65376b4e75a9e81c31d66b46b824feccc1f20239",
+      "bytes": 2155
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/focused-final-product/report.json",
+      "sha256": "b7478978ce11141fa87a5d6ca9b19f1033f43a85fa8fa1cc4baf507e7028dbd5",
+      "bytes": 799070
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/focused-native-audit-e47ed.json",
+      "sha256": "831517f1e8928ff0bd4236117c805314824e4d3632a0e3c806ba39606b8b2aa1",
+      "bytes": 1054
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/focused-final-product/raw.log",
+      "sha256": "be249be4d72864882ffc98f32550befbce5ef407b73376354330c147e51bb704",
+      "bytes": 5603
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/summary.json",
+      "sha256": "0abc0404e4d1159dc4960ce099b946872e195df9a7741322bb47314671ab5814",
+      "bytes": 29606
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/mutation-plan-execution-ready-e47ed.json",
+      "sha256": "3c8b302d522239e356fdccf7f5c8d2aa66d954e1d67be5e2a9f9401b411273b4",
+      "bytes": 209881
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/run-isolated-mutations-root-reviewed-e47ed.py",
+      "sha256": "97b343fa6b919b477e4e131756308831457d2da2ade185f7ee4ad44610c0e2c2",
+      "bytes": 36071
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/command.json",
+      "sha256": "5ce7713001d85b54b015f5411b483dad5fe868d06ad2d77d8ad56fd4e378fb92",
+      "bytes": 3610
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/report.json",
+      "sha256": "83e5a3efc33558b745d3eefcecc661206d82d5b030511a0ab3b18bbde551e142",
+      "bytes": 73909
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/raw.log",
+      "sha256": "13741c78ccd5f61d02221b2f285bd447db0405b62d7d5555234aabae74b67872",
+      "bytes": 813
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/command.json",
+      "sha256": "826d715dbdb8302092e2db9f8334eec4154abebae38d7019181abc4900282392",
+      "bytes": 3613
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/report.json",
+      "sha256": "beebbdfd8afc9de0d5b9d78fce25adf6ee4c27083c2fed83518375f121d6c7a3",
+      "bytes": 73910
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/raw.log",
+      "sha256": "94067a585013e1128784558241dd5aa0bdac0523c2a874d575afc79e6a23f26b",
+      "bytes": 814
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-01-shared-invalid-input-refusal.json",
+      "sha256": "755b2c1dd9e201298aeb578db73d4732093620887b6860f165addbe84f7c0357",
+      "bytes": 11894
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/01-shared-invalid-input-refusal/command.json",
+      "sha256": "5c54c5cfddbf9334f3ebb92255c63840b20d5ee414b8cd34ca967d7359ce68ba",
+      "bytes": 23112
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/01-shared-invalid-input-refusal/report.json",
+      "sha256": "183f74eee68d2f00b32d56511571cdc79706970049d2fa78b84c954e6f49b27c",
+      "bytes": 73482
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/01-shared-invalid-input-refusal/raw.log",
+      "sha256": "ba4748a4c11164d7e3bf7ce01a1e625415f98a6bdb76d8ad91cc031fa8de2f03",
+      "bytes": 6695
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-02-bounded-clean-identifiers.json",
+      "sha256": "4238d7b9d9e4c4e590bf3ee51e508075d08b2335a7d27ab591fe766c9aa263ee",
+      "bytes": 2365
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/02-bounded-clean-identifiers/command.json",
+      "sha256": "0522f9a3565ec991e5a558b82715ab607a8d8c726eb1b6b25d5ed074ad67d4f0",
+      "bytes": 4101
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/02-bounded-clean-identifiers/report.json",
+      "sha256": "eead44c7b4de8abd83aeea671b87e7e402c845983d931e666c155afcaba6024e",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/02-bounded-clean-identifiers/raw.log",
+      "sha256": "526a249facf3660dcc416549a21b7b41c051dc7588f0f97eaf6be79b30906ef3",
+      "bytes": 1491
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-03-exact-helper-control-scope.json",
+      "sha256": "8080222f525eab74ce0554a0a5133c5e461f36784c1be608131f1032569616d5",
+      "bytes": 2303
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/03-exact-helper-control-scope/command.json",
+      "sha256": "e96a89780a4adf64be8e6b4a9b438c8f03ce9dd13a0a40b734dde7412ab3c63e",
+      "bytes": 4104
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/03-exact-helper-control-scope/report.json",
+      "sha256": "3fc44c5f7f584df1738a2c894c84792ff54c881b3b01c91ba83a54c65ee25c8f",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/03-exact-helper-control-scope/raw.log",
+      "sha256": "cc8b655408c227432db3bb07edd956225afa611c75b9b7792638fc883c52a049",
+      "bytes": 1492
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-04-utc-millisecond-precision.json",
+      "sha256": "c7d760a11d4904a078e3bd7743887e9ce8ee6abe05bec4b2fe1db347d08f4e42",
+      "bytes": 2218
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/04-utc-millisecond-precision/command.json",
+      "sha256": "dbc4892993592a952fcb60ee54dafc7497afe0e03a670f28d6904ef55e57c49d",
+      "bytes": 4073
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/04-utc-millisecond-precision/report.json",
+      "sha256": "efd9bacc022b57a3614ccf9dcb4968410cd690158f0e84a3480926bb27aa0fc7",
+      "bytes": 38676
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/04-utc-millisecond-precision/raw.log",
+      "sha256": "320bc2686545ca73f82e7a88cbafce5238b3ae5647b0b3ab98aed1afe9d2f342",
+      "bytes": 1465
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-05-finite-physical-values.json",
+      "sha256": "7e6d785b2f2f0715aff3f6db2cb3a2a3d128237be87736c9e2243a3c88015e27",
+      "bytes": 2700
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/05-finite-physical-values/command.json",
+      "sha256": "a9a192cad28a36f1bf097605587a2a486dffd92acad0688614bdf42a408b5eda",
+      "bytes": 5487
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/05-finite-physical-values/report.json",
+      "sha256": "d88c63cb7dc3b999ba4fab2c36f53012507261167b77600dbf65674a504dc605",
+      "bytes": 41700
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/05-finite-physical-values/raw.log",
+      "sha256": "d469ae5ccdc832ece0a2ef1bbbb585638a53674c99d9a25dcbefd6ef76fd1995",
+      "bytes": 1744
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-06-positive-safe-duration.json",
+      "sha256": "054adae414a099db8e9b451a71f9b1999af31c63e9293e36e9df25c95a223832",
+      "bytes": 2263
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/06-positive-safe-duration/command.json",
+      "sha256": "211f00e546e9072e801ff319f51d582b5b1594d0ece30175e71e76460b9c9519",
+      "bytes": 4100
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/06-positive-safe-duration/report.json",
+      "sha256": "1b3b55f42f1c285c0f31965fffa3587b484d09332a0d7c703fa1c52e0de0e4b2",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/06-positive-safe-duration/raw.log",
+      "sha256": "e36327a18cfff4ba2d65c059697ace86d22441374354f89f72dab46745082675",
+      "bytes": 1493
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-07-strict-boolean-flags.json",
+      "sha256": "98e483f44a7c3848086368bdce191efcff9afea1bc84458a9b0891a636e1611b",
+      "bytes": 2276
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/07-strict-boolean-flags/command.json",
+      "sha256": "572c8e4b08f41446f093f134da59c5e3e34c3418e1b56f465c95203efd2269ed",
+      "bytes": 4126
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/07-strict-boolean-flags/report.json",
+      "sha256": "6c42aa6ef6959e204d748bf9b94c8f8f52851c0f4192fe09a7d4768230f0617c",
+      "bytes": 38596
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/07-strict-boolean-flags/raw.log",
+      "sha256": "586c6a3c6c48f2dfcc497e568668951b6880306f93ec28a1ae76d35718d93077",
+      "bytes": 1543
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-08-range-order-schema.json",
+      "sha256": "915f448c118a9cf2d1b40fed17a00cc181ab06ecc45584d602b570e61dcc0d2d",
+      "bytes": 2264
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/08-range-order-schema/command.json",
+      "sha256": "cf04a63e5e4c57f162ccfa42d194a6d9cb3bd28bc26638190d59455d3ef6b8d9",
+      "bytes": 4097
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/08-range-order-schema/report.json",
+      "sha256": "182f04a6113e4fc389319996d48090f066ac469314c710d81635c660bb580a59",
+      "bytes": 38573
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/08-range-order-schema/raw.log",
+      "sha256": "28747f843d792f7929be89b347c61ca998628a4bc08549d3a96e978f208f2d4c",
+      "bytes": 1473
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-09-strict-setpoint-extra-fields.json",
+      "sha256": "b68697f649ae425bb2a2301b534ba66fd990e137da162c01dc1e55caea031ef0",
+      "bytes": 2271
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/09-strict-setpoint-extra-fields/command.json",
+      "sha256": "c15a5d1318c267190d55776d4994bf17b5e08bc581c3ad6f4a6e4550db9b6370",
+      "bytes": 4119
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/09-strict-setpoint-extra-fields/report.json",
+      "sha256": "289616a2efcf011d497ebb16de1501156688a1c04b486cde99e4b6ef53129af4",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/09-strict-setpoint-extra-fields/raw.log",
+      "sha256": "11a4d1042339bc9e56b1d94fbf0ae1e660f12ee5e8d38abcbaba5eb430202fb6",
+      "bytes": 1498
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-10-strict-cea-caller-clock.json",
+      "sha256": "33139504db1ef2d9b68b2be1b322b10f2c77920c614ff63772bbcf0e720c9489",
+      "bytes": 2407
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/10-strict-cea-caller-clock/command.json",
+      "sha256": "b777481ba8b7c4270b1bbcee8feb0e224d53778a74b03421eebfe64df6edd846",
+      "bytes": 4176
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/10-strict-cea-caller-clock/report.json",
+      "sha256": "b41fcc21d26503606a63a8d6120b78b8389b68f28401989a225d0586d8447152",
+      "bytes": 38599
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/10-strict-cea-caller-clock/raw.log",
+      "sha256": "0e7526bae7b13671a9d3f1689a32f8d518e03f3ed991af1095182388f7cdbc72",
+      "bytes": 1586
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-11-same-subject-control-plan-binding.json",
+      "sha256": "6a0d99ddd94d29d4b8f2a307ddc38f87937195ff1169d0720245162505b1867d",
+      "bytes": 2698
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/11-same-subject-control-plan-binding/command.json",
+      "sha256": "d60f910e199da64db0b451ca664bc6eb329255141b911fb34d3dff482aba29d7",
+      "bytes": 4997
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/11-same-subject-control-plan-binding/report.json",
+      "sha256": "7bf9f7e81940c41c51c7926001404c94e6438c1c2544edbf7f31fc983190e272",
+      "bytes": 40099
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/11-same-subject-control-plan-binding/raw.log",
+      "sha256": "ca8e139a4bf0fa2c2d325a682a988799821830d3060418cab92df9c5f22e903f",
+      "bytes": 1951
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-12-setpoint-inventory-unavailable.json",
+      "sha256": "992caded65dc5dc5f76a8ced251aca893ad3df846cff3de145f6066b3a611022",
+      "bytes": 2331
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/12-setpoint-inventory-unavailable/command.json",
+      "sha256": "431299bd307087fc3b39a1945408eeaf056adc3ce100bdb9557da687d1700e24",
+      "bytes": 4144
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/12-setpoint-inventory-unavailable/report.json",
+      "sha256": "37b258644c6ab1a378ff83e6132b0ef9b9f0aafd4e79c53be187e08d6bfc0f68",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/12-setpoint-inventory-unavailable/raw.log",
+      "sha256": "2b80eacb2c455d9a6941202d09f5619f803dbd4fd022f5a75e6fefdf17a3c211",
+      "bytes": 1514
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-13-outage-inventory-unavailable.json",
+      "sha256": "cf333df5c5b3887e58a7feb23d59ba8b2612ff415aaafc2141f2e2f423d7191e",
+      "bytes": 2333
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/13-outage-inventory-unavailable/command.json",
+      "sha256": "ac01c98142aa275179f84c0c2aeac10794b6f4475055927ed337a2d3790be2d1",
+      "bytes": 4159
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/13-outage-inventory-unavailable/report.json",
+      "sha256": "f7b0b9919269d77c1d1d07a2e700d77146cfc8e1e0839ce41173acb81d7f998d",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/13-outage-inventory-unavailable/raw.log",
+      "sha256": "590febee1be21f2f4580932a4c6e52f7be6d388d042b024a279394504077c0f1",
+      "bytes": 1523
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-14-shared-unique-asset.json",
+      "sha256": "df5837189ea5bc8d811ffc7920c5fb4a6bf7d0b2e02ddb550160c12173e47903",
+      "bytes": 2298
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/14-shared-unique-asset/command.json",
+      "sha256": "e05c16fbeca67357e37f8ee1a5b3d6ce510ca6b109aedb4a68d154fb214fb776",
+      "bytes": 4198
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/14-shared-unique-asset/report.json",
+      "sha256": "e4d0912e77f5d33e351f4b480faee066a74d26df351beb619c39f2b2bf0e0716",
+      "bytes": 38715
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/14-shared-unique-asset/raw.log",
+      "sha256": "26566b42a19b2c46a870d610960ffdbad123add5510a303f06fdb0b817652b7c",
+      "bytes": 1503
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-15-authenticated-command-actor.json",
+      "sha256": "ec588ba9efcd882e55035c342fa0fa12639a56af2c1f840cb1436eec4a29b0ce",
+      "bytes": 2319
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/15-authenticated-command-actor/command.json",
+      "sha256": "4f3165add1f7c867cc089d08c3dec2340b37dcd75fa3022f56a42b877910a2ed",
+      "bytes": 4109
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/15-authenticated-command-actor/report.json",
+      "sha256": "0a91cfcd7fdd0883b15d4d8a836130cb579ab0f326531eb6efa12d4954ad4abe",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/15-authenticated-command-actor/raw.log",
+      "sha256": "f857a2162d767029e773032a87cb44ec4d34b6c69d626fce6e039c09426b4e5d",
+      "bytes": 1499
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-16-command-target-asset.json",
+      "sha256": "954e73846f1c1e3648e42e98b4921494c6e69fd89ab028cf4131e5db50bda1f2",
+      "bytes": 2235
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/16-command-target-asset/command.json",
+      "sha256": "4ce432599528b4318f1c542f63ec2276dcab39068a89afe2b6814ab158de074c",
+      "bytes": 4089
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/16-command-target-asset/report.json",
+      "sha256": "c28b9bb7b9bf4e43cb1ef641b986576f78bc12f8804fbabad106f92ea0c4e0f0",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/16-command-target-asset/raw.log",
+      "sha256": "3fa6c6c1307d5514f810b7c1f74ab300d2653adce6c439b39a2d2a0056f10a52",
+      "bytes": 1492
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-17-mandatory-agent-write-refusal.json",
+      "sha256": "efc320ddea3903ac7269a7c9aabe82cbdf5e2730a68e47d274f33caa4732bb66",
+      "bytes": 2803
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/17-mandatory-agent-write-refusal/command.json",
+      "sha256": "bbd2356adba978be316234a4a8961b978806b37d13edc99dbeb66fdc274f5ab2",
+      "bytes": 4983
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/17-mandatory-agent-write-refusal/report.json",
+      "sha256": "464314092ce4f4030ef23ca35fb5e9e9051f86b844362785e1854f8b12e9f438",
+      "bytes": 40215
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/17-mandatory-agent-write-refusal/raw.log",
+      "sha256": "9f9fe96ed07479f26a259154208028248fb2adbed8285dab02924bfb113a0ed4",
+      "bytes": 2387
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-18-safe-profile-availability-asset.json",
+      "sha256": "54885ca345b4c502894a6f31cf37f4a2e131eb146ea10a36d7f68666a4ebe79f",
+      "bytes": 2362
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/18-safe-profile-availability-asset/command.json",
+      "sha256": "49cc90eb84c20b9aa67c5d8d42169364a29a37f3bf8f2e909e6761c4cb836409",
+      "bytes": 4168
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/18-safe-profile-availability-asset/report.json",
+      "sha256": "1b0b8b8cba739c647fe66ce3720cdaec351944f28545d5f34ac94039d52bbaf3",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/18-safe-profile-availability-asset/raw.log",
+      "sha256": "344d024cf7f09dc91890c9792d6f06af4f53a1ece3c0984452632e8ecdee77ea",
+      "bytes": 1526
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-19-exercise-actual-outage.json",
+      "sha256": "bb9f6f176fe1baa7a419f3117f23298d8030ae8038f983ff90098ae8ba150fa8",
+      "bytes": 2324
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/19-exercise-actual-outage/command.json",
+      "sha256": "f14eb9df7535fce3b27bb3879c7d0793414c67ef85ad3e0826516857baf56b1b",
+      "bytes": 4141
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/19-exercise-actual-outage/report.json",
+      "sha256": "e6ca504198a20cf29491d539084eef66b7c37d26032e6e23d80c7b20b1199a45",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/19-exercise-actual-outage/raw.log",
+      "sha256": "c3938287e1637dc5807018bb86b8e37742c5c635c0536bbf05927cfe97f64d77",
+      "bytes": 1517
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-20-controller-distinct-from-agent.json",
+      "sha256": "896d3723fd31d1e8a793f261196464112a7a550b67a115a538d96c5f1142d7ee",
+      "bytes": 2346
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/20-controller-distinct-from-agent/command.json",
+      "sha256": "b19dbafb28da1d55cd0074fdfa720f47a6ddd85b8d6a396d2cc6d921bb6d1700",
+      "bytes": 4165
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/20-controller-distinct-from-agent/report.json",
+      "sha256": "c0eea2aef00bac30e223fd3b27a0fa51a1b8499fe726b929d5f08fd512f677d7",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/20-controller-distinct-from-agent/raw.log",
+      "sha256": "dbb692ff9efe5c27c69234e14194abd195bf1f27d68511aa519795119a87a2bd",
+      "bytes": 1526
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-21-outage-agent-action-before-apply.json",
+      "sha256": "e102c22bc9fb59248874515058a5708bf0bfd45aaf53d31116415fc8cd947aa1",
+      "bytes": 2433
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/21-outage-agent-action-before-apply/command.json",
+      "sha256": "a12ebb19cd5e05e2c805caa05f23991d6ebb09811b4d3817bc18ae3b979a5783",
+      "bytes": 4165
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/21-outage-agent-action-before-apply/report.json",
+      "sha256": "e85ff3e99e488ebca1a9c3e2b14226dc9b86ffa6e515132edbc3c129a9d8e2be",
+      "bytes": 38563
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/21-outage-agent-action-before-apply/raw.log",
+      "sha256": "bc8fd27e912bf54217ed2cb0b0127a21fa7593f78751ad87f4286ddfed85e3aa",
+      "bytes": 1616
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-22-outage-attempt-not-success.json",
+      "sha256": "f628e4b73df14c84f9377bbf9a80f67dcadeeb6e6467ca28608b1fd0c3c85837",
+      "bytes": 2348
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/22-outage-attempt-not-success/command.json",
+      "sha256": "342be3b47a37e0782acec39215b7b81ec86a4cc1a372bab8ab8210faca0cdaa5",
+      "bytes": 4155
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/22-outage-attempt-not-success/report.json",
+      "sha256": "324d5a6a9bc1280ee0e736a65d0d9223946560ba577d6744dc92b80e8e7eeb90",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/22-outage-attempt-not-success/raw.log",
+      "sha256": "b893fd55f5f2644478a18a124e7dd8bb714e8b96a50b65a7a99aa1d86519ba25",
+      "bytes": 1523
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-23-observed-safe-state.json",
+      "sha256": "e6867e71be71aafce1b60323c05396eefc16235b07971369af5299ba100ad8b7",
+      "bytes": 2257
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/23-observed-safe-state/command.json",
+      "sha256": "1f1279dc243f88007981006fb75d272b11020f4abcfd13a9e776b7126d5646c6",
+      "bytes": 4082
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/23-observed-safe-state/report.json",
+      "sha256": "c85ec8b6362970e137439dd9aa3c8d444c7c60c331e421f34500248fcf94f818",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/23-observed-safe-state/raw.log",
+      "sha256": "0a2390c04106bb5fb598a9de22e22125fd8a628d00459834815f2c3b4f22546e",
+      "bytes": 1490
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-24-alert-and-manual-fallback.json",
+      "sha256": "9a7f95b33dc627054526e4a2f32c56c083547413670ace187fadd2ec2ee139d8",
+      "bytes": 2294
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/24-alert-and-manual-fallback/command.json",
+      "sha256": "9bf84411a642df1ceb963e31120f5380974b5007d849caa13a31c9b9c860a084",
+      "bytes": 4101
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/24-alert-and-manual-fallback/report.json",
+      "sha256": "24d2843ef75502aeefee9cb7be95bbfbad5e198c9acc5c7b6f3be8d3268b60ea",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/24-alert-and-manual-fallback/raw.log",
+      "sha256": "b34223c56611583c8edc80c846efd636d56493216fb7d6795bb49f3ee03f7e9b",
+      "bytes": 1495
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-25-unknown-cea-capacity.json",
+      "sha256": "56e1d93de60712acc17227794f66426b8b1062676ae50db2596285af3e6690e4",
+      "bytes": 2337
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/25-unknown-cea-capacity/command.json",
+      "sha256": "a264f2f1baf60f693949a5310a6282cfbfb95f836e009b9bea867d68cede6f6e",
+      "bytes": 4132
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/25-unknown-cea-capacity/report.json",
+      "sha256": "cbf25d8b93a324640493cdcc3d7e161fb9dd55b3f1570efeb2b1a5ce77d2847c",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/25-unknown-cea-capacity/raw.log",
+      "sha256": "ac2a5e1d13555496359169cfc75a2ccb5fc0395cf3b56089f45fb2e232008889",
+      "bytes": 1525
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-26-cea-incident-vs-sabotage-window.json",
+      "sha256": "1c9cd11045414d27b8d1cf5a1f5db3238794a8013570b189c50e36f9c36d3b42",
+      "bytes": 2369
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/26-cea-incident-vs-sabotage-window/command.json",
+      "sha256": "0fbfd18363ff85871cb45e58c568a3e3c9572ce9e1b520526d2ea5c6c0716739",
+      "bytes": 4174
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/26-cea-incident-vs-sabotage-window/report.json",
+      "sha256": "94fe5a53f87da99629b76fe4b2453efaaf99c21887ec827e00368dd42e60b759",
+      "bytes": 38753
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/26-cea-incident-vs-sabotage-window/raw.log",
+      "sha256": "8e879717a1ea49bc2b8e44582c67436f469fb96d1ef0a2d17e20c34a4aaa5c41",
+      "bytes": 1706
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-27-draft-packet-completeness.json",
+      "sha256": "e71ec647d716275ca42727983c7613f70bde73fbe8afda9d518fe84fba5b48f2",
+      "bytes": 2439
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/27-draft-packet-completeness/command.json",
+      "sha256": "7e5d9ee2f99de7d90ac2e014fa40adba059886b080390197e012d3905a107827",
+      "bytes": 4175
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/27-draft-packet-completeness/report.json",
+      "sha256": "3c38806e3c4560e1f8d2bbec53b4c31ce070f3b82614382e10747e7fe3e8d434",
+      "bytes": 38757
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/27-draft-packet-completeness/raw.log",
+      "sha256": "eec392ecc3ec8fc3f276d5233532443ba4ad3e32d18b9d569abfdf417ff4af96",
+      "bytes": 1722
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-28-draft-packet-causal-order.json",
+      "sha256": "9bdc18e091212f7e799302abba7f47ab5bb4daba349685dd132fd3625ef3bcd6",
+      "bytes": 2361
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/28-draft-packet-causal-order/command.json",
+      "sha256": "79d513438a1168555c4d50938fb421a92aecedafafe4d6e1c39bb967c17c8259",
+      "bytes": 4179
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/28-draft-packet-causal-order/report.json",
+      "sha256": "fac9700577f368bfca3f52e68540076ebf5a844804c6b3294b02f024d70cc919",
+      "bytes": 38757
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/28-draft-packet-causal-order/raw.log",
+      "sha256": "77745e8023752be06b823f2eedc9f97bc5cd00e9823cfd24c771159a5ca8cc4b",
+      "bytes": 1652
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-29-draft-packet-inclusive-deadline.json",
+      "sha256": "f6a11edc82bd0537750d5edab7b593bf38196fa7941faa7858939b5cfc619f05",
+      "bytes": 2394
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/29-draft-packet-inclusive-deadline/command.json",
+      "sha256": "aad041928ffadd312ba5af6009823b879a94c37ee4a9756b3c87c9f9de54b54e",
+      "bytes": 4196
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/29-draft-packet-inclusive-deadline/report.json",
+      "sha256": "6254f547bf6b675450a9d6879108e30302d5b8e3da91af68533944bd8fc3df94",
+      "bytes": 38756
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/29-draft-packet-inclusive-deadline/raw.log",
+      "sha256": "9e7c774fc49b6ea8f5173a03abadce72694a53b03456b2bf701f2bb06cd65496",
+      "bytes": 1802
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-30-cea-owner-dependency-remains-ne.json",
+      "sha256": "791db8c5cf27d370627313ee3e022bb41aa5bfe99277d5400e017b4f12697ee4",
+      "bytes": 2337
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/30-cea-owner-dependency-remains-ne/command.json",
+      "sha256": "6203acd647afab72e51166b4dfe6d0c646154902e5a9e79febc81ac5334872dd",
+      "bytes": 4148
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/30-cea-owner-dependency-remains-ne/report.json",
+      "sha256": "8c484e19ddbc4c23cdc48b87affc34ae5c7a148aeb3f6bf052765c0560c06f98",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/30-cea-owner-dependency-remains-ne/raw.log",
+      "sha256": "4c0f038f79682f3a67997312d401f47f46768f591ca033f43b580b637742dc2e",
+      "bytes": 1529
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-31-recall-unavailable-owner-fixture.json",
+      "sha256": "e50bb0bcaa354c6713a1665e3b79135d6e62a2f51649b075f87740a69cae7af4",
+      "bytes": 2346
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/31-recall-unavailable-owner-fixture/command.json",
+      "sha256": "736c4345f0f61912d184ce0caf452ff58c97b866b4fb7ca149df5523d9c9f86f",
+      "bytes": 4164
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/31-recall-unavailable-owner-fixture/report.json",
+      "sha256": "7c0e10352852e3c3a1f356cbc6681c9e4d750ff07e2ccb0d22168a4700e2d38c",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/31-recall-unavailable-owner-fixture/raw.log",
+      "sha256": "3d03067f9edd2f5c056a8b8819c7ad8437ba5d12a9bc6a4a80e91aa8eec7a29c",
+      "bytes": 1529
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-32-complete-unambiguous-genealogy.json",
+      "sha256": "580c28c407e09d673a573568f4f4eb8996e2db1703701b94101a55808a574909",
+      "bytes": 2374
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/32-complete-unambiguous-genealogy/command.json",
+      "sha256": "5107b0a345cad95d38a84d0f9c8d48239eab9e13e5169257c32ec70633f9e3ea",
+      "bytes": 4192
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/32-complete-unambiguous-genealogy/report.json",
+      "sha256": "903e8f4ee6f9f53052e03964feb7ef7e8e06d5e5e997fb2b60f843aac3ef3651",
+      "bytes": 38598
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/32-complete-unambiguous-genealogy/raw.log",
+      "sha256": "f1322e95ef49d8dffa8f01caf49ed1bf8072844ad74028bef0d7557469a395b4",
+      "bytes": 1583
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-33-independent-descendant-traversal.json",
+      "sha256": "fa7991f33886d700fe35cd887a339da279d1b0cabc105a4a611e11d824ab0200",
+      "bytes": 2793
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/33-independent-descendant-traversal/command.json",
+      "sha256": "243278fca851dad5c28dc34547b6c173065ea1b3fa16d89210be57f5c7f33816",
+      "bytes": 5107
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/33-independent-descendant-traversal/report.json",
+      "sha256": "34322a613e040a03ff8ee6cb978b263d720dc7e7a17628f9880d30b31c522750",
+      "bytes": 40348
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/33-independent-descendant-traversal/raw.log",
+      "sha256": "182f04d7503d37892780c0adf6a8a5eaef14938b8feba62b1055e3e2790334e0",
+      "bytes": 2970
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-34-detect-missed-descendant-notices.json",
+      "sha256": "501f50da6a63fd32c8ca890ce913298a170d3281fa565935c214dca38f3859c9",
+      "bytes": 2382
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/34-detect-missed-descendant-notices/command.json",
+      "sha256": "897c7fd2f28d29d49df492ed18f17e07ffe61395d93ddf7dc8a672d45373aeeb",
+      "bytes": 4216
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/34-detect-missed-descendant-notices/report.json",
+      "sha256": "97c13e1d601b0f810bd6dab73e8b40f410a44c872b2022dfd994898f14d76d12",
+      "bytes": 38781
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/34-detect-missed-descendant-notices/raw.log",
+      "sha256": "037dd0e75770dbad6e8f2270d16648d51a6eb4aa672b817f6b99473309c46e54",
+      "bytes": 1883
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-35-recall-component-not-owner-integration.json",
+      "sha256": "56eafcec584a6040badb95e02ed5014d1033a6cf261829645fa7be3315d5ebd4",
+      "bytes": 2381
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/35-recall-component-not-owner-integration/command.json",
+      "sha256": "517ef6a296a16718cf013afc561834bbc5a1121e3e0935a6bdba553b7eb51362",
+      "bytes": 4182
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/35-recall-component-not-owner-integration/report.json",
+      "sha256": "080a4f9200dabac9cd2cefe55a010b64775f990113e47bdf854668c13b776930",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/35-recall-component-not-owner-integration/raw.log",
+      "sha256": "90400bb5710b01c8fb6c52b87568abc94ea255071782c38c40531ddabda35ed0",
+      "bytes": 1536
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-36-sensor-feed-availability.json",
+      "sha256": "5414d1e0d7862260b23f5cad98226ef4607f3fb972c680bcd0e21f24fd434442",
+      "bytes": 2241
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/36-sensor-feed-availability/command.json",
+      "sha256": "43e064dfe1666a8250a37382c3aeda138adcb8d5f2056ccb0e109bdd9e6b240d",
+      "bytes": 4106
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/36-sensor-feed-availability/report.json",
+      "sha256": "b6d84144ef29df2afa7c661c1a16702a5b99e876e7bebec501e5e3ea3be3b876",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/36-sensor-feed-availability/raw.log",
+      "sha256": "b117b76dbc0d7ef8c7d59590349c2ac00e1e236a10dc9ef9694b8b2c5c8d0278",
+      "bytes": 1495
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-37-exact-lot-sensor-unit-scope.json",
+      "sha256": "9bcba88788358b2e7d049d78fa3aef86a15bd4f030e03ba370e5e91487100f2d",
+      "bytes": 2281
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/37-exact-lot-sensor-unit-scope/command.json",
+      "sha256": "c09262e25e4d94576d5b93fbdd87c8fc4aead4fff868aee604cdd94fd9588b8b",
+      "bytes": 4115
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/37-exact-lot-sensor-unit-scope/report.json",
+      "sha256": "666f9eaed5b4b524cc10b38b1f22d297f23389693980214c27ff28fd42a29945",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/37-exact-lot-sensor-unit-scope/raw.log",
+      "sha256": "b1e57c689c03851a698864eaccee62002894eade63ee0a45fbed44df04e4dc23",
+      "bytes": 1498
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-38-contradictory-same-time-values.json",
+      "sha256": "5884af28049df658a6ecd30c23e49fc9db35a72b9c2e3518ec79e0a3997ce2ce",
+      "bytes": 2289
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/38-contradictory-same-time-values/command.json",
+      "sha256": "dd3549591b73f1ec01896163295c63ee0e2a034a3dd69ed79a05bae0fcc0ad1e",
+      "bytes": 4123
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/38-contradictory-same-time-values/report.json",
+      "sha256": "0a962799b4a230a597b6d7e254eb27fd89f9c14bc2a8cff788a44c707514908b",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/38-contradictory-same-time-values/raw.log",
+      "sha256": "1b0baae7b5b5eefada052bc2dcab18a2a6c4e1f416914437fedfb9c262c91f5a",
+      "bytes": 1501
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-39-mandatory-shared-sensor-time-verdict.json",
+      "sha256": "7627ae39dc36a1fac451217c8fffaca518b053478093c9a7d9bfa7a517f261a8",
+      "bytes": 2742
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/39-mandatory-shared-sensor-time-verdict/command.json",
+      "sha256": "c38f3d4a5da0a1dc45c41ad17dbd4539e4804d5595cb5f5e2e2fda7ccdb9c16a",
+      "bytes": 4980
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/39-mandatory-shared-sensor-time-verdict/report.json",
+      "sha256": "d01c01bc31ae07dbef2b8b5eeec08a91b74c1b80e814e8235bd02d44723ab2f4",
+      "bytes": 40217
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/39-mandatory-shared-sensor-time-verdict/raw.log",
+      "sha256": "25525e50a29b1008d091b1b8c552d9eb83509325b92a1433c16cb561dc50ac65",
+      "bytes": 2350
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-40-every-in-window-range-bound.json",
+      "sha256": "281f5fa64f3559b766d824b5476e4eb2ce60fc7346f46a01d9eb0a310f5f5025",
+      "bytes": 2655
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/40-every-in-window-range-bound/command.json",
+      "sha256": "f90208d6a260c628341697550cf83c43f0fc2fd9c6130c4bca5ac1a18337f4fa",
+      "bytes": 4942
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/40-every-in-window-range-bound/report.json",
+      "sha256": "6c56f4fec89fb69400d1a523d2806b6fa1435e7da929fff728468e65bfc95202",
+      "bytes": 40217
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/40-every-in-window-range-bound/raw.log",
+      "sha256": "1cacf57204724bf240ad6d5a4a63c7be690c1a6a04ba0c65ab601b00f8ef0a1c",
+      "bytes": 2336
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-41-statement-register-availability.json",
+      "sha256": "057062d5b3b290b7d4263c898e0886e1da599c52fc3ddce12eed016623e2e370",
+      "bytes": 2223
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/41-statement-register-availability/command.json",
+      "sha256": "9b61556357dfad0a99f6403877c842e165f0140d43e7fa23c957a2edbd60de7d",
+      "bytes": 4096
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/41-statement-register-availability/report.json",
+      "sha256": "130569d9dbadea124c62977c8a92d97955b9664b1bef7c0d8c84850dc0e76a71",
+      "bytes": 38684
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/41-statement-register-availability/raw.log",
+      "sha256": "4165d4e43ecbd04b25dd2eb5f750ac12cd05ac296d644d5ca38a8c7f47e17326",
+      "bytes": 1487
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-42-statement-policy-scope.json",
+      "sha256": "5ac33b40fa8c34a22e0155b2c53c6761b922a3e465e2acf58420927250c7d577",
+      "bytes": 2225
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/42-statement-policy-scope/command.json",
+      "sha256": "8220a4d8874414e52d48652f1829baa544b7166eb533d2e28d4c679cccbf91ad",
+      "bytes": 4069
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/42-statement-policy-scope/report.json",
+      "sha256": "3269cac7837e38c1b566ae2f1b56d3e5ad9de6cec086aae2d4591cca5c29b24e",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/42-statement-policy-scope/raw.log",
+      "sha256": "5fc873b348d7a2064a20bec88acc5783a7679b5b4f94fce5d9492f1ce8e34c70",
+      "bytes": 1478
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-43-statement-reference-required.json",
+      "sha256": "2b5dad65c2df529cca3655720b4b5503fea3eca28a09abe77350bb0b62399dbc",
+      "bytes": 2297
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/43-statement-reference-required/command.json",
+      "sha256": "ac57f4735d88ef713f454564312fcecad36131a9eb50bbbb85c63d2ab157245d",
+      "bytes": 4119
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/43-statement-reference-required/report.json",
+      "sha256": "30738f9b50fa3c8e5e6df6b95e71ec70eb16d763a2e9b8bdcaded98be5bb47b3",
+      "bytes": 38687
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/43-statement-reference-required/raw.log",
+      "sha256": "84057a429c4a6ff9021efc5b41ca5387fc662da53975116944c1ea4dd825a0f7",
+      "bytes": 1501
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-44-statement-reference-unique.json",
+      "sha256": "e5840ba9dbfd057739a818344ec5b4054cc2c32c1f93675e25aafe73521622d1",
+      "bytes": 2223
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/44-statement-reference-unique/command.json",
+      "sha256": "178e0eb1b76155d03f80e09665935ddeefcd4ec72516c8d17b86020b77ba8ca4",
+      "bytes": 4081
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/44-statement-reference-unique/report.json",
+      "sha256": "094a5bab246a040d763d7b97ecf6eb1424a669f1b40a48744821717d809feb1c",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/44-statement-reference-unique/raw.log",
+      "sha256": "b826ec2b087175de12fc614388410007f7c164657a8142abb4213664c1eaf0b6",
+      "bytes": 1482
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-45-same-lot-and-commodity-statement.json",
+      "sha256": "437990aaa3e282233a03f98fc651cbf72bfec48136e83bf4d1cf8e0faf6082df",
+      "bytes": 2282
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/45-same-lot-and-commodity-statement/command.json",
+      "sha256": "5bfde6af7bda3e95e3d47803aed2554e7acdf2956c59c7ff188d33f694c302df",
+      "bytes": 4131
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/45-same-lot-and-commodity-statement/report.json",
+      "sha256": "311e7a6eefd4fefbc383ecac8f684a7d3bc6e46617ab05315625e3d55141d96e",
+      "bytes": 38685
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/45-same-lot-and-commodity-statement/raw.log",
+      "sha256": "156a785967e7916138af6663ff8ed19045cf48870f201188bed789e5a2a385df",
+      "bytes": 1504
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-46-compiled-control-selected.json",
+      "sha256": "42fa277c79c77dcce327a2210d77396faa803c534f771f6bab1f0e3fc7a4c05e",
+      "bytes": 2323
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/46-compiled-control-selected/command.json",
+      "sha256": "4a968f35231040f3427345c86f241aceeea84531857eeb81dc69aab7682e97ea",
+      "bytes": 4086
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/46-compiled-control-selected/report.json",
+      "sha256": "e07512f4b77427d393d861270f7b7777627f712ff46f0c229c7fc448a00252fc",
+      "bytes": 31060
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/46-compiled-control-selected/raw.log",
+      "sha256": "735e141f7f945eadf5cec80548a0aa934fb01e2c50afc31034eeee611bc68513",
+      "bytes": 1437
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-47-compiled-fixture-subject-bound.json",
+      "sha256": "18c903d63ed75c5ede3c1314aec786ac8c9c7c4d17daa4279bb9d433cc702712",
+      "bytes": 2317
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/47-compiled-fixture-subject-bound/command.json",
+      "sha256": "c66e7b29a71b82a0ced8f0cf3111b1e56c001a6837f29a0c9e484b30ba1bb6ee",
+      "bytes": 4106
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/47-compiled-fixture-subject-bound/report.json",
+      "sha256": "c2d356a223fab8d525aff392289f41b4c3847fbec87777e1a472a75630ba2b97",
+      "bytes": 31061
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/47-compiled-fixture-subject-bound/raw.log",
+      "sha256": "12aa8783afb33b3089ada062bf85db90846826fac93b02ca1bf96c3a5791c31f",
+      "bytes": 1422
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-48-each-required-sensor-has-window-sample.json",
+      "sha256": "96a433a0e83657c720c4acc310d355480e6d81fdff8ff205088b29fefd8a7205",
+      "bytes": 2465
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/48-each-required-sensor-has-window-sample/command.json",
+      "sha256": "87985fea3c551496ebfa3b38878b441537421ed44c151d593760e6353ddff0c0",
+      "bytes": 4164
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/48-each-required-sensor-has-window-sample/report.json",
+      "sha256": "ea57927a0d47fa0f8e3c174301ef8ac33f2589d062ebcf339abe530072927507",
+      "bytes": 38688
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/48-each-required-sensor-has-window-sample/raw.log",
+      "sha256": "c290583adfb9cc1cbf339b91dfb9b5d9ffd9d09310d54f11a260d55cfd02c319",
+      "bytes": 1518
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-49-carried-boundary-sample-range-checked.json",
+      "sha256": "aa17aa9f457c87ad58992a8fcf29d0d07b95af2a20598b3ec2cfe5625ccbeaa8",
+      "bytes": 2394
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/49-carried-boundary-sample-range-checked/command.json",
+      "sha256": "55e2040ad561460291ca39918b52c68d2940ff073d2c530537c4d16f81ea1778",
+      "bytes": 4112
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/49-carried-boundary-sample-range-checked/report.json",
+      "sha256": "c2d31a76a8165fc43e547375b1c06f9cdb6b11af3b621909331bb4ca20c018f0",
+      "bytes": 38686
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/49-carried-boundary-sample-range-checked/raw.log",
+      "sha256": "c7c542befdc3dd35ab2da1ff9fc9a33a80af3a14d5834a788f9c1ecd57cde525",
+      "bytes": 1493
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/probe-final-product/command.json",
+      "sha256": "5e2f9d2e3bc3ad2f7d985f4f35abfb049ae4b8ef1cbf3d67fbb0ec52540080f3",
+      "bytes": 1724
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/catalog-probe-e47ed.json",
+      "sha256": "7ef1a37b1dcf70188ab64fa8ff36f78e360c4b849da7e127a480ac03b2ec9c2c",
+      "bytes": 198260
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/probe-final-product/raw.log",
+      "sha256": "8e1d66d62f6ac4266ccfba223e230946d13a2b1393ddeaeda3ccc6c8281c7ae4",
+      "bytes": 589
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/inventory-provenance-audit-dcec5999.json",
+      "sha256": "6f137b2124f5fc6179a0bb211dd5c3c141170f0a5e82de10c566bfc803cc21a7",
+      "bytes": 103567
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/candidate-readonly-state.json",
+      "sha256": "8c0e3b19fd5821b9382bcfe5a135e9f0c23a4d0e40f3ac7b5a6519bab57c7a25",
+      "bytes": 2515
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/root-current-product-audit-e47ed.json",
+      "sha256": "348b7539cc05da64b467c3aa9f0c4c7ec898c847e0a797d3cc7c5c64532d8d1e",
+      "bytes": 1908
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/composition-red/command.json",
+      "sha256": "0a78a5bc75b3474e0090541b77def1dbf0b77d333cf7a809dfe8678f6b0c14f0",
+      "bytes": 3071
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/composition-green/command.json",
+      "sha256": "b9a9b79a97ecb8d03571a0deba5a0893fb4c13861a186de95ce32d9920b482f6",
+      "bytes": 3363
+    }
+  ],
+  "remaining": "Commit preparation metadata to finalQ; rerun23checks and one maxWorkers2 full suite on exactQ. Complete native-validated off-tree receipt and every failure/skip classification before local landing. No later source commit or byte-equivalence waiver."
+}

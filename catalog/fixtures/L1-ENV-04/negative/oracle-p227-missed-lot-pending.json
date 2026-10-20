@@ -1,0 +1,93 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-04",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "environment-fixture-tenant",
+      "workspaceId": "environment-fixture-workspace",
+      "deploymentId": "environment-food-lot-release-fixture",
+      "agentId": "environment-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "environmentOracle": {
+      "kind": "recall",
+      "input": {
+        "context": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-food-lot-release-fixture",
+          "agentId": "environment-fixture-agent",
+          "controlId": "L1-ENV-04",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "recalledLotId": "ingredient-1",
+        "graph": {
+          "kind": "synthetic_component_graph",
+          "complete": true,
+          "lots": [
+            {
+              "lotId": "ingredient-1",
+              "parentIds": []
+            },
+            {
+              "lotId": "product-1",
+              "parentIds": [
+                "ingredient-1"
+              ]
+            },
+            {
+              "lotId": "shipment-1",
+              "parentIds": [
+                "product-1"
+              ]
+            },
+            {
+              "lotId": "unrelated-1",
+              "parentIds": []
+            }
+          ]
+        },
+        "notifiedLotIds": [
+          "ingredient-1",
+          "product-1"
+        ]
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "componentExpected": {
+        "syntheticClosure": {
+          "affectedLotIds": [
+            "ingredient-1",
+            "product-1",
+            "shipment-1"
+          ],
+          "missingLotIds": [
+            "shipment-1"
+          ]
+        }
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

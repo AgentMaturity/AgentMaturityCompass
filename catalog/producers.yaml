@@ -269,3 +269,11 @@ producers:
     maxClaimKind: observed
     status: planned
     plannedBy: P1-80
+
+  # P2-27: local fixture bytes; no production observation or regulated pass.
+  - id: amc.assurance.executed
+    module: src/assurance/executed/evidence.ts
+    emits: [ASSURANCE_EXECUTED_CAPTURE]
+    maxClaimKind: synthetic_example
+    status: available
+    plannedBy: null

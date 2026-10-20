@@ -9,7 +9,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import type { ComplianceFramework } from "./frameworks.js";
+import { descopedReason, familyReview, type ComplianceFramework } from "./frameworks.js";
 import { defaultComplianceMapsFile } from "./builtInMappings.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import {
@@ -229,11 +229,8 @@ function evaluateMapping(mapping: ComplianceMapping, evaluations: RequirementEva
   };
 }
 
-/** Unsigned or tampered maps decide nothing: every category is not evaluated on untrusted evidence. */
-function untrustedMapping(mapping: ComplianceMapping, reason: string | null, now: number): ComplianceCategoryResult {
-  const message = `Compliance maps signature invalid (${reason ?? "unknown"}); categories are not evaluated against untrusted maps.`;
-  const claim = envelopeForUnverifiedResult({ producer: `compliance:${mapping.framework}:${mapping.id}`, recordCount: 0,
-    regulated: true, signatureValid: false, now });
+/** A category that was not evaluated for a reason outside its evidence: the claim, the message and what would fix it. */
+function unevaluatedMapping(mapping: ComplianceMapping, claim: ClaimEnvelope, message: string, needed: string): ComplianceCategoryResult {
   return {
     id: mapping.id,
     framework: mapping.framework,
@@ -250,8 +247,23 @@ function untrustedMapping(mapping: ComplianceMapping, reason: string | null, now
     evidenceRefs: [],
     admitted: [],
     rejected: [],
-    neededToSatisfy: ["Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"]
+    neededToSatisfy: [needed]
   };
+}
+
+/** Unsigned or tampered maps decide nothing: every category is not evaluated on untrusted evidence. */
+function untrustedMapping(mapping: ComplianceMapping, reason: string | null, now: number): ComplianceCategoryResult {
+  const message = `Compliance maps signature invalid (${reason ?? "unknown"}); categories are not evaluated against untrusted maps.`;
+  const claim = envelopeForUnverifiedResult({ producer: `compliance:${mapping.framework}:${mapping.id}`, recordCount: 0,
+    regulated: true, signatureValid: false, now });
+  return unevaluatedMapping(mapping, claim, message, "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`");
+}
+
+/** A descoped category (ISO/IEC 42005): no evidence is read for it and coverage leaves it out (P1-45). */
+function descopedMapping(mapping: ComplianceMapping, reason: string, now: number): ComplianceCategoryResult {
+  const claim = envelopeForUnverifiedResult({ producer: `compliance:${mapping.framework}:${mapping.id}`, recordCount: 0,
+    regulated: true, applicability: { state: "unresolved", reason }, now });
+  return { ...unevaluatedMapping(mapping, claim, reason, "A licensed copy of the standard and a named expert's review (D-08)"), descoped: reason };
 }
 
 function monitorKeysOf(workspace: string): string[] | null {
@@ -302,10 +314,14 @@ export function generateComplianceReport(params: {
     const ctx = complianceContext({ workspaceId: source.workspaceId, agentId, windowStartTs, windowEndTs,
       producers: loadCatalog().producers });
 
-    const categories = mappings.map((mapping) => verify.valid
-      ? evaluateMapping(mapping, mapping.evidenceRequirements.map((requirement, index) =>
-        evaluateMappingRequirement(mapping, requirement, index, source, ctx)), now)
-      : untrustedMapping(mapping, verify.reason, now));
+    const categories = mappings.map((mapping) => {
+      const descoped = descopedReason(mapping);
+      if (descoped !== null) return descopedMapping(mapping, descoped, now);
+      return verify.valid
+        ? evaluateMapping(mapping, mapping.evidenceRequirements.map((requirement, index) =>
+          evaluateMappingRequirement(mapping, requirement, index, source, ctx)), now)
+        : untrustedMapping(mapping, verify.reason, now);
+    });
 
     const trustCounts = {
       observed: 0,
@@ -341,8 +357,9 @@ export function generateComplianceReport(params: {
       configTrusted: verify.valid,
       configReason: verify.valid ? null : verify.reason,
       trustTierCoverage,
-      coverage: coverageScore(categories),
+      coverage: coverageScore(categories.filter((row) => row.descoped === undefined)),
       categories,
+      familyReview: familyReview(params.framework),
       nonClaims: [
         "This report provides evidence-backed signals only; it is not legal advice.",
         "Controls without control-bound AMC runtime evidence in the window are NOT_EVALUATED; absence of evidence is never a pass.",

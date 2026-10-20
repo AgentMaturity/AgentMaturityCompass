@@ -45,7 +45,7 @@ const CATEGORIES = [
   {
     name: 'Compliance & Regulatory',
     icon: '07',
-    docs: ['EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS', 'CERTIFICATION', 'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING', 'ASSURANCE_CERTS', 'ASSURANCE_LAB', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist', 'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING', 'REGULATORY_CALENDAR', 'industries/README', 'industries/education', 'industries/environment', 'industries/governance', 'industries/health', 'industries/mobility', 'industries/technology', 'industries/wealth']
+    docs: ['EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS', 'CERTIFICATION', 'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING', 'ASSURANCE_CERTS', 'ASSURANCE_LAB', 'assurance/EXECUTED_TESTS', 'assurance/JUDGE_CALIBRATION', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist', 'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING', 'REGULATORY_CALENDAR', 'industries/README', 'industries/education', 'industries/environment', 'industries/governance', 'industries/health', 'industries/mobility', 'industries/technology', 'industries/wealth']
   },
   {
     name: 'Security',
@@ -103,6 +103,7 @@ const ALL_DOCS = [
   'A4_FORGE','ACCESSIBILITY','ACTION_EVIDENCE_LOGIC','ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
   'AMC_QUESTIONS_IN_DEPTH','ANTI_HALLUCINATION','API_REFERENCE','PACKAGE_API_REFERENCE','API_SURFACES',
   'APPROVALS','ARCHETYPES','ARCHITECTURE_BRIEF','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB','CODE_GRAPH',
+  'assurance/EXECUTED_TESTS', 'assurance/JUDGE_CALIBRATION',
   'ATTESTATION_EVIDENCE_PATHS','AUDIT_BINDER','BACKUPS','BENCHMARKING','BENCHMARKS',
   'BENCH_REGISTRY','BOARD_RISK_L3_MEMO','BOM','BRIDGE','BRIDGE_PROMPT_ENFORCEMENT','BUDGETS','BUNDLES',
   'CANON','CASEBOOKS','CERTIFICATION','CHAIN_ARCHITECTURE','CI','CLAIM_KINDS','CLAIM_PROVENANCE',
@@ -210,6 +211,7 @@ const PUBLIC_DOC_IDS = new Set([
   'EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS',
   'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING',
   'ASSURANCE_LAB', 'AUDIT_BINDER', 'compliance/eu-ai-act-checklist',
+  'assurance/EXECUTED_TESTS', 'assurance/JUDGE_CALIBRATION',
   'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING',
   // Station deployment guides and the regulatory calendar: experimental, AI-drafted (P1-42)
   'REGULATORY_CALENDAR', 'industries/README', 'industries/education', 'industries/environment', 'industries/governance', 'industries/health', 'industries/mobility', 'industries/technology', 'industries/wealth',

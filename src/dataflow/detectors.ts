@@ -5,7 +5,7 @@ import { findPIISpans, getPIIDetectorMetadata, KEYWORD_BOUND, PII_SPAN_SCAN_REVI
 import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
+import { RedactionRefused, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -331,6 +331,27 @@ export function redactProtectedText(text: string, replace: (region: ProtectedDat
 /** A number a parse kept as its source literal (`JSON.rawJSON`, Node 21 and later). */
 export const isRawJson = (value: unknown): value is { readonly rawJSON: string } =>
   (JSON as unknown as { isRawJSON?: (value: unknown) => boolean }).isRawJSON?.(value) === true;
+export const rawJSON = (JSON as unknown as { rawJSON?: (text: string) => unknown }).rawJSON;
+export const NOT_JSON = Symbol("not JSON");
+
+/**
+ * Parses JSON text so that re-serializing it reproduces every number's source text (`JSON.rawJSON`, Node 21 and later;
+ * a caller refuses without it); `NOT_JSON` when the text is not JSON. A duplicate key keeps its last value, as the parse
+ * does. Anything else that stops the parse (nesting too deep) refuses. The session redactor and the detokenization gate
+ * use it.
+ */
+export function parseExact(text: string): unknown {
+  try {
+    return JSON.parse(text, (_key, value: unknown, context?: { readonly source?: unknown }) => {
+      if (typeof value !== "number") return value;
+      if (rawJSON === undefined || typeof context?.source !== "string") throw new RedactionRefused("runtime_unsupported");
+      return rawJSON(context.source);
+    });
+  } catch (error) {
+    if (error instanceof SyntaxError) return NOT_JSON;
+    throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
+  }
+}
 
 /**
  * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text, its source literal
