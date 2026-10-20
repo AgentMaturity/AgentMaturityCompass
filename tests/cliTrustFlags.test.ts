@@ -1,3 +1,4 @@
+import { createHash, generateKeyPairSync } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -178,12 +179,25 @@ describe("trustFromFlags", () => {
     }]);
   });
 
-  it("refuses a --pubkey that is not an Ed25519 public key, or not there", () => {
+  it("pins a canonical P-256 --pubkey identity for exactly the purposes the command checks", () => {
+    const dir = tempDir("amc-cli-trust-p256-");
+    const pair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+    const pem = pair.publicKey.export({ type: "spki", format: "pem" }).toString();
+    const path = join(dir, "issuer.pub");
+    writeFileSync(path, pem.replaceAll("\n", "\r\n"));
+    const trust = trustFromFlags({ pubkey: path }, ["artifact-seal", "revocation-list"]);
+    expect(trust.explicitPins).toEqual([{
+      keyId: createHash("sha256").update(pem, "utf8").digest("hex"),
+      purposes: ["artifact-seal", "revocation-list"], origin: `--pubkey ${path}`
+    }]);
+  });
+
+  it("refuses a --pubkey that is not a supported SPKI public key, or is missing", () => {
     const dir = tempDir("amc-cli-trust-pub-");
     writeFileSync(join(dir, "garbage.pub"), "not a key");
     writeFileSync(join(dir, "private.pem"), ISSUER.privateKeyPem);
-    expect(() => trustFromFlags({ pubkey: join(dir, "garbage.pub") }, purposes)).toThrow("is not an Ed25519 SPKI public key");
-    expect(() => trustFromFlags({ pubkey: join(dir, "private.pem") }, purposes)).toThrow("is not an Ed25519 SPKI public key");
+    expect(() => trustFromFlags({ pubkey: join(dir, "garbage.pub") }, purposes)).toThrow("is not an Ed25519 or ECDSA P-256 SPKI public key");
+    expect(() => trustFromFlags({ pubkey: join(dir, "private.pem") }, purposes)).toThrow("is not an Ed25519 or ECDSA P-256 SPKI public key");
     expect(() => trustFromFlags({ pubkey: join(dir, "absent.pub") }, purposes)).toThrow("ENOENT");
   });
 
