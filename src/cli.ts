@@ -471,7 +471,7 @@ import {
   complianceDiffCli,
   complianceFleetReportCli,
   complianceReportCli,
-  initComplianceMapsCli,
+  initComplianceMapsCliAsync,
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { complianceFrameworkFamilies, frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
@@ -12512,8 +12512,8 @@ withTrustFlags(transparencyMerkle
 compliance
   .command("init")
   .description("Create and sign compliance-maps.yaml")
-  .action(() => {
-    const out = initComplianceMapsCli(process.cwd());
+  .action(async () => {
+    const out = await initComplianceMapsCliAsync(process.cwd());
     console.log(chalk.green(`Compliance maps created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });

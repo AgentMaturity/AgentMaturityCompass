@@ -27,3 +27,5 @@ Restrict local transparency seal, Merkle-root and migration admission to the cor
 Await certificate and benchmark transparency after archive publication, retaining original authority and truthful partial-publication diagnostics.
 
 Await the explicit doctor live signing probe through the checked async policy signer and keep public signing and unexpected health diagnostics fixed.
+
+Prepare checked org signature bytes for the actual compliance-map publisher, await CLI/SDK publication, retain exact-purpose same-read verification and report partial pair publication truthfully.

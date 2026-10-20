@@ -703,7 +703,7 @@ export {
 } from "./experiments/experimentRunner.js";
 export { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed } from "./experiments/stats.js";
 export {
-  initComplianceMaps,
+  initComplianceMaps, initComplianceMapsAsync, ComplianceMapsPublicationError,
   loadComplianceMaps,
   verifyComplianceMapsSignature,
   generateComplianceReport
@@ -822,7 +822,7 @@ export {
   type RiskCostLatencyTraceStatus
 } from "./observability/riskCostLatencySlo.js";
 export {
-  initComplianceMapsCli,
+  initComplianceMapsCli, initComplianceMapsCliAsync,
   verifyComplianceMapsCli,
   complianceReportCli,
   complianceFleetReportCli,

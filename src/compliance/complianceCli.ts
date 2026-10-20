@@ -1,6 +1,6 @@
 import { familyReview, type ComplianceFramework, type FamilyReview } from "./frameworks.js";
 import type { Station } from "../domains/stations.js";
-import { generateComplianceReport, initComplianceMaps, verifyComplianceMapsSignature } from "./complianceEngine.js";
+import { generateComplianceReport, initComplianceMaps, initComplianceMapsAsync, verifyComplianceMapsSignature } from "./complianceEngine.js";
 import { writeComplianceReport, diffComplianceReports } from "./complianceReport.js";
 import { listAgents } from "../fleet/registry.js";
 import { envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
@@ -8,6 +8,10 @@ import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 
 export function initComplianceMapsCli(workspace: string): { path: string; sigPath: string } {
   return initComplianceMaps(workspace);
+}
+
+export function initComplianceMapsCliAsync(workspace: string): Promise<{ path: string; sigPath: string }> {
+  return initComplianceMapsAsync(workspace);
 }
 
 export function verifyComplianceMapsCli(workspace: string): {
