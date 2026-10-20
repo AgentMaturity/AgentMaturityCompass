@@ -161,6 +161,8 @@ This scope does not qualify cold Studio supervision as a whole. The conditional 
 
 Audit-packet generation awaits the checked artifact-purpose signer and rechecks the captured key-set generation and current refusal policy immediately before its atomic archive write. Its existing four-field manifest signature and default Ed25519 signed bytes are preserved. Caller arguments are copied before the first await. A locked no-sign ephemeral key cannot publish a packet whose signature fails under the committed public key; an unlocked valid file key retains its existing no-sign behavior. This producer migration does not enable general artifact-purpose binding or change the separate synchronous transparency consumers.
 
+Assurance-certificate issuance awaits the existing checked policy signer. It keeps the original certificate, envelope, latest-copy and hash formats, and verifies/parses the captured assurance-policy bytes from one read. The policy body/signature, run and findings must remain byte-identical through preparation; packaged run/findings hashes use those captured bytes. The original signer and complete trust policy are rechecked after awaits and before archive publication. Synchronous transparency publication remains a separate integration limit.
+
 ## Notary `KEY_PROVIDER` backend
 
 In the notary's `notary.yaml`:

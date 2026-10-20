@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import YAML from "yaml";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -13,8 +14,10 @@ import { loadTrustConfig, checkNotaryTrust } from "../trust/trustConfig.js";
 import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
 import { cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { orgSignatureSchema } from "../org/orgSchema.js";
+import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { assurancePolicySchema } from "./assurancePolicySchema.js";
 import {
   assuranceCertSchema,
   assuranceFindingsDocSchema,
@@ -26,13 +29,11 @@ import {
   assuranceCertificatesDir,
   assuranceLatestCertificatePath,
   assuranceLatestCertificateShaPath,
+  assurancePolicyPath,
+  assurancePolicySigPath,
   assuranceRunJsonPath,
   assuranceTimestampedCertificatePath,
   assuranceTimestampedCertificateShaPath,
-  loadAssuranceFindings,
-  loadAssurancePolicy,
-  loadAssuranceRun,
-  verifyAssurancePolicySignature
 } from "./assurancePolicyStore.js";
 import { evaluateAssuranceEvidenceGates } from "./assuranceScoring.js";
 import { assertFileNotExample } from "../claims/eligibility/exampleMode.js";
@@ -132,25 +133,48 @@ const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
 };
 
 
-export async function issueAssuranceCertificate(params: {
+export async function issueAssuranceCertificate(input: {
   workspace: string;
   runId: string;
   outFile?: string;
 }): Promise<AssuranceIssueCertificateResult> {
-  assertFileNotExample(assuranceRunJsonPath(params.workspace, params.runId), "issued an assurance certificate");
-  const policySig = verifyAssurancePolicySignature(params.workspace);
+  const params = { ...input };
+  const runPath = assuranceRunJsonPath(params.workspace, params.runId);
+  const findingsPath = join(dirname(runPath), "findings.json");
+  const policyPath = assurancePolicyPath(params.workspace);
+  const sourceInputs = new Map([policyPath, assurancePolicySigPath(params.workspace), runPath, findingsPath]
+    .map(path => [path, pathExists(path) ? readFileSync(path) : null] as const));
+  const assertInputsCurrent = () => {
+    for (const [path, before] of sourceInputs) {
+      let after: Buffer | null;
+      try { after = pathExists(path) ? readFileSync(path) : null; }
+      catch { throw new Error("assurance certificate source inputs changed while preparing"); }
+      if (before === null ? after !== null : after === null || !before.equals(after)) {
+        throw new Error("assurance certificate source inputs changed while preparing");
+      }
+    }
+  };
+  assertFileNotExample(runPath, "issued an assurance certificate");
+  const policyBytes = sourceInputs.get(policyPath)!;
+  if (policyBytes === null) {
+    throw new Error("assurance policy signature invalid: assurance policy missing");
+  }
+  const policySig = verifySignedFileWithAuditor(params.workspace, policyPath, policyBytes);
   if (!policySig.valid) {
     throw new Error(`assurance policy signature invalid: ${policySig.reason ?? "unknown"}`);
   }
-  const policy = loadAssurancePolicy(params.workspace);
-  const run = loadAssuranceRun(params.workspace, params.runId);
-  if (!run) {
+  const policy = assurancePolicySchema.parse(YAML.parse(policyBytes.toString("utf8")) as unknown);
+  const runBytes = sourceInputs.get(runPath)!;
+  if (runBytes === null) {
     throw new Error(`assurance run not found: ${params.runId}`);
   }
-  const findings = loadAssuranceFindings(params.workspace, params.runId);
-  if (!findings) {
+  const run = assuranceRunSchema.parse(JSON.parse(runBytes.toString("utf8")) as unknown);
+  const findingsBytes = sourceInputs.get(findingsPath)!;
+  if (findingsBytes === null) {
     throw new Error(`assurance findings not found for run: ${params.runId}`);
   }
+  assuranceFindingsDocSchema.parse(JSON.parse(findingsBytes.toString("utf8")) as unknown);
+  assertInputsCurrent();
   const evidence = evaluateAssuranceEvidenceGates({
     policy,
     gates: run.evidenceGates
@@ -160,7 +184,17 @@ export async function issueAssuranceCertificate(params: {
   }
 
   const trust = loadTrustConfig(params.workspace);
+  const signer = describePolicySigner(params.workspace, "CERT");
+  const signingPolicy = JSON.stringify(trust);
+  const assertSigningCurrent = () => {
+    assertPolicySignerCurrent(params.workspace, signer);
+    if (JSON.stringify(loadTrustConfig(params.workspace)) !== signingPolicy) {
+      throw new Error("assurance certificate signing policy changed while preparing");
+    }
+  };
   const notary = await checkNotaryTrust(params.workspace);
+  assertInputsCurrent();
+  assertSigningCurrent();
 
   const proofs = buildBenchProofs({
     workspace: params.workspace,
@@ -204,11 +238,13 @@ export async function issueAssuranceCertificate(params: {
 
   const certJson = Buffer.from(canonicalize(cert), "utf8");
   const certDigest = sha256Hex(certJson);
-  const signed = signDigestWithPolicy({
+  const signed = await signDigestWithPolicyAsync({
     workspace: params.workspace,
     kind: "CERT",
-    digestHex: certDigest
+    digestHex: certDigest,
+    expectedSigner: signer
   });
+  assertInputsCurrent();
   const signature = orgSignatureSchema.parse({
     digestSha256: certDigest,
     signature: signed.signature,
@@ -246,9 +282,11 @@ export async function issueAssuranceCertificate(params: {
     });
 
     writeFileAtomic(join(root, "meta", "policy.sha256"), `${run.policySha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "run.sha256"), `${fileSha(join(params.workspace, ".amc", "assurance", "runs", run.runId, "run.json"))}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "findings.sha256"), `${fileSha(join(params.workspace, ".amc", "assurance", "runs", run.runId, "findings.json"))}\n`, 0o644);
+    writeFileAtomic(join(root, "meta", "run.sha256"), `${sha256Hex(runBytes)}\n`, 0o644);
+    writeFileAtomic(join(root, "meta", "findings.sha256"), `${sha256Hex(findingsBytes)}\n`, 0o644);
 
+    assertInputsCurrent();
+    assertSigningCurrent();
     tarCreateDeterministic(tmp, outFile);
   } finally {
     cleanup(tmp);
