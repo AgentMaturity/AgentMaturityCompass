@@ -150,7 +150,7 @@ The strict judge path uses fixed provider origins, exact actual response-model p
 
 Authority, calibration and captured-call capabilities are process-local. Serializing their visible fields does not preserve authority; copied or reopened JSON cannot recreate a capability. Evaluation calls are consumed once and calibration calls cannot be replayed as evaluations. Expired, revoked, changed or mismatched inputs require fresh admission.
 
-The public pending table is generated from `docs/assurance/calibration/index.json`. That file is a documentation status record, not a calibration bundle, trusted roster or publication approval. The current generator refuses nonempty calibration records and nonpending approval claims. Measured-rate publication needs an explicitly reviewed extension after actual human inputs, an authorized model run and Sid's publication approval.
+The public pending table is generated from `docs/assurance/calibration/index.json`. That file is a documentation status record, not a calibration bundle, trusted roster or publication approval. The current generator refuses nonempty calibration records and nonpending approval claims. A separate `display-index.json` can render historical documentation rows. Its schema, arithmetic and content digests do not authenticate native origin, human review, publication approval or current calibration. Actual-rate publication still needs Sid's approval of the actual reviewed inputs; documentation data never enters the native admission path.
 
 See [executed assurance tests](EXECUTED_TESTS.md) for the effect-evidence boundary. Real human review, legal applicability and independent external observation remain separate requirements.
 

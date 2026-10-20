@@ -32,12 +32,12 @@ function sign<T extends { kind: string }>(unsigned: T, key: Key): T & { signatur
   const h = sha256Hex(Buffer.concat([Buffer.from(`amc.assurance.calibration/${unsigned.kind}/v1`, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(unsigned), "utf8")]));
   return { ...unsigned, signature: { keyId: ed25519KeyId(key.publicKeyPem)!, value: signHexDigest(h, key.privateKeyPem) } };
 }
-function fixture(opts: { disagree?: boolean; adjudicate?: boolean; allPositive?: boolean } = {}) {
+function fixture(opts: { disagree?: boolean; adjudicate?: boolean; allPositive?: boolean; calibrationId?: string; scenarioId?: string } = {}) {
   const root = mkdtempSync(join(tmpdir(), "amc-p227-calibration-contract-")); roots.push(root);
   const put = (path: string, value: unknown) => { const bytes = Buffer.from(canonicalize(value), "utf8");
     writeFileSync(join(root, path), bytes, { mode: 0o600 }); return { path, sha256: sha256Hex(bytes), bytes: bytes.length }; };
   const gold = { version: 1, synthetic: true, items: ["a", "b", "c", "d"].map(id => ({ id, input: { sample: id } })) };
-  const scenario = { id: "fixture-scenario", version: 1, domain: "wealth", synthetic: true };
+  const scenario = { id: opts.scenarioId ?? "fixture-scenario", version: 1, domain: "wealth", synthetic: true };
   const prompt = { version: 1, contract: "amc.regulated-boolean/v1", system: "Synthetic contract evaluator.", userTemplate: "Assess this case: {{case}}" };
   const rubric = { version: 1, criteria: "Synthetic fixture criterion, not a regulated policy." };
   const goldRef = put("gold.json", gold), scenarioRef = put("scenario.json", scenario), promptRef = put("prompt.json", prompt), rubricRef = put("rubric.json", rubric);
@@ -54,7 +54,7 @@ function fixture(opts: { disagree?: boolean; adjudicate?: boolean; allPositive?:
   const adjudication = opts.adjudicate ? put("adjudication.json", sign({ version: 1, kind: "adjudication", binding,
     signer: signer(pins[3]!.subject), signedAt: instant(-21), labelFileSha256: [aRef.sha256, bRef.sha256],
     choices: [{ itemId: "a", pass: labels[0]!.pass, rationale: "Synthetic fixture adjudication only" }] }, keyLegal)) : null;
-  const bundle = { version: 1, id: "fixture-calibration", binding, gold: goldRef, scenario: scenarioRef, prompt: promptRef,
+  const bundle = { version: 1, id: opts.calibrationId ?? "fixture-calibration", binding, gold: goldRef, scenario: scenarioRef, prompt: promptRef,
     rubric: rubricRef, labels: [aRef, bRef], adjudication, policy: policyRef };
   put("bundle.json", bundle);
   const experts = new Map(ROSTER); experts.set(pins[2]!.subject, { domains: ["wealth"], identities: ["c@fixture.test"] });
@@ -107,6 +107,14 @@ describe("P2-27 artifact-bound calibration authority (synthetic contracts)", () 
     expect(result.state).toBe("private_review_draft"); expect(fetched).toBe(4);
     if (result.state !== "private_review_draft" || !result.calibration) throw new Error(JSON.stringify(result));
     expect(result.publicationApproval).toBe("pending"); expect(result.recordSha256).toBe(hash(result.record));
+    const display = (result as unknown as { documentation: Record<string, unknown> }).documentation;
+    expect(display).toMatchObject({ calibrationId: f.bundle.id, scenarioId: f.binding.scenarioId,
+      goldSet: { sha256: result.record.goldSet.sha256, items: 4 }, confusion: { tp: 2, fp: 0, tn: 2, fn: 0 },
+      falsePositiveRate: 0, falseNegativeRate: 0, sourceRecordSha256: result.recordSha256 });
+    expect(JSON.stringify(display)).not.toContain(f.root);
+    expect(display).not.toHaveProperty("goldSet.path"); expect(display).not.toHaveProperty("goldSet.labelledBy");
+    expect(renderOperatorCalibrationReport(display as unknown as AuthorizedCalibration, f.context))
+      .toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_TOKEN_UNVERIFIED"] });
     expect(result.record).toMatchObject({ goldSet: { items: 4 }, minimumGoldSetSize: 4,
       confusion: { tp: 2, fp: 0, tn: 2, fn: 0 }, falsePositiveRate: 0, falseNegativeRate: 0 });
     for (const expected of ["# PRIVATE judge calibration review draft", "Publication approval: **pending**",
@@ -122,8 +130,15 @@ describe("P2-27 artifact-bound calibration authority (synthetic contracts)", () 
     expect(fresh.state).toBe("private_review_draft");
     if (fresh.state !== "private_review_draft") throw new Error(JSON.stringify(fresh));
     expect(fresh.record.falsePositiveRate).toBe(0); expect(fresh.recordSha256).toBe(hash(fresh.record));
+    expect((fresh as unknown as { documentation: { falsePositiveRate: number } }).documentation.falsePositiveRate).toBe(0);
     expect(fresh.markdown).toContain("| FPR | `0` |");
   });
+  it.each([{ calibrationId: "c".repeat(257) }, { scenarioId: "s".repeat(257) }])(
+    "private export preserves the existing native identifier contract %j", async options => {
+      const f = fixture(options);
+      await expect(runOperatorCalibration(f.root, f.context)).resolves.toMatchObject({ state: "private_review_draft",
+        documentation: { calibrationId: f.bundle.id, scenarioId: f.binding.scenarioId } });
+    });
   it("copied calibration fields and raw caller records cannot reopen the private report path", async () => {
     const f = fixture(), result = await runOperatorCalibration(f.root, f.context);
     if (result.state !== "private_review_draft" || !result.calibration) throw new Error(JSON.stringify(result));

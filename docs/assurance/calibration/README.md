@@ -1,8 +1,8 @@
 # Regulated judge calibration inputs
 
-This directory currently contains only `index.json`, an explicit pending publication status. **No real calibration/model calls were authorized or performed for this status.** There are no actual human-labelled gold sets, approved error thresholds, measured model error rates or publication approval. Credential presence is not inferred or inspected here.
+This directory contains `index.json`, an explicit pending publication status, and an empty `display-index.json` for historical documentation data. **No real calibration/model calls were authorized or performed for this status.** There are no actual human-labelled gold sets, approved error thresholds, measured model error rates or publication approval. Credential presence is not inferred or inspected here.
 
-The documentation index is not an authority input. `pnpm gen:judge-calibration` reads that index and the canonical 119-scenario registry to generate `docs/assurance/JUDGE_CALIBRATION.md`. `pnpm check:judge-calibration` checks identical bytes without writing. The pending-only renderer rejects measured records and approval claims; it never loads a bundle, roster, credential or capability. Public measured-rate publication remains blocked on actual human inputs, an authorized model run and Sid's explicit publication approval.
+The documentation index is not an authority input. `pnpm gen:judge-calibration` reads both indices and the canonical 119-scenario registry to generate `docs/assurance/JUDGE_CALIBRATION.md`. `pnpm check:judge-calibration` checks identical bytes without writing. The pending-only renderer rejects measured records and approval claims; it never loads a bundle, roster, credential or capability. Public measured-rate publication remains blocked on actual human inputs, an authorized model run and Sid's explicit publication approval.
 
 ## Actual signed bundle contract
 
@@ -36,4 +36,15 @@ An admitted judgment cannot excuse an unsafe captured effect or fill a missing e
 
 Positive means a reference that is accepted/safe. FPR is FP / (FP + TN): unsafe gold accepted by the judge. FNR is FN / (FN + TP): safe gold rejected. Both classes need actual items. Wilson 95% intervals use z = 1.96 and actual class denominators. The native policy gate compares measured point rates with the signed expert bounds; intervals are reported, not silently substituted for an approved tolerance.
 
-Real human labels/adjudication, a named expert's minimum and tolerances, authorized native model calls, and Sid's approval to publish measured rates remain pending. A future measured publication requires a reviewed export/rendering workflow that verifies the actual results and approval; adding JSON rows to the current pending index is deliberately unsupported. Keep raw keys, gold contents and signer-private material outside the public documentation output.
+Real human labels/adjudication, a named expert's minimum and tolerances, authorized native model calls, and Sid's approval to publish measured rates remain pending. The pending status index still rejects measured rows and approval claims. Historical display data has a separate generation/check path; actual native origin, human/model facts and publication approval are not established by that path. Keep raw keys, gold contents and signer-private material outside the public documentation output.
+
+
+## Historical documentation data
+
+A successful `runOperatorCalibration` or fresh `renderOperatorCalibrationReport` returns a private `documentation` projection alongside the complete private report. It uses the same freshly revalidated native snapshot, includes the source-record and projection SHA-256 digests, and omits gold paths and label identities. This ordinary data object is not a calibration capability. Keep its initial copy in the private review packet; never substitute fixture identities or mocked test calls for actual human/model facts.
+
+The display-index shape is `{ "version": 1, "kind": "documentation_display", "rows": [] }`. This branch deliberately keeps `rows` empty. After actual results have been reviewed and Sid has authorized publishing the actual rates, the corresponding historical projections can be placed in that index. The normal generator and `--check` use one deterministic renderer; no additional approval flag or trust importer exists.
+
+The renderer verifies strict fields, class counts, rates, Wilson intervals, chronological metadata, content digests, unique canonical scenario identities and duplicate-free JSON. These checks prove consistency only. A recomputed digest cannot authenticate native origin or establish engaged humans, real provider execution, review, publication approval or current eligibility. Submitted rows are labelled `recorded_display_only`; expired dates remain historical metadata. The source-record hash is a reference, not a public signature or an authority token. Unknown rows and approval fields are refused, while all unsubmitted canonical scenarios remain pending.
+
+Neither generator mode loads credentials, contacts a provider or enters native admission. Read-only checking refuses drift without overwriting the document. Actual public publication remains a separate authorized release action; no measured rows or public rate publication are produced by this change.

@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readCalibrationDisplayIndex } from "../src/assurance/judges/calibrationDisplay.js";
+import { canonicalize, assertNoDuplicateJsonKeys } from "../src/utils/json.js";
 import { REGULATED_SCENARIO_DISPOSITIONS } from "../src/assurance/executed/registry.js";
 
 interface PendingIndex {
@@ -52,7 +54,7 @@ const outro = [
   "",
   "Authority, calibration and captured-call capabilities are process-local. Serializing their visible fields does not preserve authority; copied or reopened JSON cannot recreate a capability. Evaluation calls are consumed once and calibration calls cannot be replayed as evaluations. Expired, revoked, changed or mismatched inputs require fresh admission.",
   "",
-  "The public pending table is generated from `docs/assurance/calibration/index.json`. That file is a documentation status record, not a calibration bundle, trusted roster or publication approval. The current generator refuses nonempty calibration records and nonpending approval claims. Measured-rate publication needs an explicitly reviewed extension after actual human inputs, an authorized model run and Sid's publication approval.",
+  "The public pending table is generated from `docs/assurance/calibration/index.json`. That file is a documentation status record, not a calibration bundle, trusted roster or publication approval. The current generator refuses nonempty calibration records and nonpending approval claims. A separate `display-index.json` can render historical documentation rows. Its schema, arithmetic and content digests do not authenticate native origin, human review, publication approval or current calibration. Actual-rate publication still needs Sid's approval of the actual reviewed inputs; documentation data never enters the native admission path.",
   "",
   "See [executed assurance tests](EXECUTED_TESTS.md) for the effect-evidence boundary. Real human review, legal applicability and independent external observation remain separate requirements.",
   "",
@@ -61,9 +63,10 @@ const outro = [
   "Run `pnpm gen:judge-calibration` to regenerate this file and `pnpm check:judge-calibration` to check for drift. The check does not write files, inspect credentials, contact a model or load a calibration capability."
 ];
 
-/** Documentation only. Never loads authority, credentials, model calls or measured calibration records. */
+/** Documentation only. Display data never loads authority, credentials or model calls. */
 export function renderPendingCalibrationTable(index: unknown,
-  scenarios: readonly { readonly id: string; readonly packId: string }[]): string {
+  scenarios: readonly { readonly id: string; readonly packId: string }[],
+  displayIndex: unknown = { version: 1, kind: "documentation_display", rows: [] }): string {
   pendingIndex(index);
   const rows = [...scenarios].sort((a, b) => compare(a.packId, b.packId) || compare(a.id, b.id));
   const keys = rows.map(row => `${row.packId}/${row.id}`);
@@ -71,15 +74,28 @@ export function renderPendingCalibrationTable(index: unknown,
       rows.some(row => !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(row.packId) || !/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(row.id))) {
     throw new Error("Pending calibration table must cover the exact 119 canonical scenario identities");
   }
+  const display = readCalibrationDisplayIndex(displayIndex, rows);
   const packs = new Set(rows.map(row => row.packId)).size;
-  const table = rows.map(row => `| \`${row.packId}\` | \`${row.id}\` | \`not_evaluated\` | not measured | pending | not measured | not measured | not measured | not issued |`);
-  return [...intro, `All **${rows.length}** canonical regulated scenarios across **${packs}** packs are unavailable for real calibrated admission. Fixture execution availability does not establish judge calibration.`, "",
-    "| Pack | Scenario | Status | Model / prompt / rubric / temperature | Human gold | FPR | FNR | Wilson 95% intervals | Expiry |",
-    "| --- | --- | --- | --- | --- | --- | --- | --- | --- |", ...table, "", ...outro, ""].join("\n");
+  const value = (input: unknown): string => canonicalize(input).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll("|", "&#124;").replaceAll("`", "&#96;");
+  const table = rows.map(row => {
+    const data = display.get(row.id);
+    if (!data) return `| \`${row.packId}\` | \`${row.id}\` | \`not_evaluated\` | not measured | pending | not measured | not measured | not measured | not issued |${display.size ? " not measured |" : ""}`;
+    return `| \`${row.packId}\` | \`${row.id}\` | \`recorded_display_only\` | \`${value({ provider: data.provider, ...data.judge })}\` | \`${data.goldSet.items} / ${data.goldSet.sha256}\` | ${data.falsePositiveRate} | ${data.falseNegativeRate} | \`${value(data.interval95)}\` | \`${data.calibratedAt} / ${data.expiresAt}\` | \`${data.sourceRecordSha256} / ${data.projectionSha256}\` |`;
+  });
+  const heading = display.size ? ["# Judge calibration", "", "**Historical documentation display only.**", "",
+    "Native origin is not authenticated by this documentation check. Schema, arithmetic and digests prove internal consistency only.", "",
+    "This display does not grant calibration, review or publication authority. Actual-rate publication still needs Sid's approval; source human/model facts require separate review.", "",
+    "Expired dates are historical metadata. Software-test fixture rows are not real-model measurements or engaged-human review.", "",
+    `All **${rows.length}** canonical scenarios across **${packs}** packs are listed; **${display.size}** have submitted historical display data. No row grants native admission.`, ""] :
+    [...intro, `All **${rows.length}** canonical regulated scenarios across **${packs}** packs are unavailable for real calibrated admission. Fixture execution availability does not establish judge calibration.`, ""];
+  return [...heading,
+    `| Pack | Scenario | Status | Model / prompt / rubric / temperature | ${display.size ? "Recorded gold size / digest" : "Human gold"} | FPR | FNR | Wilson 95% intervals | ${display.size ? "Recorded at / expiry" : "Expiry"} |${display.size ? " Source record / projection digests |" : ""}`,
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- |" + (display.size ? " --- |" : ""), ...table, "", ...outro, ""].join("\n");
 }
 
 /** Optional in-process private export from the existing native calibration capability.
- * The ordinary CLI below still writes pending status only; raw measured JSON is never accepted. */
+ * The ordinary CLI reads separate display data; serialized records never grant native authority. */
 export async function renderNativeCalibrationReviewDraft(
   calibration: import("../src/assurance/judges/calibrationAuthority.js").AuthorizedCalibration,
   current: import("../src/assurance/judges/calibrationAuthority.js").OperatorCalibrationContext
@@ -88,23 +104,27 @@ export async function renderNativeCalibrationReviewDraft(
   return native.renderOperatorCalibrationReport(calibration, current);
 }
 
+/** Same deterministic read/render path for generation and read-only drift checks; no authority or provider IO. */
+export function generateCalibrationDocumentation(root: string, check: boolean): void {
+  const readIndex = (name: string): unknown => {
+    const bytes = readFileSync(resolve(root, "docs/assurance/calibration", name));
+    const text = bytes.toString("utf8");
+    if (bytes.length > 500_000 || !Buffer.from(text, "utf8").equals(bytes)) throw new Error("Calibration documentation input invalid");
+    const value: unknown = JSON.parse(text); assertNoDuplicateJsonKeys(text); return value;
+  };
+  const rendered = renderPendingCalibrationTable(readIndex("index.json"), REGULATED_SCENARIO_DISPOSITIONS, readIndex("display-index.json"));
+  const output = resolve(root, "docs/assurance/JUDGE_CALIBRATION.md");
+  if (check) {
+    if (!existsSync(output) || readFileSync(output, "utf8") !== rendered) throw new Error("Judge calibration table is stale; run pnpm gen:judge-calibration");
+  } else { mkdirSync(dirname(output), { recursive: true }); writeFileSync(output, rendered); }
+}
 const scriptPath = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   try {
     const args = process.argv.slice(2);
     if (args.length > 1 || args.some(arg => arg !== "--check")) throw new Error("Usage: gen-judge-calibration.mts [--check]");
-    const root = resolve(dirname(scriptPath), "..");
-    const output = resolve(root, "docs/assurance/JUDGE_CALIBRATION.md");
-    const index = JSON.parse(readFileSync(resolve(root, "docs/assurance/calibration/index.json"), "utf8")) as unknown;
-    const rendered = renderPendingCalibrationTable(index, REGULATED_SCENARIO_DISPOSITIONS);
-    if (args.includes("--check")) {
-      if (!existsSync(output) || readFileSync(output, "utf8") !== rendered) throw new Error("Judge calibration table is stale; run pnpm gen:judge-calibration");
-      process.stdout.write("Judge calibration pending table is current (119 scenarios; no measured calibration records)\n");
-    } else {
-      mkdirSync(dirname(output), { recursive: true });
-      writeFileSync(output, rendered);
-      process.stdout.write("Generated pending judge calibration table (119 scenarios; no measured calibration records)\n");
-    }
+    generateCalibrationDocumentation(resolve(dirname(scriptPath), ".."), args.includes("--check"));
+    process.stdout.write(args.includes("--check") ? "Judge calibration documentation is current (display data grants no authority)\n" : "Generated judge calibration documentation (display data grants no authority)\n");
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

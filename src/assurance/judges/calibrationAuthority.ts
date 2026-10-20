@@ -1,4 +1,5 @@
 /** P2-27: real native signature/roster authorizer; no caller verifier or authority flags. */
+import { projectCalibrationDisplay, type CalibrationDisplayRow } from "./calibrationDisplay.js";
 import { lstatSync } from "node:fs";
 import { z } from "zod";
 import type { RosterEntry } from "../../catalog/governance/support.js";
@@ -249,7 +250,7 @@ export function admitCapturedJudgeDecision(token: AuthorizedCalibration, call: C
 }
 
 export type OperatorCalibrationDraft = NE | { state: "private_review_draft"; publicationApproval: "pending";
-  provider: JudgeBinding["provider"]; record: RegulatedJudgeCalibration; recordSha256: string; markdown: string };
+  provider: JudgeBinding["provider"]; record: RegulatedJudgeCalibration; recordSha256: string; markdown: string; documentation: CalibrationDisplayRow };
 export type OperatorCalibrationRun = OperatorCalibrationDraft & { calibration?: AuthorizedCalibration };
 
 /** Revalidates the existing native capability and copies its private record; DTO fields grant no authority. */
@@ -297,5 +298,6 @@ export function renderOperatorCalibrationReport(token: AuthorizedCalibration,
     "Publication approval: **pending**. This private export does not authorize a public write, a regulated pass or a production attack success rate.", "",
     "Statistics describe captured native judge calls against the exact synthetic gold bytes. Fixture/mock calls in software tests are not real-model measurements or engaged-human review.", "",
     "| Field | Authenticated value |", "| --- | --- |", ...rows.map(([field, input]) => `| ${field} | \`${value(input)}\` |`), ""].join("\n");
-  return { state: "private_review_draft", publicationApproval: "pending", provider, record, recordSha256, markdown };
+  return { state: "private_review_draft", publicationApproval: "pending", provider, record, recordSha256, markdown,
+    documentation: projectCalibrationDisplay(record, provider, recordSha256) };
 }
