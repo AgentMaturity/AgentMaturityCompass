@@ -1,6 +1,6 @@
-/** P2-27 proposal: pure math and rejection diagnostics, NOT positive calibration admission.
- * No file/credential/model IO. Current native authority and D-08 roster are unavailable.
- * Every current result is not_evaluated, even when all diagnostic metadata is consistent.
+/** Pure math and caller-metadata rejection diagnostics, not positive calibration admission.
+ * No file, credential or model IO. Verified admission lives in calibrationAuthority.ts.
+ * This metadata-only API remains not_evaluated even when every diagnostic is consistent.
  */
 import { z } from "zod";
 import { sha256Hex } from "../../utils/hash.js";
@@ -68,11 +68,12 @@ export function calculateConfusion(pairs: unknown): ConfusionStatistics | null {
     interval95: { fpr: wilson95(confusion.fp, negatives), fnr: wilson95(confusion.fn, positives) } };
 }
 
+/** Authority status of this metadata-only diagnostic API; it cannot mint a native capability. */
 export function regulatedCalibrationAuthorityStatus(): {
   available: false; reason: "CALIBRATION_AUTHORITY_UNAVAILABLE"; detail: string;
 } {
   return { available: false, reason: "CALIBRATION_AUTHORITY_UNAVAILABLE",
-    detail: "D-08 roster and supported artifact-bound calibration authorizer are unavailable. Caller metadata cannot establish human labels, adjudication or expert approval." };
+    detail: "Caller metadata cannot establish human labels, adjudication or expert approval. Native calibrationAuthority admission requires verified artifacts and a trusted operator roster; the unconfigured D-08 roster is empty." };
 }
 export interface RegulatedJudgeAdmission {
   outcome: "not_evaluated";
@@ -137,6 +138,6 @@ export function admitRegulatedJudgeResult(input: unknown): RegulatedJudgeAdmissi
   }
   result.reasons = [...new Set(result.reasons)];
   // Intentionally no pass/fail branch and no minted capability/roster/signature schema.
-  // Real positive admission requires a future supported, reviewed native authority path.
+  // Positive admission uses calibrationAuthority's verified native capabilities instead.
   return result;
 }

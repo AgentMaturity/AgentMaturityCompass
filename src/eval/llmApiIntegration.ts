@@ -8,12 +8,20 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { sha256Hex } from "../utils/hash.js";
+import { assertNoDuplicateJsonKeys } from "../utils/json.js";
+import { residencyFetch } from "../residency/checkEgress.js";
+import { assertStrictJudgeRequest } from "../assurance/judges/regulatedJudgeRequestGuard.js";
 
 // ---------------------------------------------------------------------------
 // API Types
 // ---------------------------------------------------------------------------
 
 export interface LLMApiConfig {
+  /** Trusted workspace scope for residency admission; omitted only for native unregulated fallback. */
+  workspace?: string;
+  /** Capture exact wire digests/actual response model for the strict regulated wrapper. */
+  captureWire?: boolean;
   /** API provider */
   provider: 'openai' | 'anthropic';
   /** API key */
@@ -46,6 +54,11 @@ export interface LLMRequest {
 export interface LLMResponse {
   /** Generated text */
   text: string;
+  /** Additive native capture: no configured model substituted when the provider omits it. */
+  responseModel?: string | null;
+  /** SHA-256 over the exact transmitted UTF-8 body and captured response bytes; never auth headers. */
+  wireRequestSha256?: string;
+  wireResponseSha256?: string;
   /** Token usage */
   usage: {
     promptTokens: number;
@@ -156,28 +169,33 @@ export class LLMApiClient {
     }
     messages.push({ role: 'user', content: request.prompt });
 
-    const response = await fetch(url, {
+    const body = JSON.stringify({ model: request.model, messages,
+      temperature: request.temperature, max_tokens: request.maxTokens });
+    // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
+    if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
+    const init: RequestInit = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: request.model,
-        messages,
-        temperature: request.temperature,
-        max_tokens: request.maxTokens
-      }),
+      body,
       signal: AbortSignal.timeout(this.config.timeout)
-    });
+    };
+    const response = this.config.captureWire
+      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
+      : await fetch(url, init);
 
     if (!response.ok) {
+      if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
       throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const decoded = await this.decodeResponse(response, body);
+    const data = decoded.data;
     
     return {
+      ...decoded.capture,
       text: data.choices[0]?.message?.content || '',
       usage: {
         promptTokens: data.usage?.prompt_tokens || 0,
@@ -193,30 +211,34 @@ export class LLMApiClient {
     
     const messages = [{ role: 'user', content: request.prompt }];
 
-    const response = await fetch(url, {
+    const body = JSON.stringify({ model: request.model, messages, system: request.system,
+      temperature: request.temperature, max_tokens: request.maxTokens });
+    // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
+    if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
+    const init: RequestInit = {
       method: 'POST',
       headers: {
         'x-api-key': this.config.apiKey,
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: request.model,
-        messages,
-        system: request.system,
-        temperature: request.temperature,
-        max_tokens: request.maxTokens
-      }),
+      body,
       signal: AbortSignal.timeout(this.config.timeout)
-    });
+    };
+    const response = this.config.captureWire
+      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
+      : await fetch(url, init);
 
     if (!response.ok) {
+      if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
       throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const decoded = await this.decodeResponse(response, body);
+    const data = decoded.data;
     
     return {
+      ...decoded.capture,
       text: data.content[0]?.text || '',
       usage: {
         promptTokens: data.usage?.input_tokens || 0,
@@ -225,6 +247,42 @@ export class LLMApiClient {
       },
       cost: this.calculateAnthropicCost(request.model, data.usage)
     };
+  }
+
+  /** Existing calls retain response.json(); strict capture retains at most 4 MiB of wire bytes. */
+  private async decodeResponse(response: Response, body: string) {
+    if (!this.config.captureWire) return { data: await response.json(), capture: {} };
+    const wireBytes = await this.strictResponseBytes(response);
+    const wireText = wireBytes.toString("utf8");
+    if (!Buffer.from(wireText, "utf8").equals(wireBytes)) throw new Error("LLM response is not valid UTF-8");
+    const data = JSON.parse(wireText);
+    assertNoDuplicateJsonKeys(wireText);
+    return { data, capture: {
+      responseModel: typeof data?.model === "string" ? data.model : null,
+      wireRequestSha256: sha256Hex(Buffer.from(body, "utf8")), wireResponseSha256: sha256Hex(wireBytes)
+    } };
+  }
+
+  private async strictResponseBytes(response: Response): Promise<Buffer> {
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("LLM response body is unavailable");
+    const chunks: Buffer[] = [];
+    let size = 0, complete = false;
+    try {
+      for (;;) {
+        const next = await reader.read();
+        if (next.done) { complete = true; break; }
+        size += next.value.byteLength;
+        if (size > 4 * 1024 * 1024) throw new Error("LLM response exceeds 4 MiB");
+        chunks.push(Buffer.from(next.value));
+      }
+      return Buffer.concat(chunks, size);
+    } finally {
+      if (!complete) {
+        try { await reader.cancel(); } catch { /* Preserve the original read or size refusal. */ }
+      }
+      reader.releaseLock();
+    }
   }
 
   private calculateOpenAICost(model: string, usage: any): number {
