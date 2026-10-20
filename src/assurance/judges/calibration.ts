@@ -37,9 +37,9 @@ const requestSchema = z.strictObject({
   calibration: calibrationSchema.nullable(), goldSetBytes: z.instanceof(Uint8Array).nullable(),
   diagnosticPairs: z.array(pairSchema)
 });
-export type JudgeIdentity = z.infer<typeof identitySchema>;
+type JudgeIdentity = z.infer<typeof identitySchema>;
 export type RegulatedJudgeCalibration = z.infer<typeof calibrationSchema>;
-export interface ConfusionPair { itemId: string; expectedPass: boolean; predictedPass: boolean }
+interface ConfusionPair { itemId: string; expectedPass: boolean; predictedPass: boolean }
 export interface ConfusionStatistics {
   confusion: { tp: number; fp: number; tn: number; fn: number };
   items: number; falsePositiveRate: number | null; falseNegativeRate: number | null;

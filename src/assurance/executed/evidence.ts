@@ -1,3 +1,4 @@
+import { executedEvaluationSnapshotSchema, type ExecutedEvaluationSnapshot } from "./evaluationSnapshot.js";
 import type { Ledger } from "../../ledger/ledger.js";
 import type { EvidenceItem } from "../../catalog/evidence/types.js";
 import { z } from "zod";
@@ -24,6 +25,8 @@ export interface ExecutedCaptureRecord {
   capture: unknown;
   /** Server-side execution completion, authenticated with the capture bytes. */
   invocationComplete: boolean;
+  /** Absent only on earlier local captures, which cannot feed the new control projection. */
+  evaluation?: ExecutedEvaluationSnapshot;
 }
 
 export interface ExecutedEvidenceReference {
@@ -41,9 +44,9 @@ const recordSchema = z.object({
   v: z.literal(1), scenarioId: text, packId: text,
   fixture: z.object({ environment: text, seed: text }).strict(),
   binding: z.object({ tenantId: text, workspaceId: text, deploymentId: text, agentId: text,
-    controlId: text, controlVersion: text, policyDigest: digest,
+    controlId: text, controlVersion: text, policyDigest: z.string().regex(/^(?:sha256:)?[a-f0-9]{64}$/),
     runId: text, attemptId: text, fixtureDigest: digest }).strict(),
-  policy: z.unknown(), capture: z.unknown(), invocationComplete: z.boolean()
+  policy: z.unknown(), capture: z.unknown(), invocationComplete: z.boolean(), evaluation: executedEvaluationSnapshotSchema.optional()
 }).strict();
 
 /** The signature proves these local bytes. It does not approve a fixture or observe a production system. */

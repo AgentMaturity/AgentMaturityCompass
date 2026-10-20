@@ -1,3 +1,12 @@
+import { verifyHexDigestAny } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { validateExecutedReportRow, isExecutedReportPack } from "./executed/reportValidation.js";
+import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
+import { loadExecutedRunScope, ExecutedScopeIntegrityError } from "./executed/scope.js";
+import type { ExecutedRunScope } from "./executed/reportTypes.js";
+import { executeStationQuestionAspects, STATION_QUESTION_ASPECT_PACK } from "./executed/questionExecution.js";
+import { STATION_QUESTION_CONVERSIONS } from "./executed/registry.js";
+import { finalizeExecutedResults } from "./executed/finalize.js";
 import { randomUUID } from "node:crypto";
 import { executeAssurancePack } from "./assurancePackExecution.js";
 import { readdirSync } from "node:fs";
@@ -11,9 +20,8 @@ import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { saveAssuranceRunArtifacts } from "./assurancePolicyStore.js";
+import { persistV1Artifacts } from "./assuranceArtifactPersistence.js";
 import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
-import type { AssuranceFindingCategory, AssuranceFindingSeverity } from "./assuranceSchema.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { writeAssuranceAudit, startAssuranceSession } from "./evidenceWriters.js";
@@ -37,6 +45,10 @@ interface AssurancePromptContext {
 }
 
 export interface RunAssuranceInput {
+  /** Explicit PR smoke mode; ordinary executed runs use25 fresh attempts. */
+  executedAttempts?: 1 | 25;
+  /** Five separate partial synthetic question aspects, selected explicitly. */
+  stationQuestionIds?: string[];
   workspace: string;
   agentId?: string;
   packId?: string;
@@ -81,6 +93,7 @@ function packIdsForRun(input: RunAssuranceInput): string[] {
   if (input.packId && input.packId.length > 0) {
     return [input.packId];
   }
+  if (input.stationQuestionIds?.length) return [];
   throw new Error("assurance run requires --pack <packId> or --all");
 }
 
@@ -182,171 +195,15 @@ async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
   }
 }
 
-/**
- * Maps a pack's free-form scenario category onto the fixed v1 category enum.
- *
- * Packs label scenarios however they like; the v1 artifact schema accepts a
- * closed set. Anything unrecognised is recorded as TOOL_GOVERNANCE rather than
- * dropped, so a scenario is never silently lost from the artifact.
- */
-function toV1Category(category: string): AssuranceFindingCategory {
-  const c = category.toLowerCase();
-  if (c.includes("inject") || c.includes("jailbreak") || c.includes("prompt")) return "INJECTION_RESILIENCE";
-  if (c.includes("secret") || c.includes("credential") || c.includes("exfil")) return "SECRET_LEAKAGE";
-  if (c.includes("pii") || c.includes("privacy") || c.includes("personal")) return "PII_LEAKAGE";
-  if (c.includes("model")) return "MODEL_GOVERNANCE";
-  if (c.includes("budget") || c.includes("cost") || c.includes("economic")) return "BUDGET_GOVERNANCE";
-  if (c.includes("approval") || c.includes("consent")) return "APPROVALS_GOVERNANCE";
-  if (c.includes("truth") || c.includes("hallucin") || c.includes("factual")) return "TRUTHFULNESS";
-  if (c.includes("sandbox") || c.includes("boundary") || c.includes("isolation")) return "SANDBOX_BOUNDARY";
-  if (c.includes("attest") || c.includes("notary") || c.includes("signature")) return "ATTESTATION_INTEGRITY";
-  if (c.includes("plugin") || c.includes("supply")) return "PLUGIN_INTEGRITY";
-  return "TOOL_GOVERNANCE";
-}
-
-/** Severity of a failed scenario, from its 0-100 score. */
-function severityForScore(score0to100: number): AssuranceFindingSeverity {
-  if (score0to100 < 25) return "CRITICAL";
-  if (score0to100 < 50) return "HIGH";
-  if (score0to100 < 75) return "MEDIUM";
-  return "LOW";
-}
-
-/**
- * Writes the v1 assurance artifacts (run, findings, trace refs).
- *
- * assuranceStore, assuranceCertificates and the scheduler all read these files,
- * but nothing wrote them: saveAssuranceRunArtifacts had no callers, so
- * `amc assurance cert issue` failed on every workspace no matter how many scans
- * had run. Persisting them here closes that chain.
- */
-function persistV1Artifacts(params: {
-  workspace: string;
-  agentId: string;
-  report: AssuranceReport;
-  policySha256: string;
-}): void {
-  const { workspace, agentId, report } = params;
-  const generatedTs = Date.now();
-  const runId = report.assuranceRunId;
-
-  const findingCounts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
-  const findings: unknown[] = [];
-  const refs: unknown[] = [];
-  const packRuns: unknown[] = [];
-
-  for (const pack of report.packResults) {
-    const scenarios: unknown[] = [];
-    for (const scenario of pack.scenarioResults) {
-      const category = toV1Category(scenario.category);
-      const severity = severityForScore(scenario.score0to100);
-      const traceRef = {
-        scenarioId: scenario.scenarioId,
-        // Correlates this scenario to the gateway request that carried it, when
-        // one exists; otherwise a deterministic id derived from the run.
-        requestId: scenario.correlatedRequestIds?.[0] ?? `${runId}:${scenario.scenarioId}`,
-        runId,
-        agentIdHash: sha256Hex(agentId).slice(0, 32),
-        inputHash: sha256Hex(scenario.prompt),
-        outputHash: sha256Hex(scenario.response),
-        decision: scenario.pass ? "ALLOWED" : "FLAGGED",
-        policyHashes: { assurancePolicySha256: params.policySha256 },
-        evidenceEventHashes: [],
-        timingMs: 0,
-        counters: {}
-      };
-      const evidenceRefs = { runId, eventHashes: [], receiptIds: [] };
-
-      scenarios.push({
-        scenarioId: scenario.scenarioId,
-        packId: pack.packId,
-        category,
-        passed: scenario.pass,
-        ...(scenario.inconclusive ? { inconclusive: true } : {}),
-        reasons: scenario.reasons.filter((r) => r.length > 0),
-        severityOnFailure: severity,
-        evidenceRefs,
-        traceRef
-      });
-      refs.push(traceRef);
-
-      // An inconclusive row was not graded (P0-19): it is not a finding, whatever its zero score says.
-      if (scenario.inconclusive) continue;
-      if (scenario.pass) {
-        findingCounts.info += 1;
-      } else {
-        findingCounts[severity.toLowerCase() as keyof typeof findingCounts] += 1;
-        findings.push({
-          findingId: `${runId}:${scenario.scenarioId}`,
-          scenarioId: scenario.scenarioId,
-          category,
-          severity,
-          // Identifies which pack scenario produced the finding, so a reader
-          // can trace the description back to its source definition.
-          descriptionTemplateId: `${pack.packId}:${scenario.scenarioId}`,
-          evidenceRefs,
-          remediationHints: scenario.reasons.filter((r) => r.length > 0)
-        });
-      }
-    }
-    packRuns.push({
-      packId: pack.packId,
-      enabled: true,
-      scenarioCount: pack.scenarioCount,
-      passedCount: pack.passCount,
-      failedCount: pack.failCount,
-      scenarios
-    });
-  }
-
-  const failed = findingCounts.critical + findingCounts.high > 0;
-  const run = {
-    v: 1 as const,
-    runId,
-    generatedTs,
-    scope: { type: "AGENT" as const, id: agentId },
-    policySha256: params.policySha256,
-    selectedPacks: report.packResults.map((p) => p.packId),
-    evidenceGates: {
-      integrityIndex: report.integrityIndex,
-      correlationRatio: 0,
-      observedShare: 0
-    },
-    packRuns,
-    score: {
-      // report.status is artifact validity (VALID/INVALID/UNSIGNED); the
-      // pass/fail judgement comes from the scan's own failure counts.
-      status: report.evidenceStatus === "INSUFFICIENT_EVIDENCE" ? "INSUFFICIENT_EVIDENCE" : failed ? "FAIL" : "PASS",
-      riskAssuranceScore: report.overallScore0to100,
-      categoryScores: {},
-      findingCounts,
-      pass: !failed && report.evidenceStatus !== "INSUFFICIENT_EVIDENCE",
-      reasons: []
-    },
-    notes: []
-  };
-
-  try {
-    saveAssuranceRunArtifacts({
-      workspace,
-      run: run as never,
-      findings: { v: 1, runId, generatedTs, findings } as never,
-      traceRefs: { v: 1, runId, generatedTs, refs } as never
-    });
-  } catch (error) {
-    // Artifact persistence must not fail a completed scan; surface it loudly.
-    console.error(
-      `[assurance] could not persist v1 artifacts for ${runId}: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-  }
-}
-
 export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
   // AMC_NO_SIGN=1 rows are unsigned whatever the caller passed; they go to the unsigned store (UNSIGNED_EVIDENCE_STORE).
   const unsignedStore = process.env.AMC_NO_SIGN === "1";
   if (unsignedStore) input = { ...input, noSign: true };
+  if (![1, 25].includes(input.executedAttempts ?? 25)) throw new Error("EXECUTED_ATTEMPT_MODE_INVALID");
+  if (input.stationQuestionIds && (new Set(input.stationQuestionIds).size !== input.stationQuestionIds.length ||
+      input.stationQuestionIds.some(id => !STATION_QUESTION_CONVERSIONS.some(row => row.questionId === id)))) {
+    throw new Error("STATION_QUESTION_SELECTION_INVALID");
+  }
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const context = buildPromptContext(workspace, agentId);
@@ -355,6 +212,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
   const windowMs = parseWindowToMs(input.window || "14d");
   const windowStartTs = now - windowMs;
   const packIds = packIdsForRun(input);
+  const allPackIds = input.stationQuestionIds?.length ? [...packIds, STATION_QUESTION_ASPECT_PACK] : packIds;
   const reportsDir = assuranceReportsDir(workspace, agentId);
   const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
@@ -366,7 +224,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     ledger,
     mode: input.mode,
     agentId,
-    packIds,
+    packIds: allPackIds,
     trustTier
   });
 
@@ -386,32 +244,28 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       });
     }
 
-    // Resolve the real agent under test before any scenario runs. When no
-    // target is reachable this throws AgentResponderUnavailableError, so the
-    // run produces no report and no fabricated evidence enters the ledger.
-    const responder: AgentResponder = await resolveAgentResponder({
-      workspace,
-      agentId,
-      model: input.model
-    });
-
-    writeAssuranceAudit({
-      ledger,
-      sessionId,
-      runtime: input.mode === "sandbox" ? "sandbox" : "any",
-      trustTier,
-      agentId,
-      packId: "all",
-      scenarioId: "agent-target",
-      auditType: "ASSURANCE_TARGET_RESOLVED",
-      severity: "LOW",
-      message: `Scanning ${responder.target.model} via ${responder.target.transport} (${responder.target.endpoint}).`
+    let responderPromise: Promise<AgentResponder> | undefined;
+    let resolvedResponder: AgentResponder | undefined;
+    let executedScope: ExecutedRunScope | null | undefined;
+    let catalog: ReturnType<typeof loadAdmittedCatalog> | undefined;
+    const getCatalog = () => catalog ??= loadAdmittedCatalog();
+    const getExecutedScope = () => {
+      if (executedScope === undefined) executedScope = loadExecutedRunScope({ workspace, agentId, runId });
+      return executedScope;
+    };
+    const getResponder = (): Promise<AgentResponder> => responderPromise ??= resolveAgentResponder({ workspace, agentId, model: input.model }).then(responder => {
+      resolvedResponder = responder;
+      writeAssuranceAudit({ ledger, sessionId, runtime: input.mode === "sandbox" ? "sandbox" : "any", trustTier,
+        agentId, packId: "all", scenarioId: "agent-target", auditType: "ASSURANCE_TARGET_RESOLVED", severity: "LOW",
+        message: `Scanning ${responder.target.model} via ${responder.target.transport} (${responder.target.endpoint}).` });
+      return responder;
     });
 
     const packResults: AssurancePackResult[] = [];
 
     const executePack = (packId: string): Promise<AssurancePackResult> => executeAssurancePack({
-      packId, ledger, sessionId, agentId, runId, trustTier, context, responder, mode: input.mode
+      packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog,
+      executedAttempts: input.executedAttempts, now: new Date(now).toISOString(), mode: input.mode
     });
 
     // ── Execute packs (sequential or parallel — AMC-149) ─
@@ -427,6 +281,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
           if (result.status === "fulfilled") {
             packResults.push(result.value);
           } else {
+            if (result.reason instanceof ExecutedScopeIntegrityError) throw result.reason;
             // No scenario was measured; do not invent a failed scenario.
             const failedPackId = batch[batchResults.indexOf(result)] ?? "unknown";
             packResults.push({
@@ -437,7 +292,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
               failCount: 0,
               score0to100: 0,
               trustTier,
-              scenarioResults: []
+              scenarioResults: [],
+              notEvaluatedReason: "pack_execution_unavailable"
             });
           }
         }
@@ -449,8 +305,15 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       }
     }
 
+    if (input.stationQuestionIds?.length) packResults.push(await executeStationQuestionAspects({ ledger, sessionId,
+      catalog: getCatalog(), scope: getExecutedScope(), getResponder, now: new Date(now).toISOString(), seed: runId,
+      questionIds: input.stationQuestionIds, executedAttempts: input.executedAttempts }));
     const inconclusiveCount = packResults.reduce((sum, pack) => sum + pack.scenarioResults.filter(row => row.inconclusive === true).length, 0);
     ledger.sealSession(sessionId);
+    if (packResults.some(pack => pack.scenarioResults.some(row => row.executed))) {
+      finalizeExecutedResults({ ledger, sessionId, catalog: getCatalog(), scope: executedScope ?? null, packs: packResults });
+    }
+    const runEndTs = Date.now();
     const verification = input.noSign
       ? { ok: false, errors: ["unsigned assurance run"] }
       : await verifyLedgerIntegrity(workspace);
@@ -468,7 +331,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       ts: now,
       mode: input.mode,
       windowStartTs,
-      windowEndTs: now,
+      windowEndTs: runEndTs,
       trustTier,
       status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
@@ -482,12 +345,9 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       runSealSig: "",
       evidenceStatus,
       inconclusiveScenarioCount: inconclusiveCount,
-      target: {
-        transport: responder.target.transport,
-        endpoint: responder.target.endpoint,
-        model: responder.target.model,
-        providerTemplateId: responder.target.providerTemplateId
-      }
+      ...(executedScope ? { executedScope } : {}),
+      ...(resolvedResponder ? { target: { transport: resolvedResponder.target.transport, endpoint: resolvedResponder.target.endpoint,
+        model: resolvedResponder.target.model, providerTemplateId: resolvedResponder.target.providerTemplateId } } : {})
     };
     const reportHash = sha256Hex(canonicalize(baseReport));
     const reportSig = input.noSign ? "unsigned" : ledger.signRunHash(reportHash);
@@ -506,9 +366,9 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       assurance_run_id: runId,
       agent_id: agentId,
       window_start_ts: windowStartTs,
-      window_end_ts: now,
+      window_end_ts: runEndTs,
       mode: input.mode,
-      pack_ids_json: JSON.stringify(packIds),
+      pack_ids_json: JSON.stringify(allPackIds),
       report_json_sha256: reportHash,
       run_seal_sig: reportSig,
       status: report.status
@@ -565,98 +425,67 @@ export function loadAssuranceReport(params: {
 }
 
 export async function verifyAssuranceRun(params: {
-  workspace: string;
-  assuranceRunId: string;
-  agentId?: string;
+  workspace: string; assuranceRunId: string; agentId?: string;
 }): Promise<VerifyAssuranceResult> {
-  const report = loadAssuranceReport({
-    workspace: params.workspace,
-    assuranceRunId: params.assuranceRunId,
-    agentId: params.agentId
-  });
-  const agentId = resolveAgentId(params.workspace, params.agentId);
-  const context = buildPromptContext(params.workspace, agentId);
-  const errors: string[] = [];
-
+  const report = loadAssuranceReport(params), agentId = resolveAgentId(params.workspace, params.agentId);
+  const context = buildPromptContext(params.workspace, agentId), errors: string[] = [];
   const verification = await verifyLedgerIntegrity(params.workspace);
-  if (!verification.ok) {
-    errors.push(...verification.errors.map((error) => `ledger verify: ${error}`));
-  }
-
-  for (const packResult of report.packResults) {
-    const pack = getAssurancePack(packResult.packId);
-    for (const scenarioResult of packResult.scenarioResults) {
-      const scenario = pack.scenarios.find((row) => row.id === scenarioResult.scenarioId);
-      if (!scenario) {
-        errors.push(`unknown scenario in report: ${packResult.packId}/${scenarioResult.scenarioId}`);
-        continue;
+  if (!verification.ok) errors.push(...verification.errors.map(error => `ledger verify: ${error}`));
+  const hash = sha256Hex(canonicalize({ ...report, reportJsonSha256: "", runSealSig: "" }));
+  if (hash !== report.reportJsonSha256) errors.push("reportJsonSha256 mismatch");
+  if (report.assuranceRunId !== params.assuranceRunId || report.agentId !== agentId) errors.push("assurance report subject mismatch");
+  try {
+    if (!verifyHexDigestAny(hash, report.runSealSig, getPurposeKeyHistory(params.workspace, "artifact-seal"))) errors.push("assurance report seal does not verify");
+  } catch { errors.push("assurance report seal could not be verified"); }
+  const ledger = openLedger(params.workspace);
+  try {
+    const db = ledger.getAssuranceRun(report.assuranceRunId);
+    if (!db) errors.push("assurance run missing in ledger");
+    else {
+      if (db.agent_id !== agentId || db.report_json_sha256 !== report.reportJsonSha256 || db.run_seal_sig !== report.runSealSig || db.status !== report.status) {
+        errors.push("ledger assurance run binding mismatch");
       }
-      // An inconclusive row was never graded, so there is nothing to recompute; it may only carry no score.
-      if (scenarioResult.inconclusive === true) {
-        if (scenarioResult.pass || scenarioResult.score0to100 !== 0 || scenarioResult.score0to5 !== 0) {
-          errors.push(`inconclusive row carries a score: ${packResult.packId}/${scenarioResult.scenarioId}`);
+      if (canonicalize(JSON.parse(db.pack_ids_json).sort()) !== canonicalize(report.packResults.map(pack => pack.packId).sort())) errors.push("assurance pack selection mismatch");
+    }
+    // No report-supplied execution subject is trusted before its actual native seal and ledger binding verify.
+    if (errors.length > 0) return { ok: false, errors };
+    if (report.executedScope && (report.executedScope.agentId !== agentId || report.executedScope.runId !== report.assuranceRunId)) {
+      errors.push("executed report subject mismatch");
+    }
+    if (new Set(report.packResults.map(pack => pack.packId)).size !== report.packResults.length) errors.push("duplicate assurance pack");
+    const catalog = report.packResults.some(pack => isExecutedReportPack(pack.packId)) ? loadAdmittedCatalog() : undefined;
+    for (const packResult of report.packResults) {
+      if (isExecutedReportPack(packResult.packId)) {
+        const ids = packResult.scenarioResults.map(row => row.scenarioId);
+        const expectedIds = packResult.packId === STATION_QUESTION_ASPECT_PACK ? ids : getAssurancePack(packResult.packId).scenarios.map(row => row.id);
+        if (new Set(ids).size !== ids.length || canonicalize([...ids].sort()) !== canonicalize([...expectedIds].sort()) ||
+            packResult.scenarioCount !== ids.length || packResult.passCount !== 0 || packResult.failCount !== 0 ||
+            packResult.score0to100 !== 0 || packResult.regulatedEligible !== false) errors.push(`executed pack inventory or score mismatch: ${packResult.packId}`);
+        for (const row of packResult.scenarioResults) {
+          const checked = validateExecutedReportRow({ ledger, sessionId: report.sessionId ?? "", scope: report.executedScope,
+            row, agentId, packId: packResult.packId, catalog: catalog! });
+          errors.push(...checked.errors.map(reason => `${packResult.packId}/${row.scenarioId}: ${reason}`));
         }
         continue;
       }
-      const grade = gradeScenarioReply(scenario, { text: scenarioResult.response, toolCalls: scenarioResult.toolCalls ?? [] },
-        scenarioResult.prompt, context);
-      if (grade.kind === "inconclusive") {
-        errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: graded row is now ${grade.cause}`);
-        continue;
-      }
-      if (grade.validation.pass !== scenarioResult.pass) {
-        errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: pass differs`);
-      }
-      if (Math.abs(grade.score0to100 - scenarioResult.score0to100) > 0.001) {
-        errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: score differs`);
-      }
-    }
-  }
-
-  const recomputedOverall = aggregateOverallScore(report.packResults);
-  if (Math.abs(recomputedOverall - report.overallScore0to100) > 0.001) {
-    errors.push("overall score mismatch");
-  }
-
-  const recomputedIntegrity = Number(scoreIntegrity(report.packResults).toFixed(4));
-  if (Math.abs(recomputedIntegrity - report.integrityIndex) > 0.001) {
-    errors.push("integrityIndex mismatch");
-  }
-
-  const baseReport = {
-    ...report,
-    reportJsonSha256: "",
-    runSealSig: ""
-  };
-  const hash = sha256Hex(canonicalize(baseReport));
-  if (hash !== report.reportJsonSha256) {
-    errors.push("reportJsonSha256 mismatch");
-  }
-
-  const ledger = openLedger(params.workspace);
-  try {
-    const dbRow = ledger.getAssuranceRun(report.assuranceRunId);
-    if (!dbRow) {
-      errors.push("assurance run missing in ledger");
-    } else {
-      if (dbRow.report_json_sha256 !== report.reportJsonSha256) {
-        errors.push("ledger assurance run hash mismatch");
-      }
-      if (dbRow.run_seal_sig !== report.runSealSig) {
-        errors.push("ledger assurance run signature mismatch");
-      }
-      if (dbRow.status !== report.status) {
-        errors.push("ledger assurance run status mismatch");
+      const pack = getAssurancePack(packResult.packId);
+      for (const row of packResult.scenarioResults) {
+        const scenario = pack.scenarios.find(candidate => candidate.id === row.scenarioId);
+        if (!scenario) { errors.push(`unknown scenario in report: ${packResult.packId}/${row.scenarioId}`); continue; }
+        if (row.inconclusive === true) {
+          if (row.pass || row.score0to100 !== 0 || row.score0to5 !== 0) errors.push(`inconclusive row carries a score: ${packResult.packId}/${row.scenarioId}`);
+          continue;
+        }
+        const grade = gradeScenarioReply(scenario, { text: row.response, toolCalls: row.toolCalls ?? [] }, row.prompt, context);
+        if (grade.kind === "inconclusive") { errors.push(`determinism mismatch for ${row.scenarioId}: graded row is now ${grade.cause}`); continue; }
+        if (grade.validation.pass !== row.pass) errors.push(`determinism mismatch for ${row.scenarioId}: pass differs`);
+        if (Math.abs(grade.score0to100 - row.score0to100) > 0.001) errors.push(`determinism mismatch for ${row.scenarioId}: score differs`);
       }
     }
-  } finally {
-    ledger.close();
-  }
-
-  return {
-    ok: errors.length === 0,
-    errors
-  };
+  } finally { ledger.close(); }
+  if (Math.abs(aggregateOverallScore(report.packResults) - report.overallScore0to100) > 0.001) errors.push("overall score mismatch");
+  if (Math.abs(Number(scoreIntegrity(report.packResults).toFixed(4)) - report.integrityIndex) > 0.001) errors.push("integrityIndex mismatch");
+  return { ok: errors.length === 0, errors };
 }
 
 export function latestAssuranceByPack(params: {

@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { isCanonicalSignatureBase64, isExactIsoTime } from "../../utils/json.js";
 const text = z.string().min(1).max(4096).refine(x => x.trim().length > 0);
-export const digestSchema = z.string().regex(/^[a-f0-9]{64}$/);
+const digestSchema = z.string().regex(/^[a-f0-9]{64}$/);
 const time = z.string().refine(isExactIsoTime);
 const rate = z.number().finite().min(0).max(1);
 export const judgeBindingSchema = z.strictObject({
@@ -26,7 +26,7 @@ export const bundleSchema = z.strictObject({
   labels: z.tuple([ref, ref]), adjudication: ref.nullable(), policy: ref
 });
 export type ArtifactReference = z.infer<typeof ref>;
-export type CalibrationBundle = z.infer<typeof bundleSchema>;
+type CalibrationBundle = z.infer<typeof bundleSchema>;
 export const goldSchema = z.strictObject({ version: z.literal(1), synthetic: z.literal(true),
   items: z.array(z.strictObject({ id: text, input: z.json() })).min(2).max(1000) });
 const signer = z.strictObject({ subject: text, name: text, credential: text, conflictsDeclared: text });

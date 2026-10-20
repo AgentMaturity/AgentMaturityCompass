@@ -6,6 +6,7 @@ import { evaluateControl } from "../../../../src/catalog/evidence/evaluate.js";
 import type { EvaluationContext, EvidenceItem } from "../../../../src/catalog/evidence/types.js";
 import { loadCatalog, type LoadedCatalog } from "../../../../src/catalog/loader.js";
 import type { ControlRecord, FixtureEnvelope } from "../../../../src/catalog/types.js";
+import { partitionFixtureDeclarations } from "../../executedDeclarations.js";
 import { canonicalize } from "../../../../src/utils/json.js";
 import { sha256Hex } from "../../../../src/utils/hash.js";
 
@@ -31,7 +32,7 @@ export function environmentHarness() {
     if (!control) throw new Error("Environment control " + id + " is absent");
     return control;
   });
-  const fixtures = controls.flatMap((control): EnvironmentFixture[] => {
+  const referencedFixtures = controls.flatMap((control): EnvironmentFixture[] => {
     const refs = [...new Set(control.tests.flatMap(test => [...test.fixtures.positive, ...test.fixtures.negative]))];
     return refs.map(ref => {
       const envelope = catalog.fixtures.get(ref)?.envelope;
@@ -39,7 +40,8 @@ export function environmentHarness() {
       return { ref, control, envelope };
     });
   });
-  return { catalog, plans, controls, fixtures };
+  const { fixtures, declarations } = partitionFixtureDeclarations(catalog, referencedFixtures);
+  return { catalog, plans, controls, fixtures, declarations };
 }
 
 function context(catalog: LoadedCatalog, compiled: EnvironmentPlan, control: ControlRecord, setup: EvidenceSetup): EvaluationContext {

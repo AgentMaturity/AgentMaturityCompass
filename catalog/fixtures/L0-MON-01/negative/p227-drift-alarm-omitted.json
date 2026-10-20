@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "fin-model-drift",
+      "environmentId": "model-lineage-v1",
+      "caseId": "p227-drift-alarm-omitted"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "unauthorized_effect"
+  }
+}

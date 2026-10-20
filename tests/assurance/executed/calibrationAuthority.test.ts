@@ -13,7 +13,9 @@ import { sha256Hex } from "../../../src/utils/hash.js";
 import { signHexDigest } from "../../../src/crypto/keys.js";
 import { ed25519KeyId } from "../../../src/trust/trustList.js";
 import { authorizeCalibrationBundle, calibrateOperatorJudge, calibrationStanding, admitCapturedJudgeDecision,
+  runOperatorCalibration, renderOperatorCalibrationReport,
   type OperatorCalibrationContext, type AuthorizedCalibration } from "../../../src/assurance/judges/calibrationAuthority.js";
+import { renderNativeCalibrationReviewDraft } from "../../../scripts/gen-judge-calibration.mjs";
 import { captureNativeJudgeCall, type CapturedJudgeCall } from "../../../src/assurance/judges/regulatedJudgeRuntime.js";
 import type { JudgeBinding } from "../../../src/assurance/judges/calibrationContract.js";
 import { NOW, keyA, keyB, keyC, keyLegal, AUTHOR, operatorHome, type Key, ROSTER } from "../../catalog/governance/reviewers.js";
@@ -99,6 +101,55 @@ describe("P2-27 artifact-bound calibration authority (synthetic contracts)", () 
     const call = await capture(f);
     expect(admitCapturedJudgeDecision(token, call, f.context, hash({ sample: "a" }))).toMatchObject({ state: "admitted", outcome: "pass" });
     expect(admitCapturedJudgeDecision(token, call, f.context, hash({ sample: "a" })).state).toBe("not_evaluated");
+  });
+  it("orchestrates actual native fixture calls into a complete authentic private stats draft", async () => {
+    const f = fixture(), result = await runOperatorCalibration(f.root, f.context);
+    expect(result.state).toBe("private_review_draft"); expect(fetched).toBe(4);
+    if (result.state !== "private_review_draft" || !result.calibration) throw new Error(JSON.stringify(result));
+    expect(result.publicationApproval).toBe("pending"); expect(result.recordSha256).toBe(hash(result.record));
+    expect(result.record).toMatchObject({ goldSet: { items: 4 }, minimumGoldSetSize: 4,
+      confusion: { tp: 2, fp: 0, tn: 2, fn: 0 }, falsePositiveRate: 0, falseNegativeRate: 0 });
+    for (const expected of ["# PRIVATE judge calibration review draft", "Publication approval: **pending**",
+      f.binding.scenarioId, f.binding.judge.model, f.binding.judge.promptSha256, f.binding.judge.rubricSha256,
+      "| Temperature | `0` |", "| Gold-set size | `4` |", "| Expert minimum | `4` |",
+      "| FPR | `0` |", "| FNR | `0` |", "FPR Wilson 95%", "FNR Wilson 95%", "Calibrated at", "Expires at",
+      instant(24), "not real-model measurements"]) expect(result.markdown).toContain(expected);
+    const draft = renderOperatorCalibrationReport(result.calibration, f.context);
+    expect(draft.state).toBe("private_review_draft");
+    expect(await renderNativeCalibrationReviewDraft(result.calibration, f.context)).toEqual(draft);
+    result.record.falsePositiveRate = 0.75;
+    const fresh = renderOperatorCalibrationReport(result.calibration, f.context);
+    expect(fresh.state).toBe("private_review_draft");
+    if (fresh.state !== "private_review_draft") throw new Error(JSON.stringify(fresh));
+    expect(fresh.record.falsePositiveRate).toBe(0); expect(fresh.recordSha256).toBe(hash(fresh.record));
+    expect(fresh.markdown).toContain("| FPR | `0` |");
+  });
+  it("copied calibration fields and raw caller records cannot reopen the private report path", async () => {
+    const f = fixture(), result = await runOperatorCalibration(f.root, f.context);
+    if (result.state !== "private_review_draft" || !result.calibration) throw new Error(JSON.stringify(result));
+    const forged = [JSON.parse(JSON.stringify(result.calibration)), { ...result.calibration, publicationApproval: "approved" },
+      result.record, { id: f.bundle.id, verified: true }];
+    for (const value of forged) {
+      expect(renderOperatorCalibrationReport(value as AuthorizedCalibration, f.context))
+        .toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_TOKEN_UNVERIFIED"] });
+      expect(await renderNativeCalibrationReviewDraft(value as AuthorizedCalibration, f.context))
+        .toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_TOKEN_UNVERIFIED"] });
+    }
+  });
+  it("rechecks expiry and trusted operator context before exporting a genuine calibration", async () => {
+    const f = fixture(), result = await runOperatorCalibration(f.root, f.context);
+    if (result.state !== "private_review_draft" || !result.calibration) throw new Error(JSON.stringify(result));
+    expect(renderOperatorCalibrationReport(result.calibration, { ...f.context, authors: new Map() }).state).toBe("not_evaluated");
+    vi.setSystemTime(new Date(NOW.getTime() + 25 * 3600000));
+    expect(renderOperatorCalibrationReport(result.calibration, f.context))
+      .toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_EXPIRED_OR_FUTURE"] });
+    expect((await renderNativeCalibrationReviewDraft(result.calibration, f.context)).state).toBe("not_evaluated");
+  });
+  it("a missing trusted roster refuses orchestration before provider calls or private stats export", async () => {
+    const f = fixture();
+    expect(await runOperatorCalibration(f.root, { ...f.context, experts: new Map() }))
+      .toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_ROSTER_EMPTY"] });
+    expect(fetched).toBe(0);
   });
   it("same genuine fixture signatures with an empty roster refuse", () => {
     const f = fixture(); expect(authorizeCalibrationBundle(f.root, { ...f.context, experts: new Map() })).toEqual({ state: "not_evaluated", reasons: ["CALIBRATION_ROSTER_EMPTY"] });

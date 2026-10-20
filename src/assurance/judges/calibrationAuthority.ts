@@ -16,7 +16,7 @@ import { calculateConfusion, type ConfusionStatistics, type RegulatedJudgeCalibr
 import { bundleSchema, goldSchema, labelsSchema, adjudicationSchema, policySchema, promptDefinitionSchema,
   rubricDefinitionSchema, judgeBindingSchema, judgeRefusalCode, type ArtifactReference, type JudgeBinding, type CalibrationStatement } from "./calibrationContract.js";
 import { captureNativeJudgeCall, capturedJudgeCall, consumeEvaluationCall, type CapturedJudgeCall } from "./regulatedJudgeRuntime.js";
-export interface SourceAuthors { readonly identities: readonly string[]; readonly provenance: string }
+interface SourceAuthors { readonly identities: readonly string[]; readonly provenance: string }
 /** Only trusted operator composition supplies this. Never deserialize it from the bundle or an HTTP/CLI JSON body.
  * The default roster is empty. Signing keys do not prove human engagement, credentials or honest disclosures. */
 export interface OperatorCalibrationContext {
@@ -169,7 +169,7 @@ function readBundle(root: string, original: OperatorCalibrationContext): Loaded 
   } else if (adjudication) reject("CALIBRATION_UNNECESSARY_ADJUDICATION");
   if (gold.items.length < policy.minimumGoldSetSize) reject("CALIBRATION_BELOW_EXPERT_MINIMUM");
   return { root, context, operatorDigest: operatorDigest(context), bundleSha256: sha256Hex(manifestBytes), id: bundle.id, goldPath: bundle.gold.path,
-    binding: context.expected, gold, prompt, rubric, policy, finalLabels, references: refs.map(r => ({ ...r })),
+    binding: context.expected, gold, prompt, rubric, policy, finalLabels, references: refs.map(reference => ({ ...reference })),
     labelSubjects: [a.signer.subject, b.signer.subject], labelledAt: [a.signedAt, b.signedAt, ...(adjudication ? [adjudication.signedAt] : [])].sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1)! };
 }
 export function authorizeCalibrationBundle(root: string, context: OperatorCalibrationContext): AuthorityResult {
@@ -246,4 +246,56 @@ export function admitCapturedJudgeDecision(token: AuthorizedCalibration, call: C
       Date.parse(execution.evaluatedAt) > Date.now()) return { state: "not_evaluated", reasons: ["JUDGE_EXECUTION_NOT_BOUND"] };
   return { state: "admitted", outcome: execution.pass ? "pass" : "fail", calibrationId: standing.id,
     requestSha256: execution.requestSha256, responseSha256: execution.responseSha256 };
+}
+
+export type OperatorCalibrationDraft = NE | { state: "private_review_draft"; publicationApproval: "pending";
+  provider: JudgeBinding["provider"]; record: RegulatedJudgeCalibration; recordSha256: string; markdown: string };
+export type OperatorCalibrationRun = OperatorCalibrationDraft & { calibration?: AuthorizedCalibration };
+
+/** Revalidates the existing native capability and copies its private record; DTO fields grant no authority. */
+function nativeCalibrationReportSnapshot(token: AuthorizedCalibration, current: OperatorCalibrationContext):
+  NE | { state: "current"; provider: JudgeBinding["provider"]; record: RegulatedJudgeCalibration; recordSha256: string } {
+  const standing = calibrationStanding(token, current);
+  if (standing.state !== "eligible") return standing;
+  const native = calibrations.get(token);
+  if (!native) return { state: "not_evaluated", reasons: ["CALIBRATION_TOKEN_UNVERIFIED"] };
+  return { state: "current", provider: native.loaded.binding.provider, recordSha256: hash(native.record),
+    record: JSON.parse(canonicalize(native.record)) as RegulatedJudgeCalibration };
+}
+
+/** One in-process operation; trusted native composition is never deserialized from bundle/CLI JSON. */
+export async function runOperatorCalibration(root: string, current: OperatorCalibrationContext): Promise<OperatorCalibrationRun> {
+  const authority = authorizeCalibrationBundle(root, current);
+  if (authority.state !== "ready") return authority;
+  const result = await calibrateOperatorJudge(authority.authority, current);
+  if (result.state !== "eligible") return result;
+  // This synchronous fresh read and formatting use the private record, never result.record.
+  const draft = renderOperatorCalibrationReport(result.calibration, current);
+  return draft.state === "private_review_draft" ? { ...draft, calibration: result.calibration } : draft;
+}
+
+/** Complete measured review/export, never publication approval or a serialized capability importer. */
+export function renderOperatorCalibrationReport(token: AuthorizedCalibration,
+  current: OperatorCalibrationContext): OperatorCalibrationDraft {
+  const snapshot = nativeCalibrationReportSnapshot(token, current);
+  if (snapshot.state !== "current") return snapshot;
+  const { record, provider, recordSha256 } = snapshot;
+  const value = (input: unknown): string => canonicalize(input).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll("|", "&#124;").replaceAll("`", "&#96;");
+  const rows: Array<[string, unknown]> = [
+    ["Calibration", record.id], ["Scenario", record.scenarioId], ["Provider", provider],
+    ["Model", record.judge.model], ["Prompt SHA-256", record.judge.promptSha256],
+    ["Rubric SHA-256", record.judge.rubricSha256], ["Temperature", record.judge.temperature],
+    ["Gold SHA-256", record.goldSet.sha256], ["Gold-set size", record.goldSet.items],
+    ["Expert minimum", record.minimumGoldSetSize], ["Confusion", record.confusion],
+    ["FPR", record.falsePositiveRate], ["FNR", record.falseNegativeRate],
+    ["FPR Wilson 95%", record.interval95.fpr], ["FNR Wilson 95%", record.interval95.fnr],
+    ["Expert tolerances", record.tolerance], ["Labelled at", record.goldSet.labelledAt],
+    ["Calibrated at", record.calibratedAt], ["Expires at", record.expiresAt], ["Record SHA-256", recordSha256]
+  ];
+  const markdown = ["# PRIVATE judge calibration review draft", "",
+    "Publication approval: **pending**. This private export does not authorize a public write, a regulated pass or a production attack success rate.", "",
+    "Statistics describe captured native judge calls against the exact synthetic gold bytes. Fixture/mock calls in software tests are not real-model measurements or engaged-human review.", "",
+    "| Field | Authenticated value |", "| --- | --- |", ...rows.map(([field, input]) => `| ${field} | \`${value(input)}\` |`), ""].join("\n");
+  return { state: "private_review_draft", publicationApproval: "pending", provider, record, recordSha256, markdown };
 }

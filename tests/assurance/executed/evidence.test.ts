@@ -75,6 +75,18 @@ describe("P2-27 sealed synthetic executed captures", () => {
     expect(loaded.item.attributes.claimKind).toBe("synthetic_example");
   });
 
+  test("preserves the exact native catalog policy digest spelling", () => {
+    const id = session(), native = structuredClone(record);
+    native.binding.policyDigest = `sha256:${record.binding.policyDigest}`;
+    const ref = writeExecutedEvidence(ledger, id, native);
+    ledger.sealSession(id);
+    const loaded = loadExecutedEvidence(ledger, ref, { ...native, sessionId: id });
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) expect(loaded.record.binding.policyDigest).toBe(native.binding.policyDigest);
+    expect(loadExecutedEvidence(ledger, ref, { ...native, sessionId: id,
+      binding: { ...native.binding, policyDigest: record.binding.policyDigest } }).ok).toBe(false);
+  });
+
   test("an unsealed session cannot supply a verified capture", () => {
     const id = session();
     const ref = writeExecutedEvidence(ledger, id, record);

@@ -171,27 +171,10 @@ export class LLMApiClient {
 
     const body = JSON.stringify({ model: request.model, messages,
       temperature: request.temperature, max_tokens: request.maxTokens });
-    // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
-    if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
-    const init: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body,
-      signal: AbortSignal.timeout(this.config.timeout)
-    };
-    const response = this.config.captureWire
-      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
-      : await fetch(url, init);
-
-    if (!response.ok) {
-      if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
-    }
-
-    const decoded = await this.decodeResponse(response, body);
+    const decoded = await this.dispatchProvider(request, url, body, {
+      'Authorization': `Bearer ${this.config.apiKey}`,
+      'Content-Type': 'application/json'
+    }, "OpenAI");
     const data = decoded.data;
     
     return {
@@ -213,28 +196,11 @@ export class LLMApiClient {
 
     const body = JSON.stringify({ model: request.model, messages, system: request.system,
       temperature: request.temperature, max_tokens: request.maxTokens });
-    // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
-    if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
-    const init: RequestInit = {
-      method: 'POST',
-      headers: {
-        'x-api-key': this.config.apiKey,
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
-      },
-      body,
-      signal: AbortSignal.timeout(this.config.timeout)
-    };
-    const response = this.config.captureWire
-      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
-      : await fetch(url, init);
-
-    if (!response.ok) {
-      if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
-      throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`);
-    }
-
-    const decoded = await this.decodeResponse(response, body);
+    const decoded = await this.dispatchProvider(request, url, body, {
+      'x-api-key': this.config.apiKey,
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01'
+    }, "Anthropic");
     const data = decoded.data;
     
     return {
@@ -247,6 +213,22 @@ export class LLMApiClient {
       },
       cost: this.calculateAnthropicCost(request.model, data.usage)
     };
+  }
+
+  /** Shared dispatch keeps the strict guard and native residency check at the actual provider boundary. */
+  private async dispatchProvider(request: LLMRequest, url: string, body: string,
+    headers: Record<string, string>, errorLabel: "OpenAI" | "Anthropic") {
+    // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
+    if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
+    const init: RequestInit = { method: "POST", headers, body, signal: AbortSignal.timeout(this.config.timeout) };
+    const response = this.config.captureWire
+      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
+      : await fetch(url, init);
+    if (!response.ok) {
+      if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
+      throw new Error(`${errorLabel} API error: ${response.status} ${response.statusText}`);
+    }
+    return this.decodeResponse(response, body);
   }
 
   /** Existing calls retain response.json(); strict capture retains at most 4 MiB of wire bytes. */

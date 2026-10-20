@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { listAssurancePacks } from "../src/assurance/packs/index.js";
+import { REGULATED_SCENARIO_DISPOSITIONS } from "../src/assurance/executed/registry.js";
 import { normalizeFrameworkName } from "../src/compliance/frameworks.js";
 import { DOMAIN_REGISTRY, type Domain } from "../src/domains/domainRegistry.js";
 import { getIndustryPacksByStation, listIndustryPacks, type IndustryPack } from "../src/domains/industryPacks.js";
@@ -74,6 +75,12 @@ const F = {
   bridgeAuth: "src/bridge/bridgeAuth.ts",
   receipt: "src/receipts/receipt.ts",
   runner: "src/assurance/assuranceRunner.ts",
+  packExecution: "src/assurance/assurancePackExecution.ts",
+  regulatedExecution: "src/assurance/executed/packExecution.ts",
+  executedRegistry: "src/assurance/executed/registry.ts",
+  executedRoutes: "src/assurance/executed/routes.ts",
+  executedHarness: "src/assurance/executed/harness.ts",
+  compiledExecution: "src/assurance/executed/compiledExecution.ts",
   domainCli: "src/domains/domainCliIntegration.ts",
   cliDomain: "src/cli-domain-product-commands.ts",
   cli: "src/cli.ts",
@@ -116,6 +123,11 @@ function controlsSection(c: Cites): string[] {
   ];
 }
 
+function regulatedAssuranceBoundary(c: Cites): string {
+  const available = REGULATED_SCENARIO_DISPOSITIONS.filter((row) => row.fixtureAvailable).length;
+  return `Across all regulated packs, the source registry retains ${REGULATED_SCENARIO_DISPOSITIONS.length} legacy scenario IDs: ${available} have seeded local adapters ${c.ref("Canonical regulated scenario inventory and adapter availability", F.executedRegistry, "export const REGULATED_SCENARIO_DISPOSITIONS")}; the other ${REGULATED_SCENARIO_DISPOSITIONS.length - available} have no executable adapter ${c.ref("Unavailable adapters refuse scenario compilation", F.executedRoutes, "!disposition.fixtureAvailable")}. Unsupported rows are not evaluated without resolving the responder ${c.ref("Unsupported rows bypass compiled execution and responder resolution", F.regulatedExecution, "unavailableExecutedRow({ scenarioId: scenario.id, reason: selected.reason })")}. Available adapters assess captured effects rather than grade reply prose ${c.ref("Seeded execution assesses the actual scoped capture", F.executedHarness, "const observed = assessScopedCapture(compiled, capture, policy, binding, true)")}. Native regulated rows remain unscored and not evaluated ${c.ref("Native base rows remain unscored and inconclusive", F.compiledExecution, 'inconclusive: true, inconclusiveCause: "ungradable_evidence"', "export function unavailableExecutedRow")}. Local diagnostics are synthetic and ineligible for regulated claims ${c.ref("Synthetic diagnostics cannot become regulated eligible", F.executedHarness, 'claimKind: "synthetic_example", regulatedEligible: false')}; production attack success rate is not measured ${c.ref("Production attack success rate remains unavailable", F.executedHarness, "attackSuccessRate: null")}.`;
+}
+
 function evidenceSection(c: Cites): string[] {
   return [
     "## Evidence outputs",
@@ -124,11 +136,13 @@ function evidenceSection(c: Cites): string[] {
     "|---|---|---|",
     `| Signed receipts | Receipts are minted for LLM requests and responses, tool actions and results, guard checks and accepted wire work, and verified against public keys. | ${c.ref("Receipt kinds", F.receipt, "export type ReceiptKind")} ${c.ref("Receipt minting", F.receipt, "export function mintReceipt")} ${c.ref("Receipt verification", F.receipt, "export function verifyReceipt")} |`,
     `| Tool-call evidence rows | The native toolset records each tool call's evidence row through the session recorder, or appends it to the workspace ledger for a caller without one. | ${c.ref("Tool evidence goes to the recorder or the ledger", F.toolset, "rawLedger().appendEvidence({ sessionId: options.sessionId")} ${c.ref("The session recorder path", F.toolset, "options.recorder.recordProjectedEvidence(row)")} |`,
-    `| Assurance report | \`amc assurance run --agent <id> --pack <packId>\` runs a pack against the agent through its responder. | ${c.ref("CLI usage names --agent and --pack", F.cli, "amc assurance run --agent <id> --pack <packId>")} ${c.ref("CLI calls runAssurance", F.cli, "report = await runAssurance({")} ${c.ref("runAssurance definition", F.runner, "export async function runAssurance")} ${c.ref("Each scenario prompt goes to the responder", F.runner, "await responder.respond(prompt)")} |`,
+    `| Assurance report | \`amc assurance run --agent <id> --pack <packId>\` dispatches generic packs through the responder loop and regulated packs through seeded effect adapters. | ${c.ref("CLI usage names --agent and --pack", F.cli, "amc assurance run --agent <id> --pack <packId>")} ${c.ref("CLI calls runAssurance", F.cli, "report = await runAssurance({")} ${c.ref("runAssurance definition", F.runner, "export async function runAssurance")} ${c.ref("Generic scenario prompts go to the responder", F.packExecution, "await responder.respond(prompt)")} ${c.ref("Regulated packs use the executed effect path", F.packExecution, "return executeRegulatedPack(input, pack)")} |`,
     `| Domain report | The domain report builder writes Markdown when given an output path. | ${c.ref("Domain report builder", F.domainCli, "export function buildDomainReportForAgent")} ${c.ref("Domain report is written atomically", F.domainCli, "writeFileAtomic(outputPath, reportMarkdown)")} |`,
     `| Compliance report | \`amc compliance report --framework <id>\` (alias \`comply\`) writes a Markdown or JSON report; the Markdown appendix states it is not legal advice. | ${c.ref("compliance command and comply alias", F.cli, 'program.command("compliance").alias("comply")')} ${c.ref("Compliance report writer", F.compReport, "export function writeComplianceReport")} ${c.ref("Not-legal-advice line", F.compReport, "This appendix is not legal advice.")} |`,
     `| Audit binder | \`amc audit binder create\` produces a signed \`.amcaudit\` artifact. | ${c.ref("Binder create command", F.cli, "Create deterministic signed .amcaudit artifact")} ${c.ref("Binder create implementation", F.auditCli, "export function auditBinderCreateCli")} ${c.ref("Binder signing", F.binderSigner, "export function signBinderJson")} |`,
     `| Enterprise audit export | Audit records export as Splunk, Datadog, CloudTrail, Azure, Elasticsearch or syslog payloads. \`buildSignedAuditTrail\`, despite its name, attaches an integrity hash and a chain hash over the records and no signature. | ${c.ref("Export formats", F.entExport, "export type EnterpriseAuditExportFormat")} ${c.ref("Audit trail builder", F.entExport, "export function buildSignedAuditTrail")} ${c.ref("Audit trail integrity is a plain hash", F.entExport, "const integrityHash = sha256Hex(JSON.stringify(sorted));")} |`,
+    "",
+    regulatedAssuranceBoundary(c),
     "",
     "No output above was produced for this guide. Each row names the function that produces it.",
     ""
@@ -201,7 +215,7 @@ function stationGuide(station: Domain): { md: string; packs: number; questions: 
   L.push(`Dated entries are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from \`GLOBAL_FRAMEWORKS\` ${c.ref("Register the calendar is generated from", F.globalReg, "export const GLOBAL_FRAMEWORKS")} and the key dates of the sourced register ${c.ref("Sourced regulatory register", F.register, "export const REGULATORY_REGISTER")}.`, "");
 
   L.push("## Assurance packs", "", "### Linked by the station registry", "");
-  L.push(`The station's \`assurancePacks\` field ${R("Station assurancePacks", "assurancePacks:")} lists these packs. "Empty-response passes" counts scenarios whose validator passes an empty string; a nonzero count means the pack can pass without the agent producing anything.`, "");
+  L.push(`The station's \`assurancePacks\` field ${R("Station assurancePacks", "assurancePacks:")} lists these packs. "Empty-response passes" counts scenarios whose legacy callback passes an empty string. This is a callback diagnostic, not an executed fixture result.`, "");
   L.push("| Pack | Title | Scenarios | Empty-response passes |", "|---|---|---|---|");
   for (const id of meta.assurancePacks) { const p = byId.get(id)!; L.push(`| \`${id}\` | ${p.title} | ${p.scenarios.length} | ${emptyPasses(p)} |`); }
   L.push("", "### Registered but not linked", "");
@@ -212,9 +226,9 @@ function stationGuide(station: Domain): { md: string; packs: number; questions: 
     L.push("| Pack | Title | Scenarios | Empty-response passes |", "|---|---|---|---|");
     for (const p of named) L.push(`| \`${p.id}\` | ${p.title} | ${p.scenarios.length} | ${emptyPasses(p)} |`);
   } else L.push("None under that rule.");
-  L.push("", "### How each command grades", "");
-  L.push(`- \`amc domain assurance --agent <id> --domain ${station}\` ${c.ref("Domain assurance command", F.cliDomain, "Run domain-specific assurance packs")} runs the linked packs ${c.ref("Domain assurance runs the registry's packs", F.domainCli, "export function runDomainAssurance")} without invoking any agent, so every pack is reported not evaluated ${c.ref("Without an agent each pack is not evaluated", F.domainCli, 'status: "not_evaluated", reason: NO_AGENT_INVOKED')}. With \`--example\` it grades a built-in synthetic reply ${c.ref("Example mode grades the built-in reply", F.domainCli, "scenario.validate(EXAMPLE_ASSURANCE_REPLY")}; that output is a labelled synthetic example and never evidence about the agent.`);
-  L.push("- `amc assurance run --agent <id> --pack <packId>` sends each scenario prompt to the agent through its responder and grades the answer; see Evidence outputs below.", "");
+  L.push("", "### How each command runs", "");
+  L.push(`- \`amc domain assurance --agent <id> --domain ${station}\` ${c.ref("Domain assurance command", F.cliDomain, "Run domain-specific assurance packs")} runs the linked packs ${c.ref("Domain assurance runs the registry's packs", F.domainCli, "export function runDomainAssurance")} without invoking any agent, so every pack is reported not evaluated ${c.ref("Without an agent each pack is not evaluated", F.domainCli, 'status: "not_evaluated", reason: NO_AGENT_INVOKED')}. With \`--example\` it applies legacy callbacks to a built-in synthetic reply ${c.ref("Example mode invokes legacy callbacks on the built-in reply", F.domainCli, "scenario.validate(EXAMPLE_ASSURANCE_REPLY")}; that output is a labelled synthetic example and never evidence about the agent.`);
+  L.push("- `amc assurance run --agent <id> --pack <packId>` uses reply grading for generic packs and captured-effect execution for available regulated adapters; see Evidence outputs and its synthetic evidence limits below.", "");
 
   L.push(...controlsSection(c));
   L.push(...evidenceSection(c));
@@ -276,9 +290,10 @@ function readme(totals: Record<string, { packs: number; questions: number }>): s
   L.push("- `tests/industryGuides.test.ts` re-derives every pack, question and scenario count from source, and fails when an appendix row's text is no longer in its file. Rows cite a symbol or text, never a line number, so edits elsewhere in a file do not break them.");
   L.push(`- [The regulatory calendar](../REGULATORY_CALENDAR.md) is generated from \`GLOBAL_FRAMEWORKS\` ${c.ref("Calendar register", F.globalReg, "export const GLOBAL_FRAMEWORKS")} and the sourced register's key dates ${c.ref("Sourced regulatory register", F.register, "export const REGULATORY_REGISTER")} by \`node scripts/gen-regulatory-calendar.mjs\`; \`npm run check:regulatory-calendar\` fails when the page and its sources disagree.`, "");
   L.push("## Shared caveats", "");
-  L.push("- Pack questions and these guides are AI-drafted and experimental: no qualified expert has reviewed them, and nothing in them is evaluated until an operator answers a pack.");
+  L.push("- Pack questions and these guides are AI-drafted and experimental: no qualified expert has reviewed them. Questionnaire answers remain self-reported; separate seeded assurance adapters do not promote the questionnaire content or its review status.");
   L.push("- Deployment controls and evidence outputs do not vary by station in source; each guide repeats them so it stands alone.");
-  L.push(`- \`amc domain assurance\` invokes no agent and reports every pack not evaluated ${c.ref("Without an agent each pack is not evaluated", F.domainCli, 'status: "not_evaluated", reason: NO_AGENT_INVOKED')}; use \`amc assurance run --agent <id> --pack <packId>\` to grade the agent ${c.ref("Each scenario prompt goes to the responder", F.runner, "await responder.respond(prompt)")}.`);
+  L.push(`- \`amc domain assurance\` invokes no agent and reports every pack not evaluated ${c.ref("Without an agent each pack is not evaluated", F.domainCli, 'status: "not_evaluated", reason: NO_AGENT_INVOKED')}; \`amc assurance run --agent <id> --pack <packId>\` uses the generic responder loop ${c.ref("Generic scenario prompts go to the responder", F.packExecution, "await responder.respond(prompt)")} or the regulated effect path ${c.ref("Regulated packs use the executed effect path", F.packExecution, "return executeRegulatedPack(input, pack)")}.`);
+  L.push(`- ${regulatedAssuranceBoundary(c)}`);
   L.push("", ...appendix(c));
   return L.join("\n").trimEnd() + "\n";
 }

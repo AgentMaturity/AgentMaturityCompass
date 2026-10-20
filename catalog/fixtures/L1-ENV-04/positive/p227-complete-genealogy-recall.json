@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-04",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "ENV-FF-16",
+      "environmentId": "recall-v1",
+      "caseId": "p227-complete-genealogy-recall"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

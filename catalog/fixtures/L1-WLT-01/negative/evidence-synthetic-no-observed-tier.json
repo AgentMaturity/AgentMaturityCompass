@@ -1,0 +1,63 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-01",
+  "polarity": "negative",
+  "evidenceClass": "unknown_authority",
+  "setup": {
+    "harness": "evidence",
+    "synthetic": true,
+    "scopeNote": "Native P1-11 admission contract fixture only. Supplied unit-test metadata does not attest a real captured drill, production enforcement, clinical or legal adequacy. Applicability is deliberately set applicable in this test to prove the absent tier blocks a positive result independently of the disabled deployment predicate.",
+    "window": {
+      "start": "2026-10-20T00:00:00.000Z",
+      "end": "2026-10-20T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "ledger_event",
+          "id": "L1-WLT-01-synthetic-null-tier-unit-case"
+        },
+        "producerId": "amc.assurance.executed",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.assurance.executed",
+          "trustTier": null
+        },
+        "recordedAt": "2026-10-20T10:00:00.000Z",
+        "binding": {
+          "tenantId": "tenant-a",
+          "workspaceId": "ws-a",
+          "deploymentId": "dep-a",
+          "agentId": "agent-1",
+          "controlId": "L1-WLT-01",
+          "controlVersion": "0.1.0",
+          "sessionId": "p227-unit-fixture-session",
+          "policyDigest": "sha256:fixture-policy",
+          "producerId": "amc.assurance.executed"
+        },
+        "verdict": "neutral",
+        "attributes": {
+          "synthetic": true,
+          "fixtureOnly": true
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_unverified"
+  }
+}

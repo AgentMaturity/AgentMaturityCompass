@@ -1,3 +1,7 @@
+import type { LoadedCatalog } from "../catalog/loader.js";
+import type { ExecutedRunScope } from "./executed/reportTypes.js";
+import { INDUSTRY_ASSURANCE_PACK_IDS } from "../domains/domainRegistry.js";
+import { executeRegulatedPack } from "./executed/packExecution.js";
 import type { AssurancePackResult, AssuranceScenarioResult, TrustTier } from "../types.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { AgentResponderInvocationError, type AgentResponder } from "./agentResponder.js";
@@ -16,18 +20,25 @@ export interface PackExecutionInput {
   mode: "sandbox" | "supervise";
   trustTier: TrustTier;
   context: AssurancePromptContext;
-  responder: AgentResponder;
+  getResponder: () => Promise<AgentResponder>;
+  getExecutedScope: () => ExecutedRunScope | null;
+  getCatalog: () => LoadedCatalog;
+  executedAttempts?: 1 | 25;
+  now: string;
 }
 
 /** Executes one pack; the run owns session lifetime and aggregates its unscored rows. */
 export async function executeAssurancePack(input: PackExecutionInput): Promise<AssurancePackResult> {
-  const { packId, ledger, sessionId, agentId, runId, trustTier, context, responder } = input;
+  const { packId, ledger, sessionId, agentId, runId, trustTier, context } = input;
   const pack = getAssurancePack(packId);
+  if (INDUSTRY_ASSURANCE_PACK_IDS.some(id => id === pack.id)) return executeRegulatedPack(input, pack);
   const scenarioResults: AssuranceScenarioResult[] = [];
 
   for (const scenario of pack.scenarios) {
     const prompt = scenario.buildPrompt(context);
     const runtime = input.mode === "sandbox" ? "sandbox" : "any";
+    // Resolve only for a real generic scenario, before recording a prompt to an unavailable target.
+    const responder = await input.getResponder();
     const promptEventId = writeScenarioPrompt({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id, prompt, agentId });
     const row = {
       scenarioId: scenario.id,
@@ -46,7 +57,6 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
         auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
     };
 
-    // Invoke the real agent under test.
     const answer = await responder.respond(prompt).catch((error: unknown) => {
       if (!(error instanceof AgentResponderInvocationError)) throw error;
       return error;

@@ -1,3 +1,4 @@
+import type { ExecutedRunScope, ExecutedScenarioRunReport } from "./assurance/executed/reportTypes.js";
 // "amc" is a session AMC ran natively through its own agent loop (SessionService)
 // — as opposed to "claude"/"gemini"/"openclaw"/"pi", which mean AMC observed or
 // controlled an external agent of that kind, or "gateway"/"sandbox", the
@@ -3414,6 +3415,8 @@ export interface GatePolicy {
 }
 
 export interface AssuranceScenarioResult {
+  /** Authenticated synthetic fixture diagnostics; never a regulated assurance pass. */
+  executed?: ExecutedScenarioRunReport;
   scenarioId: string;
   title: string;
   category: string;
@@ -3450,6 +3453,8 @@ export interface AssuranceScenarioResult {
 export type AssuranceGradingMethod = "keyword" | "token-claim" | "structured" | "executed";
 
 export interface AssurancePackResult {
+  /** Fixed reason when an entire pack could not be executed. */
+  notEvaluatedReason?: string;
   packId: string;
   title: string;
   scenarioCount: number;
@@ -3465,6 +3470,8 @@ export interface AssurancePackResult {
 }
 
 export interface AssuranceReport {
+  /** Native policy/profile subject used for synthetic fixture captures. */
+  executedScope?: ExecutedRunScope;
   assuranceRunId: string;
   agentId: string;
   /**
