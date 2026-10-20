@@ -171,15 +171,13 @@ import { driftCheckCli } from "../drift/driftCli.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
 import {
-  addUser,
+  addUserAsync, revokeUserAsync, setUserRolesAsync, createUsersMutationGuard, publicUsersMutationRecord, respondUsersMutationError,
   authenticateUser,
   clearSessionCookie,
-  createSession,
+  createSessionAsync,
   listUsers as listHumanUsers,
-  revokeUser,
   revokeSessionByToken,
   sessionFromRequest,
-  setUserRoles,
   setSessionCookie,
   verifyUsersConfigSignature
 } from "../auth/authApi.js";
@@ -187,7 +185,7 @@ import { parseCookieHeader } from "../auth/sessionTokens.js";
 import { enforceRoleOrAdmin, hasAnyRole, type AccessContext } from "../auth/rbac.js";
 import type { UserRole } from "../auth/roles.js";
 import { parseUserRoles } from "../auth/roles.js";
-import { claimPairingForResponse, clearPairingCookie, pairingCookieValid } from "../pairing/pairingApi.js";
+import { claimPairingForResponseAsync, clearPairingCookie, pairingCookieValid } from "../pairing/pairingApi.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { createPairingCode } from "../pairing/pairingCodes.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -1987,7 +1985,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "pairing code is required" });
           return;
         }
-        const claimed = claimPairingForResponse({
+        const claimed = await claimPairingForResponseAsync({
           workspace: options.workspace,
           code: parsed.code.trim(),
           res,
@@ -2054,7 +2052,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: authUser.error ?? "invalid credentials" });
           return;
         }
-        const session = createSession({
+        const session = await createSessionAsync({
           workspace: options.workspace,
           user: authUser.user
         });
@@ -2260,6 +2258,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
+      const assertUsersMutationAuthorized = createUsersMutationGuard({ workspace: options.workspace, expected: auth,
+        authenticate: () => authenticate(req, options.workspace, options.token), access: accessContext, readOnly: () => requiresReadOnlyMode(options.workspace) });
 
       const requireUnlockedVaultForSigning = (): boolean => {
         if (vaultStatus(options.workspace).unlocked) return true;
@@ -2421,6 +2421,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           pinnedFingerprint: null,
           currentFingerprint: null,
           attestationLevel: null,
+          attestationBasis: null,
           requiredAttestationLevel: null,
           lastAttestationTs: null
         }));
@@ -2519,6 +2520,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             pinnedFingerprint: trust.pinnedFingerprint,
             currentFingerprint: trust.currentFingerprint,
             attestationLevel: trust.attestationLevel,
+            attestationBasis: trust.attestationBasis,
             requiredAttestationLevel: trust.requiredAttestationLevel,
             lastAttestationTs: trust.lastAttestationTs
           }
@@ -2540,6 +2542,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           pinnedFingerprint: null,
           currentFingerprint: null,
           attestationLevel: null,
+          attestationBasis: null,
           requiredAttestationLevel: null,
           lastAttestationTs: null
         }));
@@ -5490,12 +5493,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username, password, roles are required" });
           return;
         }
-        const user = addUser({
+        const user = await addUserAsync({
           workspace: options.workspace,
           username: parsed.username,
           password: parsed.password,
           roles: parseUserRoles(parsed.roles)
-        });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
         json(res, 200, {
           user: {
             userId: user.userId,
@@ -5521,11 +5524,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username is required" });
           return;
         }
-        const user = revokeUser({
+        const user = await revokeUserAsync({
           workspace: options.workspace,
           username: parsed.username
-        });
-        json(res, 200, { user });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
+        json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }
 
@@ -5543,12 +5546,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username and roles are required" });
           return;
         }
-        const user = setUserRoles({
+        const user = await setUserRolesAsync({
           workspace: options.workspace,
           username: parsed.username,
           roles: parseUserRoles(parsed.roles)
-        });
-        json(res, 200, { user });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
+        json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }
 
@@ -8794,6 +8797,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         json(res, 400, { error: "invalid JSON body" });
         return;
       }
+      if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
       json(res, 500, { error: "internal server error" });
     }
   });

@@ -8,7 +8,7 @@
  * a lease file that is not mode 0600, and a control manifest without the receipt keys AMC pinned at install. Those
  * keys are workspace keys: a verified receipt is a local audit trail, not a portable verdict.
  */
-import { verify } from "node:crypto";
+import { verifyWithKey } from "../../keys/algorithmPolicy.js";
 import { readFileSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { sha256Hex } from "../../utils/hash.js";
@@ -103,13 +103,13 @@ function nonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.length > 0;
 }
 
-/** The payload of a receipt that verifies under one of `publicKeys` (Ed25519 over the payload bytes), or a throw. */
+/** The payload of a receipt that verifies under one of the pinned receipt keys, over the received payload bytes, or a throw. */
 function verifiedReceiptPayload(receipt: unknown, publicKeys: readonly string[]): Record<string, unknown> {
   const parts = typeof receipt === "string" ? receipt.split(".") : [];
   if (parts.length !== 2 || !parts[0] || !parts[1]) throw new Error("AMC decision receipt is malformed");
   const payload = Buffer.from(parts[0], "base64url");
   const signature = Buffer.from(parts[1], "base64url");
-  if (!publicKeys.some((key) => verify(null, payload, key, signature))) throw new Error("AMC decision receipt signature does not verify");
+  if (!publicKeys.some((key) => verifyWithKey(payload, key, signature))) throw new Error("AMC decision receipt signature does not verify");
   return JSON.parse(payload.toString("utf8")) as Record<string, unknown>;
 }
 

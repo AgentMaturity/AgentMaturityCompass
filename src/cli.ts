@@ -35,7 +35,7 @@ import {
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
-import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig, signAmcConfig } from "./workspace.js";
+import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfigAsync, signAmcConfigAsync } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
@@ -229,8 +229,8 @@ import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerNativeProviderCommands } from "./cli-agent-options.js";
 import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
-import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
-import { generateTrustCertificate } from "./cert/trustCertificate.js";
+import { issueCertificate, inspectCertificate, revokeCertificateAsync, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
+import { generateTrustCertificateAsync } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
 import {
   assuranceApplyPolicyCli,
@@ -314,20 +314,20 @@ import {
   runGovernorCheck
 } from "./governor/governorCli.js";
 import {
-  initActionPolicy,
+  initActionPolicy, initActionPolicyAsync,
   verifyActionPolicySignature
 } from "./governor/actionPolicyEngine.js";
 import { initToolhubConfig } from "./toolhub/toolhubCli.js";
 import { registerToolsCommands } from "./cli-tools-commands.js";
 import { parseActionClasses, parseRiskTier } from "./workorders/workorderCli.js";
 import {
-  createWorkOrder,
-  expireWorkOrder,
+  createWorkOrderAsync,
+  expireWorkOrderAsync,
   listWorkOrders,
   loadWorkOrder,
   verifyWorkOrder
 } from "./workorders/workorderEngine.js";
-import { issueExecTicket, verifyExecTicket } from "./tickets/execTicketVerify.js";
+import { issueExecTicketAsync, verifyExecTicket } from "./tickets/execTicketVerify.js";
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
 import { registerBudgetCommands } from "./cli-budget-commands.js";
 import { driftCheckCli, driftReportCli, freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
@@ -417,11 +417,11 @@ import {
 import { request as httpRequest } from "node:http";
 import {
   parseRolesCsv,
-  userAddCli,
-  userInitCli,
+  userAddCliAsync as userAddCli,
+  userInitCliAsync as userInitCli,
   userListCli,
-  userRevokeCli,
-  userRoleSetCli,
+  userRevokeCliAsync as userRevokeCli,
+  userRoleSetCliAsync as userRoleSetCli,
   userVerifyCli
 } from "./auth/authCli.js";
 import { verifyUsersConfigSignature } from "./auth/authApi.js";
@@ -501,7 +501,7 @@ import {
   outcomesAttestCli,
   outcomesDiffCli,
   outcomesFleetReportCli,
-  outcomesInitCli,
+  outcomesInitCliAsync,
   outcomesReportCli,
   outcomesVerifyCli
 } from "./outcomes/outcomeCli.js";
@@ -645,13 +645,13 @@ import {
   transformVerifyCli
 } from "./transformation/transformCli.js";
 import {
-  notaryAttestCli,
+  notaryAttestCliAsync as notaryAttestCli,
   notaryInitCli,
   notaryInitInteractiveCli,
   notaryLogVerifyCli,
-  notaryPubkeyCli,
-  notarySignCli,
-  notaryStatusCli,
+  notaryPubkeyCliAsync as notaryPubkeyCli,
+  notarySignCliAsync as notarySignCli,
+  notaryStatusCliAsync as notaryStatusCli,
   notaryVerifyAttestCli
 } from "./notary/notaryCli.js";
 import { registerNotaryStartCommand } from "./cli-notary-commands.js";
@@ -706,7 +706,7 @@ import {
 import {
   normalizePluginRef,
   pluginExecuteCli,
-  pluginInitCli,
+  pluginInitCliAsync,
   pluginInstallCli,
   pluginKeygenCli,
   pluginListCli,
@@ -2180,7 +2180,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   if (opts.trustBoundary) {
     profiled.security.trustBoundaryMode = opts.trustBoundary;
   }
-  saveAMCConfig(process.cwd(), profiled);
+  await saveAMCConfigAsync(process.cwd(), profiled);
 
   const fmt = await import("./cliFormat.js");
   console.log(fmt.logo());
@@ -2286,7 +2286,7 @@ program
     if (opts.trustBoundary) {
       profiled.security.trustBoundaryMode = opts.trustBoundary;
     }
-    saveAMCConfig(process.cwd(), profiled);
+    await saveAMCConfigAsync(process.cwd(), profiled);
     const fmt = await import("./cliFormat.js");
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
@@ -3963,6 +3963,7 @@ program
       pinnedFingerprint: null,
       currentFingerprint: null,
       attestationLevel: null,
+      attestationBasis: null,
       requiredAttestationLevel: null,
       lastAttestationTs: null
     }));
@@ -3971,7 +3972,7 @@ program
     if (trustCheck.mode === "NOTARY") {
       console.log(`Notary reachable: ${trustCheck.notaryReachable ? "yes" : "no"}`);
       console.log(`Notary fingerprint: pinned=${trustCheck.pinnedFingerprint ?? "n/a"} current=${trustCheck.currentFingerprint ?? "n/a"}`);
-      console.log(`Notary attestation: current=${trustCheck.attestationLevel ?? "n/a"} required=${trustCheck.requiredAttestationLevel ?? "n/a"}`);
+      console.log(`Notary attestation: current=${trustCheck.attestationLevel ?? "n/a"} basis=${trustCheck.attestationBasis ?? "unknown"} required=${trustCheck.requiredAttestationLevel ?? "n/a"}`);
       if (trustCheck.lastAttestationTs) {
         console.log(`Notary last attestation: ${new Date(trustCheck.lastAttestationTs).toISOString()}`);
       }
@@ -4063,7 +4064,7 @@ configCmd
 configCmd
   .command("profile [name]")
   .description("Print or apply workspace config profile (dev|ci|prod)")
-  .action((name?: "dev" | "ci" | "prod") => {
+  .action(async (name?: "dev" | "ci" | "prod") => {
     const current = loadAMCConfig(process.cwd());
     if (!name) {
       console.log(chalk.hex('#4AEF79')(`Active workspace config profile: ${current.profile ?? "dev"}`));
@@ -4073,7 +4074,7 @@ configCmd
       return;
     }
     const next = applyAMCConfigProfile(name, current);
-    saveAMCConfig(process.cwd(), next);
+    await saveAMCConfigAsync(process.cwd(), next);
     console.log(chalk.green(`✓ Applied workspace config profile: ${name}`));
     console.log(chalk.gray(`  Wrote .amc/amc.config.yaml`));
     console.log(chalk.gray(`  trustBoundaryMode=${next.security.trustBoundaryMode}`));
@@ -4719,8 +4720,8 @@ plugin
 plugin
   .command("init")
   .description("Initialize signed plugin workspace files")
-  .action(() => {
-    const out = pluginInitCli(process.cwd());
+  .action(async () => {
+    const out = await pluginInitCliAsync(process.cwd());
     console.log(chalk.green("Plugin workspace initialized"));
     console.log(`registries: ${out.registriesPath}`);
     console.log(`registries.sig: ${out.registriesSigPath}`);
@@ -6217,7 +6218,7 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
   .option("--dry-run", "With --relabel-legacy: print what would be recorded and write nothing", false)
   .option("--path <file>", "With --relabel-legacy: also classify this file (repeatable)", (value: string, previous: string[]) => [...previous, value], [] as string[])
   .action(async (opts: { repair: boolean; apply: boolean; yes: boolean; signConfig: boolean; relabelLegacy: boolean; dryRun: boolean; path: string[] } & TrustFlags) => {
-    if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
+    if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${await signAmcConfigAsync(process.cwd())}`); return; }
     if (opts.relabelLegacy && opts.repair) { console.error("--relabel-legacy cannot be combined with --repair"); process.exit(2); }
     if (!opts.relabelLegacy && (opts.dryRun || opts.path.length > 0)) { console.error("--dry-run and --path only work with --relabel-legacy"); process.exit(2); }
     if (opts.repair) {
@@ -7563,8 +7564,8 @@ registerActionEvidenceLogicCommands(policyAction);
 policyAction
   .command("init")
   .description("Create and sign .amc/action-policy.yaml")
-  .action(() => {
-    const created = initActionPolicy(process.cwd());
+  .action(async () => {
+    const created = await initActionPolicyAsync(process.cwd());
     console.log(chalk.green(`Action policy created: ${created.policyPath}`));
     console.log(`Signature: ${created.signaturePath}`);
   });
@@ -9461,7 +9462,7 @@ workorder
       ]);
       description = answer.description;
     }
-    const created = createWorkOrder({
+    const created = await createWorkOrderAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       title: opts.title!,
@@ -9533,8 +9534,8 @@ workorder
   .argument("<workOrderId>")
   .option("--reason <text>", "reason")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((workOrderId: string, opts: { reason?: string; agent?: string }) => {
-    const expired = expireWorkOrder({
+  .action(async (workOrderId: string, opts: { reason?: string; agent?: string }) => {
+    const expired = await expireWorkOrderAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       workOrderId,
@@ -9553,9 +9554,9 @@ ticket
   .option("--tool <name>", "restrict ticket to a tool")
   .option("--ttl <ttl>", "ticket TTL (e.g. 15m, 1h)", "15m")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { workorder: string; action: string; tool?: string; ttl: string; agent?: string }) => {
+  .action(async (opts: { workorder: string; action: string; tool?: string; ttl: string; agent?: string }) => {
     const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program));
-    const issued = issueExecTicket({
+    const issued = await issueExecTicketAsync({
       workspace: process.cwd(),
       agentId,
       workOrderId: opts.workorder,
@@ -11427,7 +11428,7 @@ cert
       throw new Error("--valid-days must be a positive number.");
     }
     const preview = opts.sign === false || opts.preview === true;
-    const generated = generateTrustCertificate({
+    const generated = await generateTrustCertificateAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       outputPath: opts.output,
@@ -11557,8 +11558,8 @@ cert
   .requiredOption("--reason <text>", "revocation reason")
   .requiredOption("--cert <file>", "certificate file")
   .requiredOption("--out <file>", "output .amcrevoke file")
-  .action((opts: { reason: string; cert: string; out: string }) => {
-    const revoked = revokeCertificate({
+  .action(async (opts: { reason: string; cert: string; out: string }) => {
+    const revoked = await revokeCertificateAsync({
       workspace: process.cwd(),
       certFile: resolve(process.cwd(), opts.cert),
       reason: opts.reason,
@@ -11654,8 +11655,8 @@ notary
   .command("status")
   .description("Show notary backend and log status")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { notaryDir?: string }) => {
-    const status = notaryStatusCli({ notaryDir: opts.notaryDir });
+  .action(async (opts: { notaryDir?: string }) => {
+    const status = await notaryStatusCli({ notaryDir: opts.notaryDir });
     console.log(`notaryDir=${status.notaryDir}`);
     console.log(`config=${status.configPath}`);
     console.log(`backend=${status.backend}`);
@@ -11674,8 +11675,8 @@ notary
   .command("pubkey")
   .description("Print notary public key and fingerprint")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { notaryDir?: string }) => {
-    const out = notaryPubkeyCli({ notaryDir: opts.notaryDir });
+  .action(async (opts: { notaryDir?: string }) => {
+    const out = await notaryPubkeyCli({ notaryDir: opts.notaryDir });
     console.log(`notaryDir=${out.notaryDir}`);
     console.log(`fingerprint=${out.fingerprint}`);
     console.log(out.pubkeyPem);
@@ -11687,8 +11688,8 @@ notary
   .requiredOption("--out <file>", "output file path")
   .option("--notary-dir <dir>", "notary data directory")
   .option("--workspace <dir>", "workspace path for config snapshot", process.cwd())
-  .action((opts: { out: string; notaryDir?: string; workspace?: string }) => {
-    const out = notaryAttestCli({
+  .action(async (opts: { out: string; notaryDir?: string; workspace?: string }) => {
+    const out = await notaryAttestCli({
       notaryDir: opts.notaryDir,
       workspace: opts.workspace ?? process.cwd(),
       outFile: opts.out
@@ -11714,8 +11715,8 @@ notary
   .requiredOption("--in <file>", "input file")
   .requiredOption("--out <file>", "output signature JSON")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { kind: string; in: string; out: string; notaryDir?: string }) => {
-    const out = notarySignCli({
+  .action(async (opts: { kind: string; in: string; out: string; notaryDir?: string }) => {
+    const out = await notarySignCli({
       notaryDir: opts.notaryDir,
       kind: opts.kind,
       inFile: opts.in,
@@ -11811,6 +11812,7 @@ trust
       pinnedFingerprint: trustCfg.trust.mode === "NOTARY" ? trustCfg.trust.notary.pinnedPubkeyFingerprint : null,
       currentFingerprint: null,
       attestationLevel: null,
+      attestationBasis: null,
       requiredAttestationLevel: trustCfg.trust.mode === "NOTARY" ? trustCfg.trust.notary.requiredAttestationLevel : null,
       lastAttestationTs: null
     }));
@@ -11824,6 +11826,7 @@ trust
     console.log(`pinnedFingerprint=${status.pinnedFingerprint ?? "n/a"}`);
     console.log(`currentFingerprint=${status.currentFingerprint ?? "n/a"}`);
     console.log(`attestationLevel=${status.attestationLevel ?? "n/a"}`);
+    console.log(`attestationBasis=${status.attestationBasis ?? "unknown"}`);
     console.log(`requiredAttestationLevel=${status.requiredAttestationLevel ?? "n/a"}`);
     if (status.lastAttestationTs) {
       console.log(`lastAttestationTs=${new Date(status.lastAttestationTs).toISOString()}`);
@@ -11914,7 +11917,7 @@ user
         mask: "*"
       }
     ]);
-    const created = userInitCli({
+    const created = await userInitCli({
       workspace: process.cwd(),
       username: opts.username,
       password: passwordAnswer.password
@@ -11938,7 +11941,7 @@ user
         mask: "*"
       }
     ]);
-    const created = userAddCli({
+    const created = await userAddCli({
       workspace: process.cwd(),
       username: opts.username,
       roles: parseRolesCsv(opts.role),
@@ -11966,8 +11969,8 @@ user
   .command("revoke")
   .description("Revoke a user account")
   .argument("<username>")
-  .action((username: string) => {
-    const out = userRevokeCli({
+  .action(async (username: string) => {
+    const out = await userRevokeCli({
       workspace: process.cwd(),
       username
     });
@@ -11981,8 +11984,8 @@ user
   .description("Replace roles for a user")
   .argument("<username>")
   .requiredOption("--roles <roles>", "comma-separated roles")
-  .action((username: string, opts: { roles: string }) => {
-    const out = userRoleSetCli({
+  .action(async (username: string, opts: { roles: string }) => {
+    const out = await userRoleSetCli({
       workspace: process.cwd(),
       username,
       roles: parseRolesCsv(opts.roles)
@@ -13063,8 +13066,8 @@ outcomes
   .description("Create and sign outcome contract")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--archetype <id>", "optional archetype hint")
-  .action((opts: { agent?: string; archetype?: string }) => {
-    const out = outcomesInitCli({
+  .action(async (opts: { agent?: string; archetype?: string }) => {
+    const out = await outcomesInitCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       archetype: opts.archetype
@@ -15942,9 +15945,9 @@ program
   .requiredOption("--action <desc>", "description of what the override allows")
   .option("--ttl <ms>", "TTL in milliseconds", "3600000")
   .action(async (opts: { agent?: string; reason: string; action: string; ttl: string }) => {
-    const { activateEmergencyOverride } = await import("./governor/policyCanary.js");
+    const { activateEmergencyOverrideAsync } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const override = activateEmergencyOverride({
+    const override = await activateEmergencyOverrideAsync({
       agentId,
       reason: opts.reason,
       actionDescription: opts.action,
@@ -19668,10 +19671,10 @@ program
   .option("--ttl <ttl>", "TTL (e.g., 4h)", "4h")
   .option("--mode <mode>", "execute or dry-run", "dry-run")
   .action(async (opts: { agent?: string; reason: string; ttl: string; mode: string }) => {
-    const { activateOverride, renderOverrideMarkdown } = await import("./governor/emergencyOverride.js");
+    const { activateOverrideAsync, renderOverrideMarkdown } = await import("./governor/emergencyOverride.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const ttlMs = parseWindowToMs(opts.ttl);
-    const entry = activateOverride(process.cwd(), {
+    const entry = await activateOverrideAsync(process.cwd(), {
       agentId,
       reason: opts.reason,
       ttlMs,
@@ -24187,11 +24190,11 @@ program
     try {
       const ws = await quickstartWizard(process.cwd());
       const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-      saveAMCConfig(process.cwd(), profiled);
+      await saveAMCConfigAsync(process.cwd(), profiled);
       console.log(chalk.green("  ✓ Workspace initialized"));
       console.log(chalk.gray(`    Profile: ${opts.profile}`));
       console.log(chalk.gray(`    Gateway: ${ws.nextGatewayCommand}`));
-    } catch { console.log(chalk.green("  ✓ Workspace already configured")); }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exitCode = 1; return; }
 
     // Step 2: Quick Score
     console.log(chalk.hex('#4AEF79')("\nStep 2: Quick Score Assessment (10 questions)\n"));

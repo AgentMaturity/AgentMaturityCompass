@@ -25,6 +25,7 @@ import {
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
   filePostmortem,
   getOverridesMissingPostmortem,
@@ -37,6 +38,7 @@ export {
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
   filePostmortem,
   getOverridesMissingPostmortem

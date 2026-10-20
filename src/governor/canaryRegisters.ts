@@ -12,7 +12,8 @@ import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
-import { BreakGlassSigningError, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
+import { BreakGlassSigningError, prepareOverrideDigestSignature, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
+import { canaryOverrideDigest as overrideDigest, publishCanaryOverride, withCanaryOverridePublicationLock } from "./canaryOverridePublication.js";
 import { saveWorkspaceRecord, loadWorkspaceRecords } from "../storage/workspaceRecordStore.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // policyCanary.ts, which imports the values from here.
@@ -108,12 +109,6 @@ export function getLatestRollbackPack(agentId: string, workspace?: string): Roll
 // workspace, and an in-process cache not keyed by workspace leaked one
 // workspace's overrides into another's report, where they failed verification.
 
-/** The signed activation-time fields; postmortem fields change later. */
-function overrideDigest(o: EmergencyOverride): string {
-  const { overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs } = o;
-  return sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs }));
-}
-
 function isVerified(o: EmergencyOverride, workspace?: string): boolean {
   return workspace !== undefined && verifyOverrideDigest(workspace, overrideDigest(o), o.signature).valid;
 }
@@ -123,7 +118,7 @@ function isVerified(o: EmergencyOverride, workspace?: string): boolean {
  * override's signature is persisted as `override_signature` and restored on load.
  */
 function persistOverride(workspace: string, o: EmergencyOverride, now: number): void {
-  saveWorkspaceRecord(workspace, OVERRIDES_AT, o.overrideId, { ...o, override_signature: o.signature }, now);
+  withCanaryOverridePublicationLock(workspace, () => saveWorkspaceRecord(workspace, OVERRIDES_AT, o.overrideId, { ...o, override_signature: o.signature }, now));
 }
 
 /**
@@ -166,6 +161,18 @@ export function activateEmergencyOverride(
 
   persistOverride(workspace, override, now);
   return override;
+}
+
+/** Actual runtime activation: config-purpose domain signature and artifact-purpose record signature both precede publication. */
+export async function activateEmergencyOverrideAsync(params: Parameters<typeof activateEmergencyOverride>[0], workspace?: string): Promise<EmergencyOverride> {
+  if (workspace === undefined) throw new BreakGlassSigningError("Emergency override requires a workspace with an auditor signing key");
+  const input = { ...params }, now = Date.now();
+  if (!Number.isFinite(input.ttlMs) || input.ttlMs <= 0) throw new Error("canary override TTL must be finite and positive");
+  const body = { overrideId: `emo_${randomUUID().slice(0, 12)}`, agentId: input.agentId, reason: input.reason,
+    actionDescription: input.actionDescription, ttlMs: input.ttlMs, startedTs: now, expiresTs: now + input.ttlMs };
+  const prepared = await prepareOverrideDigestSignature(workspace, overrideDigest(body));
+  const override: EmergencyOverride = { ...body, postmortemFiled: false, postmortemArtifactId: null, signature: prepared.signed.signature.toString("base64") };
+  return publishCanaryOverride(workspace, override, prepared);
 }
 
 /** The workspace's stored overrides, verified or not; none without a workspace (not evaluated). */

@@ -60,8 +60,8 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   const explicitPins: TrustPin[] = [];
   if (opts.pubkey) {
     const pem = boundedFile(opts.pubkey.path, 64 * 1024).toString("utf8");
-    const keyId = ed25519KeyId(pem);
-    if (keyId === null) throw new Error(`--pubkey ${opts.pubkey.path} is not an Ed25519 SPKI public key`);
+    const keyId = signingKeyId(pem);
+    if (keyId === null) throw new Error(`--pubkey ${opts.pubkey.path} is not an Ed25519 or ECDSA P-256 SPKI public key`);
     explicitPins.push({ keyId, purposes: [...opts.pubkey.purposes], origin: `--pubkey ${opts.pubkey.path}` });
   }
   const monitor = opts.expectMonitor !== undefined

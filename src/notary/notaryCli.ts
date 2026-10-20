@@ -11,14 +11,15 @@ import {
   notaryPublicKeyPath,
   resolveNotaryDir
 } from "./notaryConfigStore.js";
-import { initFileSealedNotaryKey, loadNotarySigner, notarySignResponse } from "./notarySigner.js";
-import { appendNotaryLogEntry, initNotaryLog, tailNotaryLog, verifyNotaryLog } from "./notaryLog.js";
-import { exportNotaryAttestationBundle, verifyNotaryAttestationBundle } from "./notaryAttestation.js";
+import { initFileSealedNotaryKey, loadNotarySigner, loadNotarySignerAsync, notarySignResponse } from "./notarySigner.js";
+import { appendNotaryLogEntry, appendNotaryLogEntryAsync, initNotaryLogAsync, tailNotaryLog, verifyNotaryLog } from "./notaryLog.js";
+import { exportNotaryAttestationBundle, exportNotaryAttestationBundleAsync, verifyNotaryAttestationBundle } from "./notaryAttestation.js";
 import { resolveNotaryBindHost, startNotaryServer } from "./notaryServer.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { assertFileNotExample } from "../claims/eligibility/exampleMode.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import type { NotaryAttestationBasis, NotaryAttestationLevel } from "./notaryApiTypes.js";
 
 function loadPassphraseForInit(): string {
   const fromFile = process.env.AMC_NOTARY_PASSPHRASE_FILE;
@@ -57,11 +58,11 @@ export async function notaryInitCli(params: {
   }
   const configPath = initNotaryConfig(notaryDir, config);
   if (config.notary.backend.type === "EXTERNAL_SIGNER") {
-    const signer = loadNotarySigner({
+    const signer = await loadNotarySignerAsync({
       notaryDir,
       backend: config.notary.backend
     });
-    initNotaryLog(notaryDir, signer);
+    await initNotaryLogAsync(notaryDir, signer);
     return {
       notaryDir,
       configPath,
@@ -75,11 +76,11 @@ export async function notaryInitCli(params: {
     notaryDir,
     passphrase
   });
-  const signer = loadNotarySigner({
+  const signer = await loadNotarySignerAsync({
     notaryDir,
     backend: config.notary.backend
   });
-  initNotaryLog(notaryDir, signer);
+  await initNotaryLogAsync(notaryDir, signer);
   return {
     notaryDir,
     configPath,
@@ -126,6 +127,8 @@ export function notaryStatusCli(params: {
   ready: boolean;
   reasons: string[];
   fingerprint: string | null;
+  attestationLevel: NotaryAttestationLevel | null;
+  attestationBasis: NotaryAttestationBasis | null;
   tail: ReturnType<typeof tailNotaryLog>;
 } {
   const notaryDir = resolveNotaryDir(params.notaryDir);
@@ -134,12 +137,16 @@ export function notaryStatusCli(params: {
   let ready = true;
   const reasons: string[] = [];
   let fingerprint: string | null = null;
+  let attestationLevel: NotaryAttestationLevel | null = null;
+  let attestationBasis: NotaryAttestationBasis | null = null;
   try {
     const signer = loadNotarySigner({
       notaryDir,
       backend: config.notary.backend
     });
     fingerprint = signer.pubkeyFingerprint();
+    attestationLevel = signer.attestationLevel();
+    attestationBasis = signer.attestationBasis();
   } catch (error) {
     ready = false;
     reasons.push(String(error));
@@ -152,6 +159,8 @@ export function notaryStatusCli(params: {
     ready,
     reasons,
     fingerprint,
+    attestationLevel,
+    attestationBasis,
     tail: tailNotaryLog(notaryDir, 20)
   };
 }
@@ -160,6 +169,8 @@ export function notaryPubkeyCli(params: { notaryDir?: string }): {
   notaryDir: string;
   pubkeyPem: string;
   fingerprint: string;
+  attestationLevel: NotaryAttestationLevel;
+  attestationBasis: NotaryAttestationBasis;
 } {
   const notaryDir = resolveNotaryDir(params.notaryDir);
   const config = loadNotaryConfig(notaryDir);
@@ -170,7 +181,9 @@ export function notaryPubkeyCli(params: { notaryDir?: string }): {
   return {
     notaryDir,
     pubkeyPem: signer.pubkeyPem(),
-    fingerprint: signer.pubkeyFingerprint()
+    fingerprint: signer.pubkeyFingerprint(),
+    attestationLevel: signer.attestationLevel(),
+    attestationBasis: signer.attestationBasis()
   };
 }
 
@@ -205,6 +218,8 @@ export function notarySignCli(params: {
   outFile: string;
   fingerprint: string;
   payloadSha256: string;
+  attestationLevel: NotaryAttestationLevel;
+  attestationBasis: NotaryAttestationBasis;
 } {
   assertFileNotExample(params.inFile, "notary-signed");
   const notaryDir = resolveNotaryDir(params.notaryDir);
@@ -228,7 +243,9 @@ export function notarySignCli(params: {
   return {
     outFile: resolve(params.outFile),
     fingerprint: signed.pubkeyFingerprint,
-    payloadSha256
+    payloadSha256,
+    attestationLevel: signed.attestationLevel,
+    attestationBasis: signed.attestationBasis
   };
 }
 
@@ -239,6 +256,44 @@ export function notaryLogVerifyCli(params: { notaryDir?: string }): {
   lastHash: string;
 } {
   return verifyNotaryLog(resolveNotaryDir(params.notaryDir));
+}
+
+/** Real maintained read paths avoid the synchronous provider bridge; synchronous SDK functions above remain. */
+export async function notaryStatusCliAsync(params: Parameters<typeof notaryStatusCli>[0]): Promise<ReturnType<typeof notaryStatusCli>> {
+  const notaryDir = resolveNotaryDir(params.notaryDir), config = loadNotaryConfig(notaryDir);
+  try {
+    const signer = await loadNotarySignerAsync({ notaryDir, backend: config.notary.backend });
+    return { notaryDir, configPath: notaryConfigPath(notaryDir), backend: config.notary.backend.type, logPath: notaryLogPath(notaryDir), ready: true,
+      reasons: [], fingerprint: signer.pubkeyFingerprint(), attestationLevel: signer.attestationLevel(), attestationBasis: signer.attestationBasis(), tail: tailNotaryLog(notaryDir, 20) };
+  } catch {
+    return { notaryDir, configPath: notaryConfigPath(notaryDir), backend: config.notary.backend.type, logPath: notaryLogPath(notaryDir), ready: false,
+      reasons: ["SIGNER_INIT_FAILED"], fingerprint: null, attestationLevel: null, attestationBasis: null, tail: tailNotaryLog(notaryDir, 20) };
+  }
+}
+export async function notaryPubkeyCliAsync(params: Parameters<typeof notaryPubkeyCli>[0]): Promise<ReturnType<typeof notaryPubkeyCli>> {
+  const notaryDir = resolveNotaryDir(params.notaryDir), config = loadNotaryConfig(notaryDir);
+  const signer = await loadNotarySignerAsync({ notaryDir, backend: config.notary.backend });
+  return { notaryDir, pubkeyPem: signer.pubkeyPem(), fingerprint: signer.pubkeyFingerprint(), attestationLevel: signer.attestationLevel(), attestationBasis: signer.attestationBasis() };
+}
+export async function notaryAttestCliAsync(params: Parameters<typeof notaryAttestCli>[0]): Promise<ReturnType<typeof notaryAttestCli>> {
+  const captured = { ...params }, notaryDir = resolveNotaryDir(captured.notaryDir), config = loadNotaryConfig(notaryDir), identity = canonicalize(config);
+  const signer = await loadNotarySignerAsync({ notaryDir, backend: config.notary.backend });
+  return exportNotaryAttestationBundleAsync({ signer, workspace: captured.workspace ?? null, outFile: resolve(captured.outFile),
+    assertPublicationCurrent: () => { if (canonicalize(loadNotaryConfig(notaryDir)) !== identity) throw new Error("notary config changed while signing"); } });
+}
+export async function notarySignCliAsync(params: Parameters<typeof notarySignCli>[0]): Promise<ReturnType<typeof notarySignCli>> {
+  const captured = { ...params }; assertFileNotExample(captured.inFile, "notary-signed");
+  const notaryDir = resolveNotaryDir(captured.notaryDir), config = loadNotaryConfig(notaryDir), identity = canonicalize(config);
+  const signer = await loadNotarySignerAsync({ notaryDir, backend: config.notary.backend });
+  const payload = readFileSync(resolve(captured.inFile)), payloadSha256 = sha256Hex(payload);
+  const signed = await signer.sign(captured.kind, payload);
+  const current = () => { if (canonicalize(loadNotaryConfig(notaryDir)) !== identity) throw new Error("notary config changed while signing"); };
+  current();
+  await appendNotaryLogEntryAsync({ notaryDir, signer, requestId: `cli_${Date.now()}`, kind: captured.kind, payloadSha256 });
+  current();
+  writeFileAtomic(resolve(captured.outFile), canonicalize(notarySignResponse(captured.kind, payloadSha256, signed)) + "\n", 0o600);
+  return { outFile: resolve(captured.outFile), fingerprint: signed.pubkeyFingerprint, payloadSha256,
+    attestationLevel: signed.attestationLevel, attestationBasis: signed.attestationBasis };
 }
 
 export async function notaryInitInteractiveCli(params: {

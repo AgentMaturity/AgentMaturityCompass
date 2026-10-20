@@ -11,6 +11,7 @@ import { z } from "zod";
 import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyCanonical, verifyWithKey } from "./algorithmPolicy.js";
 import { signChecked, type KeyDescription, type KeyProvider } from "./provider.js";
+import { delegationScopeSchema, type DelegationScope } from "./delegationScope.js";
 
 const TAG = "AMC_KEY_DELEGATION_V1";
 export const MAX_DELEGATION_HOURS = 24;
@@ -18,9 +19,8 @@ const HOUR_MS = 3_600_000;
 const hex = z.string().regex(/^[0-9a-f]{64}$/);
 const time = z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form");
 
-const delegationSchema = z.strictObject({
+const delegationFields = {
   type: z.literal("amc.key-delegation"),
-  version: z.literal(1),
   delegateKeyId: hex,
   delegatePublicKeyPem: z.string().min(1).max(4096),
   purpose: z.literal("ledger-row"),
@@ -28,17 +28,26 @@ const delegationSchema = z.strictObject({
   notAfter: time,
   maxEvents: z.number().int().positive().safe(),
   issuerKeyId: hex
-});
+};
+const delegationV1Schema = z.strictObject({ ...delegationFields, version: z.literal(1) });
+const delegationV2Schema = z.strictObject({ ...delegationFields, version: z.literal(2), scope: delegationScopeSchema });
+const delegationSchema = z.discriminatedUnion("version", [delegationV1Schema, delegationV2Schema]);
 const signedDelegationSchema = z.strictObject({
   delegation: delegationSchema,
   algorithm: z.enum(SIGNING_ALGORITHMS),
   signature: z.string().refine(isCanonicalSignatureBase64, "signature must be canonical base64 of 64 bytes")
 });
-export type KeyDelegationV1 = z.infer<typeof delegationSchema>;
+export type KeyDelegationV1 = z.infer<typeof delegationV1Schema>;
+export type KeyDelegationV2 = z.infer<typeof delegationV2Schema>;
 export type SignedKeyDelegation = z.infer<typeof signedDelegationSchema>;
 
-function signedBytes(delegation: KeyDelegationV1): Buffer {
-  return Buffer.concat([Buffer.from(TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(delegation), "utf8")]);
+function signedBytes(delegation: KeyDelegationV1 | KeyDelegationV2): Buffer {
+  const tag = delegation.version === 1 ? TAG : "AMC_KEY_DELEGATION_V2";
+  return Buffer.concat([Buffer.from(tag, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(delegation), "utf8")]);
+}
+
+export function parseDelegation(bytes: Buffer): SignedKeyDelegation {
+  return signedDelegationSchema.parse(parseCanonicalJson(bytes));
 }
 
 export function encodeDelegation(signed: SignedKeyDelegation): Buffer {
@@ -47,12 +56,13 @@ export function encodeDelegation(signed: SignedKeyDelegation): Buffer {
 
 /** The provider key `issuer` certifies the Ed25519 delegate for [notBefore, notBefore + hours], hours at most 24. */
 export async function issueDelegation(provider: KeyProvider, issuer: KeyDescription,
-  input: { delegatePublicKeyPem: string; notBefore: Date; hours: number; maxEvents: number }): Promise<SignedKeyDelegation> {
+  input: { delegatePublicKeyPem: string; notBefore: Date; hours: number; maxEvents: number; scope?: DelegationScope }): Promise<SignedKeyDelegation> {
   if (!(input.hours > 0 && input.hours <= MAX_DELEGATION_HOURS)) throw new Error(`a delegation lasts at most ${MAX_DELEGATION_HOURS} hours`);
   const delegate = canonicalSigningKey(input.delegatePublicKeyPem);
   if (delegate?.algorithm !== "ed25519") throw new Error("the ledger-row delegate must be an Ed25519 public key");
   const delegation = delegationSchema.parse({
-    type: "amc.key-delegation", version: 1, delegateKeyId: signingKeyId(delegate.pem), delegatePublicKeyPem: delegate.pem, purpose: "ledger-row",
+    type: "amc.key-delegation", version: input.scope ? 2 : 1, ...(input.scope ? { scope: input.scope } : {}),
+    delegateKeyId: signingKeyId(delegate.pem), delegatePublicKeyPem: delegate.pem, purpose: "ledger-row",
     notBefore: input.notBefore.toISOString(), notAfter: new Date(input.notBefore.getTime() + input.hours * HOUR_MS).toISOString(),
     maxEvents: input.maxEvents, issuerKeyId: issuer.keyId
   });
@@ -60,7 +70,7 @@ export async function issueDelegation(provider: KeyProvider, issuer: KeyDescript
   return { delegation, algorithm: canonicalSigningKey(issuer.publicKeyPem)!.algorithm, signature: signature.toString("base64") };
 }
 
-export type DelegationVerdict = { valid: true; delegation: KeyDelegationV1 } | { valid: false; reason: string };
+export type DelegationVerdict = { valid: true; delegation: KeyDelegationV1 | KeyDelegationV2 } | { valid: false; reason: string };
 
 /**
  * Valid only for the canonical encoding of a delegation whose issuer is one of `issuerPublicKeyPems` (pinned by the
@@ -69,9 +79,13 @@ export type DelegationVerdict = { valid: true; delegation: KeyDelegationV1 } | {
  */
 export function verifyDelegation(bytes: Buffer, opts: { issuerPublicKeyPems: readonly string[]; at: Date; eventsSigned?: number }): DelegationVerdict {
   const fail = (reason: string): DelegationVerdict => ({ valid: false, reason });
+  if (!(opts.at instanceof Date) || !Number.isFinite(opts.at.getTime())) return fail("delegation verification time must be a finite Date");
+  if (opts.eventsSigned !== undefined && (!Number.isSafeInteger(opts.eventsSigned) || opts.eventsSigned <= 0)) {
+    return fail("eventsSigned must be a positive safe integer");
+  }
   let signed: SignedKeyDelegation;
   try {
-    signed = signedDelegationSchema.parse(parseCanonicalJson(bytes));
+    signed = parseDelegation(bytes);
   } catch {
     return fail("not a canonical signed amc.key-delegation");
   }
@@ -99,6 +113,7 @@ export function verifyDelegation(bytes: Buffer, opts: { issuerPublicKeyPems: rea
 export function admitDelegatedRow(input: {
   delegation: Buffer; issuerPublicKeyPems: readonly string[]; digestHex: string; signatureB64: string; signedAt: Date; eventIndex: number;
 }): { admitted: true } | { admitted: false; reason: string } {
+  if (!Number.isSafeInteger(input.eventIndex) || input.eventIndex <= 0) return { admitted: false, reason: "eventIndex must be a positive safe integer" };
   const verdict = verifyDelegation(input.delegation, { issuerPublicKeyPems: input.issuerPublicKeyPems, at: input.signedAt, eventsSigned: input.eventIndex });
   if (!verdict.valid) return { admitted: false, reason: verdict.reason };
   if (!/^[0-9a-f]{64}$/.test(input.digestHex) || !verifyWithKey(Buffer.from(input.digestHex, "hex"), verdict.delegation.delegatePublicKeyPem, Buffer.from(input.signatureB64, "base64"))) {

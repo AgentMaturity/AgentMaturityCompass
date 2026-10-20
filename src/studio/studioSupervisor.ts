@@ -3,8 +3,8 @@ import { spawn } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
-import { initActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
-import { initToolsConfig, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
+import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
 import { getWorkspacePaths, initWorkspace } from "../workspace.js";
@@ -22,7 +22,7 @@ import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { initOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
 import { initForecastPolicy } from "../forecast/forecastEngine.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
-import { initPluginWorkspace, verifyPluginWorkspace } from "../plugins/pluginApi.js";
+import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { checkNotaryTrust, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { initMechanicWorkspace } from "../mechanic/mechanicApi.js";
 import { mechanicTargetsPath, verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
@@ -357,15 +357,15 @@ export async function runStudioForeground(params: {
   }
 
   if (!existsSync(join(workspace, ".amc", "plugins", "registries.yaml")) || !existsSync(join(workspace, ".amc", "plugins", "installed.lock.json"))) {
-    initPluginWorkspace({ workspace });
+    await initPluginWorkspaceAsync({ workspace });
   }
 
   const token = ensureAdminToken(workspace);
   if (!existsSync(join(workspace, ".amc", "action-policy.yaml"))) {
-    initActionPolicy(workspace);
+    await initActionPolicyAsync(workspace, undefined, { onlyIfMissing: true });
   }
   if (!existsSync(join(workspace, ".amc", "tools.yaml"))) {
-    initToolsConfig(workspace);
+    await initToolsConfigAsync(workspace, undefined, { onlyIfMissing: true });
   }
   if (!existsSync(join(workspace, ".amc", "approval-policy.yaml"))) {
     initApprovalPolicy(workspace);

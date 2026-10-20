@@ -1,5 +1,5 @@
 /**
- * PKCS#11 (P2-08) through pkcs11js, an optional peer that compiles natively and never joins the default install. The ref
+ * PKCS#11 (P2-08) through an optional wrapper and its pkcs11js peer, loaded only when a token is opened. The ref
  * id is a PKCS#11 URI naming the token and key labels (`pkcs11:token=amc;object=artifact-seal`, RFC 7512). The library
  * path comes from AMC_PKCS11_MODULE and the user PIN from AMC_PKCS11_PIN or AMC_PKCS11_PIN_FILE: never from workspace
  * config, so a workspace writer can neither load a library nor read a PIN. P-256 keys sign with CKM_ECDSA over a SHA-256
@@ -80,9 +80,10 @@ function loadModule(env: NodeJS.ProcessEnv): Pkcs11Module & { gcmParamsType: num
   if (!path) throw failure("KEY_PROVIDER_NOT_INSTALLED", "set AMC_PKCS11_MODULE to the PKCS#11 library path");
   let pkcs11js: { PKCS11: new () => Pkcs11Module & { load(path: string): void; C_Initialize(): void }; CK_PARAMS_AES_GCM?: number };
   try {
-    pkcs11js = createRequire(import.meta.url)("pkcs11js");
+    const optional = createRequire(import.meta.url)("agent-maturity-compass-key-provider-pkcs11") as { loadPkcs11: () => typeof pkcs11js };
+    pkcs11js = optional.loadPkcs11();
   } catch {
-    throw failure("KEY_PROVIDER_NOT_INSTALLED", "install pkcs11js to use keys provider pkcs11");
+    throw failure("KEY_PROVIDER_NOT_INSTALLED", "install agent-maturity-compass-key-provider-pkcs11 and pkcs11js@2.1.7 to use keys provider pkcs11");
   }
   const module = new pkcs11js.PKCS11();
   try {
@@ -122,6 +123,10 @@ export function pkcs11Provider(deps: { module?: Pkcs11Module & { gcmParamsType?:
   const session = (token: string): { slot: Handle; session: Handle; pkcs11: Pkcs11Module & { gcmParamsType?: number } } => {
     const pkcs11 = (module ??= loadModule(env));
     if (open?.token === token) return { ...open, pkcs11 };
+    if (open !== null) {
+      pkcs11.C_CloseSession(open.session);
+      open = null;
+    }
     const slot = pkcs11.C_GetSlotList(true).find(candidate => pkcs11.C_GetTokenInfo(candidate).label.trim() === token);
     if (slot === undefined) throw failure("KEY_PROVIDER_UNAVAILABLE", "no present token has the configured label");
     const handle = pkcs11.C_OpenSession(slot, CK.CKF_SERIAL_SESSION | CK.CKF_RW_SESSION);

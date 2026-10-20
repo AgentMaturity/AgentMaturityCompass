@@ -18,6 +18,7 @@ export async function renderTrustPage(params) {
         pinnedFingerprint: state.pinnedFingerprint || null,
         currentFingerprint: state.currentFingerprint || null,
         attestationLevel: state.attestationLevel || null,
+        attestationBasis: state.attestationBasis || null,
         requiredAttestationLevel: state.requiredAttestationLevel || null,
         lastAttestationTs: state.lastAttestationTs || null
       }, null, 2))}</pre>

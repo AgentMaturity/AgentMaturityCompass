@@ -1,4 +1,5 @@
-import { createPublicKey, generateKeyPairSync, sign, verify } from "node:crypto";
+import { generateKeyPairSync, sign } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { copyFileSync, readFileSync, statSync } from "node:fs";
 import { createServer as createHttpServer } from "node:http";
 import { dirname, join, normalize, relative, resolve } from "node:path";
@@ -62,7 +63,7 @@ function verifyIndex(index: BenchRegistryIndex, sigRaw: string, pubPem: string):
     if (digest !== parsed.digestSha256) {
       return { ok: false, reason: "digest mismatch" };
     }
-    const valid = verify(null, payload, createPublicKey(pubPem), Buffer.from(parsed.signature, "base64"));
+    const valid = verifyWithKey(payload, pubPem, Buffer.from(parsed.signature, "base64"));
     return {
       ok: valid,
       reason: valid ? null : "signature verification failed"

@@ -96,8 +96,7 @@ function signedWritePolicy(workspace: string): z.infer<typeof spillWritePolicySc
   const digest = sha256Hex(bytes);
   // Preserve the existing ops-policy verifier's envelope/legacy signature
   // compatibility while authenticating precisely the YAML parsed below.
-  if (digest !== signature.digestSha256 || !(verifySignedDigest({ workspace, digestHex: digest, signed: signature }) ||
-      verifyHexDigestAny(digest, signature.signature, getPublicKeyHistory(workspace, "auditor")))) {
+  if (digest !== signature.digestSha256 || !verifySignedDigest({ workspace, digestHex: digest, signed: signature })) {
     throw new Error("spill operations policy signature verification failed");
   }
   return spillWritePolicySchema.parse(YAML.parse(bytes.toString("utf8"))).opsPolicy;

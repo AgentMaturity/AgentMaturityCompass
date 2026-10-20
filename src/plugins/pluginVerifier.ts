@@ -4,7 +4,7 @@ import { pluginManifestSchema } from "./pluginManifestSchema.js";
 import { installedPluginTrust, verifyPluginPackage } from "./pluginPackage.js";
 import { installedPluginsLockSchema } from "./pluginRegistrySchema.js";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
-import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { verifyInstalledPluginsLock } from "./pluginStore.js";
 import { sha256Hex } from "../utils/hash.js";
 
 export interface InstalledPluginIntegrityResult {
@@ -26,7 +26,7 @@ export function verifyInstalledPluginsIntegrity(workspace: string): InstalledPlu
   const root = pluginsRoot(workspace);
   ensureDir(root);
   const lockPath = installedLockPath(workspace);
-  const lockSig = verifySignedFileWithAuditor(workspace, lockPath);
+  const lockSig = verifyInstalledPluginsLock(workspace);
   const errors: string[] = [];
   if (!lockSig.valid) {
     errors.push(`installed lock signature invalid: ${lockSig.reason ?? "unknown"}`);

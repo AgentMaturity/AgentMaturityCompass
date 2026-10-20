@@ -16,6 +16,7 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
@@ -316,7 +317,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     const runEndTs = Date.now();
     const verification = input.noSign
       ? { ok: false, errors: ["unsigned assurance run"] }
-      : await verifyLedgerIntegrity(workspace);
+      : await verifyLedgerIntegrity(workspace, { trust: workspaceSelfTrust(workspace) });
     const integrityIndex = Number(scoreIntegrity(packResults).toFixed(4));
     const trustLabel = trustLabelFromIntegrity(integrityIndex);
     const overallScore0to100 = aggregateOverallScore(packResults);
@@ -426,10 +427,11 @@ export function loadAssuranceReport(params: {
 
 export async function verifyAssuranceRun(params: {
   workspace: string; assuranceRunId: string; agentId?: string;
+  trust?: import("../trust/trustContext.js").TrustContext;
 }): Promise<VerifyAssuranceResult> {
   const report = loadAssuranceReport(params), agentId = resolveAgentId(params.workspace, params.agentId);
   const context = buildPromptContext(params.workspace, agentId), errors: string[] = [];
-  const verification = await verifyLedgerIntegrity(params.workspace);
+  const verification = await verifyLedgerIntegrity(params.workspace, { trust: params.trust });
   if (!verification.ok) errors.push(...verification.errors.map(error => `ledger verify: ${error}`));
   const hash = sha256Hex(canonicalize({ ...report, reportJsonSha256: "", runSealSig: "" }));
   if (hash !== report.reportJsonSha256) errors.push("reportJsonSha256 mismatch");
@@ -462,7 +464,7 @@ export async function verifyAssuranceRun(params: {
             packResult.scenarioCount !== ids.length || packResult.passCount !== 0 || packResult.failCount !== 0 ||
             packResult.score0to100 !== 0 || packResult.regulatedEligible !== false) errors.push(`executed pack inventory or score mismatch: ${packResult.packId}`);
         for (const row of packResult.scenarioResults) {
-          const checked = validateExecutedReportRow({ ledger, sessionId: report.sessionId ?? "", scope: report.executedScope,
+          const checked = validateExecutedReportRow({ ledger, sessionId: report.sessionId ?? "", scope: report.executedScope, trust: params.trust,
             row, agentId, packId: packResult.packId, catalog: catalog! });
           errors.push(...checked.errors.map(reason => `${packResult.packId}/${row.scenarioId}: ${reason}`));
         }

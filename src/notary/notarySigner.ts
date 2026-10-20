@@ -20,9 +20,10 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { runExternalSigner } from "./notaryExternalSigner.js";
 import type { NotaryAttestationBasis, NotaryAttestationLevel, NotarySignResponse } from "./notaryApiTypes.js";
-import { verifyCanonical } from "../keys/algorithmPolicy.js";
+import { canonicalSigningKey, SIGNING_ALGORITHMS, verifyCanonical } from "../keys/algorithmPolicy.js";
 import { callProviderSync } from "../keys/providerBridge.js";
-import { checkedDescription, KeyProviderError } from "../keys/provider.js";
+import { attempt, checkedDescription, KeyProviderError, signChecked, type KeyProvider, type KeyRef } from "../keys/provider.js";
+import { loadKeyProvider } from "../keys/purposeProviders.js";
 
 const sealedKeySchema = z.object({
   v: z.literal(1),
@@ -138,6 +139,50 @@ export interface NotarySigner {
   attestationBasis: () => NotaryAttestationBasis;
   backendType: () => NotaryBackendType;
   claims: () => Record<string, unknown>;
+}
+
+export type AsyncNotarySigner = Omit<NotarySigner, "sign"> & { sign: (kind: string, payload: Buffer) => Promise<NotarySignResult> };
+
+/** Real server/CLI provider path. A provider never exports a private key or enters a synchronous child bridge. */
+export async function loadNotarySignerAsync(params: {
+  notaryDir: string; backend: NotaryBackendConfig; provider?: KeyProvider;
+}): Promise<AsyncNotarySigner> {
+  const backend = structuredClone(params.backend);
+  if (backend.type !== "KEY_PROVIDER") {
+    const signer = loadNotarySigner({ notaryDir: params.notaryDir, backend });
+    const pem = signer.pubkeyPem(), fingerprint = signer.pubkeyFingerprint();
+    return { ...signer, sign: async (kind, payload) => {
+      const bytes = Buffer.from(payload), signed = signer.sign(kind, bytes);
+      if (signed.pubkeyPem !== pem || signed.pubkeyFingerprint !== fingerprint || !verifyCanonicalKey(bytes, pem, signed.signatureB64)) {
+        throw new Error("notary signing response differs from its selected key");
+      }
+      return signed;
+    } };
+  }
+  const ref: KeyRef = Object.freeze({ ...backend.ref });
+  const provider = params.provider ?? loadKeyProvider("", ref.provider);
+  if (provider.id !== ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the notary provider differs from its configured ref");
+  const reported = await attempt(ref.provider, "describe", () => provider.describe({ ...ref }));
+  const description = Object.freeze(checkedDescription({ ...reported, ref: Object.freeze({ ...reported.ref }) },
+    { allowed: SIGNING_ALGORITHMS, requireNonExportable: true }));
+  if (description.ref.provider !== ref.provider || description.ref.id !== ref.id || description.ref.version !== ref.version) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the notary description differs from its configured ref");
+  }
+  const level: NotaryAttestationLevel = description.protection === "hsm" ? "HARDWARE" : "SOFTWARE";
+  const basis: NotaryAttestationBasis = description.protectionBasis;
+  const fingerprint = sha256Hex(Buffer.from(description.publicKeyPem, "utf8"));
+  const claims = () => ({ hardware: level === "HARDWARE", provider: ref.provider, protection: description.protection, protectionBasis: basis });
+  return { sign: async (_kind, payload) => ({
+    signatureB64: (await signChecked(provider, description, Buffer.from(payload))).toString("base64"),
+    pubkeyPem: description.publicKeyPem, pubkeyFingerprint: fingerprint, claims: claims(), backend: "KEY_PROVIDER",
+    attestationLevel: level, attestationBasis: basis, signedTs: Date.now()
+  }), pubkeyPem: () => description.publicKeyPem, pubkeyFingerprint: () => fingerprint, attestationLevel: () => level,
+    attestationBasis: () => basis, backendType: () => "KEY_PROVIDER", claims };
+}
+
+function verifyCanonicalKey(bytes: Buffer, pem: string, signatureB64: string): boolean {
+  const key = canonicalSigningKey(pem);
+  return key !== null && verifyCanonical(key.algorithm, bytes, key.pem, Buffer.from(signatureB64, "base64"));
 }
 
 export function initFileSealedNotaryKey(params: {
@@ -261,10 +306,10 @@ function loadExternalSigner(backend: Extract<NotaryBackendConfig, { type: "EXTER
  * P2-08: a key held by a key provider, reached synchronously through the provider bridge (one child process per call).
  * The level is HARDWARE only when the provider's description says "hsm", with its basis (provider metadata, or the
  * operator's configuration for PKCS#11); nothing a signer claims about itself counts. Notary signatures end up in
- * Ed25519-only artifact envelopes, so an ECDSA key is refused here until those envelopes accept it.
+ * Ed25519 or canonical P-256 artifact envelopes; their algorithm is derived from this key.
  */
 function loadKeyProviderSigner(backend: Extract<NotaryBackendConfig, { type: "KEY_PROVIDER" }>, bridge: typeof callProviderSync): NotarySigner {
-  const description = checkedDescription(bridge({ op: "describe", ref: backend.ref }).description, { allowed: ["ed25519"], requireNonExportable: true });
+  const description = checkedDescription(bridge({ op: "describe", ref: backend.ref }).description, { allowed: SIGNING_ALGORITHMS, requireNonExportable: true });
   const level: NotaryAttestationLevel = description.protection === "hsm" ? "HARDWARE" : "SOFTWARE";
   const basis: NotaryAttestationBasis = description.protectionBasis;
   const fingerprint = sha256Hex(Buffer.from(description.publicKeyPem, "utf8"));

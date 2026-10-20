@@ -8,6 +8,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 import { containedPath } from '../utils/pathSafety.js';
+import { KeyProviderError } from '../keys/provider.js';
+import { KeyRevokedError } from '../keys/keyRevocations.js';
 
 export async function handleCryptoRoute(
   pathname: string,
@@ -24,8 +26,8 @@ export async function handleCryptoRoute(
   if (pathname === '/api/v1/crypto/notary/status' && method === 'GET') {
     try {
       const notaryDir = queryParam(req.url ?? '', 'notaryDir');
-      const { notaryStatusCli } = await import('../notary/notaryCli.js');
-      const status = notaryStatusCli({ notaryDir });
+      const { notaryStatusCliAsync } = await import('../notary/notaryCli.js');
+      const status = await notaryStatusCliAsync({ notaryDir });
       apiSuccess(res, status);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Notary status failed');
@@ -37,8 +39,8 @@ export async function handleCryptoRoute(
   if (pathname === '/api/v1/crypto/notary/pubkey' && method === 'GET') {
     try {
       const notaryDir = queryParam(req.url ?? '', 'notaryDir');
-      const { notaryPubkeyCli } = await import('../notary/notaryCli.js');
-      const out = notaryPubkeyCli({ notaryDir });
+      const { notaryPubkeyCliAsync } = await import('../notary/notaryCli.js');
+      const out = await notaryPubkeyCliAsync({ notaryDir });
       apiSuccess(res, out);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Notary pubkey failed');
@@ -51,8 +53,8 @@ export async function handleCryptoRoute(
     try {
       const body = await bodyJson<{ outFile: string; notaryDir?: string; workspace?: string }>(req);
       if (!body.outFile) { apiError(res, 400, 'outFile required'); return true; }
-      const { notaryAttestCli } = await import('../notary/notaryCli.js');
-      const out = notaryAttestCli({
+      const { notaryAttestCliAsync } = await import('../notary/notaryCli.js');
+      const out = await notaryAttestCliAsync({
         notaryDir: body.notaryDir,
         workspace: body.workspace ?? workspace,
         outFile: body.outFile
@@ -90,8 +92,8 @@ export async function handleCryptoRoute(
         apiError(res, 400, 'Required: kind, inFile, outFile');
         return true;
       }
-      const { notarySignCli } = await import('../notary/notaryCli.js');
-      const out = notarySignCli(body);
+      const { notarySignCliAsync } = await import('../notary/notaryCli.js');
+      const out = await notarySignCliAsync(body);
       apiSuccess(res, out, 201);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Notary sign failed');
@@ -122,8 +124,8 @@ export async function handleCryptoRoute(
         apiError(res, 400, 'Required: agentId, outputPath');
         return true;
       }
-      const { generateTrustCertificate } = await import('../cert/trustCertificate.js');
-      const out = generateTrustCertificate({
+      const { generateTrustCertificateAsync } = await import('../cert/trustCertificate.js');
+      const out = await generateTrustCertificateAsync({
         workspace,
         agentId: body.agentId,
         outputPath: body.outputPath,
@@ -219,8 +221,8 @@ export async function handleCryptoRoute(
         apiError(res, 400, 'Required: certFile, reason, outFile');
         return true;
       }
-      const { revokeCertificate } = await import('../assurance/certificate.js');
-      const out = revokeCertificate({
+      const { revokeCertificateAsync } = await import('../assurance/certificate.js');
+      const out = await revokeCertificateAsync({
         workspace,
         certFile: resolve(workspace, body.certFile),
         reason: body.reason,
@@ -228,7 +230,10 @@ export async function handleCryptoRoute(
       });
       apiSuccess(res, out, 201);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Cert revoke failed');
+      if (err instanceof KeyProviderError) apiError(res, err.status, err.message);
+      else if (err instanceof KeyRevokedError) apiError(res, 409, 'A4_KEY_REVOKED: the revocation-list key was revoked');
+      else if (err instanceof Error && /vault locked/i.test(err.message)) apiError(res, 423, 'A4_VAULT_LOCKED: unlock the vault to revoke a certificate');
+      else apiError(res, 500, err instanceof Error ? err.message : 'Cert revoke failed');
     }
     return true;
   }

@@ -21,6 +21,7 @@ import { verifyDelegation } from "./delegation.js";
 import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { configuredRef, loadKeysConfig } from "./keysConfig.js";
 import { KeyProviderError, type KeyProviderId } from "./provider.js";
+import { operationalIssuerCandidates } from "./operationalDelegationState.js";
 
 export function assertLocal(purpose: KeyPurpose): LocalPurpose {
   if (!isLocalPurpose(purpose)) throw new Error(`${purpose} keys never live in a workspace vault; sign with the key its owner holds`);
@@ -92,7 +93,7 @@ export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): st
   if (purpose === "ledger-row" && bound !== null) {
     // The issuer passes the same gate as any key it could sign with directly.
     assertSigningKeyUsable(workspace, purpose, bound.publicKeyPem, bound.binding.provider);
-    return currentDelegateKeyId(workspace, bound.publicKeyPem, bound.binding.provider);
+    return currentDelegateKeyId(workspace, bound.publicKeyPem, bound.binding.provider, bound.binding.delegationSha256);
   }
   throw new KeyProviderError("KEY_PROVIDER_HELD", bound?.binding.provider ?? ref!.provider, bound === null
     ? `the ${purpose} key is configured to a provider key that the key set does not bind yet; run amc keys rotate --purpose ${purpose}`
@@ -103,13 +104,14 @@ export const DELEGATION_REL = ".amc/keys/delegations/ledger-row.json";
 const delegationMemo = new Map<string, { stamp: string; notBefore: number; notAfter: number; delegateKeyId: string }>();
 
 /** The key id a delegation from the bound provider key names, when that delegation verifies and covers now. */
-function currentDelegateKeyId(workspace: string, issuerPublicKeyPem: string, provider: KeyProviderId): string {
+function currentDelegateKeyId(workspace: string, issuerPublicKeyPem: string, provider: KeyProviderId, expectedSha256?: string): string {
   const now = new Date();
-  const stamp = statStamp([join(workspace, DELEGATION_REL), join(workspace, keysetFileRel("keys/ledger-row-provider.pub"))]);
+  const stamp = `${statStamp([join(workspace, DELEGATION_REL), join(workspace, keysetFileRel("keys/ledger-row-provider.pub"))])}:${expectedSha256 ?? "legacy"}`;
   let window = delegationMemo.get(workspace);
   if (window?.stamp !== stamp) {
     const bytes = readContainedOrNull(workspace, DELEGATION_REL, 64 * 1024);
     if (bytes === null) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, "the ledger-row delegate has no delegation; renew it with amc keys rotate --purpose ledger-row");
+    if (expectedSha256 !== undefined && sha256Hex(bytes) !== expectedSha256) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, "the delegation is not the statement the committed provider binding names");
     const verdict = verifyDelegation(bytes, { issuerPublicKeyPems: [issuerPublicKeyPem], at: now });
     if (!verdict.valid) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, `${verdict.reason}; renew it with amc keys rotate --purpose ledger-row`);
     window = { stamp, notBefore: Date.parse(verdict.delegation.notBefore), notAfter: Date.parse(verdict.delegation.notAfter), delegateKeyId: verdict.delegation.delegateKeyId };
@@ -169,5 +171,6 @@ export function getPurposeKeyHistory(workspace: string, purpose: KeyPurpose): st
   const history = own ? readHistory(workspace, local, current) : readHistory(workspace, role, keyFile(workspace, `${role}_ed25519.pub`) ?? current);
   // P2-08: a provider key the key set binds to this purpose signs for it too.
   const provider = boundProviderKey(workspace, local)?.publicKeyPem;
-  return [...new Set([...(history?.entries.map(entry => entry.publicKeyPem) ?? []), current, ...(provider === undefined ? [] : [provider])])];
+  return [...new Set([...(history?.entries.map(entry => entry.publicKeyPem) ?? []), current, ...(provider === undefined ? [] : [provider]),
+    ...(local === "ledger-row" ? operationalIssuerCandidates(workspace) : [])])];
 }

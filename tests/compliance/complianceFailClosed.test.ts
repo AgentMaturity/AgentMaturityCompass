@@ -1,8 +1,16 @@
+import YAML from "yaml";
+import { signAmcConfig } from "../../src/workspace.js";
+import { signingKeyId } from "../../src/keys/algorithmPolicy.js";
+import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
+import { bindPurposeProviderKey } from "../../src/keys/purposeProviders.js";
+import { withPins } from "../../src/trust/trustContext.js";
+import { workspaceKeyTrust } from "../helpers/trustContext.js";
+import { AWS_ARN, awsFake, fakeKey } from "../keys/providerFakes.js";
 import { randomUUID } from "node:crypto";
-import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
@@ -163,7 +171,51 @@ function writeSealedAssuranceReport(workspace: string, agentId: string, score: n
     JSON.stringify({ ...base, reportJsonSha256: hash, runSealSig: sig }, null, 2));
 }
 
+
+async function bindOwnedReaderProvider(workspace: string) {
+  const key = fakeKey("p256"), id = AWS_ARN(`outer-reader-${randomUUID()}`), fake = awsFake({ [id]: key });
+  const publicKeyPem = key.publicKey.export({ format: "pem", type: "spki" }).toString();
+  // Operator choices are fixed before the binding and new provider-authorized artifacts exist.
+  const operatorPins = withPins(workspaceKeyTrust(workspace), [{ keyId: signingKeyId(publicKeyPem)!, purposes: ["ledger-row"], origin: "owned independent outer-reader operator" }]);
+  const path = join(workspace, ".amc", "amc.config.yaml"), config = YAML.parse(readFileSync(path, "utf8"));
+  config.keys = { ...(config.keys ?? {}), refs: { ...(config.keys?.refs ?? {}), "ledger-row": { provider: "aws-kms", id } } };
+  writeFileSync(path, YAML.stringify(config)); signAmcConfig(workspace);
+  const binding = await bindPurposeProviderKey(workspace, "ledger-row", { passphrase: process.env.AMC_VAULT_PASSPHRASE!,
+    provider: awsKmsProvider(fake.call), delegation: { maxEvents: 10_000 } });
+  expect(binding.keyId).toBe(signingKeyId(publicKeyPem));
+  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+  return { binding, operatorPins, fake };
+}
+
 describe("compliance fails closed (P0-17)", () => {
+
+  test("actual compliance report assembly marks a provider epoch untrusted without the independent issuer pin", async () => {
+    const workspace = newWorkspace(), home = join(workspace, "owned-provider-operator");
+    mkdirSync(home, { recursive: true }); vi.stubEnv("AMC_HOME", home);
+    try {
+      const { operatorPins } = await bindOwnedReaderProvider(workspace);
+      const mappingId = "owned_provider_event";
+      initComplianceMaps(workspace, { complianceMaps: { version: 1, mappings: [fixtureMapping(mappingId, [EVENT])] } });
+      appendEvent(workspace, { meta: { agentId: "default", controlIds: [mappingId] } });
+      const pinned = { ...operatorPins, asOf: new Date() }, absent = { ...pinned, explicitPins: [] };
+      const assembled = (trust?: typeof pinned) => generateComplianceReport({ workspace, agentId: "default", framework: "SOC2", window: "1d",
+        ...(trust === undefined ? {} : { trust }) });
+      const positive = assembled(pinned);
+      expect(positive.configTrusted).toBe(true);
+      expect(positive.categories).toHaveLength(1);
+      expect(positive.categories[0]).toMatchObject({ id: mappingId, evidence: "sufficient", result: "not_evaluated",
+        dimensions: { evidence: "sufficient", applicability: { state: "unresolved" } } });
+      expect(positive.categories[0]!.admitted).toHaveLength(1);
+      for (const trust of [absent, undefined]) {
+        const refused = assembled(trust);
+        expect(refused.configTrusted).toBe(true); // The actual signed mapping still verifies; only row authority differs.
+        expect(refused.categories[0]).toMatchObject({ id: mappingId, evidence: "untrusted", result: "not_evaluated", admitted: [] });
+        expect(refused.categories[0]!.rejected).toContainEqual(expect.objectContaining({ reason: "producer_unverified", detail: expect.stringMatching(/issuer.*not-pinned/) }));
+      }
+      expect(assembled({ ...operatorPins, asOf: new Date() }).categories[0]!.evidence).toBe("sufficient");
+    } finally { vi.unstubAllEnvs(); }
+  });
+
   test("empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace);

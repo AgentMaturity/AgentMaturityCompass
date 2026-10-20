@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SIGNING_ALGORITHMS } from "../keys/algorithmPolicy.js";
 import { pluginArtifactPathSchema, pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 import { pluginArtifactKindSchema, pluginRiskCategorySchema } from "./pluginTypes.js";
 
@@ -58,7 +59,7 @@ export const pluginManifestSchema = z.object({
   ),
   generatedTs: z.number().int(),
   signing: z.object({
-    algorithm: z.literal("ed25519"),
+    algorithm: z.enum(SIGNING_ALGORITHMS),
     pubkeyFingerprint: z.string().length(64)
   })
 });

@@ -19,7 +19,7 @@
  * identical so a divergence between the two shows up as different wording rather
  * than as a quietly missing rule.
  */
-import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { openSessionEventStore, resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
@@ -27,6 +27,9 @@ import { merkleRoot } from "../session/sessionMerkle.js";
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { sessionRootDescriptorSchema, type SessionRootDescriptor } from "./sessionAnchorSchema.js";
+import { operationalEvidenceProblems } from "../keys/operationalLedgerReader.js";
+import { verifyMonitorTrustRoot } from "../persistence/sessionStoreVerification.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 /**
  * Thrown when a session cannot honestly be anchored.
@@ -49,6 +52,7 @@ export class SessionAnchorError extends Error {
 }
 
 export interface SessionRootDescriptorOptions {
+  readonly trust?: TrustContext;
   /**
    * sha256 of the monitor public key PEM this workspace is expected to use.
    *
@@ -70,20 +74,6 @@ function readMeta(event: EvidenceEvent): Record<string, unknown> {
   } catch {
     return {};
   }
-}
-
-function verifyMonitorAnchor(workspace: string, expected: string | null, errors: string[]): string {
-  let fingerprint = "";
-  try {
-    fingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8"));
-  } catch {
-    errors.push("workspace has no monitor public key");
-    return "";
-  }
-  if (expected !== null && expected !== fingerprint) {
-    errors.push(`monitor key fingerprint mismatch: expected ${expected}, found ${fingerprint}`);
-  }
-  return fingerprint;
 }
 
 /**
@@ -222,7 +212,9 @@ export function buildSessionRootDescriptor(params: {
   const errors: string[] = [];
   const expected =
     params.options?.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
-  const monitorKeyFingerprint = verifyMonitorAnchor(workspace, expected, errors);
+  // Use the provider-aware fingerprint/admission shared with the store verifier.
+  const monitorKeyFingerprint = verifyMonitorTrustRoot(workspace, expected, errors, params.options?.trust).monitorFingerprint ?? "";
+  errors.push(...operationalEvidenceProblems(workspace, rows, { trust: params.options?.trust }));
 
   if (rows.length === 0) {
     throw new SessionAnchorError(sessionId, [...errors, `session ${sessionId} has no events`]);

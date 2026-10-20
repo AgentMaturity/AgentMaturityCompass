@@ -7,7 +7,7 @@
  */
 import { createHash, createPublicKey } from "node:crypto";
 import { signingKeyId } from "../algorithmPolicy.js";
-import { attempt, importOptional, KeyProviderError, memoizedDescribe, type KeyProvider, type KeyRef } from "../provider.js";
+import { attempt, importOptional, KeyProviderError, memoizedDescribe, type KeyDescription, type KeyProvider, type KeyRef } from "../provider.js";
 
 export interface AzureKey {
   key?: { kty?: string; crv?: string; x?: Uint8Array; y?: Uint8Array };
@@ -65,7 +65,7 @@ export function azureKeyVaultProvider(calls?: AzureKeyVaultCalls): KeyProvider {
     if (algorithm === undefined) throw refused("only RSA keys or Managed HSM AES keys wrap data keys");
     return algorithm;
   };
-  const describe = memoizedDescribe(async ref => {
+  const describe = memoizedDescribe(ref => attempt<KeyDescription>("azure-kv", "describe", async () => {
     const found = await getKey(ref);
     const { kty, crv, x, y } = found.key ?? {};
     if ((kty !== "EC" && kty !== "EC-HSM") || crv !== "P-256" || !x || !y) throw refused("the key is not an EC P-256 key");
@@ -77,23 +77,23 @@ export function azureKeyVaultProvider(calls?: AzureKeyVaultCalls): KeyProvider {
       ref, algorithm: "ecdsa-p256-sha256", publicKeyPem, keyId: signingKeyId(publicKeyPem) ?? "",
       protection: kty === "EC-HSM" ? "hsm" : "software", protectionBasis: "provider-metadata", exportable: false
     };
-  });
+  }));
   return {
     id: "azure-kv",
     describe,
-    async sign(ref, message) {
+    sign: (ref, message) => attempt("azure-kv", "sign", async () => {
       await describe(ref);
       const digest = createHash("sha256").update(message).digest();
       const { result } = await run("sign", client => client.sign(parsed(ref).keyUrl, "ES256", digest));
       return Buffer.from(result);
-    },
-    async wrapKey(ref, plaintextKey) {
+    }),
+    wrapKey: (ref, plaintextKey) => attempt("azure-kv", "wrapKey", async () => {
       const algorithm = await wrapAlgorithm(ref);
       return Buffer.from((await run("wrapKey", client => client.wrapKey(parsed(ref).keyUrl, algorithm, plaintextKey))).result);
-    },
-    async unwrapKey(ref, wrapped) {
+    }),
+    unwrapKey: (ref, wrapped) => attempt("azure-kv", "unwrapKey", async () => {
       const algorithm = await wrapAlgorithm(ref);
       return Buffer.from((await run("unwrapKey", client => client.unwrapKey(parsed(ref).keyUrl, algorithm, wrapped))).result);
-    }
+    })
   };
 }

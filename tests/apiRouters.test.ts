@@ -619,14 +619,16 @@ vi.mock("../src/notary/notaryCli.js", () => ({
   notaryAttestCli: m.notaryAttestCli,
   notaryVerifyAttestCli: m.notaryVerifyAttestCli,
   notarySignCli: m.notarySignCli,
-  notaryLogVerifyCli: m.notaryLogVerifyCli
+  notaryLogVerifyCli: m.notaryLogVerifyCli,
+  notaryStatusCliAsync: m.notaryStatusCli, notaryPubkeyCliAsync: m.notaryPubkeyCli,
+  notaryAttestCliAsync: m.notaryAttestCli, notarySignCliAsync: m.notarySignCli
 }));
-vi.mock("../src/cert/trustCertificate.js", () => ({ generateTrustCertificate: m.generateTrustCertificate }));
+vi.mock("../src/cert/trustCertificate.js", () => ({ generateTrustCertificate: m.generateTrustCertificate, generateTrustCertificateAsync: m.generateTrustCertificate }));
 vi.mock("../src/assurance/certificate.js", () => ({
   issueCertificate: m.issueCertificate,
   verifyCertificate: m.verifyCertificateBundle,
   inspectCertificate: m.inspectCertificate,
-  revokeCertificate: m.revokeCertificate,
+  revokeCertificateAsync: m.revokeCertificate,
   verifyRevocation: m.verifyRevocation
 }));
 vi.mock("../src/transparency/transparencyMerkleCli.js", () => ({

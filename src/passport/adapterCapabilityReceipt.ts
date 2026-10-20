@@ -364,7 +364,8 @@ function verifyTrustedSignature(
   }
   const trustedPublicKeys = options.trustedPublicKeys ?? [];
   if (trustedPublicKeys.length === 0) return false;
-  if (receipt.signature.envelope) {
+  if (receipt.signature.envelope !== undefined) {
+    if (receipt.signature.signature !== receipt.signature.envelope.sigB64) return false;
     return verifySignatureEnvelope(receipt.receiptHash, receipt.signature.envelope, {
       trustedPublicKeys,
       requireTrustedKey: true

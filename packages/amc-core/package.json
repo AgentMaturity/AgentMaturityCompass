@@ -31,6 +31,9 @@
     "@amc/schemastery": "workspace:^",
     "js-yaml": "^4.3.2"
   },
+  "optionalDependencies": {
+    "node-addon-require-builtin": "0.1.5"
+  },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9"
   },

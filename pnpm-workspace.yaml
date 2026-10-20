@@ -14,6 +14,10 @@ packages:
 # package of the same name. The verify-vendored-links gate asserts this.
 linkWorkspacePackages: true
 
+# P2-08: an ordinary pnpm 10.33.0 install otherwise installs these optional peers.
+# Keep cloud SDKs and native bindings opt-in; required workspace peers stay explicit.
+autoInstallPeers: false
+
 # Native modules whose install scripts must run.
 #
 # pnpm 10 blocks lifecycle scripts by default. better-sqlite3 is AMC's evidence
@@ -23,6 +27,7 @@ linkWorkspacePackages: true
 onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
+  - pkcs11js
 
 # Flat node_modules, as npm produces.
 #

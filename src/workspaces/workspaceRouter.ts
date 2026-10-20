@@ -29,11 +29,7 @@ import {
 } from "./hostDb.js";
 import { issueHostSessionToken, verifyHostSessionToken } from "./hostAuth.js";
 import { parseCookieHeader, type SessionPayload } from "../auth/sessionTokens.js";
-import {
-  createTrackedSession,
-  revokeSessionByToken,
-  verifyTrackedSessionToken
-} from "../auth/authApi.js";
+import { createTrackedSessionAsync, revokeSessionByToken, verifyTrackedSessionToken } from "../auth/authApi.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { readRevokedLeaseIds } from "../leases/leaseStore.js";
@@ -602,6 +598,17 @@ function resolveWorkspaceRolesForHostAccess(hostDir: string, workspaceId: string
   }
   const legacy = listAccessibleWorkspaces(hostDir, access.username).find((row) => row.workspaceId === workspaceId);
   return hostRoleToUserRoles(legacy?.roles ?? []);
+}
+
+/** Re-read the host authority that a router session represents, including after remote signing. */
+function workspaceSessionAuthorityCurrent(hostDir: string, workspaceId: string, payload: SessionPayload): boolean {
+  const currentUser = findHostUserById(hostDir, payload.userId);
+  if (!currentUser || currentUser.disabled || currentUser.username !== payload.username) return false;
+  const currentRoles = resolveWorkspaceRolesForHostAccess(hostDir, workspaceId, {
+    ok: true, status: 200, username: currentUser.username, userId: currentUser.userId, isHostAdmin: currentUser.isHostAdmin
+  }).sort();
+  const tokenRoles = [...payload.roles].sort();
+  return tokenRoles.length === currentRoles.length && tokenRoles.every((role, index) => role === currentRoles[index]);
 }
 
 function parseUrlEncodedForm(raw: string): Record<string, string> {
@@ -1511,7 +1518,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         }
         const runtime = await ensureWorkspaceApi(urlWorkspaceId).catch(() => null);
         const workspaceDir = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
-        const issued = createTrackedSession({
+        const issued = await createTrackedSessionAsync({
           workspace: workspaceDir,
           userId,
           username,
@@ -1519,6 +1526,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           ttlMs: 8 * 60 * 60_000,
           authSource: "WORKSPACE_ROUTER"
         });
+        if (!workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, issued.payload)) {
+          revokeSessionByToken({ workspace: workspaceDir, token: issued.token });
+          writeControlError(res, 401, "workspace session authority changed");
+          return;
+        }
         setWorkspaceSessionCookie(
           res,
           urlWorkspaceId,
@@ -1644,25 +1656,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               return;
             }
           } else {
-            const currentUser = findHostUserById(options.hostDir, workspaceSession.payload.userId);
-            const currentRoles = currentUser && !currentUser.disabled
-              ? resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, {
-                  ok: true,
-                  status: 200,
-                  username: currentUser.username,
-                  userId: currentUser.userId,
-                  isHostAdmin: currentUser.isHostAdmin
-                })
-              : [];
-            const tokenRoles = [...workspaceSession.payload.roles].sort();
-            const activeRoles = [...currentRoles].sort();
-            const sessionCurrent = Boolean(
-              currentUser &&
-              !currentUser.disabled &&
-              currentUser.username === workspaceSession.payload.username &&
-              tokenRoles.length === activeRoles.length &&
-              tokenRoles.every((role, index) => role === activeRoles[index])
-            );
+            const sessionCurrent = workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, workspaceSession.payload);
             if (!sessionCurrent) {
               workspaceSessionValid = false;
               clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
@@ -1679,7 +1673,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           }
           const canMintWorkspaceSession = hostAccess.username && hostAccess.userId;
           if (!workspaceSessionValid && canMintWorkspaceSession && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
-            const issued = createTrackedSession({
+            const issued = await createTrackedSessionAsync({
               workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
               userId: hostAccess.userId!,
               username: hostAccess.username!,
@@ -1687,6 +1681,11 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               ttlMs: 8 * 60 * 60_000,
               authSource: "WORKSPACE_ROUTER"
             });
+            if (!workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, issued.payload)) {
+              revokeSessionByToken({ workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir), token: issued.token });
+              writeControlError(res, 401, "workspace session authority changed");
+              return;
+            }
             setWorkspaceSessionCookie(
               res,
               urlWorkspaceId,
@@ -1701,7 +1700,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           }
         } else if (allowLocalDemoAccess) {
           if (!workspaceSessionValid) {
-            const issued = createTrackedSession({
+            const issued = await createTrackedSessionAsync({
               workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
               userId: "local-demo",
               username: "demo",

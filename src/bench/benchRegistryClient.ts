@@ -1,4 +1,4 @@
-import { createPublicKey, verify } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
@@ -69,7 +69,7 @@ function verifyIndexSignature(params: {
         reason: "digest mismatch"
       };
     }
-    const valid = verify(null, payload, createPublicKey(params.registryPub), Buffer.from(sig.signature, "base64"));
+    const valid = verifyWithKey(payload, params.registryPub, Buffer.from(sig.signature, "base64"));
     return valid ? { ok: true } : { ok: false, reason: "signature invalid" };
   } catch (error) {
     return {

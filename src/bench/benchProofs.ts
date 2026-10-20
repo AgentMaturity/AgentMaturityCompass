@@ -186,7 +186,7 @@ export function verifyProofsAgainstSignedRoot(params: {
   const errors = [...bound.errors];
   if (sig.digestSha256 !== digest) errors.push("signed merkle root digest mismatch");
   const check = checkDigestSignature({ signature: "proofs/merkle.root.sig", purpose: "artifact-seal", digestHex: digest,
-    signatureB64: String(sig.signature ?? ""), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,
+    signatureB64: String(sig.signature ?? ""), envelope: sig.envelope, candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,
     claimedSignedAt: params.claimedSignedAt ?? null });
   if (!check.verified) errors.push("signed merkle root signature invalid");
   const anchored = check.verified && sig.digestSha256 === digest && bound.ok;

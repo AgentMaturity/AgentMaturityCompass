@@ -64,6 +64,32 @@ describe("ledger-row delegation from a provider-held key (P2-08)", () => {
     expect(verifyDelegation(bytes, { issuerPublicKeyPems: [other.publicKeyPem], at: new Date(t0.getTime() + HOUR) })).toEqual({ valid: false, reason: expect.stringMatching(/not a pinned/) });
   });
 
+  it("refuses an invalid verification Date instead of letting NaN pass both window comparisons", async () => {
+    const { description, bytes } = await delegation();
+    const issuerPublicKeyPems = [description.publicKeyPem];
+    const invalid = new Date(Number.NaN);
+    expect(verifyDelegation(bytes, { issuerPublicKeyPems, at: invalid })).toEqual({ valid: false, reason: expect.stringMatching(/finite Date/) });
+    expect(admitDelegatedRow({ delegation: bytes, issuerPublicKeyPems, ...row(1), signedAt: invalid, eventIndex: 1 }))
+      .toEqual({ admitted: false, reason: expect.stringMatching(/finite Date/) });
+  });
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, -1, 0, 0.5, Number.MAX_SAFE_INTEGER + 1])("refuses invalid event index %s", async eventIndex => {
+    const { description, bytes } = await delegation();
+    const issuerPublicKeyPems = [description.publicKeyPem];
+    const at = new Date(t0.getTime() + HOUR);
+    expect(verifyDelegation(bytes, { issuerPublicKeyPems, at, eventsSigned: eventIndex }))
+      .toEqual({ valid: false, reason: expect.stringMatching(/positive safe integer/) });
+    expect(admitDelegatedRow({ delegation: bytes, issuerPublicKeyPems, ...row(1), signedAt: at, eventIndex }))
+      .toEqual({ admitted: false, reason: expect.stringMatching(/positive safe integer/) });
+  });
+
+  it("requires a row event index even when an unchecked caller omits it", async () => {
+    const { description, bytes } = await delegation();
+    expect(admitDelegatedRow({ delegation: bytes, issuerPublicKeyPems: [description.publicKeyPem], ...row(1),
+      signedAt: new Date(t0.getTime() + HOUR), eventIndex: undefined as unknown as number }))
+      .toEqual({ admitted: false, reason: expect.stringMatching(/positive safe integer/) });
+  });
+
   it("signs through the provider: one KMS Sign per delegation, never per ledger row", async () => {
     const before = kms.requests.filter(r => r.operation === "Sign").length;
     const { description, bytes } = await delegation();

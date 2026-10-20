@@ -4,7 +4,7 @@ import { join, dirname, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { getPublicKeyHistory, getPublicKeyPem } from "../../crypto/keys.js";
+import { getPublicKeyHistory } from "../../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { loadOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../policy.js";
@@ -14,7 +14,8 @@ import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
 import { decryptBackupPayload, encryptBackupPayload, type BackupEncryptionEnvelope } from "./backupCrypto.js";
 import { appendOpsAuditEvent } from "../audit.js";
-import { signDigestWithPolicy } from "../../crypto/signing/signer.js";
+import { describePolicySigner, signDigestWithPolicy } from "../../crypto/signing/signer.js";
+import { canonicalSigningKey, signingKeyId } from "../../keys/algorithmPolicy.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, untrustedReasons, verdictExitCode, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../../trust/index.js";
 import { fileSha256 } from "../../trust/signatureCheck.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../../security/safeTarArchive.js";
@@ -134,6 +135,7 @@ export function createBackup(params: { workspace: string; outFile: string }): {
     throw new Error("AMC_BACKUP_PASSPHRASE_FILE (or AMC_BACKUP_PASSPHRASE) is required for encrypted backups");
   }
 
+  const policySigner = describePolicySigner(params.workspace, "BACKUP_MANIFEST");
   const files = collectFiles(params.workspace, policy.opsPolicy.backups.includePaths, policy.opsPolicy.backups.excludePaths);
   const temp = mkdtempSync(join(tmpdir(), "amc-backup-"));
   const payloadSrc = join(temp, "payload-src");
@@ -194,8 +196,8 @@ export function createBackup(params: { workspace: string; outFile: string }): {
         : null
     },
     signing: {
-      algorithm: "ed25519",
-      auditorFingerprint: sha256Hex(Buffer.from(getPublicKeyPem(params.workspace, "auditor"), "utf8"))
+      algorithm: policySigner.algorithm,
+      auditorFingerprint: policySigner.fingerprint
     }
   });
   const manifestPath = join(bundleRoot, "manifest.json");
@@ -204,7 +206,8 @@ export function createBackup(params: { workspace: string; outFile: string }): {
   const signed = signDigestWithPolicy({
     workspace: params.workspace,
     kind: "BACKUP_MANIFEST",
-    digestHex: digest
+    digestHex: digest,
+    expectedSigner: policySigner
   });
   const sig = backupManifestSigSchema.parse({
     digestSha256: digest,
@@ -214,7 +217,7 @@ export function createBackup(params: { workspace: string; outFile: string }): {
     envelope: signed.envelope
   });
   writeFileAtomic(join(bundleRoot, "manifest.sig"), JSON.stringify(sig, null, 2), 0o644);
-  writeFileAtomic(join(keysDir, "auditor.pub"), Buffer.from(getPublicKeyPem(params.workspace, "auditor"), "utf8"), 0o644);
+  writeFileAtomic(join(keysDir, "auditor.pub"), Buffer.from(policySigner.publicKeyPem, "utf8"), 0o644);
 
   const outFile = resolve(params.workspace, params.outFile);
   ensureDir(dirname(outFile));
@@ -271,14 +274,20 @@ function loadBundle(bundleFile: string): {
 
 /** keys/auditor.pub, the envelope key and --pubkey only locate the signer; admitKey decides whether it counts (P0-09). */
 function verifyManifestSignature(manifestPath: string, sigPath: string, candidates: Array<string | null>, trust: TrustContext,
-  signatures: IssuerAdmission[]): string[] {
+  signatures: IssuerAdmission[], signing: BackupManifest["signing"]): string[] {
   const errors: string[] = [];
   const digest = sha256Hex(readFileSync(manifestPath));
   try {
     const sig = backupManifestSigSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const check = checkDigestSignature({ signature: "manifest.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+    const check = checkDigestSignature({ signature: "manifest.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature, envelope: sig.envelope,
       candidates: [...candidates, envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
     signatures.push(check.admission);
+    if (check.verified) {
+      const pem = [...candidates, envelopePublicKey(sig.envelope)].find(pem => typeof pem === "string" && signingKeyId(pem) === check.admission.keyId);
+      if (typeof pem !== "string" || canonicalSigningKey(pem)?.algorithm !== signing.algorithm || check.admission.keyId !== signing.auditorFingerprint) {
+        errors.push("manifest signing metadata does not match verified signer");
+      }
+    }
     if (sig.digestSha256 !== digest) {
       errors.push("manifest digest mismatch");
     } else if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
@@ -368,7 +377,7 @@ export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; 
       return finish();
     }
     const candidates = [params.pubkeyPath ? readUtf8(resolve(params.pubkeyPath)) : null, pathExists(pubPath) ? readUtf8(pubPath) : null];
-    errors.push(...verifyManifestSignature(manifestPath, sigPath, candidates, params.trust, signatures));
+    errors.push(...verifyManifestSignature(manifestPath, sigPath, candidates, params.trust, signatures, manifest.signing));
     const payloadSha = sha256Hex(readFileSync(payloadPath));
     if (payloadSha !== manifest.payload.payloadSha256) {
       errors.push("payload sha mismatch");

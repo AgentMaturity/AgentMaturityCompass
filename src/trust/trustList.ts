@@ -1,5 +1,6 @@
 import { createPublicKey, sign, X509Certificate } from "node:crypto";
 import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
+import { checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider } from "../keys/provider.js";
 import { z } from "zod";
 import { assertNoteKey } from "../transparency/checkpointNote.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
@@ -137,6 +138,7 @@ export const trustListSchema = z.strictObject({
 
 /** One row per root key, each in its one canonical base64 spelling, so a list has no second encoding of the same signatures. */
 export const signedTrustListSchema = z.strictObject({
+  signatureVersion: z.literal(2).optional(),
   list: trustListSchema,
   signatures: z.array(z.strictObject({
     keyId: keyIdSchema,
@@ -162,17 +164,31 @@ export function parseTrustValue<T>(schema: z.ZodType<T>, value: unknown, what: s
   return parsed.data;
 }
 
-/** Domain-separated bytes, signed directly and never through signHexDigest. */
-function signedBytes(list: TrustList): Buffer {
-  return Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(list), "utf8")]);
+/** Absent signatureVersion signs the original v1 bytes; version 2 signs a distinct tag plus SHA-256 of those complete bytes. */
+function signedBytes(list: TrustList, signatureVersion: 1 | 2 = 1): Buffer {
+  const legacy = Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(list), "utf8")]);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from("AMC_TRUST_LIST_V2_DIGEST\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
 }
+export { signedBytes as trustListSigningBytes };
 
-export function signTrustList(list: TrustList, rootPrivateKeyPem: string): SignedTrustList {
+export function signTrustList(list: TrustList, rootPrivateKeyPem: string, opts: { signatureVersion?: 1 | 2 } = {}): SignedTrustList {
   const parsed = parseTrustValue(trustListSchema, list, "trust list");
   const publicKeyPem = createPublicKey(rootPrivateKeyPem).export({ format: "pem", type: "spki" }).toString();
   const keyId = ed25519KeyId(publicKeyPem);
   if (keyId === null) throw new TrustListError("TRUST_LIST_INVALID", "the trust-list root key must be Ed25519");
-  return { list: parsed, signatures: [{ keyId, publicKeyPem, signature: sign(null, signedBytes(parsed), rootPrivateKeyPem).toString("base64") }] };
+  return { ...(opts.signatureVersion === 2 ? { signatureVersion: 2 as const } : {}), list: parsed,
+    signatures: [{ keyId, publicKeyPem, signature: sign(null, signedBytes(parsed, opts.signatureVersion), rootPrivateKeyPem).toString("base64") }] };
+}
+
+/** An external root holder supplies its provider and independently pinned public description; no workspace key is selected. */
+export async function signTrustListWithProvider(list: TrustList, provider: KeyProvider, description: KeyDescription, opts: { signatureVersion?: 1 | 2 } = {}): Promise<SignedTrustList> {
+  const parsed = parseTrustValue(trustListSchema, list, "trust list");
+  const key = checkedDescription({ ...description, ref: { ...description.ref } }, { allowed: SIGNING_ALGORITHMS, requireNonExportable: false });
+  if (provider.id !== key.ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the pinned description belongs to another provider");
+  const signatureVersion = opts.signatureVersion ?? 1;
+  const signature = await signChecked(provider, key, signedBytes(parsed, signatureVersion));
+  return { ...(signatureVersion === 2 ? { signatureVersion: 2 as const } : {}), list: parsed,
+    signatures: [{ keyId: key.keyId, publicKeyPem: key.publicKeyPem, signature: signature.toString("base64") }] };
 }
 
 /**
@@ -180,8 +196,8 @@ export function signTrustList(list: TrustList, rootPrivateKeyPem: string): Signe
  * Every signature row must verify under the key it names, pinned or not, so a list carries no unverifiable extra rows.
  */
 export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds: readonly string[]; now: Date; threshold?: number }): TrustList {
-  const { list, signatures } = parseTrustValue(signedTrustListSchema, signed, "signed trust list");
-  const bytes = signedBytes(list);
+  const { list, signatures, signatureVersion } = parseTrustValue(signedTrustListSchema, signed, "signed trust list");
+  const bytes = signedBytes(list, signatureVersion);
   // Never below the floor the signed list declares: a weaker local policy cannot downgrade m-of-n.
   const threshold = Math.max(1, opts.threshold ?? 1, list.rootThreshold ?? 1);
   // A root may be Ed25519 or ECDSA P-256 (P1363 only, P2-08).

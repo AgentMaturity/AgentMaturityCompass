@@ -7,11 +7,12 @@
  * AMC-native agent-to-agent trust verification protocol.
  */
 
-import { createHash, createHmac, randomBytes, sign, timingSafeEqual, verify } from 'node:crypto';
+import { createHash, createHmac, randomBytes, sign, timingSafeEqual } from 'node:crypto';
 import { publicKeyFromPrivate } from '../crypto/keyHistoryEnvelope.js';
 import { admitKey, type IssuerAdmission } from '../trust/admission.js';
 import type { TrustContext } from '../trust/trustContext.js';
 import { ed25519KeyId } from '../trust/trustList.js';
+import { canonicalSigningKey, signingKeyId, verifyWithKey, type SigningAlgorithm } from '../keys/algorithmPolicy.js';
 import { canonicalize } from '../utils/json.js';
 import { type MaturityLevel } from './formalSpec.js';
 import { scoreToLevel, toDisplayScore } from './scoringScale.js';
@@ -25,7 +26,7 @@ export interface AgentIdentityClaim {
   issuingWorkspace: string;        // AMC workspace that issued this identity
   issuedAt: Date;
   expiresAt?: Date;
-  signature: string;               // HMAC (hex) or Ed25519 (base64) over every field below, never over a subset
+  signature: string;               // HMAC (hex) or a supported session-key signature (base64) over every field below, never over a subset
   /** P1-08: who the claim is for (the receiving agent or workspace); verified against the verifier's expectation. */
   audience?: string;
   /** P1-08: single-use value; a verifier's replay cache refuses it a second time. */
@@ -45,14 +46,14 @@ export interface TrustVerificationResult {
   requiredActions?: string[];
   /**
    * P1-08 (G6-10): what proved the claim. "shared-secret" is an HMAC any holder of the secret, every verifier included,
-   * can forge; "ed25519" is a signature by the agent's session key; "none" did not verify.
+   * can forge; "ed25519" or "ecdsa-p256-sha256" names the verified session-key algorithm; "none" did not verify.
    */
   integrity: ClaimIntegrity;
-  /** Never above SELF_REPORTED for a shared secret; ATTESTED only for an Ed25519 session key admitted for `session`. */
+  /** Never above SELF_REPORTED for a shared secret; ATTESTED only for a supported signing key admitted for `session`. */
   trustTier: 'ATTESTED' | 'SELF_REPORTED' | 'UNVERIFIED';
 }
 
-type ClaimIntegrity = 'shared-secret' | 'ed25519' | 'none';
+type ClaimIntegrity = 'shared-secret' | SigningAlgorithm | 'none';
 
 export interface TrustPolicyRule {
   minAmcScore?: number;
@@ -73,7 +74,7 @@ export interface ClaimExpectation {
   requestedScope: string;
   grants: Readonly<Record<string, readonly string[]>>;
   /**
-   * The key ids the verifier binds to each issuer: an Ed25519 session key id, or an HMAC secret's claimHmacKeyId. A
+   * The key ids the verifier binds to each issuer: a supported session key id, or an HMAC secret's claimHmacKeyId. A
    * claim verifies only with a key bound to the issuer it names, so one agent's key never speaks for another.
    */
   issuerKeyIds: Readonly<Record<string, readonly string[]>>;
@@ -254,7 +255,7 @@ export function createSignedAgentClaim(
 }
 
 /**
- * Verifies an Ed25519 claim with the session public key the verifier located, bound by keyId and publicKeyHash. The
+ * Verifies a canonical Ed25519 or P-256 claim with the session public key the verifier located, bound by keyId and publicKeyHash. The
  * result is ATTESTED only when issuer admission (P0-09) admits that key for `session` in `context`; otherwise
  * SELF_REPORTED.
  */
@@ -264,17 +265,18 @@ export function verifySignedAgentClaim(
   input: { publicKeyPem: string; context: TrustContext },
   expected?: ClaimExpectation,
 ): TrustVerificationResult & { admission: IssuerAdmission | null } {
-  const keyId = ed25519KeyId(input.publicKeyPem);
+  const keyId = signingKeyId(input.publicKeyPem);
+  const algorithm = canonicalSigningKey(input.publicKeyPem)?.algorithm;
   let sigValid = false;
   try {
-    sigValid = keyId !== null && keyId === claim.publicKeyHash
-      && verify(null, signedClaimBytes(claim), input.publicKeyPem, Buffer.from(claim.signature, 'base64'));
+    sigValid = keyId !== null && algorithm !== undefined && keyId === claim.publicKeyHash
+      && verifyWithKey(signedClaimBytes(claim), input.publicKeyPem, Buffer.from(claim.signature, 'base64'));
   } catch { /* reported as an invalid signature */ }
   if (!sigValid) return { ...refused('none', ['SIGNATURE INVALID — claim may be forged']), admission: null };
   const problems = bindingProblems(claim, expected, 'session', keyId!);
-  if (problems) return { ...refused('ed25519', problems), admission: null };
+  if (problems) return { ...refused(algorithm!, problems), admission: null };
   const admission = admitKey({ publicKeyPem: input.publicKeyPem, purpose: 'session', signature: 'agent identity claim', context: input.context, claimedSignedAt: claim.issuedAt });
-  return { ...finish(scoreClaim(claim, policy, true), expected!, claim, keyId!, 'ed25519', admission.status === 'admitted' ? 'ATTESTED' : 'SELF_REPORTED'), admission };
+  return { ...finish(scoreClaim(claim, policy, true), expected!, claim, keyId!, algorithm!, admission.status === 'admitted' ? 'ATTESTED' : 'SELF_REPORTED'), admission };
 }
 
 function scoreClaim(claim: AgentIdentityClaim, policy: TrustPolicyRule, sigValid: boolean): Omit<TrustVerificationResult, 'integrity' | 'trustTier'> {

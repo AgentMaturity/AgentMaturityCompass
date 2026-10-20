@@ -174,3 +174,9 @@ export function verifySignature(message: Uint8Array, publicKeyPem: string, signa
 export function tagged(tag: string, text: string): Buffer {
   return Buffer.concat([Buffer.from(tag, "ascii"), Buffer.from([0]), Buffer.from(text, "utf8")]);
 }
+
+/** One envelope selects one signing form for all rows; v2 hashes the complete original domain-separated v1 payload. */
+export function statementMessage(v1Tag: string, v2Tag: string, text: string, signatureVersion?: 2): Buffer {
+  const legacy = tagged(v1Tag, text);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from(v2Tag + "\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
+}

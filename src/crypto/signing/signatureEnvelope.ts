@@ -1,7 +1,7 @@
-import { isSha256HexDigest } from "../keys.js";
 import { z } from "zod";
 import { SIGNING_ALGORITHMS, verifyCanonical } from "../../keys/algorithmPolicy.js";
-import { sha256Hex } from "../../utils/hash.js";
+import { isSha256HexDigest, sha256Hex } from "../../utils/hash.js";
+import { notaryAttestationBasisSchema } from "../../notary/notaryApiTypes.js";
 
 export const signatureEnvelopeSchema = z.object({
   v: z.literal(1),
@@ -14,6 +14,7 @@ export const signatureEnvelopeSchema = z.object({
   signer: z.object({
     type: z.enum(["VAULT", "NOTARY"]),
     attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
+    attestationBasis: notaryAttestationBasisSchema.optional(),
     notaryFingerprint: z.string().length(64).optional()
   })
 });

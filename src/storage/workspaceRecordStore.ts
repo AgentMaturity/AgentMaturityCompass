@@ -74,6 +74,11 @@ function lastRecordHash(workspace: string, at: RecordLocation): string {
   return sorted[sorted.length - 1]?.record_hash ?? "GENESIS";
 }
 
+/** Internal async preparation reuses the unchanged legacy head rule; this does not verify historical record preimages. */
+export function workspaceRecordHead(workspace: string, at: RecordLocation): string {
+  return lastRecordHash(workspace, at);
+}
+
 /**
  * Writes one record, chained to the previous one and signed where a key exists.
  *

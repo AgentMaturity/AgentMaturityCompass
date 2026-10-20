@@ -11,7 +11,7 @@ import { containedExists, readContainedOrNull, statStamp } from "../utils/contai
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { assertNeverAnchored } from "./anchors.js";
 import { highWaterPath } from "./highWater.js";
-import { assertBoundPublicKey } from "./keyset.js";
+import { assertBoundPublicKey, boundProviderKey, keysetPaths } from "./keyset.js";
 import { readAnchoredRevocationList, readStagedRevocationList, type AnchoredListLocation } from "./revocationList.js";
 
 export const KEY_REVOCATION_REASONS = ["key-compromise", "superseded", "unspecified"] as const;
@@ -34,7 +34,8 @@ function trustedRevocationKeys(workspace: string): string[] {
   try {
     history = verifyKeyHistoryEnvelope(JSON.parse(keyFile(workspace, "revocation-list_history.json") ?? "null"), "revocation-list", current).envelope?.entries.map(entry => entry.publicKeyPem) ?? [];
   } catch { /* an unauthenticated history adds no keys */ }
-  return [...new Set([...history, current])];
+  const provider = boundProviderKey(workspace, "revocation-list")?.publicKeyPem;
+  return [...new Set([...history, current, ...(provider === undefined ? [] : [provider])])];
 }
 
 /** Where the list lives; `trusted` overrides the keys read from the public files (a writer that holds them already). */
@@ -50,7 +51,8 @@ const memo = new Map<string, { stamp: string; rows: KeyRevocation[] }>();
  */
 export function readKeyRevocations(workspace: string, required: boolean): KeyRevocation[] {
   const path = join(keysDir(workspace), "revocations.signed.json");
-  const now = statStamp([path, `${path}.pending`, highWaterPath()]);
+  const keyset = keysetPaths(workspace);
+  const now = statStamp([path, `${path}.pending`, keyset.keyset, keyset.pending, join(keysDir(workspace), "revocation-list-provider.pub"), highWaterPath()]);
   const cached = memo.get(workspace);
   if (cached && cached.stamp === now) return cached.rows;
   if (!containedExists(workspace, LIST_REL)) {

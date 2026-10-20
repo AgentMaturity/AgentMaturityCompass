@@ -10,6 +10,7 @@ import { loadExecutedEvidence } from "./evidence.js";
 import { bindingMatches } from "./oracles.js";
 import { benignRegistryFor } from "./routes.js";
 import type { Binding, CompiledScenario } from "./types.js";
+import type { TrustContext } from "../../trust/trustContext.js";
 
 const applicability = (value: ExecutedEvaluationSnapshot["applicability"]): ControlPlan["applicability"] =>
   value === "applicable" ? { state: "applicable" } : value === "not_applicable" ?
@@ -25,6 +26,7 @@ export type ExecutedControlProjection = { ok: true; result: ControlResult } | { 
  */
 export function evaluateExecutedControl(input: {
   ledger: Ledger; sessionId: string; compiled: CompiledScenario; catalog: LoadedCatalog;
+  trust?: TrustContext;
   scope: Omit<Binding, "attemptId" | "fixtureDigest">; evaluation: ExecutedEvaluationSnapshot; references: unknown;
 }): ExecutedControlProjection {
   const reject = (reason: string): ExecutedControlProjection => ({ ok: false, reason });
@@ -54,7 +56,7 @@ export function evaluateExecutedControl(input: {
     for (const entry of rows) {
       if (entry.reference === null) continue;
       const loaded = loadExecutedEvidence(input.ledger, entry.reference, { sessionId: input.sessionId,
-        scenarioId: scenario.scenario.id, packId: scenario.scenario.packId, fixture: scenario.scenario.fixture, binding: entry.binding });
+        scenarioId: scenario.scenario.id, packId: scenario.scenario.packId, fixture: scenario.scenario.fixture, binding: entry.binding }, { trust: input.trust });
       if (!loaded.ok) return `executed_control_capture_not_authenticated:${loaded.reason}`;
       const recorded = executedEvaluationSnapshotSchema.safeParse(loaded.record.evaluation);
       if (!recorded.success || canonicalize(recorded.data) !== canonicalize(expected) ||

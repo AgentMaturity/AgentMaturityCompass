@@ -109,6 +109,7 @@ export function awsFake(signing: Record<string, FakeKey & { origin?: string; sta
 }
 
 export const GCP_KEY = "projects/amc-test/locations/europe-west1/keyRings/amc/cryptoKeys/artifact-seal";
+export const GCP_WRAP_KEY = "projects/amc-test/locations/europe-west1/keyRings/amc/cryptoKeys/data-key";
 
 /** Google Cloud KMS: version "1" of GCP_KEY is `key`, with `protectionLevel`. */
 export function gcpFake(key: FakeKey, protectionLevel: "HSM" | "SOFTWARE") {
@@ -116,10 +117,13 @@ export function gcpFake(key: FakeKey, protectionLevel: "HSM" | "SOFTWARE") {
   const wrap = aead(randomBytes(32));
   const call: GcpKmsCall = async (operation, request) => {
     requests.push({ operation, request });
-    if (operation === "encrypt") return { ciphertext: wrap.seal(request.plaintext as Uint8Array) };
-    if (operation === "decrypt") {
+    if (operation === "encrypt" || operation === "decrypt") {
+      if (request.name === GCP_KEY) throw Object.assign(new Error("signing keys cannot encrypt or decrypt"), { code: 9 });
+      if (request.name !== GCP_WRAP_KEY) throw Object.assign(new Error("NOT_FOUND"), { code: 5 });
+      if (operation === "encrypt") return { ciphertext: wrap.seal(request.plaintext as Uint8Array) };
       try { return { plaintext: wrap.open(request.ciphertext as Uint8Array) }; } catch { throw Object.assign(new Error("decrypt failed"), { code: 3 }); }
     }
+    if (request.name === `${GCP_WRAP_KEY}/cryptoKeyVersions/1`) throw Object.assign(new Error("encryption keys cannot sign"), { code: 9 });
     if (request.name !== `${GCP_KEY}/cryptoKeyVersions/1`) throw Object.assign(new Error("NOT_FOUND"), { code: 5 });
     if (operation === "getPublicKey") return { pem: publicPem(key), algorithm: key.kind === "ed25519" ? "EC_SIGN_ED25519" : "EC_SIGN_P256_SHA256", protectionLevel, name: request.name };
     const digest = (request.digest as { sha256?: Buffer } | undefined)?.sha256;

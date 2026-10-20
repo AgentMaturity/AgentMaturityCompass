@@ -1,4 +1,5 @@
-import { randomUUID, sign, verify } from "node:crypto";
+import { randomUUID, sign } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { receiptV1Schema, receiptV2Schema, type ReceiptV2 } from "../contracts/v1/receipt.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -141,7 +142,7 @@ export function verifyReceipt(receipt: string, publicKeysPem: string[]): {
     const parsed = parseReceipt(receipt);
     const payloadBytes = fromBase64Url(parsed.payloadB64);
     const signatureBytes = fromBase64Url(parsed.signatureB64);
-    const ok = publicKeysPem.some((pub) => verify(null, payloadBytes, pub, signatureBytes));
+    const ok = publicKeysPem.some((pub) => verifyWithKey(payloadBytes, pub, signatureBytes));
     if (!ok) {
       return {
         ok: false,

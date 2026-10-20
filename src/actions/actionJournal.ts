@@ -21,6 +21,9 @@ import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js"
 import { noteTelemetryDropped, takeDroppedTelemetry } from "../observability/telemetryDrops.js";
 import { verifyReceipt, type ActionReceiptMembers } from "../receipts/receipt.js";
 import type { ActionClass } from "../types.js";
+import type { EvidenceEvent } from "../types.js";
+import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -163,7 +166,7 @@ function parseJson(text: string): unknown {
  * allowed transitions only, one agent and this workspace throughout, the index row naming the head, and for every
  * receipt the signed ACTION_STATE evidence row and its `v: 2` receipt binding the same bytes and state.
  */
-export function verifyChainIn(ledger: { readonly workspace: string; readonly db: Database.Database }, executionId: string): ChainVerification {
+export function verifyChainIn(ledger: { readonly workspace: string; readonly db: Database.Database }, executionId: string, options: OperationalEvidenceOptions = {}): ChainVerification {
   const { db, workspace } = ledger;
   const rows = db.prepare("SELECT seq, receipt_json, receipt_digest, evidence_event_id FROM action_transitions WHERE execution_id = ? ORDER BY seq")
     .all(executionId) as TransitionRow[];
@@ -195,7 +198,7 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
     if (events.has(row.evidence_event_id)) fail("evidence row already used by another receipt");
     events.add(row.evidence_event_id);
     keys ??= getPublicKeyHistory(workspace, "monitor");
-    const evidence = checkEvidence(db, row, receipt, keys);
+    const evidence = checkEvidence(ledger, row, receipt, keys, options);
     if ("problem" in evidence) fail(evidence.problem);
     else {
       receiptIds.set(row.seq, evidence.payload.receipt_id);
@@ -211,12 +214,13 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
 
 type EvidenceCheck = { readonly problem: string } | { readonly payload: ReceiptV2 };
 
-function checkEvidence(db: Database.Database, row: TransitionRow, receipt: ActionReceiptV1, keys: string[]): EvidenceCheck {
+function checkEvidence(ledger: { readonly workspace: string; readonly db: Database.Database }, row: TransitionRow, receipt: ActionReceiptV1, keys: string[], options: OperationalEvidenceOptions): EvidenceCheck {
+  const { db, workspace } = ledger;
   const problem = (text: string): EvidenceCheck => ({ problem: text });
-  const event = db.prepare("SELECT event_type, session_id, payload_inline, payload_sha256, meta_json, event_hash, writer_sig FROM evidence_events WHERE id = ?")
-    .get(row.evidence_event_id) as { event_type: string; session_id: string; payload_inline: string | null; payload_sha256: string;
-      meta_json: string; event_hash: string; writer_sig: string } | undefined;
+  const event = db.prepare("SELECT * FROM evidence_events WHERE id = ?").get(row.evidence_event_id) as EvidenceEvent | undefined;
   if (event === undefined) return problem("evidence row missing");
+  const delegated = operationalEvidenceProblems(workspace, [event], { ...options, ledger });
+  if (delegated.length) return problem(`evidence delegation invalid: ${delegated.slice(0, 3).join("; ")}`);
   // A pruned payload leaves its digest, which the signed event hash and receipt still bind.
   if (event.event_type !== "audit" || event.payload_sha256 !== row.receipt_digest
     || (event.payload_inline !== null && event.payload_inline !== row.receipt_json)) return problem("evidence row does not carry this receipt");
@@ -285,7 +289,7 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
   const agents = new Map<string, string>();
 
   const verified = (executionId: string): ChainVerification => {
-    const chain = verifyChainIn(ledger, executionId);
+    const chain = verifyChainIn(ledger, executionId, { trust: workspaceSelfTrust(workspace) });
     if (!chain.ok) throw new ReceiptChainBroken(executionId, chain.errors);
     return chain;
   };
@@ -483,7 +487,7 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     },
     blockingExecutions: ({ workspaceId: scope, agentId }) => (scope === workspaceId ? blockingFor(agentId, null) : []),
     verifyReceiptChain(executionId) {
-      const chain = verifyChainIn(ledger, executionId);
+      const chain = verifyChainIn(ledger, executionId, { trust: workspaceSelfTrust(workspace) });
       return chain.receipts.length === 0 && chain.errors.length === 0 ? { ...chain, ok: false, errors: ["no receipts for this execution"] } : chain;
     },
     block,

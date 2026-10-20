@@ -13,7 +13,7 @@
  * Failures are KeyProviderError: a code and a fixed message, never the provider's own error text, which can carry
  * endpoints, paths, account ids or PINs.
  */
-import { canonicalSigningKey, lowS, signingKeyId, verifyCanonical, type SigningAlgorithm } from "./algorithmPolicy.js";
+import { canonicalSigningKey, lowS, SIGNING_ALGORITHMS, signingKeyId, verifyCanonical, type SigningAlgorithm } from "./algorithmPolicy.js";
 
 export const KEY_PROVIDER_IDS = ["file", "aws-kms", "gcp-kms", "azure-kv", "pkcs11"] as const;
 export type KeyProviderId = (typeof KEY_PROVIDER_IDS)[number];
@@ -106,11 +106,12 @@ export function providerFailure(provider: KeyProviderId, error: unknown, action:
   return new KeyProviderError(code, provider, `${action}: ${FIXED_DETAIL[code]}`);
 }
 
-/** Runs one provider call; any failure becomes a KeyProviderError with a fixed message. */
+/** Cloud failures use fixed codes; the file provider preserves the vault's existing lock and key-lifecycle errors. */
 export async function attempt<T>(provider: KeyProviderId, action: string, call: () => Promise<T>): Promise<T> {
   try {
     return await call();
   } catch (error) {
+    if (provider === "file") throw error;
     throw providerFailure(provider, error, action);
   }
 }
@@ -166,13 +167,15 @@ export function checkedDescription(description: KeyDescription, policy: KeyPolic
  * low S first, the same signature in canonical form.
  */
 export async function signChecked(provider: KeyProvider, description: KeyDescription, message: Uint8Array): Promise<Buffer> {
-  const algorithm = canonicalSigningKey(description.publicKeyPem)?.algorithm;
-  if (algorithm === undefined || algorithm !== description.algorithm) {
-    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the described algorithm is not the algorithm of the described key");
+  const pinned = checkedDescription({ ...description, ref: { ...description.ref } }, { allowed: SIGNING_ALGORITHMS, requireNonExportable: false });
+  if (provider.id !== pinned.ref.provider) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the pinned description belongs to another provider");
   }
-  const answer = await attempt(provider.id, "sign", () => provider.sign(description.ref, message));
-  const signature = algorithm === "ecdsa-p256-sha256" ? lowS(answer) : Buffer.from(answer);
-  if (!verifyCanonical(algorithm, message, description.publicKeyPem, signature)) {
+  // Pin the authorization and original bytes before awaiting provider code. Its request objects are disposable copies.
+  const bytes = Buffer.from(message);
+  const answer = await attempt(provider.id, "sign", () => provider.sign({ ...pinned.ref }, Buffer.from(bytes)));
+  const signature = pinned.algorithm === "ecdsa-p256-sha256" ? lowS(answer) : Buffer.from(answer);
+  if (!verifyCanonical(pinned.algorithm, bytes, pinned.publicKeyPem, signature)) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the provider's signature does not verify under the described public key");
   }
   return signature;

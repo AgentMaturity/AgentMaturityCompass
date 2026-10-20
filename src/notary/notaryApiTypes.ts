@@ -7,7 +7,7 @@ export type NotaryAttestationLevel = z.infer<typeof notaryAttestationLevelSchema
  * "provider-metadata" (the KMS or HSM's own key metadata) or "provider-reported" (an external signer's own claim).
  * Never "attested": nothing here verifies a hardware attestation.
  */
-const notaryAttestationBasisSchema = z.enum(["configured", "provider-metadata", "provider-reported"]);
+export const notaryAttestationBasisSchema = z.enum(["configured", "provider-metadata", "provider-reported"]);
 export type NotaryAttestationBasis = z.infer<typeof notaryAttestationBasisSchema>;
 const notaryBackendTypeSchema = z.enum(["FILE_SEALED", "EXTERNAL_SIGNER", "KEY_PROVIDER"]);
 
@@ -77,6 +77,7 @@ export const notaryTailEntrySchema = z.object({
   signerFingerprint: z.string().length(64),
   attestationLevel: notaryAttestationLevelSchema,
   prevHash: z.string(),
+  attestationBasis: notaryAttestationBasisSchema.optional(),
   entryHash: z.string().length(64)
 });
 export type NotaryTailEntry = z.infer<typeof notaryTailEntrySchema>;

@@ -1,3 +1,4 @@
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -360,7 +361,7 @@ export class ToolHubService {
       workOrder: workOrderContext,
       hasExecTicket: false,
       freezeStatus: activeFreezeStatus(this.workspace, input.agentId),
-      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId),
+      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) }),
       policy: loadActionPolicy(this.workspace),
       policySignatureValid: actionPolicySig.valid
     });
@@ -594,7 +595,7 @@ export class ToolHubService {
       );
     }
 
-    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId);
+    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) });
     if (!budget.budgetConfigValid && requestedMode === "EXECUTE") {
       return this.auditDenied(
         intent,

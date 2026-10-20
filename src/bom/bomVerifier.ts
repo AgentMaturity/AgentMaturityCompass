@@ -1,3 +1,4 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
@@ -16,21 +17,7 @@ const bomSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export type BomSignature = z.infer<typeof bomSignatureSchema>;
@@ -123,7 +110,7 @@ export function verifyBomSignature(params: {
       return finish();
     }
     const workspaceKeys = pathExists(join(params.workspace, ".amc", "keys", "auditor_ed25519.pub")) ? getPublicKeyHistory(params.workspace, "auditor") : [];
-    const check = checkDigestSignature({ signature: "bom.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: signature.signature,
+    const check = checkDigestSignature({ signature: "bom.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: signature.signature, envelope: signature.envelope,
       candidates: [params.pubkeyPemFile ? readFileSync(resolve(params.workspace, params.pubkeyPemFile), "utf8") : null,
         ...workspaceKeys, envelopePublicKey(signature.envelope)],
       context: params.trust, claimedSignedAt: signature.signedTs });

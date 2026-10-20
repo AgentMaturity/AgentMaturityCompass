@@ -4,7 +4,7 @@ AMC Notary is a separate signing service used to enforce a hardened trust bounda
 
 ## What Notary does
 
-- Signs allowed payload kinds for AMC with Ed25519, from a sealed key file, an external signer or a key held by a key provider.
+- Signs allowed payload kinds for AMC from a sealed Ed25519 key file, the fixed Ed25519 external-signer protocol, or an Ed25519/ECDSA P-256 key held by a key provider.
 - Provides signed runtime attestations (`.amcattest`).
 - Maintains its own append-only, hash-chained signing log.
 - Authenticates Studio->Notary requests via HMAC headers.
@@ -68,7 +68,7 @@ AMC includes testable reference script:
 
 ## 3) Key provider backend (P2-08)
 
-The notary signs with an Ed25519 key held by AWS KMS, Google Cloud KMS or a PKCS#11 token (an HSM, or SoftHSM2 for testing). Set the backend in `notary.yaml`:
+The notary signs with an Ed25519 or ECDSA P-256 key held by AWS KMS, Google Cloud KMS, Azure Key Vault or a PKCS#11 token (hardware, or SoftHSM2 for software-token tests). Set the backend in `notary.yaml`:
 
 ```yaml
 notary:
@@ -77,7 +77,15 @@ notary:
     ref: { provider: aws-kms, id: "arn:aws:kms:eu-west-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab" }
 ```
 
-Credentials, the PKCS#11 library path and PIN come from the notary's environment ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)), never from this file. Each signature runs the provider in a child process and is checked against the provider's public key before the notary returns it. An ECDSA key (Azure Key Vault, HSM-protected Google keys) is refused here: the artifact envelopes the notary signs are Ed25519-only in this release.
+Credentials, the PKCS#11 library path and PIN come from the notary's environment ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)), never from this file. The maintained server uses `loadNotarySignerAsync` to call `KEY_PROVIDER` through its Promise interface in the notary process. The checked ref/public description is pinned, exportable keys refuse, and every signature is checked against that public key. The response algorithm comes from the verified public key. P-256 signatures use low-S IEEE P1363; DER and high-S artifact signatures refuse.
+
+The server awaits payload signing and its mandatory log seal before returning `/sign` success. Log sealing occurs outside the short publication lock; publication rechecks the exact log/seal/sidecar predecessor and retries a concurrent append. Partial cross-file publication fails verification; there is no transaction across all three file replacements.
+
+The maintained notary CLI commands and crypto/export HTTP handlers use their asynchronous status, public-key, sign and attestation functions. Existing synchronous SDK exports remain, including `loadNotarySigner`, `notaryStatusCli`, `notaryPubkeyCli`, `notarySignCli` and `notaryAttestCli`; their `KEY_PROVIDER` route still uses a bridge child and can block. The fixed external script implementation and native synchronous token calls retain their existing execution behavior.
+
+Workspace artifact producers can use `signDigestWithPolicyAsync`. Its native HTTP/HTTPS transport enforces workspace `bridge` egress and checked DNS/address pinning, follows no redirects, caps response bodies at 1 MiB, and starts a 30-second request deadline before DNS. Late DNS completion cannot open a socket after timeout. Configured Unix sockets use local IPC. The signer/policy/revocation/distrust checks run again after the remote wait. See [KEY_PROVIDERS.md](KEY_PROVIDERS.md#asynchronous-workspace-to-notary-transport) for the precise boundary.
+
+The trust-certificate CLI and HTTP producer use this asynchronous policy path and bind their issuer metadata to the actual selected signer. Other artifact producers and public admission edges require their own integration evidence; the backend alone does not qualify all of them or enable direct workspace `artifact-seal` provider binding. Owned fake-provider and local-transport tests do not establish live cloud/HSM, CI, hardware-attestation or all-producer qualification.
 
 ## Attestation level and its basis
 

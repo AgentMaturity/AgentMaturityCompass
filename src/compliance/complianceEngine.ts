@@ -1,9 +1,10 @@
+import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
+import { orgSignatureSchema } from "../org/orgSchema.js";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { z } from "zod";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -39,19 +40,7 @@ interface SignedDigest {
   signature: string;
   signedTs: number;
   signer: "auditor";
-  envelope?: {
-    v: 1;
-    alg: "ed25519";
-    pubkeyB64: string;
-    fingerprint: string;
-    sigB64: string;
-    signedTs: number;
-    signer: {
-      type: "VAULT" | "NOTARY";
-      attestationLevel: "SOFTWARE" | "HARDWARE";
-      notaryFingerprint?: string;
-    };
-  };
+  envelope?: SignatureEnvelope;
 }
 
 function complianceMapsPath(workspace: string): string {
@@ -129,29 +118,7 @@ export function verifyComplianceMapsSignature(workspace: string, explicitPath?: 
     return { valid: false, signatureExists: false, reason: "compliance maps signature missing", path, sigPath };
   }
   try {
-    const sig = z
-      .object({
-        digestSha256: z.string().length(64),
-        signature: z.string().min(1),
-        signedTs: z.number().int(),
-        signer: z.literal("auditor"),
-        envelope: z
-          .object({
-            v: z.literal(1),
-            alg: z.literal("ed25519"),
-            pubkeyB64: z.string().min(1),
-            fingerprint: z.string().length(64),
-            sigB64: z.string().min(1),
-            signedTs: z.number().int(),
-            signer: z.object({
-              type: z.enum(["VAULT", "NOTARY"]),
-              attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-              notaryFingerprint: z.string().length(64).optional()
-            })
-          })
-          .optional()
-      })
-      .parse(JSON.parse(readUtf8(sigPath)) as unknown);
+    const sig = orgSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
     const digest = sha256Hex(readFileSync(path));
     if (digest !== sig.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
@@ -163,7 +130,7 @@ export function verifyComplianceMapsSignature(workspace: string, explicitPath?: 
         signature: sig.signature,
         envelope: sig.envelope
       }
-    }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    });
     return {
       valid,
       signatureExists: true,
@@ -276,6 +243,7 @@ function monitorKeysOf(workspace: string): string[] | null {
 
 export function generateComplianceReport(params: {
   workspace: string;
+  trust?: import("../trust/trustContext.js").TrustContext;
   agentId?: string;
   window: string;
   framework: ComplianceFramework;
@@ -306,7 +274,7 @@ export function generateComplianceReport(params: {
       // Events that could matter to this subject at any scope; the evidence contracts decide how each counts.
       rows: chain.filter((event) => event.ts >= windowStartTs && event.ts <= windowEndTs
         && subjectRole(event, agentId, "workspace") !== "none"),
-      chainError: monitorKeys === null ? "this workspace has no monitor key to verify its ledger" : ledgerChainError(chain, monitorKeys),
+      chainError: monitorKeys === null ? "this workspace has no monitor key to verify its ledger" : ledgerChainError(chain, monitorKeys, { workspace, ledger, trust: params.trust }),
       monitorKeys: monitorKeys ?? [],
       reader,
       assurance: verifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs })

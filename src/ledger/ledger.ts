@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 import { assertOutcomeTrustTier, assertTrustTierProvenance } from "./trustTierValidation.js";
-import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
+import { randomUUID, type KeyObject } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import YAML from "yaml";
 import { join, relative, resolve } from "node:path";
@@ -16,6 +16,8 @@ import type {
   SessionRecord
 } from "../types.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
+import { cachedSigningKey } from "../keys/cachedSigningKey.js";
+import { operationalSqlMetadata } from "../keys/operationalLedgerWriter.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -185,13 +187,12 @@ export class Ledger {
   // change lands through a fresh connection, so there is nothing to invalidate.
   private opsPolicyCache: ReturnType<typeof loadOpsPolicy> | null = null;
 
-  // The monitor private key, parsed once. sign() re-parses the PEM on every call
-  // (~64µs); reusing a KeyObject drops that to ~27µs/sign. Held only in memory,
-  // alongside the already-unlocked vault payload the PEM itself came from.
-  private monitorKeyObjectCache: KeyObject | null = null;
+  // Parse each admitted PEM once; recheck the signing gate on every use.
+  private readonly monitorSigningKey: () => KeyObject;
 
   constructor(workspace: string, options: { readonly?: boolean; store?: LedgerStore } = {}) {
     this.workspace = workspace;
+    this.monitorSigningKey = cachedSigningKey(workspace, "ledger-row");
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
     const connection = openLedgerConnection(workspace, {
       ...options,
@@ -221,16 +222,6 @@ export class Ledger {
       this.opsPolicyCache = loadOpsPolicy(this.workspace);
     }
     return this.opsPolicyCache;
-  }
-
-  // The monitor private key as a parsed KeyObject, created at most once per
-  // connection. Never reached under AMC_NO_SIGN: signMonitorDigest short-circuits
-  // before this, so a workspace with no vault is not forced to parse a key.
-  private monitorSigningKey(): KeyObject {
-    if (this.monitorKeyObjectCache === null) {
-      this.monitorKeyObjectCache = createPrivateKey(this.monitorPrivateKey());
-    }
-    return this.monitorKeyObjectCache;
   }
 
   private signMonitorDigest(digestHex: string): string {
@@ -495,6 +486,7 @@ export class Ledger {
   } {
     const { input, id, ts, prevHash } = params;
     assertLedgerSessionAppend(this.db, input);
+    const meta = operationalSqlMetadata(this, "sqlite-evidence", input.meta ?? {}, ts);
     const policy = params.policy ?? this.getOpsPolicy();
     const payload = input.payload;
     let payloadPath: string | null = null;
@@ -523,7 +515,6 @@ export class Ledger {
       }
     }
 
-    const meta = input.meta ?? {};
     assertTrustTierProvenance(meta, this.workspace);
     const metaJson = JSON.stringify(meta);
     const canonicalMetadata = canonicalMetadataForHash({
@@ -707,7 +698,7 @@ export class Ledger {
     const prepared = this.runImmediateTransaction(() => {
       const receiptId = randomUUID();
       const baseMeta = {
-        ...(input.meta ?? {}),
+        ...operationalSqlMetadata(this, "sqlite-evidence", input.meta ?? {}, ts),
         receipt_id: receiptId
       };
       // Checked here too: this method builds its own row rather than going
@@ -819,7 +810,6 @@ export class Ledger {
     const outcomeEventId = randomUUID();
     const ts = input.ts ?? Date.now();
     const sessionId = input.sessionId ?? `outcome-${input.agentId}`;
-    const metaJson = JSON.stringify(input.meta ?? {});
     const payloadText =
       input.payload ??
       canonicalize({
@@ -830,6 +820,7 @@ export class Ledger {
       });
     const payloadSha256 = sha256Hex(Buffer.from(payloadText, "utf8"));
     return this.runImmediateTransaction(() => {
+      const metaJson = JSON.stringify(operationalSqlMetadata(this, "sqlite-outcome", input.meta ?? {}, ts));
       const prevHash = this.latestOutcomeEventHash();
       const eventHash = sha256Hex(
         `${prevHash}${canonicalize({

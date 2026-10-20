@@ -3,12 +3,12 @@
  * (src/trust/rootRotation.ts) and revocation lists (src/keys/revocationList.ts). Each exists in exactly one byte
  * encoding (canonical JSON), which the verifier checks separately.
  */
-import { canonicalEd25519Pem, ed25519KeyId, isCanonicalSignatureBase64 } from "../bytes.js";
+import { canonicalSigningPem, signingKeyId, isCanonicalSignatureBase64 } from "../bytes.js";
 import { KEY_PURPOSES } from "../codes.js";
 import { arr, bool, int, isoTimeExact, lit, nullable, obj, oneOf, opt, refine, sha256, str } from "../schema.js";
 
 const signature = str({ check: isCanonicalSignatureBase64, what: "canonical base64 of 64 bytes" });
-const canonicalPem = str({ min: 1, max: 4096, check: pem => canonicalEd25519Pem(pem) === pem, what: "a canonical Ed25519 SPKI PEM" });
+const canonicalPem = str({ min: 1, max: 4096, check: pem => canonicalSigningPem(pem)?.pem === pem, what: "a canonical Ed25519 or P-256 SPKI PEM" });
 const unique = (items: string[]) => new Set(items).size === items.length;
 
 /** Rows sorted by role (in `roles` order) then keyId, one per (role, key). Same comparison as AMC (localeCompare). */
@@ -24,6 +24,7 @@ export const ROTATION_REASONS = ["scheduled", "superseded", "purpose-split", "ke
 const ROTATION_ROLES = ["previous", "next", "root"] as const;
 
 export const signedKeyRotation = obj({
+  signatureVersion: opt(lit(2, "UNSUPPORTED_VERSION")),
   statement: obj({
     type: lit("amc.key-rotation"),
     version: lit(1, "UNSUPPORTED_VERSION"),
@@ -58,10 +59,11 @@ const rootStatement = refine(obj({
   allowDecrease: bool,
   issuedAt: isoTimeExact
 }), value => value.newThreshold <= value.newRoots.length && value.newRootPublicKeyPems.length === value.newRoots.length
-  && value.newRootPublicKeyPems.every((pem, index) => ed25519KeyId(pem) === value.newRoots[index]),
+  && value.newRootPublicKeyPems.every((pem, index) => signingKeyId(pem) === value.newRoots[index]),
 "newThreshold within the new roots, and newRootPublicKeyPems are the new roots' keys in order");
 
 export const signedRootRotation = obj({
+  signatureVersion: opt(lit(2, "UNSUPPORTED_VERSION")),
   statement: rootStatement,
   signatures: refine(arr(obj({ by: oneOf(ROOT_ROLES), keyId: sha256, signature }), { max: 128 }),
     sortedRows(ROOT_ROLES), "signatures sorted by role then key id, one per key and role")
@@ -85,6 +87,7 @@ const revocationList = refine(obj({
 }), value => new Set(value.revoked.map(row => `${row.kind}:${row.id}`)).size === value.revoked.length, "one row per revoked id");
 
 export const signedRevocationList = obj({
+  signatureVersion: opt(lit(2, "UNSUPPORTED_VERSION")),
   list: revocationList,
   signature: obj({ keyId: sha256, signature }),
   anchor: nullable(obj({ transparencyEntryHash: sha256 }))

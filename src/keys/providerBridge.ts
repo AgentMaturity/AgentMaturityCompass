@@ -30,6 +30,9 @@ const SCRIPT = fileURLToPath(new URL("./providerBridge.js", import.meta.url));
 /** In the parent: one child process per call; anything but a well-formed answer is KEY_PROVIDER_UNAVAILABLE. */
 export function callProviderSync(request: BridgeRequest, opts: { script?: string; timeoutMs?: number } = {}): { description: KeyDescription; signatureB64?: string } {
   const out = spawnSync(process.execPath, [opts.script ?? SCRIPT], { input: JSON.stringify(request), encoding: "utf8", timeout: opts.timeoutMs ?? 30_000, maxBuffer: 1024 * 1024, stdio: ["pipe", "pipe", "ignore"] });
+  if (out.status !== 0 || out.error || out.signal) {
+    throw new KeyProviderError("KEY_PROVIDER_UNAVAILABLE", request.ref.provider, `${request.op}: the provider bridge did not complete successfully`);
+  }
   let answer: BridgeResponse | null = null;
   try { answer = JSON.parse(String(out.stdout ?? "").trim().split("\n").at(-1) ?? "") as BridgeResponse; } catch { /* reported below */ }
   if (answer?.ok === true && typeof answer.description === "object") return answer;

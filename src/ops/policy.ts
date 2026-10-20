@@ -1,8 +1,8 @@
+import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
@@ -57,19 +57,7 @@ interface SignedDigest {
   signature: string;
   signedTs: number;
   signer: "auditor";
-  envelope?: {
-    v: 1;
-    alg: "ed25519";
-    pubkeyB64: string;
-    fingerprint: string;
-    sigB64: string;
-    signedTs: number;
-    signer: {
-      type: "VAULT" | "NOTARY";
-      attestationLevel: "SOFTWARE" | "HARDWARE";
-      notaryFingerprint?: string;
-    };
-  };
+  envelope?: SignatureEnvelope;
 }
 
 export function opsPolicyPath(workspace: string): string {
@@ -175,7 +163,7 @@ export function verifyOpsPolicySignature(workspace: string): {
         signature: signature.signature,
         envelope: signature.envelope
       }
-    }) || verifyHexDigestAny(digest, signature.signature, getPublicKeyHistory(workspace, "auditor"));
+    });
     return {
       valid,
       signatureExists: true,

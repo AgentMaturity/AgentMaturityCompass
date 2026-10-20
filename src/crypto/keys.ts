@@ -8,7 +8,8 @@ import { assertBoundPublicKey, assertNoPendingKeyset } from "../keys/keyset.js";
 import { getSigningKey } from "../keys/signingKeys.js";
 import { isLocalPurpose, ROLE_PRIMARY_PURPOSE, type LocalPurpose } from "../vault/vaultPayload.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
+import { isSha256HexDigest, sha256Hex } from "../utils/hash.js";
+export { isSha256HexDigest } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
 
@@ -172,10 +173,6 @@ export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): st
   const current = getPublicKeyPem(workspace, kind);
   const history = getAuthenticatedKeyHistory(workspace, kind);
   return [...new Set([...(history?.entries.map((entry) => entry.publicKeyPem) ?? []), current])];
-}
-
-export function isSha256HexDigest(value: string): boolean {
-  return /^[a-f0-9]{64}$/.test(value);
 }
 
 export function assertSha256HexDigest(value: string): void {

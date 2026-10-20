@@ -18,6 +18,7 @@ import {
   browsePluginRegistryForWorkspace,
   executePluginRequest,
   initPluginWorkspace,
+  initPluginWorkspaceAsync,
   listInstalledPlugins,
   requestPluginInstall,
   requestPluginRemove,
@@ -49,6 +50,10 @@ export function pluginPrintCli(file: string, trust: TrustContext) {
 
 export function pluginInitCli(workspace: string) {
   return initPluginWorkspace({ workspace });
+}
+
+export async function pluginInitCliAsync(workspace: string) {
+  return initPluginWorkspaceAsync({ workspace });
 }
 
 export function pluginWorkspaceVerifyCli(workspace: string) {

@@ -50,7 +50,7 @@ describe.runIf(enabled)("PKCS#11 provider on SoftHSM2 (P2-08)", () => {
       const pair = (label: string, params: Buffer, mechanism: number, extractable: boolean) => lib.C_GenerateKeyPair!(session, { mechanism },
         [{ type: CKA.TOKEN, value: true }, { type: CK.CKA_LABEL, value: label }, { type: CK.CKA_EC_PARAMS, value: params }, { type: CKA.VERIFY, value: true }],
         [{ type: CKA.TOKEN, value: true }, { type: CK.CKA_LABEL, value: label }, { type: CKA.PRIVATE, value: true }, { type: CKA.SIGN, value: true },
-          { type: CK.CKA_SENSITIVE, value: !extractable }, { type: CK.CKA_EXTRACTABLE, value: extractable }]);
+          { type: CK.CKA_SENSITIVE, value: true }, { type: CK.CKA_EXTRACTABLE, value: extractable }]);
       pair("seal-ec", Buffer.from("06082a8648ce3d030107", "hex"), CKM_EC_KEY_PAIR_GEN, false);
       pair("extractable-ec", Buffer.from("06082a8648ce3d030107", "hex"), CKM_EC_KEY_PAIR_GEN, true);
       if (eddsa) pair("seal-ed", Buffer.from("130c656477617264733235353139", "hex"), CKM_EC_EDWARDS_KEY_PAIR_GEN, false);

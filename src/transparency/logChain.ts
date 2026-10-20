@@ -2,7 +2,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, appendFileSync } from "
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -255,7 +255,7 @@ export function verifyTransparencyLog(workspace: string): {
             signature: sig.signature,
             envelope: sig.envelope
           }
-        }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+        });
         if (!valid) {
           errors.push("seal signature verification failed");
         }
@@ -365,7 +365,7 @@ export function verifyTransparencyBundle(bundleFile: string, trust: TrustContext
     if (digest !== sig.digestSha256) {
       errors.push("seal digest mismatch");
     } else {
-      const check = checkDigestSignature({ signature: "log.seal.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+      const check = checkDigestSignature({ signature: "log.seal.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature, envelope: sig.envelope,
         candidates: [pubkeyPem, readUtf8(auditorPubPath), envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
       signatures.push(check.admission);
       if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {

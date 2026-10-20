@@ -1,4 +1,4 @@
-import { verify } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { sha256Hex } from "../utils/hash.js";
 import { notaryAttestResponseSchema, notarySignResponseSchema } from "./notaryApiTypes.js";
 import { canonicalize } from "../utils/json.js";
@@ -14,7 +14,7 @@ export function verifyNotarySignResponse(payload: unknown, expectedPayload: Buff
     if (sha !== parsed.payloadSha256) {
       return { ok: false, error: "notary payload digest mismatch", parsed };
     }
-    const ok = verify(null, expectedPayload, parsed.pubkeyPem, Buffer.from(parsed.signatureB64, "base64"));
+    const ok = verifyWithKey(expectedPayload, parsed.pubkeyPem, Buffer.from(parsed.signatureB64, "base64"));
     if (!ok) {
       return { ok: false, error: "notary signature invalid", parsed };
     }
@@ -34,8 +34,7 @@ export function verifyNotaryAttestResponse(payload: unknown): {
 } {
   try {
     const parsed = notaryAttestResponseSchema.parse(payload);
-    const ok = verify(
-      null,
+    const ok = verifyWithKey(
       Buffer.from(canonicalize(parsed.attestation), "utf8"),
       parsed.pubkeyPem,
       Buffer.from(parsed.signatureB64, "base64")

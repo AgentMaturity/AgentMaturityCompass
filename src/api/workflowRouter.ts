@@ -5,19 +5,25 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { KeyProviderError } from '../keys/provider.js';
+import { KeyRevokedError } from '../keys/keyRevocations.js';
 
 export async function handleWorkflowRoute(
   pathname: string,
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (
     !pathname.startsWith('/api/v1/workorder') &&
     !pathname.startsWith('/api/v1/ticket') &&
     !pathname.startsWith('/api/v1/lifecycle')
   ) return false;
+  const beforePublish = () => {
+    if (revalidateAuthority && !revalidateAuthority()) throw new Error('authenticated authority changed before work-order publication');
+  };
 
   // ── Work Orders ─────────────────────────────────────────────────
 
@@ -37,8 +43,8 @@ export async function handleWorkflowRoute(
         return true;
       }
       const { parseRiskTier, parseActionClasses } = await import('../workorders/workorderCli.js');
-      const { createWorkOrder } = await import('../workorders/workorderEngine.js');
-      const created = createWorkOrder({
+      const workorders = await import('../workorders/workorderEngine.js');
+      const input: Parameters<typeof workorders.createWorkOrder>[0] = {
         workspace,
         agentId: body.agentId,
         title: body.title,
@@ -46,14 +52,21 @@ export async function handleWorkflowRoute(
         riskTier: parseRiskTier(body.riskTier),
         requestedMode: body.mode.toUpperCase() === 'EXECUTE' ? 'EXECUTE' : 'SIMULATE',
         allowedActionClasses: parseActionClasses(body.allowedActionClasses ?? []),
-      });
+      };
+      const created = revalidateAuthority
+        ? await workorders.createWorkOrderAsync(input, { beforePublish })
+        : workorders.createWorkOrder(input);
       apiSuccess(res, {
         workOrderId: created.workOrder.workOrderId,
         filePath: created.filePath,
         sigPath: created.sigPath,
       }, 201);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not create work order');
+      if (res.headersSent) return true;
+      if (err instanceof KeyProviderError) apiError(res, err.status, err.message);
+      else if (err instanceof KeyRevokedError) apiError(res, 409, 'A4_KEY_REVOKED: the work-order key was revoked');
+      else if (err instanceof Error && /vault locked/i.test(err.message)) apiError(res, 423, 'A4_VAULT_LOCKED: unlock the vault to sign a work order');
+      else apiError(res, 500, err instanceof Error ? err.message : 'Could not create work order');
     }
     return true;
   }
@@ -113,16 +126,23 @@ export async function handleWorkflowRoute(
   if (woExpireParams && method === 'POST') {
     try {
       const body = await bodyJson<{ reason?: string; agentId?: string }>(req);
-      const { expireWorkOrder } = await import('../workorders/workorderEngine.js');
-      const result = expireWorkOrder({
+      const workorders = await import('../workorders/workorderEngine.js');
+      const input = {
         workspace,
         agentId: body.agentId,
         workOrderId: woExpireParams.workOrderId!,
         reason: body.reason,
-      });
+      };
+      const result = revalidateAuthority
+        ? await workorders.expireWorkOrderAsync(input, { beforePublish })
+        : workorders.expireWorkOrder(input);
       apiSuccess(res, { expired: true, ...result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not expire work order');
+      if (res.headersSent) return true;
+      if (err instanceof KeyProviderError) apiError(res, err.status, err.message);
+      else if (err instanceof KeyRevokedError) apiError(res, 409, 'A4_KEY_REVOKED: the work-order key was revoked');
+      else if (err instanceof Error && /vault locked/i.test(err.message)) apiError(res, 423, 'A4_VAULT_LOCKED: unlock the vault to sign a work order');
+      else apiError(res, 500, err instanceof Error ? err.message : 'Could not expire work order');
     }
     return true;
   }
@@ -144,20 +164,26 @@ export async function handleWorkflowRoute(
         return true;
       }
       const { normalizeActionClass, parseTtlToMs } = await import('../tickets/execTicketCli.js');
-      const { issueExecTicket } = await import('../tickets/execTicketVerify.js');
+      const tickets = await import('../tickets/execTicketVerify.js');
       const { resolveAgentId } = await import('../fleet/paths.js');
       const agentId = resolveAgentId(workspace, body.agentId);
-      const issued = issueExecTicket({
+      const input = {
         workspace,
         agentId,
         workOrderId: body.workOrderId,
         actionClass: normalizeActionClass(body.action),
         ttlMs: parseTtlToMs(body.ttl ?? '15m'),
         toolName: body.tool,
-      });
+      };
+      const issued = revalidateAuthority ? await tickets.issueExecTicketAsync(input) : tickets.issueExecTicket(input);
+      // A trusted direct caller rereads its credential/current roles after the provider wait.
+      if (revalidateAuthority && !revalidateAuthority()) return true;
       apiSuccess(res, { ticket: issued.ticket, payload: issued.payload }, 201);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Could not issue ticket');
+      if (err instanceof KeyProviderError) apiError(res, err.status, err.message);
+      else if (err instanceof KeyRevokedError) apiError(res, 409, 'A4_KEY_REVOKED: the execution-ticket key was revoked');
+      else if (err instanceof Error && /vault locked/i.test(err.message)) apiError(res, 423, 'A4_VAULT_LOCKED: unlock the vault to issue an execution ticket');
+      else apiError(res, 500, err instanceof Error ? err.message : 'Could not issue ticket');
     }
     return true;
   }

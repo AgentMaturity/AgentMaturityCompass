@@ -36,13 +36,16 @@
  * session-path behaviour changes, but a non-session use of this backend would
  * not get incident auto-linking.
  */
-import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
+import { randomUUID, type KeyObject } from "node:crypto";
 import { join } from "node:path";
 import type { EvidenceEvent, SessionRecord } from "../../types.js";
 import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
-import { ensureSigningKeys, getSigningKey, signHexDigestWith } from "../../crypto/keys.js";
+import { ensureSigningKeys, signHexDigestWith } from "../../crypto/keys.js";
+import { cachedSigningKey } from "../../keys/cachedSigningKey.js";
+import { withOperationalLedgerRow } from "../../keys/operationalLedgerWriter.js";
+import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
 import { queueEvidenceEventSpan } from "../../observability/otelExporter.js";
 import { storeEncryptedBlob } from "../../storage/blobs/blobStore.js";
@@ -183,12 +186,13 @@ export class JsonlSessionEventStore implements SessionEventStore {
   private readonly knownEventIds: Set<string>;
 
   private headHash: string;
-  private monitorKeyObjectCache: KeyObject | null = null;
+  private readonly monitorSigningKey: () => KeyObject;
   private opsPolicyCache: ReturnType<typeof loadOpsPolicy> | null = null;
   private closed = false;
 
   constructor(workspace: string, options: SessionStoreOpenOptions = {}) {
     this.workspace = workspace;
+    this.monitorSigningKey = cachedSigningKey(workspace, "ledger-row");
     this.readOnly = options.readOnly ?? false;
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
 
@@ -216,7 +220,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
         const prior = readEventRows(workspace);
         const records = [...readSessionRecords(workspace).values()];
         if (prior.length) {
-          const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: records });
+          const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: records, trust: workspaceSelfTrust(workspace) });
           if (!verified.ok) throw new Error("JSONL writer refused: existing history failed authentication; restore the original evidence before appending");
         }
         options.beforeWriterOpen?.();
@@ -268,55 +272,57 @@ export class JsonlSessionEventStore implements SessionEventStore {
       throw new Error(`duplicate event id: ${id}`);
     }
     const ts = input.ts ?? Date.now();
+    return withOperationalLedgerRow(this.workspace, "jsonl-evidence", input.meta, ts, metadata => {
+      if ((lastEventHash(this.workspace) ?? GLOBAL_GENESIS) !== this.headHash) throw new Error("the JSONL head changed outside this writer; reopen and verify it");
+      const stored = this.storePayload(input.payload);
+      const metaJson = JSON.stringify(metadata);
+      const canonicalMetadata = canonicalMetadataForHash({
+        id,
+        ts,
+        sessionId: input.sessionId,
+        runtime: input.runtime,
+        eventType: input.eventType,
+        payloadPath: stored.path,
+        payloadInline: null,
+        metaJson
+      });
+      const eventHash = sha256Hex(`${this.headHash}${canonicalMetadata}${stored.sha}`);
+      const writerSig = this.signMonitorDigest(eventHash);
 
-    const stored = this.storePayload(input.payload);
-    const metaJson = JSON.stringify(input.meta);
-    const canonicalMetadata = canonicalMetadataForHash({
-      id,
-      ts,
-      sessionId: input.sessionId,
-      runtime: input.runtime,
-      eventType: input.eventType,
-      payloadPath: stored.path,
-      payloadInline: null,
-      metaJson
+      const row: EvidenceEvent = {
+        id,
+        ts,
+        session_id: input.sessionId,
+        runtime: input.runtime,
+        event_type: input.eventType,
+        payload_path: stored.path,
+        payload_inline: null,
+        payload_sha256: stored.sha,
+        meta_json: metaJson,
+        prev_event_hash: this.headHash,
+        event_hash: eventHash,
+        writer_sig: writerSig,
+        canonical_payload_path: stored.path,
+        canonical_payload_inline: null,
+        blob_ref: stored.blobRef,
+        archived: 0,
+        archive_segment_id: null,
+        archive_manifest_sha256: null,
+        payload_pruned: 0,
+        payload_pruned_ts: null
+      };
+
+      this.appendOnlyEvents().appendLine(serializeEventRow(row));
+
+      // Advance ONLY after the write returned, exactly as the ledger advances only
+      // after its transaction commits: a throw above must leave the head pointing
+      // at the last durable row so a retry re-chains from the truth.
+      this.headHash = eventHash;
+      this.knownEventIds.add(id);
+      queueEvidenceEventSpan(row, this.workspace);
+
+      return { id, ts, payloadSha256: stored.sha, eventHash, writerSig };
     });
-    const eventHash = sha256Hex(`${this.headHash}${canonicalMetadata}${stored.sha}`);
-    const writerSig = this.signMonitorDigest(eventHash);
-
-    const row: EvidenceEvent = {
-      id,
-      ts,
-      session_id: input.sessionId,
-      runtime: input.runtime,
-      event_type: input.eventType,
-      payload_path: stored.path,
-      payload_inline: null,
-      payload_sha256: stored.sha,
-      meta_json: metaJson,
-      prev_event_hash: this.headHash,
-      event_hash: eventHash,
-      writer_sig: writerSig,
-      canonical_payload_path: stored.path,
-      canonical_payload_inline: null,
-      blob_ref: stored.blobRef,
-      archived: 0,
-      archive_segment_id: null,
-      archive_manifest_sha256: null,
-      payload_pruned: 0,
-      payload_pruned_ts: null
-    };
-
-    this.appendOnlyEvents().appendLine(serializeEventRow(row));
-
-    // Advance ONLY after the write returned, exactly as the ledger advances only
-    // after its transaction commits: a throw above must leave the head pointing
-    // at the last durable row so a retry re-chains from the truth.
-    this.headHash = eventHash;
-    this.knownEventIds.add(id);
-    queueEvidenceEventSpan(row, this.workspace);
-
-    return { id, ts, payloadSha256: stored.sha, eventHash, writerSig };
   }
 
   readSessionEvents(sessionId: string): readonly EvidenceEvent[] {
@@ -431,13 +437,6 @@ export class JsonlSessionEventStore implements SessionEventStore {
       this.opsPolicyCache = loadOpsPolicy(this.workspace);
     }
     return this.opsPolicyCache;
-  }
-
-  private monitorSigningKey(): KeyObject {
-    if (this.monitorKeyObjectCache === null) {
-      this.monitorKeyObjectCache = createPrivateKey(getSigningKey(this.workspace, "ledger-row"));
-    }
-    return this.monitorKeyObjectCache;
   }
 
   private signMonitorDigest(digestHex: string): string {

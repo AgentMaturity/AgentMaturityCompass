@@ -3,6 +3,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
+    "signatureVersion": {
+      "const": 2,
+      "type": "number"
+    },
     "list": {
       "additionalProperties": false,
       "properties": {

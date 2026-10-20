@@ -8,10 +8,16 @@ import {
   URL_ARGUMENTS,
   argumentStrings
 } from "./toolArgumentRoles.js";
-import { isAbsolute, join, normalize, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, normalize, relative, resolve } from "node:path";
 import YAML from "yaml";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
 
@@ -65,23 +71,58 @@ export function loadToolsConfig(workspace: string, explicitPath?: string): Tools
 
 export function signToolsConfig(workspace: string, explicitPath?: string): string {
   const file = explicitPath ? resolve(workspace, explicitPath) : toolsConfigPath(workspace);
-  if (!pathExists(file)) {
-    throw new Error(`Tools config not found: ${file}`);
-  }
-  const bytes = readFileSync(file);
-  // Validate and sign the same snapshot; never endorse malformed edited grants.
+  return withToolsConfigLock(file, () => {
+    if (!pathExists(file)) throw new Error(`Tools config not found: ${file}`);
+    const bytes = readFileSync(file);
+    toolsConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+    const digest = sha256Hex(bytes), signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
+    writeFileAtomic(`${file}.sig`, toolsSignatureBytes(digest, signature), 0o644);
+    return `${file}.sig`;
+  });
+}
+
+function toolsSignatureBytes(digestSha256: string, signature: string): string {
+  const payload: SignedDigest = { digestSha256, signature, signedTs: Date.now(), signer: "auditor" };
+  return JSON.stringify(payload, null, 2);
+}
+
+function withToolsConfigLock<T>(file: string, operation: () => T): T {
+  return withControlFileLock({ root: dirname(file), name: "tools-config", operation });
+}
+type ToolsConfigPair = { config: Buffer | null; signature: Buffer | null };
+function readToolsConfigPair(file: string): ToolsConfigPair {
+  return { config: pathExists(file) ? readFileSync(file) : null,
+    signature: pathExists(`${file}.sig`) ? readFileSync(`${file}.sig`) : null };
+}
+const equalToolsBytes = (a: Buffer | null, b: Buffer | null) => a === null ? b === null : b !== null && a.equals(b);
+
+/** No remote work occurs under the synchronous publication lock. */
+async function publishToolsConfigAsync(workspace: string, file: string, replacement?: Buffer, onlyIfMissing = false): Promise<string> {
+  const authority = capturePurposePublication(workspace, "config-signature");
+  const previous = withToolsConfigLock(file, () => readToolsConfigPair(file));
+  if (onlyIfMissing && previous.config !== null) throw new Error("tools config appeared while initializing; retry");
+  const bytes = replacement === undefined ? previous.config : Buffer.from(replacement);
+  if (bytes === null) throw new Error(`Tools config not found: ${file}`);
+  // The exact reviewed bytes are parsed, hashed and signed; never serialize an edited sign request again.
   toolsConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
-  const digest = sha256Hex(bytes);
-  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
-  const payload: SignedDigest = {
-    digestSha256: digest,
-    signature,
-    signedTs: Date.now(),
-    signer: "auditor"
-  };
-  const sigPath = `${file}.sig`;
-  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
-  return sigPath;
+  const digest = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"));
+  return withToolsConfigLock(file, () => {
+    const current = readToolsConfigPair(file);
+    if (!equalToolsBytes(previous.config, current.config) || !equalToolsBytes(previous.signature, current.signature)) {
+      throw new Error("tools config or signature changed while signing; retry");
+    }
+    assertPurposePublicationCurrent(workspace, authority, signed);
+    if (replacement !== undefined) assertOwnerMode(workspace, "tools init");
+    const signatureBytes = toolsSignatureBytes(digest, signed.signature.toString("base64"));
+    if (replacement !== undefined) writeFileAtomic(file, bytes, 0o644);
+    writeFileAtomic(`${file}.sig`, signatureBytes, 0o644);
+    return `${file}.sig`;
+  });
+}
+
+export function signToolsConfigAsync(workspace: string, explicitPath?: string): Promise<string> {
+  const file = explicitPath ? resolve(workspace, explicitPath) : toolsConfigPath(workspace);
+  return publishToolsConfigAsync(workspace, file);
 }
 
 function verifyToolsConfigBytes(workspace: string, explicitPath?: string): VerifiedToolsConfigBytes {
@@ -118,7 +159,8 @@ function verifyToolsConfigBytes(workspace: string, explicitPath?: string): Verif
         bytes: null
       };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const valid = verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(sig.signature, "base64"));
     return {
       valid,
       signatureExists: true,
@@ -194,15 +236,25 @@ export function initToolsConfig(workspace: string, config?: ToolsConfig): {
   configPath: string;
   sigPath: string;
 } {
-  ensureDir(join(workspace, ".amc"));
+  assertOwnerMode(workspace, "tools init");
   const parsed = toolsConfigSchema.parse(config ?? defaultToolsConfig());
   const configPath = toolsConfigPath(workspace);
-  writeFileAtomic(configPath, YAML.stringify(parsed), 0o644);
-  const sigPath = signToolsConfig(workspace);
-  return {
-    configPath,
-    sigPath
-  };
+  return withToolsConfigLock(configPath, () => {
+    // Preserve sync compatibility, but refuse provider-held/locked keys before replacing either file.
+    const privateKey = getSigningKey(workspace, "config-signature"), bytes = Buffer.from(YAML.stringify(parsed), "utf8");
+    const digest = sha256Hex(bytes), signature = signHexDigest(digest, privateKey);
+    assertOwnerMode(workspace, "tools init");
+    writeFileAtomic(configPath, bytes, 0o644);
+    writeFileAtomic(`${configPath}.sig`, toolsSignatureBytes(digest, signature), 0o644);
+    return { configPath, sigPath: `${configPath}.sig` };
+  });
+}
+
+export async function initToolsConfigAsync(workspace: string, config?: ToolsConfig, opts: { onlyIfMissing?: boolean } = {}): Promise<{ configPath: string; sigPath: string }> {
+  assertOwnerMode(workspace, "tools init");
+  const bytes = Buffer.from(YAML.stringify(toolsConfigSchema.parse(config ?? defaultToolsConfig())), "utf8"), configPath = toolsConfigPath(workspace);
+  const sigPath = await publishToolsConfigAsync(workspace, configPath, bytes, opts.onlyIfMissing === true);
+  return { configPath, sigPath };
 }
 
 export function listAllowedTools(workspace: string): ToolDefinition[] {

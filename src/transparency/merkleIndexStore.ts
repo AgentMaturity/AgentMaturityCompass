@@ -1,9 +1,10 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { appendFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { z } from "zod";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { entryInclusionProof, entryLeafHash, entryTreeRoot, MERKLE_ALGORITHMS, verifyEntryInclusion, type MerkleAlgorithm } from "./merkle.js";
@@ -87,21 +88,7 @@ const rootSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 function transparencyDir(workspace: string): string {
@@ -174,7 +161,7 @@ function readSignedRow<T>(workspace: string, path: string, sigPath: string, sche
           signature: sig.signature,
           envelope: sig.envelope
         }
-      }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+      });
       if (!verified) {
         errors.push(`${label} signature invalid`);
       }
@@ -632,7 +619,7 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
     }
     const candidates = [pubkeyPem, readUtf8(pubFile)];
     const signedBy = (name: string, digest: string, sig: z.infer<typeof rootSignatureSchema>): boolean => {
-      const check = checkDigestSignature({ signature: name, purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+      const check = checkDigestSignature({ signature: name, purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature, envelope: sig.envelope,
         candidates: [...candidates, envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
       signatures.push(check.admission);
       return check.verified && (sig.envelope === undefined || sig.signature === sig.envelope.sigB64);

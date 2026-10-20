@@ -7,7 +7,7 @@
  */
 import { createHash, createPublicKey } from "node:crypto";
 import { derToP1363, signingKeyId, type SigningAlgorithm } from "../algorithmPolicy.js";
-import { attempt, importOptional, KeyProviderError, memoizedDescribe, type KeyProtection, type KeyProvider, type KeyRef } from "../provider.js";
+import { attempt, importOptional, KeyProviderError, memoizedDescribe, type KeyDescription, type KeyProtection, type KeyProvider, type KeyRef } from "../provider.js";
 
 export type GcpKmsOperation = "getPublicKey" | "asymmetricSign" | "encrypt" | "decrypt";
 /** One KeyManagementServiceClient call; resolves to the response (the first element of the SDK's tuple). */
@@ -44,7 +44,7 @@ export function gcpKmsProvider(call?: GcpKmsCall): KeyProvider {
   let kms: Promise<GcpKmsCall> | null = call ? Promise.resolve(call) : null;
   const send = (operation: GcpKmsOperation, request: Record<string, unknown>) =>
     attempt("gcp-kms", operation, async () => (await (kms ??= sdkCall()))(operation, request));
-  const describe = memoizedDescribe(async ref => {
+  const describe = memoizedDescribe(ref => attempt<KeyDescription>("gcp-kms", "describe", async () => {
     const key = await send("getPublicKey", { name: versionName(ref) });
     const algorithm = ALGORITHMS[String(key.algorithm)];
     if (algorithm === undefined || typeof key.pem !== "string") throw refused("the key version is not an EC_SIGN_ED25519 or EC_SIGN_P256_SHA256 key");
@@ -53,11 +53,11 @@ export function gcpKmsProvider(call?: GcpKmsCall): KeyProvider {
       ref, algorithm, publicKeyPem, keyId: signingKeyId(publicKeyPem) ?? "",
       protection: PROTECTION[String(key.protectionLevel)] ?? "unknown", protectionBasis: "provider-metadata", exportable: false
     };
-  });
+  }));
   return {
     id: "gcp-kms",
     describe,
-    async sign(ref, message) {
+    sign: (ref, message) => attempt("gcp-kms", "sign", async () => {
       const { algorithm } = await describe(ref);
       const request = algorithm === "ed25519"
         ? { name: versionName(ref), data: Buffer.from(message) }
@@ -65,12 +65,12 @@ export function gcpKmsProvider(call?: GcpKmsCall): KeyProvider {
       const signature = Buffer.from((await send("asymmetricSign", request)).signature as Uint8Array);
       if (algorithm === "ed25519") return signature;
       try { return derToP1363(signature); } catch { throw refused("Cloud KMS answered with a malformed ECDSA signature"); }
-    },
-    async wrapKey(ref, plaintextKey) {
+    }),
+    wrapKey: (ref, plaintextKey) => attempt("gcp-kms", "wrapKey", async () => {
       return Buffer.from((await send("encrypt", { name: keyName(ref), plaintext: Buffer.from(plaintextKey) })).ciphertext as Uint8Array);
-    },
-    async unwrapKey(ref, wrapped) {
+    }),
+    unwrapKey: (ref, wrapped) => attempt("gcp-kms", "unwrapKey", async () => {
       return Buffer.from((await send("decrypt", { name: keyName(ref), ciphertext: Buffer.from(wrapped) })).plaintext as Uint8Array);
-    }
+    })
   };
 }

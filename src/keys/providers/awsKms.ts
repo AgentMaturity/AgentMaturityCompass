@@ -52,7 +52,7 @@ export function awsKmsProvider(call?: KmsCall): KeyProvider {
     const region = regionOf(ref);
     return attempt("aws-kms", operation, async () => (await (kms ??= sdkCall()))(operation, input, region));
   };
-  const describe = memoizedDescribe(async (ref: KeyRef): Promise<KeyDescription> => {
+  const describe = memoizedDescribe((ref: KeyRef) => attempt<KeyDescription>("aws-kms", "describe", async () => {
     const key = await send("GetPublicKey", { KeyId: ref.id }, ref);
     const meta = ((await send("DescribeKey", { KeyId: ref.id }, ref)).KeyMetadata ?? {}) as Record<string, unknown>;
     const signing = SIGNING[String(key.KeySpec)];
@@ -65,23 +65,23 @@ export function awsKmsProvider(call?: KmsCall): KeyProvider {
       ref, algorithm: signing.algorithm, publicKeyPem, keyId: signingKeyId(publicKeyPem) ?? "",
       protection: PROTECTION[String(meta.Origin)] ?? "unknown", protectionBasis: "provider-metadata", exportable: false
     };
-  });
+  }));
   return {
     id: "aws-kms",
     describe,
-    async sign(ref, message) {
+    sign: (ref, message) => attempt("aws-kms", "sign", async () => {
       const { algorithm } = await describe(ref);
       if (message.length > MAX_RAW_MESSAGE) throw refused(`KMS signs raw messages of at most ${MAX_RAW_MESSAGE} bytes`);
       const out = await send("Sign", { KeyId: ref.id, Message: message, MessageType: "RAW", SigningAlgorithm: algorithm === "ed25519" ? "ED25519_SHA_512" : "ECDSA_SHA_256" }, ref);
       const signature = Buffer.from(out.Signature as Uint8Array);
       if (algorithm === "ed25519") return signature;
       try { return derToP1363(signature); } catch { throw refused("KMS answered with a malformed ECDSA signature"); }
-    },
-    async wrapKey(ref, plaintextKey) {
+    }),
+    wrapKey: (ref, plaintextKey) => attempt("aws-kms", "wrapKey", async () => {
       return Buffer.from((await send("Encrypt", { KeyId: ref.id, Plaintext: plaintextKey }, ref)).CiphertextBlob as Uint8Array);
-    },
-    async unwrapKey(ref, wrapped) {
+    }),
+    unwrapKey: (ref, wrapped) => attempt("aws-kms", "unwrapKey", async () => {
       return Buffer.from((await send("Decrypt", { KeyId: ref.id, CiphertextBlob: wrapped }, ref)).Plaintext as Uint8Array);
-    }
+    })
   };
 }

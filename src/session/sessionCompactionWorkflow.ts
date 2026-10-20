@@ -8,21 +8,22 @@ import { compactionReceipt } from "./surfaceCompactionValidation.js";
 import { resumeSession } from "./sessionResume.js";
 import type { SessionService } from "./sessionService.js";
 import { redactCompactionReplacement } from "../dataflow/redactingSession.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
-function snapshot(workspace: string, sessionId: string) {
+function snapshot(workspace: string, sessionId: string, trust?: TrustContext) {
   // Inspect the recorded backend, never a permissive fallback selected from a
   // malformed marker or environment. Keep verification and measurement inside
   // the same reader's change fence; this is still read-only, not writer admission.
   const reader = openHistoryReader(workspace);
   try {
-    const integrity = verifyLedgerIntegrity(reader.workspace);
+    const integrity = verifyLedgerIntegrity(reader.workspace, { trust });
     if (!integrity.chain.ok) throw new Error(`Session compaction refuses invalid evidence: ${integrity.chain.errors.slice(0, 3).join("; ")}`);
     const store = reader.store;
     const record = store.readSessionRecord(sessionId);
     if (record === null) throw new Error(`No session ${sessionId} exists in this workspace`);
     const rows = store.readSessionEvents(sessionId), head = rows.at(-1);
     if (!head) throw new Error("Session has no native history to compact");
-    const entries = describeMeasuredLiveEntries(reader.workspace, rows);
+    const entries = describeMeasuredLiveEntries(reader.workspace, rows, { trust });
     let lastSeal = -1;
     rows.forEach((row, index) => { if (row.event_type === "turn/seal") lastSeal = index; });
     const interrupted = rows.slice(lastSeal + 1).some(row => row.event_type === "turn/start");
@@ -31,8 +32,8 @@ function snapshot(workspace: string, sessionId: string) {
   } finally { reader.store.close(); }
 }
 
-export function inspectSessionCompaction(workspace: string, sessionId: string) {
-  const source = snapshot(workspace, sessionId);
+export function inspectSessionCompaction(workspace: string, sessionId: string, options: { trust?: TrustContext } = {}) {
+  const source = snapshot(workspace, sessionId, options.trust);
   return { ok: true as const, sessionId, headEventId: source.head.id, headEventHash: source.head.event_hash,
     trustRootAnchored: source.anchored, backend: source.backend,
     closed: source.record.ended_ts !== null || source.record.session_seal_sig !== null,
@@ -42,6 +43,7 @@ export function inspectSessionCompaction(workspace: string, sessionId: string) {
 }
 
 export interface SessionCompactionInput {
+  readonly trust?: TrustContext;
   readonly workspace: string; readonly sessionId: string; readonly expectedHeadHash: string;
   readonly originEventIds: readonly string[]; readonly reason: string;
   readonly mode: "summarize" | "replace" | "drop";
@@ -54,7 +56,7 @@ export function compactReleasedSession(input: SessionCompactionInput) {
   if (!["summarize", "replace", "drop"].includes(input.mode)) throw new Error("Unsupported compaction mode");
   if (input.mode === "drop" && input.replacement !== undefined) throw new Error("Drop does not accept replacement text");
   if (input.mode !== "summarize" && input.summaryRole !== undefined) throw new Error("A summary role applies only to range summaries");
-  const source = snapshot(input.workspace, input.sessionId);
+  const source = snapshot(input.workspace, input.sessionId, input.trust);
   if (source.backend !== "sqlite") throw new Error("JSONL compaction through a resumed writer is unavailable; read-only inspection remains supported");
   if (source.record.ended_ts !== null || source.record.session_seal_sig !== null) throw new Error("Closed sessions are immutable; use compaction during an open native conversation");
   if (source.interrupted) throw new Error("This session has an unsealed turn; explicitly recover it before requesting compaction");
@@ -64,7 +66,7 @@ export function compactReleasedSession(input: SessionCompactionInput) {
   const redacted = input.replacement === undefined ? null : redactCompactionReplacement(input.workspace, input.replacement);
   prepareSurfaceCompaction(input.workspace, source.rows, { origins: input.originEventIds, mode: input.mode,
     reason: input.reason, ...(redacted === null ? {} : { replacement: redacted.text }),
-    ...(input.summaryRole === undefined ? {} : { summaryRole: input.summaryRole }) });
+    ...(input.summaryRole === undefined ? {} : { summaryRole: input.summaryRole }) }, { trust: input.trust });
   const opened = source.rows.find(row => row.event_type === "session/open");
   if (!opened) throw new Error("Session has no supported native identity");
   const identity = JSON.parse(opened.meta_json) as Record<string, unknown>;

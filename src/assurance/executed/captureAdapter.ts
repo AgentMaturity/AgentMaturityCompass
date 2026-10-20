@@ -7,6 +7,7 @@ import type { Attempt, Binding, CompiledScenario, SeededScenarioRun } from "./ty
 import { writeExecutedEvidence, loadExecutedEvidence, type ExecutedEvidenceReference } from "./evidence.js";
 import { bindingMatches, replayCapturedAttempt } from "./oracles.js";
 import { benignRegistryFor } from "./routes.js";
+import type { OperationalEvidenceOptions } from "../../keys/operationalLedgerReader.js";
 
 interface AttemptReference {
   binding: Binding;
@@ -58,7 +59,7 @@ function unavailable(binding: Binding, reason: string): Attempt {
  * The source registry compiles `compiled`; no caller-supplied scenario object is authoritative.
  */
 export function replaySeededRunCaptures(ledger: Ledger, sessionId: string, compiled: CompiledScenario,
-  expectedScope: Omit<Binding, "attemptId" | "fixtureDigest">, input: unknown, expectedEvaluation?: ExecutedEvaluationSnapshot):
+  expectedScope: Omit<Binding, "attemptId" | "fixtureDigest">, input: unknown, expectedEvaluation?: ExecutedEvaluationSnapshot, options: OperationalEvidenceOptions = {}):
   { ok: true; authenticationErrors: string[]; attack: Attempt[]; benign: Attempt[] } | { ok: false; reason: string } {
   let heldExpectedEvaluation: ExecutedEvaluationSnapshot | undefined;
   if (expectedEvaluation !== undefined) {
@@ -88,7 +89,7 @@ export function replaySeededRunCaptures(ledger: Ledger, sessionId: string, compi
   const replay = (scenario: CompiledScenario, entry: AttemptReference): Attempt => {
     if (entry.reference === null) return unavailable(entry.binding, "captured_attempt_unavailable");
     const loaded = loadExecutedEvidence(ledger, entry.reference, { sessionId,
-      scenarioId: scenario.scenario.id, packId: scenario.scenario.packId, fixture: scenario.scenario.fixture, binding: entry.binding });
+      scenarioId: scenario.scenario.id, packId: scenario.scenario.packId, fixture: scenario.scenario.fixture, binding: entry.binding }, options);
     if (!loaded.ok) { authenticationErrors.push(`${scenario.scenario.id}:${entry.binding.attemptId}:${loaded.reason}`);
       return unavailable(entry.binding, loaded.reason); }
     if (heldExpectedEvaluation !== undefined && canonicalize(loaded.record.evaluation) !== canonicalize(heldExpectedEvaluation)) {

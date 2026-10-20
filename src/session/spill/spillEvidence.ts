@@ -27,6 +27,8 @@
  * caller who cares should ask it too.
  */
 import type { EvidenceEvent } from "../../types.js";
+import { createOperationalEvidenceVerifier } from "../../keys/operationalLedgerReader.js";
+import type { TrustContext } from "../../trust/trustContext.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import { verifyMonitorTrustRoot } from "../../persistence/sessionStoreVerification.js";
@@ -35,6 +37,8 @@ import { readSpilled, spillRoot, type SpillReadStatus } from "./spillStore.js";
 import { extractSpillRef, parseSpillLocator, SPILL_META_KEY, type SpillRef } from "./spillTypes.js";
 
 export interface SpillRetrievalOptions {
+  /** Independently supplied issuer admission; omission uses the ordinary public trust configuration. */
+  readonly trust?: TrustContext;
   /**
    * Pinned monitor-key fingerprint. Defaults to `AMC_EXPECTED_MONITOR_FINGERPRINT`,
    * exactly as `verifyStoredSessionEvents` does, so an anchored workspace stays
@@ -105,6 +109,7 @@ function resolveExpectedFingerprint(options: SpillRetrievalOptions): string | nu
  * answer — the same shape the P2.2 blob index had to have removed from it.
  */
 interface SpillAuthContext {
+  readonly operationalProblems: (rows: readonly EvidenceEvent[]) => string[];
   readonly monitorKeys: readonly string[];
   readonly trustError: string | null;
   readonly root: string;
@@ -112,7 +117,7 @@ interface SpillAuthContext {
 
 function spillAuthContext(workspace: string, options: SpillRetrievalOptions): SpillAuthContext {
   const trustErrors: string[] = [];
-  verifyMonitorTrustRoot(workspace, resolveExpectedFingerprint(options), trustErrors);
+  verifyMonitorTrustRoot(workspace, resolveExpectedFingerprint(options), trustErrors, options.trust);
   let monitorKeys: readonly string[] = [];
   try {
     monitorKeys = getPublicKeyHistory(workspace, "monitor");
@@ -123,6 +128,7 @@ function spillAuthContext(workspace: string, options: SpillRetrievalOptions): Sp
     monitorKeys = [];
   }
   return {
+    operationalProblems: createOperationalEvidenceVerifier(workspace, { trust: options.trust }),
     monitorKeys,
     trustError: trustErrors[0] ?? null,
     root: options.root ?? spillRoot(workspace)
@@ -150,7 +156,7 @@ function authenticateWithContext(
   }
 
   const context = typeof resolveContext === "function" ? resolveContext() : resolveContext;
-  const authError = context.trustError ?? rowAuthenticityError(event, context.monitorKeys);
+  const authError = context.trustError ?? context.operationalProblems([event])[0] ?? rowAuthenticityError(event, context.monitorKeys);
   if (authError !== null) {
     return { eventId: event.id, status: "row-unauthentic", detail: authError, bytes: null, ref };
   }
@@ -189,7 +195,7 @@ export function spillLifecycleEventAuthenticityError(
   options: SpillRetrievalOptions = {}
 ): string | null {
   const context = spillAuthContext(workspace, options);
-  return context.trustError ?? rowAuthenticityError(event, context.monitorKeys);
+  return context.trustError ?? context.operationalProblems([event])[0] ?? rowAuthenticityError(event, context.monitorKeys);
 }
 
 function inspectWithContext(

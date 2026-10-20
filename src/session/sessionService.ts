@@ -6,8 +6,8 @@ import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
 import { describeLiveEntries, prepareSurfaceCompaction, type AutomaticCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
-
 import { SessionEventWriter } from "./sessionSpine.js";
 export { NATIVE_TRUST_TIER } from "./sessionSpine.js";
 
@@ -616,7 +616,7 @@ export class SessionService extends SessionEventWriter {
   private commitSurfaceCompaction(params: Parameters<typeof prepareSurfaceCompaction>[2]): SessionEventRef {
     this.ensureUsable();
     if (this.currentStep !== null) throw new Error("compaction is allowed only between steps, never during an in-flight model/tool step");
-    const prepared = prepareSurfaceCompaction(this.workspace, this.readEvents(), params);
+    const prepared = prepareSurfaceCompaction(this.workspace, this.readEvents(), params, { trust: workspaceSelfTrust(this.workspace) });
     return this.appendSessionEvent({ eventType: "loop/compact", typeMeta: {
       turn: this.currentTurn, step: this.currentStep, ...prepared.typeMeta
     }, surface: prepared.surface, payload: prepared.payload, turn: this.currentTurn, step: this.currentStep });

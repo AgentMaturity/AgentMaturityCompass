@@ -1,4 +1,6 @@
+import { signatureEnvelopeSchema } from "../../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
+import { SIGNING_ALGORITHMS } from "../../keys/algorithmPolicy.js";
 
 export const backupManifestSchema = z.object({
   v: z.literal(1),
@@ -39,7 +41,7 @@ export const backupManifestSchema = z.object({
     evidenceDbSha256: z.string().length(64).nullable()
   }),
   signing: z.object({
-    algorithm: z.literal("ed25519"),
+    algorithm: z.enum(SIGNING_ALGORITHMS),
     auditorFingerprint: z.string().length(64)
   })
 });
@@ -51,21 +53,7 @@ export const backupManifestSigSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export type BackupManifestSig = z.infer<typeof backupManifestSigSchema>;

@@ -99,6 +99,7 @@ export type TrustList = ReturnType<typeof list>;
 
 /** One row per root key, each signature in its canonical base64 spelling. */
 export const signedTrustList = obj({
+  signatureVersion: opt(lit(2, "UNSUPPORTED_VERSION")),
   list,
   signatures: refine(arr(obj({
     keyId: sha256,

@@ -2,14 +2,14 @@
 
 AMC signing keys live in the workspace vault unless you configure a key provider. A key provider holds a key that never leaves it: AWS KMS, Google Cloud KMS, Azure Key Vault or Managed HSM, or a PKCS#11 token such as an HSM or SoftHSM2. AMC asks the provider to sign and checks every signature it returns against the provider's public key before using it.
 
-This page covers what P2-08 added: the provider interface, the algorithm policy, provider configuration, binding a provider key to a signing purpose, the ledger-row delegation, the notary `KEY_PROVIDER` backend, error codes and failure modes. [KEY_LIFECYCLE.md](KEY_LIFECYCLE.md) covers purpose keys, key sets and rotation.
+This page covers the provider interface, algorithm policy, purpose binding and rotation, scoped ledger-row delegation, asynchronous producer and notary paths, error codes and retained limits. [KEY_HISTORY.md](KEY_HISTORY.md) covers authenticated key history. The repository source guide `docs/KEY_LIFECYCLE.md` covers purpose keys, key sets and rotation.
 
 ## What this release does and does not do
 
 - **The vault stays the default.** Without a `keys` section in `.amc/amc.config.yaml`, every purpose signs with the vault exactly as before.
-- **A purpose configured to a provider never signs with the vault.** As soon as `keys.refs.<purpose>` names a provider key, `getSigningKey` refuses that purpose with `KEY_PROVIDER_HELD`, whether or not the key is bound yet, whether the provider is reachable or not.
-- **Only `ledger-row` can be bound in this release.** Most AMC signers still take a vault key synchronously (`getSigningKey`). Binding any other purpose would make all of them refuse, including the transparency-log seal written by every key rotation. Those call sites have to move to `signWithPurposeKey` first (follow-up). Until then, `keys.refs` for another purpose only makes its signers refuse; remove the ref to sign with the vault again.
-- **Artifact signatures can come from a provider through the notary.** The notary's `KEY_PROVIDER` backend signs every kind that `signDigestWithPolicy` sends to the notary in `trust.mode: NOTARY` (transparency and Merkle roots, certificates, bundles, BOMs, release and backup manifests and the other notary kinds), with an Ed25519 key held by the provider.
+- **A provider-held purpose has no vault fallback.** `getSigningKey` refuses direct private-key use with `KEY_PROVIDER_HELD`, whether or not the configured provider is reachable or already bound. The explicit exception is the bound ledger-row purpose: its local delegate is served only under the current provider-signed scoped delegation, live key gates and quota. That authorization is not a fallback when remote signing fails.
+- **Binding has a limited owner surface.** `bindPurposeProviderKey` supports `ledger-row` and `session`; `config-signature` has a separate candidate-config owner transition. This does not enable every purpose or every consumer. Synchronous private-key consumers refuse a provider-held purpose. Removing an editable ref never releases a committed binding or enables a vault fallback.
+- **Artifact signatures can come from a provider through the notary.** In `trust.mode: NOTARY`, the notary's `KEY_PROVIDER` backend signs allowed kinds with an Ed25519 or ECDSA P-256 key held by the provider. `signDigestWithPolicyAsync` supplies the asynchronous policy/transport path; the trust-certificate CLI and HTTP producer use it and bind their signed issuer metadata to the actual described signer. Existing synchronous policy and SDK APIs remain. Each other producer and admission edge needs its own integration evidence; support in the notary alone does not qualify every artifact producer or bind the workspace's `artifact-seal` purpose.
 - **Protection labels are never "attested".** `protectionBasis` says where a label came from: `provider-metadata` (the provider's own key metadata) or `configured` (the operator's statement). Verifying a provider's key attestation is a follow-up.
 
 ## Algorithm policy
@@ -24,13 +24,13 @@ Defined in `src/keys/algorithmPolicy.ts`.
 - A provider that answers in DER (AWS KMS and Google Cloud KMS for ECDSA) is converted by a strict DER parser: short-form lengths, minimal positive integers, 0 < r, s < n, no trailing bytes. Anything else is refused. Every ECDSA answer is then brought to low S (s ≤ n/2), the same signature in its one canonical form.
 - One encoding per signature: Ed25519 is 64 bytes with S below the group order; ECDSA is P1363 (64 bytes) with 0 < r < n and 0 < s ≤ n/2. A DER signature, a high-S twin (r, n − s), an unreduced Ed25519 S, another curve, another key type, or an algorithm that is not the key's own never verifies.
 - The algorithm always comes from the pinned key: a provider's description, an envelope's `alg` or a statement's `algorithm` must agree with it and never selects one.
-- A key's identity comes from its DER SubjectPublicKeyInfo bytes: the key id is sha256 of the canonical PEM rendered from that DER (the id P1-08 already uses). PEM line breaks, CRLF, surrounding whitespace or the DER itself give the same id; a provider-reported id that is not this id is refused. This holds for digest verification (`verifyHexDigest`), signature envelopes, trust-list entries and roots, issuer admission, proofs of possession, delegations and the standalone verifier (`packages/verifier`).
+- A key is parsed as SubjectPublicKeyInfo and rendered as canonical SPKI PEM. Its key id is SHA-256 of the UTF-8 bytes of that canonical PEM, as in P1-08; it is not SHA-256 of the raw DER. Equivalent PEM formatting and DER input therefore resolve to the same id. A provider-reported id that disagrees is refused. Digest verification, envelopes, issuer admission, proofs of possession, delegations and the standalone verifier use this identity.
 - `keys.algorithmPolicy.allowed` narrows the algorithms a workspace accepts from its providers (default: both).
-- AMC's own messages fit every provider's limit (the largest is a delegation or a proof of possession, under 1 KiB). AWS KMS signs raw messages of at most 4096 bytes; a longer message is refused, never hashed into another form.
+- Raw provider signing preserves the requested bytes and enforces provider limits; AWS KMS RAW messages above 4096 bytes refuse. Trust lists, key-rotation statements, revocation lists and root-rotation statements also support an explicit envelope `signatureVersion: 2`: a distinct v2 digest tag, NUL and SHA-256 of the complete v1 tagged payload. The inner record remains version 1. Absent `signatureVersion` keeps the exact v1 bytes; unknown versions, mixed holder modes and downgrade substitutions refuse. This is a declared wire format, never an implicit hash of an oversized v1 request. The repository source guide `docs/KEY_LIFECYCLE.md` lists the exact tags.
 
 ### Provider matrix
 
-From the provider facts recorded in the P2-08 issue, checked on 5 October 2026. **Not re-checked in this session (no network access).** Re-check before relying on a row; capabilities change, and AMC tests capabilities (key spec, mechanism list), not provider names.
+From the provider facts recorded in the P2-08 issue, checked on 5 October 2026. **Historical source facts; not independently re-verified as a complete matrix during this implementation.** Re-check before relying on a row; capabilities change, and AMC tests capabilities (key spec, mechanism list), not provider names.
 
 | Provider | Algorithm | Key type and mechanism | Protection AMC reports | Source |
 |---|---|---|---|---|
@@ -48,7 +48,7 @@ From the provider facts recorded in the P2-08 issue, checked on 5 October 2026. 
 The `keys` section of `.amc/amc.config.yaml` holds identifiers only: never credentials, PINs, endpoints or library paths. The file is editable by anyone who can write the workspace, so AMC reads it in two ways:
 
 - **To refuse, as it stands.** A ref, `keys.provider` or `requireNonExportable: true` makes the vault refuse for the purposes it names, signed or not.
-- **To pick a key, only when signed.** Binding a key (`amc keys rotate`) reads the ref from an `amc.config.yaml` whose signature (`amc verify --sign-config`, the `config-signature` key) verifies, from one read of the file: the bytes verified are the bytes used. After an edit, sign the file again before binding. Once bound, the key set records the ref and signing reaches the key by that record, never by the config; renewing the bound key needs no signature.
+- **To pick a key, only through its owner transition.** Ledger-row/session binding reads a new ref from one verified snapshot of `amc.config.yaml`; renewal can reuse the committed ref without a new config signature. The dedicated config-signature transition has the current config authority endorse the exact candidate before publishing the new binding and candidate pair. Once bound, signing reaches the provider by the committed key-set record. Current editable key policy can narrow or refuse signing; it is not independent positive authority.
 
 Limit: a workspace writer who rewrites the file can remove `requireNonExportable` or a ref for a purpose that is not bound yet; bound purposes are held by the key set.
 
@@ -76,10 +76,12 @@ The provider SDKs are not installed with AMC. Install the one you use next to it
 npm install @aws-sdk/client-kms@3.1146.0                       # aws-kms
 npm install @google-cloud/kms@6.2.1                            # gcp-kms
 npm install @azure/keyvault-keys@4.10.2 @azure/identity@4.13.3  # azure-kv
-npm install pkcs11js@2.1.7                                     # pkcs11 (compiles natively: needs a C++ toolchain)
+# From an AMC source checkout, install the unpublished optional wrapper locally:
+npm install --install-links ./packages/key-provider-pkcs11 pkcs11js@2.1.7
+# pkcs11js compiles natively and needs a C++ toolchain.
 ```
 
-A missing SDK fails with `KEY_PROVIDER_NOT_INSTALLED`, naming the package. They are not yet declared as optional peer dependencies: that needs a lockfile update with network access (follow-up).
+A missing SDK fails with `KEY_PROVIDER_NOT_INSTALLED`, naming the package. The pinned SDKs and the local PKCS#11 wrapper are optional peer dependencies. Ordinary installation omits the SDKs and pkcs11js; native loading occurs only when the wrapper loader is called. The wrapper is a local package, with no registry publication claimed.
 
 ### Least-privilege access
 
@@ -98,14 +100,15 @@ amc keys rotate --purpose ledger-row
 amc keys list
 ```
 
-For a purpose whose `keys.refs` names a provider key, `amc keys rotate` binds that key instead of generating one (`--reason`, `--overlap-days` and `--root-key` are refused):
+For `ledger-row` or `session` whose `keys.refs` names a provider key, `amc keys rotate` binds that key instead of generating one. The generic provider branch refuses `--reason`, `--overlap-days` and `--root-key`; it does not silently ignore them. `config-signature` uses its separate candidate-config transition and supports ordinary rotation reasons/overlap, while provider compromise and pinned-root recovery remain explicitly refused.
 
 1. AMC reads the ref from the signed config (or, to renew, from the binding), then the provider describes the key; AMC checks it is a canonical Ed25519 or P-256 key whose algorithm and id derive from its key bytes, allowed by `keys.algorithmPolicy`, not exportable and not revoked.
 2. The provider signs a proof of possession (`AMC_KEY_POP_V1`) for the purpose, and AMC verifies it.
-3. One key-set generation records the binding (`providers.<purpose>`: provider, ref id and version, key id, algorithm, protection and basis) and pins `.amc/keys/<purpose>-provider.pub` by digest. It is committed and marked like every P1-08 generation, so restoring an older `keyset.json` (from before the binding) is `ROLLBACK_DETECTED`, and a changed public key file refuses signing.
-4. Later generations, such as a rotation of another purpose, carry the binding forward.
+3. A genuine change of effective signing key prepares a separate P1-08 rotation statement with signatures by the previous and next holders. A proof of possession or a delegation chain does not replace that statement. Preparation happens before the short synchronous publication lock; publication rechecks the exact predecessor, key-set generation, identities/refs, current refusal policy, revocations and live delegation window.
+4. One key-set generation records the binding (`providers.<purpose>`: provider, ref id and version, key id, algorithm, protection and basis), public key, exact-purpose issuer history, statement and any delegation archive. It is committed and marked like every P1-08 generation. An older key set or changed pinned file refuses.
+5. Later generations, such as a rotation of another purpose, carry the binding forward.
 
-Running the command again keeps the generation when the configured ref is the bound one (it renews the delegation, needing no config signature). Pointing `keys.refs` at another key and running it again binds that key in a new generation (re-binding) and drops the previous provider key from the purpose's admitted keys. There is no command that moves a bound purpose back to the vault in this release.
+Renewal or re-binding commits a new generation. The same canonical public key, including a changed alias that still resolves to it, does not create a fake key-rotation statement. A different key requires the genuine previous/next statement; an unavailable old holder refuses the transition. Immutable histories and delegation archives retain previous issuers for their exact purpose rather than dropping them or admitting them through a broader role history. Retired keys are not automatically revoked. The current key cannot be revoked while bound; explicit retirement/revocation and independently updated portable trust remain separate operations. There is no supported provider-to-vault unbind command.
 
 From then on:
 
@@ -115,25 +118,42 @@ From then on:
 - `amc keys revoke` refuses the bound key as a key still in use; re-bind first.
 - `amc keys list` shows, per purpose, `provider`, `algorithm`, `protection`, `protectionBasis` and `providerKeyId`, as the key set recorded them at binding (no provider call).
 
-## Ledger-row delegation
+## Ledger-row delegation and verification
 
 The ledger signs every event, and a remote call per event is too slow and rate-limited. The vault's `ledger-row` key therefore keeps signing rows as a *delegate*, and the bound provider key certifies it:
 
 ```json
-{ "delegation": { "type": "amc.key-delegation", "version": 1, "purpose": "ledger-row",
+{ "delegation": { "type": "amc.key-delegation", "version": 2, "purpose": "ledger-row",
     "delegateKeyId": "<64 hex>", "delegatePublicKeyPem": "<Ed25519 SPKI PEM>",
     "notBefore": "2026-10-18T00:00:00.000Z", "notAfter": "2026-10-19T00:00:00.000Z",
-    "maxEvents": 1000000, "issuerKeyId": "<64 hex>" },
+    "maxEvents": 1000000, "issuerKeyId": "<64 hex>",
+    "scope": { "workspaceId": "acme-prod", "sequence": 1, "previousDelegationSha256": null,
+      "starts": { "sqlite-evidence": { "count": 0, "head": "GENESIS" },
+        "jsonl-evidence": { "count": 0, "head": "GENESIS" },
+        "sqlite-outcome": { "count": 0, "head": "GENESIS_OUTCOME" } },
+      "checkpoints": { "sequence": 0, "sha256": null } } },
   "algorithm": "ecdsa-p256-sha256", "signature": "<base64, 64 bytes>" }
 ```
 
-- Signed bytes: `AMC_KEY_DELEGATION_V1`, one 0x00 byte, then the canonical statement. Only the canonical encoding is accepted.
+- New owner bindings issue scoped v2 delegations: `AMC_KEY_DELEGATION_V2`, NUL and the canonical delegation. Legacy v1 bytes retain their v1 tag. The first signed scope fixes the legacy cutover using actual stream/checkpoint heads; later scopes chain by digest and sequence. It cannot authorize a different workspace or expand another purpose.
 - `amc keys rotate --purpose ledger-row` writes a fresh delegation to `.amc/keys/delegations/ledger-row.json`, valid for 24 hours from now (the maximum). Renew it at least daily; schedule the command.
-- While the delegation is current, verifies under the bound provider key (which must not be revoked) and names the very key the vault serves, `getSigningKey(workspace, "ledger-row")` serves the delegate. Every refusal is decided before the vault is touched. Otherwise it refuses with `KEY_DELEGATION_INVALID`, and no new ledger connection signs until the delegation is renewed. Limit: an open ledger connection (and the JSONL session store) caches the key it loaded and keeps signing past the window until it is closed, so an expired delegation stops a long-running process such as Studio only when it reopens the ledger (follow-up: check the window per append).
-- A verifier admits a delegate's row only through a delegation from a provider key it pinned, valid at the row's signing time, and only for rows up to `maxEvents` (`admitDelegatedRow`). The workspace's own verification admits the vault ledger-row key as before. Wiring delegation admission into `amc verify` and the standalone verifier is a follow-up.
-- Checkpoints and other ledger-row signatures made through `signWithPurposeKey` are signed by the provider key directly.
+- While the delegation is current, verifies under the bound provider key (which must not be revoked) and names the very key the vault serves, `getSigningKey(workspace, "ledger-row")` serves the delegate. Delegation authorization is checked before vault access; the served key identity is checked again after reading it. Invalid delegation refuses with `KEY_DELEGATION_INVALID`. SQLite and JSONL writers recheck authorization on every key use, including warmed writers; only PEM parsing is cached. Lock, expiry, revocation and keyset rollback refuse the next signature.
+- SQLite evidence, JSONL evidence and SQLite outcome events share one durable use sequence/quota for a delegation. Signed row markers bind the delegation digest and use sequence. Checking a selected subset alone cannot establish the global quota: public operational readers validate actual global prefixes and selected row preimages/membership, with independently supplied or loaded trust. Internal writer self-checks do not turn self trust into anchored public admission.
+- The maintained checkpoint producer signs directly through the bound ledger-row provider. Its verifier uses the authenticated legacy boundary and exact-purpose historical issuer candidates; post-boundary omission or vault/delegate fallback refuses. Main operational readers and standalone cryptographic formats have focused coverage, while reserved A4 consumers and portable transport of complete global quota context remain integration limits.
 
-To rotate the delegate key itself, remove `keys.refs.ledger-row`, run `amc keys rotate --purpose ledger-row` (a vault rotation), put the ref back and run it again to delegate the new key. Rows stop between the two steps.
+Delegate-key rotation is not supported by removing a ref: the committed provider binding continues to hold the purpose and vault rotation refuses. Coherent delegate rotation and provider compromise/root recovery remain owner-integration work. Renew before expiry; expired, revoked, rolled-back or exhausted delegation state refuses.
+
+## Maintained asynchronous producers
+
+`session` signing is direct provider signing, not ledger delegation. Maintained ticket, pairing/session, outcome-contract, workorder and signed-users producers have asynchronous paths. Tools init/reviewed signing and action-policy initialization also use the bound config-purpose signer. Publication rechecks the exact predecessor, committed purpose authority and current refusal policy after signing, plus the actual caller's authorization where supplied. Initializers and ticket/workorder issuers mirror their existing owner-mode command gates at entry and final publication/return; this does not add an agent-mode prohibition to `tools sign` or invent one for users. Signed-users HTTP mutations retain fixed provider/revocation/locked-vault status responses without exposing password verifiers or provider text. Default signed bytes and synchronous compatibility APIs remain, subject to the documented provider-held refusal.
+
+Ticket and work-order CLI commands and direct asynchronous APIs support provider signing. Their registry and Studio HTTP writers currently retain synchronous signing: the default vault remains supported, and a provider-held config key returns `KEY_PROVIDER_HELD`/409 before a ticket, work-order body or revocation marker is published. Remote HTTP signing remains unavailable until current-credential forwarding is integrated and verified.
+
+Governor override activation signs the existing domain-tagged config-purpose payload; canary activation additionally signs its artifact-seal record before publication. Both recheck their captured authorities and the override-specific no-sign refusal in the final publication phase. The asynchronous policy signer also enforces its own declared no-sign rule at entry and after its wait. These checks do not impose a new global rule on every synchronous signing API.
+
+Plugin initialization uses the actual policy-selected config signer or required notary, preserves existing installed rows and complete signed pairs, and checks its captured policy inputs before publication. Required-notary records are authenticated against the currently selected policy pin; a carried `signer.type` label never authorizes them. Changing or removing that pin can refuse historical plugin records. Plugin publication explicitly refuses no-sign mode even with an unlocked vault; generic synchronous policy SDK behavior is retained separately.
+
+This scope does not qualify cold Studio supervision as a whole. The conditional plugin/action/tools startup handoffs use their asynchronous initializers, while `up`/workspace/bootstrap, other missing configuration/blob initialization, signature repair and compound policy writers still need coherent migrations. Approval cold bootstrap, held API-index current-credential forwarding and other reserved consumers retain their existing ownership dependencies. Native installed-lock admission uses the same exact-purpose/current-notary verifier on its bounded file snapshot. This does not migrate native execution approvals or compound plugin installation. No new endpoint or general-purpose binder is implied. Normal `revocation-list` binding remains refused pending lease-store and native-task integration, even though asynchronous key/certificate revocation APIs exist.
 
 ## Notary `KEY_PROVIDER` backend
 
@@ -146,9 +166,19 @@ notary:
     ref: { provider: pkcs11, id: "pkcs11:token=amc-notary;object=notary-signing" }
 ```
 
-- The notary reaches the provider through a bridge child process (`dist/keys/providerBridge.js`), one per call, so its synchronous signing path is unchanged. The child reads credentials from the environment and answers with JSON; a failure crosses as a code and AMC's own message, never the provider's text.
-- The key must be Ed25519 (AWS KMS, Google Cloud KMS software keys, or a PKCS#11 token with `CKM_EDDSA`): the artifact envelopes the notary signs are Ed25519-only in this release. Azure Key Vault and HSM-protected Google keys cannot back the notary yet.
+- The maintained notary server and asynchronous CLI/API paths use `loadNotarySignerAsync`: `KEY_PROVIDER` calls the provider's Promise interface in the notary process, pins the checked public description/ref, requires nonexportability and verifies every returned signature. It does not enter the synchronous provider bridge or export private key material. Payload signing and the mandatory signing-log seal finish before the server returns a successful `/sign` response.
+- The asynchronous log signs outside its short file lock, then compares the exact log/seal/signature predecessor before publishing. A concurrent append requires fresh preparation; a changed or incomplete authenticated state refuses. The three files are individually replaced, with no cross-file crash-atomicity claim.
+- Existing synchronous SDK APIs, including `loadNotarySigner`, `signDigestWithPolicy`, synchronous notary log functions and `notaryStatusCli`/`notaryPubkeyCli`/`notarySignCli`/`notaryAttestCli`, remain compatible. Their `KEY_PROVIDER` route still uses `dist/keys/providerBridge.js` and can block its caller. The async wrappers for `FILE_SEALED` and `EXTERNAL_SIGNER` retain their existing local/external implementation; the external script protocol and synchronous native PKCS#11 calls are not made nonblocking merely by returning a Promise.
+- The key may be Ed25519 or ECDSA P-256. Responses, attestations, log verification, shared artifact envelopes and the standalone verifier use the matching key algorithm. ECDSA signatures must be canonical low-S P1363; DER and high-S artifact signatures refuse. The old `EXTERNAL_SIGNER` script protocol remains Ed25519.
 - `attestationLevel` is `HARDWARE` only when the provider describes the key as `hsm`, and every level now carries `attestationBasis` (see [HARDWARE_TRUST.md](HARDWARE_TRUST.md)).
+
+### Asynchronous workspace-to-notary transport
+
+`signDigestWithPolicyAsync` uses native HTTP/HTTPS or the configured Unix-domain socket. TCP destinations pass the existing workspace `bridge` egress policy and `resolveAndCheck`/`decideEgress`; the chosen allowed address is pinned for that request, and workspace egress is checked again after DNS. A DNS name does not grant a private or loopback address; use an explicit configured IP literal where the egress policy allows it. Unix sockets use local IPC without DNS or TCP. No transport follows redirects.
+
+One 30-second transport deadline starts before DNS and covers the response body, which is capped at 1 MiB. Native DNS work may finish later; both late outcomes are consumed, and a timed-out resolution cannot open a socket. This is a per-request transport bound, not a deadline for every provider operation or an entire multi-step producer.
+
+The asynchronous policy signer captures the signer descriptor and enforcement policy, checks current key revocation/operator distrust, verifies the response against the original signer and digest, then rechecks the descriptor, policy and refusals after the remote wait. A notary's transport pin does not create workspace purpose authority. Public artifact verification still requires independently admitted signer trust.
 
 ## Data-key wrapping
 
@@ -156,7 +186,7 @@ notary:
 
 ## Error codes
 
-Every provider failure is a `KeyProviderError` with a code, the provider id and a fixed message. The provider's own error text is never copied: it can carry endpoints, account ids, paths or PINs.
+Remote provider failures are `KeyProviderError` values with a code, provider id and a fixed message. File-provider signing preserves the vault’s existing lock, revocation and rollback errors across its async boundary. The provider's own error text is never copied: it can carry endpoints, account ids, paths or PINs.
 
 | Code | Suggested HTTP status | Meaning |
 |---|---|---|
@@ -194,12 +224,14 @@ interface KeyProvider {
 
 - `tests/keys/providerContract.test.ts` runs one contract suite against the vault and in-process fakes of AWS KMS, Google Cloud KMS, Azure Key Vault and a PKCS#11 token, and checks request shapes. Nothing touches the network.
 - `tests/keys/pkcs11Softhsm.test.ts` runs against a real SoftHSM2 token when `AMC_TEST_PKCS11_MODULE` names `libsofthsm2.so` and pkcs11js is installed; the CI job `pkcs11-softhsm` does that on Ubuntu with a token, PINs and keys created per run.
-- No test or script calls a real KMS. Running against a real AWS, Google or Azure key needs the operator's credentials and is the operator's step.
+- Default tests use owned in-process keys or local child processes and never call a real KMS. A separate local macOS SoftHSM2 run exercised P-256, extractability refusal and EdDSA with three passing tests. That software-token run is not Ubuntu CI or hardware qualification. Real AWS, Google or Azure keys require the operator’s credentials.
 
 ## Not in this release
 
-- Binding purposes other than `ledger-row`, which needs their synchronous signers moved to `signWithPurposeKey`; moving a bound purpose back to the vault.
-- ECDSA artifact envelopes from `signDigestWithPolicy` (twelve artifact schemas pin `alg: ed25519`), so the notary takes Ed25519 provider keys only.
-- Delegation admission in `amc verify` and the standalone verifier; provider-signed trust lists, rotation statements and revocation lists.
+- General binding of every workspace purpose, provider-to-vault unbinding, delegate-key rotation, or provider compromise/root recovery. Direct `artifact-seal`, `revocation-list`, `receipt` and `lease` binding is not enabled by low-level async APIs.
+- Complete provider-backed producer integration and truthful signer metadata for every artifact format; shared-envelope support does not substitute for those producer checks.
+- Complete reserved A4/approval/lease integration and portable transport of global delegated-use context. Provider trust-list/root authoring, rotation statements and async key/certificate revocation have implemented paths; this does not release reserved owners or qualify normal revocation-list provider binding.
 - Verifying provider key attestations: labels stay `provider-metadata` or `configured`.
-- Optional peer declarations for the provider SDKs, and live tests against real providers.
+- Live tests against real cloud or hardware providers and an executed Ubuntu SoftHSM CI job. The local job definition is not a CI pass.
+
+The recorded implementation evidence is focused source, whole-file native/compiled tests, owned local transport/process witnesses and measured guard mutations. It is not a final full-suite, hosted-CI, live-cloud, hardware-attestation or every-purpose qualification claim. Optional SDK source/type checks establish the pinned API shapes only.

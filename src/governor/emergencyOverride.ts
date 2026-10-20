@@ -11,9 +11,13 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signOverrideDigest, verifyOverrideDigest, type OverrideSignatureCheck } from "./overrideSignature.js";
+import { assertOverridePublicationCurrent, BreakGlassSigningError, prepareOverrideDigestSignature, signOverrideDigest, verifyOverrideDigest, type OverrideSignatureCheck } from "./overrideSignature.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { capturePurposePublication } from "../keys/purposePublication.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { getSigningKey } from "../keys/signingKeys.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -92,9 +96,31 @@ function saveOverride(workspace: string, entry: EmergencyOverrideEntry): void {
 
 function getLastOverrideHash(workspace: string): string {
   const entries = loadAllOverrides(workspace);
-  if (entries.length === 0) return "GENESIS_OVERRIDES";
-  const sorted = entries.sort((a, b) => a.startedTs - b.startedTs);
-  return sorted[sorted.length - 1]!.override_hash;
+  const next = new Map<string, EmergencyOverrideEntry>(), hashes = new Set<string>();
+  for (const entry of entries) {
+    if (!verifyOverrideEntry(workspace, entry).valid || hashes.has(entry.override_hash) || next.has(entry.prev_override_hash)) throw new Error("override register has no unique verified chain");
+    hashes.add(entry.override_hash); next.set(entry.prev_override_hash, entry);
+  }
+  let head = "GENESIS_OVERRIDES", visited = 0;
+  while (next.has(head) && visited <= entries.length) { head = next.get(head)!.override_hash; visited++; }
+  if (visited !== entries.length) throw new Error("override register has no unique verified chain");
+  return head;
+}
+
+function overrideRegisterSnapshot(workspace: string): string {
+  const dir = overrideDir(workspace);
+  return pathExists(dir) ? canonicalize(readdirSync(dir).filter(name => name.endsWith(".json")).sort()
+    .map(name => ({ name, sha256: sha256Hex(readFileSync(join(dir, name))) }))) : "[]";
+}
+
+function publishOverride(workspace: string, entry: EmergencyOverrideEntry, predecessor: string, assertAuthority: () => void): EmergencyOverrideEntry {
+  return withControlFileLock({ root: overrideDir(workspace), name: "override-register", operation: () => {
+    assertAuthority();
+    if (overrideRegisterSnapshot(workspace) !== predecessor || getLastOverrideHash(workspace) !== entry.prev_override_hash) throw new Error("override register changed while signing was prepared; retry");
+    if (!Number.isFinite(entry.expiresTs) || Date.now() > entry.expiresTs) throw new Error("override expired while signing was prepared");
+    if (pathExists(overrideFilePath(workspace, entry.overrideId))) throw new Error("override publication destination already exists");
+    saveOverride(workspace, entry); return entry;
+  } });
 }
 
 // ---------------------------------------------------------------------------
@@ -115,9 +141,23 @@ export function activateOverride(
     maxTtlMs?: number;
   },
 ): EmergencyOverrideEntry {
+  const predecessor = overrideRegisterSnapshot(workspace);
+  let captured: ReturnType<typeof capturePurposePublication>;
+  try { captured = capturePurposePublication(workspace, "config-signature"); }
+  catch { throw new BreakGlassSigningError(); }
+  const entry = prepareOverrideEntry(workspace, params);
+  entry.signature = signOverrideDigest(workspace, entry.override_hash);
+  return publishOverride(workspace, entry, predecessor, () => {
+    if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset) throw new BreakGlassSigningError();
+    getSigningKey(workspace, "config-signature");
+  });
+}
+
+type OverrideActivationInput = Parameters<typeof activateOverride>[1];
+function prepareOverrideEntry(workspace: string, params: OverrideActivationInput): EmergencyOverrideEntry {
   const maxTtl = params.maxTtlMs ?? MAX_TTL_MS;
   const ttl = Math.min(params.ttlMs, maxTtl);
-  if (ttl <= 0) throw new Error("TTL must be positive");
+  if (!Number.isFinite(ttl) || ttl <= 0) throw new Error("TTL must be finite and positive");
   if (!params.reason || params.reason.trim().length < 10) {
     throw new Error("Emergency override requires a meaningful reason (>= 10 chars)");
   }
@@ -143,18 +183,22 @@ export function activateOverride(
   };
 
   const overrideHash = sha256Hex(canonicalize(body));
-  // Throws before anything is written: unsigned overrides are never recorded.
-  const signature = signOverrideDigest(workspace, overrideHash);
-
   const entry: EmergencyOverrideEntry = {
     ...body,
     actionLog: [],
     override_hash: overrideHash,
-    signature,
+    signature: "",
   };
 
-  saveOverride(workspace, entry);
   return entry;
+}
+
+/** Actual async provider-backed activation. No override or lock directory is created before signing succeeds. */
+export async function activateOverrideAsync(workspace: string, params: OverrideActivationInput): Promise<EmergencyOverrideEntry> {
+  const input = { ...params }, predecessor = overrideRegisterSnapshot(workspace), entry = prepareOverrideEntry(workspace, input);
+  const prepared = await prepareOverrideDigestSignature(workspace, entry.override_hash);
+  entry.signature = prepared.signed.signature.toString("base64");
+  return publishOverride(workspace, entry, predecessor, () => assertOverridePublicationCurrent(workspace, prepared.captured, prepared.signed));
 }
 
 /**

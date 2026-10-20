@@ -20,13 +20,15 @@ That binding lives in AMC home. Under `trustBoundaryMode: shared`, an agent that
 
 Keys for `release`, `notary`, `trust-list-root`, `evidence-authority`, `independent-attestation` and `catalog-review` never live in a workspace vault; `getSigningKey` refuses them. A `catalog-review` key is a named expert's own key, pinned in a signed trust list, that signs catalog review records (docs/catalog/GOVERNANCE.md).
 
-Every signing call site takes its key from `getSigningKey(workspace, purpose)`. `scripts/architecture-boundaries-check.mjs` fails any file outside `src/keys/`, `src/vault/` and `src/crypto/keys.ts` that calls `getPrivateKeyPem(` or `getVaultPrivateKeyPem(`. Four `src/a4` call sites are listed by name until the A4 lane moves them.
+Synchronous private-key consumers use `getSigningKey(workspace, purpose)`. Maintained asynchronous consumers can use `signWithPurposeKey` or the policy signer without exporting a provider private key; their publication checks run after remote waits. `scripts/architecture-boundaries-check.mjs` checks the older private-key boundaries, including named A4 exceptions owned by that lane. Neither an async helper nor those exceptions enable general provider binding.
 
 ## Vault payload v2 and migration
 
 The vault now holds one key per purpose (`{ "v": 2, "keys": { "<purpose>": { "keyId", "privateKeyPem", "createdTs" } }, "secrets": {} }`). On the first unlock after upgrading, a v1 vault is rewritten as v2 with the same key bytes: each role's key serves every purpose it signed before, so no public key changes and nothing needs re-pinning. The v1 envelope is kept in AMC home (`<AMC home>/state/keyset-recovery/<workspace scope>/previous-vault.amcvault`), out of the workspace. AMC 1.2.0 cannot read a v2 vault; downgrading is unsupported.
 
 Public files: `.amc/keys/<purpose>.pub` and `<purpose>_history.json` (key-history envelope v2, whose `role` is the purpose). Lease and session keep their role history. The role files stay as a compatible view: a role's `<role>_ed25519.pub` names its primary purpose's key (monitor: `ledger-row`, auditor: `artifact-seal`), and its `<role>_history.json` admits every key its purposes use, so verifiers that read role histories keep verifying after a purpose is split off.
+
+That role view is legacy compatibility, not new provider authority. Provider transitions retain authenticated history for the exact purpose. A provider admitted for ledger rows, session credentials or configuration does not gain another purpose merely because their old vault keys shared a role.
 
 ## The key set: atomic key changes
 
@@ -82,6 +84,19 @@ Authority never comes from the statement's own fields. The verifier names the ch
 A statement never changes a verifier's pins by itself. To move a pinned key, the trust-list owner publishes a new list (sequence plus one) that sets the old key's `validTo` to `overlap.notAfter` and adds the new key. `amc keys export-public --purpose <p>` prints the public key, its key id and a proof of possession (tag `AMC_KEY_POP_V1`, 0x00, canonical `{ keyId, purpose, issuedAt }`, signed by that key) for the organisation's list. Rotation statements replace the old `amc.monitor-key-rotation` receipts; `verifyKeyRotationReceipt` still verifies old ones.
 
 `amc vault rotate-keys` remains, as an alias that rotates `ledger-row` and `receipt` to one new key.
+
+### Explicit digest signatures for large lists and statements
+
+The v1 examples on this page preserve their original bytes when the envelope omits `signatureVersion`. An explicit envelope `signatureVersion: 2` supports large payloads within provider message limits. The signed bytes are the format's v2 tag, NUL and the 32-byte SHA-256 of the complete v1 tagged payload (including its v1 tag and NUL). The inner statement/list still has `version: 1`.
+
+| Envelope | v2 tag |
+|---|---|
+| Trust list | `AMC_TRUST_LIST_V2_DIGEST` |
+| Key rotation | `AMC_KEY_ROTATION_V2_DIGEST` |
+| Revocation list | `AMC_REVOCATION_LIST_V2_DIGEST` |
+| Trust-root rotation | `amc.root-rotation/v2-digest` |
+
+All holders in one envelope sign the same version. Main and standalone verifiers reject unknown discriminators, mixed-version signatures, changed complete preimages and v1/v2 substitutions. Provider authoring uses pinned descriptions and canonical signatures. Raw provider signing does not silently hash an oversized v1 message. Trust-list and root-statement authoring preserves independent external root ownership; a workspace provider binding never becomes trust-root authority.
 
 ## Revocation lists
 
@@ -182,9 +197,11 @@ amc keys export-public --purpose <p>
 
 A purpose's key can be held by a key provider (AWS KMS, Google Cloud KMS, Azure Key Vault, a PKCS#11 token) instead of the vault; [KEY_PROVIDERS.md](KEY_PROVIDERS.md) has the setup. In terms of this page:
 
-- `keys.refs.<purpose>` in `.amc/amc.config.yaml` names the provider key. From then on `getSigningKey` refuses the purpose (`KEY_PROVIDER_HELD`): the vault never stands in for it.
-- `amc keys rotate --purpose <p>` binds the configured key instead of generating one, reading the ref only from an `amc.config.yaml` whose signature verifies, after the provider proves possession. The binding is one key-set generation: `keyset.json` gains `providers.<purpose>` (provider, ref, key id, algorithm, protection) and pins `keys/<purpose>-provider.pub` in `files`; signing reaches the key by that record, never by the config. It is committed and marked like every other generation, so an older key set from before the binding is `ROLLBACK_DETECTED`, and later generations carry the binding. Only `ledger-row` can be bound in this release; its vault key keeps signing rows as a delegate while a provider-signed delegation (24 hours at most, renewed by the same command) is current, else `KEY_DELEGATION_INVALID`.
-- The bound key is admitted for its purpose next to the vault key, `amc keys export-public` prints the provider's public key with a proof of possession signed by the provider, and `amc keys revoke` refuses it while it is bound.
+- `keys.refs.<purpose>` in `.amc/amc.config.yaml` names provider intent. Direct private-key callers refuse (`KEY_PROVIDER_HELD`); an editable ref cannot select a new committed signer. A bound ledger-row purpose may serve its local key only as the explicitly authorized, current scoped delegate. The vault never stands in for a failed provider call.
+- The generic provider owner command binds `ledger-row` and `session`; `config-signature` has a dedicated exact-candidate transition. Each commits one new generation with binding/public/history files and any rotation statement/delegation archives. A real previous-to-next key change needs the separate P1-08 holder signatures; possession/delegation alone does not authorize rotation. Same-key renewal is a new generation without a fake key-change statement. Runtime signing follows the committed ref, and removing an editable ref does not release it.
+- Ledger rows use a scoped provider-signed delegation (at most 24 hours), durable shared usage across SQLite/JSONL/outcome streams and an authenticated legacy boundary. Checkpoints sign directly through the provider. Session/config consumers sign directly and have their own authorization/publication checks. This is a limited migrated surface, not every consumer or every purpose; [KEY_PROVIDERS.md](KEY_PROVIDERS.md) records the remaining A4, approval, lease, portable-context and cold-start dependencies.
+- Bound and historical provider issuers are admitted for their exact purpose. `amc keys export-public` prints the public key with its proof of possession. Re-binding retains history and does not automatically revoke the old key. `amc keys revoke` refuses the active key; the async owner flow can revoke a retired eligible key while preserving list sequence/predecessor and key-set semantics. Normal provider binding for `revocation-list` remains refused pending its lease/native-task owners.
+- Maintained async producers include tools init/reviewed signing, action-policy init, users, tickets/workorders, outcome contracts, overrides and policy-selected plugin initialization. Their final publication/return checks retain current purpose authority and the caller's existing mode/actor rules. Overrides recheck their explicit no-sign policy after the last wait. These migrations preserve the limited binder and do not qualify full cold startup, reserved compound callers or every artifact producer.
 - `amc keys list` adds `provider`, `algorithm`, `protection`, `protectionBasis` and `providerKeyId` per purpose (`file`, `ed25519`, `software`, `configured` for the vault).
 - A rotation now refuses before it commits when the transparency log's signer would refuse the log append that follows the commit (an unverifiable trust config, or an `artifact-seal` key held by a provider).
 - One pre-sign gate for every key, the vault's and a provider's alike (`assertSigningKeyUsable`): the key, identified by its own bytes, must be the one the committed, mark-bound key set names for the purpose and holder; the workspace key revocation list must load, verify and not name it (a missing or unverifiable list refuses every key); and the built-in distrust list must not distrust it at the server clock. A provider is never asked whether its own key is fine: AMC decides from its signed state before the provider is called, and the key the provider then presents must be the bound key by its bytes.
@@ -192,7 +209,7 @@ A purpose's key can be held by a key provider (AWS KMS, Google Cloud KMS, Azure 
 Three decisions recorded for this release:
 
 - ECDSA P-256 signatures have one accepted encoding, IEEE P1363 with low S (s ≤ n/2); DER and the high-S twin are refused everywhere. Ed25519 keeps its 64-byte form with S below the group order.
-- Signing consults the built-in distrust list (`src/trust/amc-distrust.json`) only. Distrust entries in operator trust lists under AMC home stay a verification-time check, so an existing workspace signs exactly as before.
-- Purpose keys have no expiry field; the only time limit at signing is the ledger-row delegation window. Expiry of a pinned key (`validTo`) is judged at verification, as in P1-06.
+- Direct purpose signing checks the committed authority, workspace key revocation list and built-in distrust. The asynchronous notary policy path also rechecks its selected descriptor, enforcement policy and applicable operator distrust after the remote wait. Public verification uses its independent trust context; a notary transport pin is not workspace purpose authority.
+- Signing has distinct time gates. The vault evicts cached unlocked sessions after 30 minutes since their last unlock/refresh; obtaining a vault key still needs a usable session (or an allowed environment-passphrase unlock). This is an access-session TTL, not a new per-purpose cryptoperiod. Delegated rows additionally require the current delegation window and quota. Credentials and verifier pins retain their own lifetime/`validTo` checks. No claim that delegation is the only signing time limit is intended.
 
-Not in this release: public anchoring of the transparency log (P1-26), RFC 3161 tokens on statements (P1-25) and standalone verification of statements (P1-06).
+P2-08 adds strict statement/list algorithm and explicit digest-envelope verification in both main and standalone formats. It does not claim new P1-26 public anchoring or P1-25 RFC 3161 qualification. Provider compromise with independent roots, delegate rotation, general purpose binding and complete reserved-owner integration remain limits. Focused native/compiled test and mutation evidence is not final full-suite, hosted-CI, live-cloud or hardware qualification.

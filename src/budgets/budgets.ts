@@ -8,6 +8,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
 import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 const actionClassSchema = z.enum([
   "READ_ONLY",
@@ -199,11 +200,11 @@ export function budgetForAgent(config: BudgetsConfig, agentId: string): BudgetsC
 }
 
 /** Counters combine verified native and legacy evidence; numeric usage is a known subtotal. */
-export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now()): BudgetUsage {
-  return projectBudgetUsage(readBudgetEvents(workspace), agentId, now);
+export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): BudgetUsage {
+  return projectBudgetUsage(readBudgetEvents(workspace, undefined, options), agentId, now);
 }
 
-export function evaluateBudgetStatus(workspace: string, agentId: string, now = Date.now()): {
+export function evaluateBudgetStatus(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): {
   ok: boolean;
   reasons: string[];
   exceededActionClasses: ActionClass[];
@@ -218,7 +219,7 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
       ok: false,
       reasons: ["budgets config signature invalid"],
       exceededActionClasses: ["DEPLOY", "WRITE_HIGH", "SECURITY"],
-      usage: budgetUsageSnapshot(workspace, agentId, now),
+      usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: false,
       nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
@@ -231,12 +232,12 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
       ok: true,
       reasons: [],
       exceededActionClasses: [],
-      usage: budgetUsageSnapshot(workspace, agentId, now),
+      usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: true,
       nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
   }
-  const usage = budgetUsageSnapshot(workspace, agentId, now);
+  const usage = budgetUsageSnapshot(workspace, agentId, now, options);
   const reasons: string[] = [];
   const exceededActionClasses: ActionClass[] = [];
 

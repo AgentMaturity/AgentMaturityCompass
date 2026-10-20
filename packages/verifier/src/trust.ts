@@ -5,7 +5,7 @@
  */
 // The one admission rule AMC's verifiers also use; it imports only node: built-ins (check:architecture-boundaries).
 import { distrustAt, listsAt } from "../../../src/trust/admissionRule.js";
-import { canonicalize, same, signingKeyId, tagged, verifySignature } from "./bytes.js";
+import { canonicalize, same, signingKeyId, statementMessage, verifySignature } from "./bytes.js";
 import type { Finding, KeyPurpose } from "./codes.js";
 import { signedTrustList, type DistrustEntry, type SignedTrustList, type TrustList, type TrustListEntry } from "./records/trustList.js";
 import { attempt } from "./schema.js";
@@ -48,7 +48,7 @@ export interface ListFacts {
 
 /** The key id of the first signature row whose key id or signature does not verify; null when every row verifies. */
 function badRow(signed: SignedTrustList): string | null {
-  const bytes = tagged("AMC_TRUST_LIST_V1", canonicalize(signed.list));
+  const bytes = statementMessage("AMC_TRUST_LIST_V1", "AMC_TRUST_LIST_V2_DIGEST", canonicalize(signed.list), signed.signatureVersion);
   return signed.signatures.find(row => !same(signingKeyId(row.publicKeyPem) ?? "", row.keyId)
     || !verifySignature(bytes, row.publicKeyPem, Buffer.from(row.signature, "base64")))?.keyId ?? null;
 }

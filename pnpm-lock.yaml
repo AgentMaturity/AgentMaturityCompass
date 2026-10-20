@@ -1,7 +1,7 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 overrides:
@@ -123,7 +123,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: ^4.1.10
-        version: 4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(vite@8.2.2(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
   packages/amc-core:
     dependencies:
@@ -158,6 +158,12 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
+    optionalDependencies:
+      node-addon-require-builtin:
+        specifier: 0.1.5
+        version: 0.1.5
+
+  packages/key-provider-pkcs11: {}
 
   packages/verifier: {}
 
@@ -165,12 +171,6 @@ importers:
 
   vendor/cordis:
     dependencies:
-      '@amc/cordis-plugin-include':
-        specifier: workspace:^
-        version: link:../include
-      '@amc/cordis-plugin-loader':
-        specifier: workspace:^
-        version: link:../loader
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
@@ -180,29 +180,10 @@ importers:
 
   vendor/cosmokit: {}
 
-  vendor/group:
-    dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
-      '@amc/cordis-plugin-loader':
-        specifier: workspace:^
-        version: link:../loader
+  vendor/group: {}
 
   vendor/hmr:
     dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
-      '@amc/cordis-plugin-include':
-        specifier: workspace:^
-        version: link:../include
-      '@amc/cordis-plugin-loader':
-        specifier: workspace:^
-        version: link:../loader
-      '@amc/cordis-plugin-timer':
-        specifier: workspace:^
-        version: link:../timer
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
@@ -231,12 +212,6 @@ importers:
 
   vendor/include:
     dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
-      '@amc/cordis-plugin-loader':
-        specifier: workspace:^
-        version: link:../loader
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
@@ -246,21 +221,12 @@ importers:
 
   vendor/loader:
     dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
-      node-addon-require-builtin:
-        specifier: ^0.1.4
-        version: 0.1.5
 
   vendor/logger-console:
     dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
@@ -282,9 +248,6 @@ importers:
 
   vendor/timer:
     dependencies:
-      '@amc/cordis':
-        specifier: workspace:^
-        version: link:../cordis
       '@amc/cosmokit':
         specifier: workspace:^
         version: link:../cosmokit
@@ -2943,7 +2906,6 @@ packages:
       '@vitest/ui': 4.1.11
       happy-dom: '*'
       jsdom: '*'
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -4116,7 +4078,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(vite@8.2.2(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
   '@vitest/expect@4.1.11':
     dependencies:
@@ -4972,7 +4934,8 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
-  node-addon-native-custom-loader@0.1.5: {}
+  node-addon-native-custom-loader@0.1.5:
+    optional: true
 
   node-addon-require-builtin-darwin-arm64@0.1.5:
     dependencies:
@@ -5020,6 +4983,7 @@ snapshots:
       node-addon-require-builtin-win32-arm64-msvc: 0.1.5
       node-addon-require-builtin-win32-ia32-msvc: 0.1.5
       node-addon-require-builtin-win32-x64-msvc: 0.1.5
+    optional: true
 
   node-domexception@1.0.0: {}
 
@@ -5563,7 +5527,7 @@ snapshots:
       tsx: 4.23.12
       yaml: 2.9.0
 
-  vitest@4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(vite@8.2.2(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)):
+  vitest@4.1.11(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(vite@8.2.2(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -5589,7 +5553,18 @@ snapshots:
       '@types/node': 25.9.5
       '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)
     transitivePeerDependencies:
+      - '@vitejs/devtools'
+      - esbuild
+      - jiti
+      - less
       - msw
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - yaml
 
   walk-up-path@4.0.0: {}
 

@@ -15,6 +15,7 @@ const signatureEnvelope = obj({
   signer: obj({
     type: oneOf(["VAULT", "NOTARY"] as const),
     attestationLevel: oneOf(["SOFTWARE", "HARDWARE"] as const),
+    attestationBasis: opt(oneOf(["configured", "provider-metadata", "provider-reported"] as const)),
     notaryFingerprint: opt(str({ length: 64 }))
   })
 });

@@ -1,4 +1,5 @@
-import { randomUUID, verify } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -8,7 +9,7 @@ import { runTarCreate, runTarExtract } from "../release/releaseUtils.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import type { NotarySigner } from "./notarySigner.js";
+import type { AsyncNotarySigner, NotarySigner } from "./notarySigner.js";
 import { notaryAttestPayloadSchema, notaryAttestResponseSchema } from "./notaryApiTypes.js";
 import { amcVersion } from "../version.js";
 import { buildVerifierReport, checkSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -44,7 +45,7 @@ function configSha(workspace: string, relPath: string): string | null {
 }
 
 function buildNotaryAttestation(params: {
-  signer: NotarySigner;
+  signer: NotarySigner | AsyncNotarySigner;
   workspace?: string | null;
 }): z.infer<typeof notaryAttestPayloadSchema> {
   const workspace = params.workspace ? resolve(params.workspace) : null;
@@ -104,6 +105,25 @@ export function exportNotaryAttestationBundle(params: {
     signer: params.signer,
     workspace: params.workspace
   });
+  return writeNotaryAttestationBundle(params, data);
+}
+
+export async function signNotaryAttestationAsync(params: { signer: AsyncNotarySigner; workspace?: string | null }): Promise<z.infer<typeof notaryAttestResponseSchema>> {
+  const attestation = buildNotaryAttestation(params), bytes = Buffer.from(canonicalize(attestation), "utf8");
+  const signed = await params.signer.sign("NOTARY_ATTESTATION", bytes);
+  if (signed.pubkeyPem !== params.signer.pubkeyPem() || signed.pubkeyFingerprint !== params.signer.pubkeyFingerprint()
+    || !verifyWithKey(bytes, signed.pubkeyPem, Buffer.from(signed.signatureB64, "base64"))) throw new Error("notary attestation signing response invalid");
+  return notaryAttestResponseSchema.parse({ v: 1, attestation, signatureB64: signed.signatureB64,
+    pubkeyPem: signed.pubkeyPem, pubkeyFingerprint: signed.pubkeyFingerprint });
+}
+
+export async function exportNotaryAttestationBundleAsync(params: { signer: AsyncNotarySigner; workspace?: string | null; outFile: string; assertPublicationCurrent?: () => void }): Promise<{ outFile: string }> {
+  const data = await signNotaryAttestationAsync(params);
+  params.assertPublicationCurrent?.();
+  return writeNotaryAttestationBundle(params, data);
+}
+
+function writeNotaryAttestationBundle(params: { outFile: string }, data: z.infer<typeof notaryAttestResponseSchema>): { outFile: string } {
   const rootTmp = mkdtempSync(join(tmpdir(), "amc-attest-"));
   try {
     const root = join(rootTmp, "attest");
@@ -150,7 +170,7 @@ export function verifyNotaryAttestationBundle(file: string, trust: TrustContext,
       const sig = readUtf8(sigPath).trim();
       const pub = readUtf8(pubPath);
       const check = checkSignature({ signature: "attest.sig", purpose: "notary", context: trust, claimedSignedAt: payload.ts,
-        candidates: [pubkeyPem, pub], verify: (pem) => verify(null, Buffer.from(canonicalize(payload), "utf8"), pem, Buffer.from(sig, "base64")) });
+        candidates: [pubkeyPem, pub], verify: (pem) => verifyWithKey(Buffer.from(canonicalize(payload), "utf8"), pem, Buffer.from(sig, "base64")) });
       signatures.push(check.admission);
       if (!check.verified) {
         errors.push("attestation signature invalid");

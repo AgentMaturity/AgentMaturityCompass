@@ -1,4 +1,4 @@
-import { createPublicKey, verify } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, posix, resolve } from "node:path";
@@ -106,7 +106,7 @@ function verifyRegistryIndexSignature(params: {
     if (digest !== sig.digestSha256) {
       return { ok: false, reason: "index digest mismatch" };
     }
-    const verified = verify(null, payload, createPublicKey(params.pubPem), Buffer.from(sig.signature, "base64"));
+    const verified = verifyWithKey(payload, params.pubPem, Buffer.from(sig.signature, "base64"));
     return verified ? { ok: true } : { ok: false, reason: "index signature verification failed" };
   } catch (error) {
     return { ok: false, reason: String(error) };

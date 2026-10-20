@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { orgSignatureSchema } from "./orgSchema.js";
@@ -102,7 +101,7 @@ export function verifySignedFileWithAuditor(workspace: string, path: string, byt
         signature: sig.signature,
         envelope: sig.envelope
       }
-    }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    });
     return {
       valid,
       signatureExists: true,

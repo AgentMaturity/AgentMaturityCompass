@@ -123,8 +123,8 @@ export async function handleExportRoute(
       if (!body.outFile) {
         apiError(res, 400, 'outFile required'); return true;
       }
-      const { notaryAttestCli } = await import('../notary/notaryCli.js');
-      const result = notaryAttestCli({
+      const { notaryAttestCliAsync } = await import('../notary/notaryCli.js');
+      const result = await notaryAttestCliAsync({
         notaryDir: body.notaryDir,
         workspace,
         outFile: body.outFile,

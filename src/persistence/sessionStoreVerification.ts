@@ -26,17 +26,22 @@
  */
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
-import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { join } from "node:path";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
+import { legacyLedgerRowKeys, operationalSessionProblems } from "../keys/operationalLedgerReader.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import { admitKey } from "../trust/admission.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 const GLOBAL_GENESIS = "GENESIS";
 
 export interface StoredSessionVerifyOptions {
+  readonly trust?: TrustContext;
   /**
    * SHA-256 of the monitor public key PEM this workspace is expected to use.
    *
@@ -78,11 +83,13 @@ export interface StoredSessionVerifyResult {
 export function verifyMonitorTrustRoot(
   workspace: string,
   expected: string | null,
-  errors: string[]
+  errors: string[], trust?: TrustContext
 ): StoredSessionTrustRoot {
   let monitorFingerprint: string | null = null;
+  let rootPem: string | null = null;
   try {
-    monitorFingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8"));
+    rootPem = boundProviderKey(workspace, "ledger-row")?.publicKeyPem ?? getPublicKeyPem(workspace, "monitor");
+    monitorFingerprint = sha256Hex(Buffer.from(rootPem, "utf8"));
   } catch {
     // No monitor key at all. The per-event signature checks below report the
     // consequences; recording null keeps this verdict honest rather than
@@ -99,7 +106,11 @@ export function verifyMonitorTrustRoot(
       );
     }
   }
-  return { anchored: expected !== null, monitorFingerprint, expectedFingerprint: expected };
+  const admission = trust ? admitKey({ publicKeyPem: rootPem,
+    purpose: "ledger-row", signature: "session ledger root", context: trust }) : null;
+  if (admission !== null && admission.status !== "admitted") errors.push(`trust root: ledger issuer ${admission.status}`);
+  const independentlyAdmitted = admission?.status === "admitted" && admission.source !== "workspace-self";
+  return { anchored: Boolean(expected) || independentlyAdmitted, monitorFingerprint, expectedFingerprint: expected };
 }
 
 function verifyPayload(event: EvidenceEvent, workspace: string, errors: string[]): void {
@@ -144,7 +155,7 @@ function verifyGlobalChainAndSignatures(
   errors: string[],
   checkPayloads = true
 ): void {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(workspace);
   const seenIds = new Set<string>();
   let previous = GLOBAL_GENESIS;
   for (const event of rows) {
@@ -229,7 +240,7 @@ function verifySessionRecords(
       errors.push(`Event ${event.id} references missing session ${event.session_id}`);
     }
   }
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(workspace);
   for (const record of records) {
     if (record.session_final_event_hash === null) {
       continue;
@@ -268,10 +279,11 @@ export function verifyStoredSessionEvents(
   const errors: string[] = [];
   const expected =
     options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
-  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors);
+  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
+  errors.push(...operationalSessionProblems(workspace, rows, options.trust));
   verifyGlobalChainAndSignatures(rows, workspace, errors);
   verifySessionEnvelopeChains(rows, errors);
-  try { validateSurfaceCompactions(workspace, rows); }
+  try { validateSurfaceCompactions(workspace, rows, { trust: options.trust }); }
   catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   if (options.sessionRecords !== undefined) {
     verifySessionRecords(rows, options.sessionRecords, workspace, errors);
@@ -291,7 +303,8 @@ export function verifyStoredSessionEventMetadata(
 ): StoredSessionVerifyResult {
   const errors: string[] = [];
   const expected = options.expectedMonitorFingerprint ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT ?? null;
-  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors);
+  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
+  errors.push(...operationalSessionProblems(workspace, rows, options.trust));
   verifyGlobalChainAndSignatures(rows, workspace, errors, false);
   verifySessionEnvelopeChains(rows, errors);
   if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, workspace, errors);

@@ -15,10 +15,12 @@ import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js"
 import { jsonlEventsPath, readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
 import { verifyStoredSessionEvents } from "../persistence/sessionStoreVerification.js";
 import { pathExists } from "../utils/fs.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 export function verifyAlternateBackendEvidence(
   workspace: string,
-  expectedMonitorFingerprint: string | null
+  expectedMonitorFingerprint: string | null,
+  trust?: TrustContext
 ): string[] {
   if (readSessionStoreMarker(workspace) !== "jsonl") {
     return [];
@@ -29,11 +31,12 @@ export function verifyAlternateBackendEvidence(
     }
     const rows = readEventRows(workspace);
     const stored = verifyStoredSessionEvents(workspace, rows, {
+      trust,
       ...(expectedMonitorFingerprint ? { expectedMonitorFingerprint } : {})
     });
     return [...stored.errors];
-  } catch (error) {
-    // Unreadable JSONL evidence is a verification failure, not an absence.
-    return [`jsonl session store could not be read: ${error instanceof Error ? error.message : String(error)}`];
+  } catch {
+    // Native diagnostics may include private filesystem paths or key/provider details.
+    return ["jsonl session store could not be read: unreadable or unauthenticated evidence"];
   }
 }

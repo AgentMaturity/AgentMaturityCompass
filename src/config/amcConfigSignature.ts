@@ -4,10 +4,12 @@ import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   getSigningKey,
-  getPublicKeyHistory,
   signHexDigest,
   verifyHexDigestAny
 } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { withAmcConfigPublicationLock } from "./configPublicationLock.js";
 
 /**
  * Signs .amc/amc.config.yaml with the auditor key.
@@ -19,6 +21,10 @@ import {
  * asserts something the file itself could not attest to.
  */
 export function signAmcConfig(workspace: string): string {
+  return withAmcConfigPublicationLock(workspace, () => signAmcConfigLocked(workspace));
+}
+
+function signAmcConfigLocked(workspace: string): string {
   const configPath = join(workspace, ".amc", "amc.config.yaml");
   if (!pathExists(configPath)) {
     throw new Error(`Cannot sign missing config: ${configPath}`);
@@ -62,7 +68,8 @@ export function verifyAmcConfigSignature(workspace: string): {
     if (digest !== payload.configSha256) {
       return { valid: false, signatureExists: true, reason: "config digest mismatch" };
     }
-    const ok = verifyHexDigestAny(digest, payload.signature, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const ok = verifyHexDigestAny(digest, payload.signature, getPurposeKeyHistory(workspace, "config-signature"));
     return { valid: ok, signatureExists: true, reason: ok ? null : "signature invalid" };
   } catch (error) {
     return {

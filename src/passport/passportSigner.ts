@@ -1,3 +1,4 @@
+import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { readFileSync } from "node:fs";
 import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
@@ -11,19 +12,7 @@ export function signPassportJson(workspace: string, passport: PassportJson): {
   signature: string;
   signedTs: number;
   signer: "auditor";
-  envelope?: {
-    v: 1;
-    alg: "ed25519";
-    pubkeyB64: string;
-    fingerprint: string;
-    sigB64: string;
-    signedTs: number;
-    signer: {
-      type: "VAULT" | "NOTARY";
-      attestationLevel: "SOFTWARE" | "HARDWARE";
-      notaryFingerprint?: string;
-    };
-  };
+  envelope?: SignatureEnvelope;
 } {
   return passportSignatureSchema.parse(signSerializedPayloadWithAuditor(workspace, canonicalize(passport)));
 }
@@ -39,21 +28,17 @@ export function verifyPassportDigestSignature(params: {
     : params.workspace
       ? getPublicKeyHistory(params.workspace, "auditor")
       : [];
-  if (params.signature.envelope) {
+  if (params.signature.envelope !== undefined) {
     try {
       if (params.signature.signature !== params.signature.envelope.sigB64) {
         return false;
       }
-      if (
-        verifySignatureEnvelope(params.digestHex, params.signature.envelope, {
-          trustedPublicKeys: trustedKeys,
-          requireTrustedKey: true
-        })
-      ) {
-        return true;
-      }
+      return verifySignatureEnvelope(params.digestHex, params.signature.envelope, {
+        trustedPublicKeys: trustedKeys,
+        requireTrustedKey: true
+      });
     } catch {
-      // fallback below
+      return false;
     }
   }
   if (trustedKeys.length > 0) {

@@ -113,11 +113,14 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
     },
     () => run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok,
     () => {
-      // The private workspace packages must be ABSENT here — the runtime has to work without them.
-      const r = spawnSync("node", ["-e", "require.resolve('@amc/core')"], { cwd: consumer, env: isolated, encoding: "utf8" });
-      const absent = r.status !== 0;
-      console.log(`${absent ? "ok  " : "FAIL"} @amc/core is not resolvable from the consumer directory`);
-      return absent;
+      // Resolve from installed AMC, without loading a cloud SDK or native binding.
+      const forbidden = ["@amc/core", "@aws-sdk/client-kms", "@google-cloud/kms", "@azure/keyvault-keys", "@azure/identity", "agent-maturity-compass-key-provider-pkcs11", "pkcs11js"];
+      const installedManifest = join(consumer, "node_modules", pkg.name, "package.json");
+      const script = `const resolve = require("node:module").createRequire(${JSON.stringify(installedManifest)});`
+        + ` const unexpected = []; for (const name of ${JSON.stringify(forbidden)}) {`
+        + ' try { resolve.resolve(name); unexpected.push(name); } catch (error) { if (error.code !== "MODULE_NOT_FOUND") throw error; } }'
+        + ' if (unexpected.length) { console.error("unexpected default-install packages: " + unexpected.join(", ")); process.exit(1); }';
+      return run("installed AMC has no private workspace dependency, cloud SDK, or PKCS#11 addon", process.execPath, ["-e", script], { cwd: consumer, env: isolated }).ok;
     },
     () => run("installed standalone production API (no dev dependencies)", "node",
       [join(root, "scripts", "standalone-api-smoke.mjs"), join(consumer, "node_modules", pkg.name, "dist", "standalone-api.js")],

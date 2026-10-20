@@ -6,9 +6,11 @@ import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import {
   initOutcomeContract,
+  initOutcomeContractAsync,
   loadOutcomeContract,
   outcomeContractPath,
   signOutcomeContract,
+  signOutcomeContractAsync,
   verifyOutcomeContractSignature
 } from "./outcomeContractEngine.js";
 import { diffOutcomeReports, fleetOutcomeReport, loadOutcomeReport, runOutcomeReport } from "./outcomeReport.js";
@@ -43,6 +45,10 @@ export function outcomesVerifyCli(params: { workspace: string; agentId?: string 
   sigPath: string;
 } {
   return verifyOutcomeContractSignature(params.workspace, params.agentId);
+}
+
+export async function outcomesInitCliAsync(params: { workspace: string; agentId?: string; archetype?: string }): Promise<{ path: string; sigPath: string }> {
+  return initOutcomeContractAsync(params.workspace, params.agentId, params.archetype);
 }
 
 export function outcomesReportCli(params: { workspace: string; agentId?: string; window: string; outFile?: string }): {
@@ -179,4 +185,8 @@ export function outcomesResignCli(params: { workspace: string; agentId?: string 
 export function loadOutcomeReportCli(params: { workspace: string; agentId?: string; reportId: string | "latest" }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   return loadOutcomeReport(params.workspace, agentId, params.reportId);
+}
+
+export async function outcomesResignCliAsync(params: { workspace: string; agentId?: string }): Promise<{ sigPath: string }> {
+  return { sigPath: await signOutcomeContractAsync(params.workspace, params.agentId) };
 }

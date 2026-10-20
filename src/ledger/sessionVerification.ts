@@ -10,6 +10,7 @@
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import type { Ledger } from "./ledger.js";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
+import type { OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 
 /**
  * Verifies the per-session chain carried inside session events.
@@ -26,9 +27,9 @@ import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
  * Rows with no envelope (legacy events) are skipped, so a workspace with no
  * session spine is unaffected — strictly additive to today's verifier.
  */
-export function verifySessionChains(ledger: Ledger, errors: string[]): void {
+export function verifySessionChains(ledger: Ledger, errors: string[], options: OperationalEvidenceOptions = {}): void {
   const events = ledger.getAllEvents();
-  try { validateSurfaceCompactions(ledger.workspace, events); }
+  try { validateSurfaceCompactions(ledger.workspace, events, { ...options, ledger }); }
   catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   const expectedSeqBySession = new Map<string, number>();
   const expectedPrevHashBySession = new Map<string, string>();

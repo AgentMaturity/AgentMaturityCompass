@@ -1,10 +1,10 @@
-import { createHash, createPublicKey, generateKeyPairSync, verify } from "node:crypto";
+import { createHash, createPublicKey, generateKeyPairSync, randomUUID, verify } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { signingKeyId } from "../../src/keys/algorithmPolicy.js";
-import { checkedDescription, KeyProviderError, signChecked, type KeyProvider, type KeyRef } from "../../src/keys/provider.js";
+import { checkedDescription, importOptional, KeyProviderError, signChecked, type KeyProvider, type KeyRef } from "../../src/keys/provider.js";
 import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
 import { azureKeyVaultProvider } from "../../src/keys/providers/azureKeyVault.js";
 import { fileKeyProvider } from "../../src/keys/providers/file.js";
@@ -12,7 +12,7 @@ import { gcpKmsProvider } from "../../src/keys/providers/gcpKms.js";
 import { CK, pkcs11Provider } from "../../src/keys/providers/pkcs11.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
-import { AWS_ARN, AZURE_KEY, AZURE_WRAP_KEY, awsFake, azureFake, fakeKey, GCP_KEY, gcpFake, pkcs11Fake, publicPem } from "./providerFakes.js";
+import { AWS_ARN, AZURE_KEY, AZURE_WRAP_KEY, awsFake, azureFake, fakeKey, GCP_KEY, GCP_WRAP_KEY, gcpFake, pkcs11Fake, publicPem } from "./providerFakes.js";
 
 const roots: string[] = [];
 afterAll(() => { for (const root of roots) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
@@ -41,7 +41,7 @@ const suites: Suite[] = [
   { name: "file (vault)", provider: () => (file ??= fileKeyProvider(fileWorkspace())), ref: { provider: "file", id: "artifact-seal" }, wrapRef: { provider: "file", id: "ledger-dek" }, algorithm: "ed25519", protection: "software", basis: "configured" },
   { name: "aws-kms Ed25519", provider: () => awsKmsProvider(aws.call), ref: { provider: "aws-kms", id: AWS_ARN("ed") }, wrapRef: { provider: "aws-kms", id: AWS_ARN("wrap") }, algorithm: "ed25519", protection: "hsm", basis: "provider-metadata" },
   { name: "aws-kms P-256", provider: () => awsKmsProvider(aws.call), ref: { provider: "aws-kms", id: AWS_ARN("ec") }, wrapRef: null, algorithm: "ecdsa-p256-sha256", protection: "hsm", basis: "provider-metadata" },
-  { name: "gcp-kms Ed25519 (software)", provider: () => gcpKmsProvider(gcpEd.call), ref: { provider: "gcp-kms", id: GCP_KEY, version: "1" }, wrapRef: { provider: "gcp-kms", id: GCP_KEY }, algorithm: "ed25519", protection: "software", basis: "provider-metadata" },
+  { name: "gcp-kms Ed25519 (software)", provider: () => gcpKmsProvider(gcpEd.call), ref: { provider: "gcp-kms", id: GCP_KEY, version: "1" }, wrapRef: { provider: "gcp-kms", id: GCP_WRAP_KEY }, algorithm: "ed25519", protection: "software", basis: "provider-metadata" },
   { name: "gcp-kms P-256 (HSM)", provider: () => gcpKmsProvider(gcpEc.call), ref: { provider: "gcp-kms", id: GCP_KEY, version: "1" }, wrapRef: null, algorithm: "ecdsa-p256-sha256", protection: "hsm", basis: "provider-metadata" },
   { name: "azure-kv P-256 (EC-HSM)", provider: () => azureKeyVaultProvider(azure.calls), ref: { provider: "azure-kv", id: AZURE_KEY }, wrapRef: { provider: "azure-kv", id: AZURE_WRAP_KEY }, algorithm: "ecdsa-p256-sha256", protection: "hsm", basis: "provider-metadata" },
   { name: "pkcs11 P-256 (in-process token)", provider: () => pkcs11Provider({ module: token.module, env: pkcs11Env }), ref: { provider: "pkcs11", id: "pkcs11:token=amc;object=seal-ec" }, wrapRef: { provider: "pkcs11", id: "pkcs11:token=amc;object=dek-wrap" }, algorithm: "ecdsa-p256-sha256", protection: "software", basis: "configured" },
@@ -91,6 +91,8 @@ describe.each(suites)("key provider contract (P2-08): $name", suite => {
   it("offers no private-key export", () => {
     const provider = suite.provider();
     expect(Object.keys(provider).sort()).toEqual(["describe", "id", "sign", "unwrapKey", "wrapKey"]);
+    expect(Reflect.has(provider, "exportPrivateKey")).toBe(false);
+    expect(() => (provider as KeyProvider & { exportPrivateKey(ref: KeyRef): unknown }).exportPrivateKey(suite.ref)).toThrow(TypeError);
   });
 });
 
@@ -156,10 +158,15 @@ describe("key provider requests and failures (P2-08)", () => {
   });
 
   it("a missing SDK is KEY_PROVIDER_NOT_INSTALLED naming the package", async () => {
-    await expect(awsKmsProvider().describe({ provider: "aws-kms", id: AWS_ARN("ed") })).rejects.toMatchObject({ code: "KEY_PROVIDER_NOT_INSTALLED", message: expect.stringContaining("@aws-sdk/client-kms") });
-    await expect(gcpKmsProvider().describe({ provider: "gcp-kms", id: GCP_KEY, version: "1" })).rejects.toMatchObject({ code: "KEY_PROVIDER_NOT_INSTALLED", message: expect.stringContaining("@google-cloud/kms") });
-    await expect(pkcs11Provider({ env: { AMC_PKCS11_MODULE: "/nonexistent/libsofthsm2.so" } }).describe({ provider: "pkcs11", id: "pkcs11:token=amc;object=k" }))
-      .rejects.toMatchObject({ code: "KEY_PROVIDER_NOT_INSTALLED" });
+    for (const provider of ["aws-kms", "gcp-kms", "azure-kv"] as const) {
+      const absent = `@amc-test/missing-key-sdk-${randomUUID()}`;
+      await expect(importOptional(provider, absent)).rejects.toMatchObject({ code: "KEY_PROVIDER_NOT_INSTALLED", provider, message: expect.stringContaining(absent) });
+    }
+  });
+
+  it("a missing PKCS#11 module setting refuses before loading any optional package", async () => {
+    await expect(pkcs11Provider({ env: {} }).describe({ provider: "pkcs11", id: "pkcs11:token=amc;object=k" }))
+      .rejects.toMatchObject({ code: "KEY_PROVIDER_NOT_INSTALLED", message: expect.stringContaining("AMC_PKCS11_MODULE") });
   });
 
   it("PKCS#11: an extractable or non-sensitive key is refused; Ed25519 only when the token lists CKM_EDDSA", async () => {

@@ -50,6 +50,9 @@ import { auditPolicyPath, initAuditPolicy } from "./audit/auditPolicyStore.js";
 import { auditMapActivePath, auditMapBuiltinPath, initAuditMaps } from "./audit/auditMapStore.js";
 import { readFileSync } from "node:fs";
 import { signAmcConfig } from "./config/amcConfigSignature.js";
+import { saveSignedAmcConfig } from "./config/amcConfigSigning.js";
+import { withAmcConfigPublicationLock } from "./config/configPublicationLock.js";
+import { assertNoPendingKeyset } from "./keys/keyset.js";
 
 export interface WorkspacePaths {
   agentId: string;
@@ -184,7 +187,15 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
 export function saveAMCConfig(workspace: string, config: AMCConfig): void {
   const paths = getWorkspacePaths(workspace);
   ensureDir(paths.amcDir);
-  writeFileAtomic(paths.config, YAML.stringify(config), 0o644);
+  withAmcConfigPublicationLock(workspace, () => {
+    assertNoPendingKeyset(workspace);
+    writeFileAtomic(paths.config, YAML.stringify(config), 0o644);
+  });
+}
+
+/** Owner runtime update: sign the serialized snapshot, then publish config and sidecar in one recoverable generation. */
+export async function saveAMCConfigAsync(workspace: string, config: AMCConfig): Promise<void> {
+  await saveSignedAmcConfig(workspace, Buffer.from(YAML.stringify(config), "utf8"));
 }
 
 export interface InitWorkspaceOptions {
@@ -783,3 +794,4 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
 }
 
 export { signAmcConfig, verifyAmcConfigSignature } from "./config/amcConfigSignature.js";
+export { signAmcConfigAsync } from "./config/amcConfigSigning.js";

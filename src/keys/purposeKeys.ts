@@ -33,7 +33,10 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { logSequence } from "./anchorLog.js";
 import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence, preflightHistoryLog } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
-import { assertLocal, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
+import { assertLocal, assertSigningKeyUsable, assertVaultMaySign, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
+import { checkedDescription, KeyProviderError, type KeyProvider } from "./provider.js";
+import { configuredRef, keyPolicy, loadKeysConfig } from "./keysConfig.js";
+import { signPurposeRevocationList } from "./purposeProviders.js";
 export { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem } from "./signingKeys.js";
 import {
   assertKeysetComplete, assertNoPendingKeyset, boundKeyset, boundProviderKey, commitKeyset, keysetAnchoring, keysetDeclared, keysetFileRel, keysetIdentity, keysetPaths,
@@ -43,15 +46,74 @@ import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
-  encodeSignedRevocationList, nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256,
+  encodeSignedRevocationList, nextRevocationList, publishRevocationList, publishSignedRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256,
   signRevocationList
 } from "./revocationList.js";
 import {
-  DEFAULT_MAX_OVERLAP_DAYS, encodeRotationStatement, parseRotationStatement, rotationStatementSha256, signRotationStatement,
+  DEFAULT_MAX_OVERLAP_DAYS, addRotationSignature, addRotationSignatureWithProvider, encodeRotationStatement, parseRotationStatement, rotationStatementBytes, rotationStatementSha256, signRotationStatement,
   verifyRotationStatement, type RotationReason, type SignedKeyRotationStatement
 } from "./rotationStatement.js";
 
 const DAY_MS = 86_400_000;
+
+/** Internal owner preparation; one actual bind/rebind caller consumes the resulting statement in its key-set commit. */
+export interface ProviderPurposeRotationPlan {
+  purpose: LocalPurpose; previousKeyId: string; nextKeyId: string; reason: RotationReason;
+  predecessorSha256: string | null; bytes: Buffer; sha256: string; path: string;
+}
+
+/** Remote holders are awaited here, before any synchronous publication lock/SQL transaction is entered. */
+export async function prepareProviderPurposeRotation(input: {
+  workspace: string; purpose: LocalPurpose; previousPublicKeyPem: string;
+  previous: { privateKeyPem: string } | { provider: KeyProvider; description: import("./provider.js").KeyDescription };
+  next: { provider: KeyProvider; description: import("./provider.js").KeyDescription };
+  reason?: RotationReason; overlapDays?: number; now: Date;
+}): Promise<ProviderPurposeRotationPlan | null> {
+  const { workspace, purpose, now } = input;
+  const previousKeyId = signingKeyId(input.previousPublicKeyPem), nextKeyId = input.next.description.keyId;
+  if (!previousKeyId) throw new Error("the current purpose issuer is not a supported signing key");
+  // The current CLI refuses every provider reason/root flag. Preserve compromise refusal at the owner API too.
+  if (input.reason === "key-compromise") throw new Error("provider key-compromise rotation is not supported yet; a provider proof or delegation cannot replace pinned-root P1-08 authority");
+  if (input.reason !== undefined && !["scheduled", "superseded", "purpose-split"].includes(input.reason)) throw new Error("unsupported provider rotation reason");
+  const overlapDays = input.overlapDays ?? 7;
+  if (!Number.isFinite(overlapDays) || overlapDays < 0 || overlapDays > DEFAULT_MAX_OVERLAP_DAYS) throw new Error(`overlapDays must be between 0 and ${DEFAULT_MAX_OVERLAP_DAYS}`);
+  if (previousKeyId === nextKeyId) {
+    if (input.reason !== undefined || input.overlapDays !== undefined) throw new Error("a same-key provider renewal does not rotate a purpose key");
+    return null;
+  }
+  preflightHistoryLog(workspace);
+  const head = chainHead(workspace, purpose);
+  if (head && head.statement.nextKeyId !== previousKeyId) throw new Error("the P1-08 rotation predecessor does not end at the current effective purpose issuer; refusing an implicit history repair");
+  const shared = LOCAL_PURPOSES.some(other => other !== purpose &&
+    (boundProviderKey(workspace, other)?.binding.keyId ?? signingKeyId(getSigningPublicKeyPem(workspace, other))) === previousKeyId);
+  const reason = input.reason ?? (shared ? "purpose-split" : "scheduled");
+  const statement = { type: "amc.key-rotation" as const, version: 1 as const, workspaceId: workspaceIdFromDirectory(workspace), purpose,
+    sequence: (head?.statement.sequence ?? 0) + 1, previousStatementSha256: head ? rotationStatementSha256(head) : null,
+    previousKeyId, nextKeyId, nextPublicKeyPem: input.next.description.publicKeyPem, reason,
+    overlap: overlapDays === 0 ? null : { notBefore: now.toISOString(), notAfter: new Date(now.getTime() + overlapDays * DAY_MS).toISOString() }, issuedAt: now.toISOString() };
+  const needsDigest = (input.next.provider.id === "aws-kms" || ("provider" in input.previous && input.previous.provider.id === "aws-kms"))
+    && rotationStatementBytes(statement).length > 4096;
+  let signed = await addRotationSignatureWithProvider({ ...(needsDigest ? { signatureVersion: 2 as const } : {}), statement, signatures: [] }, "next", input.next.provider, input.next.description);
+  signed = "privateKeyPem" in input.previous ? addRotationSignature(signed, "previous", input.previous.privateKeyPem)
+    : await addRotationSignatureWithProvider(signed, "previous", input.previous.provider, input.previous.description);
+  const bytes = encodeRotationStatement(signed);
+  const verdict = verifyRotationStatement(bytes, { expected: { workspaceId: statement.workspaceId, purpose }, trustedCurrentPublicKeyPem: input.previousPublicKeyPem, previous: head });
+  if (!verdict.valid) throw new Error(`provider purpose rotation statement does not verify: ${verdict.reason}`);
+  return { purpose, previousKeyId, nextKeyId, reason, predecessorSha256: head ? rotationStatementSha256(head) : null,
+    bytes, sha256: sha256Hex(bytes), path: join(statementDir(workspace, purpose), `${statement.sequence}.json`) };
+}
+
+/** Final synchronous recheck. A generation check alone is not permission to extend another statement predecessor. */
+export function assertProviderPurposeRotationCurrent(workspace: string, plan: ProviderPurposeRotationPlan | null): void {
+  if (!plan) return;
+  const head = chainHead(workspace, plan.purpose);
+  if ((head ? rotationStatementSha256(head) : null) !== plan.predecessorSha256) throw new Error("the P1-08 rotation predecessor changed while signing; retry binding");
+}
+
+/** Same post-commit anchor/recovery contract as the existing vault rotation. Never await inside it. */
+export function anchorProviderPurposeRotation(workspace: string, plan: ProviderPurposeRotationPlan | null): void {
+  if (plan) anchorRotation(workspace, [plan], []);
+}
 
 function statementDir(workspace: string, purpose: LocalPurpose): string {
   return join(vaultPaths(workspace).keysDir, "statements", purpose);
@@ -132,6 +194,11 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   if (targets.size === 0) throw new Error("Name at least one purpose to rotate.");
   const compromised = new Set(input.reason === "key-compromise" ? [...targets].map(purpose => keyOf(purpose).keyId) : []);
   for (const purpose of LOCAL_PURPOSES) if (payload.keys[purpose] && compromised.has(payload.keys[purpose]!.keyId)) targets.add(purpose);
+  for (const purpose of targets) {
+    const held = boundProviderKey(workspace, purpose), configured = configuredRef(loadKeysConfig(workspace), purpose);
+    if (held !== null || configured !== null) throw new KeyProviderError("KEY_PROVIDER_HELD", held?.binding.provider ?? configured!.provider,
+      "a provider-backed purpose must rotate through its asynchronous owner flow; rotating its vault anchor alone is refused");
+  }
   const overlapDays = input.overlapDays ?? 7;
   if (!Number.isFinite(overlapDays) || overlapDays < 0 || overlapDays > DEFAULT_MAX_OVERLAP_DAYS) throw new Error(`--overlap-days must be between 0 and ${DEFAULT_MAX_OVERLAP_DAYS}`);
   // Root authority comes from this machine's pinned trust-list roots and threshold, never from the keys handed in.
@@ -348,8 +415,8 @@ export function listKeys(workspace: string): { generation: number | null; digest
  * purpose still signs with is refused: rotate it first. The workspace's own self-check honours the list; portable
  * verifiers learn of it when the trust-list owner publishes the revocation.
  */
-export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
-  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number } {
+function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
+  passphrase: string | undefined): LocalPurpose {
   assertOwnerMode(workspace, "keys revoke");
   if (!passphrase) throw new Error("Key revocation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   // The owner's gate, as for a rotation: the real passphrase opens the vault and its keys match the published ones.
@@ -361,6 +428,12 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
     throw new Error(`key ${keyId} still signs for this workspace; rotate it first (amc keys rotate --purpose ${local})`);
   }
   if (!getPurposeKeyHistory(workspace, local).some(pem => signingKeyId(pem) === keyId)) throw new Error(`key ${keyId} is not in the ${local} key history`);
+  return local;
+}
+
+export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
+  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number } {
+  const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
   return withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
     const location = keyRevocationLocation(workspace);
     recoverPendingRevocationList(location);
@@ -375,4 +448,50 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
     const published = publishRevocationList(location, nextRevocationList(location.listId, previous, rows, 0), getSigningKey(workspace, "revocation-list"), logSequence);
     return { listId: location.listId, sequence: published.list.sequence };
   } });
+}
+
+/** Same owner operation, with provider signing outside the synchronous lock and exact state revalidation before publication. */
+export async function revokeKeyAsync(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
+  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE, opts: { provider?: KeyProvider } = {}): Promise<{ listId: string; sequence: number }> {
+  const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
+  const locked = <T>(operation: () => T): T => withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation });
+  for (let attempt = 0; attempt < 3; ++attempt) {
+    const plan = locked(() => {
+      const location = keyRevocationLocation(workspace);
+      recoverPendingRevocationList(location);
+      const current = readAnchoredRevocationList(location);
+      if (current === null) {
+        if (keysetDeclared(workspace)) throw new Error("the workspace key revocation list is missing; restore it before revoking");
+        assertNeverAnchored(workspace, "REVOCATION_LIST", location.listId);
+      }
+      const rows = [...(current?.list.revoked ?? []).filter(row => row.id !== keyId),
+        { id: keyId, kind: "key" as const, revokedAt: new Date().toISOString(), reason: `${reason}: ${local}` }];
+      const previous = current ? { sequence: current.list.sequence, sha256: revocationListSha256(current.list) } : null;
+      return { list: nextRevocationList(location.listId, previous, rows, 0), predecessor: current === null ? null : sha256Hex(encodeSignedRevocationList(current)),
+        keyset: canonicalize(keysetIdentity(workspace)) };
+    });
+    const prepared = await signPurposeRevocationList(workspace, plan.list, opts);
+    const result = locked(() => {
+      const location = keyRevocationLocation(workspace);
+      recoverPendingRevocationList(location);
+      const current = readAnchoredRevocationList(location);
+      const predecessor = current === null ? null : sha256Hex(encodeSignedRevocationList(current));
+      if (predecessor !== plan.predecessor || canonicalize(keysetIdentity(workspace)) !== plan.keyset) return null;
+      assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
+      const { description, provider } = prepared;
+      checkedDescription(description, keyPolicy(loadKeysConfig(workspace)));
+      if (provider === "file") assertVaultMaySign(workspace, "revocation-list");
+      else {
+        const bound = boundProviderKey(workspace, "revocation-list")?.binding;
+        if (bound?.provider !== provider || bound.id !== description.ref.id || bound.version !== description.ref.version || bound.keyId !== description.keyId) {
+          throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider, "the revocation-list signer is no longer the active bound key and ref");
+        }
+      }
+      assertSigningKeyUsable(workspace, "revocation-list", description.publicKeyPem, provider);
+      const published = publishSignedRevocationList(location, prepared.signed, logSequence);
+      return { listId: location.listId, sequence: published.list.sequence };
+    });
+    if (result !== null) return result;
+  }
+  throw new Error("key revocations changed while signing; retry the operation");
 }

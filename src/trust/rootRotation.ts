@@ -1,3 +1,5 @@
+import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
+import { checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider } from "../keys/provider.js";
 /**
  * Trust-list root-set rotation (P1-08). `<AMC home>/trust/trust-roots.json` names a root set (`rootSetId`), its roots and
  * its threshold. A rotation is one signed `amc.root-rotation` statement:
@@ -15,15 +17,17 @@
  * from an older set fails. Applied statements are kept outside the trust directory, in
  * `<AMC home>/state/root-rotations/<rootSetId>/<sequence>.json`, and the latest one is anchored by this machine's
  * high-water mark: once a rotation was applied, trust-roots.json must equal what that signed statement installed.
+ * Envelope signatureVersion:2 instead signs amc.root-rotation/v2-digest + NUL + SHA-256 of the complete v1 tagged payload.
+ * All holders in one envelope use that mode; absent signatureVersion remains the exact legacy v1 form.
  */
-import { createPublicKey, sign, verify } from "node:crypto";
+import { createPublicKey, sign } from "node:crypto";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { carryHighWaterMarks, compareHighWater, highWaterIds, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
 import { containedExists, listContainedDir, readContained, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
-import { canonicalEd25519Pem, ed25519KeyId, parseTrustJson, parseTrustValue, TrustListError } from "./trustList.js";
+import { ed25519KeyId, parseTrustJson, parseTrustValue, TrustListError } from "./trustList.js";
 
 const DOMAIN = "amc.root-rotation/v1";
 const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/);
@@ -51,17 +55,18 @@ const statementSchema = z.strictObject({
   previousThreshold: z.number().int().positive(),
   newRoots: rootSet,
   newThreshold: z.number().int().min(2, "a root set needs a threshold of at least 2").max(64),
-  newRootPublicKeyPems: z.array(z.string().min(1).max(4096).refine(pem => canonicalEd25519Pem(pem) === pem, "canonical Ed25519 SPKI PEM")).max(64),
+  newRootPublicKeyPems: z.array(z.string().min(1).max(4096).refine(pem => canonicalSigningKey(pem)?.pem === pem, "canonical Ed25519 or P-256 SPKI PEM")).max(64),
   allowDecrease: z.boolean(),
   issuedAt: z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form")
 }).refine(statement => statement.newThreshold <= statement.newRoots.length, "newThreshold cannot exceed the number of new roots")
   .refine(statement => statement.newRootPublicKeyPems.length === statement.newRoots.length
-    && statement.newRootPublicKeyPems.every((pem, index) => ed25519KeyId(pem) === statement.newRoots[index]), "newRootPublicKeyPems must be the new roots' keys, in order");
+    && statement.newRootPublicKeyPems.every((pem, index) => signingKeyId(pem) === statement.newRoots[index]), "newRootPublicKeyPems must be the new roots' keys, in order");
 const ROLE_ORDER = ["current", "new"] as const;
 const rowSchema = z.strictObject({ by: z.enum(ROLE_ORDER), keyId: keyIdSchema, signature: z.string().refine(isCanonicalSignatureBase64, "canonical base64") });
 type Row = z.infer<typeof rowSchema>;
 const rowOrder = (a: Row, b: Row) => ROLE_ORDER.indexOf(a.by) - ROLE_ORDER.indexOf(b.by) || a.keyId.localeCompare(b.keyId);
 const signedSchema = z.strictObject({
+  signatureVersion: z.literal(2).optional(),
   statement: statementSchema,
   signatures: z.array(rowSchema).max(128).refine(rows => rows.every((row, index) => index === 0 || rowOrder(rows[index - 1]!, row) < 0),
     "signatures sorted by role then key id, one per key and role")
@@ -71,31 +76,49 @@ export type RootRotationStatement = z.infer<typeof statementSchema>;
 export { signedSchema as signedRootRotationSchema };
 type SignedRootRotation = z.infer<typeof signedSchema>;
 
-const bytesToSign = (statement: RootRotationStatement) => Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
+const bytesToSign = (statement: RootRotationStatement, signatureVersion: 1 | 2 = 1) => {
+  const legacy = Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from("amc.root-rotation/v2-digest\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
+};
+export { bytesToSign as rootRotationSigningBytes };
 const sortedEqual = (a: readonly string[], b: readonly string[]) => a.length === b.length && [...a].sort().every((value, index) => value === [...b].sort()[index]);
 
-function signatureRow(statement: RootRotationStatement, by: Row["by"], privateKeyPem: string): Row {
+function signatureRow(statement: RootRotationStatement, by: Row["by"], privateKeyPem: string, signatureVersion: 1 | 2 = 1): Row {
   const keyId = ed25519KeyId(publicOf(privateKeyPem));
   if (keyId === null) throw new Error("root keys are Ed25519");
   if (!(by === "current" ? statement.previousRoots : statement.newRoots).includes(keyId)) throw new Error(`${keyId} is not a key of the ${by} root set`);
-  return { by, keyId, signature: sign(null, bytesToSign(statement), privateKeyPem).toString("base64") };
+  return { by, keyId, signature: sign(null, bytesToSign(statement, signatureVersion), privateKeyPem).toString("base64") };
 }
 
-function encodeSigned(statement: RootRotationStatement, rows: readonly Row[]): Buffer {
-  return Buffer.from(canonicalize(signedSchema.parse({ statement, signatures: [...rows].sort(rowOrder) })), "utf8");
+function encodeSigned(statement: RootRotationStatement, rows: readonly Row[], signatureVersion: 1 | 2 = 1): Buffer {
+  return Buffer.from(canonicalize(signedSchema.parse({ ...(signatureVersion === 2 ? { signatureVersion: 2 } : {}), statement, signatures: [...rows].sort(rowOrder) })), "utf8");
 }
 
 /** Signs a root-set rotation with current-set keys ("current") and new-set keys ("new"). Only the canonical encoding is ever accepted. */
-export function signRootRotation(statement: RootRotationStatement, keys: { current: readonly string[]; next: readonly string[] }): Buffer {
+export function signRootRotation(statement: RootRotationStatement, keys: { current: readonly string[]; next: readonly string[] }, opts: { signatureVersion?: 1 | 2 } = {}): Buffer {
   const parsed = statementSchema.parse(statement);
-  return encodeSigned(parsed, [...keys.current.map(pem => signatureRow(parsed, "current", pem)), ...keys.next.map(pem => signatureRow(parsed, "new", pem))]);
+  return encodeSigned(parsed, [...keys.current.map(pem => signatureRow(parsed, "current", pem, opts.signatureVersion)), ...keys.next.map(pem => signatureRow(parsed, "new", pem, opts.signatureVersion))], opts.signatureVersion);
 }
 
 /** Adds (or replaces) one holder's signature, so each root holder can sign on their own machine. */
-export function addRootRotationSignature(bytes: Buffer, by: Row["by"], privateKeyPem: string): Buffer {
-  const { statement, signatures } = parseSigned(bytes, "the statement");
-  const row = signatureRow(statement, by, privateKeyPem);
-  return encodeSigned(statement, [...signatures.filter(existing => existing.by !== by || existing.keyId !== row.keyId), row]);
+export function addRootRotationSignature(bytes: Buffer, by: Row["by"], privateKeyPem: string, opts: { signatureVersion?: 1 | 2 } = {}): Buffer {
+  const parsed = parseSigned(bytes, "the statement"), { statement, signatures } = parsed;
+  const signatureVersion = opts.signatureVersion ?? parsed.signatureVersion ?? 1;
+  if (signatures.length > 0 && signatureVersion !== (parsed.signatureVersion ?? 1)) throw new Error("a root rotation cannot mix signature versions");
+  const row = signatureRow(statement, by, privateKeyPem, signatureVersion);
+  return encodeSigned(statement, [...signatures.filter(existing => existing.by !== by || existing.keyId !== row.keyId), row], signatureVersion);
+}
+
+/** Each external root holder adds only its own provider signature; authority still comes from the independently pinned set at apply. */
+export async function addRootRotationSignatureWithProvider(bytes: Buffer, by: Row["by"], provider: KeyProvider, description: KeyDescription, opts: { signatureVersion?: 1 | 2 } = {}): Promise<Buffer> {
+  const parsed = parseSigned(bytes, "the statement"), { statement, signatures } = parsed;
+  const signatureVersion = opts.signatureVersion ?? parsed.signatureVersion ?? 1;
+  if (signatures.length > 0 && signatureVersion !== (parsed.signatureVersion ?? 1)) throw new Error("a root rotation cannot mix signature versions");
+  const key = checkedDescription({ ...description, ref: { ...description.ref } }, { allowed: SIGNING_ALGORITHMS, requireNonExportable: false });
+  if (provider.id !== key.ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the pinned description belongs to another provider");
+  if (!(by === "current" ? statement.previousRoots : statement.newRoots).includes(key.keyId)) throw new Error(`${key.keyId} is not a key of the ${by} root set`);
+  const row: Row = { by, keyId: key.keyId, signature: (await signChecked(provider, key, bytesToSign(statement, signatureVersion))).toString("base64") };
+  return encodeSigned(statement, [...signatures.filter(existing => existing.by !== by || existing.keyId !== row.keyId), row], signatureVersion);
 }
 
 function publicOf(privateKeyPem: string): string {
@@ -128,7 +151,7 @@ function count(statementBytes: Buffer, rows: readonly Row[], by: Row["by"], pems
     const pem = pems.get(row.keyId);
     if (pem === undefined) refuse(`${by} signature by ${row.keyId} is not by a key of the ${by} root set`);
     let ok = false;
-    try { ok = verify(null, statementBytes, pem!, Buffer.from(row.signature, "base64")); } catch { /* reported below */ }
+    try { ok = verifyWithKey(statementBytes, pem!, Buffer.from(row.signature, "base64")); } catch { /* reported below */ }
     if (!ok) refuse(`${by} signature by ${row.keyId} does not verify`);
     valid.add(row.keyId);
   }
@@ -139,7 +162,7 @@ const newSetPems = (statement: RootRotationStatement) => new Map(statement.newRo
 
 /** The supplied keys that belong to the pinned set; any other key is ignored. */
 function pinnedPems(roots: readonly string[], pems: readonly string[]): Map<string, string> {
-  return new Map(pems.flatMap(pem => { const id = ed25519KeyId(pem); return id !== null && roots.includes(id) ? [[id, pem] as const] : []; }));
+  return new Map(pems.flatMap(pem => { const id = signingKeyId(pem); return id !== null && roots.includes(id) ? [[id, pem] as const] : []; }));
 }
 
 /**
@@ -154,7 +177,7 @@ function authorize(signed: SignedRootRotation, current: RootSetState, currentPem
   if ((statement.newThreshold < current.threshold || statement.newRoots.length < current.roots.length) && !statement.allowDecrease) {
     refuse("it lowers the threshold or the set size without allowDecrease");
   }
-  const bytes = bytesToSign(statement);
+  const bytes = bytesToSign(statement, signed.signatureVersion);
   if (currentPems !== null && count(bytes, signed.signatures, "current", currentPems) < current.threshold) refuse(`it needs ${current.threshold} distinct signatures from the current root set`);
   if (count(bytes, signed.signatures, "new", newSetPems(statement)) < statement.newThreshold) refuse(`the new set must prove possession with ${statement.newThreshold} distinct signatures`);
 }

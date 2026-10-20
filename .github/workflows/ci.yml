@@ -327,8 +327,9 @@ jobs:
           module="$(dpkg -L libsofthsm2 softhsm2 2>/dev/null | grep -m1 '/libsofthsm2\.so$' || true)"
           if [ -z "$module" ]; then echo "libsofthsm2.so not found in the softhsm2 packages"; exit 1; fi
           echo "AMC_TEST_PKCS11_MODULE=$module" >> "$GITHUB_ENV"
-          npm install --prefix "$RUNNER_TEMP/pkcs11" --no-save --no-package-lock --no-audit --no-fund pkcs11js@2.1.7
+          npm install --install-links --prefix "$RUNNER_TEMP/pkcs11" --no-save --no-package-lock --no-audit --no-fund "$GITHUB_WORKSPACE/packages/key-provider-pkcs11" pkcs11js@2.1.7
           echo "NODE_PATH=$RUNNER_TEMP/pkcs11/node_modules" >> "$GITHUB_ENV"
+          NODE_PATH="$RUNNER_TEMP/pkcs11/node_modules" node -e 'if (typeof require("agent-maturity-compass-key-provider-pkcs11").loadPkcs11().PKCS11 !== "function") process.exit(1)'
       - name: PKCS#11 provider on SoftHSM2
         run: |
           npx vitest run tests/keys/pkcs11Softhsm.test.ts --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/pkcs11.json"

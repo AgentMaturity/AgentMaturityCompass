@@ -11,6 +11,7 @@ import { verifyNotaryAttestResponse } from "../notary/notaryVerify.js";
 import { addPublicKeyToHistory } from "../crypto/keys.js";
 import { buildNotaryAuthSignature } from "../notary/notaryAuth.js";
 import { signDigestWithVault } from "../crypto/signing/signerVault.js";
+import type { NotaryAttestationBasis } from "../notary/notaryApiTypes.js";
 
 function signTrustConfigWithVault(workspace: string, path: string): string {
   const digest = sha256Hex(Buffer.from(readUtf8(path), "utf8"));
@@ -233,6 +234,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
   pinnedFingerprint: string | null;
   currentFingerprint: string | null;
   attestationLevel: "SOFTWARE" | "HARDWARE" | null;
+  attestationBasis: NotaryAttestationBasis | null;
   requiredAttestationLevel: "SOFTWARE" | "HARDWARE" | null;
   lastAttestationTs: number | null;
 }> {
@@ -247,6 +249,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     pinnedFingerprint: config.trust.mode === "NOTARY" ? config.trust.notary.pinnedPubkeyFingerprint : null,
     currentFingerprint: null as string | null,
     attestationLevel: null as "SOFTWARE" | "HARDWARE" | null,
+    attestationBasis: null as NotaryAttestationBasis | null,
     requiredAttestationLevel: config.trust.mode === "NOTARY" ? config.trust.notary.requiredAttestationLevel : null,
     lastAttestationTs: null as number | null
   };
@@ -314,6 +317,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     return out;
   }
   out.attestationLevel = verified.parsed.attestation.notary.attestationLevel;
+  out.attestationBasis = verified.parsed.attestation.notary.attestationBasis ?? null;
   out.lastAttestationTs = verified.parsed.attestation.ts;
   if (verified.parsed.pubkeyFingerprint !== config.trust.notary.pinnedPubkeyFingerprint) {
     out.ok = false;

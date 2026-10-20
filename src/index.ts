@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-export { quickstartWizard, initWorkspace, runDoctor, type InitWorkspaceOptions } from "./workspace.js";
+export { quickstartWizard, initWorkspace, runDoctor, saveAMCConfigAsync, signAmcConfigAsync, type InitWorkspaceOptions } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
 export {
   buildSupplyChainGuardDecisionReceiptInput,
@@ -336,11 +336,11 @@ export {
   issueCertificate,
   verifyCertificate,
   inspectCertificate,
-  revokeCertificate,
+  revokeCertificate, revokeCertificateAsync,
   verifyRevocation
 } from "./assurance/certificate.js";
 export {
-  generateTrustCertificate,
+  generateTrustCertificate, generateTrustCertificateAsync,
   verifyTrustCertificateEnvelope
 } from "./cert/trustCertificate.js";
 export type {
@@ -562,7 +562,7 @@ export {
   notaryAttestCli,
   notaryVerifyAttestCli,
   notarySignCli,
-  notaryLogVerifyCli
+  notaryLogVerifyCli, notaryStatusCliAsync, notaryPubkeyCliAsync, notaryAttestCliAsync, notarySignCliAsync
 } from "./notary/notaryCli.js";
 export { startNotaryServer } from "./notary/notaryServer.js";
 export { loadNotaryConfig, initNotaryConfig, saveNotaryConfig, defaultNotaryConfig } from "./notary/notaryConfigStore.js";
@@ -663,10 +663,13 @@ export { serveConsolePath } from "./console/consoleServer.js";
 export * from "./sdk/index.js";
 export {
   initOutcomeContract,
+  initOutcomeContractAsync,
   loadOutcomeContract,
   signOutcomeContract,
+  signOutcomeContractAsync,
   verifyOutcomeContractSignature,
-  upsertOutcomeContract
+  upsertOutcomeContract,
+  upsertOutcomeContractAsync
 } from "./outcomes/outcomeContractEngine.js";
 export {
   runOutcomeReport,
@@ -1371,6 +1374,7 @@ export {
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
   filePostmortem,
   getOverridesMissingPostmortem,
