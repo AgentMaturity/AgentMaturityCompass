@@ -61,7 +61,7 @@ Steps, in order (all run against the same workspace):
 | evidence-export | `amc evidence export --format json --include-chain` [C17] | 0 | `out/evidence.json` |
 | binder-create | `amc audit binder create --scope agent --id default` [C18] | 0 | `out/binder.amcaudit` |
 | binder-verify | `amc audit binder verify out/binder.amcaudit --pubkey <recorded auditor.pub>` [C19] | 0 | none |
-| assurance-gate | `amc assurance run --pack <pack>` [C20] | 2 | none |
+| assurance-gate | `amc assurance run --pack injection` [C20] | 2 | none |
 
 A step whose exit code differs from the expected one stops the run [C21].
 
@@ -84,10 +84,15 @@ A step whose exit code differs from the expected one stops the run [C21].
 - `evidence-export`: `--include-chain` adds hash chain verification fields to
   each exported record [C29].
 - `binder-create`: writes a signed `.amcaudit` artifact [C30].
-- `assurance-gate`: the example names an agent endpoint [C31], which takes the
-  responder's explicit-endpoint branch [C32]; with no provider key set it
-  refuses before sending a request [C33], and the CLI exits with code 2 [C34].
-  No assurance score is produced. This step runs last: when the examples were
+- `assurance-gate`: this separate target check selects the generic injection
+  pack [C45], whose execution resolves a responder [C46]. Regulated effect
+  scenarios can return unscored not evaluated before any responder is needed
+  [C47]; that result is not a missing-target error. The station's regulated pack
+  remains the input to `assurance-pack`, which describes its inventory [C14].
+  The gate names an agent endpoint [C31], which takes the responder's
+  explicit-endpoint branch [C32]; with no provider key set it refuses before
+  sending a request [C33], and the CLI exits with code 2 [C34]. No assurance
+  score is produced. This step runs last: when the examples were
   written an aborted scan left an unsealed ledger session, and an aborted scan
   is now sealed with `ASSURANCE_RUN_ABORTED` [C43]; running it last keeps
   every ledger check above independent of the scan.
@@ -156,3 +161,6 @@ text, not a line number, so unrelated edits do not break a citation.
 | C42 | `src/cli.ts` (`compliance risk-classify`) | `const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });` |
 | C43 | `src/assurance/evidenceWriters.ts` | `auditType: "ASSURANCE_RUN_ABORTED",` |
 | C44 | `examples/regulated-industries/lib/runStation.mjs` | `pins: { monitorSha256: pins.monitorSha256, auditorPubSha256: sha256(readFileSync(pins.auditorPub))` |
+| C45 | `examples/regulated-industries/lib/runStation.mjs` | `const TARGET_GATE_PACK = "injection";` |
+| C46 | `src/assurance/assurancePackExecution.ts` | `const responder = await input.getResponder();` |
+| C47 | `src/assurance/executed/compiledExecution.ts` | `if (scope === null) return unavailable("verified_execution_scope_unavailable");` |

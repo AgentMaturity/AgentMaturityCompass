@@ -16,6 +16,8 @@ export type EvidenceProducer = "amc-runtime" | "import" | "manual" | "external-r
 /** Every `meta.source` that is not AMC runtime evidence. Anything absent is amc-runtime. */
 export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProducer, "amc-runtime">>> = Object.freeze({
   "dogfood-maturity": "synthetic",
+  // P2-27 seeded fixture captures remain synthetic even if a claim flag is absent or mislabelled.
+  "assurance.executed": "synthetic",
   eval_import: "import",
   import: "import",
   watch: "import",
