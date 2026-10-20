@@ -7,7 +7,7 @@ import { initAdaptersConfig, loadAdaptersConfig, setAgentAdapterProfile, verifyA
 import { runAdapterCommand, initAdapterProjectSample } from "./adapterRunner.js";
 import { assembleAdapterEnv } from "./envAssembler.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
-import { issueAdapterCapabilityReceipt } from "../passport/adapterCapabilityReceipt.js";
+import { issueAdapterCapabilityReceipt, issueAdapterCapabilityReceiptAsync } from "../passport/adapterCapabilityReceipt.js";
 import { readDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
 
 export function adaptersInitCli(workspace: string): { configPath: string; sigPath: string } {
@@ -56,6 +56,14 @@ export function adaptersCapabilitiesCli(params: {
     agentId: params.agentId,
     adapterId: params.adapterId
   });
+}
+
+export async function adaptersCapabilitiesCliAsync(params: {
+  workspace: string;
+  agentId?: string;
+  adapterId: string;
+}): Promise<Awaited<ReturnType<typeof issueAdapterCapabilityReceiptAsync>>> {
+  return issueAdapterCapabilityReceiptAsync({ workspace: params.workspace, agentId: params.agentId, adapterId: params.adapterId });
 }
 
 export function adaptersConfigureCli(params: {

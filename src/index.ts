@@ -473,7 +473,7 @@ export {
   adaptersListCli,
   adaptersDetectCli,
   adaptersConfigureCli,
-  adaptersCapabilitiesCli,
+  adaptersCapabilitiesCli, adaptersCapabilitiesCliAsync,
   adaptersRunCli,
   adaptersEnvCli,
   adaptersInitProjectCli
@@ -2106,7 +2106,7 @@ export {
   ADAPTER_CAPABILITY_RECEIPT_VERSION,
   adapterCapabilityInspectionSchema,
   adapterCapabilityReceiptSchema,
-  issueAdapterCapabilityReceipt,
+  issueAdapterCapabilityReceipt, issueAdapterCapabilityReceiptAsync,
   trustedAdapterCapabilityReceiptKeys,
   verifyAdapterCapabilityReceipt
 } from "./passport/adapterCapabilityReceipt.js";

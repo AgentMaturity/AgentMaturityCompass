@@ -671,7 +671,7 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
-  adaptersCapabilitiesCli,
+  adaptersCapabilitiesCliAsync,
   adaptersConfigureCli,
   adaptersDetectCli,
   adaptersEnvCli,
@@ -4520,8 +4520,8 @@ adapters
   .requiredOption("--adapter <adapterId>", "adapter ID")
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
-  .action((opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const receipt = adaptersCapabilitiesCli({
+  .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
+    const receipt = await adaptersCapabilitiesCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       adapterId: opts.adapter

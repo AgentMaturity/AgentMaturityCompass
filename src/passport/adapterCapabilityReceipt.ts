@@ -17,7 +17,12 @@ import {
 } from "../adapters/adapterTypes.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { signatureEnvelopeSchema, verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy, signDigestWithPolicyAsync, verifySignedDigest } from "../crypto/signing/signer.js";
+import type { SignedDigest } from "../crypto/signing/signerTypes.js";
+import { readContainedOrNull } from "../utils/containedFs.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -241,12 +246,12 @@ function receiptHash(base: z.infer<typeof adapterCapabilityReceiptBaseSchema>): 
   return sha256Hex(Buffer.from(canonicalize(base), "utf8"));
 }
 
-export function buildAdapterCapabilityReceipt(input: BuildAdapterCapabilityReceiptInput): AdapterCapabilityReceipt {
+function prepareAdapterCapabilityReceipt(input: BuildAdapterCapabilityReceiptInput): z.infer<typeof adapterCapabilityReceiptBaseSchema> {
   const issuedAt = input.issuedAt ?? new Date().toISOString();
   const capabilities = adapterCapabilityDeclarationSchema.parse(input.definition.capabilities);
   const inspection = adapterCapabilityInspectionSchema.parse(input.inspection);
   const projection = projectCapabilities(capabilities, inspection, input.source);
-  const base = adapterCapabilityReceiptBaseSchema.parse({
+  return adapterCapabilityReceiptBaseSchema.parse({
     receiptVersion: ADAPTER_CAPABILITY_RECEIPT_VERSION,
     receiptId: receiptId(input.agentId, input.definition.id, issuedAt),
     issuedAt,
@@ -266,12 +271,9 @@ export function buildAdapterCapabilityReceipt(input: BuildAdapterCapabilityRecei
     effective: projection.effective,
     verification: projection.verification
   });
-  const digestSha256 = receiptHash(base);
-  const signature = signDigestWithPolicy({
-    workspace: input.workspace,
-    kind: "BUNDLE",
-    digestHex: digestSha256
-  });
+}
+
+function signedAdapterCapabilityReceipt(base: z.infer<typeof adapterCapabilityReceiptBaseSchema>, digestSha256: string, signature: SignedDigest): AdapterCapabilityReceipt {
   return adapterCapabilityReceiptSchema.parse({
     ...base,
     receiptHash: digestSha256,
@@ -283,6 +285,42 @@ export function buildAdapterCapabilityReceipt(input: BuildAdapterCapabilityRecei
       envelope: signature.envelope
     }
   });
+}
+
+export function buildAdapterCapabilityReceipt(input: BuildAdapterCapabilityReceiptInput): AdapterCapabilityReceipt {
+  const base = prepareAdapterCapabilityReceipt(input), digestSha256 = receiptHash(base);
+  const signature = signDigestWithPolicy({ workspace: input.workspace, kind: "BUNDLE", digestHex: digestSha256 });
+  return signedAdapterCapabilityReceipt(base, digestSha256, signature);
+}
+
+function receiptSigningAuthority(workspace: string) {
+  const selected = describePolicySigner(workspace, "BUNDLE");
+  return { selected, captured: selected.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null,
+    provider: boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? ("file" as const) };
+}
+function assertReceiptSigningAuthorityCurrent(workspace: string, authority: ReturnType<typeof receiptSigningAuthority>, receipt: AdapterCapabilityReceipt): void {
+  assertPolicySignerCurrent(workspace, authority.selected);
+  const signed = receipt.signature, envelope = signed.envelope;
+  if (envelope === undefined || envelope.sigB64 !== signed.signature
+    || !verifySignatureEnvelope(receipt.receiptHash, envelope, { trustedPublicKeys: [authority.selected.publicKeyPem], requireTrustedKey: true })) {
+    throw new Error("prepared adapter capability signature no longer matches its selected signer");
+  }
+  if (authority.captured !== null) {
+    const publicKeyPem = Buffer.from(envelope.pubkeyB64, "base64").toString("utf8"), keyId = signingKeyId(publicKeyPem);
+    if (keyId === null) throw new Error("prepared adapter capability signature key is unsupported");
+    assertPurposePublicationCurrent(workspace, authority.captured, { provider: authority.provider, algorithm: envelope.alg,
+      publicKeyPem, keyId, signature: Buffer.from(signed.signature, "base64") });
+  }
+}
+
+/** Existing v1 receipt bytes through the selected asynchronous policy route; no new purpose binding. */
+export async function buildAdapterCapabilityReceiptAsync(input: BuildAdapterCapabilityReceiptInput): Promise<AdapterCapabilityReceipt> {
+  const workspace = input.workspace, base = prepareAdapterCapabilityReceipt(input), digestSha256 = receiptHash(base);
+  const authority = receiptSigningAuthority(workspace);
+  const signature = await signDigestWithPolicyAsync({ workspace, kind: "BUNDLE", digestHex: digestSha256, expectedSigner: authority.selected });
+  const receipt = signedAdapterCapabilityReceipt(base, digestSha256, signature);
+  assertReceiptSigningAuthorityCurrent(workspace, authority, receipt);
+  return receipt;
 }
 
 function inspectConfiguration(workspace: string, agentId: string, adapterId: string): AdapterCapabilityInspection["configuration"] {
@@ -319,7 +357,7 @@ function inspectHook(workspace: string, agentId: string, adapterId: string): Ada
   }
 }
 
-export function issueAdapterCapabilityReceipt(input: IssueAdapterCapabilityReceiptInput): AdapterCapabilityReceipt {
+function inspectAdapterCapabilityReceipt(input: IssueAdapterCapabilityReceiptInput): BuildAdapterCapabilityReceiptInput {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   const definition = getAdapterDefinition(input.workspace, input.adapterId);
   const source = hasBuiltInAdapter(definition.id) ? "builtin" : "plugin";
@@ -333,7 +371,7 @@ export function issueAdapterCapabilityReceipt(input: IssueAdapterCapabilityRecei
         ? { status: "detected", command: detection.command ? basename(detection.command) : null, version: detection.version }
         : { status: "version_unavailable", command: detection.command ? basename(detection.command) : null, version: null }
       : { status: "not_detected", command: null, version: null };
-  return buildAdapterCapabilityReceipt({
+  return {
     workspace: input.workspace,
     agentId,
     definition,
@@ -344,7 +382,34 @@ export function issueAdapterCapabilityReceipt(input: IssueAdapterCapabilityRecei
       configuration: inspectConfiguration(input.workspace, agentId, definition.id),
       hook: inspectHook(input.workspace, agentId, definition.id)
     }
-  });
+  };
+}
+
+/** Only hashes/public projections are retained in memory; the receipt never carries configuration bytes or paths. */
+function capabilityReceiptInputs(workspace: string, agentId: string, adapterId: string): string {
+  const digest = (relative: string) => {
+    const bytes = readContainedOrNull(workspace, relative, 1024 * 1024);
+    return bytes === null ? null : sha256Hex(bytes);
+  };
+  return canonicalize({ definition: getAdapterDefinition(workspace, adapterId), source: hasBuiltInAdapter(adapterId) ? "builtin" : "plugin",
+    config: digest(".amc/adapters.yaml"), configSignature: digest(".amc/adapters.yaml.sig"),
+    configuration: inspectConfiguration(workspace, agentId, adapterId), hook: inspectHook(workspace, agentId, adapterId) });
+}
+
+export function issueAdapterCapabilityReceipt(input: IssueAdapterCapabilityReceiptInput): AdapterCapabilityReceipt {
+  return buildAdapterCapabilityReceipt(inspectAdapterCapabilityReceipt(input));
+}
+
+/** Runtime probing is the existing synchronous bounded inspection; only policy signing becomes awaitable. */
+export async function issueAdapterCapabilityReceiptAsync(input: IssueAdapterCapabilityReceiptInput): Promise<AdapterCapabilityReceipt> {
+  const request = { ...input }, workspace = request.workspace, agentId = resolveAgentId(workspace, request.agentId);
+  const authority = receiptSigningAuthority(workspace), before = capabilityReceiptInputs(workspace, agentId, request.adapterId);
+  const inspected = inspectAdapterCapabilityReceipt({ ...request, agentId });
+  if (before !== capabilityReceiptInputs(workspace, agentId, request.adapterId)) throw new Error("adapter capability receipt inputs changed while signing");
+  const receipt = await buildAdapterCapabilityReceiptAsync(inspected);
+  if (before !== capabilityReceiptInputs(workspace, agentId, request.adapterId)) throw new Error("adapter capability receipt inputs changed while signing");
+  assertReceiptSigningAuthorityCurrent(workspace, authority, receipt);
+  return receipt;
 }
 
 function verifyTrustedSignature(
