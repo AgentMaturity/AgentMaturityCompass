@@ -1,8 +1,9 @@
 // Proposed destination: tests/keys/asyncAssuranceCertificate.test.ts. Source-only proposal; never executed by the author.
 import { sign, verify } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, expect, test, vi } from "vitest";
 import YAML from "yaml";
 import { initWorkspace } from "../../src/workspace.js";
@@ -12,6 +13,7 @@ import { runAssurance } from "../../src/assurance/assuranceRunner.js";
 import { assuranceCertificatesDir, assuranceLatestCertificatePath, assuranceLatestCertificateShaPath,
   assuranceRunJsonPath, assurancePolicyPath, assurancePolicySigPath, verifyAssurancePolicySignature,
   initAssurancePolicy, loadAssurancePolicy, saveAssurancePolicy } from "../../src/assurance/assurancePolicyStore.js";
+import { assuranceTimestampedCertificatePath, assuranceTimestampedCertificateShaPath } from "../../src/assurance/assurancePolicyStore.js";
 import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
 import { rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { verifySignatureEnvelope } from "../../src/crypto/signing/signatureEnvelope.js";
@@ -20,7 +22,13 @@ import { signDigestWithVault } from "../../src/crypto/signing/signerVault.js";
 import type { SignatureEnvelope } from "../../src/crypto/signing/signerTypes.js";
 import type { KeyRef } from "../../src/keys/provider.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
-import { transparencyLogPath } from "../../src/transparency/logChain.js";
+import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifyTransparencyLog } from "../../src/transparency/logChain.js";
+import { merkleCurrentRootPath } from "../../src/transparency/merklePaths.js";
+import { rebuildTransparencyMerkle } from "../../src/transparency/merkleIndexStore.js";
+import { TransparencyMerkleLagError } from "../../src/transparency/merkleIndexState.js";
+import { ownedAsyncWorkspaceLogNotary } from "../helpers/ownedAsyncWorkspaceLogNotary.js";
+import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
+import * as files from "../../src/utils/fs.js";
 import { extractValidatedTarGzipArchive } from "../../src/security/safeTarArchive.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
@@ -55,6 +63,7 @@ function deferred() { let resolve!: () => void; const promise = new Promise<void
 async function fixture() {
   const root = mkdtempSync(join(tmpdir(), "amc-assurance-async-")), workspace = join(root, "workspace"); roots.push(root);
   vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
+  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined); vi.stubEnv("AMC_SESSION_STORE", "sqlite");
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   // Existing embeddedKeyForgery / remainingPortableEnvelopeCallers fixture: an actual controlled endpoint and
   // actual assurance runner. Zero signed evidence gates establish certificate crypto, not an assurance-pass claim.
@@ -98,7 +107,9 @@ test("the maintained assurance issuer uses the real file provider and preserves 
   const f = await fixture(), now = Date.now(); vi.spyOn(Date, "now").mockReturnValue(now);
   const result = await issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "owned.amccert" });
   const observed = inspect(f, result.outFile), calls = file.calls.filter(row => row.workspace === f.workspace && row.ref.id === "artifact-seal");
-  expect(calls).toHaveLength(1); expect(calls[0]!.bytes).toEqual(Buffer.from(observed.signature.digestSha256, "hex"));
+  expect(calls).toHaveLength(3); expect(calls.map(row => row.bytes)).toEqual([
+    Buffer.from(observed.signature.digestSha256, "hex"), Buffer.from(sha256Hex(readFileSync(transparencySealPath(f.workspace))), "hex"),
+    Buffer.from(sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))), "hex") ]);
   const signature = sign(null, Buffer.from(observed.signature.digestSha256, "hex"), f.privateKeyPem).toString("base64");
   // Independently reconstructed existing default wire, rather than comparing two newly changed implementations.
   const expected = { digestSha256: observed.signature.digestSha256, signature, signedTs: now, signer: "auditor", envelope: {
@@ -246,3 +257,91 @@ test.each(["run", "findings", "policy", "policy-sidecar"] as const)("a %s source
   expect(readFileSync(join(output.root, "meta", "run.sha256"), "utf8")).toBe(`${sha256Hex(originals.find(row => row.kind === "run")!.bytes)}\n`);
   expect(readFileSync(join(output.root, "meta", "findings.sha256"), "utf8")).toBe(`${sha256Hex(originals.find(row => row.kind === "findings")!.bytes)}\n`);
 });
+
+function pauseCertificateLog() {
+  const entered = deferred(), release = deferred(); let remaining = 3;
+  const wait = async () => { if (--remaining === 0) { entered.resolve(); await release.promise; } else file.afterSign = wait; };
+  file.afterSign = wait; return { entered, release };
+}
+test.each(["run", "findings", "policy", "policy-sidecar", "archive", "checksum", "latest", "latest-checksum", "timestamped", "timestamped-checksum"] as const)(
+  "late certificate %s drift refuses only transparency and preserves the actual already-published files", async target => {
+    const f = await fixture(), gate = pauseCertificateLog(), beforeCalls = file.calls.length;
+    const pending = issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "owned.amccert" }), outcome = pending.then(() => null, error => error);
+    let changedPath: string | undefined, original: Buffer | undefined;
+    try {
+      expect(await Promise.race([gate.entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      const out = join(f.workspace, "owned.amccert"), observed = inspect(f, out), runPath = assuranceRunJsonPath(f.workspace, f.runId);
+      const targets = { run: runPath, findings: join(f.workspace, ".amc", "assurance", "runs", f.runId, "findings.json"), policy: assurancePolicyPath(f.workspace),
+        "policy-sidecar": assurancePolicySigPath(f.workspace), archive: out, checksum: `${out}.sha256`, latest: assuranceLatestCertificatePath(f.workspace),
+        "latest-checksum": assuranceLatestCertificateShaPath(f.workspace), timestamped: assuranceTimestampedCertificatePath(f.workspace, observed.cert.issuedTs),
+        "timestamped-checksum": assuranceTimestampedCertificateShaPath(f.workspace, observed.cert.issuedTs) };
+      const calls = file.calls.slice(beforeCalls); expect(calls).toHaveLength(3);
+      for (const call of calls) expect(verify(null, call.bytes, f.publicKeyPem, call.signature)).toBe(true);
+      expect(existsSync(join(f.workspace, ".amc/transparency/.workspace-transparency.lock"))).toBe(false);
+      changedPath = targets[target]; original = readFileSync(changedPath); writeFileAtomic(changedPath, Buffer.concat([original, Buffer.from("\n ")]), 0o644);
+      const afterEdit = publication(f); gate.release.resolve(); const error = await outcome;
+      expect(error).toMatchObject({ code: "ASSURANCE_CERT_TRANSPARENCY_PUBLICATION_INCOMPLETE", publication: { outFile: out }, cause: expect.any(Error) });
+      expect(String(error.cause)).toContain(["run", "findings", "policy", "policy-sidecar"].includes(target)
+        ? "assurance certificate source inputs changed while preparing" : "assurance certificate published outputs changed while preparing transparency");
+      expect(publication(f)).toEqual(afterEdit);
+    } finally { gate.release.resolve(); await Promise.allSettled([pending]); file.afterSign = undefined; if (changedPath && original) writeFileAtomic(changedPath, original, 0o644); }
+    inspect(f, (await issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "fresh.amccert" })).outFile);
+  });
+
+test("certificate final purpose authority is rechecked after two real independently usable native notary log signatures", async () => {
+  const f = await fixture(), remote = await ownedAsyncWorkspaceLogNotary(f.workspace, f.root), entered = deferred(), release = deferred();
+  remote.setBeforeReply(async kind => { if (kind === "MERKLE_ROOT") { entered.resolve(); await release.promise; } });
+  const pending = issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "owned.amccert" }), outcome = pending.then(() => null, error => error);
+  try {
+    try {
+      expect(await Promise.race([entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      inspect({ ...f, trust: remote.trust }, join(f.workspace, "owned.amccert")); const published = publication(f);
+      expect(remote.requests.map(row => row.kind)).toEqual(["TRANSPARENCY_ROOT", "MERKLE_ROOT"]);
+      lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", ""); release.resolve();
+      expect(await outcome).toMatchObject({ code: "ASSURANCE_CERT_TRANSPARENCY_PUBLICATION_INCOMPLETE", cause: expect.any(Error) });
+      expect(publication(f)).toEqual(published);
+    } finally { release.resolve(); await Promise.allSettled([pending]); remote.setBeforeReply(undefined); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
+    inspect({ ...f, trust: remote.trust }, (await issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "fresh.amccert" })).outFile);
+    expect(remote.requests.slice(-2)).toEqual([
+      { kind: "TRANSPARENCY_ROOT", payload: Buffer.from(sha256Hex(readFileSync(transparencySealPath(f.workspace))), "hex") },
+      { kind: "MERKLE_ROOT", payload: Buffer.from(sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))), "hex") } ]);
+    expect(JSON.parse(readFileSync(transparencySealSigPath(f.workspace), "utf8")).envelope).toMatchObject({ alg: "ecdsa-p256-sha256", fingerprint: remote.keyId });
+  } finally { await remote.close(); }
+});
+
+test("certificate preserves every archive copy and the committed-log native cause after a real post-line root rename failure", async () => {
+  const f = await fixture(), actualWrite = files.writeFileAtomic; let reached = false;
+  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => { actualWrite(path, bytes, mode);
+    if (path === transparencySealSigPath(f.workspace) && !reached) { reached = true; const root = merkleCurrentRootPath(f.workspace);
+      rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned post-line I/O failure"); } });
+  try {
+    const error = await issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "owned.amccert" }).then(() => null, value => value);
+    expect(reached).toBe(true); expect(error).toMatchObject({ code: "ASSURANCE_CERT_TRANSPARENCY_PUBLICATION_INCOMPLETE" });
+    expect(error.cause).toBeInstanceOf(TransparencyMerkleLagError); expect(error.cause.pendingRecorded).toBe(true);
+    const out = join(f.workspace, "owned.amccert"), observed = inspect(f, out), archive = readFileSync(out), sha = sha256Hex(archive);
+    for (const path of [assuranceLatestCertificatePath(f.workspace), assuranceTimestampedCertificatePath(f.workspace, observed.cert.issuedTs)]) expect(readFileSync(path)).toEqual(archive);
+    for (const path of [`${out}.sha256`, assuranceLatestCertificateShaPath(f.workspace), assuranceTimestampedCertificateShaPath(f.workspace, observed.cert.issuedTs)]) {
+      expect(readFileSync(path, "utf8")).toBe(`${sha}\n`);
+    }
+    expect(error.publication.sha256).toBe(sha);
+    expect(JSON.parse(readFileSync(transparencyLogPath(f.workspace), "utf8").trim().split(/\r?\n/).at(-1)!).hash).toBe(error.cause.entryHash);
+    expect(verifyTransparencyLog(f.workspace).ok).toBe(true);
+  } finally { spy.mockRestore(); rmSync(merkleCurrentRootPath(f.workspace), { recursive: true, force: true }); rebuildTransparencyMerkle(f.workspace); }
+  inspect(f, (await issueAssuranceCertificate({ workspace: f.workspace, runId: f.runId, outFile: "fresh.amccert" })).outFile);
+});
+
+test.skipIf(process.platform === "win32")("compiled assurance cert-issue awaits all three real raw32 phases and leaves a verified published certificate", async () => {
+  const f = await fixture(), actual = pathToFileURL(resolve("dist/keys/providers/file.js")).href, purpose = pathToFileURL(resolve("dist/keys/purposeProviders.js")).href;
+  const replacement = join(f.root, "file-boundary.mjs"), loader = join(f.root, "file-loader.mjs"), requests = join(f.root, "calls.jsonl"); writeFileSync(requests, "");
+  writeFileSync(replacement, `import {appendFileSync} from "node:fs"; import {fileKeyProvider as actual} from ${JSON.stringify(actual)};
+export function fileKeyProvider(workspace) { const provider=actual(workspace); return {...provider, async sign(ref,bytes) { const signature=await provider.sign(ref,bytes); appendFileSync(process.env.P208_CERT_CALLS,JSON.stringify({purpose:ref.id,hex:Buffer.from(bytes).toString("hex")})+"\\n"); return signature; }}; }\n`);
+  writeFileSync(loader, `import {pathToFileURL} from "node:url";
+export async function resolve(specifier,context,nextResolve) { if (["@aws-sdk/","@google-cloud/","@azure/","pkcs11js"].some(prefix=>specifier.startsWith(prefix))) throw new Error("owned cert test forbids remote SDK imports"); const found=await nextResolve(specifier,context); if(context.parentURL===${JSON.stringify(purpose)}&&found.url===${JSON.stringify(actual)}) return {url:pathToFileURL(process.env.P208_CERT_BOUNDARY).href,shortCircuit:true}; return found; }\n`);
+  const child = spawnOwnedNode(["--experimental-loader", pathToFileURL(loader).href, resolve("dist/cli.js"), "assurance", "cert-issue", "--run", f.runId, "--out", "cli.amccert"],
+    { cwd: f.workspace, env: { ...process.env, NO_COLOR: "1", P208_CERT_CALLS: requests, P208_CERT_BOUNDARY: replacement } });
+  try { const result = await child.wait(30_000); expect(result.code, result.stderr).toBe(0); expect(result.signal).toBeNull();
+    const observed = inspect(f, join(f.workspace, "cli.amccert")); expect(readFileSync(requests, "utf8").trim().split("\n").filter(Boolean).map(line => JSON.parse(line))).toEqual([
+      { purpose: "artifact-seal", hex: observed.signature.digestSha256 }, { purpose: "artifact-seal", hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+      { purpose: "artifact-seal", hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) } ]);
+  } finally { await child.stop(); }
+}, 60_000);

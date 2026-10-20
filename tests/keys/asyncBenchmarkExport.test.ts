@@ -1,6 +1,6 @@
 // Proposed destination: tests/keys/asyncBenchmarkExport.test.ts. Root alone builds/runs/applies this packet.
 import { sign, verify } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -18,7 +18,12 @@ import { initUsersConfigAsync, createSession, verifyTrackedSessionToken, setUser
 import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
 import type { KeyRef } from "../../src/keys/provider.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
-import { transparencyLogPath } from "../../src/transparency/logChain.js";
+import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifyTransparencyLog } from "../../src/transparency/logChain.js";
+import { merkleCurrentRootPath } from "../../src/transparency/merklePaths.js";
+import { rebuildTransparencyMerkle } from "../../src/transparency/merkleIndexStore.js";
+import { TransparencyMerkleLagError } from "../../src/transparency/merkleIndexState.js";
+import { ownedAsyncWorkspaceLogNotary } from "../helpers/ownedAsyncWorkspaceLogNotary.js";
+import * as files from "../../src/utils/fs.js";
 import { extractValidatedTarGzipArchive } from "../../src/security/safeTarArchive.js";
 import { writeFileAtomic } from "../../src/utils/fs.js";
 import { sha256Hex } from "../../src/utils/hash.js";
@@ -90,7 +95,9 @@ test("the async benchmark exporter preserves every default signed member and rea
   const legacy = exportBenchmarkArtifact({ ...f.params, outFile: "legacy.amcbench" });
   const result = await exportBenchmarkArtifactAsync(f.params), actual = inspect(f, result.outFile), old = inspect(f, legacy.outFile);
   expect(actual.body).toEqual(old.body); expect(actual.sigBytes).toEqual(old.sigBytes); expect(actual.pub).toEqual(old.pub);
-  expect(boundary.calls).toHaveLength(before + 1); expect(boundary.calls.at(-1)!.bytes).toEqual(Buffer.from(actual.signature.digestSha256, "hex"));
+  expect(boundary.calls).toHaveLength(before + 3); expect(boundary.calls.slice(before).map(row => row.bytes)).toEqual([
+    Buffer.from(actual.signature.digestSha256, "hex"), Buffer.from(sha256Hex(readFileSync(transparencySealPath(f.workspace))), "hex"),
+    Buffer.from(sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))), "hex") ]);
   const signature = sign(null, Buffer.from(actual.signature.digestSha256, "hex"), getSigningKey(f.workspace, "artifact-seal")).toString("base64");
   expect(actual.sigBytes.toString()).toBe(JSON.stringify({ digestSha256: sha256Hex(actual.body), signature, signedTs: now, signer: "auditor" }, null, 2));
   expect(actual.bench.hashes.reportSha256).toBe(sha256Hex(readFileSync(join(f.paths.runsDir, `${f.run.runId}.json`))));
@@ -220,14 +227,96 @@ test.skipIf(process.platform === "win32")("the actual compiled benchmark export 
   const replacement = join(f.root, "file-boundary.mjs"), loader = join(f.root, "file-loader.mjs"), requests = join(f.root, "calls.jsonl");
   writeFileSync(requests, "");
   writeFileSync(replacement, `import {appendFileSync} from "node:fs"; import {fileKeyProvider as actual} from ${JSON.stringify(actual)};
-export function fileKeyProvider(workspace) { const provider=actual(workspace); return {...provider, async sign(ref,bytes) { const signature=await provider.sign(ref,bytes); appendFileSync(process.env.P208_BENCH_CALLS,JSON.stringify({purpose:ref.id,size:bytes.length})+"\\n"); return signature; }}; }\n`);
+export function fileKeyProvider(workspace) { const provider=actual(workspace); return {...provider, async sign(ref,bytes) { const signature=await provider.sign(ref,bytes); appendFileSync(process.env.P208_BENCH_CALLS,JSON.stringify({purpose:ref.id,size:bytes.length,hex:Buffer.from(bytes).toString("hex")})+"\\n"); return signature; }}; }\n`);
   writeFileSync(loader, `import {pathToFileURL} from "node:url";
 export async function resolve(specifier,context,nextResolve) { if (["@aws-sdk/","@google-cloud/","@azure/","pkcs11js"].some(prefix=>specifier.startsWith(prefix))) throw new Error("owned benchmark test forbids remote SDK imports"); const found=await nextResolve(specifier,context); if(context.parentURL===${JSON.stringify(purpose)}&&found.url===${JSON.stringify(actual)}) return {url:pathToFileURL(process.env.P208_BENCH_BOUNDARY).href,shortCircuit:true}; return found; }\n`);
   const owned = spawnOwnedNode(["--experimental-loader", pathToFileURL(loader).href, resolve("dist/cli.js"), "benchmark", "export", "--agent", "default", "--run", f.run.runId, "--out", "cli.amcbench"],
     { cwd: f.workspace, env: { ...process.env, NO_COLOR: "1", P208_BENCH_CALLS: requests, P208_BENCH_BOUNDARY: replacement } });
   try {
     const result = await owned.wait(30_000); expect(result.code, result.stderr).toBe(0); expect(result.signal).toBeNull(); expect(result.stdout).toContain("Benchmark exported:");
-    expect(readFileSync(requests, "utf8").split("\n").filter(Boolean).map(line => JSON.parse(line))).toEqual([{ purpose: "artifact-seal", size: 32 }]);
-    inspect(f, join(f.workspace, "cli.amcbench"));
+    const actual = inspect(f, join(f.workspace, "cli.amcbench"));
+    expect(readFileSync(requests, "utf8").split("\n").filter(Boolean).map(line => JSON.parse(line))).toEqual([
+      { purpose: "artifact-seal", size: 32, hex: actual.signature.digestSha256 },
+      { purpose: "artifact-seal", size: 32, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+      { purpose: "artifact-seal", size: 32, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) } ]);
   } finally { await owned.stop(); }
 }, 60_000);
+
+function pauseBenchmarkLog() {
+  const entered = deferred(), release = deferred(); let remaining = 3;
+  const wait = async () => { if (--remaining === 0) { entered.resolve(); await release.promise; } else boundary.afterSign = wait; };
+  boundary.afterSign = wait; return { entered, release };
+}
+test.each(["run", "output", "output-mode"] as const)("late benchmark %s drift refuses transparency and preserves the actual already-published archive", async target => {
+  const f = await fixture(), gate = pauseBenchmarkLog(), beforeCalls = boundary.calls.length;
+  const pending = exportBenchmarkArtifactAsync(f.params), outcome = pending.then(() => null, error => error);
+  let path: string | undefined, original: Buffer | undefined, mode: number | undefined;
+  try {
+    expect(await Promise.race([gate.entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+    const out = join(f.workspace, f.params.outFile); inspect(f, out);
+    const calls = boundary.calls.slice(beforeCalls); expect(calls).toHaveLength(3);
+    for (const call of calls) expect(verify(null, call.bytes, f.publicKeyPem, call.signature)).toBe(true);
+    path = target === "run" ? join(f.paths.runsDir, `${f.run.runId}.json`) : out; original = readFileSync(path); mode = lstatSync(path).mode & 0o777;
+    if (target === "output-mode") chmodSync(path, mode === 0o600 ? 0o644 : 0o600); else writeFileAtomic(path, Buffer.concat([original, Buffer.from("\n ")]), mode);
+    const after = readFileSync(out), afterMode = lstatSync(out).mode & 0o777, log = readFileSync(transparencyLogPath(f.workspace));
+    gate.release.resolve(); const error = await outcome;
+    expect(error).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", outFile: out, cause: expect.any(Error) });
+    expect(String(error.cause)).toContain(target === "run" ? "benchmark inputs changed while preparing" : "benchmark published output changed while preparing transparency");
+    expect(readFileSync(out)).toEqual(after); expect(lstatSync(out).mode & 0o777).toBe(afterMode); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+  } finally { gate.release.resolve(); await Promise.allSettled([pending]); boundary.afterSign = undefined; if (path && original && mode !== undefined) writeFileAtomic(path, original, mode); }
+  inspect(f, (await exportBenchmarkArtifactAsync({ ...f.params, outFile: "fresh.amcbench" })).outFile);
+});
+
+test("benchmark final purpose authority remains required while both native notary log signers stay independently usable", async () => {
+  const f = await fixture(), remote = await ownedAsyncWorkspaceLogNotary(f.workspace, f.root), entered = deferred(), release = deferred();
+  remote.setBeforeReply(async kind => { if (kind === "MERKLE_ROOT") { entered.resolve(); await release.promise; } });
+  const pending = exportBenchmarkArtifactAsync(f.params), outcome = pending.then(() => null, error => error);
+  try {
+    try {
+      expect(await Promise.race([entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      const out = join(f.workspace, f.params.outFile); inspect({ ...f, trust: remote.trust }, out);
+      const archive = readFileSync(out), log = readFileSync(transparencyLogPath(f.workspace)); expect(remote.requests.map(row => row.kind)).toEqual(["TRANSPARENCY_ROOT", "MERKLE_ROOT"]);
+      lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", ""); release.resolve();
+      expect(await outcome).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", cause: expect.any(Error) });
+      expect(readFileSync(out)).toEqual(archive); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+    } finally { release.resolve(); await Promise.allSettled([pending]); remote.setBeforeReply(undefined); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
+    inspect({ ...f, trust: remote.trust }, (await exportBenchmarkArtifactAsync({ ...f.params, outFile: "fresh.amcbench" })).outFile);
+    expect(remote.requests.slice(-2)).toEqual([
+      { kind: "TRANSPARENCY_ROOT", payload: Buffer.from(sha256Hex(readFileSync(transparencySealPath(f.workspace))), "hex") },
+      { kind: "MERKLE_ROOT", payload: Buffer.from(sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))), "hex") } ]);
+    expect(JSON.parse(readFileSync(transparencySealSigPath(f.workspace), "utf8")).envelope).toMatchObject({ alg: "ecdsa-p256-sha256", fingerprint: remote.keyId });
+  } finally { await remote.close(); }
+});
+
+test("trusted benchmark route rechecks actual current-role loss after archive publication during the last log Sign", async () => {
+  const f = await fixture(), owner = (await initUsersConfigAsync({ workspace: f.workspace, username: "late-benchmark-owner", password: "late-benchmark-password" })).owner;
+  let session = createSession({ workspace: f.workspace, user: owner });
+  const current = () => { const checked = verifyTrackedSessionToken({ workspace: f.workspace, token: session.token }); return checked.ok && checked.payload !== null
+    && checked.payload.roles.some(role => resolveApiRolePolicy("/api/v1/benchmarks/export", "POST").roles.includes(role)); };
+  const gate = pauseBenchmarkLog(), pending = api(f, "late-api.amcbench", current);
+  try {
+    expect(await Promise.race([gate.entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+    const out = join(f.workspace, "late-api.amcbench"); inspect(f, out); const archive = readFileSync(out);
+    await setUserRolesAsync({ workspace: f.workspace, username: owner.username, roles: ["VIEWER"] }); expect(current()).toBe(false);
+    const log = readFileSync(transparencyLogPath(f.workspace)); gate.release.resolve(); const result = await pending;
+    expect(result.status).toBe(403); expect(readFileSync(out)).toEqual(archive); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+  } finally { gate.release.resolve(); await Promise.allSettled([pending]); boundary.afterSign = undefined; await setUserRolesAsync({ workspace: f.workspace, username: owner.username, roles: ["OWNER"] }); }
+  session = createSession({ workspace: f.workspace, user: activeUserRecord(f.workspace, owner.userId)! });
+  expect((await api(f, "fresh-late-api.amcbench", current)).status).toBe(200); inspect(f, join(f.workspace, "fresh-late-api.amcbench"));
+});
+
+test("benchmark reports the retained archive and native committed-entry cause after a real post-line log I/O failure", async () => {
+  const f = await fixture(), actualWrite = files.writeFileAtomic; let reached = false;
+  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => { actualWrite(path, bytes, mode);
+    if (path === transparencySealSigPath(f.workspace) && !reached) { reached = true; const root = merkleCurrentRootPath(f.workspace);
+      rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned post-line I/O failure"); } });
+  try {
+    const error = await exportBenchmarkArtifactAsync(f.params).then(() => null, value => value);
+    expect(reached).toBe(true); expect(error).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", outFile: join(f.workspace, f.params.outFile) });
+    expect(error.cause).toBeInstanceOf(TransparencyMerkleLagError); expect(error.cause.pendingRecorded).toBe(true); inspect(f, join(f.workspace, f.params.outFile));
+    expect(error.sha256).toBe(sha256Hex(readFileSync(join(f.workspace, f.params.outFile))));
+    expect(JSON.parse(readFileSync(transparencyLogPath(f.workspace), "utf8").trim().split(/\r?\n/).at(-1)!).hash).toBe(error.cause.entryHash);
+    expect(verifyTransparencyLog(f.workspace).ok).toBe(true);
+  } finally { spy.mockRestore(); rmSync(merkleCurrentRootPath(f.workspace), { recursive: true, force: true }); rebuildTransparencyMerkle(f.workspace); }
+  inspect(f, (await exportBenchmarkArtifactAsync({ ...f.params, outFile: "fresh.amcbench" })).outFile);
+});

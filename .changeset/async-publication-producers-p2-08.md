@@ -23,3 +23,5 @@ Route maintained fleet trust-report CLI and the added SDK producer through check
 Prepare workspace transparency signatures before the common short publication lock, verify exact predecessor and original authorities before append, authenticate the legacy frontier resume root, and await the BOM log handoff with truthful partial-publication errors.
 
 Restrict local transparency seal, Merkle-root and migration admission to the correct purpose or authenticated notary history, and authenticate the same seal bytes that were parsed.
+
+Await certificate and benchmark transparency after archive publication, retaining original authority and truthful partial-publication diagnostics.

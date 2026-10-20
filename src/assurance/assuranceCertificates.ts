@@ -8,7 +8,10 @@ import YAML from "yaml";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntryAsync } from "../transparency/logChain.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { buildBenchProofs, writeBenchProofFiles } from "../bench/benchProofs.js";
 import { loadTrustConfig, checkNotaryTrust } from "../trust/trustConfig.js";
 import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
@@ -112,6 +115,14 @@ export interface AssuranceIssueCertificateResult {
   timestampedPath: string;
 }
 
+class AssuranceTransparencyPublicationError extends Error {
+  readonly code = "ASSURANCE_CERT_TRANSPARENCY_PUBLICATION_INCOMPLETE";
+  constructor(readonly publication: Omit<AssuranceIssueCertificateResult, "transparencyHash">, cause: unknown) {
+    super("Assurance certificate archive was published; transparency publication is incomplete", { cause });
+    this.name = "AssuranceTransparencyPublicationError";
+  }
+}
+
 // z import only for type inference above.
 import { z } from "zod";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
@@ -185,11 +196,18 @@ export async function issueAssuranceCertificate(input: {
 
   const trust = loadTrustConfig(params.workspace);
   const signer = describePolicySigner(params.workspace, "CERT");
+  const captured = signer.mode === "VAULT" ? capturePurposePublication(params.workspace, "artifact-seal") : null;
+  const holder = boundProviderKey(params.workspace, "artifact-seal")?.binding.provider ?? "file";
   const signingPolicy = JSON.stringify(trust);
-  const assertSigningCurrent = () => {
+  const assertSigningCurrent = (signed?: SignedDigest) => {
     assertPolicySignerCurrent(params.workspace, signer);
     if (JSON.stringify(loadTrustConfig(params.workspace)) !== signingPolicy) {
       throw new Error("assurance certificate signing policy changed while preparing");
+    }
+    if (captured !== null && signed !== undefined) {
+      if (signed.envelope === undefined) throw new Error("assurance certificate prepared envelope is missing");
+      assertPurposePublicationCurrent(params.workspace, captured, { provider: holder, algorithm: signed.envelope.alg,
+        publicKeyPem: signer.publicKeyPem, keyId: signer.fingerprint, signature: Buffer.from(signed.signature, "base64") });
     }
   };
   const notary = await checkNotaryTrust(params.workspace);
@@ -286,50 +304,56 @@ export async function issueAssuranceCertificate(input: {
     writeFileAtomic(join(root, "meta", "findings.sha256"), `${sha256Hex(findingsBytes)}\n`, 0o644);
 
     assertInputsCurrent();
-    assertSigningCurrent();
+    assertSigningCurrent(signed);
     tarCreateDeterministic(tmp, outFile);
   } finally {
     cleanup(tmp);
   }
 
-  const sha256 = sha256Hex(readFileSync(outFile));
+  const archiveBytes = readFileSync(outFile), sha256 = sha256Hex(archiveBytes);
   writeFileAtomic(`${outFile}.sha256`, `${sha256}\n`, 0o644);
 
   ensureDir(assuranceCertificatesDir(params.workspace));
   const latestPath = assuranceLatestCertificatePath(params.workspace);
   const timestampedPath = assuranceTimestampedCertificatePath(params.workspace, cert.issuedTs);
   if (outFile !== latestPath) {
-    writeFileAtomic(latestPath, readFileSync(outFile));
+    writeFileAtomic(latestPath, archiveBytes);
     writeFileAtomic(assuranceLatestCertificateShaPath(params.workspace), `${sha256}\n`, 0o644);
   } else {
     writeFileAtomic(assuranceLatestCertificateShaPath(params.workspace), `${sha256}\n`, 0o644);
   }
   if (outFile !== timestampedPath) {
-    writeFileAtomic(timestampedPath, readFileSync(outFile));
+    writeFileAtomic(timestampedPath, archiveBytes);
     writeFileAtomic(assuranceTimestampedCertificateShaPath(params.workspace, cert.issuedTs), `${sha256}\n`, 0o644);
   } else {
     writeFileAtomic(assuranceTimestampedCertificateShaPath(params.workspace, cert.issuedTs), `${sha256}\n`, 0o644);
   }
 
-  const transparency = appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "ASSURANCE_CERT_ISSUED",
-    agentId: run.scope.type === "AGENT" ? run.scope.id : "workspace",
-    artifact: {
-      kind: "amccert",
-      sha256,
-      id: cert.certId
+  const publication = { outFile, sha256, cert, latestPath, timestampedPath };
+  const publishedFiles: Array<[string, Buffer]> = [
+    [outFile, archiveBytes], [latestPath, archiveBytes], [timestampedPath, archiveBytes],
+    [`${outFile}.sha256`, Buffer.from(`${sha256}\n`)], [assuranceLatestCertificateShaPath(params.workspace), Buffer.from(`${sha256}\n`)],
+    [assuranceTimestampedCertificateShaPath(params.workspace, cert.issuedTs), Buffer.from(`${sha256}\n`)]
+  ];
+  const assertPublishedCurrent = () => {
+    for (const [path, bytes] of publishedFiles) {
+      try { if (readFileSync(path).equals(bytes)) continue; } catch { /* Refuse missing/unreadable publication too. */ }
+      throw new Error("assurance certificate published outputs changed while preparing transparency");
     }
-  });
-
-  return {
-    outFile,
-    sha256,
-    cert,
-    transparencyHash: transparency.hash,
-    latestPath,
-    timestampedPath
   };
+  try {
+    const transparency = await appendTransparencyEntryAsync({
+      workspace: params.workspace,
+      type: "ASSURANCE_CERT_ISSUED",
+      agentId: run.scope.type === "AGENT" ? run.scope.id : "workspace",
+      artifact: {
+        kind: "amccert",
+        sha256,
+        id: cert.certId
+      }
+    }, { beforeCommit: () => { assertInputsCurrent(); assertSigningCurrent(signed); assertPublishedCurrent(); } });
+    return { outFile, sha256, cert, transparencyHash: transparency.hash, latestPath, timestampedPath };
+  } catch (error) { throw new AssuranceTransparencyPublicationError(publication, error); }
 }
 
 export function inspectAssuranceCertificate(file: string): {

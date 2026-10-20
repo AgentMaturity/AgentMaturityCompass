@@ -12,7 +12,7 @@ import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { benchmarkSchema, type BenchmarkArtifact } from "./benchSchema.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -161,6 +161,14 @@ export function exportBenchmarkArtifact(params: BenchmarkExportInput): { outFile
 }
 
 type BenchmarkFileState = { bytes: Buffer; mode: number } | null;
+class BenchmarkTransparencyPublicationError extends Error {
+  readonly code = "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE";
+  constructor(readonly outFile: string, readonly sha256: string, cause: unknown) {
+    super("Benchmark archive was published; transparency publication is incomplete", { cause });
+    this.name = "BenchmarkTransparencyPublicationError";
+  }
+}
+
 function benchmarkFileState(path: string): BenchmarkFileState {
   try {
     const stat = lstatSync(path);
@@ -221,9 +229,17 @@ export async function exportBenchmarkArtifactAsync(input: BenchmarkExportInput, 
       if (!sameBenchmarkFile(outputBefore, benchmarkFileState(outFile))) throw new Error("benchmark output changed while preparing");
       writeFileAtomic(outFile, archiveBytes, outputBefore?.mode ?? archiveMode);
     } });
-    // Preserve the synchronous log contract; it may throw after publication. Hash the actual bytes this call wrote.
-    appendTransparencyEntry({ workspace, type: "BENCHMARK_EXPORTED", agentId,
-      artifact: { kind: "amcbench", sha256: sha256Hex(archiveBytes), id: bench.benchId } });
+    // Archive publication already succeeded. Only local current/input/output checks enter the final log gate.
+    const archiveSha256 = sha256Hex(archiveBytes), published = { bytes: archiveBytes, mode: outputBefore?.mode ?? archiveMode };
+    try {
+      await appendTransparencyEntryAsync({ workspace, type: "BENCHMARK_EXPORTED", agentId,
+        artifact: { kind: "amcbench", sha256: archiveSha256, id: bench.benchId } }, { beforeCommit: () => {
+          withControlFileLock({ root: dirname(outFile), name: `benchmark-export-${sha256Hex(outFile).slice(0, 24)}`, operation: () => {
+            beforePublish?.(); assertSigningAllowed(); assertPurposePublicationCurrent(workspace, captured, signed); assertInputsCurrent();
+            if (!sameBenchmarkFile(published, benchmarkFileState(outFile))) throw new Error("benchmark published output changed while preparing transparency");
+          } });
+        } });
+    } catch (error) { throw new BenchmarkTransparencyPublicationError(outFile, archiveSha256, error); }
     return { outFile, bench };
   } finally { rmSync(tmp, { recursive: true, force: true }); }
 }
