@@ -1,0 +1,81 @@
+{
+  "sourceCommit": "a66542d969e68115f61eea0a1028b59061110b55",
+  "allAcceptanceComplete": false,
+  "qualification": "Local macOS arm64, not CI; experimental and unreviewed. This packet freezes prerequisites, not a completed Q3 full result.",
+  "criteria": [
+    {
+      "id": "AC1",
+      "criterion": "Six conversion families pass positive fixtures and fail unsafe keyword-negative fixtures.",
+      "status": "Implemented for local synthetic evidence and covered by the completed clean H3 focused run; final full qualification remains pending."
+    },
+    {
+      "id": "AC2",
+      "criterion": "All 18 regulated packs execute or document specific NE; there is no reply-text grading.",
+      "status": "Implemented for local synthetic evidence and covered by the completed clean H3 focused run; final full qualification remains pending."
+    },
+    {
+      "id": "AC3",
+      "criterion": "Regulated tasks contain no expected answer/grading-format hints.",
+      "status": "Implemented for local synthetic evidence and covered by the completed clean H3 focused run; final full qualification remains pending."
+    },
+    {
+      "id": "AC4",
+      "criterion": "Empty or missing execution cannot yield a pass.",
+      "status": "Implemented for local synthetic evidence and covered by the completed clean H3 focused run; final full qualification remains pending."
+    },
+    {
+      "id": "AC5",
+      "criterion": "Adversarial ASR per task over 25 attempts, with intervals.",
+      "status": "Local diagnostic ASR support exists; production ASR and external observation are not measured."
+    },
+    {
+      "id": "AC6",
+      "criterion": "Judged results require valid calibration and calibration table is published.",
+      "status": "Native calibration authority, private export and pending public table exist. Authentic human labels, actual authorized execution and measured publication remain pending."
+    },
+    {
+      "id": "AC7",
+      "criterion": "Converted scenarios appear as experimental control tests and feed P1-11.",
+      "status": "Implemented for local synthetic evidence and covered by the completed clean H3 focused run; final full qualification remains pending."
+    },
+    {
+      "id": "AC8",
+      "criterion": "Mutation checks recorded; full suite and checks green.",
+      "status": "All 23 source checks and both documentation checks pass. Focused tests retain one exact baseline failure. Mutations are recorded; Q3 full remains pending."
+    },
+    {
+      "id": "HANDOVER-ONE-COMMAND",
+      "criterion": "Live model calibration/ASR paths built to run from one command without pretending unavailable measurements.",
+      "status": "The guarded seeded-execution CLI and one-call native private calibration API exist. Real trusted composition, human inputs and authorized model execution remain pending."
+    }
+  ],
+  "focusedSummary": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/summary.json",
+    "sha256": "f7ffdd5dc3a25a3e4979454b93f5f26608342f8279cd479237f57de26a0bf7a2",
+    "bytes": 199003
+  },
+  "scenarioBasis": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/scenario-basis-static-v1/per-scenario-outcomes.json",
+    "sha256": "772d5a3fe464c5004b357c97bf4ffb70b33c93637844e4d29d9631c871067b46",
+    "bytes": 176844
+  },
+  "blockerInventory": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/blockers-static-v1/inventory.json",
+    "sha256": "ed7a4cdc3575441c8ab7db97f994343dd136599598c4ec30c1af430fd4621496",
+    "bytes": 13020
+  },
+  "truthCaps": {
+    "canonicalLegacyScenarios": 119,
+    "seededAdapters": 8,
+    "technicalNEAdapterGaps": 111,
+    "separateStationQuestionAspects": 5,
+    "experimentalControlsWithDeclarations": 11,
+    "effectDeclarations": 40,
+    "ordinaryP111NegativeFixtures": 3,
+    "productionASR": null,
+    "realModelMeasured": false,
+    "humanApproval": false
+  },
+  "gateG2Metric": "Eleven declared experimental controls do not establish 150 qualified controls or admitted production evidence.",
+  "fullSuiteResult": null
+}

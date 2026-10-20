@@ -1,0 +1,43 @@
+{
+  "state": "NOT_STARTED_FOR_Q3",
+  "sourceCommit": "a66542d969e68115f61eea0a1028b59061110b55",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020",
+  "branch": "codex/p2-27-compatibility-final",
+  "qualificationPrefix": "qualification/2026-10-20-P2-27-compatibility/",
+  "boundHelper": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-compatibility-full-suite-bound-v1.py",
+    "sha256": "de0ab164195f729a1c75a86f507ad5ab159146a08003a3d4498be52b78c020f0",
+    "bytes": 14869
+  },
+  "bindingReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/bound-full-helper-binding-review-v1.json",
+    "sha256": "a3ff543acef5996d24eb851577bee47a74512f6cf4241a2b575006751ede9df1",
+    "bytes": 2711
+  },
+  "commandShape": "npx vitest run --maxWorkers=2 --reporter=verbose --reporter=json --outputFile=<owned full-suite/Q3/report.json>",
+  "requirements": [
+    "Actual Q3 is the clean single-parent metadata-only child of H3.",
+    "Before and after: exact HEAD, int, branch, Node, pnpm, owned TMPDIR, tracked status and source hashes.",
+    "Use an exclusive new output directory and owned process group; never overwrite earlier captures.",
+    "Preserve native JSON, raw log, exit code, failed assertions, genuine collection errors and skips.",
+    "Root checks native arithmetic, exact file roster and exit/success coherence; missing or malformed output never qualifies.",
+    "Classify each failure separately against actual clean int and candidate evidence. No future failure is preclassified.",
+    "Do not edit, rebuild, stage or commit in the candidate while its full run executes.",
+    "Write completed full evidence outside Q3, bound to Q3, so the measured final commit remains unchanged."
+  ],
+  "inheritedCaptureCaveats": "Some launch, snapshot and malformed nested JSON exceptions can escape before result.json. Preserve all available artifacts and record an invalid capture explicitly.",
+  "priorQ2": {
+    "nativeResult": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/full-suite/4c06e443b83d87c5f117bee8c413649dc4000f61/result.json",
+      "sha256": "6d4444cc7f3a84a1d54f02122efef7bc4f9e6ddd282ba180ee60b3ce25423389",
+      "bytes": 5200
+    },
+    "status": "completed_failed_not_qualification_for_H3_or_Q3",
+    "ownedFailures": 7,
+    "exactBaselineDocsFailures": 1,
+    "fullOnlyTsaFailuresPassingAloneOnBothLines": 8
+  },
+  "actualQ3Result": null,
+  "nativeTotals": null,
+  "automaticQualificationOrLanding": false
+}
