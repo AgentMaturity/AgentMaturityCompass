@@ -6247,12 +6247,15 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     } else {
       console.log(chalk.red("Ledger verification FAILED — configuration signatures"));
       console.log(chalk.gray("  The evidence chain itself verified; the failures below are unsigned or edited configs."));
+      if (!result.trustRoot.anchored && result.trustRoot.monitorAdmission?.status === "not-pinned") {
+        console.log(chalk.yellow("  Trust root: UNANCHORED. The monitor key was read from the workspace being verified and has no independent admission."));
+      }
     }
     const sigErrors = result.errors.filter((e: string) => e.includes("signature invalid"));
     const otherErrors = result.errors.filter((e: string) => !e.includes("signature invalid"));
     if (sigErrors.length > 0 && sigErrors.length === result.errors.length) {
       console.log(chalk.yellow(`  ${sigErrors.length} signatures are invalid.`));
-      console.log(chalk.gray("  Every event signature failed. A re-initialized vault and altered evidence look the same here; keep the files and run amc verify --repair to see the options."));
+      console.log(chalk.gray("  The reported signature checks failed; keep the files and run amc verify --repair to see the options."));
     } else {
       for (const error of result.errors.slice(0, 10)) {
         console.log(`- ${error}`);

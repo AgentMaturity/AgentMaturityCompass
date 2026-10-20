@@ -212,6 +212,7 @@ export function buildSessionRootDescriptor(params: {
   const errors: string[] = [];
   const expected =
     params.options?.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+  if (expected === "") errors.push("trust root: expected monitor fingerprint must not be empty");
   // Use the provider-aware fingerprint/admission shared with the store verifier.
   const monitorKeyFingerprint = verifyMonitorTrustRoot(workspace, expected, errors, params.options?.trust).monitorFingerprint ?? "";
   errors.push(...operationalEvidenceProblems(workspace, rows, { trust: params.options?.trust }));

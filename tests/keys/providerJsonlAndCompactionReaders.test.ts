@@ -35,7 +35,7 @@ async function fixture() {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-owned-jsonl-read-"))), workspace = join(root, "workspace"), home = join(root, "operator-home");
   mkdirSync(home); const f = { root, workspace, service: undefined as SessionService | undefined }; fixtures.push(f);
   vi.stubEnv("AMC_HOME", home); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
-  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
   // No environment backend selector is inherited: each actual test opens its one explicitly selected backend.
   vi.stubEnv("AMC_SESSION_STORE", "sqlite");
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });

@@ -746,8 +746,9 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
     governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
     trustRoot: {
-      anchored: Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint
-        || monitorAdmission?.status === "admitted" && monitorAdmission.source !== "workspace-self",
+      anchored: monitorAdmission
+        ? monitorAdmission.status === "admitted" && monitorAdmission.source !== "workspace-self"
+        : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
       monitorFingerprint,
       expectedFingerprint,
       ...(monitorAdmission ? { monitorAdmission } : {})

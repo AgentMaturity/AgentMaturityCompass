@@ -86,6 +86,7 @@ export function verifyMonitorTrustRoot(
   expected: string | null,
   errors: string[], trust?: TrustContext
 ): StoredSessionTrustRoot {
+  const expectedFingerprint = expected === null ? null : expected.toLowerCase();
   let monitorFingerprint: string | null = null;
   let rootPem: string | null = null;
   // Unknown binding state stays strict; only a positively unbound local key may retain integrity without a pin.
@@ -101,22 +102,24 @@ export function verifyMonitorTrustRoot(
     // claiming a match against a key that is absent.
     monitorFingerprint = null;
   }
-  if (expected) {
+  const pinMatches = expectedFingerprint !== null && monitorFingerprint !== null && monitorFingerprint === expectedFingerprint;
+  if (expectedFingerprint) {
     if (!monitorFingerprint) {
       errors.push("trust root: no monitor public key present to compare against the expected fingerprint");
-    } else if (monitorFingerprint !== expected) {
+    } else if (!pinMatches) {
       errors.push(
         `trust root: monitor key fingerprint ${monitorFingerprint.slice(0, 16)}… does not match the expected ` +
-          `${expected.slice(0, 16)}… — the evidence may have been re-signed with a substituted key`
+          `${expectedFingerprint.slice(0, 16)}… — the evidence may have been re-signed with a substituted key`
       );
     }
   }
   const admission = trust ? admitKey({ publicKeyPem: rootPem,
     purpose: "ledger-row", signature: "session ledger root", context: trust }) : null;
-  if (admission !== null && admission.status !== "admitted"
-    && (providerBound || admission.status !== "not-pinned")) errors.push(`trust root: ledger issuer ${admission.status}`);
+  const admissionRejected = admission !== null && admission.status !== "admitted"
+    && (providerBound || admission.status !== "not-pinned");
+  if (admissionRejected) errors.push(`trust root: ledger issuer ${admission.status}`);
   const independentlyAdmitted = admission?.status === "admitted" && admission.source !== "workspace-self";
-  return { anchored: Boolean(expected) || independentlyAdmitted, monitorFingerprint, expectedFingerprint: expected };
+  return { anchored: !admissionRejected && (pinMatches || independentlyAdmitted), monitorFingerprint, expectedFingerprint };
 }
 
 function verifyPayload(event: EvidenceEvent, workspace: string, errors: string[]): void {

@@ -101,12 +101,17 @@ test("unbound JSONL explicit operator distrust still refuses a matching independ
   vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", sha256Hex(Buffer.from(pem, "utf8")));
   const recorded = recordJsonl(f.workspace);
   expect((await verifyAgentRun(f.workspace, recorded.sessionId, trusted))).toMatchObject({ ok: true, integrityOk: true });
-  const denied = await verifyAgentRun(f.workspace, recorded.sessionId, { ...trusted, asOf: new Date(), distrust: [{
+  const deniedTrust = { ...trusted, asOf: new Date(), distrust: [{
     keyId, distrustedFrom: null, reason: "key-compromise", note: "owned operator explicit refusal", source: "owned JSONL trust boundary"
-  }] });
+  }] } as const;
+  const rootErrors: string[] = [];
+  expect(verifyMonitorTrustRoot(f.workspace, sha256Hex(Buffer.from(pem, "utf8")), rootErrors, deniedTrust))
+    .toMatchObject({ anchored: false });
+  expect(rootErrors).toEqual(["trust root: ledger issuer distrusted"]);
+  const denied = await verifyAgentRun(f.workspace, recorded.sessionId, deniedTrust);
   expect(denied.ok).toBe(false);
   expect(denied.integrityOk).toBe(false);
-  expect(denied).toMatchObject({ ok: false, integrityOk: false, ledgerOk: false, trustRoot: { monitorAdmission: { status: "distrusted" } } });
+  expect(denied).toMatchObject({ ok: false, integrityOk: false, ledgerOk: false, trustRoot: { anchored: false, monitorAdmission: { status: "distrusted" } } });
   expect(denied.ledgerErrors).toContain("trust root: ledger issuer distrusted");
   expect(nativeEvidenceVerdict(denied)).toMatchObject({ verification: "failed" });
 });
