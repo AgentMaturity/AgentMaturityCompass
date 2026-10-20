@@ -12,7 +12,7 @@ const seam = vi.hoisted(() => ({
   signature: { valid: true, signatureExists: true, reason: null as string | null },
   studioRunning: true,
   notary: vi.fn(async () => ({ ok: true, reasons: [] })),
-  sign: vi.fn(),
+  sign: vi.fn(async () => undefined),
   lease: vi.fn(() => ({ token: "synthetic-lease-must-not-render" })),
   http: vi.fn(async () => ({ status: 200, failure: null })),
   sqlite: vi.fn(() => ({ id: "native-modules", status: "PASS", message: "Fixture SQLite seam" }))
@@ -30,7 +30,7 @@ vi.mock("../src/workspaces/workspaceId.js", () => ({ workspaceIdFromDirectory: (
 vi.mock("../src/adapters/adapterCli.js", () => ({ adaptersDetectCli: () => [] }));
 vi.mock("../src/toolhub/toolhubValidators.js", () => ({ pathAllowedByPatterns: () => ({ ok: false }) }));
 vi.mock("../src/trust/trustConfig.js", () => ({ checkNotaryTrust: seam.notary, loadTrustConfig: () => ({ trust: { mode: "NOTARY" } }), verifyTrustConfigSignature: () => seam.signature }));
-vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicy: seam.sign }));
+vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicyAsync: seam.sign }));
 vi.mock("../src/crypto/keys.js", () => ({ verifyKeyHistoryChain: () => ({ ok: true }) }));
 vi.mock("../src/doctor/nativeModuleProbe.js", () => ({ nativeModuleCheck: seam.sqlite }));
 vi.mock("../src/doctor/doctorLiveProbe.js", async importOriginal => ({ ...await importOriginal<typeof import("../src/doctor/doctorLiveProbe.js")>(), requestDoctorStatus: seam.http }));

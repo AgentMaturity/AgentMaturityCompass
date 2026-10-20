@@ -25,3 +25,5 @@ Prepare workspace transparency signatures before the common short publication lo
 Restrict local transparency seal, Merkle-root and migration admission to the correct purpose or authenticated notary history, and authenticate the same seal bytes that were parsed.
 
 Await certificate and benchmark transparency after archive publication, retaining original authority and truthful partial-publication diagnostics.
+
+Await the explicit doctor live signing probe through the checked async policy signer and keep public signing and unexpected health diagnostics fixed.
