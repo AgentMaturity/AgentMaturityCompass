@@ -507,6 +507,13 @@
       "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
     },
     {
+      "path": "src/studio/apiDelegation.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/studio/apiDelegation.ts.landed",
+      "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
+    },
+    {
       "path": "src/studio/studioServer.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
