@@ -7,7 +7,7 @@ import { arr, int, isoTime, lit, nonEmpty, obj, oneOf, opt, sha256, str } from "
 /** The signature envelope AMC artifacts carry, refusing unknown members here: none of them is signed. */
 const signatureEnvelope = obj({
   v: lit(1),
-  alg: lit("ed25519"),
+  alg: oneOf(["ed25519", "ecdsa-p256-sha256"] as const),
   pubkeyB64: nonEmpty,
   fingerprint: str({ length: 64 }),
   sigB64: nonEmpty,

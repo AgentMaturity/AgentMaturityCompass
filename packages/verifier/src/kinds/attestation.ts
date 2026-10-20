@@ -3,7 +3,7 @@
  * named by `controlResultsDigest` hold for one tenant, workspace, subject, deployment, profile and window.
  */
 import { createHash } from "node:crypto";
-import { canonicalEd25519Pem, canonicalize, isCanonicalSignatureBase64, same, sha256Hex, tagged, verifySignature } from "../bytes.js";
+import { canonicalSigningPem, canonicalize, isCanonicalSignatureBase64, same, sha256Hex, tagged, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
 import { ATTESTATION_DIGEST_TAG, scopedAttestation, type ScopedAttestation } from "../records/attestation.js";
@@ -12,7 +12,7 @@ import { arr, attempt, isRecord } from "../schema.js";
 import { admit } from "../trust.js";
 import { refused } from "./common.js";
 
-/** sha256(tag, 0x00, canonical attestation without `signature`): the 32 bytes the envelope's Ed25519 signature covers. */
+/** sha256(tag, 0x00, canonical attestation without `signature`): the 32 bytes the envelope's signature covers. */
 export function attestationDigest(attestation: Omit<ScopedAttestation, "signature"> & { signature?: unknown }): Buffer {
   const { signature: _signature, ...body } = attestation;
   return createHash("sha256").update(tagged(ATTESTATION_DIGEST_TAG, canonicalize(body))).digest();
@@ -120,8 +120,9 @@ export function evaluateAttestation(value: unknown, env: Env): Evaluation {
   }
   if (signature.signedTs !== at(attestation.issuedAt)) integrity.push({ code: "MALFORMED", detail: "signature.signedTs must equal issuedAt" });
   const pem = Buffer.from(signature.pubkeyB64, "base64").toString("utf8");
-  if (Buffer.from(pem, "utf8").toString("base64") !== signature.pubkeyB64 || canonicalEd25519Pem(pem) !== pem) {
-    integrity.push({ code: "MALFORMED", detail: "signature.pubkeyB64 is not base64 of a canonical Ed25519 SPKI PEM" });
+  const key = canonicalSigningPem(pem);
+  if (Buffer.from(pem, "utf8").toString("base64") !== signature.pubkeyB64 || key?.pem !== pem || key.algorithm !== signature.alg) {
+    integrity.push({ code: "MALFORMED", detail: "signature.pubkeyB64 is not base64 of a canonical Ed25519 or P-256 SPKI PEM of signature.alg" });
   } else if (!same(sha256Hex(pem), signature.fingerprint) || !same(attestation.issuerKeyId, signature.fingerprint)
     || (signature.signer.notaryFingerprint !== undefined && !same(signature.signer.notaryFingerprint, signature.fingerprint))) {
     integrity.push({ code: "DIGEST_MISMATCH", detail: "issuerKeyId, signature.fingerprint and the carried key do not agree" });
