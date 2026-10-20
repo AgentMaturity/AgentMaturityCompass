@@ -45,6 +45,13 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "pnpm-workspace.yaml",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/pnpm-workspace.yaml.landed",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+    },
+    {
       "path": "scripts/source-quality.mjs",
       "issue": "P0-14",
       "baseCommit": "691a041dc552e57688175331959ada75e302e0c0",
