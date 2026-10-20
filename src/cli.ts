@@ -502,7 +502,7 @@ import {
   outcomesDiffCli,
   outcomesFleetReportCli,
   outcomesInitCliAsync,
-  outcomesReportCli,
+  outcomesReportCliAsync,
   outcomesVerifyCli
 } from "./outcomes/outcomeCli.js";
 import {
@@ -13103,7 +13103,7 @@ outcomes
   .requiredOption("--window <window>", "window (e.g. 14d)")
   .requiredOption("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((scope: string | undefined, opts: { window: string; out: string; agent?: string }) => {
+  .action(async (scope: string | undefined, opts: { window: string; out: string; agent?: string }) => {
     const outPath = resolve(process.cwd(), opts.out);
     if (scope === "fleet") {
       const out = outcomesFleetReportCli({
@@ -13116,7 +13116,7 @@ outcomes
       return;
     }
 
-    const out = outcomesReportCli({
+    const out = await outcomesReportCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       window: opts.window,

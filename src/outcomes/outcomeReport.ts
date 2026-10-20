@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 import type { OutcomeCategory, OutcomeReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -12,7 +12,11 @@ import { parseWindowToMs } from "../utils/time.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { computeMetric, outcomeTrustTier, scoreCategory, type ComputedMetric } from "./outcomeScoring.js";
-import { loadOutcomeContract, verifyOutcomeContractSignature } from "./outcomeContractEngine.js";
+import { loadOutcomeContract, outcomeContractPath, verifyOutcomeContractSignature } from "./outcomeContractEngine.js";
+
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 
 export interface RunOutcomeReportInput {
   workspace: string;
@@ -127,8 +131,27 @@ export function renderOutcomeReportMarkdown(report: OutcomeReport): string {
   ].join("\n");
 }
 
-export function runOutcomeReport(input: RunOutcomeReportInput): { report: OutcomeReport; jsonPath: string; mdPath: string } {
+function readReportEvidence(workspace: string, agentId: string, start: number, end: number) {
+  const ledger = openLedger(workspace);
+  try { return { outcomeEvents: ledger.getOutcomeEventsBetween(start, end, agentId), evidence: ledger.getEventsBetween(start, end) }; }
+  finally { ledger.close(); }
+}
+
+function optionalReportBytes(path: string): string | null { return pathExists(path) ? readFileSync(path).toString("base64") : null; }
+function reportFileInputs(workspace: string, agentId: string) {
+  const contract = outcomeContractPath(workspace, agentId), dir = reportsDir(workspace, agentId), files = listOutcomeReportFiles(dir);
+  const previous = files[files.length - 1] ?? null;
+  return { contract, contractBytes: optionalReportBytes(contract), signatureBytes: optionalReportBytes(`${contract}.sig`),
+    dir, previous, previousBytes: previous === null ? null : optionalReportBytes(previous) };
+}
+function currentReportInputState(workspace: string, prepared: ReturnType<typeof prepareOutcomeReport>): string {
+  return canonicalize({ files: reportFileInputs(workspace, prepared.agentId),
+    data: readReportEvidence(workspace, prepared.agentId, prepared.base.windowStartTs, prepared.base.windowEndTs) });
+}
+
+function prepareOutcomeReport(input: RunOutcomeReportInput, snapshot = false) {
   const agentId = resolveAgentId(input.workspace, input.agentId);
+  const files = snapshot ? reportFileInputs(input.workspace, agentId) : null;
   const contract = loadOutcomeContract(input.workspace, agentId);
   const contractSig = verifyOutcomeContractSignature(input.workspace, agentId);
   const windowMs = parseWindowToMs(input.window);
@@ -136,12 +159,12 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
   const windowStartTs = windowEndTs - windowMs;
   const previous = loadPreviousReport(input.workspace, agentId);
 
-  const ledger = openLedger(input.workspace);
-  let outcomeEvents = ledger.getOutcomeEventsBetween(windowStartTs, windowEndTs, agentId);
+  const data = readReportEvidence(input.workspace, agentId, windowStartTs, windowEndTs);
+  let outcomeEvents = data.outcomeEvents;
   let llmTokens = 0;
   let blockedAudits: string[] = [];
-  try {
-    const evidence = ledger.getEventsBetween(windowStartTs, windowEndTs);
+  {
+    const evidence = data.evidence;
     const scopedEvidence = evidence.filter((event) => {
       try {
         const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
@@ -183,8 +206,6 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
           payload_sha256: event.payload_sha256
         }));
     }
-  } finally {
-    ledger.close();
   }
 
   const computed: ComputedMetric[] = contract.outcomeContract.metrics.map((metric) =>
@@ -261,25 +282,20 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
     ]
   } satisfies Omit<OutcomeReport, "reportJsonSha256" | "reportSealSig">;
 
-  const reportJsonSha256 = sha256Hex(canonicalize(base));
-  const reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(input.workspace, "artifact-seal"));
-  const report: OutcomeReport = {
-    ...base,
-    reportJsonSha256,
-    reportSealSig
-  };
-
   const outDir = reportsDir(input.workspace, agentId);
-  ensureDir(outDir);
-  const jsonPath = input.outFile
-    ? join(input.workspace, input.outFile)
-    : join(outDir, `${reportId}.json`);
+  const jsonPath = input.outFile ? join(input.workspace, input.outFile) : join(outDir, `${reportId}.json`);
   const mdPath = jsonPath.endsWith(".json") ? jsonPath.slice(0, -5) + ".md" : `${jsonPath}.md`;
-  writeFileAtomic(jsonPath, JSON.stringify(report, null, 2), 0o644);
-  writeFileAtomic(mdPath, renderOutcomeReportMarkdown(report), 0o644);
+  if (snapshot && canonicalize(reportFileInputs(input.workspace, agentId)) !== canonicalize(files)) {
+    throw new Error("Outcome report inputs changed while calculation was prepared");
+  }
+  return { base, previous, agentId, jsonPath, mdPath, source: snapshot ? canonicalize({ files, data }) : null };
+}
 
+function recordOutcomeReport(workspace: string, prepared: ReturnType<typeof prepareOutcomeReport>, report: OutcomeReport) {
+  const { agentId, previous, jsonPath, mdPath } = prepared;
+  const { reportId, reportJsonSha256, valueRegressionRisk, valueScore, economicSignificanceIndex } = report;
   appendTransparencyEntry({
-    workspace: input.workspace,
+    workspace,
     type: "OUTCOME_REPORT_RECORDED",
     agentId,
     artifact: {
@@ -291,7 +307,7 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
 
   if (valueRegressionRisk > 0) {
     void dispatchIntegrationEvent({
-      workspace: input.workspace,
+      workspace,
       eventName: "VALUE_REGRESSION_DETECTED",
       agentId,
       summary: `Value regression detected for ${agentId}`,
@@ -311,6 +327,56 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
     jsonPath,
     mdPath
   };
+}
+
+export function runOutcomeReport(input: RunOutcomeReportInput): { report: OutcomeReport; jsonPath: string; mdPath: string } {
+  const prepared = prepareOutcomeReport(input), reportJsonSha256 = sha256Hex(canonicalize(prepared.base));
+  const report: OutcomeReport = { ...prepared.base, reportJsonSha256,
+    reportSealSig: signHexDigest(reportJsonSha256, getSigningKey(input.workspace, "artifact-seal")) };
+  ensureDir(reportsDir(input.workspace, prepared.agentId));
+  writeFileAtomic(prepared.jsonPath, JSON.stringify(report, null, 2), 0o644);
+  writeFileAtomic(prepared.mdPath, renderOutcomeReportMarkdown(report), 0o644);
+  return recordOutcomeReport(input.workspace, prepared, report);
+}
+
+class OutcomeReportPublicationError extends Error {
+  readonly code = "OUTCOME_REPORT_PUBLICATION_INCOMPLETE";
+  constructor(readonly publishedFiles: readonly string[], cause: unknown) {
+    super("Outcome report publication is incomplete; published files are retained", { cause });
+    this.name = "OutcomeReportPublicationError";
+  }
+}
+
+/** Awaitable artifact-purpose producer. The report's legacy raw seal and synchronous transparency protocol are retained. */
+export async function runOutcomeReportAsync(params: RunOutcomeReportInput, options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runOutcomeReport>> {
+  const input = { workspace: params.workspace, agentId: params.agentId, window: params.window, outFile: params.outFile }, beforePublish = options.beforePublish;
+  const assertSigningAllowed = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize outcome report signing"); };
+  beforePublish?.(); assertSigningAllowed();
+  const captured = capturePurposePublication(input.workspace, "artifact-seal"), prepared = prepareOutcomeReport(input, true);
+  const locked = <T>(operation: () => T): T => withControlFileLock({ root: dirname(prepared.jsonPath), name: "outcome-report", operation });
+  const destinations = locked(() => ({ json: optionalReportBytes(prepared.jsonPath), markdown: optionalReportBytes(prepared.mdPath) }));
+  const reportJsonSha256 = sha256Hex(canonicalize(prepared.base));
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"));
+  const report: OutcomeReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };
+  const publishedFiles: string[] = [];
+  try {
+    locked(() => {
+      beforePublish?.(); assertSigningAllowed(); assertPurposePublicationCurrent(input.workspace, captured, signed);
+      if (currentReportInputState(input.workspace, prepared) !== prepared.source) throw new Error("Outcome report inputs changed while signing was prepared");
+      if (optionalReportBytes(prepared.jsonPath) !== destinations.json || optionalReportBytes(prepared.mdPath) !== destinations.markdown) {
+        throw new Error("Outcome report destinations changed while signing was prepared");
+      }
+      ensureDir(reportsDir(input.workspace, prepared.agentId));
+      writeFileAtomic(prepared.jsonPath, JSON.stringify(report, null, 2), 0o644); publishedFiles.push(prepared.jsonPath);
+      writeFileAtomic(prepared.mdPath, renderOutcomeReportMarkdown(report), 0o644); publishedFiles.push(prepared.mdPath);
+    });
+  } catch (error) {
+    if (publishedFiles.length > 0) throw new OutcomeReportPublicationError([...publishedFiles], error);
+    throw error;
+  }
+  // The existing synchronous transparency call runs after the output lock is released; no automatic rollback is claimed.
+  try { return recordOutcomeReport(input.workspace, prepared, report); }
+  catch (error) { throw new OutcomeReportPublicationError([...publishedFiles], error); }
 }
 
 export function loadOutcomeReport(workspace: string, agentId: string, reportId: string | "latest"): OutcomeReport {

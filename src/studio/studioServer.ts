@@ -215,7 +215,7 @@ import {
 import { resolveSecretRef } from "../integrations/integrationStore.js";
 import {
   outcomesFleetReportCli,
-  outcomesReportCli,
+  outcomesReportCliAsync,
   outcomesVerifyCli
 } from "../outcomes/outcomeCli.js";
 import { ingestFeedbackOutcome, ingestOutcomeWebhook, verifyHmacSignature } from "../outcomes/outcomeApi.js";
@@ -2258,9 +2258,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
+      const signingAuthority = (requested: UserRole[]) => {
+        const roles = [...requested], expected = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
+        return () => {
+          const current = authenticate(req, options.workspace, options.token);
+          if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) { if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" }); throw new Error("authenticated authority changed while signing"); }
+          if (!requireRoles({ auth: current, res, workspace: options.workspace, roles })) throw new Error("authenticated authority changed while signing");
+        };
+      };
       const assertUsersMutationAuthorized = createUsersMutationGuard({ workspace: options.workspace, expected: auth,
         authenticate: () => authenticate(req, options.workspace, options.token), access: accessContext, readOnly: () => requiresReadOnlyMode(options.workspace) });
-
       const requireUnlockedVaultForSigning = (): boolean => {
         if (vaultStatus(options.workspace).unlocked) return true;
         json(res, 423, { error: "vault locked; unlock required for signing" });
@@ -7750,20 +7757,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/report" && req.method === "GET") {
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
-        const window = url.searchParams.get("window") ?? "14d";
-        const result = outcomesReportCli({
-          workspace: options.workspace,
-          agentId,
-          window
-        });
-        json(res, 200, {
-          ...result,
-          report: JSON.parse(readUtf8(result.jsonPath))
-        });
+        const roles: UserRole[] = ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"];
+        if (!requireRouteRoles(roles)) return;
+        const beforePublish = signingAuthority(roles);
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default"), window = url.searchParams.get("window") ?? "14d";
+        const result = await outcomesReportCliAsync({ workspace: options.workspace, agentId, window }, { beforePublish })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (result) json(res, 200, { ...result, report: JSON.parse(readUtf8(result.jsonPath)) });
         return;
       }
 

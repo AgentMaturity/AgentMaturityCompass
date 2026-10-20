@@ -13,3 +13,7 @@ Issue adapter capability receipts through checked asynchronous signing in mainta
 Export benchmarks through an awaitable maintained producer and CLI, preserving signed archive bytes and the synchronous SDK. Recheck actual input files, destination and current authority before publication; keep HTTP activation conditional on trusted caller revalidation.
 
 Verify report seals against artifact-purpose history, preserving explicit authenticated legacy enrollment while refusing distinct keys rotated for other auditor purposes.
+
+Publish outcome reports through checked asynchronous artifact signing in the CLI and Studio. Preserve report bytes and scoring, recheck current authority and exact inputs/destinations, and expose truthful partial publication if a later file or log write fails.
+
+Refuse explicit no-sign mode before asynchronous outcome report signing and final publication.

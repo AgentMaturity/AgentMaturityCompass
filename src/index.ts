@@ -672,7 +672,7 @@ export {
   upsertOutcomeContractAsync
 } from "./outcomes/outcomeContractEngine.js";
 export {
-  runOutcomeReport,
+  runOutcomeReport, runOutcomeReportAsync,
   loadOutcomeReport,
   fleetOutcomeReport,
   diffOutcomeReports,

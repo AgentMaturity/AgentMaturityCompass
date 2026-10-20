@@ -47,7 +47,24 @@ function contextDeclaration(source: string): string {
 function currentGuardCalls(source: string): string[] {
   const ast = sourceAst(source), rows: string[] = [];
   function walk(node: ts.Node) {
-    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "requireRouteRoles") rows.push(node.getText(ast));
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "requireRouteRoles") {
+      let call = node.getText(ast);
+      const argument = node.arguments[0];
+      if (argument && ts.isIdentifier(argument)) {
+        let scope: ts.Node | undefined = node.parent;
+        while (scope && !ts.isBlock(scope)) scope = scope.parent;
+        const bindings = scope && ts.isBlock(scope) ? scope.statements.filter(ts.isVariableStatement)
+          .filter(statement => (statement.declarationList.flags & ts.NodeFlags.Const) !== 0)
+          .flatMap(statement => [...statement.declarationList.declarations])
+          .filter(row => row.pos < node.pos && ts.isIdentifier(row.name) && row.name.text === argument.text) : [];
+        const initializer = bindings.length === 1 ? bindings[0]?.initializer : undefined;
+        if (!initializer || !ts.isArrayLiteralExpression(initializer) || !initializer.elements.every(ts.isStringLiteral)) {
+          throw new Error("Actual Studio role argument needs its local constant array declaration");
+        }
+        call = `requireRouteRoles(${initializer.getText(ast)})`;
+      }
+      rows.push(call);
+    }
     ts.forEachChild(node, walk);
   }
   walk(ast);

@@ -13,7 +13,7 @@ import {
   signOutcomeContractAsync,
   verifyOutcomeContractSignature
 } from "./outcomeContractEngine.js";
-import { diffOutcomeReports, fleetOutcomeReport, loadOutcomeReport, runOutcomeReport } from "./outcomeReport.js";
+import { diffOutcomeReports, fleetOutcomeReport, loadOutcomeReport, runOutcomeReport, runOutcomeReportAsync } from "./outcomeReport.js";
 
 function parseValue(value: string): number | string | boolean {
   const lower = value.trim().toLowerCase();
@@ -73,6 +73,12 @@ export function outcomesReportCli(params: { workspace: string; agentId?: string;
     trustLabel: out.report.trustLabel,
     reportId: out.report.reportId
   };
+}
+
+export async function outcomesReportCliAsync(params: Parameters<typeof outcomesReportCli>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof outcomesReportCli>> {
+  const out = await runOutcomeReportAsync(params, options);
+  return { jsonPath: out.jsonPath, mdPath: out.mdPath, valueScore: out.report.valueScore,
+    economicSignificanceIndex: out.report.economicSignificanceIndex, trustLabel: out.report.trustLabel, reportId: out.report.reportId };
 }
 
 export function outcomesFleetReportCli(params: { workspace: string; window: string; outFile?: string }): {
