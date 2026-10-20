@@ -9,7 +9,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs } from "../utils/time.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { computeMetric, outcomeTrustTier, scoreCategory, type ComputedMetric } from "./outcomeScoring.js";
 import { loadOutcomeContract, outcomeContractPath, verifyOutcomeContractSignature } from "./outcomeContractEngine.js";
@@ -292,19 +292,15 @@ function prepareOutcomeReport(input: RunOutcomeReportInput, snapshot = false) {
 }
 
 function recordOutcomeReport(workspace: string, prepared: ReturnType<typeof prepareOutcomeReport>, report: OutcomeReport) {
-  const { agentId, previous, jsonPath, mdPath } = prepared;
-  const { reportId, reportJsonSha256, valueRegressionRisk, valueScore, economicSignificanceIndex } = report;
-  appendTransparencyEntry({
-    workspace,
-    type: "OUTCOME_REPORT_RECORDED",
-    agentId,
-    artifact: {
-      kind: "policy",
-      sha256: reportJsonSha256,
-      id: reportId
-    }
-  });
+  appendTransparencyEntry({ workspace, type: "OUTCOME_REPORT_RECORDED", agentId: prepared.agentId,
+    artifact: { kind: "policy", sha256: report.reportJsonSha256, id: report.reportId } });
+  return completeOutcomeReport(workspace, prepared, report);
+}
 
+/** Post-log notification/return only. Both actual producers call this outside their publication locks. */
+function completeOutcomeReport(workspace: string, prepared: ReturnType<typeof prepareOutcomeReport>, report: OutcomeReport) {
+  const { agentId, previous, jsonPath, mdPath } = prepared;
+  const { reportId, valueRegressionRisk, valueScore, economicSignificanceIndex } = report;
   if (valueRegressionRisk > 0) {
     void dispatchIntegrationEvent({
       workspace,
@@ -341,13 +337,13 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
 
 class OutcomeReportPublicationError extends Error {
   readonly code = "OUTCOME_REPORT_PUBLICATION_INCOMPLETE";
-  constructor(readonly publishedFiles: readonly string[], cause: unknown) {
+  constructor(readonly publishedFiles: readonly string[], cause: unknown, readonly phase: "report-files" | "transparency") {
     super("Outcome report publication is incomplete; published files are retained", { cause });
     this.name = "OutcomeReportPublicationError";
   }
 }
 
-/** Awaitable artifact-purpose producer. The report's legacy raw seal and synchronous transparency protocol are retained. */
+/** Awaitable artifact-purpose producer. Raw report bytes remain; successful logging precedes best-effort notification. */
 export async function runOutcomeReportAsync(params: RunOutcomeReportInput, options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runOutcomeReport>> {
   const input = { workspace: params.workspace, agentId: params.agentId, window: params.window, outFile: params.outFile }, beforePublish = options.beforePublish;
   const assertSigningAllowed = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize outcome report signing"); };
@@ -358,6 +354,7 @@ export async function runOutcomeReportAsync(params: RunOutcomeReportInput, optio
   const reportJsonSha256 = sha256Hex(canonicalize(prepared.base));
   const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"));
   const report: OutcomeReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };
+  const jsonBytes = JSON.stringify(report, null, 2), markdownBytes = renderOutcomeReportMarkdown(report);
   const publishedFiles: string[] = [];
   try {
     locked(() => {
@@ -367,16 +364,25 @@ export async function runOutcomeReportAsync(params: RunOutcomeReportInput, optio
         throw new Error("Outcome report destinations changed while signing was prepared");
       }
       ensureDir(reportsDir(input.workspace, prepared.agentId));
-      writeFileAtomic(prepared.jsonPath, JSON.stringify(report, null, 2), 0o644); publishedFiles.push(prepared.jsonPath);
-      writeFileAtomic(prepared.mdPath, renderOutcomeReportMarkdown(report), 0o644); publishedFiles.push(prepared.mdPath);
+      writeFileAtomic(prepared.jsonPath, jsonBytes, 0o644); publishedFiles.push(prepared.jsonPath);
+      writeFileAtomic(prepared.mdPath, markdownBytes, 0o644); publishedFiles.push(prepared.mdPath);
     });
   } catch (error) {
-    if (publishedFiles.length > 0) throw new OutcomeReportPublicationError([...publishedFiles], error);
+    if (publishedFiles.length > 0) throw new OutcomeReportPublicationError([...publishedFiles], error, "report-files");
     throw error;
   }
-  // The existing synchronous transparency call runs after the output lock is released; no automatic rollback is claimed.
-  try { return recordOutcomeReport(input.workspace, prepared, report); }
-  catch (error) { throw new OutcomeReportPublicationError([...publishedFiles], error); }
+  // Scoring inputs are a pre-publication snapshot. Own new reports can change the latest-report selector.
+  try {
+    await appendTransparencyEntryAsync({ workspace: input.workspace, type: "OUTCOME_REPORT_RECORDED", agentId: prepared.agentId,
+      artifact: { kind: "policy", sha256: reportJsonSha256, id: report.reportId } }, { beforeCommit: () => locked(() => {
+        beforePublish?.(); assertSigningAllowed(); assertPurposePublicationCurrent(input.workspace, captured, signed);
+        if (optionalReportBytes(prepared.jsonPath) !== Buffer.from(jsonBytes).toString("base64")
+          || optionalReportBytes(prepared.mdPath) !== Buffer.from(markdownBytes).toString("base64")) {
+          throw new Error("Outcome report published files changed while preparing transparency");
+        }
+      }) });
+  } catch (error) { throw new OutcomeReportPublicationError([...publishedFiles], error, "transparency"); }
+  return completeOutcomeReport(input.workspace, prepared, report);
 }
 
 export function loadOutcomeReport(workspace: string, agentId: string, reportId: string | "latest"): OutcomeReport {

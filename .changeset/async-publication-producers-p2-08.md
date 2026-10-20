@@ -31,3 +31,5 @@ Await the explicit doctor live signing probe through the checked async policy si
 Prepare checked org signature bytes for the actual compliance-map publisher, await CLI/SDK publication, retain exact-purpose same-read verification and report partial pair publication truthfully.
 
 Await config-purpose ops policy preparation in maintained initialized-workspace callers, retain upstream owner unlock gates, share exact-kind historical verification and report partial pair publication truthfully.
+
+Await outcome-report workspace transparency before notification, retaining original caller/file authority, historical scoring inputs, exact published bytes and truthful partial-publication phases.

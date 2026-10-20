@@ -1,8 +1,8 @@
 // The compiled CLI case requires the root-owned normal build; all other cases use actual source producers.
 import { sign, verify } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import YAML from "yaml";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -19,7 +19,12 @@ import { assertKeysetComplete } from "../../src/keys/keyset.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
 import { initUsersConfig, addUser, createSession, revokeSessionByToken, setUserRoles, verifyTrackedSessionToken } from "../../src/auth/authApi.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
-import { transparencyLogPath, transparencySealPath } from "../../src/transparency/logChain.js";
+import { readTransparencyEntries, transparencyLogPath, transparencySealPath, transparencySealSigPath, verifyTransparencyLog } from "../../src/transparency/logChain.js";
+import { merkleCurrentRootPath, merkleCurrentRootSigPath } from "../../src/transparency/merklePaths.js";
+import { rebuildTransparencyMerkle, verifyTransparencyMerkle } from "../../src/transparency/merkleIndexStore.js";
+import { TransparencyMerkleLagError } from "../../src/transparency/merkleIndexState.js";
+import { describePolicySigner } from "../../src/crypto/signing/signer.js";
+import { ownedAsyncWorkspaceLogNotary } from "../helpers/ownedAsyncWorkspaceLogNotary.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
@@ -91,8 +96,11 @@ describe("actual awaitable outcome-report artifact publication", () => {
       metrics: base.metrics, nonClaims: base.nonClaims, reportJsonSha256, reportSealSig };
     expect(before.json.toString()).toBe(JSON.stringify(expected, null, 2));
     const spy = vi.spyOn(f.provider, "sign"), out = await positive(f);
-    expect(readFileSync(out.jsonPath)).toEqual(before.json); expect(readFileSync(out.mdPath)).toEqual(before.markdown); expect(spy).toHaveBeenCalledTimes(1);
-    expect(Buffer.from(spy.mock.calls[0]![1])).toEqual(Buffer.from(reportJsonSha256, "hex"));
+    expect(readFileSync(out.jsonPath)).toEqual(before.json); expect(readFileSync(out.mdPath)).toEqual(before.markdown);
+    expect(spy.mock.calls.map(([ref, bytes]) => ({ ref, hex: Buffer.from(bytes).toString("hex") }))).toEqual([
+      { ref: { provider: "file", id: "artifact-seal" }, hex: reportJsonSha256 },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) }]);
   });
 
   test("uses the public default report loader and awaits real file signing outside the report lock with captured caller inputs", async () => {
@@ -181,7 +189,7 @@ describe("actual awaitable outcome-report artifact publication", () => {
     const f = fixture(), actualWrite = files.writeFileAtomic, cause = new Error("owned Markdown writer refused"); seedOutputs(f);
     const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => { if (path === f.mdPath) throw cause; actualWrite(path, bytes, mode); });
     try {
-      await expect(reports.runOutcomeReportAsync(f.params)).rejects.toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath], cause });
+      await expect(reports.runOutcomeReportAsync(f.params)).rejects.toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath], phase: "report-files", cause });
       verified(f); expect(readFileSync(f.mdPath, "utf8")).toBe(SENTINEL);
     } finally { spy.mockRestore(); }
     await positive(f);
@@ -194,7 +202,7 @@ describe("actual awaitable outcome-report artifact publication", () => {
       actualWrite(path, bytes, mode); if (path === f.mdPath) { lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); }
     });
     try {
-      await expect(reports.runOutcomeReportAsync(f.params)).rejects.toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath, f.mdPath], cause: expect.any(Error) });
+      await expect(reports.runOutcomeReportAsync(f.params)).rejects.toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath, f.mdPath], phase: "transparency", cause: expect.any(Error) });
       verified(f); expect(readFileSync(f.mdPath, "utf8")).toBe(reports.renderOutcomeReportMarkdown(verified(f)));
       expect(sealWriterReached).toBe(false); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
       expect(existsSync(join(f.workspace, ".outcome-report.lock"))).toBe(false);
@@ -243,5 +251,168 @@ test.skipIf(process.platform === "win32")("compiled outcomes report CLI awaits t
   expect(result.error).toBeUndefined(); expect(result.signal).toBeNull(); expect(result.code, result.stderr).toBe(0);
   const match = /Outcome report generated: (.+)/.exec(result.stdout); expect(match).not.toBeNull(); const output = match![1]!.trim(), report = verified(f, output);
   const calls = readFileSync(requests, "utf8").trim().split("\n").filter(Boolean).map(line => JSON.parse(line));
-  expect(calls).toEqual([{ ref: { provider: "file", id: "artifact-seal" }, hex: report.reportJsonSha256 }]);
+  expect(calls).toEqual([
+    { ref: { provider: "file", id: "artifact-seal" }, hex: report.reportJsonSha256 },
+    { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+    { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) }]);
 }, 60_000);
+
+function pauseReportLog(f: ReturnType<typeof fixture>) {
+  const entered = deferred(), release = deferred(), actual = f.provider.sign.bind(f.provider);
+  const calls: Array<{ ref: unknown; bytes: Buffer; signature: Buffer }> = [];
+  const spy = vi.spyOn(f.provider, "sign").mockImplementation(async (ref, bytes) => {
+    const signature = await actual(ref, bytes); calls.push({ ref, bytes: Buffer.from(bytes), signature: Buffer.from(signature) });
+    if (calls.length === 3) { entered.resolve(); await release.promise; }
+    return signature;
+  });
+  return { entered, release, spy, calls };
+}
+async function atReportLogPause(gate: ReturnType<typeof pauseReportLog>, pending: Promise<unknown>) {
+  expect(await Promise.race([gate.entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+}
+function checkedReportPhases(f: ReturnType<typeof fixture>, gate: ReturnType<typeof pauseReportLog>, report: ReturnType<typeof verified>) {
+  expect(gate.calls).toHaveLength(3); expect(gate.calls[0]!.bytes).toEqual(Buffer.from(report.reportJsonSha256, "hex"));
+  for (const call of gate.calls) {
+    expect(call.ref).toEqual({ provider: "file", id: "artifact-seal" }); expect(call.bytes).toHaveLength(32);
+    expect(verify(null, call.bytes, f.pem, call.signature)).toBe(true);
+  }
+}
+function healthyReportLog(workspace: string) {
+  expect(verifyTransparencyLog(workspace)).toMatchObject({ ok: true, errors: [] });
+  expect(verifyTransparencyMerkle(workspace)).toMatchObject({ ok: true, errors: [], lagPending: false });
+}
+
+test.each(["json", "markdown"] as const)("late published outcome %s byte drift refuses the log and truthfully retains both actual report files", async target => {
+  const f = fixture(), gate = pauseReportLog(f), pending = reports.runOutcomeReportAsync(f.params), outcome = pending.then(() => null, error => error);
+  let originalJson: Buffer | undefined, originalMarkdown: Buffer | undefined;
+  try {
+    await atReportLogPause(gate, pending); const report = verified(f); checkedReportPhases(f, gate, report);
+    originalJson = readFileSync(f.jsonPath); originalMarkdown = readFileSync(f.mdPath);
+    const path = target === "json" ? f.jsonPath : f.mdPath, current = readFileSync(path); writeFileSync(path, Buffer.concat([current, Buffer.from("\n ")]));
+    if (target === "json") verified(f); // Whitespace preserves the complete decoded report and real raw seal.
+    const actualJson = readFileSync(f.jsonPath), actualMarkdown = readFileSync(f.mdPath), log = readFileSync(transparencyLogPath(f.workspace));
+    gate.release.resolve(); const error = await outcome;
+    expect(error).toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", publishedFiles: [f.jsonPath, f.mdPath], phase: "transparency",
+      cause: { message: "Outcome report published files changed while preparing transparency" } });
+    expect(readFileSync(f.jsonPath)).toEqual(actualJson); expect(readFileSync(f.mdPath)).toEqual(actualMarkdown);
+    expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+  } finally { gate.release.resolve(); await Promise.allSettled([pending]); gate.spy.mockRestore();
+    if (originalJson) writeFileSync(f.jsonPath, originalJson); if (originalMarkdown) writeFileSync(f.mdPath, originalMarkdown); }
+  await positive(f); healthyReportLog(f.workspace);
+});
+
+test.each(["contract", "previous report", "backdated SQL row"] as const)("post-publication %s changes leave the already-signed outcome scoring snapshot historical without rebasing it", async target => {
+  const f = fixture(), gate = pauseReportLog(f), pending = reports.runOutcomeReportAsync(f.params);
+  const contract = outcomeContractPath(f.workspace, "default"), contractBytes = readFileSync(contract), previousBytes = readFileSync(f.seed.jsonPath);
+  let publishedJson: Buffer | undefined, publishedMarkdown: Buffer | undefined, report: ReturnType<typeof verified> | undefined, newEventId: string | undefined;
+  try {
+    await atReportLogPause(gate, pending); report = verified(f); checkedReportPhases(f, gate, report);
+    publishedJson = readFileSync(f.jsonPath); publishedMarkdown = readFileSync(f.mdPath);
+    if (target === "contract") { const value = YAML.parse(contractBytes.toString()); value.outcomeContract.title = "Owned later contract"; writeFileSync(contract, YAML.stringify(value)); }
+    if (target === "previous report") { const value = JSON.parse(previousBytes.toString()); value.nonClaims.push("Owned later baseline"); writeFileSync(f.seed.jsonPath, JSON.stringify(value, null, 2)); }
+    if (target === "backdated SQL row") {
+      const ledger = openLedger(f.workspace);
+      try {
+        const before = ledger.getOutcomeEventsBetween(report.windowStartTs, report.windowEndTs, "default").length;
+        newEventId = ledger.appendOutcomeEvent({ ts: report.windowEndTs - 1, agentId: "default", workOrderId: null, category: "Functional", metricId: "functional.success",
+          value: 1, unit: null, trustTier: "SELF_REPORTED", source: "manual", meta: { ownedPostPublication: true } }).outcomeEventId;
+        expect(ledger.getOutcomeEventsBetween(report.windowStartTs, report.windowEndTs, "default")).toHaveLength(before + 1);
+      } finally { ledger.close(); }
+      expect(report.metrics.flatMap(metric => metric.evidenceRefs)).not.toContain(newEventId);
+    }
+    gate.release.resolve(); const out = await pending;
+    expect(out.report).toEqual(report); expect(readFileSync(out.jsonPath)).toEqual(publishedJson); expect(readFileSync(out.mdPath)).toEqual(publishedMarkdown);
+    expect(out.report.contractSignatureValid).toBe(true); expect(out.report.trustLabel).toBe("TRUSTED"); healthyReportLog(f.workspace);
+    expect(gate.calls.map(({ ref, bytes }) => ({ ref, hex: bytes.toString("hex") }))).toEqual([
+      { ref: { provider: "file", id: "artifact-seal" }, hex: report.reportJsonSha256 },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(transparencySealPath(f.workspace))) },
+      { ref: { provider: "file", id: "artifact-seal" }, hex: sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))) }]);
+  } finally { gate.release.resolve(); await Promise.allSettled([pending]); gate.spy.mockRestore(); writeFileSync(contract, contractBytes); writeFileSync(f.seed.jsonPath, previousBytes); }
+  await positive(f); healthyReportLog(f.workspace); // The owned SQL append remains actual history; no fixture rollback is claimed.
+});
+
+test("new default reports and replacement of the selected prior report do not self-refuse at the historical log boundary", async () => {
+  const f = fixture(), initial = await reports.runOutcomeReportAsync({ ...f.params, outFile: undefined }); verified(f, initial.jsonPath); healthyReportLog(f.workspace);
+  const replacement = await reports.runOutcomeReportAsync({ ...f.params, outFile: relative(f.workspace, initial.jsonPath) });
+  expect(replacement.jsonPath).toBe(initial.jsonPath); expect(replacement.mdPath).toBe(initial.mdPath); verified(f, replacement.jsonPath); healthyReportLog(f.workspace);
+});
+
+test("an already-invalid contract remains signed report data labelled UNTRUSTED CONFIG rather than a new publication refusal", async () => {
+  const f = fixture(), path = outcomeContractPath(f.workspace, "default"), original = readFileSync(path), value = YAML.parse(original.toString());
+  value.outcomeContract.title = "Owned unsigned contract edit"; writeFileSync(path, YAML.stringify(value));
+  try {
+    const out = await positive(f); expect(out.report.contractSignatureValid).toBe(false); expect(out.report.trustLabel).toBe("UNTRUSTED CONFIG"); healthyReportLog(f.workspace);
+  } finally { writeFileSync(path, original); }
+  await positive(f);
+});
+
+test("original outcome file authority remains required after two actual native NOTARY log signatures stay valid and usable", async () => {
+  const f = fixture(), remote = await ownedAsyncWorkspaceLogNotary(f.workspace, f.root), entered = deferred(), release = deferred();
+  remote.setBeforeReply(async kind => { if (kind === "MERKLE_ROOT") { entered.resolve(); await release.promise; } });
+  const pending = reports.runOutcomeReportAsync(f.params), outcome = pending.then(() => null, error => error);
+  try {
+    try {
+      expect(await Promise.race([entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
+      verified(f); const json = readFileSync(f.jsonPath), markdown = readFileSync(f.mdPath), log = readFileSync(transparencyLogPath(f.workspace));
+      expect(remote.requests.map(row => row.kind)).toEqual(["TRANSPARENCY_ROOT", "MERKLE_ROOT"]);
+      expect(describePolicySigner(f.workspace, "TRANSPARENCY_ROOT").mode).toBe("NOTARY"); expect(describePolicySigner(f.workspace, "MERKLE_ROOT").mode).toBe("NOTARY");
+      lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+      expect(describePolicySigner(f.workspace, "TRANSPARENCY_ROOT").mode).toBe("NOTARY"); expect(describePolicySigner(f.workspace, "MERKLE_ROOT").mode).toBe("NOTARY"); release.resolve();
+      expect(await outcome).toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", phase: "transparency", publishedFiles: [f.jsonPath, f.mdPath], cause: expect.any(Error) });
+      expect(readFileSync(f.jsonPath)).toEqual(json); expect(readFileSync(f.mdPath)).toEqual(markdown); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+    } finally { release.resolve(); await Promise.allSettled([pending]); remote.setBeforeReply(undefined); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
+    await positive(f); healthyReportLog(f.workspace);
+    expect(remote.requests.slice(-2)).toEqual([
+      { kind: "TRANSPARENCY_ROOT", payload: Buffer.from(sha256Hex(readFileSync(transparencySealPath(f.workspace))), "hex") },
+      { kind: "MERKLE_ROOT", payload: Buffer.from(sha256Hex(readFileSync(merkleCurrentRootPath(f.workspace))), "hex") }]);
+    expect(remote.requests).toHaveLength(4);
+    for (const [body, sidecar] of [[transparencySealPath(f.workspace), transparencySealSigPath(f.workspace)], [merkleCurrentRootPath(f.workspace), merkleCurrentRootSigPath(f.workspace)]]) {
+      const digest = sha256Hex(readFileSync(body!)), signed = JSON.parse(readFileSync(sidecar!, "utf8"));
+      expect(signed.envelope).toMatchObject({ alg: "ecdsa-p256-sha256", fingerprint: remote.keyId, signer: { type: "NOTARY" } });
+      expect(verify("sha256", Buffer.from(digest, "hex"), { key: remote.publicKeyPem, dsaEncoding: "ieee-p1363" }, Buffer.from(signed.signature, "base64"))).toBe(true);
+    }
+  } finally { await remote.close(); }
+});
+
+test.each(["revoked token", "changed roles"] as const)("the actual Studio caller refuses a %s after both files publish during the last outcome log Sign", async changed => {
+  const f = fixture(); initUsersConfig({ workspace: f.workspace, username: "late-report-owner", password: "late-report-owner-password" });
+  const viewer = addUser({ workspace: f.workspace, username: "late-report-viewer", roles: ["VIEWER"], password: "late-report-viewer-password" });
+  const session = createSession({ workspace: f.workspace, user: viewer }), api = await startStudioApiServer({ workspace: f.workspace, host: "127.0.0.1", port: 0, token: "late-report-admin" }); servers.push(api);
+  const get = (admin = false) => fetch(api.url + "/outcomes/report?window=1d", { headers: admin ? { "x-amc-admin-token": "late-report-admin" } : { cookie: `amc_session=${encodeURIComponent(session.token)}` } });
+  const first = await get(), firstBody = await first.json() as { jsonPath: string }; expect(first.status).toBe(200); verified(f, firstBody.jsonPath);
+  const before = readdirSync(f.dir).sort(), gate = pauseReportLog(f), pending = get();
+  let jsonPath: string | undefined, mdPath: string | undefined;
+  try {
+    await atReportLogPause(gate, pending); const added = readdirSync(f.dir).filter(name => !before.includes(name));
+    expect(added.filter(name => name.endsWith(".json"))).toHaveLength(1); expect(added.filter(name => name.endsWith(".md"))).toHaveLength(1);
+    jsonPath = join(f.dir, added.find(name => name.endsWith(".json"))!); mdPath = jsonPath.slice(0, -5) + ".md";
+    const report = verified(f, jsonPath); checkedReportPhases(f, gate, report);
+    const json = readFileSync(jsonPath), markdown = readFileSync(mdPath);
+    if (changed === "revoked token") revokeSessionByToken({ workspace: f.workspace, token: session.token });
+    else setUserRoles({ workspace: f.workspace, username: "late-report-viewer", roles: ["AGENT"] });
+    expect(verifyTrackedSessionToken({ workspace: f.workspace, token: session.token }).ok).toBe(false);
+    const log = readFileSync(transparencyLogPath(f.workspace)); gate.release.resolve();
+    const denied = await pending, text = await denied.text(); expect(denied.status).toBe(401); expect(text).toContain("authenticated authority changed while signing");
+    expect(text).not.toContain('"reportSealSig"'); expect(readFileSync(jsonPath)).toEqual(json); expect(readFileSync(mdPath)).toEqual(markdown);
+    expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+  } finally { gate.release.resolve(); await Promise.allSettled([pending]); gate.spy.mockRestore(); }
+  const fresh = await get(true), body = await fresh.json() as { jsonPath: string }; expect(fresh.status).toBe(200); verified(f, body.jsonPath); healthyReportLog(f.workspace);
+});
+
+test("outcome partial failure retains both files and the actual committed-entry native cause after post-line I/O refusal", async () => {
+  const f = fixture(), actualWrite = files.writeFileAtomic; let reached = false;
+  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
+    actualWrite(path, bytes, mode);
+    if (path === transparencySealSigPath(f.workspace) && !reached) { reached = true; const root = merkleCurrentRootPath(f.workspace);
+      rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned post-line outcome I/O failure"); }
+  });
+  try {
+    const error = await reports.runOutcomeReportAsync(f.params).then(() => null, value => value);
+    expect(reached).toBe(true); expect(error).toMatchObject({ code: "OUTCOME_REPORT_PUBLICATION_INCOMPLETE", phase: "transparency", publishedFiles: [f.jsonPath, f.mdPath] });
+    expect(error.cause).toBeInstanceOf(TransparencyMerkleLagError); expect(error.cause.pendingRecorded).toBe(true);
+    const report = verified(f); expect(readFileSync(f.mdPath, "utf8")).toBe(reports.renderOutcomeReportMarkdown(report));
+    expect(readTransparencyEntries(f.workspace).at(-1)).toMatchObject({ hash: error.cause.entryHash, type: "OUTCOME_REPORT_RECORDED",
+      artifact: { kind: "policy", sha256: report.reportJsonSha256, id: report.reportId } }); expect(verifyTransparencyLog(f.workspace).ok).toBe(true);
+  } finally { spy.mockRestore(); rmSync(merkleCurrentRootPath(f.workspace), { recursive: true, force: true }); rebuildTransparencyMerkle(f.workspace); }
+  await positive(f); healthyReportLog(f.workspace);
+});
