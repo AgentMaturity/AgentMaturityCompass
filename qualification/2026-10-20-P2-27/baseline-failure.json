@@ -1,0 +1,65 @@
+{
+  "baseline": {
+    "head": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/publicDocsGraph.test.ts",
+      "--maxWorkers=1",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json"
+    ],
+    "exit": 1,
+    "durationMs": 1470,
+    "totals": {
+      "numTotalTests": 6,
+      "numPassedTests": 5,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "failureMessages": [
+      [
+        "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    ],
+    "sourceStatusAfter": "",
+    "artifacts": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/raw.log",
+        "sha256": "145619f0a64200474e2ff9774a27107ed30ebe0e61a30e930091ddb9e2ffa2ad",
+        "bytes": 1951
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json",
+        "sha256": "aad80b2235e9dec484d93c3813a50414d0b8560cd49bad82974ad321043ab1a8",
+        "bytes": 3971
+      }
+    ]
+  },
+  "completeNormalizedComparison": {
+    "candidateHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+    "baselineHead": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "scope": "Complete native failed-assertion name/message arrays; only the two known clone path prefixes normalized",
+    "candidateFailures": [
+      {
+        "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "messages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "baselineFailures": [
+      {
+        "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "messages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "exactNormalizedArraysEqual": true
+  },
+  "scope": "Only this single docs-edge failure is established baseline-only; no future full-suite failure is preclassified."
+}
