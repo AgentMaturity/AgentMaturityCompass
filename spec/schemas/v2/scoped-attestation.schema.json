@@ -114,6 +114,14 @@
         "signer": {
           "additionalProperties": false,
           "properties": {
+            "attestationBasis": {
+              "enum": [
+                "configured",
+                "provider-metadata",
+                "provider-reported"
+              ],
+              "type": "string"
+            },
             "attestationLevel": {
               "enum": [
                 "SOFTWARE",
