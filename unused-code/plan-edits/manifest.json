@@ -24,6 +24,13 @@
       "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
     },
     {
+      "path": "dist/standard/externalEvidenceProfile.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/standard/externalEvidenceProfile.d.ts.landed",
+      "sha256": "b14d55d260d9c5b5c84b97fce4fd4db27bec942d24feccb15477fb15c37c9d69"
+    },
+    {
       "path": "knip.json",
       "issue": "P1-58",
       "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
@@ -477,6 +484,13 @@
       "baseCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
       "archivePath": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
       "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
+    },
+    {
+      "path": "src/standard/externalEvidenceProfile.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/standard/externalEvidenceProfile.ts.landed",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
     },
     {
       "path": "src/storage/blobs/blobStore.ts",
