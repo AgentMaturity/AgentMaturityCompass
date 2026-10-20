@@ -11,3 +11,5 @@ Add maintained asynchronous BOM signing for direct callers and the CLI, preservi
 Issue adapter capability receipts through checked asynchronous signing in maintained CLI and direct SDK paths. Preserve v1 signed bytes and synchronous compatibility, check captured adapter inputs and final authority, and keep HTTP async activation conditional on trusted caller revalidation.
 
 Export benchmarks through an awaitable maintained producer and CLI, preserving signed archive bytes and the synchronous SDK. Recheck actual input files, destination and current authority before publication; keep HTTP activation conditional on trusted caller revalidation.
+
+Verify report seals against artifact-purpose history, preserving explicit authenticated legacy enrollment while refusing distinct keys rotated for other auditor purposes.

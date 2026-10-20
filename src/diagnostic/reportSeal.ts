@@ -1,4 +1,6 @@
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -7,7 +9,7 @@ import { sha256Hex } from "../utils/hash.js";
  *
  * Diagnostic and assurance runs share the same seal discipline: the writer
  * hashes the canonical report with `reportJsonSha256`/`runSealSig` emptied,
- * then signs that hash with the workspace auditor key. Every consumer that
+ * then signs that hash with the artifact-seal purpose key. Every consumer that
  * feeds a report back into scoring must check the seal the same way — G9
  * exists because each reader had been deciding for itself, and most decided
  * not to look.
@@ -28,7 +30,14 @@ export function sealedRunReportVerifies(
   );
   if (recomputed !== claimedHash) return false;
   try {
-    return verifyHexDigestAny(claimedHash, seal, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const keys = getPurposeKeyHistory(workspace, "artifact-seal");
+    // Preserve explicit owner enrollment for unbound legacy reports, not other auditor-purpose rotations.
+    if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
+      const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+      keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+    }
+    return verifyHexDigestAny(claimedHash, seal, keys);
   } catch {
     return false;
   }
