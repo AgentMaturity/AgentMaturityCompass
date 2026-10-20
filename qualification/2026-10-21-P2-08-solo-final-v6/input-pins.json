@@ -1,0 +1,122 @@
+{
+  "item": "P2-08",
+  "productH": "e2a1b6b0e47d96d4a1fd8a350817aef0b15c318b",
+  "externalEvidence": {
+    "publication-fixture-final-required23-v10": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-fixture-final-required23-v10/summary.json",
+      "sha256": "6dd86c443c0a2f33531757994dc097fb35855675f82388bdaf49ff49a9c53ba2",
+      "bytes": 195448
+    },
+    "publication-fixture-final-extras-v7": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-fixture-final-extras-v7/summary.json",
+      "sha256": "c2f9c147652e5165808ecd6153b53e4ba12cc917cb3e9ab52fb238b44118392d",
+      "bytes": 186310
+    },
+    "publication-fixture-final-softhsm-v6": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-fixture-final-softhsm-v6/summary.json",
+      "sha256": "0c7c3f80767f643ce22659cad042954e5a62a27f9d54162a065cbdfb652c2c3c",
+      "bytes": 185794
+    },
+    "post-fixture-product-h-scope-v7.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/post-fixture-product-h-scope-v7.json",
+      "sha256": "35486b763f234377648fc42b647c7ed01e91e66a8e293124be11a68616a42cf1",
+      "bytes": 69666
+    },
+    "root-post-full-repair-seven-guards-audit-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-post-full-repair-seven-guards-audit-v1.json",
+      "sha256": "848cf8b3163ad7da07a1bf6d2fb8ff27dd471c8ec4fafa2871166e52201aa6a3",
+      "bytes": 1361
+    },
+    "provider-static-review/owned-source-eligibility-prospective-v5/eligibility-successor.UNBOUND.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/provider-static-review/owned-source-eligibility-prospective-v5/eligibility-successor.UNBOUND.json",
+      "sha256": "407a6d772a0ee260b69000f2d8a8d78eee52546964a2432327a2e0abd8c87a9f",
+      "bytes": 46477
+    },
+    "provider-static-review/owned-source-eligibility-prospective-v5/review.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/provider-static-review/owned-source-eligibility-prospective-v5/review.md",
+      "sha256": "5c9402c9399a4cd37a87aa401ef59c5c2432ebf4b11fbb3aac43185ab62e324d",
+      "bytes": 2246
+    },
+    "signing-static-review/repaired-source-and-blockers-v1/review.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/signing-static-review/repaired-source-and-blockers-v1/review.md",
+      "sha256": "cd6d86ed99d9ca623478124b556bb6ba2de8268551bc28dc881d6eb4d83176ed",
+      "bytes": 1751
+    },
+    "acceptance-static-review/session-root-direct-oracle-boundary-review-v1/review.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/session-root-direct-oracle-boundary-review-v1/review.md",
+      "sha256": "00d738c483991d382b55ca13170ba8cfc813b34de5d5449d3fc573d811e35ef8",
+      "bytes": 2122
+    },
+    "root-closed-q60-full-integrity-audit-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-closed-q60-full-integrity-audit-v1.json",
+      "sha256": "10ea424dfda32eed8b6b96d5e0bc5aaf74c459c58d7de617713b466fc73f0ff3",
+      "bytes": 6464
+    },
+    "root-q60-every-failure-classification-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-q60-every-failure-classification-v1.json",
+      "sha256": "b9b4ccb5910069d7e624747fc9dd1e6899d03abaee48183dcbae40e3af9790a1",
+      "bytes": 14402
+    },
+    "direct-human-exact-api4-index7-authorization-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/direct-human-exact-api4-index7-authorization-v1.json",
+      "sha256": "b4c4ebacf01dad425ba60b5dab352fe872f6d9ae40413c17bc60ca6c396f7f8a",
+      "bytes": 1221
+    },
+    "approved-api4-index7-applied-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/approved-api4-index7-applied-v1.json",
+      "sha256": "5168bf765eee67d0888fed6977650e697d556d186ebde735c2cebb47436edb46",
+      "bytes": 1051
+    },
+    "actual-packed-check-home-project-side-effect-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/actual-packed-check-home-project-side-effect-v1.json",
+      "sha256": "92d2d9fcb8687f21a31361ab1ebb6882f3b52effc750790bfd6aa9c5e2343f65",
+      "bytes": 2749
+    },
+    "root-closed-q2da-source-integrity-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-closed-q2da-source-integrity-v1.json",
+      "sha256": "20d8215639a37dfc7579008a12cab20e23844c5757c651370ec2aafbae202b7c",
+      "bytes": 1863
+    },
+    "root-closed-q2da-every-failure-classification-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-closed-q2da-every-failure-classification-v1.json",
+      "sha256": "38b5710127b7bf49348c993b6c0414dfce789a58033a02aba0657b5c815b89c6",
+      "bytes": 8518
+    },
+    "root-closed-q2da-conditional-eligibility-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-closed-q2da-conditional-eligibility-v1.json",
+      "sha256": "e52f850b540a1321d18dd38f3d5d5ff34cd00aa45bd5165ec9461661a6914370",
+      "bytes": 7553
+    },
+    "closed-q2da-failed-receipt-v1/2026-10-21-P2-08-solo-failed-v1/receipt.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/closed-q2da-failed-receipt-v1/2026-10-21-P2-08-solo-failed-v1/receipt.json",
+      "sha256": "b5488a22aade15e7f1e775abcc085357d1f8a38f192faf4e6b8fdccaf9c0c22f",
+      "bytes": 4955
+    },
+    "q2da-selected-reader-fixture-two-whole-green-v1/result.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/q2da-selected-reader-fixture-two-whole-green-v1/result.json",
+      "sha256": "a84989b98fb4711a185d63adafc1560fe1239d95c41f319864dadc05f1d7cf45",
+      "bytes": 59237
+    },
+    "q2da-selected-reader-fixture-two-whole-green-v1/report.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/q2da-selected-reader-fixture-two-whole-green-v1/report.json",
+      "sha256": "75fefa2a3960cbff201c4183f367ef42e02a4dbe70cad712e78a6dd79c0a7031",
+      "bytes": 10152
+    },
+    "parity-framing-correction-pins-v1.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/parity-framing-correction-pins-v1.json",
+      "sha256": "e864081facb581db10be35aaad796a2c5c8cfe1f3b2fa71b171f5dfb0c74cce2",
+      "bytes": 845
+    },
+    "acceptance-static-review/four-worker-neutral-capture-diff-review-v1/review.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/four-worker-neutral-capture-diff-review-v1/review.md",
+      "sha256": "8b23a2b755e66a67137c377e0496d8a845b103b8100c058c0b324166b5dc9cc5",
+      "bytes": 911
+    },
+    "softwareNative": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-fixture-final-softhsm-v6/vitest.json",
+      "sha256": "81ddfb5335c178c760bb3dfd5d73bd0df1828ba2f0074d4b5baad4cf07831226",
+      "bytes": 1752
+    }
+  },
+  "rawReportsRemainExternal": true
+}
