@@ -37,6 +37,16 @@ function run(label, cmd, args, opts) {
   return { ok, stdout: result.stdout ?? "", out: `${result.stdout ?? ""}${result.stderr ?? ""}` };
 }
 
+export function installPackedConsumer(tarball, consumer, isolated, packageName) {
+  const installed = run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--prefix", consumer, "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok;
+  if (!installed) return false;
+  if (!existsSync(join(consumer, "node_modules", packageName, "package.json"))) {
+    console.error("FAIL installed packed consumer package manifest is missing");
+    return false;
+  }
+  return true;
+}
+
 export function isolatedInstallEnvironment(base, home) {
   const isolated = { ...base, HOME: home, CI: "1" };
   for (const key of Object.keys(isolated)) {
@@ -111,7 +121,7 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       tarball = join(work, JSON.parse(r.stdout)[0].filename);
       return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
     },
-    () => run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok,
+    () => installPackedConsumer(tarball, consumer, isolated, pkg.name),
     () => {
       // Resolve from installed AMC, without loading a cloud SDK or native binding.
       const forbidden = ["@amc/core", "@aws-sdk/client-kms", "@google-cloud/kms", "@azure/keyvault-keys", "@azure/identity", "agent-maturity-compass-key-provider-pkcs11", "pkcs11js"];
