@@ -1,0 +1,375 @@
+{
+  "scope": "All H2 scoped captures are complete: 23 required checks and two extra docs checks pass; focused149 exits 1 with one exact clean-int baseline docs assertion failure. Historical runtime/mutations remain separately labeled; overlapping runs are not summed. Final Q2 full is unexecuted.",
+  "artifacts": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-required23-v1/summary.json",
+      "sha256": "e1ace46efccfb08ffd2adeaf3a886455a3cb6a3cc0c191b482c77faac6c22120",
+      "bytes": 108913
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-focused149-v1/summary.json",
+      "sha256": "a3b506df79341e8fbaeab296b4fdb66f2e59053bda4bd16f9e55b113d7b7fb1c",
+      "bytes": 165446
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-extra-doc-checks-v1/summary.json",
+      "sha256": "a1a8cb500dcaf23436559f67fb0f4245db1bc9e7bcbd0416cd38080a8fe65302",
+      "bytes": 99477
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/catalog-and-cli-ne-presentation-corrections-green-v1/summary.json",
+      "sha256": "3bd2ccf9bdbfe1058ed14b20e4087d044c8a6111726f8d152b9e2e133cea7043",
+      "bytes": 111919
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/post-cli-mutations-restoration-green-v1/summary.json",
+      "sha256": "08a83815523a12acfbed07932c80e1cdc691d0e279832cceffd9ec46dff1ef6c",
+      "bytes": 99590
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/native-built-public-doc-assets-v2.json",
+      "sha256": "177dfebab42dee88d8ec64ee156a432dedef3fcb2448688ab9e137ebc9f1fbbd",
+      "bytes": 1567
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cold-installed-cli-option-contracts-v1/summary.json",
+      "sha256": "0d90d69f9d61a71c15217980fa2726c24d71dfb9b7141bc37a901e7b29ac1fe0",
+      "bytes": 3811
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/operator-calibration-private-draft-red-v1/summary.json",
+      "sha256": "afc39b5d9de5bb563dee7188b5034a53a1d1accc4612019f9b86b3ea0ed5ed13",
+      "bytes": 105806
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-options-red-calibration-draft-first-green-v1/summary.json",
+      "sha256": "3a0e144745cd151ed83b9414fcc3fc6d1a008950e0ca409c3316d417ecffdc88",
+      "bytes": 107077
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-options-and-native-private-draft-green-v1/summary.json",
+      "sha256": "a72bf531b92030251dc1b9320891dee14946afc0b86aaf0a26333ada177a7637",
+      "bytes": 107613
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-ne-presentation-red-v1/summary.json",
+      "sha256": "d08a3d5423b15cc57bcd67842216e2f698c5e95a2d5313d825fa94d7ed970561",
+      "bytes": 108603
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-integration-adversarial-static-review-v18.json",
+      "sha256": "f9f2eeb4a9abf56fb9db0e1a78a1b0a1e4c48c00109b01659395d3ed92f17238",
+      "bytes": 23993
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-receipt-design-v3/manifest-final.json",
+      "sha256": "bad199ed7a6ea2e0d20489fc3be8ee63176d0c0cce969cd9f2aa267384a98b8f",
+      "bytes": 36356
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-full-suite-root-reviewed-v1.py",
+      "sha256": "35fa2d9f5a16a3a155a8eb1bc492e25563a44d55045fac4c5a6b292c03eaa5d6",
+      "bytes": 12956
+    }
+  ],
+  "historicalProductHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+  "landingProductHead": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+  "pendingLandingCaptures": [],
+  "landingCountRegeneration": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/native-count-regeneration-v1/summary.json",
+    "sha256": "1d24788ef34f8043ecc180a499a101e16c83ac02a65ffd91e31a25a4e5bdf1ca",
+    "bytes": 104290
+  },
+  "landingNativeLaunches": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-required23-v1/launch.json",
+      "sha256": "128d0276607f4749c7bf4228da22753c06cb342af1fba6252ec2da740eb0f541",
+      "bytes": 54622
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/launch.json",
+      "sha256": "4a431f9a3cc3d063344f626815c1e3fb6174944e64465ba949c48af83da725b5",
+      "bytes": 90008
+    }
+  ],
+  "originalQ1Interruption": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/interim-full-e89880-intentional-interruption-v1.json",
+    "sha256": "c0162677887dc52a0a4e111b94026ff798549932958d36039f2c206b2db89419",
+    "bytes": 794
+  },
+  "completedLandingCaptures": [
+    {
+      "state": "completed_native_H2_required23",
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-required23-v1/summary.json",
+        "sha256": "d95015369eb683de10744104fc96ff4379a654f65dd4921cdef869afc04c52eb",
+        "bytes": 116227
+      },
+      "passedChecks": 23,
+      "failedChecks": 0,
+      "allExitCodesZero": true,
+      "totalCommandDurationMs": 192356,
+      "sourceUnchanged": true,
+      "headBefore": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "headAfter": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "statusBefore": "",
+      "statusAfter": "",
+      "launch": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-required23-v1/launch.json",
+        "sha256": "128d0276607f4749c7bf4228da22753c06cb342af1fba6252ec2da740eb0f541",
+        "bytes": 54622
+      }
+    },
+    {
+      "state": "completed_native_H2_extra_docs",
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-extra-doc-checks-v1/summary.json",
+        "sha256": "a69ffac90671340126b3e0a6a9a544c516933caf5aea7781d154c4b2692f20aa",
+        "bytes": 106459
+      },
+      "passedChecks": 2,
+      "failedChecks": 0,
+      "allExitCodesZero": true,
+      "totalCommandDurationMs": 752,
+      "sourceUnchanged": true,
+      "headBefore": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "headAfter": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "statusBefore": "",
+      "statusAfter": "",
+      "localBuiltAssets": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/native-built-public-doc-assets-h2-v1.json",
+        "sha256": "e7f0872d949fbdb5b389783d08c0f8d099bc25096c543e63edcca68ab63bdbd1",
+        "bytes": 1582
+      },
+      "publicPublication": false
+    },
+    {
+      "state": "completed_native_H2_focused149",
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/summary.json",
+        "sha256": "961f1894ce715e9ad6d9819fe679caea8dd623c6ede4457f908670c6646109c9",
+        "bytes": 173149
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/advancedAdversarial.test.ts",
+        "tests/adversarialAlignmentProbes.test.ts",
+        "tests/adversarialPacksGap.test.ts",
+        "tests/adversarialRobustnessPack.test.ts",
+        "tests/apiClaimLabels.test.ts",
+        "tests/apiRouters.test.ts",
+        "tests/approvalTheaterPack.test.ts",
+        "tests/assurance/agentAsProxy.test.ts",
+        "tests/assurance/awesomeAgentsGapPacks.test.ts",
+        "tests/assurance/cliPresentation.test.ts",
+        "tests/assurance/economicAmplification.test.ts",
+        "tests/assurance/executed/calibrationArithmetic.test.ts",
+        "tests/assurance/executed/calibrationAuthority.test.ts",
+        "tests/assurance/executed/calibrationDocs.test.ts",
+        "tests/assurance/executed/catalogCases.test.ts",
+        "tests/assurance/executed/cliOptions.test.ts",
+        "tests/assurance/executed/evidence.test.ts",
+        "tests/assurance/executed/harness.test.ts",
+        "tests/assurance/executed/judgeCalibration.test.ts",
+        "tests/assurance/executed/judgeModeBoundary.test.ts",
+        "tests/assurance/executed/llmApiLegacyDispatch.test.ts",
+        "tests/assurance/executed/packRetirement.test.ts",
+        "tests/assurance/executed/runnerBoundary.test.ts",
+        "tests/assurance/executed/runnerReplay.test.ts",
+        "tests/assurance/executed/semantic.test.ts",
+        "tests/assurance/industryPackAnchors.test.ts",
+        "tests/assurance/industryPackFailClosed.test.ts",
+        "tests/assurance/industryPackManifest.test.ts",
+        "tests/assurance/mcpSecurityResilience.test.ts",
+        "tests/assurance/overthinkingDetection.test.ts",
+        "tests/assurance/piiDetectionLeakage.test.ts",
+        "tests/assurance/zombieAgentPersistence.test.ts",
+        "tests/assuranceAgentResponder.test.ts",
+        "tests/assuranceGradingQualification.test.ts",
+        "tests/assuranceLab.test.ts",
+        "tests/assuranceReportProvenance.test.ts",
+        "tests/assuranceRunnerInconclusiveQualification.test.ts",
+        "tests/assuranceScenarioContextParity.test.ts",
+        "tests/assuranceSessionQualification.test.ts",
+        "tests/assuranceUnificationMigration.test.ts",
+        "tests/assuranceV1ArtifactChain.test.ts",
+        "tests/attest/bundleAttestation.test.ts",
+        "tests/bloomBehavioralPacks.test.ts",
+        "tests/catalog/admission/checker.test.ts",
+        "tests/catalog/admission/gatedLoads.test.ts",
+        "tests/catalog/catalogLoader.test.ts",
+        "tests/catalog/citations.test.ts",
+        "tests/catalog/compiler/cli.test.ts",
+        "tests/catalog/compiler/crosswalk.test.ts",
+        "tests/catalog/compiler/determinism.test.ts",
+        "tests/catalog/compiler/diff.test.ts",
+        "tests/catalog/compiler/golden.test.ts",
+        "tests/catalog/compiler/merge.test.ts",
+        "tests/catalog/compiler/outputPath.test.ts",
+        "tests/catalog/compiler/predicate.test.ts",
+        "tests/catalog/compiler/unknown.test.ts",
+        "tests/catalog/controlRecordSchema.test.ts",
+        "tests/catalog/evidence/decisive.test.ts",
+        "tests/catalog/governance/changelogGuard.test.ts",
+        "tests/catalog/governance/currency.test.ts",
+        "tests/catalog/governance/promotion.test.ts",
+        "tests/catalog/governance/reverify.test.ts",
+        "tests/catalog/governance/reviewRecord.test.ts",
+        "tests/catalog/l0/catalogLoads.test.ts",
+        "tests/catalog/l0/data.test.ts",
+        "tests/catalog/l0/evidenceFixtures.test.ts",
+        "tests/catalog/l0/fixtureCoverage.test.ts",
+        "tests/catalog/l0/identity.test.ts",
+        "tests/catalog/l0/inventory.test.ts",
+        "tests/catalog/l0/logging.test.ts",
+        "tests/catalog/l0/monitoring.test.ts",
+        "tests/catalog/l0/oversight.test.ts",
+        "tests/catalog/l0/tools.test.ts",
+        "tests/catalog/lockfile.test.ts",
+        "tests/catalog/predicate.test.ts",
+        "tests/catalog/stations/education/compiledPolicy.test.ts",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "tests/catalog/stations/education/overlay.test.ts",
+        "tests/catalog/stations/environment/compiledPolicy.test.ts",
+        "tests/catalog/stations/environment/fixtures.test.ts",
+        "tests/catalog/stations/environment/overlay.test.ts",
+        "tests/catalog/stations/governance/compiledPolicy.test.ts",
+        "tests/catalog/stations/governance/fixtures.test.ts",
+        "tests/catalog/stations/governance/overlay.test.ts",
+        "tests/catalog/stations/mobility/compiled.test.ts",
+        "tests/catalog/stations/mobility/fixtures.test.ts",
+        "tests/catalog/stations/mobility/overlay.test.ts",
+        "tests/catalog/stations/technology/fixtures.test.ts",
+        "tests/catalog/stations/technology/overlay.test.ts",
+        "tests/catalog/types.test.ts",
+        "tests/claims/d03Gates.test.ts",
+        "tests/commercialAgent.test.ts",
+        "tests/compliance/mappingPackRefs.test.ts",
+        "tests/diagnosticAssuranceCoverage.test.ts",
+        "tests/domain-registry.test.ts",
+        "tests/domainCliIntegration.test.ts",
+        "tests/domainRegistry.test.ts",
+        "tests/educationFERPAPack.test.ts",
+        "tests/environmentalInfraPack.test.ts",
+        "tests/excessiveAgencyUnintentional.test.ts",
+        "tests/financialSOXPack.test.ts",
+        "tests/gap0626AdversarialRegression.test.ts",
+        "tests/gap0981CtiThinkerAdversarialRegressionBoundary.test.ts",
+        "tests/gap1236PromptfooAdversarialRegressionBoundary.test.ts",
+        "tests/gap1237PromptInjectionReviewAdversarialRegressionBoundary.test.ts",
+        "tests/gap1240PromptfooDuplicateAdversarialRegressionBoundary.test.ts",
+        "tests/gap1243GiskardAdversarialRegressionBoundary.test.ts",
+        "tests/gap3619ApprovalLatencySloBoundary.test.ts",
+        "tests/gap3626EscalationQualityScoringBoundary.test.ts",
+        "tests/gapClosure.test.ts",
+        "tests/genCountsSemantics.test.ts",
+        "tests/governanceNISTRMFPack.test.ts",
+        "tests/industryAssuranceFixtures.test.ts",
+        "tests/industryAssurancePacksHealth.test.ts",
+        "tests/industryGuides.test.ts",
+        "tests/informationExtractionPack.test.ts",
+        "tests/mappingSources.test.ts",
+        "tests/mcpComplianceSafety.test.ts",
+        "tests/migration/legacyRelabel.test.ts",
+        "tests/mobilityFunctionalSafetyPack.test.ts",
+        "tests/multiTurnDeepEval.test.ts",
+        "tests/multiTurnSafetyPack.test.ts",
+        "tests/noFabricatedDomainResults.test.ts",
+        "tests/operationalDisciplinePack.test.ts",
+        "tests/parallelAssurance.test.ts",
+        "tests/pathScorersNotEvaluated.test.ts",
+        "tests/promptwareKillChain.test.ts",
+        "tests/publicDocsArtifact.test.ts",
+        "tests/publicDocsGraph.test.ts",
+        "tests/publicPlaygroundBrand.test.ts",
+        "tests/publishedCountsAccuracy.test.ts",
+        "tests/realtimeVoiceSafetyPack.test.ts",
+        "tests/regulatoryAssurancePacks.test.ts",
+        "tests/regulatoryCurrencyRegister.test.ts",
+        "tests/regulatoryReadiness.test.ts",
+        "tests/researchExodusPacks.test.ts",
+        "tests/sbomSupplyChainPack.test.ts",
+        "tests/score/failSecureGovernance.test.ts",
+        "tests/score/kernelSandboxMaturity.test.ts",
+        "tests/score/monitorBypassResistance.test.ts",
+        "tests/score/owaspLLMCoverage.test.ts",
+        "tests/securityStarterPack.test.ts",
+        "tests/simulationPacks.test.ts",
+        "tests/standaloneApi.test.ts",
+        "tests/studioClaimLabels.test.ts",
+        "tests/supplyChainIntegrityCoverage.test.ts",
+        "tests/technologyGDPRSOCPack.test.ts",
+        "tests/trust/embeddedKeyForgery.test.ts",
+        "tests/wealthManagementMiFIDPack.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/report.json"
+      ],
+      "exitCode": 1,
+      "durationMs": 399867,
+      "nativeTotals": {
+        "numTotalTests": 4484,
+        "numPassedTests": 4483,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "selectedTestFiles": 149,
+      "exactUniqueSelectedPathsVerified": true,
+      "sourceUnchanged": true,
+      "headBefore": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "headAfter": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+      "statusBefore": "",
+      "statusAfter": "",
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/raw.log",
+        "sha256": "8c4af0fd7fb0958a6f7a5820a746c7b8bc65c8de284dedae704cc5edd306afa2",
+        "bytes": 830141
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/report.json",
+        "sha256": "e7fdc40728e2ccd627eb63bfc68140a5b7845592b7b695df83e7c2204e9c48e0",
+        "bytes": 1762342
+      },
+      "exactIntBaselineComparison": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/focused149-exact-int-baseline-comparison-h2-v1.json",
+        "sha256": "69f004d9f848027985977f2ac31d748fbf42ae9200bda38c494805f43e4781f5",
+        "bytes": 3670
+      },
+      "classification": "one_exact_baseline_docs_assertion_failure_exit_1_retained_not_green"
+    }
+  ],
+  "nativeH2PathScope": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/product-h2-path-scope-manifest-v1.json",
+    "sha256": "d99dc713946781d97e11e01e3b24fdab401c8fa39399fff6b95931a46a5feb09",
+    "bytes": 46001
+  },
+  "localBuiltH2DocAssets": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/native-built-public-doc-assets-h2-v1.json",
+    "sha256": "e7f0872d949fbdb5b389783d08c0f8d099bc25096c543e63edcca68ab63bdbd1",
+    "bytes": 1582
+  },
+  "nativeBaselineComparison": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/focused149-exact-int-baseline-comparison-h2-v1.json",
+    "sha256": "69f004d9f848027985977f2ac31d748fbf42ae9200bda38c494805f43e4781f5",
+    "bytes": 3670
+  },
+  "nativeLandingEnvironment": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/native-landing-environment-and-presence-admission-v1.json",
+    "sha256": "00445951c7bc880a711586bcaa034914afd78c7430749f0663c67686b6eb3642",
+    "bytes": 547
+  },
+  "boundLandingFullHelper": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-landing-full-suite-bound-v1.py",
+    "sha256": "877f30987086f942c4886d7117b584f81b8eb0b3d15e9182532fda2162630aba",
+    "bytes": 14772
+  },
+  "unboundLandingFullHelperHistorical": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-landing-full-suite-root-v4.py",
+    "sha256": "5e9c7421c74118809d769b5c406e4a665cd71b688940623b649122b5cf11478c",
+    "bytes": 14748
+  }
+}
