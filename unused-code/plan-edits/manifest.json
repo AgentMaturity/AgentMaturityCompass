@@ -129,6 +129,13 @@
       "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
     },
     {
+      "path": "src/audit/binderVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderVerifier.ts.landed",
+      "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
+    },
+    {
       "path": "src/auth/authApi.ts",
       "issue": "P1-56",
       "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
@@ -428,6 +435,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
       "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd"
+    },
+    {
+      "path": "src/passport/passportVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportVerifier.ts.landed",
+      "sha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5"
     },
     {
       "path": "src/plugins/pluginPackage.ts",
