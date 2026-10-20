@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { postDirectApiRegistry } from "../helpers/postDirectApiRegistry.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { setMode } from "../../src/mode/mode.js";
 import { createWorkOrder, verifyWorkOrder } from "../../src/workorders/workorderEngine.js";
@@ -13,7 +14,8 @@ import { getPublicKeyHistory, verifyHexDigestAny } from "../../src/crypto/keys.j
 import { transitionConfigSignatureProvider } from "../../src/keys/configProviderTransition.js";
 import { revokeKey, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { signingKeyId, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
-import { initUsersConfigAsync, createSession } from "../../src/auth/authApi.js";
+import { activeUserRecord, initUsersConfigAsync, createSession, revokeSessionByToken, setUserRolesAsync, verifyTrackedSessionToken, verifyUsersConfigSignature } from "../../src/auth/authApi.js";
+import { verifySessionToken } from "../../src/auth/sessionTokens.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { sha256Hex } from "../../src/utils/hash.js";
@@ -224,15 +226,62 @@ describe("actual config-purpose execution-ticket producers and callers", () => {
   });
 
   test("the actual registry ticket caller refuses a provider-held key before any Sign when no trusted callback is forwarded", async () => {
-    const plain = fixture(), runtime = await studio(plain), f = await bind(plain);
+    const f = await bind(fixture());
     const body = readFileSync(f.workOrder.filePath), sidecar = readFileSync(f.workOrder.sigPath), calls = f.fake.requests.length;
-    const refused = await runtime.issue(), text = await refused.text();
+    const refused = await postDirectApiRegistry(f.workspace, "/api/v1/tickets/issue", {
+      agentId: "default", workOrderId: f.input.workOrderId, action: "WRITE_HIGH", tool: "fs.write", ttl: "15m"
+    }), text = refused.body;
     expect(refused.status).toBe(409); expect(text).toContain("KEY_PROVIDER_HELD");
     expect(text).not.toMatch(/private\.invalid|PIN=|never-output|"ticket"/);
     expect(f.fake.requests.length).toBe(calls);
     expect(readFileSync(f.workOrder.filePath)).toEqual(body); expect(readFileSync(f.workOrder.sigPath)).toEqual(sidecar);
     const direct = await issueExecTicketAsync(f.input); expectP256(direct.ticket, f.pem);
     expect(verifyExecTicket({ workspace: f.workspace, ticket: direct.ticket }).ok).toBe(true);
+  });
+
+  test("the actual Studio ticket route returns real P256, maps provider failure to 503, and never answers with a fallback ticket", async () => {
+    const plain = fixture(), runtime = await studio(plain), f = await bind(plain);
+    const success = await runtime.issue(), body = await success.json() as { data: { ticket: string } };
+    expect(success.status).toBe(201); expectP256(body.data.ticket, f.pem);
+    expect(verifyExecTicket({ workspace: f.workspace, ticket: body.data.ticket }).ok).toBe(true);
+    f.control.unavailable = true;
+    const failed = await runtime.issue(), text = await failed.text();
+    expect(failed.status).toBe(503); expect(text).toContain("KEY_PROVIDER_UNAVAILABLE");
+    expect(text).not.toMatch(/private\.invalid|PIN=|never-output|"ticket"/);
+  });
+
+  test("the actual Studio caller reauthenticates the same tracked session after a provider wait before returning its ticket", async () => {
+    const plain = fixture(), runtime = await studio(plain), f = await bind(plain), headers = { cookie: `amc_session=${encodeURIComponent(runtime.session.token)}` };
+    const positive = await runtime.issue(headers), body = await positive.json() as { data: { ticket: string } };
+    expect(positive.status).toBe(201); expectP256(body.data.ticket, f.pem);
+    const paused = f.pause(), pending = runtime.issue(headers);
+    try {
+      expect(await Promise.race([paused.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "rejected")])).toBe("signed");
+      revokeSessionByToken({ workspace: f.workspace, token: runtime.session.token }); paused.gate.resolve();
+      const denied = await pending, text = await denied.text();
+      expect(denied.status).toBe(401); expect(text).toContain("missing or invalid token"); expect(text).not.toContain('"ticket"');
+    } finally { paused.gate.resolve(); }
+    const admin = await runtime.issue(); expect(admin.status).toBe(201);
+    expectP256(((await admin.json()) as { data: { ticket: string } }).data.ticket, f.pem);
+  });
+
+  test("the actual Studio caller refuses a role change in a genuinely owner-signed users config during the provider wait", async () => {
+    const f = await bind(fixture()), runtime = await studio(f), headers = { cookie: `amc_session=${encodeURIComponent(runtime.session.token)}` };
+    const positive = await runtime.issue(headers); expect(positive.status).toBe(201);
+    expectP256(((await positive.json()) as { data: { ticket: string } }).data.ticket, f.pem);
+    const paused = f.pause(), pending = runtime.issue(headers);
+    try {
+      expect(await Promise.race([paused.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "rejected")])).toBe("signed");
+      await setUserRolesAsync({ workspace: f.workspace, username: "ticket-owner", roles: ["VIEWER"] });
+      expect(verifyUsersConfigSignature(f.workspace).valid).toBe(true);
+      expect(activeUserRecord(f.workspace, runtime.session.payload.userId)?.roles).toEqual(["VIEWER"]);
+      expect(verifySessionToken({ workspace: f.workspace, token: runtime.session.token }).ok).toBe(true);
+      expect(verifyTrackedSessionToken({ workspace: f.workspace, token: runtime.session.token })).toMatchObject({ ok: false, error: "session roles changed" });
+      paused.gate.resolve(); const denied = await pending, text = await denied.text();
+      expect(denied.status).toBe(401); expect(text).not.toContain('"ticket"');
+    } finally { paused.gate.resolve(); await pending; }
+    const admin = await runtime.issue(); expect(admin.status).toBe(201);
+    expectP256(((await admin.json()) as { data: { ticket: string } }).data.ticket, f.pem);
   });
 
 });

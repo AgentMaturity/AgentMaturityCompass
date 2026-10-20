@@ -66,6 +66,8 @@ export interface ApiRouteContext {
    * person must read it from here rather than trusting a body field.
    */
   principal?: string;
+  /** Trusted authentication layer only: rereads the same credential/current roles before an awaited write returns. */
+  revalidateAuthority?: () => boolean;
   /** Present only after Studio has checked native-task browser admission. */
   nativeTasks?: NativeTaskApiContext;
 }
@@ -359,7 +361,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleWorkflowRoute)
+    handler: (pathname, method, req, res, context) => handleWorkflowRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'governor',
@@ -525,7 +527,8 @@ export async function handleApiRoute(
   workspace = process.cwd(),
   apiToken?: string,
   principal?: string,
-  nativeTasks?: NativeTaskApiContext
+  nativeTasks?: NativeTaskApiContext,
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
   // Studio binds first (it may trust a forwarder's id); every other caller gets a server-generated one.
@@ -540,7 +543,7 @@ export async function handleApiRoute(
     if (resultRoute) labelResultsOn(res, (data) => labelResult(resultRoute, data, workspace));
     if (route) {
       const handled = await route.handler(pathname, method, req, res, {
-        workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {})
+        workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {}), ...(revalidateAuthority ? { revalidateAuthority } : {})
       });
       if (handled) {
         return true;

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import YAML from "yaml";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { postDirectApiRegistry } from "../helpers/postDirectApiRegistry.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { setMode } from "../../src/mode/mode.js";
 import { createWorkOrder, createWorkOrderAsync, expireWorkOrder, expireWorkOrderAsync, listWorkOrders, verifyWorkOrder, type WorkOrderInput } from "../../src/workorders/workorderEngine.js";
@@ -11,7 +12,7 @@ import { issueExecTicketAsync, verifyExecTicket } from "../../src/tickets/execTi
 import { getSigningKey } from "../../src/keys/signingKeys.js";
 import { transitionConfigSignatureProvider } from "../../src/keys/configProviderTransition.js";
 import { verifyCanonical } from "../../src/keys/algorithmPolicy.js";
-import { initUsersConfig, createSession } from "../../src/auth/authApi.js";
+import { initUsersConfig, createSession, revokeSessionByToken } from "../../src/auth/authApi.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { sha256Hex } from "../../src/utils/hash.js";
@@ -222,11 +223,11 @@ describe("actual async config-purpose work-order authoring and expiry", () => {
   });
 
   test.each(["create", "expire"] as const)("the actual registry %s caller refuses a provider-held key without Sign or publication when no trusted callback is forwarded", async operation => {
-    const plain = fixture(), target = createWorkOrder(plain.input), runtime = await studio(plain), f = await bind(plain);
+    const plain = fixture(), target = createWorkOrder(plain.input), f = await bind(plain);
     const path = operation === "create" ? "/api/v1/workorders" : `/api/v1/workorders/${target.workOrder.workOrderId}/expire`;
     const body = operation === "create" ? { title: "Held HTTP work order", description: "No unsigned publication", riskTier: "low", mode: "EXECUTE", allowedActionClasses: ["WRITE_HIGH"], agentId: "default" } : { reason: "Held HTTP expiry", agentId: "default" };
     const before = listWorkOrders({ workspace: f.workspace }), original = pair(target.filePath), calls = f.fake.requests.length;
-    const refused = await runtime.post(path, body), text = await refused.text();
+    const refused = await postDirectApiRegistry(f.workspace, path, body), text = refused.body;
     expect(refused.status).toBe(409); expect(text).toContain("KEY_PROVIDER_HELD");
     expect(text).not.toMatch(/private\.invalid|PIN=|never-output|"workOrderId"/);
     expect(f.fake.requests.length).toBe(calls); expect(listWorkOrders({ workspace: f.workspace })).toEqual(before);
@@ -243,6 +244,27 @@ describe("actual async config-purpose work-order authoring and expiry", () => {
     const expired = await runtime.post(`/api/v1/workorders/${target.workOrder.workOrderId}/expire`, {});
     expect(expired.status).toBe(423); expect(await expired.text()).toContain("A4_VAULT_LOCKED");
     expect(listWorkOrders({ workspace: f.workspace })).toEqual(before); expect(existsSync(marker(target.filePath))).toBe(false);
+  });
+
+  test.each(["create", "expire"] as const)("actual Studio %s reauthenticates after provider signing before any durable publication", async operation => {
+    const plain = fixture(), target = createWorkOrder(plain.input), runtime = await studio(plain), f = await bind(plain);
+    const path = operation === "create" ? "/api/v1/workorders" : `/api/v1/workorders/${target.workOrder.workOrderId}/expire`;
+    const body = operation === "create" ? { title: "HTTP provider work order", description: "Owned runtime request", riskTier: "low", mode: "EXECUTE", allowedActionClasses: ["WRITE_HIGH"], agentId: "default" } : { reason: "runtime owner expiry", agentId: "default" };
+    const before = listWorkOrders({ workspace: f.workspace }); f.control.unavailable = true;
+    const unavailable = await runtime.post(path, body), failure = await unavailable.text();
+    expect(unavailable.status).toBe(503); expect(failure).toContain("KEY_PROVIDER_UNAVAILABLE"); expect(failure).not.toMatch(/private\.invalid|PIN=|never-output/);
+    expect(listWorkOrders({ workspace: f.workspace })).toEqual(before); expect(existsSync(marker(target.filePath))).toBe(false); f.control.unavailable = false;
+    const paused = f.pause(), pending = runtime.post(path, body, { cookie: `amc_session=${encodeURIComponent(runtime.session.token)}` });
+    try {
+      expect(await Promise.race([paused.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "rejected")])).toBe("signed");
+      revokeSessionByToken({ workspace: f.workspace, token: runtime.session.token }); paused.gate.resolve();
+      const denied = await pending, text = await denied.text(); expect(denied.status).toBe(401); expect(text).not.toContain('"workOrderId"');
+    } finally { paused.gate.resolve(); await pending.catch(() => {}); }
+    expect(listWorkOrders({ workspace: f.workspace })).toEqual(before); expect(existsSync(marker(target.filePath))).toBe(false);
+    const positive = await runtime.post(path, body), result = await positive.json() as { data: { workOrderId?: string; filePath?: string; revokePath?: string } };
+    expect(positive.status).toBe(operation === "create" ? 201 : 200);
+    if (operation === "create") { expectP256(result.data.filePath!, f.pem); expect(verifyWorkOrder({ workspace: f.workspace, workOrderId: result.data.workOrderId! })).toMatchObject({ valid: true, expired: false }); }
+    else { expectP256(result.data.revokePath!, f.pem); expect(verifyWorkOrder({ workspace: f.workspace, workOrderId: target.workOrder.workOrderId })).toMatchObject({ valid: true, expired: true }); }
   });
 
 });
