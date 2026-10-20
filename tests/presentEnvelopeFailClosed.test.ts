@@ -33,13 +33,13 @@ const time = Date.now();
 const dirs: string[] = [];
 const dir = () => { const value = mkdtempSync(join(tmpdir(), "amc-envelope-refusal-")); dirs.push(value); return value; };
 afterAll(() => { for (const value of dirs) { lockVault(value); rmSync(value, { recursive: true, force: true }); } });
-function seal(digest: string, owner: TestKey): SignedDigest {
+function seal(digest: string, owner: TestKey, type: "VAULT" | "NOTARY" = "NOTARY"): SignedDigest {
   const message = Buffer.from(digest, "hex");
   const signature = (owner.algorithm === "ed25519" ? sign(null, message, owner.privateKey)
     : lowS(sign("sha256", message, { key: owner.privateKey, dsaEncoding: "ieee-p1363" }))).toString("base64");
   return { digestSha256: digest, signature, signedTs: time, signer: "auditor", envelope: { v: 1, alg: owner.algorithm,
     pubkeyB64: Buffer.from(owner.pem).toString("base64"), fingerprint: signingKeyId(owner.pem)!, sigB64: signature, signedTs: time,
-    signer: { type: "NOTARY", attestationLevel: "SOFTWARE", attestationBasis: "provider-metadata", notaryFingerprint: signingKeyId(owner.pem)! } } };
+    signer: { type, attestationLevel: "SOFTWARE", attestationBasis: "provider-metadata", ...(type === "NOTARY" ? { notaryFingerprint: signingKeyId(owner.pem)! } : {}) } } };
 }
 function pinned(owner: TestKey): TrustContext {
   return { mode: "pinned", asOf: new Date(time), lists: [], distrust: [], allowUnpinned: false, allowUnanchored: false,
@@ -111,8 +111,10 @@ it.each(localTargets)("%s does not undo envelope refusal with a raw retry", targ
   const original = (() => { try { return readFileSync(sigPath); } catch { return null; } })();
   try {
     for (const owner of [ed, p256]) {
-      const good = seal(digest, owner);
+      const good = seal(digest, owner, target === "org signed file" ? "NOTARY" : "VAULT");
       const publish = (value: unknown) => writeFileSync(sigPath, JSON.stringify(value));
+      // Imported ordinary history does not confer authenticated NOTARY provenance.
+      if (target !== "org signed file") { publish(seal(digest, owner)); expect(verifies()).toBe(false); }
       publish(good); expect(verifies()).toBe(true);
       expect(verifyHexDigestAny(digest, good.signature, [owner.pem])).toBe(true);
       // Real RED on the Ed25519 baseline: its valid raw signature cannot rescue a false envelope fingerprint.

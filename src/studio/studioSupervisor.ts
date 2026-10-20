@@ -19,7 +19,7 @@ import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
-import { initOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
+import { initOpsPolicyAsync, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
 import { initForecastPolicy } from "../forecast/forecastEngine.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
@@ -96,13 +96,18 @@ function enforceStudioLogRetention(workspace: string, retentionDays: number): vo
   }
 }
 
-function ensureWorkspace(workspace: string): void {
+async function ensureWorkspace(workspace: string): Promise<void> {
   if (!existsSync(join(workspace, ".amc"))) {
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   }
   ensureSigningKeys(workspace);
   if (!existsSync(opsPolicyPath(workspace))) {
-    initOpsPolicy(workspace);
+    if (!vaultStatus(workspace).unlocked) {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+      if (!passphrase) throw new Error("Vault locked. Unlock the vault before initializing the missing ops policy.");
+      unlockVault(workspace, passphrase);
+    }
+    await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
   }
   if (!existsSync(forecastPolicyPath(workspace))) {
     initForecastPolicy(workspace);
@@ -340,7 +345,7 @@ export async function runStudioForeground(params: {
   }
 
   const workspace = params.workspace;
-  ensureWorkspace(workspace);
+  await ensureWorkspace(workspace);
   enforceStudioLogRetention(workspace, params.dataRetentionDays ?? 30);
   const agentId = resolveAgentId(workspace);
 
@@ -575,7 +580,7 @@ const STUDIO_DAEMON_START_MS = 60_000;
 
 export async function startStudioDaemon(workspace: string, options: StartStudioDaemonOptions = {}): Promise<StudioState> {
   if (!options.hostDir) {
-    ensureWorkspace(workspace);
+    await ensureWorkspace(workspace);
   }
   enforceStudioLogRetention(workspace, 30);
   ensureDir(studioDir(workspace));

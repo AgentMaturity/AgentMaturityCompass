@@ -381,7 +381,7 @@ import {
   benchVerifyCli,
   benchVerifyPolicyCli
 } from "./bench/benchCli.js";
-import { initOpsPolicy, loadOpsPolicy, signOpsPolicy, verifyOpsPolicySignature } from "./ops/policy.js";
+import { initOpsPolicyAsync, loadOpsPolicy, signOpsPolicyAsync, verifyOpsPolicySignature } from "./ops/policy.js";
 import { retentionRunCli, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
 import { backupCreateCli, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
 import {
@@ -8235,8 +8235,8 @@ incident
 ops
   .command("init")
   .description("Create and sign .amc/ops-policy.yaml")
-  .action(() => {
-    const created = initOpsPolicy(process.cwd());
+  .action(async () => {
+    const created = await initOpsPolicyAsync(process.cwd());
     console.log(chalk.green(`Ops policy created: ${created.configPath}`));
     console.log(`Signature: ${created.sigPath}`);
   });
@@ -8244,10 +8244,10 @@ ops
 ops
   .command("sign")
   .description("Re-sign an edited .amc/ops-policy.yaml so the ledger, retention and payload caps apply it")
-  .action(() => {
+  .action(async () => {
     const workspace = process.cwd();
     const policy = loadOpsPolicy(workspace);
-    const sigPath = signOpsPolicy(workspace);
+    const sigPath = await signOpsPolicyAsync(workspace);
     console.log(chalk.green(`Ops policy signed: ${sigPath}`));
     console.log(`retention.maxPayloadBytesPerEvent: ${policy.opsPolicy.retention.maxPayloadBytesPerEvent}`);
   });

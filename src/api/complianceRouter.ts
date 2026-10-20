@@ -9,6 +9,7 @@ import type { ComplianceFramework } from '../compliance/frameworks.js';
 import { verifyUsersConfigSignature } from '../auth/authApi.js';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
 import { verifyTrustConfigSignature } from '../trust/trustConfig.js';
+import { KEY_PROVIDER_ERRORS, KeyProviderError } from '../keys/provider.js';
 
 const SCOPE_TEMPLATE_ERROR_CODES = new Set([
   'TEMPLATE_NOT_FOUND',
@@ -99,7 +100,8 @@ export async function handleComplianceRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   // ── Compliance routes (/api/v1/compliance/*) ───────────────────
   if (pathname.startsWith('/api/v1/compliance')) {
@@ -522,11 +524,23 @@ export async function handleComplianceRoute(
     // POST /api/v1/policy/ops/init — create and sign ops policy
     if (pathname === '/api/v1/policy/ops/init' && method === 'POST') {
       try {
-        const { initOpsPolicy } = await import('../ops/policy.js');
-        const created = initOpsPolicy(workspace);
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed before ops policy publication');
+            throw new Error('authenticated authority changed before ops policy publication');
+          }
+        };
+        beforePublish();
+        const opsPolicy = await import('../ops/policy.js');
+        // No registry async upgrade until the trusted dispatcher explicitly supplies its current-authority callback.
+        const created = revalidateAuthority === undefined ? opsPolicy.initOpsPolicy(workspace) : await opsPolicy.initOpsPolicyAsync(workspace, { beforePublish });
         apiSuccess(res, { configPath: created.configPath, sigPath: created.sigPath }, 201);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Ops policy init failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) {
+          apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': ops policy signing refused'); return true;
+        }
+        apiError(res, 500, 'Ops policy init failed; inspect the policy pair before retrying');
       }
       return true;
     }

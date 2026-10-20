@@ -29,3 +29,5 @@ Await certificate and benchmark transparency after archive publication, retainin
 Await the explicit doctor live signing probe through the checked async policy signer and keep public signing and unexpected health diagnostics fixed.
 
 Prepare checked org signature bytes for the actual compliance-map publisher, await CLI/SDK publication, retain exact-purpose same-read verification and report partial pair publication truthfully.
+
+Await config-purpose ops policy preparation in maintained initialized-workspace callers, retain upstream owner unlock gates, share exact-kind historical verification and report partial pair publication truthfully.

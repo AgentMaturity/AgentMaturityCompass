@@ -13,7 +13,8 @@ import { bridgeConfigPath, initBridgeConfig } from "../bridge/bridgeConfigStore.
 import { initModelTaxonomy, modelTaxonomyPath } from "../bridge/modelTaxonomy.js";
 import { initOrgConfig, orgConfigPath } from "../org/orgStore.js";
 import { initGatewayConfig } from "../gateway/config.js";
-import { initOpsPolicy, opsPolicyPath } from "../ops/policy.js";
+import { initOpsPolicyAsync, opsPolicyPath } from "../ops/policy.js";
+import { keysetDeclared } from "../keys/keyset.js";
 import { initForecastPolicy } from "../forecast/forecastEngine.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initBenchPolicy, benchPolicyPath } from "../bench/benchPolicyStore.js";
@@ -114,7 +115,7 @@ function ensureOwnerUser(params: BootstrapOptions): { created: boolean } {
   return { created: true };
 }
 
-function ensureSignedConfigs(workspace: string): Record<string, boolean> {
+async function ensureSignedConfigs(workspace: string): Promise<Record<string, boolean>> {
   const created: Record<string, boolean> = {};
   if (!pathExists(actionPolicyPath(workspace))) {
     initActionPolicy(workspace);
@@ -153,7 +154,7 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     created["org.yaml"] = true;
   }
   if (!pathExists(opsPolicyPath(workspace))) {
-    initOpsPolicy(workspace);
+    await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
     created["ops-policy.yaml"] = true;
   }
   if (!pathExists(forecastPolicyPath(workspace))) {
@@ -248,6 +249,10 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
 
   try {
     const workspace = resolve(options.workspace);
+    if (keysetDeclared(workspace) && !pathExists(opsPolicyPath(workspace))) {
+      ensureVault({ ...options, workspace }); // Preserve the existing bootstrap passphrase gate before any provider request.
+      await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
+    }
     initWorkspace({
       workspacePath: workspace,
       trustBoundaryMode: "isolated"
@@ -255,7 +260,7 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
 
     const vault = ensureVault({ ...options, workspace });
     const owner = ensureOwnerUser({ ...options, workspace });
-    const createdConfigs = ensureSignedConfigs(workspace);
+    const createdConfigs = await ensureSignedConfigs(workspace);
     if (options.lanMode) {
       enableLanMode({
         workspace,
