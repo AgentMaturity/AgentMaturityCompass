@@ -159,6 +159,8 @@ Plugin initialization uses the actual policy-selected config signer or required 
 
 This scope does not qualify cold Studio supervision as a whole. The conditional plugin/action/tools startup handoffs use their asynchronous initializers, while `up`/workspace/bootstrap, other missing configuration/blob initialization, signature repair and compound policy writers still need coherent migrations. Approval cold bootstrap and other unmigrated consumers still need separate integrations. Native installed-lock admission uses the same exact-purpose/current-notary verifier on its bounded file snapshot. This does not migrate native execution approvals or compound plugin installation. No new endpoint or general-purpose binder is implied. Normal `revocation-list` binding remains refused pending lease-store and native-task integration, even though asynchronous key/certificate revocation APIs exist.
 
+Audit-packet generation awaits the checked artifact-purpose signer and rechecks the captured key-set generation and current refusal policy immediately before its atomic archive write. Its existing four-field manifest signature and default Ed25519 signed bytes are preserved. Caller arguments are copied before the first await. A locked no-sign ephemeral key cannot publish a packet whose signature fails under the committed public key; an unlocked valid file key retains its existing no-sign behavior. This producer migration does not enable general artifact-purpose binding or change the separate synchronous transparency consumers.
+
 ## Notary `KEY_PROVIDER` backend
 
 In the notary's `notary.yaml`:

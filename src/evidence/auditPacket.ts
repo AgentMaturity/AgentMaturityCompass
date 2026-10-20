@@ -1,7 +1,8 @@
 import Database from "better-sqlite3";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -74,7 +75,9 @@ function packetReadme(nowTs: number): string {
 }
 
 export async function generateAuditPacket(params: GenerateAuditPacketParams): Promise<GenerateAuditPacketResult> {
+  params = { ...params };
   const nowTs = Date.now();
+  const publication = capturePurposePublication(params.workspace, "artifact-seal");
   const dataset = collectVerifierEvidence({
     workspace: params.workspace,
     agentId: params.agentId,
@@ -202,11 +205,12 @@ export async function generateAuditPacket(params: GenerateAuditPacketParams): Pr
 
   const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   const manifestSha256 = sha256Hex(manifestBytes);
+  const signed = await signWithPurposeKey(params.workspace, "artifact-seal", Buffer.from(manifestSha256, "hex"));
   const manifestSig = {
     signer: "auditor" as const,
     signedTs: nowTs,
     manifestSha256,
-    signature: signHexDigest(manifestSha256, getSigningKey(params.workspace, "artifact-seal"))
+    signature: signed.signature.toString("base64")
   };
 
   entries.push({
@@ -222,6 +226,7 @@ export async function generateAuditPacket(params: GenerateAuditPacketParams): Pr
 
   const archive = createZipArchive(entries);
   const outFile = resolve(params.workspace, params.outputFile);
+  assertPurposePublicationCurrent(params.workspace, publication, signed);
   writeFileAtomic(outFile, archive, 0o644);
   const packetSha = sha256Hex(archive);
 
