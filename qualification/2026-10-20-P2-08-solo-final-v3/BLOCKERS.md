@@ -1,0 +1,15 @@
+# P2-08 remaining scope and measurement limits
+
+Current product H is `f6e80b150c57d53b746fcb34238bc7e6dd95f9da`. All23 required checks and3 item extras are closed zero on clean unchanged source; local software-token3/3 and actual packed-install66285ms are separate measured results. Final-Q full measurement, actual948/87 coverage audit, every-failure classification and completed receipt validation remain agent-doable and pending. No native totals are assigned to the interrupted focused runs.
+
+Owner-held technical integrations include remaining A4 envelope/reader/preflight and portable quota/cutover contexts, approval and lease/revocation/native-retirement flows, and held dataflow/residency/operating-profile producers. Unreserved cold/compound workspace/up/bootstrap/signature-repair flows depend on those coherent held consumers. Exact API4/index7 grants release only those changes. General provider binding, provider-to-vault unbind, independent-root provider-compromise recovery and delegate rotation remain unsupported technical boundaries.
+
+Unbound owner-imported legacy rows/seals use the same authenticated history read. Intrinsic JSONL consistency remains separate from external anchoring: unpinned evidence does not become a successful externally trusted result; explicit distrust still refuses. Checkpoint authority is unchanged. A role-only imported prefix cannot first-bind a provider: exact-purpose prospective row/seal checks refuse with KEY_DELEGATION_INVALID before provider work and before publication. Supporting that transition needs an explicit separate migration protocol. These are technical boundaries, not human-only blockers.
+
+The provider matrix remains dated under the outbound research policy. Refreshing primary-source capability evidence is technical currency work limited by policy; installed SDK shapes do not establish current service capabilities. The narrow Hono security correction has separate maintainer-source and actual audit evidence and does not refresh that matrix.
+
+Human/external resources: authorized real cloud credentials/resources and explicit live permission; actual hardware HSM access/setup; hosted Ubuntu CI execution and a run URL. No such measurement is supplied by fake transports, local software tokens or a workflow definition. Hardware/protection labels retain their actual basis and do not imply independently verified attestation.
+
+Separate human decision: the earlier implicit npm prefix selected the home project and replaced/retired AMC package/bin state there; complete prior state is unknown and package/lock bookkeeping may also have changed. Sid must decide whether to inspect or repair it against trustworthy prior state. No cleanup/restoration is authorized or claimed. The repaired explicit-prefix packed pass does not reconstruct prior home state.
+
+All acceptance criteria remain explicitly scoped; no all-acceptance, formal qualification, hosted CI, hardware/live-provider pass, local landing, main merge or push is asserted here.

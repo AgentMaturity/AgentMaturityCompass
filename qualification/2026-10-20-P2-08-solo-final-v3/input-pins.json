@@ -1,0 +1,165 @@
+{
+  "item": "P2-08",
+  "productH": "f6e80b150c57d53b746fcb34238bc7e6dd95f9da",
+  "externalEvidence": {
+    "currentPrerequisites": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-current-clean-h-prerequisite-audit-v4.json",
+      "sha256": "b181dfbd7499584323aa959f0f6d8c56437f8e2fe88e4afce987eb8f1d035aa0",
+      "bytes": 17567
+    },
+    "sourceScope": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/final-hono-product-h-source-scope-manifest-v5.json",
+      "sha256": "dbda06088b1112aab6b8286c8015c535f983c11eada447dd71978ce4c3f55c5a",
+      "bytes": 89528
+    },
+    "authorization": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/direct-human-exact-api4-index7-authorization-v1.json",
+      "sha256": "b4c4ebacf01dad425ba60b5dab352fe872f6d9ae40413c17bc60ca6c396f7f8a",
+      "bytes": 1221
+    },
+    "exactApplication": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/approved-api4-index7-applied-v1.json",
+      "sha256": "5168bf765eee67d0888fed6977650e697d556d186ebde735c2cebb47436edb46",
+      "bytes": 1051
+    },
+    "sourceEligibility": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/owned-source-eligibility-preliminary-v2/eligibility-successor.UNBOUND.json",
+      "sha256": "8fcfe8a7810b3059e540e4e04fa52d6875ed36317a7674f6cd312610cb2723c5",
+      "bytes": 27312
+    },
+    "wholeFileRoster": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-compatibility-focused-roster-v3/whole-test-files.txt",
+      "sha256": "0e675f339d15c1be3af864ce58d2535a6522516fe0acdca4587cfdc2037f741a",
+      "bytes": 39535
+    },
+    "cliTestReview": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/cli-supported-pubkey-test-independent-review-v1/audit.json",
+      "sha256": "aa8f25a5306f90a6e98f30579399a8741d32561cce56fa7f41af9c1104607e75",
+      "bytes": 18146
+    },
+    "cliDevelopmentRed": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/cli-pubkey-whole-red-v1/result.json",
+      "sha256": "616ccd6201e587227738853c630022710d5de4db6e8542a9fa260636248f9d29",
+      "bytes": 55168
+    },
+    "cliDevelopmentGreen": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/cli-pubkey-whole-green-v1/result.json",
+      "sha256": "40927ae26d9b123520a5d2bdbf1648e63dd57ee520fa231139a64f7e751bafb6",
+      "bytes": 55352
+    },
+    "cliDevelopmentRestored": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/cli-pubkey-whole-restored-v1/result.json",
+      "sha256": "c1d8c61ce637e90c6e462c783c3d09152000120dc2deb97de2f75aaffcf326ec",
+      "bytes": 55352
+    },
+    "cliTwoGuards": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/cli-pubkey-two-guard-results-v1.json",
+      "sha256": "9ccb6cf63f1708029e9bad07f7b962402610165157bcb1fadaf204faab4af05e",
+      "bytes": 4388
+    },
+    "packingTwoGuards": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-packed-prefix-two-native-audit-v1.json",
+      "sha256": "50028b2001c68ae025e83db5b543c3329214cf95fc58e03cb9c5d17c08f848c5",
+      "bytes": 8326
+    },
+    "callbackFourGuards": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-approved-callback-four-native-audit-v1.json",
+      "sha256": "f7d80a2075f1eda13ede0f5b1a50a2af886265968300e5936c64dc4060962a27",
+      "bytes": 8372
+    },
+    "jsonlThreeGuards": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-jsonl-three-mutation-audit-v1.json",
+      "sha256": "b90c1e2ffd558091eac4d7eb1eb8f211b801f17556990a8fbf11c3c906b29030",
+      "bytes": 2188
+    },
+    "jsonlDistrustScalar": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-jsonl-explicit-distrust-scalar-audit-v1.json",
+      "sha256": "de7afd06aa7730fa53711d281d990065eb6d1b6690ec80345fd8f18df61d54dd",
+      "bytes": 1315
+    },
+    "legacyEightGuards": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/legacy-eight-native-independent-audit-v1/audit.json",
+      "sha256": "318a62600bab7c399b95e58dbfe158094f3b552f74a3817305b9b0c27e52b96d",
+      "bytes": 44155
+    },
+    "historicalMutationPacket": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/provider-static-review/final-h-metadata-packet-v1/2026-10-20-P2-08-solo-final/mutation-results.json",
+      "sha256": "04934786803c2291a97b663bd2b431c06f1279c97eafde85b1b206128f1602bd",
+      "bytes": 24116
+    },
+    "interruptedFocusedV3": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/compatibility-focused-v3-owned-stop-complete-v1.json",
+      "sha256": "15a5f1ad68e80a0601741875f2eb376ad1147eb703f6c37da19978b13ac9658f",
+      "bytes": 1315
+    },
+    "dependencyCorrection": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/hono-security-dependency-review-v1/manifest.json",
+      "sha256": "5534768b11b45aa9f6875c4fa32bd837bfbd35f7fc9220b1bce4759bd84f984e",
+      "bytes": 900
+    },
+    "dependencyPrimarySource": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/hono-security-dependency-review-v1/primary-source-note.json",
+      "sha256": "a9e3d07cb5135d501488d466d3fa3333f87669f260024b8bc8a572486beec4d8",
+      "bytes": 412
+    },
+    "installedDependency": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/hono-installed-sdk-and-node-server-resolution-v1.json",
+      "sha256": "33a24b72db409f45687d3bb057388d6fdc5e161ae025da45176332f883320503",
+      "bytes": 774
+    },
+    "dependencyAuditDevelopmentGreen": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/hono-override-runtime-audit-green-v1/result.json",
+      "sha256": "3087442528cdeefbee236e525f7bfd172e5c0a56f2c6b30868b4e56eac7a2aab",
+      "bytes": 55576
+    },
+    "dependencyPeerReview": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/signing-static-review/hono-dependency-scope-review-v1/review.md",
+      "sha256": "af9689311aa83b47ff1ad63b9d7a07b0a7a76bc421789e9b5c3779e75a4a6ded",
+      "bytes": 2548
+    },
+    "homeIncident": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/actual-packed-check-home-project-side-effect-v1.json",
+      "sha256": "92d2d9fcb8687f21a31361ab1ebb6882f3b52effc750790bfd6aa9c5e2343f65",
+      "bytes": 2749
+    },
+    "finalMeasurementContract": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/signing-static-review/final-unfiltered-measurement-v1/contract.md",
+      "sha256": "b7fd5ab41bad7cfab4a115f4885f0fa9358abe1ef8ca14e964d26338dca3e570",
+      "bytes": 3189
+    },
+    "finalMeasurementScript": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/signing-static-review/final-unfiltered-measurement-v1/capture-final-unfiltered-measurement.py",
+      "sha256": "6d6e85a47e83f10e3485ae68a982a482f022ecdb1921b9f235b38cf66468ad80",
+      "bytes": 31901
+    },
+    "finalMeasurementReview": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/provider-static-review/final-unfiltered-measurement-peer-review-v1/review.md",
+      "sha256": "13ec3bbf55cb814013a6ac9fefef82bb87d51182fdb45cd1c0c4743f0ffc3ed7",
+      "bytes": 4127
+    },
+    "required23": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/summary.json",
+      "sha256": "561f43f9f115f735eceb21335c64d68cae206fd4867b55cbc546ed172b3416a7",
+      "bytes": 184208
+    },
+    "extras": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-extras-v5/summary.json",
+      "sha256": "a83ddfc0c1ca6fba12e32118e55f9c44787d7649c3e9436ea96a453b3b766cf1",
+      "bytes": 175153
+    },
+    "software": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/summary.json",
+      "sha256": "48f97e8971ba2fb7cc4887eebfc5a8f44daa6e5d89694e8e229f9555ed75ff27",
+      "bytes": 174637
+    }
+  },
+  "noRawLargeReportEmbedded": true,
+  "fullPending": {
+    "state": "PENDING_ON_METADATA_ONLY_CHILD_Q",
+    "Q": null,
+    "tests": null,
+    "exitCode": null,
+    "coverageAudit": "PENDING actual complete native report against all948 required whole files and87 owned whole test files",
+    "passClaim": false
+  }
+}
