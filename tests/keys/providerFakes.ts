@@ -189,7 +189,8 @@ export function pkcs11Fake(opts: { token: string; pin: string; keys: FakeTokenKe
     objects.push({ handle: handle(), attrs: new Map<number, unknown>([[CK.CKA_CLASS, CK.CKO_PUBLIC_KEY], [CK.CKA_LABEL, entry.label], [CK.CKA_KEY_TYPE, ulong(keyType)],
       [CK.CKA_EC_PARAMS, params], [CK.CKA_EC_POINT, point]]) });
   }
-  for (const label of opts.secrets ?? []) objects.push({ handle: handle(), secret: randomBytes(32), attrs: new Map<number, unknown>([[CK.CKA_CLASS, CK.CKO_SECRET_KEY], [CK.CKA_LABEL, label]]) });
+  for (const label of opts.secrets ?? []) objects.push({ handle: handle(), secret: randomBytes(32), attrs: new Map<number, unknown>([[CK.CKA_CLASS, CK.CKO_SECRET_KEY], [CK.CKA_LABEL, label],
+    [CK.CKA_EXTRACTABLE, bool(false)], [CK.CKA_SENSITIVE, bool(true)]]) });
   const slot = Buffer.from([0xaa]);
   const calls: string[] = [];
   let loggedIn = false;

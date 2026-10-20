@@ -160,14 +160,18 @@ export function pkcs11Provider(deps: { module?: Pkcs11Module & { gcmParamsType?:
   };
   const attributes = (s: ReturnType<typeof session>, object: Handle, types: number[]): Map<number, Buffer> =>
     new Map(s.pkcs11.C_GetAttributeValue(s.session, object, types.map(type => ({ type }))).map(row => [row.type, row.value ?? Buffer.alloc(0)]));
-  const flag = (value: Buffer | undefined) => value !== undefined && value.length > 0 && value.some(byte => byte !== 0);
+  const assertNonExportable = (values: Map<number, Buffer>) => {
+    const extractable = values.get(CK.CKA_EXTRACTABLE);
+    const sensitive = values.get(CK.CKA_SENSITIVE);
+    if (extractable?.length !== 1 || extractable[0] !== 0 || sensitive?.length !== 1 || sensitive[0] !== 1) {
+      throw failure("KEY_PROVIDER_KEY_REFUSED", "the private or secret key must report CKA_EXTRACTABLE CK_FALSE and CKA_SENSITIVE CK_TRUE");
+    }
+  };
 
   const describe = memoizedDescribe(async ref => run(ref, "describe", (s, uri) => {
     const privateKey = find(s, uri.object, CK.CKO_PRIVATE_KEY);
     const secret = attributes(s, privateKey, [CK.CKA_EXTRACTABLE, CK.CKA_SENSITIVE, CK.CKA_KEY_TYPE]);
-    if (flag(secret.get(CK.CKA_EXTRACTABLE)) || !flag(secret.get(CK.CKA_SENSITIVE))) {
-      throw failure("KEY_PROVIDER_KEY_REFUSED", "the private key must be CKA_EXTRACTABLE false and CKA_SENSITIVE true");
-    }
+    assertNonExportable(secret);
     const publicKey = attributes(s, find(s, uri.object, CK.CKO_PUBLIC_KEY), [CK.CKA_EC_PARAMS, CK.CKA_EC_POINT]);
     const params = publicKey.get(CK.CKA_EC_PARAMS) ?? Buffer.alloc(0);
     const point = publicKey.get(CK.CKA_EC_POINT) ?? Buffer.alloc(0);
@@ -201,6 +205,7 @@ export function pkcs11Provider(deps: { module?: Pkcs11Module & { gcmParamsType?:
       const { algorithm } = await describe(ref);
       return run(ref, "sign", (s, uri) => {
         const key = find(s, uri.object, CK.CKO_PRIVATE_KEY);
+        assertNonExportable(attributes(s, key, [CK.CKA_EXTRACTABLE, CK.CKA_SENSITIVE]));
         const ecdsa = algorithm === "ecdsa-p256-sha256";
         s.pkcs11.C_SignInit(s.session, { mechanism: ecdsa ? CK.CKM_ECDSA : CK.CKM_EDDSA }, key);
         return Buffer.from(s.pkcs11.C_Sign(s.session, ecdsa ? createHash("sha256").update(message).digest() : Buffer.from(message), Buffer.alloc(64)));
@@ -208,8 +213,10 @@ export function pkcs11Provider(deps: { module?: Pkcs11Module & { gcmParamsType?:
     },
     async wrapKey(ref, plaintextKey) {
       return run(ref, "wrapKey", (s, uri) => {
+        const key = find(s, uri.object, CK.CKO_SECRET_KEY);
+        assertNonExportable(attributes(s, key, [CK.CKA_EXTRACTABLE, CK.CKA_SENSITIVE]));
         const iv = randomBytes(12);
-        s.pkcs11.C_EncryptInit(s.session, gcm(s, iv, uri), find(s, uri.object, CK.CKO_SECRET_KEY));
+        s.pkcs11.C_EncryptInit(s.session, gcm(s, iv, uri), key);
         return Buffer.concat([iv, Buffer.from(s.pkcs11.C_Encrypt(s.session, Buffer.from(plaintextKey), Buffer.alloc(plaintextKey.length + 16)))]);
       });
     },
@@ -217,7 +224,9 @@ export function pkcs11Provider(deps: { module?: Pkcs11Module & { gcmParamsType?:
       return run(ref, "unwrapKey", (s, uri) => {
         const bytes = Buffer.from(wrapped);
         if (bytes.length < 28) throw failure("KEY_PROVIDER_KEY_REFUSED", "not a PKCS#11 wrapped key");
-        s.pkcs11.C_DecryptInit(s.session, gcm(s, bytes.subarray(0, 12), uri), find(s, uri.object, CK.CKO_SECRET_KEY));
+        const key = find(s, uri.object, CK.CKO_SECRET_KEY);
+        assertNonExportable(attributes(s, key, [CK.CKA_EXTRACTABLE, CK.CKA_SENSITIVE]));
+        s.pkcs11.C_DecryptInit(s.session, gcm(s, bytes.subarray(0, 12), uri), key);
         return Buffer.from(s.pkcs11.C_Decrypt(s.session, bytes.subarray(12), Buffer.alloc(bytes.length)));
       });
     }
