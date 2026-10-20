@@ -472,6 +472,13 @@
       "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f"
     },
     {
+      "path": "src/plugins/pluginStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/plugins/pluginStore.ts.landed",
+      "sha256": "d8fcf3b4e4e7c79fa2841951a01adc7e6ca75feef40e38aba88784462aa1afd1"
+    },
+    {
       "path": "src/prompt/promptPackVerifier.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
