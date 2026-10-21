@@ -1,4 +1,5 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { lstatSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import YAML from "yaml";
 import { copyFileSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -7,14 +8,20 @@ import { randomUUID } from "node:crypto";
 import { getPublicKeyHistory } from "../../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { loadOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../policy.js";
+import { loadOpsPolicy, opsPolicyPath, opsPolicySigPath, opsPolicySchema, verifyOpsPolicySignature, verifyOpsPolicyBytes } from "../policy.js";
 import { currentTransparencyMerkleRoot, verifyTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
-import { transparencySealSigPath, verifyTransparencyLog, appendTransparencyEntry } from "../../transparency/logChain.js";
+import { transparencySealSigPath, verifyTransparencyLog, appendTransparencyEntry, appendTransparencyEntryAsync } from "../../transparency/logChain.js";
 import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
 import { decryptBackupPayload, encryptBackupPayload, type BackupEncryptionEnvelope } from "./backupCrypto.js";
 import { appendOpsAuditEvent } from "../audit.js";
-import { describePolicySigner, signDigestWithPolicy } from "../../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy, signDigestWithPolicyAsync } from "../../crypto/signing/signer.js";
+import { loadTrustConfig } from "../../trust/trustConfig.js";
+import { merkleCurrentRootPath, merkleCurrentRootSigPath } from "../../transparency/merklePaths.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../../keys/purposePublication.js";
+import { boundProviderKey } from "../../keys/keyset.js";
+import { assertOwnerMode } from "../../mode/mode.js";
+import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
 import { canonicalSigningKey, signingKeyId } from "../../keys/algorithmPolicy.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, untrustedReasons, verdictExitCode, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../../trust/index.js";
 import { fileSha256 } from "../../trust/signatureCheck.js";
@@ -248,6 +255,138 @@ export function createBackup(params: { workspace: string; outFile: string }): {
     manifestPath: `${outFile}#manifest.json`,
     backupId
   };
+}
+
+type BackupFileState = { bytes: Buffer; mode: number } | null;
+class BackupPublicationIncompleteError extends Error {
+  readonly code = "BACKUP_PUBLICATION_INCOMPLETE";
+  constructor(readonly publication: ReturnType<typeof createBackup>, readonly archiveSha256: string,
+    readonly phase: "ops-audit" | "transparency", readonly opsAudit: ReturnType<typeof appendOpsAuditEvent> | null, cause: unknown) {
+    super(`Backup archive was published; ${phase === "ops-audit" ? "ops audit" : "transparency publication"} did not complete`, { cause });
+    this.name = "BackupPublicationIncompleteError";
+  }
+}
+function backupFileState(path: string): BackupFileState {
+  try {
+    const stat = lstatSync(path);
+    if (!stat.isFile()) throw new Error("backup source or destination must be a regular file");
+    return { bytes: readFileSync(path), mode: stat.mode & 0o777 };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw new Error("backup source or destination is not a readable regular file");
+  }
+}
+function sameBackupFile(a: BackupFileState, b: BackupFileState): boolean {
+  return a === null ? b === null : b !== null && a.mode === b.mode && a.bytes.equals(b.bytes);
+}
+
+/** Maintained awaitable producer. Archive → synchronous ops audit → awaited transparency; failures retain publication truth. */
+export async function createBackupAsync(input: Parameters<typeof createBackup>[0]): Promise<ReturnType<typeof createBackup>> {
+  const params = { ...input }, workspace = resolve(params.workspace), outFile = resolve(workspace, params.outFile);
+  assertOwnerMode(workspace, "backup create");
+  const policyPath = opsPolicyPath(workspace), policySigPath = opsPolicySigPath(workspace);
+  const policyBytes = backupFileState(policyPath), policySigBytes = backupFileState(policySigPath);
+  if (policyBytes === null || policySigBytes === null) throw new Error("ops policy invalid: ops policy or signature missing");
+  const policyDigest = sha256Hex(policyBytes.bytes);
+  const verifiedPolicy = verifyOpsPolicyBytes(workspace, policyBytes.bytes, policySigBytes.bytes);
+  if (!verifiedPolicy.valid) throw new Error(`ops policy invalid: ${verifiedPolicy.reason ?? "signature verification failed"}`);
+  const policy = opsPolicySchema.parse(YAML.parse(policyBytes.bytes.toString("utf8")));
+  if (policy.opsPolicy.backups.requireEncryptedBackups && policy.opsPolicy.backups.defaultBackupEncryption !== "PASSPHRASE_AES_256_GCM") {
+    throw new Error("unsupported backup encryption policy");
+  }
+  const passphrase = backupPassphraseFromEnv();
+  if (policy.opsPolicy.backups.requireEncryptedBackups && (!passphrase || passphrase.length === 0)) {
+    throw new Error("AMC_BACKUP_PASSPHRASE_FILE (or AMC_BACKUP_PASSPHRASE) is required for encrypted backups");
+  }
+  const policySigner = describePolicySigner(workspace, "BACKUP_MANIFEST"), signingPolicy = JSON.stringify(loadTrustConfig(workspace));
+  const purpose = policySigner.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
+  const provider = purpose === null ? null : boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file";
+  const name = `backup-create-${sha256Hex(outFile).slice(0, 24)}`, lockRoot = dirname(outFile);
+  // Publication control files cannot become this backup's own source additions while its lock is held.
+  const exclude = [...policy.opsPolicy.backups.excludePaths, relative(workspace, join(lockRoot, `.${name}.lock`)),
+    relative(workspace, join(lockRoot, `.${name}-locks`))];
+  const files = collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude);
+  const extras = [policyPath, policySigPath, join(workspace, "package.json"), merkleCurrentRootPath(workspace),
+    merkleCurrentRootSigPath(workspace), transparencySealSigPath(workspace), join(workspace, ".amc", "evidence.sqlite")];
+  const original = new Map([...new Set([...files.map(path => join(workspace, path)), ...extras])].map(path => [path, backupFileState(path)] as const));
+  if (!sameBackupFile(policyBytes, original.get(policyPath)!) || !sameBackupFile(policySigBytes, original.get(policySigPath)!)) {
+    throw new Error("backup inputs changed while preparing");
+  }
+  const outputBefore = backupFileState(outFile);
+  const assertInputsCurrent = () => {
+    const currentFiles = collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude);
+    if (JSON.stringify(currentFiles) !== JSON.stringify(files) || [...original].some(([path, before]) => !sameBackupFile(before, backupFileState(path)))) {
+      throw new Error("backup inputs changed while preparing");
+    }
+  };
+  const root = currentTransparencyMerkleRoot(workspace);
+  const packageBytes = original.get(join(workspace, "package.json"))?.bytes;
+  let version = "unknown";
+  try { const parsed = JSON.parse(packageBytes?.toString("utf8") ?? "null") as { version?: unknown } | null;
+    if (typeof parsed?.version === "string") version = parsed.version; } catch { /* Preserve packageVersion's unknown fallback. */ }
+  const temp = mkdtempSync(join(tmpdir(), "amc-backup-async-"));
+  try {
+    const payloadSrc = join(temp, "payload-src"), payloadTar = join(temp, "workspace.tar.gz"), bundleRoot = join(temp, "amc-backup");
+    ensureDir(payloadSrc); ensureDir(join(bundleRoot, "payload")); ensureDir(join(bundleRoot, "keys"));
+    for (const path of files) {
+      const state = original.get(join(workspace, path));
+      if (state === undefined || state === null) throw new Error("backup source disappeared while preparing");
+      writeFileAtomic(join(payloadSrc, path), state.bytes, state.mode);
+    }
+    tarCreate(payloadSrc, payloadTar);
+    const encrypted = encryptBackupPayload(readFileSync(payloadTar), passphrase ?? ""), payloadSha = sha256Hex(encrypted.encrypted);
+    writeFileAtomic(join(bundleRoot, "payload", "workspace.tar.gz.enc"), encrypted.encrypted, 0o600);
+    writeFileAtomic(join(bundleRoot, "payload.sha256"), `${payloadSha}\n`, 0o644);
+    const backupId = `bkp_${randomUUID()}`, seal = original.get(transparencySealSigPath(workspace)), db = original.get(join(workspace, ".amc", "evidence.sqlite"));
+    const manifest = backupManifestSchema.parse({
+      v: 1, backupId, createdTs: Date.now(), workspace: { pathHint: params.workspace, amcVersion: version, nodeVersion: process.version },
+      policy: { opsPolicySha256: policyDigest }, payload: { encryption: encrypted.envelope, payloadSha256: payloadSha },
+      files: files.map(path => { const bytes = original.get(join(workspace, path))!.bytes; return { path, sha256: sha256Hex(bytes), bytes: bytes.byteLength }; }),
+      integrity: { transparencyRoot: root?.root ?? "", transparencySealSigSha256: sha256Hex(seal?.bytes ?? Buffer.alloc(0)), evidenceDbSha256: db === null || db === undefined ? null : sha256Hex(db.bytes) },
+      signing: { algorithm: policySigner.algorithm, auditorFingerprint: policySigner.fingerprint }
+    });
+    const manifestBytes = Buffer.from(JSON.stringify(manifest, null, 2)), digest = sha256Hex(manifestBytes);
+    writeFileAtomic(join(bundleRoot, "manifest.json"), manifestBytes, 0o644);
+    assertInputsCurrent();
+    const signed = await signDigestWithPolicyAsync({ workspace, kind: "BACKUP_MANIFEST", digestHex: digest, expectedSigner: policySigner });
+    assertInputsCurrent();
+    const assertAuthorityCurrent = () => {
+      assertOwnerMode(workspace, "backup create");
+      if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize backup signing");
+      assertPolicySignerCurrent(workspace, policySigner);
+      if (JSON.stringify(loadTrustConfig(workspace)) !== signingPolicy) throw new Error("backup signing policy changed while preparing");
+      if (purpose !== null && provider !== null) assertPurposePublicationCurrent(workspace, purpose, { provider, algorithm: policySigner.algorithm,
+        keyId: policySigner.fingerprint, publicKeyPem: policySigner.publicKeyPem, signature: Buffer.from(signed.signature, "base64") });
+    };
+    const sig = backupManifestSigSchema.parse({ digestSha256: digest, signature: signed.signature, signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope });
+    writeFileAtomic(join(bundleRoot, "manifest.sig"), JSON.stringify(sig, null, 2), 0o644);
+    writeFileAtomic(join(bundleRoot, "keys", "auditor.pub"), policySigner.publicKeyPem, 0o644);
+    const archive = join(temp, "prepared.amcbackup"); tarCreate(bundleRoot, archive);
+    const archiveBytes = readFileSync(archive), mode = lstatSync(archive).mode & 0o777;
+    withControlFileLock({ root: lockRoot, name, operation: () => {
+      assertAuthorityCurrent(); assertInputsCurrent();
+      if (!sameBackupFile(outputBefore, backupFileState(outFile))) throw new Error("backup output changed while preparing");
+      writeFileAtomic(outFile, archiveBytes, outputBefore?.mode ?? mode);
+    } });
+    const publication = { outFile, manifestPath: `${outFile}#manifest.json`, backupId }, archiveSha256 = sha256Hex(archiveBytes);
+    let opsAudit: ReturnType<typeof appendOpsAuditEvent> | null = null;
+    try { opsAudit = appendOpsAuditEvent({ workspace, auditType: "BACKUP_CREATED", payload: { backupId, outFile, payloadSha256: payloadSha, fileCount: manifest.files.length } }); }
+    catch (error) { throw new BackupPublicationIncompleteError(publication, archiveSha256, "ops-audit", null, error); }
+    // The payload is a checked pre-publication snapshot. Own archive/audit writes already changed live .amc files.
+    const published = { bytes: archiveBytes, mode: outputBefore?.mode ?? mode };
+    try {
+      await appendTransparencyEntryAsync({ workspace, type: "BACKUP_CREATED", agentId: "system", artifact: { kind: "policy", id: backupId, sha256: digest } }, {
+        beforeCommit: () => withControlFileLock({ root: lockRoot, name, operation: () => {
+          assertAuthorityCurrent();
+          if (!sameBackupFile(policyBytes, backupFileState(policyPath)) || !sameBackupFile(policySigBytes, backupFileState(policySigPath))) {
+            throw new Error("backup ops policy changed after archive publication");
+          }
+          if (!sameBackupFile(published, backupFileState(outFile))) throw new Error("backup published archive changed while preparing transparency");
+        } })
+      });
+    } catch (error) { throw new BackupPublicationIncompleteError(publication, archiveSha256, "transparency", opsAudit, error); }
+    return publication;
+  } finally { rmSync(temp, { recursive: true, force: true }); }
 }
 
 function loadBundle(bundleFile: string): {

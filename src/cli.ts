@@ -383,7 +383,7 @@ import {
 } from "./bench/benchCli.js";
 import { initOpsPolicyAsync, loadOpsPolicy, signOpsPolicyAsync, verifyOpsPolicySignature } from "./ops/policy.js";
 import { retentionRunCli, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
-import { backupCreateCli, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
+import { backupCreateCliAsync, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
 import {
   maintenancePruneCacheCli,
   maintenanceReindexCli,
@@ -9281,8 +9281,8 @@ backup
   .command("create")
   .description("Create signed encrypted backup bundle")
   .requiredOption("--out <file>", "output backup file, e.g. backup.amcbackup")
-  .action((opts: { out: string }) => {
-    const created = backupCreateCli(process.cwd(), opts.out);
+  .action(async (opts: { out: string }) => {
+    const created = await backupCreateCliAsync(process.cwd(), opts.out);
     console.log(chalk.green(`Backup created: ${created.outFile}`));
     console.log(`backupId=${created.backupId}`);
   });

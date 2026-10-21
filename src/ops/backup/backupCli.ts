@@ -1,10 +1,14 @@
-import { createBackup, printBackup, restoreBackup, verifyBackup } from "./backupEngine.js";
+import { createBackup, createBackupAsync, printBackup, restoreBackup, verifyBackup } from "./backupEngine.js";
 
 export function backupCreateCli(workspace: string, outFile: string): ReturnType<typeof createBackup> {
   return createBackup({
     workspace,
     outFile
   });
+}
+
+export async function backupCreateCliAsync(workspace: string, outFile: string): Promise<ReturnType<typeof createBackup>> {
+  return createBackupAsync({ workspace, outFile });
 }
 
 export function backupVerifyCli(params: Parameters<typeof verifyBackup>[0]): ReturnType<typeof verifyBackup> {

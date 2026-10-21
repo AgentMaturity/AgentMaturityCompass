@@ -33,3 +33,5 @@ Prepare checked org signature bytes for the actual compliance-map publisher, awa
 Await config-purpose ops policy preparation in maintained initialized-workspace callers, retain upstream owner unlock gates, share exact-kind historical verification and report partial pair publication truthfully.
 
 Await outcome-report workspace transparency before notification, retaining original caller/file authority, historical scoring inputs, exact published bytes and truthful partial-publication phases.
+
+Await backup manifest preparation and workspace transparency in maintained callers, retaining same-read ops admission, original authority, historical encrypted payload and truthful archive/audit/log partial phases.
