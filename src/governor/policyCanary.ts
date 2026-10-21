@@ -27,7 +27,7 @@ import {
   activateEmergencyOverride,
   activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem,
   getInvalidOverrides,
   resetCanaryRegisters
@@ -40,7 +40,7 @@ export {
   activateEmergencyOverride,
   activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem
 };
 

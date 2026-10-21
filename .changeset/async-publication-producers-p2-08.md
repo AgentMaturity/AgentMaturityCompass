@@ -37,3 +37,5 @@ Await outcome-report workspace transparency before notification, retaining origi
 Await backup manifest preparation and workspace transparency in maintained callers, retaining same-read ops admission, original authority, historical encrypted payload and truthful archive/audit/log partial phases.
 
 Prepare workspace records before shared publication locks and await actual false-positive CLI/SDK writers, preserving durable lifecycle checks, detached results, cache-after-write ordering and explicit legacy compatibility limits.
+
+Add awaited canary postmortem SDK filing with same-read target capture and checked outer record publication, preserving the existing inner signature, reader admission and expiry behavior.

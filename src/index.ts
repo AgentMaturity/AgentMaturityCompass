@@ -1376,7 +1376,7 @@ export {
   activateEmergencyOverride,
   activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem,
   registerPolicyDebt,
   getActivePolicyDebt,
