@@ -1370,7 +1370,7 @@ export {
   makeCanaryDecision,
   recordCanaryOutcome,
   computeCanaryStats,
-  createRollbackPack,
+  createRollbackPack, createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,

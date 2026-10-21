@@ -39,3 +39,5 @@ Await backup manifest preparation and workspace transparency in maintained calle
 Prepare workspace records before shared publication locks and await actual false-positive CLI/SDK writers, preserving durable lifecycle checks, detached results, cache-after-write ordering and explicit legacy compatibility limits.
 
 Add awaited canary postmortem SDK filing with same-read target capture and checked outer record publication, preserving the existing inner signature, reader admission and expiry behavior.
+
+Await both rollback-pack signatures in the maintained CLI and SDK, retaining original first authority through outer preparation and caching only after durable publication.

@@ -22,6 +22,7 @@ import { addDebtEntry, loadAllDebt } from "./policyDebt.js";
 // re-exported here so the public surface is unchanged.
 import {
   createRollbackPack,
+  createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
@@ -35,6 +36,7 @@ import {
 
 export {
   createRollbackPack,
+  createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,

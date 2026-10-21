@@ -16,6 +16,8 @@ import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { BreakGlassSigningError, prepareOverrideDigestSignature, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
 import { canaryOverrideDigest as overrideDigest, publishCanaryOverride } from "./canaryOverridePublication.js";
 import { saveWorkspaceRecord, loadWorkspaceRecords, captureWorkspaceRecordPredecessor, prepareWorkspaceRecordAsync, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // policyCanary.ts, which imports the values from here.
 import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
@@ -74,6 +76,23 @@ export function createRollbackPack(
     saveWorkspaceRecord(workspace, ROLLBACK_PACKS_AT, pack.packId, { ...pack }, now);
   }
   return pack;
+}
+
+/** Two checked signatures before durable publication; the retained synchronous API keeps its legacy unsigned behavior. */
+export async function createRollbackPackAsync(agentId: string, policyContent: string, reason: string, workspace?: string): Promise<RollbackPack> {
+  if (!workspace) return createRollbackPack(agentId, policyContent, reason, workspace);
+  const root = resolve(workspace), now = Date.now();
+  const body = { packId: `rbp_${randomUUID().slice(0, 12)}`, agentId, policyFileSha256: sha256Hex(policyContent), reason, createdTs: now };
+  const captured = capturePurposePublication(root, "artifact-seal");
+  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(sha256Hex(canonicalize(body)), "hex"));
+  const pack: RollbackPack = { ...body, policyContent, signature: signed.signature.toString("base64") };
+  const prepared = await prepareWorkspaceRecordAsync(root, ROLLBACK_PACKS_AT, pack.packId, { ...pack }, now);
+  return withWorkspaceRecordPublicationLock(root, ROLLBACK_PACKS_AT, () => {
+    assertPurposePublicationCurrent(root, captured, signed);
+    prepared.publish();
+    rollbackPacks.push(pack);
+    return pack;
+  });
 }
 
 /** Live entries plus any persisted earlier, deduped by id. */

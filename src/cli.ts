@@ -15925,12 +15925,12 @@ program
   .requiredOption("--reason <reason>", "reason for creating the rollback pack")
   .option("--policy-file <path>", "path to policy file", "amc-policy.yml")
   .action(async (opts: { agent?: string; reason: string; policyFile: string }) => {
-    const { createRollbackPack } = await import("./governor/policyCanary.js");
+    const { createRollbackPackAsync } = await import("./governor/policyCanary.js");
     const fs = await import("node:fs");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let policyContent = "{}";
     try { policyContent = fs.readFileSync(opts.policyFile, "utf-8"); } catch { /* use default */ }
-    const pack = createRollbackPack(agentId, policyContent, opts.reason, process.cwd());
+    const pack = await createRollbackPackAsync(agentId, policyContent, opts.reason, process.cwd());
     console.log(chalk.green(`Rollback pack created: ${pack.packId}`));
     console.log(`  Policy SHA256: ${pack.policyFileSha256.slice(0, 16)}…`);
   });
