@@ -42,6 +42,7 @@ import type { TrustContext } from "../trust/trustContext.js";
 import { legacyLedgerRowKeys, operationalLedgerProblems } from "../keys/operationalLedgerReader.js";
 import { boundProviderKey } from "../keys/keyset.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -164,6 +165,7 @@ export function verifyEvidenceEventIntegrity(input: {
 
   const monitorKeys = legacyLedgerRowKeys(input.ledger.workspace);
   errors.push(...operationalLedgerProblems(input.ledger.workspace, input.ledger, input.trust));
+  errors.push(...receiptLedgerProblems(input.ledger, input.trust));
   const retentionProofs = event.archived === 1 || event.payload_pruned === 1
     ? buildRetentionProofIndex(input.ledger.workspace)
     : undefined;
@@ -712,6 +714,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint, options.trust));
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
+      chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
       verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);

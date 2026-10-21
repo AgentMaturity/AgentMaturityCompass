@@ -43,6 +43,7 @@ import {
   keysetRecoveryDir, resumeKeyset, type Keyset, type KeysetWrite
 } from "./keyset.js";
 import { assertArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } from "./artifactBlobAnchors.js";
+import { assertReceiptOwnerBoundary, type ReceiptOwnerBoundary } from "./receiptOwnerAnchors.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
@@ -125,6 +126,15 @@ export async function prepareArtifactBlobPurposeRotation(input: Omit<ProviderPur
   boundary: ArtifactBlobAnchorBoundary): Promise<ProviderPurposeRotationPlan | null> {
   const fixed = { ...input, purpose: "artifact-seal" as const };
   assertArtifactBlobAnchorBoundary(fixed.workspace, boundary, fixed.previousPublicKeyPem);
+  const identity = providerRotationIdentity(fixed);
+  return identity === null ? null : signProviderPurposeRotation(fixed, identity);
+}
+
+/** Internal receipt-only owner entry. No generic skip/preflight override or arbitrary purpose. */
+export async function prepareReceiptPurposeRotation(input: Omit<ProviderPurposeRotationInput, "purpose">,
+  boundary: ReceiptOwnerBoundary): Promise<ProviderPurposeRotationPlan | null> {
+  const fixed = { ...input, purpose: "receipt" as const };
+  assertReceiptOwnerBoundary(fixed.workspace, boundary, fixed.previousPublicKeyPem);
   const identity = providerRotationIdentity(fixed);
   return identity === null ? null : signProviderPurposeRotation(fixed, identity);
 }

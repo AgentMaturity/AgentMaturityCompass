@@ -3,11 +3,13 @@ import { generateKeyPairSync } from "node:crypto";
 import { join, resolve } from "node:path";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
+import { canonicalize } from "../utils/json.js";
 import { getPurposeKeyHistory } from "./signingKeys.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { prepareArtifactBlobOwnerPlan } from "./purposeProviders.js";
 import { ArtifactBlobAnchoringError } from "./artifactBlobAnchors.js";
-import { commitKeyset, type KeysetWrite } from "./keyset.js";
+import { assertKeysetComplete, commitKeyset, type KeysetWrite } from "./keyset.js";
+import { readReceiptAuthorityState } from "./receiptAuthorityState.js";
 import { getBlobIndexChildKey, unlockedPayloadForKeyChange } from "../vault/vault.js";
 import { encryptVaultPayload } from "../vault/vaultCrypto.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -49,8 +51,13 @@ export async function prepareBlobIndexAuthorityOwner(workspace: string, opts: Bl
   const plan = await prepareArtifactBlobOwnerPlan(root, ownerOptions);
   if (prior?.chain.some(grant => grant.signed.authority.childKeyId === plan.description.keyId))
     throw new Error("a prior blob operation child cannot become the artifact provider issuer");
+  const receipt = readReceiptAuthorityState(root);
+  if (canonicalize(assertKeysetComplete(root)) !== canonicalize(plan.keyset)) throw new Error("the captured owner generation changed before blob certificate preparation");
+  if (receipt?.chain.some(grant => grant.signed.authority.childKeyId === plan.description.keyId))
+    throw new Error("a receipt operation child cannot become the artifact provider issuer");
   const used = [...Object.values(plan.keyset.keys), ...Object.values(plan.keyset.providers ?? {}).map(binding => binding!.keyId),
-    ...(prior?.chain.flatMap(grant => [grant.signed.authority.childKeyId, grant.signed.authority.issuerKeyId]) ?? []), plan.description.keyId];
+    ...(prior?.chain.flatMap(grant => [grant.signed.authority.childKeyId, grant.signed.authority.issuerKeyId]) ?? []),
+    ...(receipt?.chain.flatMap(grant => [grant.signed.authority.childKeyId, grant.signed.authority.issuerKeyId]) ?? []), plan.description.keyId];
   if (used.includes(childKeyId)) throw new Error("blob child is not a fresh distinct operation key");
   const signed = await issueBlobIndexAuthority(plan.provider, plan.description, { type: "amc.blob-index-authority", version: 1,
     workspaceId: workspaceIdFromDirectory(root), purpose: "artifact-seal", operation: "blob-index", epoch: (prior?.current.signed.authority.epoch ?? 0) + 1,

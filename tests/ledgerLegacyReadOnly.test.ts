@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { openLedger, verifyEvidenceEventIntegrity, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { canonicalMetadataForHash } from "../src/ledger/eventHash.js";
 import { sha256Hex } from "../src/utils/hash.js";
 
@@ -66,11 +66,13 @@ describe("read-only verification of legacy ledger schemas", () => {
     expect(existsSync(join(workspace, ".amc", "vault.amcvault"))).toBe(false);
     const ledger = openLedger(workspace, { readonly: true });
     try {
+      expect(verifyEvidenceEventIntegrity({ ledger: { workspace, db: ledger.db }, eventId: "old-event" }).ok).toBe(true);
       expect(ledger.getAllEvents()).toHaveLength(1);
       expect(ledger.getAllAssuranceRuns()).toEqual([]);
       expect(ledger.getAllOutcomeEvents()).toEqual([]);
       expect(ledger.db.prepare("SELECT name FROM sqlite_master WHERE name IN ('assurance_runs', 'outcome_events')").all()).toEqual([]);
     } finally { ledger.close(); }
+    expect(readFileSync(path)).toEqual(before);
   });
 
   test("reads existing optional-table records even with older migration metadata", () => {

@@ -13,6 +13,7 @@ import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocatio
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
 import { containedExists, readContainedOrNull } from "../utils/containedFs.js";
 import { BLOB_AUTHORITY_CURRENT, BLOB_CHILD_FILE, blobAuthorityDigest, blobChildEnvelopeSchema, openBlobChild, parseBlobIndexAuthority } from "../keys/blobIndexAuthority.js";
+import { RECEIPT_AUTHORITY_CURRENT, RECEIPT_CHILD_FILE, receiptAuthorityDigest, receiptChildEnvelopeSchema, openReceiptChild, parseReceiptAuthority } from "../keys/receiptAuthority.js";
 import { canonicalize } from "../utils/json.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
@@ -44,6 +45,7 @@ interface VaultSession {
 
 const sessions = new Map<string, VaultSession>();
 const blobChildren = new Map<string, { stamp: string; key: KeyObject }>();
+const receiptChildren = new Map<string, { stamp: string; key: KeyObject }>();
 // Verification can read encrypted evidence without granting ordinary vault
 // access. Cache only authenticated secrets here, never signing-key payloads.
 const readOnlySecrets = new Map<string, {
@@ -64,7 +66,7 @@ function evictStaleSessions(): void {
       session.unlocked = false;
       session.envelopeDigest = null;
       sessions.delete(key);
-      blobChildren.delete(key);
+      blobChildren.delete(key); receiptChildren.delete(key);
     }
   }
   for (const [key, cached] of readOnlySecrets) {
@@ -472,7 +474,7 @@ function openVaultSession(workspace: string, phrase: string): void {
 }
 
 export function lockVault(workspace: string): void {
-  blobChildren.delete(workspace);
+  blobChildren.delete(workspace); receiptChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
   session.unlocked = false;
@@ -754,4 +756,24 @@ export function getBlobIndexChildKey(workspace: string): KeyObject {
     const key = openBlobChild(decryptVaultPayload(envelope, session.passphrase), signed);
     blobChildren.set(workspace, { stamp, key }); return key;
   } catch { blobChildren.delete(workspace); throw new Error("sealed blob child cannot be opened for its committed authority"); }
+}
+
+/** Internal fixed receipt-token child only; never an arbitrary secret/path opener or a flat purpose-history key. */
+export function getReceiptChildKey(workspace: string): KeyObject {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("receipt authority is unavailable in no-sign mode");
+  const keyset = assertKeysetComplete(workspace), payload = requireUnlockedPayload(workspace), session = sessionFor(workspace);
+  if (keyset === null || LOCAL_PURPOSES.some(purpose => keyset.keys[purpose] !== payload.keys[purpose]?.keyId)) throw new Error("receipt child vault keys differ from the committed key set");
+  const binding = keyset.providers?.["receipt"], expected = binding?.receiptAuthoritySha256;
+  const certificate = readContainedOrNull(workspace, RECEIPT_AUTHORITY_CURRENT, 64 * 1024), sealed = readContainedOrNull(workspace, RECEIPT_CHILD_FILE, 64 * 1024);
+  if (expected === undefined || certificate === null || sealed === null || sha256Hex(certificate) !== expected
+    || keyset.files["keys/receipt-child.amcvault"] !== sha256Hex(sealed)) throw new Error("receipt child is not the committed operation authority");
+  const signed = parseReceiptAuthority(certificate);
+  if (receiptAuthorityDigest(signed) !== expected || !session.passphrase) throw new Error("receipt child authority is unavailable");
+  const stamp = `${session.envelopeDigest}:${expected}:${sha256Hex(sealed)}`, cached = receiptChildren.get(workspace);
+  if (cached?.stamp === stamp) return cached.key;
+  try {
+    const envelope = receiptChildEnvelopeSchema.parse(JSON.parse(sealed.toString("utf8")));
+    const key = openReceiptChild(decryptVaultPayload(envelope, session.passphrase), signed);
+    receiptChildren.set(workspace, { stamp, key }); return key;
+  } catch { receiptChildren.delete(workspace); throw new Error("sealed receipt child cannot be opened for its committed authority"); }
 }

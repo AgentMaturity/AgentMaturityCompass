@@ -79,6 +79,12 @@ export function captureArtifactBindingPredecessor(workspace: string) {
   return { state, ...verified };
 }
 
+/** Fixed receipt-owner preflight; receipt transition never replaces the current artifact log authority. */
+export function captureReceiptOwnerPredecessor(workspace: string) {
+  const state = captureTransparencyState(workspace, true), verified = verifiedPredecessor(workspace, state);
+  assertTransparencyStateCurrent(state); return { state, ...verified };
+}
+
 function captureSigner(workspace: string, descriptor: PolicySignerDescriptor) {
   const purpose = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
   const holder: KeyProviderId = boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file";

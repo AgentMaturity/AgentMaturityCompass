@@ -17,6 +17,7 @@ import type {
 } from "../types.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { cachedSigningKey } from "../keys/cachedSigningKey.js";
+import { prepareReceiptWriter, withLedgerReceipt, type PreparedReceiptWriter } from "../keys/receiptWriter.js";
 import { operationalSqlMetadata } from "../keys/operationalLedgerWriter.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -26,7 +27,7 @@ import { listWorkOrders, verifyWorkOrder } from "../workorders/workorderEngine.j
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { mintReceipt, verifyReceipt, type MintReceiptInput } from "../receipts/receipt.js";
+import { verifyReceipt, type MintReceiptInput } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import type { SqliteConnectionLease } from "../storage/sqlitePool.js";
@@ -86,6 +87,7 @@ export interface AppendOutcomeEventInput {
 }
 
 import { hasTable } from "./ledgerSchema.js";
+import { hasOptionalLegacyTable } from "./legacyOptionalTables.js";
 import { openLedgerConnection, type LedgerStore } from "./ledgerConnection.js";
 import { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
 
@@ -189,9 +191,11 @@ export class Ledger {
 
   // Parse each admitted PEM once; recheck the signing gate on every use.
   private readonly monitorSigningKey: () => KeyObject;
+  private readonly receiptWriter: PreparedReceiptWriter;
 
   constructor(workspace: string, options: { readonly?: boolean; store?: LedgerStore } = {}) {
     this.workspace = workspace;
+    this.receiptWriter = options.readonly ? null : prepareReceiptWriter(workspace);
     this.monitorSigningKey = cachedSigningKey(workspace, "ledger-row");
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
     const connection = openLedgerConnection(workspace, {
@@ -696,93 +700,95 @@ export class Ledger {
     const canonicalPayloadInline = payloadInline;
 
     const prepared = this.runImmediateTransaction(() => {
-      const receiptId = randomUUID();
-      const baseMeta = {
-        ...operationalSqlMetadata(this, "sqlite-evidence", input.meta ?? {}, ts),
-        receipt_id: receiptId
-      };
-      // Checked here too: this method builds its own row rather than going
-      // through `buildEvidenceInsert`, so validating only there would leave the
-      // receipt-bearing writers -- assurance audits among them -- unguarded.
-      assertTrustTierProvenance(baseMeta, this.workspace);
-      const baseMetaJson = JSON.stringify(baseMeta);
-      const prevHash = this.latestEventHash();
-      const baseCanonicalMetadata = canonicalMetadataForHash({
-        id,
-        ts,
-        sessionId: input.sessionId,
-        runtime: input.runtime,
-        eventType: input.eventType,
-        payloadPath,
-        payloadInline,
-        metaJson: baseMetaJson
-      });
-      const eventHash = sha256Hex(`${prevHash}${baseCanonicalMetadata}${payloadSha256}`);
-      const minted = mintReceipt({
-        ...input.receipt,
-        ts,
-        eventHash,
-        sessionId: input.sessionId,
-        privateKeyPem: getSigningKey(this.workspace, "receipt"),
-        receiptId
-      });
-
-      const metaJson = JSON.stringify({
-        ...baseMeta,
-        receipt_sha256: minted.receiptSha256,
-        receipt: minted.receipt
-      });
-      const canonicalMetadata = canonicalMetadataForHash({
-        id,
-        ts,
-        sessionId: input.sessionId,
-        runtime: input.runtime,
-        eventType: input.eventType,
-        payloadPath,
-        payloadInline,
-        metaJson
-      });
-      const recalculated = sha256Hex(`${prevHash}${canonicalMetadata}${payloadSha256}`);
-      const writerSig = signHexDigest(recalculated, this.monitorPrivateKey());
-
-      const row = {
-        id,
-        ts,
-        session_id: input.sessionId,
-        runtime: input.runtime,
-        event_type: input.eventType,
-        payload_path: payloadPath,
-        payload_inline: payloadInline,
-        payload_sha256: payloadSha256,
-        meta_json: metaJson,
-        prev_event_hash: prevHash,
-        event_hash: recalculated,
-        writer_sig: writerSig,
-        canonical_payload_path: canonicalPayloadPath,
-        canonical_payload_inline: canonicalPayloadInline,
-        blob_ref: blobRef,
-        archived: 0,
-        archive_segment_id: null,
-        archive_manifest_sha256: null,
-        payload_pruned: 0,
-        payload_pruned_ts: null
-      };
-      this.db.prepare(EVIDENCE_EVENT_INSERT_SQL).run(row);
-
-      return {
-        row,
-        baseMeta,
-        result: {
+      const operational = operationalSqlMetadata(this, "sqlite-evidence", input.meta ?? {}, ts);
+      return withLedgerReceipt(this, this.receiptWriter, "sqlite-evidence", operational, ts, (receiptMeta, mint) => {
+        const receiptId = randomUUID();
+        const baseMeta = {
+          ...receiptMeta,
+          receipt_id: receiptId
+        };
+        // Checked here too: this method builds its own row rather than going
+        // through `buildEvidenceInsert`, so validating only there would leave the
+        // receipt-bearing writers -- assurance audits among them -- unguarded.
+        assertTrustTierProvenance(baseMeta, this.workspace);
+        const baseMetaJson = JSON.stringify(baseMeta);
+        const prevHash = this.latestEventHash();
+        const baseCanonicalMetadata = canonicalMetadataForHash({
           id,
           ts,
-          payloadSha256,
-          eventHash: recalculated,
-          writerSig,
-          receipt: minted.receipt,
-          receiptId: minted.payload.receipt_id,
-          receiptSha256: minted.receiptSha256
-        }
-      };
+          sessionId: input.sessionId,
+          runtime: input.runtime,
+          eventType: input.eventType,
+          payloadPath,
+          payloadInline,
+          metaJson: baseMetaJson
+        });
+        const eventHash = sha256Hex(`${prevHash}${baseCanonicalMetadata}${payloadSha256}`);
+        const minted = mint({
+          ...input.receipt,
+          ts,
+          eventHash,
+          sessionId: input.sessionId,
+          receiptId
+        });
+
+        const metaJson = JSON.stringify({
+          ...baseMeta,
+          receipt_sha256: minted.receiptSha256,
+          receipt: minted.receipt
+        });
+        const canonicalMetadata = canonicalMetadataForHash({
+          id,
+          ts,
+          sessionId: input.sessionId,
+          runtime: input.runtime,
+          eventType: input.eventType,
+          payloadPath,
+          payloadInline,
+          metaJson
+        });
+        const recalculated = sha256Hex(`${prevHash}${canonicalMetadata}${payloadSha256}`);
+        const writerSig = signHexDigest(recalculated, this.monitorPrivateKey());
+
+        const row = {
+          id,
+          ts,
+          session_id: input.sessionId,
+          runtime: input.runtime,
+          event_type: input.eventType,
+          payload_path: payloadPath,
+          payload_inline: payloadInline,
+          payload_sha256: payloadSha256,
+          meta_json: metaJson,
+          prev_event_hash: prevHash,
+          event_hash: recalculated,
+          writer_sig: writerSig,
+          canonical_payload_path: canonicalPayloadPath,
+          canonical_payload_inline: canonicalPayloadInline,
+          blob_ref: blobRef,
+          archived: 0,
+          archive_segment_id: null,
+          archive_manifest_sha256: null,
+          payload_pruned: 0,
+          payload_pruned_ts: null
+        };
+        this.db.prepare(EVIDENCE_EVENT_INSERT_SQL).run(row);
+
+        return {
+          row,
+          baseMeta,
+          result: {
+            id,
+            ts,
+            payloadSha256,
+            eventHash: recalculated,
+            writerSig,
+            receipt: minted.receipt,
+            receiptId: minted.payload.receipt_id,
+            receiptSha256: minted.receiptSha256
+          }
+        };
+      });
     });
 
     queueEvidenceEventSpan(prepared.row as unknown as EvidenceEvent, this.workspace);
@@ -820,71 +826,73 @@ export class Ledger {
       });
     const payloadSha256 = sha256Hex(Buffer.from(payloadText, "utf8"));
     return this.runImmediateTransaction(() => {
-      const metaJson = JSON.stringify(operationalSqlMetadata(this, "sqlite-outcome", input.meta ?? {}, ts));
-      const prevHash = this.latestOutcomeEventHash();
-      const eventHash = sha256Hex(
-        `${prevHash}${canonicalize({
-          outcome_event_id: outcomeEventId,
+      const operational = operationalSqlMetadata(this, "sqlite-outcome", input.meta ?? {}, ts);
+      return withLedgerReceipt(this, this.receiptWriter, "sqlite-outcome", operational, ts, (receiptMeta, mint) => {
+        const metaJson = JSON.stringify(receiptMeta);
+        const prevHash = this.latestOutcomeEventHash();
+        const eventHash = sha256Hex(
+          `${prevHash}${canonicalize({
+            outcome_event_id: outcomeEventId,
+            ts,
+            agent_id: input.agentId,
+            work_order_id: input.workOrderId ?? null,
+            category: input.category,
+            metric_id: input.metricId,
+            value: input.value,
+            unit: input.unit ?? null,
+            trust_tier: input.trustTier,
+            source: input.source,
+            meta_json: metaJson,
+            payload_sha256: payloadSha256
+          })}`
+        );
+        const signature = signHexDigest(eventHash, this.monitorPrivateKey());
+        const minted = mint({
+          kind: "guard_check",
           ts,
-          agent_id: input.agentId,
-          work_order_id: input.workOrderId ?? null,
-          category: input.category,
-          metric_id: input.metricId,
-          value: input.value,
-          unit: input.unit ?? null,
-          trust_tier: input.trustTier,
-          source: input.source,
-          meta_json: metaJson,
-          payload_sha256: payloadSha256
-        })}`
-      );
-      const signature = signHexDigest(eventHash, this.monitorPrivateKey());
-      const minted = mintReceipt({
-        kind: "guard_check",
-        ts,
-        agentId: input.agentId,
-        providerId: "outcomes",
-        model: null,
-        eventHash,
-        bodySha256: payloadSha256,
-        sessionId,
-        privateKeyPem: getSigningKey(this.workspace, "receipt")
-      });
-
-      this.db
-        .prepare(
-          `INSERT INTO outcome_events
-          (outcome_event_id, ts, agent_id, work_order_id, category, metric_id, value, unit, trust_tier, source, meta_json, prev_event_hash, event_hash, signature, receipt_id, receipt, payload_sha256)
-          VALUES (@outcome_event_id, @ts, @agent_id, @work_order_id, @category, @metric_id, @value, @unit, @trust_tier, @source, @meta_json, @prev_event_hash, @event_hash, @signature, @receipt_id, @receipt, @payload_sha256)`
-        )
-        .run({
-          outcome_event_id: outcomeEventId,
-          ts,
-          agent_id: input.agentId,
-          work_order_id: input.workOrderId ?? null,
-          category: input.category,
-          metric_id: input.metricId,
-          value: JSON.stringify(input.value),
-          unit: input.unit ?? null,
-          trust_tier: input.trustTier,
-          source: input.source,
-          meta_json: metaJson,
-          prev_event_hash: prevHash,
-          event_hash: eventHash,
-          signature,
-          receipt_id: minted.payload.receipt_id,
-          receipt: minted.receipt,
-          payload_sha256: payloadSha256
+          agentId: input.agentId,
+          providerId: "outcomes",
+          model: null,
+          eventHash,
+          bodySha256: payloadSha256,
+          sessionId
         });
 
-      return {
-        outcomeEventId,
-        eventHash,
-        signature,
-        receiptId: minted.payload.receipt_id,
-        receipt: minted.receipt,
-        payloadSha256
-      };
+        this.db
+          .prepare(
+            `INSERT INTO outcome_events
+            (outcome_event_id, ts, agent_id, work_order_id, category, metric_id, value, unit, trust_tier, source, meta_json, prev_event_hash, event_hash, signature, receipt_id, receipt, payload_sha256)
+            VALUES (@outcome_event_id, @ts, @agent_id, @work_order_id, @category, @metric_id, @value, @unit, @trust_tier, @source, @meta_json, @prev_event_hash, @event_hash, @signature, @receipt_id, @receipt, @payload_sha256)`
+          )
+          .run({
+            outcome_event_id: outcomeEventId,
+            ts,
+            agent_id: input.agentId,
+            work_order_id: input.workOrderId ?? null,
+            category: input.category,
+            metric_id: input.metricId,
+            value: JSON.stringify(input.value),
+            unit: input.unit ?? null,
+            trust_tier: input.trustTier,
+            source: input.source,
+            meta_json: metaJson,
+            prev_event_hash: prevHash,
+            event_hash: eventHash,
+            signature,
+            receipt_id: minted.payload.receipt_id,
+            receipt: minted.receipt,
+            payload_sha256: payloadSha256
+          });
+
+        return {
+          outcomeEventId,
+          eventHash,
+          signature,
+          receiptId: minted.payload.receipt_id,
+          receipt: minted.receipt,
+          payloadSha256
+        };
+      });
     });
   }
 
@@ -1168,24 +1176,8 @@ export class Ledger {
     return this.db.prepare("SELECT * FROM runs ORDER BY ts ASC").all() as RunRecord[];
   }
 
-  private hasOptionalLegacyTable(table: "assurance_runs" | "outcome_events", introducedVersion: number): boolean {
-    if (hasTable(this.db, table)) return true;
-    // A verifier cannot migrate a snapshot. Only a known, contiguous schema
-    // prefix predating this table means it never existed; a missing table in
-    // a current or unknown schema must not silently become an empty history.
-    if (hasTable(this.db, "schema_migrations")) {
-      const versions = this.db.prepare("SELECT version FROM schema_migrations ORDER BY version ASC").all() as Array<{ version: number }>;
-      if (
-        versions.length > 0 &&
-        versions.length < introducedVersion &&
-        versions.every((row, index) => row.version === index + 1)
-      ) return false;
-    }
-    throw new Error(`Ledger table ${table} is missing from an unknown or already-migrated schema`);
-  }
-
   getAllAssuranceRuns(): AssuranceRunRecord[] {
-    if (!this.hasOptionalLegacyTable("assurance_runs", 3)) return [];
+    if (!hasOptionalLegacyTable(this.db, "assurance_runs")) return [];
     return this.db
       .prepare("SELECT * FROM assurance_runs ORDER BY ts ASC")
       .all() as AssuranceRunRecord[];
@@ -1211,7 +1203,7 @@ export class Ledger {
   }
 
   getAllOutcomeEvents(): OutcomeEvent[] {
-    if (!this.hasOptionalLegacyTable("outcome_events", 4)) return [];
+    if (!hasOptionalLegacyTable(this.db, "outcome_events")) return [];
     return this.db
       .prepare("SELECT * FROM outcome_events ORDER BY rowid ASC")
       .all() as OutcomeEvent[];

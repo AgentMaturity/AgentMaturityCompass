@@ -31,7 +31,7 @@ import { azureKeyVaultProvider } from "./providers/azureKeyVault.js";
 import { fileKeyProvider } from "./providers/file.js";
 import { gcpKmsProvider } from "./providers/gcpKms.js";
 import { pkcs11Provider } from "./providers/pkcs11.js";
-import { popBytes, prepareProviderPurposeRotation, prepareArtifactBlobPurposeRotation, assertProviderPurposeRotationCurrent, anchorProviderPurposeRotation } from "./purposeKeys.js";
+import { popBytes, prepareProviderPurposeRotation, prepareArtifactBlobPurposeRotation, prepareReceiptPurposeRotation, assertProviderPurposeRotationCurrent, anchorProviderPurposeRotation } from "./purposeKeys.js";
 import type { RotationReason } from "./rotationStatement.js";
 import { keyRevocationLocation } from "./keyRevocations.js";
 import { encodeSignedRevocationList, readAnchoredRevocationList, readStagedRevocationList } from "./revocationList.js";
@@ -39,6 +39,7 @@ import { revocationListSigningBytes, signRevocationListWithProvider, type Revoca
 import { assertKeyUsableNow, assertLocal, assertSigningKeyUsable, DELEGATION_REL, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, readHistory } from "./signingKeys.js";
 import { logHistoryRevisions, preflightHistoryLog } from "./anchors.js";
 import { captureArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } from "./artifactBlobAnchors.js";
+import { captureReceiptOwnerBoundary, type ReceiptOwnerBoundary } from "./receiptOwnerAnchors.js";
 import { captureDelegationScope, publishDelegationBoundary } from "./delegationBoundary.js";
 import { readOperationalDelegationState, delegationArchiveRel, delegationIssuerRel } from "./operationalDelegationState.js";
 
@@ -201,7 +202,8 @@ export interface BindResult extends ProviderBinding {
 
 type ProviderOwnerOptions = NonNullable<Parameters<typeof bindPurposeProviderKey>[2]>;
 /** Shared existing authority preparation; no writes or publication lock is retained across its awaits. */
-async function prepareProviderOwnerPlan(workspace: string, local: LocalPurpose, opts: ProviderOwnerOptions, artifactBoundary?: ArtifactBlobAnchorBoundary) {
+async function prepareProviderOwnerPlan(workspace: string, local: LocalPurpose, opts: ProviderOwnerOptions, artifactBoundary?: ArtifactBlobAnchorBoundary, receiptBoundary?: ReceiptOwnerBoundary) {
+  if (receiptBoundary !== undefined && (local !== "receipt" || artifactBoundary !== undefined)) throw new Error("receipt owner boundary is purpose-specific");
   const passphrase = opts.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!passphrase) throw new Error("Binding a provider key requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   const payload = unlockedPayloadForKeyChange(workspace, passphrase);
@@ -255,7 +257,8 @@ async function prepareProviderOwnerPlan(workspace: string, local: LocalPurpose, 
     assertKeyUsableNow(workspace, local, signingKeyId(previousPublicKeyPem)!, "file");
   }
   const rotationInput = { workspace, previousPublicKeyPem, previous: previousHolder, next: { provider, description }, reason: opts.reason, overlapDays: opts.overlapDays, now };
-  const rotation = artifactBoundary === undefined ? await prepareProviderPurposeRotation({ ...rotationInput, purpose: local })
+  const rotation = receiptBoundary !== undefined ? await prepareReceiptPurposeRotation(rotationInput, receiptBoundary)
+    : artifactBoundary === undefined ? await prepareProviderPurposeRotation({ ...rotationInput, purpose: local })
     : await prepareArtifactBlobPurposeRotation(rotationInput, artifactBoundary);
   const rotationWrites = rotation === null ? [] : [{ path: rotation.path, bytes: rotation.bytes, mode: 0o644 }];
   const rotationDigests = rotation === null ? [] : [rotation.sha256];
@@ -283,7 +286,8 @@ async function prepareProviderOwnerPlan(workspace: string, local: LocalPurpose, 
       if (boundProviderKey(workspace, local) !== null) throw new Error("the purpose became provider-held while signing");
       assertKeyUsableNow(workspace, local, signingKeyId(previousPublicKeyPem)!, "file");
     }
-    if (artifactBoundary !== undefined) artifactBoundary.assertPreparedCurrent(); else if (rotation) preflightHistoryLog(workspace);
+    if (receiptBoundary !== undefined) receiptBoundary.assertPreparedCurrent();
+    else if (artifactBoundary !== undefined) artifactBoundary.assertPreparedCurrent(); else if (rotation) preflightHistoryLog(workspace);
   };
   return { passphrase, payload, keyset, current, oldProvider, previousPublicKeyPem, locked, provider, ref, description, now,
     rotation, rotationWrites, rotationDigests, binding, recheck };
@@ -323,6 +327,35 @@ export async function prepareArtifactBlobOwnerPlan(workspace: string, opts: Prov
       markWrittenHistories(workspace, historyWrites);
       await boundary.complete({ ...committed, rotation: plan.rotation, historyWrites });
     } };
+}
+
+/** Internal receipt-token owner plan consumed by the actual SQL authority publisher; normal binder stays disabled. */
+export async function prepareReceiptAuthorityOwnerPlan(workspace: string, opts: ProviderOwnerOptions = {}) {
+  if (opts.reason === "key-compromise") throw new Error("provider key-compromise rotation requires independent pinned-root handling");
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("receipt authority is unavailable in no-sign mode");
+  assertOwnerMode(workspace, "keys rotate");
+  const passphrase = opts.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
+  if (!passphrase) throw new Error("receipt authority requires the vault passphrase");
+  const payload = unlockedPayloadForKeyChange(workspace, passphrase), privateKeyPem = payload.keys.receipt!.privateKeyPem;
+  const anchor = publicKeyFromPrivate(privateKeyPem), prior = readHistory(workspace, "receipt", anchor);
+  const original = readContainedOrNull(workspace, ".amc/keys/receipt_history.json", 1024 * 1024);
+  if (getSigningPublicKeyPem(workspace, "receipt") !== anchor || prior === null || original === null || canonicalize(JSON.parse(original.toString("utf8"))) !== canonicalize(prior)) throw new Error("receipt exact history is not authenticated");
+  assertKeyUsableNow(workspace, "receipt", signingKeyId(anchor)!, "file");
+  const boundary = captureReceiptOwnerBoundary(workspace);
+  const plan = await prepareProviderOwnerPlan(workspace, "receipt", opts, undefined, boundary);
+  let entries = prior.entries;
+  for (const pem of [plan.previousPublicKeyPem, plan.description.publicKeyPem]) if (!entries.some(entry => entry.publicKeyPem === pem)) entries = [...entries, buildKeyHistoryEntry(pem, entries, "imported")];
+  const envelope = sealKeyHistory("receipt", entries, privateKeyPem, prior.revision + 1);
+  const historyWrites = [{ path: purposeKeyPaths(workspace, "receipt").historyFile, bytes: JSON.stringify(envelope, null, 2), mode: 0o600 }];
+  const recheck = () => {
+    plan.recheck(); const current = readContainedOrNull(workspace, ".amc/keys/receipt_history.json", 1024 * 1024);
+    if (current === null || !current.equals(original) || canonicalize(readHistory(workspace, "receipt", anchor)) !== canonicalize(prior)) throw new Error("receipt history changed while signing");
+    assertKeyUsableNow(workspace, "receipt", signingKeyId(anchor)!, "file");
+  };
+  return { keyset: plan.keyset, binding: plan.binding, provider: plan.provider, description: plan.description, now: plan.now,
+    rotationWrites: plan.rotationWrites, rotationDigests: plan.rotationDigests, historyWrites, recheck, locked: plan.locked,
+    withAnchorBoundary: <T>(operation: () => T): T => boundary.withAnchorBoundary(operation),
+    anchor: async (committed: { generation: number; keyset: Keyset }) => { markWrittenHistories(workspace, historyWrites); await boundary.complete({ ...committed, rotation: plan.rotation, historyWrites }); } };
 }
 
 /**
