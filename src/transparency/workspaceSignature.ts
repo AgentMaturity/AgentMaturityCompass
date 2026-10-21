@@ -36,16 +36,28 @@ function notaryKeys(workspace: string, kind: WorkspaceLogKind): string[] {
  * Local workspace-log integrity, not independent anchoring or historical policy-at-signing.
  * Only actual log readers supply the hardcoded kind. No arbitrary-key override, signing, initialization, or repair.
  */
-export function verifyWorkspaceLogSignature(workspace: string, kind: WorkspaceLogKind, digestHex: string,
-  signed: { signature: string; envelope?: unknown }): boolean {
+function verifyLogSignature(workspace: string, kind: WorkspaceLogKind, digestHex: string,
+  signed: { signature: string; envelope?: unknown }, ordinary: () => string[]): boolean {
   try {
     assertKeysetComplete(workspace);
     if (signed.envelope !== undefined) {
       const envelope = signatureEnvelopeSchema.parse(signed.envelope);
       if (envelope.sigB64 !== signed.signature) return false;
-      const keys = envelope.signer.type === "NOTARY" ? notaryKeys(workspace, kind) : ordinaryKeys(workspace);
+      const keys = envelope.signer.type === "NOTARY" ? notaryKeys(workspace, kind) : ordinary();
       return verifySignatureEnvelope(digestHex, envelope, { trustedPublicKeys: keys, requireTrustedKey: true });
     }
-    return verifyHexDigestAny(digestHex, signed.signature, ordinaryKeys(workspace));
+    return verifyHexDigestAny(digestHex, signed.signature, ordinary());
   } catch { return false; }
+}
+
+/** Existing local historical admission. Its compatibility boundary is unchanged. */
+export function verifyWorkspaceLogSignature(workspace: string, kind: WorkspaceLogKind, digestHex: string,
+  signed: { signature: string; envelope?: unknown }): boolean {
+  return verifyLogSignature(workspace, kind, digestHex, signed, () => ordinaryKeys(workspace));
+}
+
+/** Internal first-binding check: role-only imports cannot survive the committed artifact binding. No key override. */
+export function verifyArtifactBindingLogSignature(workspace: string, kind: WorkspaceLogKind, digestHex: string,
+  signed: { signature: string; envelope?: unknown }): boolean {
+  return verifyLogSignature(workspace, kind, digestHex, signed, () => getPurposeKeyHistory(workspace, "artifact-seal"));
 }

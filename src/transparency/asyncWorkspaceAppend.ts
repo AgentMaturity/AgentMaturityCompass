@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicyAsync,
   type PolicySignerDescriptor } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
-import { verifyWorkspaceLogSignature, type WorkspaceLogKind } from "./workspaceSignature.js";
+import { verifyArtifactBindingLogSignature, verifyWorkspaceLogSignature, type WorkspaceLogKind } from "./workspaceSignature.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { boundProviderKey } from "../keys/keyset.js";
 import type { KeyProviderId } from "../keys/provider.js";
@@ -26,20 +26,20 @@ export interface TransparencyAppendInput {
   artifact: { kind: TransparencyArtifactKind; sha256: string; id?: string };
 }
 
-function readSignedSnapshot<T>(workspace: string, state: TransparencyState, body: string, sidecar: string, schema: z.ZodType<T>, kind: WorkspaceLogKind): T | null {
+function readSignedSnapshot<T>(workspace: string, state: TransparencyState, body: string, sidecar: string, schema: z.ZodType<T>, kind: WorkspaceLogKind, admission: "ordinary" | "artifact-binding"): T | null {
   const bytes = stateBytes(state, body), signature = stateBytes(state, sidecar);
   if (bytes === null && signature === null) return null;
   if (bytes === null || signature === null) throw new Error("transparency signed predecessor is incomplete");
   const row = schema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
   const sig = rootSignatureSchema.parse(JSON.parse(signature.toString("utf8")) as unknown), digest = sha256Hex(bytes);
-  if (sig.digestSha256 !== digest || !verifyWorkspaceLogSignature(workspace, kind, digest, sig)) {
+  if (sig.digestSha256 !== digest || !(admission === "artifact-binding" ? verifyArtifactBindingLogSignature : verifyWorkspaceLogSignature)(workspace, kind, digest, sig)) {
     throw new Error("transparency signed predecessor is invalid");
   }
   return row;
 }
 
 /** Reads/validates only the captured bytes. It neither initializes nor repairs authenticated state. */
-function verifiedPredecessor(workspace: string, state: TransparencyState): { entries: TransparencyEntry[]; algorithm: MerkleAlgorithm } {
+function verifiedPredecessor(workspace: string, state: TransparencyState, admission: "ordinary" | "artifact-binding" = "ordinary") {
   const entries = (stateBytes(state, workspaceLogPath(workspace))?.toString("utf8") ?? "").split(/\r?\n/)
     .map(line => line.trim()).filter(Boolean).map(line => transparencyEntrySchema.parse(JSON.parse(line) as unknown));
   let tail = "";
@@ -48,16 +48,16 @@ function verifiedPredecessor(workspace: string, state: TransparencyState): { ent
     if (entry.prev !== tail || sha256Hex(canonicalize(payload)) !== hash) throw new Error("transparency predecessor chain is invalid");
     tail = hash;
   }
-  const seal = readSignedSnapshot(workspace, state, workspaceSealPath(workspace), workspaceSealSigPath(workspace), transparencySealSchema, "TRANSPARENCY_ROOT");
+  const seal = readSignedSnapshot(workspace, state, workspaceSealPath(workspace), workspaceSealSigPath(workspace), transparencySealSchema, "TRANSPARENCY_ROOT", admission);
   if ((seal === null && entries.length > 0) || (seal !== null && seal.lastHash !== tail)) throw new Error("transparency predecessor seal does not cover the log");
-  const root = readSignedSnapshot(workspace, state, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "MERKLE_ROOT");
+  const root = readSignedSnapshot(workspace, state, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "MERKLE_ROOT", admission);
   if (root === null && entries.length > 0) throw new Error("transparency predecessor root is missing; repair the index first");
   const hashes = entries.map(entry => entry.hash);
   if (root !== null && (root.leafCount > hashes.length || (hashes[root.leafCount - 1] ?? "") !== root.lastEntryHash
     || entryTreeRoot(root.algorithm ?? "amc-legacy-v1", hashes.slice(0, root.leafCount)) !== root.root)) {
     throw new Error("transparency predecessor root does not cover its claimed prefix");
   }
-  const migration = readSignedSnapshot(workspace, state, merkleMigrationPath(workspace), merkleMigrationSigPath(workspace), merkleMigrationSchema, "MERKLE_ROOT");
+  const migration = readSignedSnapshot(workspace, state, merkleMigrationPath(workspace), merkleMigrationSigPath(workspace), merkleMigrationSchema, "MERKLE_ROOT", admission);
   if (migration !== null) {
     const prefix = hashes.slice(0, migration.leafCount);
     if (migration.leafCount > hashes.length || (prefix.at(-1) ?? "") !== migration.lastEntryHash
@@ -67,8 +67,16 @@ function verifiedPredecessor(workspace: string, state: TransparencyState): { ent
   }
   const legacy = root !== null && (root.algorithm ?? "amc-legacy-v1") === "amc-legacy-v1";
   if (legacy && (migration !== null || seal?.merkleAlgorithm === "rfc9162-sha256")) throw new Error("transparency predecessor attempts a tree downgrade");
-  return { entries, algorithm: legacy && migration === null && seal !== null && (seal.merkleAlgorithm ?? "amc-legacy-v1") === "amc-legacy-v1"
-    ? "amc-legacy-v1" : "rfc9162-sha256" };
+  return { entries, signedRootLeafCount: root?.leafCount ?? 0, algorithm: (legacy && migration === null && seal !== null && (seal.merkleAlgorithm ?? "amc-legacy-v1") === "amc-legacy-v1"
+    ? "amc-legacy-v1" : "rfc9162-sha256") as MerkleAlgorithm };
+}
+
+/** Fixed internal owner preflight/recovery; captured bytes only, no init, signing or arbitrary trust parameter. */
+export function captureArtifactBindingPredecessor(workspace: string) {
+  const state = captureTransparencyState(workspace, true);
+  const verified = verifiedPredecessor(workspace, state, "artifact-binding");
+  assertTransparencyStateCurrent(state);
+  return { state, ...verified };
 }
 
 function captureSigner(workspace: string, descriptor: PolicySignerDescriptor) {

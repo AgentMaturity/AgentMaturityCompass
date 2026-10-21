@@ -37,7 +37,7 @@ import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readH
  * revocation list and rotation statements. Anything else (`..`, an absolute path, a separator or NUL inside a name, a
  * look-alike Unicode slash) never reaches a filesystem call; the rest is contained by src/utils/containedFs.ts.
  */
-const KEYSET_FILE = /^(?:amc\.config\.yaml(?:\.sig)?|vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json|delegations\/(?:ledger-row|[0-9a-f]{64})\.json|delegation-issuers\/[0-9a-f]{64}\.pub))$/;
+const KEYSET_FILE = /^(?:amc\.config\.yaml(?:\.sig)?|vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json|delegations\/(?:ledger-row|[0-9a-f]{64})\.json|delegation-issuers\/[0-9a-f]{64}\.pub|blob-index-authorities\/(?:current|[0-9a-f]{64})\.json|blob-index-issuers\/[0-9a-f]{64}\.pub|blob-index-child\.amcvault))$/;
 const relSchema = z.string().regex(KEYSET_FILE, "not a key-set file");
 const hex = z.string().regex(/^[0-9a-f]{64}$/);
 /** P2-08: a provider-held key bound to a purpose; its public key is `keys/<purpose>-provider.pub`, pinned in `files`. */
@@ -50,7 +50,8 @@ const providerBindingSchema = z.strictObject({
   algorithm: z.enum(SIGNING_ALGORITHMS),
   protection: z.enum(["software", "hsm", "external", "unknown"]),
   protectionBasis: z.enum(["provider-metadata", "configured"]),
-  delegationSha256: hex.optional()
+  delegationSha256: hex.optional(),
+  blobIndexAuthoritySha256: hex.optional()
 });
 export type ProviderBinding = z.infer<typeof providerBindingSchema>;
 const keysetSchema = z.strictObject({
@@ -61,6 +62,10 @@ const keysetSchema = z.strictObject({
   files: z.record(relSchema, hex),
   statements: z.array(hex),
   providers: z.partialRecord(z.enum(LOCAL_PURPOSES), providerBindingSchema).optional()
+}).superRefine((value, ctx) => {
+  for (const [purpose, binding] of Object.entries(value.providers ?? {})) if (purpose !== "artifact-seal" && binding?.blobIndexAuthoritySha256 !== undefined) {
+    ctx.addIssue({ code: "custom", path: ["providers", purpose, "blobIndexAuthoritySha256"], message: "blob-index authority belongs only to artifact-seal" });
+  }
 });
 const manifestSchema = z.strictObject({
   generation: z.number().int().positive().safe(),
@@ -405,6 +410,8 @@ export function assertKeysetComplete(workspace: string, opts: { allowUnboundFile
 /** What readers re-check after the commit: published public keys and rotation statements. */
 function pinned(rel: string, providers?: Keyset["providers"]): boolean {
   return rel.endsWith(".pub") || rel.startsWith("keys/statements/") || rel.startsWith("keys/delegations/")
+    || rel.startsWith("keys/blob-index-authorities/") || rel === "keys/blob-index-child.amcvault"
+    || (providers?.["artifact-seal"] !== undefined && rel === "keys/artifact-seal_history.json")
     || (providers?.session !== undefined && rel === "keys/session_history.json")
     || (providers?.["config-signature"] !== undefined && rel === "keys/config-signature_history.json");
 }

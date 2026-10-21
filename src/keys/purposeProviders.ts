@@ -23,7 +23,7 @@ import type { LocalPurpose } from "../vault/vaultPayload.js";
 import type { KeyPurpose } from "../trust/keyPurposes.js";
 import { signingKeyId, verifyWithKey, type SigningAlgorithm } from "./algorithmPolicy.js";
 import { encodeDelegation, issueDelegation, MAX_DELEGATION_HOURS } from "./delegation.js";
-import { assertKeysetComplete, boundProviderKey, commitKeyset, keysetIdentity, type ProviderBinding } from "./keyset.js";
+import { assertKeysetComplete, boundProviderKey, commitKeyset, keysetIdentity, type ProviderBinding, type Keyset } from "./keyset.js";
 import { CONFIG_REL, configuredRef, keyPolicy, loadKeysConfig, parseKeysSection, type KeysConfig } from "./keysConfig.js";
 import { attempt, checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider, type KeyProviderId, type KeyRef } from "./provider.js";
 import { awsKmsProvider } from "./providers/awsKms.js";
@@ -31,20 +31,21 @@ import { azureKeyVaultProvider } from "./providers/azureKeyVault.js";
 import { fileKeyProvider } from "./providers/file.js";
 import { gcpKmsProvider } from "./providers/gcpKms.js";
 import { pkcs11Provider } from "./providers/pkcs11.js";
-import { popBytes, prepareProviderPurposeRotation, assertProviderPurposeRotationCurrent, anchorProviderPurposeRotation } from "./purposeKeys.js";
+import { popBytes, prepareProviderPurposeRotation, prepareArtifactBlobPurposeRotation, assertProviderPurposeRotationCurrent, anchorProviderPurposeRotation } from "./purposeKeys.js";
 import type { RotationReason } from "./rotationStatement.js";
 import { keyRevocationLocation } from "./keyRevocations.js";
 import { encodeSignedRevocationList, readAnchoredRevocationList, readStagedRevocationList } from "./revocationList.js";
 import { revocationListSigningBytes, signRevocationListWithProvider, type RevocationListV1, type SignedRevocationList } from "./revocationList.js";
 import { assertKeyUsableNow, assertLocal, assertSigningKeyUsable, DELEGATION_REL, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, readHistory } from "./signingKeys.js";
 import { logHistoryRevisions, preflightHistoryLog } from "./anchors.js";
+import { captureArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } from "./artifactBlobAnchors.js";
 import { captureDelegationScope, publishDelegationBoundary } from "./delegationBoundary.js";
 import { readOperationalDelegationState, delegationArchiveRel, delegationIssuerRel } from "./operationalDelegationState.js";
 
 /**
  * Ledger rows use a vault delegate; session runtime uses the async purpose signer. Session history is signed by the
  * unchanged vault session anchor and admits only session issuers. Other purposes retain their current refusal until
- * their actual synchronous callers migrate; in particular the artifact-seal transparency signer is still synchronous.
+ * their actual synchronous callers migrate; artifact-seal still has hot-path consumers outside this scoped blob-index stage.
  */
 const BINDABLE_PURPOSES: readonly LocalPurpose[] = ["ledger-row", "session"];
 
@@ -198,27 +199,9 @@ export interface BindResult extends ProviderBinding {
   delegation: { notBefore: string; notAfter: string; maxEvents: number } | null;
 }
 
-/**
- * `amc keys rotate --purpose <p>` when keys.refs names a provider key (owner mode, vault passphrase): binds that key in a
- * new key-set generation after it proves possession. Session public/history writes commit together. For ledger-row it
- * also signs a fresh delegation for the vault's ledger-row key, valid from `now` for at most 24 hours.
- */
-export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurpose, opts: { passphrase?: string; provider?: KeyProvider; now?: Date;
-  previousProvider?: KeyProvider; reason?: RotationReason; overlapDays?: number; delegation?: { hours?: number; maxEvents?: number } } = {}): Promise<BindResult> {
-  const local = assertLocal(purpose);
-  // No implicit downgrade: proof of possession/delegation is not the pinned-root authority P1-08 requires here.
-  if (opts.reason === "key-compromise") throw new Error("provider key-compromise rotation is not supported yet; pinned-root P1-08 authorization is required");
-  if (process.env.AMC_NO_SIGN === "1") throw new Error("Provider key rotation is unavailable in no-sign mode");
-  // Owner API: narrow the normal 24-hour/1M-row lease for shorter-lived or lower-volume installations.
-  const hours = opts.delegation?.hours ?? MAX_DELEGATION_HOURS;
-  const maxEvents = opts.delegation?.maxEvents ?? LEDGER_DELEGATION_MAX_EVENTS;
-  if (!Number.isFinite(hours) || hours <= 0 || hours > MAX_DELEGATION_HOURS
-    || !Number.isSafeInteger(maxEvents) || maxEvents <= 0 || maxEvents > LEDGER_DELEGATION_MAX_EVENTS) throw new Error("delegation needs 0 < hours <= 24 and 0 < maxEvents <= 1000000");
-  assertOwnerMode(workspace, "keys rotate");
-  if (!BINDABLE_PURPOSES.includes(local)) {
-    throw new Error(`a provider key cannot be bound to ${local} yet: its synchronous signers still need a vault key (only ${BINDABLE_PURPOSES.join(", ")} can be bound). `
-      + `Remove keys.refs.${local} to sign it with the vault again; while it is set, ${local} signing refuses.`);
-  }
+type ProviderOwnerOptions = NonNullable<Parameters<typeof bindPurposeProviderKey>[2]>;
+/** Shared existing authority preparation; no writes or publication lock is retained across its awaits. */
+async function prepareProviderOwnerPlan(workspace: string, local: LocalPurpose, opts: ProviderOwnerOptions, artifactBoundary?: ArtifactBlobAnchorBoundary) {
   const passphrase = opts.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!passphrase) throw new Error("Binding a provider key requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   const payload = unlockedPayloadForKeyChange(workspace, passphrase);
@@ -271,8 +254,9 @@ export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurp
   } else if (oldProvider === null) {
     assertKeyUsableNow(workspace, local, signingKeyId(previousPublicKeyPem)!, "file");
   }
-  const rotation = await prepareProviderPurposeRotation({ workspace, purpose: local, previousPublicKeyPem, previous: previousHolder,
-    next: { provider, description }, reason: opts.reason, overlapDays: opts.overlapDays, now });
+  const rotationInput = { workspace, previousPublicKeyPem, previous: previousHolder, next: { provider, description }, reason: opts.reason, overlapDays: opts.overlapDays, now };
+  const rotation = artifactBoundary === undefined ? await prepareProviderPurposeRotation({ ...rotationInput, purpose: local })
+    : await prepareArtifactBlobPurposeRotation(rotationInput, artifactBoundary);
   const rotationWrites = rotation === null ? [] : [{ path: rotation.path, bytes: rotation.bytes, mode: 0o644 }];
   const rotationDigests = rotation === null ? [] : [rotation.sha256];
   const binding: ProviderBinding = { provider: ref.provider, id: ref.id, ...(ref.version === undefined ? {} : { version: ref.version }), keyId: description.keyId,
@@ -299,8 +283,71 @@ export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurp
       if (boundProviderKey(workspace, local) !== null) throw new Error("the purpose became provider-held while signing");
       assertKeyUsableNow(workspace, local, signingKeyId(previousPublicKeyPem)!, "file");
     }
-    if (rotation) preflightHistoryLog(workspace);
+    if (artifactBoundary !== undefined) artifactBoundary.assertPreparedCurrent(); else if (rotation) preflightHistoryLog(workspace);
   };
+  return { passphrase, payload, keyset, current, oldProvider, previousPublicKeyPem, locked, provider, ref, description, now,
+    rotation, rotationWrites, rotationDigests, binding, recheck };
+}
+
+/** Internal exact artifact/blob owner plan. Normal binding remains disabled; no private payload or general-purpose override escapes. */
+export async function prepareArtifactBlobOwnerPlan(workspace: string, opts: ProviderOwnerOptions = {}) {
+  if (opts.reason === "key-compromise") throw new Error("provider key-compromise rotation is not supported yet; pinned-root P1-08 authorization is required");
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Provider key rotation is unavailable in no-sign mode");
+  assertOwnerMode(workspace, "keys rotate");
+  const passphrase = opts.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
+  if (!passphrase) throw new Error("Binding a provider key requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
+  const payload = unlockedPayloadForKeyChange(workspace, passphrase), privateKeyPem = payload.keys["artifact-seal"]!.privateKeyPem;
+  const anchor = publicKeyFromPrivate(privateKeyPem), historyPath = purposeKeyPaths(workspace, "artifact-seal").historyFile;
+  if (getSigningPublicKeyPem(workspace, "artifact-seal") !== anchor) throw new Error("the unlocked vault artifact key differs from its committed public key");
+  const prior = readHistory(workspace, "artifact-seal", anchor), historyBytes = readContainedOrNull(workspace, ".amc/keys/artifact-seal_history.json", 1024 * 1024);
+  if (prior === null || historyBytes === null || canonicalize(JSON.parse(historyBytes.toString("utf8"))) !== canonicalize(prior)) throw new Error("artifact key history is not authenticated; explicitly migrate reviewed history before binding");
+  assertKeyUsableNow(workspace, "artifact-seal", signingKeyId(anchor)!, "file");
+  const boundary = captureArtifactBlobAnchorBoundary(workspace); // fixed strict preflight before any candidate/previous provider await
+  const plan = await prepareProviderOwnerPlan(workspace, "artifact-seal", opts, boundary);
+  let entries = prior.entries;
+  for (const pem of [plan.previousPublicKeyPem, plan.description.publicKeyPem]) if (!entries.some(entry => entry.publicKeyPem === pem)) {
+    entries = [...entries, buildKeyHistoryEntry(pem, entries, "imported")];
+  }
+  const envelope = sealKeyHistory("artifact-seal", entries, privateKeyPem, prior.revision + 1);
+  const historyWrites = [{ path: historyPath, bytes: JSON.stringify(envelope, null, 2), mode: 0o600 }];
+  const recheck = () => {
+    plan.recheck();
+    const currentBytes = readContainedOrNull(workspace, ".amc/keys/artifact-seal_history.json", 1024 * 1024), current = readHistory(workspace, "artifact-seal", anchor);
+    if (currentBytes === null || !currentBytes.equals(historyBytes) || current === null || canonicalize(current) !== canonicalize(prior)) throw new Error("artifact key history changed while owner signing was prepared; retry");
+    assertKeyUsableNow(workspace, "artifact-seal", signingKeyId(anchor)!, "file");
+  };
+  return { keyset: plan.keyset, binding: plan.binding, provider: plan.provider, description: plan.description,
+    now: plan.now, rotationWrites: plan.rotationWrites, rotationDigests: plan.rotationDigests, historyWrites,
+    recheck, locked: plan.locked, withAnchorBoundary: <T>(operation: () => T): T => boundary.withAnchorBoundary(operation),
+    anchor: async (committed: { generation: number; keyset: Keyset }) => {
+      markWrittenHistories(workspace, historyWrites);
+      await boundary.complete({ ...committed, rotation: plan.rotation, historyWrites });
+    } };
+}
+
+/**
+ * `amc keys rotate --purpose <p>` when keys.refs names a provider key (owner mode, vault passphrase): binds that key in a
+ * new key-set generation after it proves possession. Session public/history writes commit together. For ledger-row it
+ * also signs a fresh delegation for the vault's ledger-row key, valid from `now` for at most 24 hours.
+ */
+export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurpose, opts: { passphrase?: string; provider?: KeyProvider; now?: Date;
+  previousProvider?: KeyProvider; reason?: RotationReason; overlapDays?: number; delegation?: { hours?: number; maxEvents?: number } } = {}): Promise<BindResult> {
+  const local = assertLocal(purpose);
+  // No implicit downgrade: proof of possession/delegation is not the pinned-root authority P1-08 requires here.
+  if (opts.reason === "key-compromise") throw new Error("provider key-compromise rotation is not supported yet; pinned-root P1-08 authorization is required");
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Provider key rotation is unavailable in no-sign mode");
+  // Owner API: narrow the normal 24-hour/1M-row lease for shorter-lived or lower-volume installations.
+  const hours = opts.delegation?.hours ?? MAX_DELEGATION_HOURS;
+  const maxEvents = opts.delegation?.maxEvents ?? LEDGER_DELEGATION_MAX_EVENTS;
+  if (!Number.isFinite(hours) || hours <= 0 || hours > MAX_DELEGATION_HOURS
+    || !Number.isSafeInteger(maxEvents) || maxEvents <= 0 || maxEvents > LEDGER_DELEGATION_MAX_EVENTS) throw new Error("delegation needs 0 < hours <= 24 and 0 < maxEvents <= 1000000");
+  assertOwnerMode(workspace, "keys rotate");
+  if (!BINDABLE_PURPOSES.includes(local)) {
+    throw new Error(`a provider key cannot be bound to ${local} yet: its synchronous signers still need a vault key (only ${BINDABLE_PURPOSES.join(", ")} can be bound). `
+      + `Remove keys.refs.${local} to sign it with the vault again; while it is set, ${local} signing refuses.`);
+  }
+  const { payload, keyset, current, oldProvider, locked, provider, ref, description, now, rotation, rotationWrites, rotationDigests, binding, recheck }
+    = await prepareProviderOwnerPlan(workspace, local, opts);
   if (local === "session") {
     const privateKeyPem = payload.keys.session!.privateKeyPem;
     const anchor = publicKeyFromPrivate(privateKeyPem);

@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from "node:crypto";
+import { generateKeyPairSync, type KeyObject } from "node:crypto";
 import { chmodSync, readFileSync, rmSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic, readUtf8 } from "../utils/fs.js";
@@ -11,7 +11,8 @@ import { assertKeysetComplete, boundKeyset, commitKeyset, keepPreviousVault, key
 import { logHistoryRevisions, machineMark, preflightHistoryLog } from "../keys/anchors.js";
 import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
-import { containedExists } from "../utils/containedFs.js";
+import { containedExists, readContainedOrNull } from "../utils/containedFs.js";
+import { BLOB_AUTHORITY_CURRENT, BLOB_CHILD_FILE, blobAuthorityDigest, blobChildEnvelopeSchema, openBlobChild, parseBlobIndexAuthority } from "../keys/blobIndexAuthority.js";
 import { canonicalize } from "../utils/json.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
@@ -42,6 +43,7 @@ interface VaultSession {
 }
 
 const sessions = new Map<string, VaultSession>();
+const blobChildren = new Map<string, { stamp: string; key: KeyObject }>();
 // Verification can read encrypted evidence without granting ordinary vault
 // access. Cache only authenticated secrets here, never signing-key payloads.
 const readOnlySecrets = new Map<string, {
@@ -62,6 +64,7 @@ function evictStaleSessions(): void {
       session.unlocked = false;
       session.envelopeDigest = null;
       sessions.delete(key);
+      blobChildren.delete(key);
     }
   }
   for (const [key, cached] of readOnlySecrets) {
@@ -469,6 +472,7 @@ function openVaultSession(workspace: string, phrase: string): void {
 }
 
 export function lockVault(workspace: string): void {
+  blobChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
   session.unlocked = false;
@@ -729,4 +733,25 @@ export function getVaultSecretReadOnly(workspace: string, secretKey: string): st
     readOnlySecrets.delete(workspace);
     throw new Error("Read-only vault access failed: missing passphrase or vault, incorrect passphrase, or corrupted vault.");
   }
+}
+
+
+/** Internal fixed blob-index child only; never an arbitrary secret/path opener or a flat purpose-history key. */
+export function getBlobIndexChildKey(workspace: string): KeyObject {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("blob authority is unavailable in no-sign mode");
+  const keyset = assertKeysetComplete(workspace), payload = requireUnlockedPayload(workspace), session = sessionFor(workspace);
+  if (keyset === null || LOCAL_PURPOSES.some(purpose => keyset.keys[purpose] !== payload.keys[purpose]?.keyId)) throw new Error("blob child vault keys differ from the committed key set");
+  const binding = keyset.providers?.["artifact-seal"], expected = binding?.blobIndexAuthoritySha256;
+  const certificate = readContainedOrNull(workspace, BLOB_AUTHORITY_CURRENT, 64 * 1024), sealed = readContainedOrNull(workspace, BLOB_CHILD_FILE, 64 * 1024);
+  if (expected === undefined || certificate === null || sealed === null || sha256Hex(certificate) !== expected
+    || keyset.files["keys/blob-index-child.amcvault"] !== sha256Hex(sealed)) throw new Error("blob child is not the committed operation authority");
+  const signed = parseBlobIndexAuthority(certificate);
+  if (blobAuthorityDigest(signed) !== expected || !session.passphrase) throw new Error("blob child authority is unavailable");
+  const stamp = `${session.envelopeDigest}:${expected}:${sha256Hex(sealed)}`, cached = blobChildren.get(workspace);
+  if (cached?.stamp === stamp) return cached.key;
+  try {
+    const envelope = blobChildEnvelopeSchema.parse(JSON.parse(sealed.toString("utf8")));
+    const key = openBlobChild(decryptVaultPayload(envelope, session.passphrase), signed);
+    blobChildren.set(workspace, { stamp, key }); return key;
+  } catch { blobChildren.delete(workspace); throw new Error("sealed blob child cannot be opened for its committed authority"); }
 }

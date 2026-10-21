@@ -42,6 +42,7 @@ import {
   assertKeysetComplete, assertNoPendingKeyset, boundKeyset, boundProviderKey, commitKeyset, keysetAnchoring, keysetDeclared, keysetFileRel, keysetIdentity, keysetPaths,
   keysetRecoveryDir, resumeKeyset, type Keyset, type KeysetWrite
 } from "./keyset.js";
+import { assertArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } from "./artifactBlobAnchors.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
@@ -62,14 +63,15 @@ export interface ProviderPurposeRotationPlan {
   predecessorSha256: string | null; bytes: Buffer; sha256: string; path: string;
 }
 
-/** Remote holders are awaited here, before any synchronous publication lock/SQL transaction is entered. */
-export async function prepareProviderPurposeRotation(input: {
+export interface ProviderPurposeRotationInput {
   workspace: string; purpose: LocalPurpose; previousPublicKeyPem: string;
   previous: { privateKeyPem: string } | { provider: KeyProvider; description: import("./provider.js").KeyDescription };
   next: { provider: KeyProvider; description: import("./provider.js").KeyDescription };
   reason?: RotationReason; overlapDays?: number; now: Date;
-}): Promise<ProviderPurposeRotationPlan | null> {
-  const { workspace, purpose, now } = input;
+}
+
+/** Validation order and same-key behavior are shared with the existing normal owner route. */
+function providerRotationIdentity(input: ProviderPurposeRotationInput) {
   const previousKeyId = signingKeyId(input.previousPublicKeyPem), nextKeyId = input.next.description.keyId;
   if (!previousKeyId) throw new Error("the current purpose issuer is not a supported signing key");
   // The current CLI refuses every provider reason/root flag. Preserve compromise refusal at the owner API too.
@@ -81,7 +83,14 @@ export async function prepareProviderPurposeRotation(input: {
     if (input.reason !== undefined || input.overlapDays !== undefined) throw new Error("a same-key provider renewal does not rotate a purpose key");
     return null;
   }
-  preflightHistoryLog(workspace);
+  return { previousKeyId, nextKeyId, overlapDays };
+}
+
+/** Exact existing P1-08 crypto body, consumed only after one of the two fixed preflight paths. */
+async function signProviderPurposeRotation(input: ProviderPurposeRotationInput,
+  identity: NonNullable<ReturnType<typeof providerRotationIdentity>>): Promise<ProviderPurposeRotationPlan> {
+  const { workspace, purpose, now } = input;
+  const { previousKeyId, nextKeyId, overlapDays } = identity;
   const head = chainHead(workspace, purpose);
   if (head && head.statement.nextKeyId !== previousKeyId) throw new Error("the P1-08 rotation predecessor does not end at the current effective purpose issuer; refusing an implicit history repair");
   const shared = LOCAL_PURPOSES.some(other => other !== purpose &&
@@ -101,6 +110,23 @@ export async function prepareProviderPurposeRotation(input: {
   if (!verdict.valid) throw new Error(`provider purpose rotation statement does not verify: ${verdict.reason}`);
   return { purpose, previousKeyId, nextKeyId, reason, predecessorSha256: head ? rotationStatementSha256(head) : null,
     bytes, sha256: sha256Hex(bytes), path: join(statementDir(workspace, purpose), `${statement.sequence}.json`) };
+}
+
+/** Remote holders are awaited before synchronous publication locks/SQL. Normal preflight stays unchanged. */
+export async function prepareProviderPurposeRotation(input: ProviderPurposeRotationInput): Promise<ProviderPurposeRotationPlan | null> {
+  const identity = providerRotationIdentity(input);
+  if (identity === null) return null;
+  preflightHistoryLog(input.workspace);
+  return signProviderPurposeRotation(input, identity);
+}
+
+/** Internal artifact/blob seam only. A real captured boundary is required; no skip flag or arbitrary purpose. */
+export async function prepareArtifactBlobPurposeRotation(input: Omit<ProviderPurposeRotationInput, "purpose">,
+  boundary: ArtifactBlobAnchorBoundary): Promise<ProviderPurposeRotationPlan | null> {
+  const fixed = { ...input, purpose: "artifact-seal" as const };
+  assertArtifactBlobAnchorBoundary(fixed.workspace, boundary, fixed.previousPublicKeyPem);
+  const identity = providerRotationIdentity(fixed);
+  return identity === null ? null : signProviderPurposeRotation(fixed, identity);
 }
 
 /** Final synchronous recheck. A generation check alone is not permission to extend another statement predecessor. */

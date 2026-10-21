@@ -8,12 +8,13 @@ import { exportPublicKey, listKeys, resumeKeyRotation, revokeKeyAsync, rotatePur
 import { acceptAdoptedKeyset, boundProviderKey, quarantineUnboundPurposeFiles, restoreCommittedKeyset } from "./keyset.js";
 import { configuredRef, loadKeysConfig } from "./keysConfig.js";
 import { bindPurposeProviderKey, exportPurposePublicKey } from "./purposeProviders.js";
-import { vaultEnvelopeKeyIds } from "../vault/vault.js";
+import { unlockVault, vaultEnvelopeKeyIds } from "../vault/vault.js";
 import { ROTATION_REASONS, type RotationReason } from "./rotationStatement.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { promptPassphrase } from "../vault/vaultCli.js";
 import { isLocalPurpose, type LocalPurpose } from "../vault/vaultPayload.js";
 import { transitionConfigSignatureProvider } from "./configProviderTransition.js";
+import { resumeArtifactBlobAnchors } from "./artifactBlobAnchors.js";
 import { CONFIG_REL } from "./keysConfig.js";
 import { join } from "node:path";
 
@@ -49,7 +50,11 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
   }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined || opts.configCandidate !== undefined) throw new Error("--resume takes no other options");
-    return resumeKeyRotation(workspace, process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")));
+    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+    const result = resumeKeyRotation(workspace, passphrase);
+    if (boundProviderKey(workspace, "artifact-seal")?.binding.blobIndexAuthoritySha256 !== undefined) unlockVault(workspace, passphrase);
+    const artifactAnchors = await resumeArtifactBlobAnchors(workspace);
+    return artifactAnchors === null ? result : { ...result, artifactAnchors };
   }
   const purpose = purposeOption(opts.purpose);
   if (opts.configCandidate !== undefined && purpose !== "config-signature") throw new Error("--config-candidate only works with --purpose config-signature");

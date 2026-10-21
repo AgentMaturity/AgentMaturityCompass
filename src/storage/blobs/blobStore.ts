@@ -10,6 +10,12 @@ import { decodeBlobV1, decryptBlobV1, encodeBlobV1, encryptBlobV1 } from "./blob
 import { blobV1Dir, ensureBlobKey, readBlobKeyMaterial, blobsRoot } from "./blobKeys.js";
 import { blobIndexRowSchema, blobIndexSignatureSchema, type BlobIndexRow, type BlobIndexSignature } from "./blobSchema.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
+import { readBlobAuthorityState, snapshotBlobIndex, verifyBlobAuthorityIndex, admitBlobAuthorityIndex, withBlobIndexLock } from "../../keys/blobIndexState.js";
+import { prepareBlobAppend, finishBlobAppend, BlobPublicationIncompleteError } from "./blobIndexPublication.js";
+import { loadTrustContext, type TrustContext } from "../../trust/trustContext.js";
+import { publicKeyFromPrivate } from "../../crypto/keyHistoryEnvelope.js";
+import { assertVaultMaySign, assertSigningKeyUsable } from "../../keys/signingKeys.js";
+import { vaultStatus } from "../../vault/vault.js";
 
 const blobIdRegex = /^blob_[a-z2-7]{26}$/;
 
@@ -56,13 +62,13 @@ function readBlobIndexRows(workspace: string): BlobIndexRow[] {
     .map((line) => blobIndexRowSchema.parse(JSON.parse(line) as unknown));
 }
 
-function writeBlobIndexSig(workspace: string, lastHash: string): void {
+function writeBlobIndexSig(workspace: string, lastHash: string, privateKeyPem: string): void {
   // Sign the chain head, not a whole-file digest. lastHash is a 64-char hex
   // sha256 that commits to the full ordered history through the per-row chain,
   // so this is O(1) per append — the whole-file read that made appends O(n) is
   // gone. lastHash is always a real row hash here (this is only called after a
   // row is appended).
-  const signature = signHexDigest(lastHash, getSigningKey(workspace, "artifact-seal"));
+  const signature = signHexDigest(lastHash, privateKeyPem);
   const payload: BlobIndexSignature = blobIndexSignatureSchema.parse({
     v: 1,
     ts: Date.now(),
@@ -98,7 +104,7 @@ function lastBlobIndexHash(workspace: string): string {
   return blobIndexRowSchema.parse(JSON.parse(lastLine) as unknown).hash;
 }
 
-function appendBlobIndexRow(workspace: string, row: Omit<BlobIndexRow, "v" | "prev" | "hash">): BlobIndexRow {
+function appendBlobIndexRow(workspace: string, row: Omit<BlobIndexRow, "v" | "prev" | "hash">, privateKeyPem: string): BlobIndexRow {
   const prev = lastBlobIndexHash(workspace);
   const hash = sha256Hex(
     canonicalize({
@@ -122,7 +128,7 @@ function appendBlobIndexRow(workspace: string, row: Omit<BlobIndexRow, "v" | "pr
   ensureDir(blobsRoot(workspace));
   const current = pathExists(path) ? readUtf8(path) : "";
   writeFileAtomic(path, `${current}${JSON.stringify(full)}\n`, 0o644);
-  writeBlobIndexSig(workspace, full.hash);
+  writeBlobIndexSig(workspace, full.hash, privateKeyPem);
   return full;
 }
 
@@ -173,8 +179,23 @@ export function storeEncryptedBlob(workspace: string, plaintext: Buffer): {
     );
   }
 
-  const keyMeta = ensureBlobKey(workspace);
+  const prepared = prepareBlobAppend(workspace);
+  const keyMeta = prepared?.metadata.metadata ?? ensureBlobKey(workspace);
   const key = readBlobKeyMaterial(workspace, keyMeta.keyVersion);
+  // Resolve/migrate any ordinary vault key before taking the common local publication lock.
+  const privateKeyPem = prepared === null ? getSigningKey(workspace, "artifact-seal") : null;
+  const unvaulted = prepared === null && process.env.AMC_NO_SIGN === "1" && !vaultStatus(workspace).unlocked;
+  return withBlobIndexLock(workspace, () => {
+  if (prepared === null) {
+    assertVaultMaySign(workspace, "artifact-seal");
+    const unlocked = vaultStatus(workspace).unlocked;
+    if (unvaulted) {
+      if (process.env.AMC_NO_SIGN !== "1" || unlocked) throw new Error("blob signing mode changed before publication; retry");
+    } else {
+      if (!unlocked) throw new Error("the vault was locked before blob publication");
+      assertSigningKeyUsable(workspace, "artifact-seal", publicKeyFromPrivate(privateKeyPem!), "file");
+    }
+  }
   let blobId = nextBlobId();
   while (pathExists(join(blobV1Dir(workspace), `${blobId}.blob`))) {
     blobId = nextBlobId();
@@ -190,17 +211,20 @@ export function storeEncryptedBlob(workspace: string, plaintext: Buffer): {
   });
   const encoded = encodeBlobV1(envelope);
   const fullPath = join(blobV1Dir(workspace), `${blobId}.blob`);
-  writeFileAtomic(fullPath, encoded, 0o600);
   const storedPath = join(".amc", "blobs", `${blobId}.blob`);
-
-  appendBlobIndexRow(workspace, {
-    ts: Date.now(),
-    blobId,
-    keyVersion: keyMeta.keyVersion,
-    path: storedPath,
-    payloadSha256: envelope.payloadSha256,
-    encryptedBytes: encoded.byteLength
-  });
+  const row = () => ({ ts: Date.now(), blobId, keyVersion: keyMeta.keyVersion, path: storedPath,
+    payloadSha256: envelope.payloadSha256, encryptedBytes: encoded.byteLength });
+  if (prepared === null) {
+    writeFileAtomic(fullPath, encoded, 0o600);
+    appendBlobIndexRow(workspace, row(), privateKeyPem!);
+  } else {
+    const final = finishBlobAppend(prepared, row(), key), published: string[] = [];
+    try {
+      writeFileAtomic(fullPath, encoded, 0o600); published.push(storedPath);
+      writeFileAtomic(blobIndexPath(workspace), `${final.indexBytes?.toString("utf8") ?? ""}${JSON.stringify(final.row)}\n`, 0o644); published.push(".amc/blobs/index.jsonl");
+      writeFileAtomic(blobIndexSigPath(workspace), JSON.stringify(final.signature, null, 2), 0o644); published.push(".amc/blobs/index.jsonl.sig");
+    } catch (error) { throw new BlobPublicationIncompleteError(published, error); }
+  }
 
   return {
     blobId,
@@ -209,6 +233,7 @@ export function storeEncryptedBlob(workspace: string, plaintext: Buffer): {
     keyVersion: keyMeta.keyVersion,
     encryptedBytes: encoded.byteLength
   };
+  });
 }
 
 export function loadBlobPlaintext(workspace: string, payloadPath: string): {
@@ -285,7 +310,7 @@ export function listStoredBlobs(workspace: string): Array<{ blobId: string; path
     .sort((a, b) => a.blobId.localeCompare(b.blobId));
 }
 
-export function verifyBlobIndexSignature(workspace: string): {
+export function verifyBlobIndexSignature(workspace: string, trust?: TrustContext): {
   valid: boolean;
   signatureExists: boolean;
   reason: string | null;
@@ -294,6 +319,13 @@ export function verifyBlobIndexSignature(workspace: string): {
 } {
   const path = blobIndexPath(workspace);
   const sigPath = blobIndexSigPath(workspace);
+  try {
+    const state = readBlobAuthorityState(workspace);
+    if (state !== null) {
+      const snapshot = snapshotBlobIndex(workspace); verifyBlobAuthorityIndex(workspace, state, snapshot); admitBlobAuthorityIndex(state, snapshot, trust ?? loadTrustContext());
+      return { valid: true, signatureExists: snapshot.signature !== null, reason: null, path, sigPath };
+    }
+  } catch { return { valid: false, signatureExists: pathExists(sigPath), reason: "blob-index authority verification failed", path, sigPath }; }
   if (!pathExists(path)) {
     return { valid: true, signatureExists: false, reason: null, path, sigPath };
   }
@@ -302,6 +334,7 @@ export function verifyBlobIndexSignature(workspace: string): {
   }
   try {
     const sig = blobIndexSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
+    if (sig.v !== 1) return { valid: false, signatureExists: true, reason: "unbound blob index has a provider sidecar", path, sigPath };
     // The signed chain head must match the index's actual last-row hash. A
     // truncation, an excised row, or an appended forgery all move this head, and
     // the attacker cannot re-sign the new head without the auditor key. The
@@ -324,11 +357,17 @@ export function verifyBlobIndexSignature(workspace: string): {
   }
 }
 
-export function verifyBlobIndexChain(workspace: string): { ok: boolean; errors: string[]; rows: number } {
+export function verifyBlobIndexChain(workspace: string, trust?: TrustContext): { ok: boolean; errors: string[]; rows: number } {
   const errors: string[] = [];
+  try {
+    const state = readBlobAuthorityState(workspace);
+    if (state !== null) { const snapshot = snapshotBlobIndex(workspace); verifyBlobAuthorityIndex(workspace, state, snapshot); admitBlobAuthorityIndex(state, snapshot, trust ?? loadTrustContext());
+      return { ok: true, errors: [], rows: snapshot.rows.length }; }
+  } catch { return { ok: false, errors: ["blob-index authority verification failed"], rows: 0 }; }
   const rows = readBlobIndexRows(workspace);
   let prev = "";
   for (const row of rows) {
+    if (row.v !== 1) errors.push(`unbound blob index has a provider row at ${row.blobId}`);
     if (row.prev !== prev) {
       errors.push(`blob index chain mismatch at ${row.blobId}`);
     }
@@ -349,7 +388,7 @@ export function verifyBlobIndexChain(workspace: string): { ok: boolean; errors: 
     }
     prev = row.hash;
   }
-  const sig = verifyBlobIndexSignature(workspace);
+  const sig = verifyBlobIndexSignature(workspace, trust);
   if (!sig.valid) {
     errors.push(`blob index signature invalid: ${sig.reason ?? "unknown reason"}`);
   }
