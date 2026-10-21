@@ -1,9 +1,7 @@
-import { join } from "node:path";
-import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { listContainedDir, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { workspaceRecordHead } from "../storage/workspaceRecordStore.js";
+import { workspaceRecordHead, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { KeyProviderError } from "../keys/provider.js";
@@ -21,7 +19,7 @@ export function canaryOverrideDigest(o: Pick<EmergencyOverride, "overrideId" | "
 }
 
 export function withCanaryOverridePublicationLock<T>(workspace: string, operation: () => T): T {
-  return withControlFileLock({ root: join(workspace, REL), name: "canary-overrides", operation });
+  return withWorkspaceRecordPublicationLock(workspace, AT, operation);
 }
 
 /** Exact current bytes, not a claim that legacy overwritten record preimages can be independently reconstructed. */

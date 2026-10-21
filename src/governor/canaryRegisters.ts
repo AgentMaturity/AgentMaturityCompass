@@ -13,7 +13,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { BreakGlassSigningError, prepareOverrideDigestSignature, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
-import { canaryOverrideDigest as overrideDigest, publishCanaryOverride, withCanaryOverridePublicationLock } from "./canaryOverridePublication.js";
+import { canaryOverrideDigest as overrideDigest, publishCanaryOverride } from "./canaryOverridePublication.js";
 import { saveWorkspaceRecord, loadWorkspaceRecords } from "../storage/workspaceRecordStore.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // policyCanary.ts, which imports the values from here.
@@ -118,7 +118,7 @@ function isVerified(o: EmergencyOverride, workspace?: string): boolean {
  * override's signature is persisted as `override_signature` and restored on load.
  */
 function persistOverride(workspace: string, o: EmergencyOverride, now: number): void {
-  withCanaryOverridePublicationLock(workspace, () => saveWorkspaceRecord(workspace, OVERRIDES_AT, o.overrideId, { ...o, override_signature: o.signature }, now));
+  saveWorkspaceRecord(workspace, OVERRIDES_AT, o.overrideId, { ...o, override_signature: o.signature }, now);
 }
 
 /**

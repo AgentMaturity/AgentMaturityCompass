@@ -21,12 +21,15 @@
  * records are hash-chained and signed like the governance debt register they
  * are modelled on.
  */
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
 
 /**
  * Where a family of records lives, relative to the workspace root.
@@ -79,6 +82,31 @@ export function workspaceRecordHead(workspace: string, at: RecordLocation): stri
   return lastRecordHash(workspace, at);
 }
 
+/** Internal same-read target used by a real caller that derives a replacement body from its stored record. */
+interface WorkspaceRecordPredecessor {
+  readonly file: string;
+  readonly head: string;
+  readonly target: Buffer | null;
+}
+export function captureWorkspaceRecordPredecessor(workspace: string, at: RecordLocation, id: string): WorkspaceRecordPredecessor {
+  const file = resolve(join(recordDir(workspace, at), `${id}.json`));
+  return Object.freeze({ file, head: lastRecordHash(workspace, at), target: pathExists(file) ? readFileSync(file) : null });
+}
+
+/** Synchronous publication only. Signatures and any key/history initialization must finish before acquiring this lock. */
+export function withWorkspaceRecordPublicationLock<T>(workspace: string, at: RecordLocation, operation: () => T): T {
+  return withControlFileLock({ root: join(workspace, ".amc"),
+    name: `workspace-records-${sha256Hex(join(...at.area, at.kind)).slice(0, 24)}`, operation });
+}
+
+function assertPredecessorCurrent(workspace: string, at: RecordLocation, id: string, expected: WorkspaceRecordPredecessor): void {
+  const current = captureWorkspaceRecordPredecessor(workspace, at, id);
+  if (current.file !== expected.file || current.head !== expected.head || (expected.target === null ? current.target !== null
+    : current.target === null || !current.target.equals(expected.target))) {
+    throw new Error("workspace record predecessor or destination changed while signing was prepared; retry");
+  }
+}
+
 /**
  * Writes one record, chained to the previous one and signed where a key exists.
  *
@@ -92,26 +120,22 @@ export function saveWorkspaceRecord<T extends Record<string, unknown>>(
   body: T,
   now: number
 ): T & RecordEnvelope {
-  const prev = lastRecordHash(workspace, at);
-  const hash = sha256Hex(canonicalize({ ...body, prev_record_hash: prev }));
+  const location = { area: [...at.area], kind: at.kind }, before = captureWorkspaceRecordPredecessor(workspace, location, id);
+  const hash = sha256Hex(canonicalize({ ...body, prev_record_hash: before.head }));
   let signature = "unsigned";
   try {
     signature = signHexDigest(hash, getSigningKey(workspace, "artifact-seal"));
   } catch {
-    // No auditor key in this workspace; the chain still detects tampering.
+    // Retained synchronous compatibility: missing/refused signing keys can leave a legacy unsigned record.
   }
-  const record = {
-    ...body,
-    prev_record_hash: prev,
-    record_hash: hash,
-    signature,
-    storedTs: now
-  } as T & RecordEnvelope;
-
-  const dir = recordDir(workspace, at);
-  ensureDir(dir);
-  writeFileAtomic(join(dir, `${id}.json`), JSON.stringify(record, null, 2), 0o644);
-  return record;
+  const record = { ...body, prev_record_hash: before.head, record_hash: hash, signature, storedTs: now } as T & RecordEnvelope;
+  const bytes = JSON.stringify(record, null, 2);
+  return withWorkspaceRecordPublicationLock(workspace, location, () => {
+    assertPredecessorCurrent(workspace, location, id, before);
+    ensureDir(recordDir(workspace, location));
+    writeFileAtomic(before.file, bytes, 0o644);
+    return record;
+  });
 }
 
 /** Replaces a stored record in place, keeping its id. Used for hold release. */
@@ -123,4 +147,28 @@ export function updateWorkspaceRecord<T extends Record<string, unknown>>(
   now: number
 ): void {
   saveWorkspaceRecord(workspace, at, id, body, now);
+}
+
+/** Internal prepared writer consumed by actual family publishers, never a remote Sign inside a file lock or SQL transaction. */
+export async function prepareWorkspaceRecordAsync<T extends Record<string, unknown>>(
+  workspace: string, at: RecordLocation, id: string, body: T, now: number,
+  predecessor?: WorkspaceRecordPredecessor
+): Promise<{ publish(): T & RecordEnvelope }> {
+  const root = resolve(workspace), location = { area: [...at.area], kind: at.kind }, ownId = id, ownBody = structuredClone(body), storedTs = now;
+  const prior = predecessor ?? captureWorkspaceRecordPredecessor(root, location, ownId);
+  const before = { file: prior.file, head: prior.head, target: prior.target === null ? null : Buffer.from(prior.target) };
+  if (before.file !== resolve(join(recordDir(root, location), `${ownId}.json`))) throw new Error("workspace record predecessor names another destination");
+  const captured = capturePurposePublication(root, "artifact-seal");
+  const hash = sha256Hex(canonicalize({ ...ownBody, prev_record_hash: before.head }));
+  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
+  const record = { ...ownBody, prev_record_hash: before.head, record_hash: hash,
+    signature: signed.signature.toString("base64"), storedTs } as T & RecordEnvelope;
+  const bytes = JSON.stringify(record, null, 2);
+  return Object.freeze({ publish(): T & RecordEnvelope {
+    assertPurposePublicationCurrent(root, captured, signed);
+    assertPredecessorCurrent(root, location, ownId, before);
+    ensureDir(recordDir(root, location));
+    writeFileAtomic(before.file, bytes, 0o644);
+    return record;
+  } });
 }

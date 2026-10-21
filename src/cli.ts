@@ -18878,7 +18878,7 @@ program
   .option("--reporter <name>", "who is filing", "cli-user")
   .action(async (opts: { scenario: string; pack: string; run: string; justification: string; reporter: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const report = fp.submitFPReport({
+    const report = await fp.submitFPReportAsync({
       scenarioId: opts.scenario,
       packId: opts.pack,
       assuranceRunId: opts.run,
@@ -18897,7 +18897,7 @@ program
   .requiredOption("--reason <text>", "resolution reason")
   .action(async (opts: { id: string; status: string; reason: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const result = fp.resolveFPReport(opts.id, {
+    const result = await fp.resolveFPReportAsync(opts.id, {
       status: opts.status as "confirmed" | "rejected",
       reason: opts.reason,
     }, process.cwd());
