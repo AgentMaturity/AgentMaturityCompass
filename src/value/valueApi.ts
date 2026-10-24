@@ -23,7 +23,12 @@ import {
   verifyValuePolicySignature,
   verifyValueSchedulerSignature
 } from "./valueStore.js";
-import { createValueReport, createValueSnapshot } from "./valueReports.js";
+import { createValueReport, createValueReportRun, createValueSnapshot, ValueOutputsPartialError } from "./valueReports.js";
+import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
+import { captureOrgPairsAuthority, captureOrgPairs, assertOrgPairsCurrent, prepareOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { pathExists } from "../utils/fs.js";
+import { initValueFilesRunAsync, loadValuePolicyAsync, loadValuePolicyAttemptAsync, loadValuePolicyReadOnly, prepareValuePolicyAsync, prepareValueContractAsync, valueSchedulerPath } from "./valueStore.js";
+import { valueSchedulerStateSchema } from "./valuePolicySchema.js";
 
 function scopeNormalized(scopeType: string | null | undefined, scopeId?: string | null): {
   type: "WORKSPACE" | "NODE" | "AGENT";
@@ -360,10 +365,21 @@ export async function valueSnapshotLatestForApi(params: {
   scopeType?: string | null;
   scopeId?: string | null;
   windowDays?: number;
-}) {
+}, options: OrgPairsOptions = {}) {
+  params = { ...params }; options = { ...options }; options.beforePublish?.();
+  // Preserve the existing cached read: no signing/unlock gate when this call has no publication to perform.
+  if (pathExists(valuePolicyPath(params.workspace))) {
+    const policy = loadValuePolicyReadOnly(params.workspace), verify = verifyValuePolicySignature(params.workspace);
+    if (!verify.valid && policy.valuePolicy.enforceSignedInputs) throw new Error(`VALUE_POLICY_UNTRUSTED:${verify.reason ?? "unknown"}`);
+    const latest = loadValueSnapshot(params.workspace, scopeNormalized(params.scopeType, params.scopeId));
+    if (latest !== null) return latest;
+  }
+  options = { ...options, beforePublish: captureOrgPairsAuthority(params.workspace, options.beforePublish) };
+  const policyAttempt = await loadValuePolicyAttemptAsync(params.workspace, options);
+  options = { ...options, beforePublish: policyAttempt.assertCurrent };
   const scope = scopeNormalized(params.scopeType, params.scopeId);
   const verify = verifyValuePolicySignature(params.workspace);
-  const policy = loadValuePolicy(params.workspace);
+  const policy = loadValuePolicyReadOnly(params.workspace);
   if (!verify.valid && policy.valuePolicy.enforceSignedInputs) {
     throw new Error(`VALUE_POLICY_UNTRUSTED:${verify.reason ?? "unknown"}`);
   }
@@ -377,7 +393,7 @@ export async function valueSnapshotLatestForApi(params: {
       scopeType: scope.type,
       scopeId: scope.id,
       windowDays: params.windowDays
-    })
+    }, options)
   ).snapshot;
 }
 
@@ -386,10 +402,13 @@ export async function valueReportForApi(params: {
   scopeType?: string | null;
   scopeId?: string | null;
   windowDays?: number;
-}) {
+}, options: OrgPairsOptions = {}) {
+  params = { ...params }; options = { ...options, beforePublish: captureOrgPairsAuthority(params.workspace, options.beforePublish) };
+  const policyAttempt = await loadValuePolicyAttemptAsync(params.workspace, options);
+  options = { ...options, beforePublish: policyAttempt.assertCurrent };
   const scope = scopeNormalized(params.scopeType, params.scopeId);
   const verify = verifyValuePolicySignature(params.workspace);
-  const policy = loadValuePolicy(params.workspace);
+  const policy = loadValuePolicyReadOnly(params.workspace);
   if (!verify.valid && policy.valuePolicy.enforceSignedInputs) {
     throw new Error(`VALUE_POLICY_UNTRUSTED:${verify.reason ?? "unknown"}`);
   }
@@ -398,7 +417,7 @@ export async function valueReportForApi(params: {
     scopeType: scope.type,
     scopeId: scope.id,
     windowDays: params.windowDays
-  });
+  }, options);
 }
 
 export function valueSchedulerStatusForApi(workspace: string) {
@@ -408,38 +427,28 @@ export function valueSchedulerStatusForApi(workspace: string) {
   };
 }
 
-export async function valueSchedulerRunNowForApi(params: {
-  workspace: string;
-  scopeType?: string | null;
-  scopeId?: string | null;
-  windowDays?: number;
-}) {
-  const scope = scopeNormalized(params.scopeType, params.scopeId);
-  const report = await createValueReport({
-    workspace: params.workspace,
-    scopeType: scope.type,
-    scopeId: scope.id,
-    windowDays: params.windowDays
-  });
-  const current = loadValueSchedulerState(params.workspace);
-  const policy = loadValuePolicy(params.workspace);
-  const nowTs = Date.now();
-  const next = {
-    ...current,
-    lastSnapshotTs: nowTs,
-    nextSnapshotTs: nowTs + policy.valuePolicy.cadence.snapshotEveryHours * 60 * 60 * 1000,
-    lastReportTs: nowTs,
-    nextReportTs: nowTs + policy.valuePolicy.cadence.reportEveryHours * 60 * 60 * 1000,
-    lastOutcome: {
-      status: "OK" as const,
-      reason: ""
-    }
-  };
-  saveValueSchedulerState(params.workspace, next);
-  return {
-    report,
-    scheduler: next
-  };
+export async function valueSchedulerRunNowRun(params: { workspace: string; scopeType?: string | null; scopeId?: string | null; windowDays?: number }, options: OrgPairsOptions = {}) {
+  options = { ...options }; params = { ...params }; const initial = captureOrgPairsAuthority(params.workspace, options.beforePublish);
+  const policyAttempt = await loadValuePolicyAttemptAsync(params.workspace, { beforePublish: initial }), beforePublish = policyAttempt.assertCurrent;
+  const scope = scopeNormalized(params.scopeType, params.scopeId), reportAttempt = await createValueReportRun({ workspace: params.workspace,
+    scopeType: scope.type, scopeId: scope.id, windowDays: params.windowDays }, { beforePublish, assertInputsCurrent: options.assertInputsCurrent });
+  const report = reportAttempt.result;
+  try {
+    const previous = captureOrgPairs([valueSchedulerPath(params.workspace)]), current = loadValueSchedulerState(params.workspace);
+    const policyPair = captureOrgPairs([valuePolicyPath(params.workspace)]), policy = loadValuePolicyReadOnly(params.workspace), nowTs = Date.now();
+    assertOrgPairsCurrent(previous); assertOrgPairsCurrent(policyPair);
+    const next = { ...current, lastSnapshotTs: nowTs, nextSnapshotTs: nowTs + policy.valuePolicy.cadence.snapshotEveryHours * 60 * 60 * 1000,
+      lastReportTs: nowTs, nextReportTs: nowTs + policy.valuePolicy.cadence.reportEveryHours * 60 * 60 * 1000, lastOutcome: { status: "OK" as const, reason: "" } };
+    const prepared = await prepareOrgPairsAsync(params.workspace, [{ path: valueSchedulerPath(params.workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(next), null, 2)) }], {
+      beforePublish: () => { beforePublish?.(); reportAttempt.assertCurrent(); },
+      assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(policyPair); }
+    }, previous);
+    prepared.publish();
+    return { result: { report, scheduler: next }, assertCurrent: prepared.assertCurrent };
+  } catch (error) { throw new ValueOutputsPartialError([report.saved.path, report.saved.sigPath], "scheduler-after-report", error, [report.transparencyHash]); }
+}
+export async function valueSchedulerRunNowForApi(params: Parameters<typeof valueSchedulerRunNowRun>[0], options: OrgPairsOptions = {}) {
+  return (await valueSchedulerRunNowRun(params, options)).result;
 }
 
 export function valueSchedulerSetEnabledForApi(params: {
@@ -465,7 +474,7 @@ export function valueReadinessGate(workspace: string): {
 } {
   const reasons: string[] = [];
   const warnings: string[] = [];
-  const policy = loadValuePolicy(workspace);
+  const policy = pathExists(valuePolicyPath(workspace)) ? loadValuePolicy(workspace) : defaultValuePolicy();
   const verify = verifyValuePolicySignature(workspace);
   if (!verify.valid && policy.valuePolicy.enforceSignedInputs) {
     reasons.push(`VALUE_POLICY_UNTRUSTED:${verify.reason ?? "unknown"}`);
@@ -485,4 +494,41 @@ export function valuePolicyDefaultsForApi(): ValuePolicy {
 
 export function valuePolicyFileForApi(workspace: string): string {
   return valuePolicyPath(workspace);
+}
+
+export async function valueInitForApiAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const original = captureOrgPairsAuthority(workspace, options.beforePublish);
+  const attempt = await initValueFilesRunAsync(workspace, valueContractTemplate({ scopeType: "WORKSPACE", scopeId: "workspace", type: "other" }), { ...options, beforePublish: original }), saved = attempt.result;
+  try { attempt.assertCurrent(); ensureValueWebhookSecret(workspace); return saved; }
+  catch (error) { throw new ValueOutputsPartialError([saved.policy.path, saved.policy.sigPath, saved.workspaceContract.path, saved.workspaceContract.sigPath, saved.scheduler.path, saved.scheduler.sigPath], "webhook-secret-after-files", error); }
+}
+export async function valuePolicyForApiAsync(workspace: string, options: OrgPairsOptions = {}) {
+  if (pathExists(valuePolicyPath(workspace))) return { policy: loadValuePolicyReadOnly(workspace), signature: verifyValuePolicySignature(workspace) };
+  const original = captureOrgPairsAuthority(workspace, options.beforePublish);
+  await loadValuePolicyAsync(workspace, { ...options, beforePublish: original }); original(); return { policy: loadValuePolicyReadOnly(workspace), signature: verifyValuePolicySignature(workspace) };
+}
+export async function valuePolicyApplyForApiAsync(params: { workspace: string; policy: unknown }, options: OrgPairsOptions = {}) {
+  const workspace = params.workspace, policy = valuePolicySchema.parse(params.policy), prepared = await prepareValuePolicyAsync(workspace, policy, options), saved = prepared.publish();
+  try { prepared.assertCurrent(); const entry = await appendTransparencyEntryAsync({ workspace, type: "VALUE_POLICY_APPLIED", agentId: "workspace",
+    artifact: { kind: "policy", id: "value-policy", sha256: prepared.sha256 } }, { beforeCommit: prepared.assertCurrent });
+    return { ...saved, transparencyHash: entry.hash };
+  } catch (error) { throw new ValueOutputsPartialError([saved.path, saved.sigPath], "policy-transparency", error); }
+}
+export async function valueContractInitForApiAsync(params: Parameters<typeof valueContractInitForApi>[0], options: OrgPairsOptions = {}) {
+  const own = { ...params }, contract = valueContractTemplate({ scopeType: own.scopeType, scopeId: own.scopeId, type: own.type, deployment: own.deployment });
+  return valueContractApplyForApiAsync({ workspace: own.workspace, contract, scopeType: own.scopeType, scopeId: own.scopeId }, options);
+}
+export async function valueContractApplyForApiAsync(params: Parameters<typeof valueContractApplyForApi>[0], options: OrgPairsOptions = {}) {
+  const workspace = params.workspace, parsed = valueContractSchema.parse(params.contract), scope = scopeNormalized(params.scopeType ?? parsed.valueContract.scope.type, params.scopeId ?? parsed.valueContract.scope.id);
+  const prepared = await prepareValueContractAsync({ workspace, contract: parsed, agentId: scope.type === "AGENT" ? scope.id : null }, options), saved = prepared.publish();
+  try { prepared.assertCurrent(); const entry = await appendTransparencyEntryAsync({ workspace, type: "VALUE_CONTRACT_APPLIED", agentId: scope.type === "AGENT" ? scope.id : "workspace",
+    artifact: { kind: "policy", id: `${scope.type}:${scope.id}`, sha256: sha256Hex(Buffer.from(canonicalize(parsed), "utf8")) } }, { beforeCommit: prepared.assertCurrent });
+    return { contract: parsed, ...saved, transparencyHash: entry.hash };
+  } catch (error) { throw new ValueOutputsPartialError([saved.path, saved.sigPath], "contract-transparency", error); }
+}
+export async function valueSchedulerSetEnabledForApiAsync(params: { workspace: string; enabled: boolean }, options: OrgPairsOptions = {}) {
+  const own = { ...params }, previous = captureOrgPairs([valueSchedulerPath(own.workspace)]), current = loadValueSchedulerState(own.workspace);
+  assertOrgPairsCurrent(previous); const next = { ...current, enabled: own.enabled };
+  const saved = (await prepareOrgPairsAsync(own.workspace, [{ path: valueSchedulerPath(own.workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(next), null, 2)) }], options, previous)).publish()[0]!;
+  return { state: next, ...saved };
 }

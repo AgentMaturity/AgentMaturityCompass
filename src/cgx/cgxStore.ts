@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import YAML from "yaml";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { captureOrgPairsAuthority, captureOrgPairs, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import {
   cgxContextPackSchema,
   cgxGraphSchema,
@@ -73,15 +74,8 @@ function defaultCgxPolicy(): CgxPolicy {
   });
 }
 
-export function saveCgxPolicy(workspace: string, policy: CgxPolicy): {
-  path: string;
-  sigPath: string;
-} {
-  ensureDir(cgxRoot(workspace));
-  const path = cgxPolicyPath(workspace);
-  writeFileAtomic(path, YAML.stringify(cgxPolicySchema.parse(policy)), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+export function saveCgxPolicy(workspace: string, policy: CgxPolicy): { path: string; sigPath: string } {
+  return publishOrgPairs(workspace, [{ path: cgxPolicyPath(workspace), bytes: Buffer.from(YAML.stringify(cgxPolicySchema.parse(policy))) }])[0]!;
 }
 
 export function initCgxPolicy(workspace: string): {
@@ -116,7 +110,7 @@ export function verifyCgxPolicySignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyCgxPair(workspace, path);
 }
 
 export function cgxPolicySha256(workspace: string): string {
@@ -127,31 +121,11 @@ export function cgxPolicySha256(workspace: string): string {
   return sha256Hex(readFileSync(path));
 }
 
-export function saveCgxGraph(workspace: string, scope: CgxScope, graph: CgxGraph): {
-  latestPath: string;
-  latestSigPath: string;
-  snapshotPath: string;
-  snapshotSigPath: string;
-} {
-  const latestPath = cgxLatestGraphPath(workspace, scope);
-  ensureDir(dirname(latestPath));
-  const normalized = cgxGraphSchema.parse(graph);
-  const payload = JSON.stringify(normalized, null, 2);
-  writeFileAtomic(latestPath, payload, 0o644);
-  const latestSigPath = signFileWithAuditor(workspace, latestPath);
-
-  const snapshots = cgxSnapshotGraphDir(workspace, scope);
-  ensureDir(snapshots);
-  const snapshotPath = join(snapshots, `${normalized.generatedTs}.json`);
-  writeFileAtomic(snapshotPath, payload, 0o644);
-  const snapshotSigPath = signFileWithAuditor(workspace, snapshotPath);
-
-  return {
-    latestPath,
-    latestSigPath,
-    snapshotPath,
-    snapshotSigPath
-  };
+export function saveCgxGraph(workspace: string, scope: CgxScope, graph: CgxGraph) {
+  const normalized = cgxGraphSchema.parse(graph), payload = Buffer.from(JSON.stringify(normalized, null, 2));
+  const latestPath = cgxLatestGraphPath(workspace, scope), snapshotPath = join(cgxSnapshotGraphDir(workspace, scope), `${normalized.generatedTs}.json`);
+  const saved = publishOrgPairs(workspace, [{ path: latestPath, bytes: payload }, { path: snapshotPath, bytes: payload }]);
+  return { latestPath, latestSigPath: saved[0]!.sigPath, snapshotPath, snapshotSigPath: saved[1]!.sigPath };
 }
 
 export function loadLatestCgxGraph(workspace: string, scope: CgxScope): CgxGraph | null {
@@ -163,18 +137,11 @@ export function loadLatestCgxGraph(workspace: string, scope: CgxScope): CgxGraph
 }
 
 export function verifyLatestCgxGraph(workspace: string, scope: CgxScope) {
-  return verifySignedFileWithAuditor(workspace, cgxLatestGraphPath(workspace, scope));
+  return verifyCgxPair(workspace, cgxLatestGraphPath(workspace, scope));
 }
 
-export function saveCgxContextPack(workspace: string, agentId: string, pack: CgxContextPack): {
-  path: string;
-  sigPath: string;
-} {
-  const path = cgxLatestPackPath(workspace, agentId);
-  ensureDir(dirname(path));
-  writeFileAtomic(path, JSON.stringify(cgxContextPackSchema.parse(pack), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+export function saveCgxContextPack(workspace: string, agentId: string, pack: CgxContextPack) {
+  return publishOrgPairs(workspace, [{ path: cgxLatestPackPath(workspace, agentId), bytes: Buffer.from(JSON.stringify(cgxContextPackSchema.parse(pack), null, 2)) }])[0]!;
 }
 
 export function loadLatestCgxContextPack(workspace: string, agentId: string): CgxContextPack | null {
@@ -186,5 +153,56 @@ export function loadLatestCgxContextPack(workspace: string, agentId: string): Cg
 }
 
 export function verifyLatestCgxContextPack(workspace: string, agentId: string) {
-  return verifySignedFileWithAuditor(workspace, cgxLatestPackPath(workspace, agentId));
+  return verifyCgxPair(workspace, cgxLatestPackPath(workspace, agentId));
+}
+
+function verifyCgxPair(workspace: string, path: string) {
+  try {
+    const before = captureOrgPairs([path]), body = orgPairBytes(before, path), sidecar = orgPairBytes(before, `${path}.sig`);
+    const verdict = body === null || sidecar === null ? { valid: false, reason: body === null ? "file missing" : "signature missing" }
+      : verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar);
+    return { ...verdict, signatureExists: sidecar !== null, path, sigPath: `${path}.sig` };
+  } catch { return { valid: false, signatureExists: pathExists(`${path}.sig`), reason: "invalid CGX signed pair", path, sigPath: `${path}.sig` }; }
+}
+export async function saveCgxPolicyAsync(workspace: string, policy: CgxPolicy, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  return (await publishOrgPairsAsync(workspace, [{ path: cgxPolicyPath(workspace), bytes: Buffer.from(YAML.stringify(cgxPolicySchema.parse(policy))) }], options, previous))[0]!;
+}
+export async function initCgxPolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const policy = defaultCgxPolicy(), saved = await saveCgxPolicyAsync(workspace, policy, options); return { ...saved, policy };
+}
+export async function loadCgxPolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<CgxPolicy> {
+  if (!pathExists(cgxPolicyPath(workspace))) return (await initCgxPolicyAsync(workspace, options)).policy;
+  return loadCgxPolicy(workspace);
+}
+export async function saveCgxGraphAsync(workspace: string, scope: CgxScope, graph: CgxGraph, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const normalized = cgxGraphSchema.parse(graph), payload = Buffer.from(JSON.stringify(normalized, null, 2));
+  const latestPath = cgxLatestGraphPath(workspace, scope), snapshotPath = join(cgxSnapshotGraphDir(workspace, scope), `${normalized.generatedTs}.json`);
+  const saved = await publishOrgPairsAsync(workspace, [{ path: latestPath, bytes: payload }, { path: snapshotPath, bytes: payload }], options, previous);
+  return { latestPath, latestSigPath: saved[0]!.sigPath, snapshotPath, snapshotSigPath: saved[1]!.sigPath };
+}
+export async function saveCgxContextPackAsync(workspace: string, agentId: string, pack: CgxContextPack, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  return (await publishOrgPairsAsync(workspace, [{ path: cgxLatestPackPath(workspace, agentId), bytes: Buffer.from(JSON.stringify(cgxContextPackSchema.parse(pack), null, 2)) }], options, previous))[0]!;
+}
+
+export async function prepareCgxGraphAsync(workspace: string, scope: CgxScope, graph: CgxGraph, options: OrgPairsOptions = {}) {
+  const normalized = cgxGraphSchema.parse(graph), payload = Buffer.from(JSON.stringify(normalized, null, 2));
+  const latestPath = cgxLatestGraphPath(workspace, scope), snapshotPath = join(cgxSnapshotGraphDir(workspace, scope), `${normalized.generatedTs}.json`);
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path: latestPath, bytes: payload }, { path: snapshotPath, bytes: payload }], options);
+  return { assertCurrent: prepared.assertCurrent, publish() { const saved = prepared.publish();
+    return { latestPath, latestSigPath: saved[0]!.sigPath, snapshotPath, snapshotSigPath: saved[1]!.sigPath }; } };
+}
+export async function prepareCgxContextPackAsync(workspace: string, agentId: string, pack: CgxContextPack, options: OrgPairsOptions = {}) {
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path: cgxLatestPackPath(workspace, agentId), bytes: Buffer.from(JSON.stringify(cgxContextPackSchema.parse(pack), null, 2)) }], options);
+  return { assertCurrent: prepared.assertCurrent, publish: () => prepared.publish()[0]! };
+}
+
+export function loadCgxPolicyReadOnly(workspace: string): CgxPolicy {
+  return cgxPolicySchema.parse(YAML.parse(readUtf8(cgxPolicyPath(workspace))) as unknown);
+}
+
+export async function loadCgxPolicyAttemptAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const original = captureOrgPairsAuthority(workspace, options.beforePublish);
+  if (pathExists(cgxPolicyPath(workspace))) return { policy: loadCgxPolicyReadOnly(workspace), assertCurrent: original };
+  const policy = defaultCgxPolicy(), prepared = await prepareOrgPairsAsync(workspace, [{ path: cgxPolicyPath(workspace), bytes: Buffer.from(YAML.stringify(policy)) }], { ...options, beforePublish: original });
+  prepared.publish(); return { policy, assertCurrent: prepared.assertCurrent };
 }

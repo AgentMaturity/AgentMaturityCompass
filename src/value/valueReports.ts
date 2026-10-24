@@ -1,5 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import YAML from "yaml";
+import { join } from "node:path";
+import { captureOrgPairsAuthority, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { canonicalize } from "../utils/json.js";
+import { valuePolicySchema } from "./valuePolicySchema.js";
+import { valueContractSchema } from "./valueContracts.js";
+import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadTrustConfig, checkNotaryTrust } from "../trust/trustConfig.js";
@@ -13,12 +20,9 @@ import { computeEconomicSignificance, detectValueRegression } from "./valueRisk.
 import {
   appendValueEvents,
   listValueReports,
-  loadValueContract,
-  loadValuePolicy,
-  loadValueSnapshot,
+  loadValuePolicyAttemptAsync, valueEventsDir, valuePolicyPath, valueWorkspaceContractPath, valueAgentContractPath, valueSnapshotLatestPath,
   readValueEvents,
-  saveValueReport,
-  saveValueSnapshot
+  prepareValueSnapshotAsync, prepareValueReportAsync
 } from "./valueStore.js";
 import { valueReportSchema, valueSnapshotSchema, type ValueReport, type ValueSnapshot } from "./valueSchema.js";
 
@@ -90,29 +94,30 @@ function nullifySnapshotNumbers(snapshot: ValueSnapshot): ValueSnapshot {
   });
 }
 
-export async function createValueSnapshot(params: {
+async function createValueSnapshotRun(params: {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId: string;
   windowDays?: number;
   nowTs?: number;
-}): Promise<{
-  snapshot: ValueSnapshot;
-  saved: ReturnType<typeof saveValueSnapshot>;
-  transparencyHash: string;
-  regressionDetected: boolean;
-}> {
+}, options: OrgPairsOptions = {}) {
+  options = { ...options }; params = { ...params }; const initial = captureOrgPairsAuthority(params.workspace, options.beforePublish);
+  const policyAttempt = await loadValuePolicyAttemptAsync(params.workspace, { beforePublish: initial }), beforePublish = policyAttempt.assertCurrent; beforePublish();
   const nowTs = params.nowTs ?? Date.now();
   const scope = {
     type: params.scopeType,
     id: params.scopeType === "WORKSPACE" ? "workspace" : params.scopeId
   } as const;
 
-  const policy = loadValuePolicy(params.workspace);
-  const contract = loadValueContract({
-    workspace: params.workspace,
-    agentId: scope.type === "AGENT" ? scope.id : null
-  });
+  const policyPath = valuePolicyPath(params.workspace), contractPath = scope.type === "AGENT" ? valueAgentContractPath(params.workspace, scope.id) : valueWorkspaceContractPath(params.workspace);
+  const sourcePairs = captureOrgPairs([policyPath, contractPath]);
+  const policyBytes = orgPairBytes(sourcePairs, policyPath), contractBytes = orgPairBytes(sourcePairs, contractPath);
+  if (policyBytes === null || contractBytes === null) throw new Error("value policy or contract missing");
+  const policy = valuePolicySchema.parse(YAML.parse(policyBytes.toString("utf8"))), contract = valueContractSchema.parse(YAML.parse(contractBytes.toString("utf8")));
+  const policySignature = orgPairBytes(sourcePairs, `${policyPath}.sig`);
+  if (policy.valuePolicy.enforceSignedInputs && (policySignature === null || !verifyAuditorSignatureBytes(params.workspace, "BUNDLE", policyBytes, policySignature).valid))
+    throw new Error("VALUE_POLICY_UNTRUSTED:invalid captured policy signature");
+  const snapshotPrevious = captureOrgPairs([valueSnapshotLatestPath(params.workspace, scope)]);
 
   const windowDays = Math.max(1, params.windowDays ?? contract.valueContract.baselines.baselineWindowDays);
   const currentWindow = nowWindow(windowDays, nowTs);
@@ -126,10 +131,15 @@ export async function createValueSnapshot(params: {
     startTs: currentWindow.startTs,
     endTs: currentWindow.endTs
   });
+  const observedPaths: string[] = [];
   if (observed.length > 0) {
+    beforePublish?.();
     appendValueEvents(params.workspace, observed);
+    for (const month of [...new Set(observed.map(event => new Date(event.ts).toISOString().slice(0, 7)))].sort()) {
+      const path = join(valueEventsDir(params.workspace), month, "events.ndjson"); observedPaths.push(path, `${path}.sha256`);
+    }
   }
-
+  try {
   const idHash = scopeIdHash(scope);
   const currentEvents = readValueEvents({
     workspace: params.workspace,
@@ -159,9 +169,13 @@ export async function createValueSnapshot(params: {
     scope,
     lookbackDays: Math.max(30, windowDays)
   });
+  const trustPolicy = canonicalize(loadTrustConfig(params.workspace));
   const trustMode = loadTrustConfig(params.workspace).trust.mode;
+  const assurance = latestAssuranceRun(params.workspace);
   const notaryRequired = trustMode === "NOTARY";
+  beforePublish();
   const notaryState = notaryRequired ? await checkNotaryTrust(params.workspace).catch(() => ({ ok: false })) : { ok: true };
+  beforePublish();
   const gates = evaluateValueEvidenceGates(policy, {
     integrityIndex: forecastSignals.evidence.latestIntegrityIndex,
     correlationRatio: forecastSignals.evidence.latestCorrelationRatio,
@@ -171,7 +185,6 @@ export async function createValueSnapshot(params: {
     notaryHealthy: notaryState.ok
   });
 
-  const assurance = latestAssuranceRun(params.workspace);
   const costKpi = scoring.kpis.find((row) => row.kpiId === "cost_usd") ?? null;
   const economic = computeEconomicSignificance({
     policy,
@@ -233,7 +246,8 @@ export async function createValueSnapshot(params: {
     notes: scoring.notes
   });
 
-  const previousSnapshot = loadValueSnapshot(params.workspace, scope);
+  const previousBytes = orgPairBytes(snapshotPrevious, valueSnapshotLatestPath(params.workspace, scope));
+  const previousSnapshot = previousBytes === null ? null : valueSnapshotSchema.parse(JSON.parse(previousBytes.toString("utf8")));
   const regression = detectValueRegression({
     previousValueScore: previousSnapshot?.valueDimensions.valueScore ?? null,
     nextValueScore: snapshotBase.valueDimensions.valueScore,
@@ -244,8 +258,22 @@ export async function createValueSnapshot(params: {
   });
 
   const finalized = gates.ok ? snapshotBase : nullifySnapshotNumbers(snapshotBase);
-  const saved = saveValueSnapshot(params.workspace, finalized);
-  const created = appendTransparencyEntry({
+  const selected = canonicalize({ currentEvents, baselineEvents, integrityIndex: forecastSignals.evidence.latestIntegrityIndex,
+    correlationRatio: forecastSignals.evidence.latestCorrelationRatio, assuranceScore: assurance?.score.riskAssuranceScore ?? null });
+  const assertInputsCurrent = () => {
+    options.assertInputsCurrent?.(); assertOrgPairsCurrent(sourcePairs);
+    if (canonicalize(loadTrustConfig(params.workspace)) !== trustPolicy) throw new Error("value trust inputs changed while signing");
+    const signals = collectForecastSignals({ workspace: params.workspace, scope, lookbackDays: Math.max(30, windowDays) });
+    const current = canonicalize({ currentEvents: readValueEvents({ workspace: params.workspace, scope, startTs: currentWindow.startTs, endTs: currentWindow.endTs, idHash }),
+      baselineEvents: readValueEvents({ workspace: params.workspace, scope, startTs: baselineWindow.startTs, endTs: baselineWindow.endTs, idHash }),
+      integrityIndex: signals.evidence.latestIntegrityIndex, correlationRatio: signals.evidence.latestCorrelationRatio,
+      assuranceScore: latestAssuranceRun(params.workspace)?.score.riskAssuranceScore ?? null });
+    if (current !== selected) throw new Error("selected value calculation inputs changed while signing");
+  };
+  const prepared = await prepareValueSnapshotAsync(params.workspace, finalized, { beforePublish, assertInputsCurrent }, snapshotPrevious);
+  const saved = prepared.publish(), transparencyHashes: string[] = [];
+  try {
+  prepared.assertCurrent(); const created = await appendTransparencyEntryAsync({
     workspace: params.workspace,
     type: "VALUE_SNAPSHOT_CREATED",
     agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -254,10 +282,10 @@ export async function createValueSnapshot(params: {
       sha256: saved.sha256,
       id: `${scope.type}:${scope.id}`
     }
-  });
+  }, { beforeCommit: prepared.assertCurrent }); transparencyHashes.push(created.hash);
 
   if (!gates.ok) {
-    appendTransparencyEntry({
+    prepared.assertCurrent(); const insufficientEntry = await appendTransparencyEntryAsync({
       workspace: params.workspace,
       type: "VALUE_EVIDENCE_INSUFFICIENT",
       agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -266,7 +294,7 @@ export async function createValueSnapshot(params: {
         sha256: saved.sha256,
         id: `${scope.type}:${scope.id}`
       }
-    });
+    }, { beforeCommit: prepared.assertCurrent }); transparencyHashes.push(insufficientEntry.hash);
     void dispatchIntegrationEvent({
       workspace: params.workspace,
       eventName: "VALUE_EVIDENCE_INSUFFICIENT",
@@ -280,7 +308,7 @@ export async function createValueSnapshot(params: {
   }
 
   if (regression.regressed) {
-    appendTransparencyEntry({
+    prepared.assertCurrent(); const regressionEntry = await appendTransparencyEntryAsync({
       workspace: params.workspace,
       type: "VALUE_REGRESSION_DETECTED",
       agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -289,7 +317,7 @@ export async function createValueSnapshot(params: {
         sha256: saved.sha256,
         id: `${scope.type}:${scope.id}`
       }
-    });
+    }, { beforeCommit: prepared.assertCurrent }); transparencyHashes.push(regressionEntry.hash);
     void dispatchIntegrationEvent({
       workspace: params.workspace,
       eventName: "VALUE_REGRESSION_DETECTED",
@@ -304,28 +332,28 @@ export async function createValueSnapshot(params: {
     }).catch(() => undefined);
   }
 
-  return {
-    snapshot: finalized,
-    saved,
-    transparencyHash: created.hash,
-    regressionDetected: regression.regressed
-  };
+  return { result: { snapshot: finalized, saved, transparencyHash: created.hash, regressionDetected: regression.regressed }, assertCurrent: prepared.assertCurrent };
+  } catch (error) { throw new ValueOutputsPartialError([saved.path, saved.sigPath], "snapshot-transparency", error, transparencyHashes); }
+  } catch (error) {
+    if (observedPaths.length === 0) throw error;
+    throw new ValueOutputsPartialError([...observedPaths, ...(error instanceof ValueOutputsPartialError ? error.publishedPaths : [])],
+      error instanceof ValueOutputsPartialError ? error.phase : "snapshot-after-value-events", error,
+      error instanceof ValueOutputsPartialError ? error.transparencyHashes : []);
+  }
 }
 
-export async function createValueReport(params: {
+export async function createValueReportRun(params: {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId: string;
   windowDays?: number;
   nowTs?: number;
-}): Promise<{
-  report: ValueReport;
-  saved: ReturnType<typeof saveValueReport>;
-  snapshot: ValueSnapshot;
-  transparencyHash: string;
-}> {
+}, options: OrgPairsOptions = {}) {
+  options = { ...options }; params = { ...params };
+  const original = captureOrgPairsAuthority(params.workspace, options.beforePublish); options = { ...options, beforePublish: original };
   const nowTs = params.nowTs ?? Date.now();
-  const snapshotRun = await createValueSnapshot(params);
+  const snapshotAttempt = await createValueSnapshotRun(params, options), snapshotRun = snapshotAttempt.result;
+  try {
   const scope = {
     type: params.scopeType,
     id: params.scopeType === "WORKSPACE" ? "workspace" : params.scopeId
@@ -365,8 +393,14 @@ export async function createValueReport(params: {
     }
   });
 
-  const saved = saveValueReport(params.workspace, report);
-  const entry = appendTransparencyEntry({
+  const historyInput = canonicalize(reports.slice(-29));
+  const prepared = await prepareValueReportAsync(params.workspace, report, {
+    beforePublish: () => { options.beforePublish?.(); snapshotAttempt.assertCurrent(); },
+    assertInputsCurrent: () => { options.assertInputsCurrent?.(); if (canonicalize(listValueReports(params.workspace, scope).slice(-29)) !== historyInput) throw new Error("selected value report history changed while signing"); }
+  });
+  const saved = prepared.publish();
+  try {
+  prepared.assertCurrent(); const entry = await appendTransparencyEntryAsync({
     workspace: params.workspace,
     type: "VALUE_REPORT_CREATED",
     agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -375,12 +409,22 @@ export async function createValueReport(params: {
       sha256: saved.sha256,
       id: report.reportId
     }
-  });
+  }, { beforeCommit: prepared.assertCurrent });
+  return { result: { report, saved, snapshot: snapshotRun.snapshot, transparencyHash: entry.hash }, assertCurrent: prepared.assertCurrent };
+  } catch (error) { throw new ValueOutputsPartialError([snapshotRun.saved.path, snapshotRun.saved.sigPath, saved.path, saved.sigPath], "report-transparency", error, [snapshotRun.transparencyHash]); }
+  } catch (error) { if (error instanceof ValueOutputsPartialError) throw error;
+    throw new ValueOutputsPartialError([snapshotRun.saved.path, snapshotRun.saved.sigPath], "report-after-snapshot", error, [snapshotRun.transparencyHash]); }
+}
 
-  return {
-    report,
-    saved,
-    snapshot: snapshotRun.snapshot,
-    transparencyHash: entry.hash
-  };
+export class ValueOutputsPartialError extends Error {
+  readonly code = "VALUE_OUTPUTS_PARTIAL";
+  constructor(readonly publishedPaths: readonly string[], readonly phase: string, cause: unknown, readonly transparencyHashes: readonly string[] = []) {
+    super("value publication has committed earlier outputs; inspect state before retrying", { cause }); this.name = "ValueOutputsPartialError";
+  }
+}
+export async function createValueSnapshot(params: Parameters<typeof createValueSnapshotRun>[0], options: OrgPairsOptions = {}) {
+  return (await createValueSnapshotRun(params, options)).result;
+}
+export async function createValueReport(params: Parameters<typeof createValueReportRun>[0], options: OrgPairsOptions = {}) {
+  return (await createValueReportRun(params, options)).result;
 }

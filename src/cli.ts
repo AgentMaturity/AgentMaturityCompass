@@ -503,23 +503,23 @@ import {
   outcomesVerifyCli
 } from "./outcomes/outcomeCli.js";
 import {
-  valueContractApplyCli,
-  valueContractInitCli,
+  valueContractApplyCliAsync as valueContractApplyCli,
+  valueContractInitCliAsync as valueContractInitCli,
   valueContractPrintCli,
   valueContractVerifyCli,
   VALUE_ATTESTED_REMOVED,
   valueImportCsvCli,
   valueIngestWebhookCli,
-  valueInitCli,
-  valuePolicyApplyCli,
+  valueInitCliAsync as valueInitCli,
+  valuePolicyApplyCliAsync as valuePolicyApplyCli,
   valuePolicyDefaultCli,
-  valuePolicyPrintCli,
+  valuePolicyPrintCliAsync as valuePolicyPrintCli,
   valueReportCli,
-  valueSchedulerEnableCli,
+  valueSchedulerEnableCliAsync as valueSchedulerEnableCli,
   valueSchedulerRunNowCli,
   valueSchedulerStatusCli,
   valueSnapshotCli,
-  valueVerifyPolicyCli,
+  valueVerifyPolicyCliAsync as valueVerifyPolicyCli,
   valueVerifyWorkspaceCli
 } from "./value/valueCli.js";
 import {
@@ -739,7 +739,7 @@ import {
 } from "./workspaces/hostCli.js";
 import { bootstrapHostFromEnv } from "./workspaces/hostBootstrap.js";
 import { canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
-import { cgxBuildCli, cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
+import { cgxBuildCliAsync as cgxBuildCli, cgxInitCliAsync as cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
 import { simulateImpact, renderSimulationMarkdown } from "./cgx/cgxSimulator.js";
 import { loadAndDiffSnapshots, renderGraphDiffMarkdown } from "./cgx/cgxDiff.js";
 import { loadLatestCgxGraph } from "./cgx/cgxStore.js";
@@ -8411,9 +8411,9 @@ canon
 cgx
   .command("init")
   .description("Create and sign .amc/cgx/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "cgx init");
-    const out = cgxInitCli(process.cwd());
+    const out = await cgxInitCli(process.cwd());
     console.log(chalk.green("CGX policy initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -8424,13 +8424,13 @@ cgx
   .description("Build deterministic signed context graph")
   .requiredOption("--scope <scope>", "workspace|agent")
   .option("--id <id>", "agent id when --scope agent")
-  .action((opts: { scope: string; id?: string }) => {
+  .action(async (opts: { scope: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "cgx build");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "agent") {
       throw new Error("scope must be workspace|agent");
     }
-    const out = cgxBuildCli({
+    const out = await cgxBuildCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "agent",
       id: opts.id
@@ -13155,9 +13155,9 @@ outcomes
 value
   .command("init")
   .description("Initialize signed value policy, default contract, and scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value init");
-    const out = valueInitCli(process.cwd());
+    const out = await valueInitCli(process.cwd());
     console.log(chalk.green(`Value policy created: ${out.policy.path}`));
     console.log(`signature=${out.policy.sigPath}`);
     console.log(`workspaceContract=${out.workspaceContract.path}`);
@@ -13167,8 +13167,8 @@ value
 value
   .command("verify-policy")
   .description("Verify signed value policy")
-  .action(() => {
-    const verify = valueVerifyPolicyCli(process.cwd());
+  .action(async () => {
+    const verify = await valueVerifyPolicyCli(process.cwd());
     if (verify.valid) {
       console.log(chalk.green(`Value policy signature valid: ${verify.sigPath}`));
       return;
@@ -13184,8 +13184,8 @@ const valueScheduler = value.command("scheduler").description("Value scheduler c
 valuePolicy
   .command("print")
   .description("Print effective value policy JSON")
-  .action(() => {
-    console.log(JSON.stringify(valuePolicyPrintCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await valuePolicyPrintCli(process.cwd()), null, 2));
   });
 
 valuePolicy
@@ -13200,9 +13200,9 @@ valuePolicy
   .description("Apply signed value policy from YAML/JSON file")
   .requiredOption("--file <path>", "value policy file")
   .option("--reason <text>", "change reason", "value policy update")
-  .action((opts: { file: string; reason?: string }) => {
+  .action(async (opts: { file: string; reason?: string }) => {
     assertOwnerMode(process.cwd(), "value policy apply");
-    const out = valuePolicyApplyCli({
+    const out = await valuePolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -13218,13 +13218,13 @@ valueContract
   .option("--id <id>", "scope id (required for node/agent)", "workspace")
   .requiredOption("--type <type>", "code-agent|support-agent|ops-agent|research-agent|sales-agent|other")
   .option("--deployment <deployment>", "single|host|k8s|compose")
-  .action((opts: { scope: string; id: string; type: string; deployment?: string }) => {
+  .action(async (opts: { scope: string; id: string; type: string; deployment?: string }) => {
     assertOwnerMode(process.cwd(), "value contract init");
     const scope = opts.scope.toLowerCase();
     if (!(scope === "workspace" || scope === "node" || scope === "agent")) {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = valueContractInitCli({
+    const out = await valueContractInitCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -13243,10 +13243,10 @@ valueContract
   .option("--scope <scope>", "workspace|node|agent")
   .option("--id <id>", "scope id")
   .option("--reason <text>", "change reason", "value contract update")
-  .action((opts: { file: string; scope?: string; id?: string; reason?: string }) => {
+  .action(async (opts: { file: string; scope?: string; id?: string; reason?: string }) => {
     assertOwnerMode(process.cwd(), "value contract apply");
     const scope = opts.scope?.toLowerCase();
-    const out = valueContractApplyCli({
+    const out = await valueContractApplyCli({
       workspace: process.cwd(),
       file: opts.file,
       scope: scope as "workspace" | "node" | "agent" | undefined,
@@ -13430,9 +13430,9 @@ valueScheduler
 valueScheduler
   .command("enable")
   .description("Enable value scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value scheduler enable");
-    console.log(JSON.stringify(valueSchedulerEnableCli({
+    console.log(JSON.stringify(await valueSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: true
     }), null, 2));
@@ -13441,9 +13441,9 @@ valueScheduler
 valueScheduler
   .command("disable")
   .description("Disable value scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value scheduler disable");
-    console.log(JSON.stringify(valueSchedulerEnableCli({
+    console.log(JSON.stringify(await valueSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: false
     }), null, 2));

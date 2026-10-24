@@ -3,7 +3,8 @@ import { readdirSync } from "node:fs";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { captureOrgPairsAuthority, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { canonicalize } from "../utils/json.js";
 import {
   defaultValuePolicy,
@@ -33,7 +34,7 @@ export function valueContractsDir(workspace: string): string {
   return join(valueRoot(workspace), "contracts");
 }
 
-function valueWorkspaceContractPath(workspace: string): string {
+export function valueWorkspaceContractPath(workspace: string): string {
   return join(valueContractsDir(workspace), "workspace.yaml");
 }
 
@@ -57,7 +58,7 @@ function valueReportsDir(workspace: string): string {
   return join(valueRoot(workspace), "reports");
 }
 
-function valueSchedulerPath(workspace: string): string {
+export function valueSchedulerPath(workspace: string): string {
   return join(valueRoot(workspace), "scheduler.json");
 }
 
@@ -109,42 +110,17 @@ export function loadValuePolicy(workspace: string): ValuePolicy {
   return valuePolicySchema.parse(YAML.parse(readUtf8(path)) as unknown);
 }
 
-export function saveValuePolicy(workspace: string, policy: ValuePolicy): {
-  path: string;
-  sigPath: string;
-} {
-  ensureValueDirs(workspace);
-  const path = valuePolicyPath(workspace);
-  writeFileAtomic(path, YAML.stringify(valuePolicySchema.parse(policy)), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
+export function saveValuePolicy(workspace: string, policy: ValuePolicy): { path: string; sigPath: string } {
+  return publishOrgPairs(workspace, [{ path: valuePolicyPath(workspace), bytes: Buffer.from(YAML.stringify(valuePolicySchema.parse(policy))) }])[0]!;
 }
 
 export function verifyValuePolicySignature(workspace: string) {
-  return verifySignedFileWithAuditor(workspace, valuePolicyPath(workspace));
+  return verifyValuePair(workspace, valuePolicyPath(workspace));
 }
 
-export function saveValueContract(params: {
-  workspace: string;
-  contract: ValueContract;
-  agentId?: string | null;
-}): {
-  path: string;
-  sigPath: string;
-} {
-  ensureValueDirs(params.workspace);
-  const normalized = valueContractSchema.parse(params.contract);
+export function saveValueContract(params: { workspace: string; contract: ValueContract; agentId?: string | null }): { path: string; sigPath: string } {
   const path = params.agentId ? valueAgentContractPath(params.workspace, params.agentId) : valueWorkspaceContractPath(params.workspace);
-  ensureDir(dirname(path));
-  writeFileAtomic(path, YAML.stringify(normalized), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
-  return {
-    path,
-    sigPath
-  };
+  return publishOrgPairs(params.workspace, [{ path, bytes: Buffer.from(YAML.stringify(valueContractSchema.parse(params.contract))) }])[0]!;
 }
 
 export function loadValueContract(params: {
@@ -163,7 +139,7 @@ export function verifyValueContractSignature(params: {
   agentId?: string | null;
 }) {
   const path = params.agentId ? valueAgentContractPath(params.workspace, params.agentId) : valueWorkspaceContractPath(params.workspace);
-  return verifySignedFileWithAuditor(params.workspace, path);
+  return verifyValuePair(params.workspace, path);
 }
 
 export function appendValueEvents(workspace: string, events: ValueEvent[]): {
@@ -278,23 +254,9 @@ export function readValueEvents(params: {
     .sort((a, b) => a.ts - b.ts);
 }
 
-export function saveValueSnapshot(workspace: string, snapshot: ValueSnapshot): {
-  path: string;
-  sigPath: string;
-  sha256: string;
-} {
-  ensureValueDirs(workspace);
-  const normalized = valueSnapshotSchema.parse(snapshot);
-  const path = valueSnapshotLatestPath(workspace, normalized.scope);
-  ensureDir(dirname(path));
-  const payload = JSON.stringify(normalized, null, 2);
-  writeFileAtomic(path, payload, 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath,
-    sha256: sha256Hex(payload)
-  };
+export function saveValueSnapshot(workspace: string, snapshot: ValueSnapshot): { path: string; sigPath: string; sha256: string } {
+  const normalized = valueSnapshotSchema.parse(snapshot), path = valueSnapshotLatestPath(workspace, normalized.scope), payload = JSON.stringify(normalized, null, 2);
+  return { ...publishOrgPairs(workspace, [{ path, bytes: Buffer.from(payload) }])[0]!, sha256: sha256Hex(payload) };
 }
 
 export function loadValueSnapshot(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): ValueSnapshot | null {
@@ -306,26 +268,12 @@ export function loadValueSnapshot(workspace: string, scope: { type: "WORKSPACE" 
 }
 
 export function verifyValueSnapshotSignature(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }) {
-  return verifySignedFileWithAuditor(workspace, valueSnapshotLatestPath(workspace, scope));
+  return verifyValuePair(workspace, valueSnapshotLatestPath(workspace, scope));
 }
 
-export function saveValueReport(workspace: string, report: ValueReport): {
-  path: string;
-  sigPath: string;
-  sha256: string;
-} {
-  ensureValueDirs(workspace);
-  const normalized = valueReportSchema.parse(report);
-  const path = valueReportPath(workspace, normalized.scope, normalized.generatedTs);
-  ensureDir(dirname(path));
-  const payload = JSON.stringify(normalized, null, 2);
-  writeFileAtomic(path, payload, 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath,
-    sha256: sha256Hex(payload)
-  };
+export function saveValueReport(workspace: string, report: ValueReport): { path: string; sigPath: string; sha256: string } {
+  const normalized = valueReportSchema.parse(report), path = valueReportPath(workspace, normalized.scope, normalized.generatedTs), payload = JSON.stringify(normalized, null, 2);
+  return { ...publishOrgPairs(workspace, [{ path, bytes: Buffer.from(payload) }])[0]!, sha256: sha256Hex(payload) };
 }
 
 export function listValueReports(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): ValueReport[] {
@@ -347,18 +295,8 @@ export function loadValueSchedulerState(workspace: string): ValueSchedulerState 
   return valueSchedulerStateSchema.parse(JSON.parse(readUtf8(path)) as unknown);
 }
 
-export function saveValueSchedulerState(workspace: string, state: ValueSchedulerState): {
-  path: string;
-  sigPath: string;
-} {
-  ensureValueDirs(workspace);
-  const path = valueSchedulerPath(workspace);
-  writeFileAtomic(path, JSON.stringify(valueSchedulerStateSchema.parse(state), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
+export function saveValueSchedulerState(workspace: string, state: ValueSchedulerState): { path: string; sigPath: string } {
+  return publishOrgPairs(workspace, [{ path: valueSchedulerPath(workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(state), null, 2)) }])[0]!;
 }
 
 export function verifyValueSchedulerSignature(workspace: string) {
@@ -372,5 +310,88 @@ export function verifyValueSchedulerSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyValuePair(workspace, path);
+}
+
+/** Same-read, exact BUNDLE admission for migrated value consumers. */
+function verifyValuePair(workspace: string, path: string) {
+  try {
+    const before = captureOrgPairs([path]), body = orgPairBytes(before, path), sidecar = orgPairBytes(before, `${path}.sig`);
+    const verdict = body === null || sidecar === null ? { valid: false, reason: body === null ? "file missing" : "signature missing" }
+      : verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar);
+    return { ...verdict, signatureExists: sidecar !== null, path, sigPath: `${path}.sig` };
+  } catch { return { valid: false, signatureExists: pathExists(`${path}.sig`), reason: "invalid value signed pair", path, sigPath: `${path}.sig` }; }
+}
+export async function saveValuePolicyAsync(workspace: string, policy: ValuePolicy, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  return (await publishOrgPairsAsync(workspace, [{ path: valuePolicyPath(workspace), bytes: Buffer.from(YAML.stringify(valuePolicySchema.parse(policy))) }], options, previous))[0]!;
+}
+export async function initValuePolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const policy = defaultValuePolicy(), saved = await saveValuePolicyAsync(workspace, policy, options); return { ...saved, policy };
+}
+export async function loadValuePolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<ValuePolicy> {
+  if (!pathExists(valuePolicyPath(workspace))) return (await initValuePolicyAsync(workspace, options)).policy;
+  return loadValuePolicy(workspace);
+}
+export async function saveValueContractAsync(params: { workspace: string; contract: ValueContract; agentId?: string | null }, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const path = params.agentId ? valueAgentContractPath(params.workspace, params.agentId) : valueWorkspaceContractPath(params.workspace);
+  return (await publishOrgPairsAsync(params.workspace, [{ path, bytes: Buffer.from(YAML.stringify(valueContractSchema.parse(params.contract))) }], options, previous))[0]!;
+}
+export async function saveValueSnapshotAsync(workspace: string, snapshot: ValueSnapshot, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const normalized = valueSnapshotSchema.parse(snapshot), path = valueSnapshotLatestPath(workspace, normalized.scope), payload = JSON.stringify(normalized, null, 2);
+  return { ...(await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options, previous))[0]!, sha256: sha256Hex(payload) };
+}
+export async function saveValueReportAsync(workspace: string, report: ValueReport, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const normalized = valueReportSchema.parse(report), path = valueReportPath(workspace, normalized.scope, normalized.generatedTs), payload = JSON.stringify(normalized, null, 2);
+  return { ...(await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options, previous))[0]!, sha256: sha256Hex(payload) };
+}
+export async function saveValueSchedulerStateAsync(workspace: string, state: ValueSchedulerState, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  return (await publishOrgPairsAsync(workspace, [{ path: valueSchedulerPath(workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(state), null, 2)) }], options, previous))[0]!;
+}
+/** The initializer signs all three exact legacy BUNDLE payloads before replacing its first pair. */
+export async function initValueFilesRunAsync(workspace: string, contract: ValueContract, options: OrgPairsOptions = {}) {
+  const policy = defaultValuePolicy();
+  const paths = [valuePolicyPath(workspace), valueWorkspaceContractPath(workspace), valueSchedulerPath(workspace)], previous = captureOrgPairs(paths), scheduler = loadValueSchedulerState(workspace);
+  assertOrgPairsCurrent(previous);
+  const bytes = [YAML.stringify(valuePolicySchema.parse(policy)), YAML.stringify(valueContractSchema.parse(contract)), JSON.stringify(valueSchedulerStateSchema.parse(scheduler), null, 2)];
+  const prepared = await prepareOrgPairsAsync(workspace, paths.map((path, index) => ({ path, bytes: Buffer.from(bytes[index]!) })), options, previous), saved = prepared.publish();
+  return { result: { policy: { ...saved[0]!, policy }, workspaceContract: saved[1]!, scheduler: saved[2]! }, assertCurrent: prepared.assertCurrent };
+}
+
+/** Internal preparations keep their original signer gate available to actual compound callers. */
+export async function prepareValuePolicyAsync(workspace: string, policy: ValuePolicy, options: OrgPairsOptions = {}) {
+  const bytes = Buffer.from(YAML.stringify(valuePolicySchema.parse(policy)));
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path: valuePolicyPath(workspace), bytes }], options);
+  return { assertCurrent: prepared.assertCurrent, sha256: sha256Hex(bytes), publish: () => prepared.publish()[0]! };
+}
+export async function prepareValueContractAsync(params: { workspace: string; contract: ValueContract; agentId?: string | null }, options: OrgPairsOptions = {}) {
+  const path = params.agentId ? valueAgentContractPath(params.workspace, params.agentId) : valueWorkspaceContractPath(params.workspace);
+  const prepared = await prepareOrgPairsAsync(params.workspace, [{ path, bytes: Buffer.from(YAML.stringify(valueContractSchema.parse(params.contract))) }], options);
+  return { assertCurrent: prepared.assertCurrent, publish: () => prepared.publish()[0]! };
+}
+export async function prepareValueSnapshotAsync(workspace: string, snapshot: ValueSnapshot, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const normalized = valueSnapshotSchema.parse(snapshot), path = valueSnapshotLatestPath(workspace, normalized.scope), payload = JSON.stringify(normalized, null, 2);
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options, previous);
+  return { assertCurrent: prepared.assertCurrent, publish: () => ({ ...prepared.publish()[0]!, sha256: sha256Hex(payload) }) };
+}
+export async function prepareValueReportAsync(workspace: string, report: ValueReport, options: OrgPairsOptions = {}) {
+  const normalized = valueReportSchema.parse(report), path = valueReportPath(workspace, normalized.scope, normalized.generatedTs), payload = JSON.stringify(normalized, null, 2);
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options);
+  return { assertCurrent: prepared.assertCurrent, publish: () => ({ ...prepared.publish()[0]!, sha256: sha256Hex(payload) }) };
+}
+
+/** Read-only health/readiness path: missing policy never creates signed state before authorization. */
+export function loadValuePolicyReadOnly(workspace: string): ValuePolicy {
+  return valuePolicySchema.parse(YAML.parse(readUtf8(valuePolicyPath(workspace))) as unknown);
+}
+
+/** Retain an actual missing-policy initialization gate through the caller's later real output. */
+export async function loadValuePolicyAttemptAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const original = captureOrgPairsAuthority(workspace, options.beforePublish);
+  if (pathExists(valuePolicyPath(workspace))) return { policy: loadValuePolicyReadOnly(workspace), assertCurrent: original };
+  const policy = defaultValuePolicy(), prepared = await prepareValuePolicyAsync(workspace, policy, { ...options, beforePublish: original }); prepared.publish();
+  return { policy, assertCurrent: prepared.assertCurrent };
+}
+
+export async function initValueFilesAsync(workspace: string, contract: ValueContract, options: OrgPairsOptions = {}) {
+  return (await initValueFilesRunAsync(workspace, contract, options)).result;
 }

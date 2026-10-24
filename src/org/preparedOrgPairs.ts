@@ -3,9 +3,45 @@ import { dirname, join, relative } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy } from "../crypto/signing/signer.js";
 import { prepareFileSignatureWithAuditor } from "./orgSigner.js";
 import { verifyAuditorSignatureBytes } from "./orgSignatureBytes.js";
+import { canonicalize } from "../utils/json.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
+import { capturePurposePublication } from "../keys/purposePublication.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
+import { vaultStatus } from "../vault/vault.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+
+/** Fixed BUNDLE operation gate. Capture before the caller's FIRST await, not after a prerequisite. */
+export function captureOrgPairsAuthority(workspace: string, beforePublish?: () => void): () => void {
+  const actor = beforePublish; actor?.();
+  const descriptor = Object.freeze({ ...describePolicySigner(workspace, "BUNDLE") });
+  // The existing purpose seam performs only its normal local unlock/migration gate, before the full snapshot.
+  const purpose = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
+  const keyset = canonicalize(assertKeysetComplete(workspace)), trust = canonicalize(loadTrustConfig(workspace));
+  const holder = descriptor.mode === "VAULT" ? boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file" : null;
+  const assertCurrent = () => {
+    actor?.();
+    assertPolicySignerCurrent(workspace, descriptor);
+    if (canonicalize(assertKeysetComplete(workspace)) !== keyset || canonicalize(loadTrustConfig(workspace)) !== trust)
+      throw new Error("original BUNDLE operation authority changed before publication");
+    if (purpose !== null && holder !== null) {
+      const current = assertKeysetComplete(workspace), policy = keyPolicy(loadKeysConfig(workspace));
+      if (current === null || canonicalize(current) !== purpose.keyset || !policy.allowed.includes(descriptor.algorithm)
+        || (holder === "file" && policy.requireNonExportable)) throw new Error("original BUNDLE purpose authority is refused");
+      assertSigningKeyUsable(workspace, "artifact-seal", descriptor.publicKeyPem, holder);
+      if (holder === "file") {
+        if (!vaultStatus(workspace).unlocked) throw new Error("original BUNDLE vault is locked; unlock before publication");
+        if (publicKeyFromPrivate(getSigningKey(workspace, "artifact-seal")) !== descriptor.publicKeyPem)
+          throw new Error("original BUNDLE vault key changed or is unavailable");
+      }
+    }
+  };
+  assertCurrent(); return assertCurrent;
+}
 
 interface Member { readonly path: string; readonly bytes: Buffer | null; readonly mode: number | null; readonly identity: string | null }
 export interface OrgPairsSnapshot { readonly members: readonly Member[] }
@@ -80,9 +116,9 @@ export function publishOrgPairs(workspace: string, writes: readonly OrgPairWrite
 }
 /** Internal fixed BUNDLE preparation. Retain the original gate across a real later log/scheduler phase. */
 export async function prepareOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  const beforePublish = options.beforePublish, assertInputsCurrent = options.assertInputsCurrent;
-  beforePublish?.(); const planned = plan(writes, previous), prepared = [];
-  for (const row of planned.own) prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE"));
+  const beforePublish = captureOrgPairsAuthority(workspace, options.beforePublish), assertInputsCurrent = options.assertInputsCurrent;
+  beforePublish(); const planned = plan(writes, previous), prepared = [];
+  for (const row of planned.own) { beforePublish(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE")); beforePublish(); }
   let published = false;
   const assertCurrent = () => { beforePublish?.(); for (const row of prepared) row.assertCurrent();
     if (published) for (let index = 0; index < planned.own.length; index += 1) {
@@ -93,7 +129,7 @@ export async function prepareOrgPairsAsync(workspace: string, writes: readonly O
     }
   };
   return Object.freeze({ assertCurrent, publish() {
-    const result = publish(workspace, planned, prepared.map(row => row.signatureBytes), () => { for (const row of prepared) row.assertCurrent(); }, { beforePublish, assertInputsCurrent });
+    const result = publish(workspace, planned, prepared.map(row => row.signatureBytes), assertCurrent, { beforePublish, assertInputsCurrent });
     published = true; return result;
   } });
 }

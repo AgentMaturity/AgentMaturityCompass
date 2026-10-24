@@ -1,3 +1,4 @@
+import YAML from "yaml";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { listAgents, loadAgentConfig } from "../fleet/registry.js";
@@ -14,11 +15,14 @@ import { loadInstalledPluginsLock, loadPluginRegistriesConfig } from "../plugins
 import { loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { openLedger } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { captureOrgPairsAuthority, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { hashId } from "../bench/benchRedaction.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
-  cgxGraphSchema,
+  cgxGraphSchema, cgxPolicySchema,
   type CgxEdge,
   type CgxGraph,
   type CgxNode,
@@ -29,7 +33,7 @@ import {
   cgxLatestGraphPath,
   cgxPolicySha256,
   loadCgxPolicy,
-  saveCgxGraph,
+  saveCgxGraph, prepareCgxGraphAsync, loadCgxPolicyAttemptAsync, cgxPolicyPath,
   verifyCgxPolicySignature
 } from "./cgxStore.js";
 
@@ -103,7 +107,7 @@ function effectiveScope(workspace: string, scope: CgxScope): CgxScope {
 }
 
 function allowedByEvidenceGate(workspace: string, scope: CgxScope, policy: CgxPolicy): boolean {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, { readonly: true });
   try {
     const runs = ledger
       .listRuns()
@@ -144,18 +148,30 @@ function allowedByEvidenceGate(workspace: string, scope: CgxScope, policy: CgxPo
   }
 }
 
+function graphInputs(workspace: string, selectedScope: CgxScope, policy: CgxPolicy) {
+  const scope = effectiveScope(workspace, selectedScope), agents = (scope.type === "agent" ? [scope.id] : listAgents(workspace).map(row => row.id)).sort((a, b) => a.localeCompare(b));
+  const budgets = loadBudgetsConfig(workspace);
+  return { scope, allowExtended: allowedByEvidenceGate(workspace, scope, policy), trustValid: verifyTrustConfigSignature(workspace).valid,
+    trust: loadTrustConfig(workspace), agents: agents.map(id => ({ id, config: loadAgentConfig(workspace, id), transform: loadLatestTransformPlan(workspace, { type: "AGENT", agentId: id }),
+      forecast: loadLatestForecastArtifact(workspace, { type: "AGENT", id }), budget: budgetForAgent(budgets, id) })),
+    bridge: loadBridgeConfig(workspace), tools: requireTrustedToolhubContext(workspace), action: loadActionPolicy(workspace), approval: loadApprovalPolicy(workspace),
+    plugins: { installed: loadInstalledPluginsLock(workspace).installed.slice(0, 100).map(row => ({ id: row.id, version: row.version })) }, registries: loadPluginRegistriesConfig(workspace), bench: loadBenchComparison(workspace) };
+}
+
 function buildGraph(params: {
   workspace: string;
   scope: CgxScope;
   policy: CgxPolicy;
+  inputs?: ReturnType<typeof graphInputs>;
+  policySha256?: string;
 }): CgxGraph {
-  const scope = effectiveScope(params.workspace, params.scope);
+  const inputs = params.inputs ?? graphInputs(params.workspace, params.scope, params.policy), scope = inputs.scope;
   const nodeMap = new Map<string, CgxNode>();
   const edgeMap = new Map<string, CgxEdge>();
-  const allowExtended = allowedByEvidenceGate(params.workspace, scope, params.policy);
+  const allowExtended = inputs.allowExtended;
 
-  const trustSig = verifyTrustConfigSignature(params.workspace);
-  const trust = loadTrustConfig(params.workspace);
+  const trustSig = { valid: inputs.trustValid };
+  const trust = inputs.trust;
   const workspaceId = hashId(params.workspace, 8);
   const wsNodeId = `workspace:${workspaceId}`;
 
@@ -189,9 +205,10 @@ function buildGraph(params: {
     }
   });
 
-  const agents = scope.type === "agent" ? [scope.id] : listAgents(params.workspace).map((row) => row.id);
+  const agents = inputs.agents.map(row => row.id);
   for (const agentId of agents.sort((a, b) => a.localeCompare(b))) {
-    const cfg = loadAgentConfig(params.workspace, agentId);
+    const selected = inputs.agents.find(row => row.id === agentId)!;
+    const cfg = selected.config;
     const agentIdHash = hashId(agentId, 8);
     const agentNodeId = `agent:${agentIdHash}`;
     addNode(nodeMap, {
@@ -235,10 +252,7 @@ function buildGraph(params: {
       }
     });
 
-    const transform = loadLatestTransformPlan(params.workspace, {
-      type: "AGENT",
-      agentId
-    });
+    const transform = selected.transform;
     if (transform) {
       const planNodeId = `transformPlan:${transform.planId}`;
       addNode(nodeMap, {
@@ -286,10 +300,7 @@ function buildGraph(params: {
       }
     }
 
-    const forecast = loadLatestForecastArtifact(params.workspace, {
-      type: "AGENT",
-      id: agentId
-    });
+    const forecast = selected.forecast;
     if (forecast) {
       const fNodeId = `forecast:${agentIdHash}`;
       addNode(nodeMap, {
@@ -314,7 +325,7 @@ function buildGraph(params: {
     }
   }
 
-  const bridge = loadBridgeConfig(params.workspace);
+  const bridge = inputs.bridge;
   for (const [provider, config] of Object.entries(bridge.bridge.providers)) {
     if (!config.enabled) {
       continue;
@@ -364,7 +375,7 @@ function buildGraph(params: {
     }
   }
 
-  const toolContext = requireTrustedToolhubContext(params.workspace);
+  const toolContext = inputs.tools;
   for (const group of toolContext.groups) {
     if (group.server) {
       addNode(nodeMap, {
@@ -423,7 +434,7 @@ function buildGraph(params: {
     }
   }
 
-  const actionPolicy = loadActionPolicy(params.workspace);
+  const actionPolicy = inputs.action;
   const actionNodeId = `policy:action:v${actionPolicy.version}`;
   addNode(nodeMap, {
     id: actionNodeId,
@@ -445,7 +456,7 @@ function buildGraph(params: {
     }
   });
 
-  const approvalPolicy = loadApprovalPolicy(params.workspace);
+  const approvalPolicy = inputs.approval;
   const approvalNodeId = `approvalPolicy:v${approvalPolicy.approvalPolicy.version}`;
   addNode(nodeMap, {
     id: approvalNodeId,
@@ -467,9 +478,8 @@ function buildGraph(params: {
     }
   });
 
-  const budgets = loadBudgetsConfig(params.workspace);
   for (const agentId of agents) {
-    const budget = budgetForAgent(budgets, agentId);
+    const budget = inputs.agents.find(row => row.id === agentId)!.budget;
     if (!budget) {
       continue;
     }
@@ -485,7 +495,7 @@ function buildGraph(params: {
     });
   }
 
-  const plugins = loadInstalledPluginsLock(params.workspace);
+  const plugins = inputs.plugins;
   for (const plugin of plugins.installed.slice(0, 100)) {
     const pluginNodeId = `plugin:${plugin.id}@${plugin.version}`;
     addNode(nodeMap, {
@@ -509,7 +519,7 @@ function buildGraph(params: {
     });
   }
 
-  const registries = loadPluginRegistriesConfig(params.workspace);
+  const registries = inputs.registries;
   for (const registry of registries.pluginRegistries.registries) {
     const registryNodeId = `registry:${registry.id}`;
     addNode(nodeMap, {
@@ -533,7 +543,7 @@ function buildGraph(params: {
     });
   }
 
-  const bench = loadBenchComparison(params.workspace);
+  const bench = inputs.bench;
   if (bench) {
     const benchNodeId = `bench:latest`;
     addNode(nodeMap, {
@@ -570,7 +580,7 @@ function buildGraph(params: {
     v: 1,
     scope,
     generatedTs: Date.now(),
-    policySha256: cgxPolicySha256(params.workspace),
+    policySha256: params.policySha256 ?? cgxPolicySha256(params.workspace),
     nodes,
     edges,
     stats: {
@@ -629,4 +639,35 @@ export function buildCgxGraph(params: {
 
 export function cgxLatestGraphFile(workspace: string, scope: CgxScope): string {
   return cgxLatestGraphPath(workspace, scope);
+}
+
+export class CgxOutputsPartialError extends Error {
+  readonly code = "CGX_OUTPUTS_PARTIAL";
+  constructor(readonly publishedPaths: readonly string[], readonly phase: string, cause: unknown, readonly transparencyHashes: readonly string[] = []) {
+    super("CGX publication has committed earlier outputs; inspect state before retrying", { cause }); this.name = "CgxOutputsPartialError";
+  }
+}
+/** Maintained async writer. persist:false remains a computation-only synchronous-compatible branch. */
+export async function buildCgxGraphRunAsync(input: { workspace: string; scope: CgxScope; persist?: boolean }, options: OrgPairsOptions = {}) {
+  options = { ...options }; const params = { ...input, scope: { ...input.scope } }, initial = options.beforePublish; initial?.();
+  if (params.persist === false) return { result: buildCgxGraph(params), assertCurrent: () => {} };
+  const original = captureOrgPairsAuthority(params.workspace, initial);
+  const policyAttempt = await loadCgxPolicyAttemptAsync(params.workspace, { beforePublish: original }), beforePublish = policyAttempt.assertCurrent; beforePublish();
+  const policyPair = captureOrgPairs([cgxPolicyPath(params.workspace)]), policyBytes = orgPairBytes(policyPair, cgxPolicyPath(params.workspace)), policySignature = orgPairBytes(policyPair, `${cgxPolicyPath(params.workspace)}.sig`);
+  if (policyBytes === null || policySignature === null || !verifyAuditorSignatureBytes(params.workspace, "BUNDLE", policyBytes, policySignature).valid) throw new Error("cgx policy signature invalid: captured pair is not trusted");
+  const policy = cgxPolicySchema.parse(YAML.parse(policyBytes.toString("utf8"))), inputs = graphInputs(params.workspace, params.scope, policy), selected = canonicalize(inputs);
+  const graph = buildGraph({ ...params, policy, inputs, policySha256: sha256Hex(policyBytes) }); assertOrgPairsCurrent(policyPair);
+  const prepared = await prepareCgxGraphAsync(params.workspace, graph.scope, graph, { beforePublish, assertInputsCurrent() {
+    options.assertInputsCurrent?.(); assertOrgPairsCurrent(policyPair);
+    if (canonicalize(graphInputs(params.workspace, params.scope, policy)) !== selected) throw new Error("selected CGX graph inputs changed while signing");
+  } });
+  const saved = prepared.publish();
+  try {
+    prepared.assertCurrent(); const entry = await appendTransparencyEntryAsync({ workspace: params.workspace, type: "CGX_GRAPH_CREATED",
+      agentId: graph.scope.type === "agent" ? graph.scope.id : "workspace", artifact: { kind: "policy", id: `cgx-${graph.scope.type}-${graph.scope.id}-${graph.generatedTs}`, sha256: sha256Hex(canonicalize(graph)) } }, { beforeCommit: prepared.assertCurrent });
+    return { result: { graph, saved, transparencyHash: entry.hash }, assertCurrent: prepared.assertCurrent };
+  } catch (error) { throw new CgxOutputsPartialError([saved.latestPath, saved.latestSigPath, saved.snapshotPath, saved.snapshotSigPath], "graph-transparency", error); }
+}
+export async function buildCgxGraphAsync(params: Parameters<typeof buildCgxGraphRunAsync>[0], options: OrgPairsOptions = {}) {
+  return (await buildCgxGraphRunAsync(params, options)).result;
 }

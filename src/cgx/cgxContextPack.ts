@@ -8,18 +8,18 @@ import { loadOutcomeContract } from "../outcomes/outcomeContractEngine.js";
 import { listToolhubTools } from "../toolhub/toolhubCli.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import { loadLatestTransformPlan } from "../transformation/transformTasks.js";
-import { loadCgxPolicy } from "./cgxStore.js";
-import { cgxContextPackSchema, type CgxContextPack } from "./cgxSchema.js";
+import { loadCgxPolicy, loadCgxPolicyAttemptAsync, cgxPolicyPath, prepareCgxContextPackAsync, loadLatestCgxContextPack } from "./cgxStore.js";
+import YAML from "yaml";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { captureOrgPairsAuthority, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { canonicalize } from "../utils/json.js";
+import { cgxContextPackSchema, cgxPolicySchema, type CgxContextPack } from "./cgxSchema.js";
 
 function boolSort(values: string[]): string[] {
   return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
-export function buildCgxContextPack(params: {
-  workspace: string;
-  agentId?: string;
-}): CgxContextPack {
-  const policy = loadCgxPolicy(params.workspace);
+function contextPackWithPolicy(params: { workspace: string; agentId?: string }, policy: ReturnType<typeof loadCgxPolicy>): CgxContextPack {
   const agentId = resolveAgentId(params.workspace, params.agentId ?? "default");
   const agentConfig = loadAgentConfig(params.workspace, agentId);
   const fleet = (() => {
@@ -122,4 +122,29 @@ export function buildCgxContextPack(params: {
   };
 
   return cgxContextPackSchema.parse(payload);
+}
+
+export function buildCgxContextPack(params: { workspace: string; agentId?: string }): CgxContextPack {
+  return contextPackWithPolicy(params, loadCgxPolicy(params.workspace));
+}
+
+/** Prepares a missing-pack/public build without a hidden synchronous policy/pack initializer. */
+export async function prepareBuiltCgxContextPackAsync(params: { workspace: string; agentId?: string }, options: OrgPairsOptions = {}) {
+  options = { ...options }; params = { ...params }; const initial = captureOrgPairsAuthority(params.workspace, options.beforePublish);
+  const policyAttempt = await loadCgxPolicyAttemptAsync(params.workspace, { beforePublish: initial }), beforePublish = policyAttempt.assertCurrent; beforePublish();
+  const policyPair = captureOrgPairs([cgxPolicyPath(params.workspace)]), policyBytes = orgPairBytes(policyPair, cgxPolicyPath(params.workspace)), signature = orgPairBytes(policyPair, `${cgxPolicyPath(params.workspace)}.sig`);
+  if (policyBytes === null || signature === null || !verifyAuditorSignatureBytes(params.workspace, "BUNDLE", policyBytes, signature).valid) throw new Error("cgx context-pack policy is not trusted");
+  const policy = cgxPolicySchema.parse(YAML.parse(policyBytes.toString("utf8"))), pack = contextPackWithPolicy(params, policy);
+  const selected = canonicalize({ ...pack, generatedTs: 0 }); assertOrgPairsCurrent(policyPair);
+  const prepared = await prepareCgxContextPackAsync(params.workspace, pack.scope.id, pack, { beforePublish, assertInputsCurrent() {
+    options.assertInputsCurrent?.(); assertOrgPairsCurrent(policyPair);
+    if (canonicalize({ ...contextPackWithPolicy(params, policy), generatedTs: 0 }) !== selected) throw new Error("selected CGX context-pack inputs changed while signing");
+  } });
+  return { pack, assertCurrent: prepared.assertCurrent, publish: prepared.publish };
+}
+/** Used async prerequisite for prompt compilation; root must wire the excluded prompt caller explicitly. */
+export async function ensureCgxContextPackAsync(params: { workspace: string; agentId?: string }, options: OrgPairsOptions = {}) {
+  const own = { ...params }, agentId = resolveAgentId(own.workspace, own.agentId ?? "default"), existing = loadLatestCgxContextPack(own.workspace, agentId);
+  if (existing !== null) return existing;
+  const prepared = await prepareBuiltCgxContextPackAsync({ workspace: own.workspace, agentId }, options); prepared.publish(); return prepared.pack;
 }

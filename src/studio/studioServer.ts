@@ -49,20 +49,20 @@ import { emitAuditSse } from "../audit/auditSse.js";
 import {
   importValueCsvForApi,
   ingestValueWebhookForApi,
-  valueContractApplyForApi,
+  valueContractApplyForApiAsync as valueContractApplyForApi,
   valueContractForApi,
-  valueContractInitForApi,
-  valuePolicyApplyForApi,
-  valuePolicyForApi,
+  valueContractInitForApiAsync as valueContractInitForApi,
+  valuePolicyApplyForApiAsync as valuePolicyApplyForApi,
+  valuePolicyForApiAsync as valuePolicyForApi,
   valueReadinessGate,
   valueReportForApi,
   valueSchedulerRunNowForApi,
-  valueSchedulerSetEnabledForApi,
+  valueSchedulerSetEnabledForApiAsync as valueSchedulerSetEnabledForApi,
   valueSchedulerStatusForApi,
   valueSnapshotLatestForApi,
   verifyValueWebhookToken
 } from "../value/valueApi.js";
-import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
+import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { valueSchedulerTick } from "../value/valueScheduler.js";
 import { timeCheckpointTick } from "../time/checkpoint.js";
 import { emitValueSse } from "../value/valueSse.js";
@@ -325,11 +325,11 @@ import {
 } from "../diagnostic/bank/bankApi.js";
 import { verifyDiagnosticBankSignature } from "../diagnostic/bank/bankLoader.js";
 import {
-  cgxBuildForApi,
+  cgxBuildForApiAsync as cgxBuildForApi,
   cgxLatestGraphForApi,
   cgxLatestPackForApi,
-  cgxPolicyApplyForApi,
-  cgxPolicyForApi,
+  cgxPolicyApplyForApiAsync as cgxPolicyApplyForApi,
+  cgxPolicyForApiAsync as cgxPolicyForApi,
   cgxVerifyForApi
 } from "../cgx/cgxApi.js";
 import { verifyCgxPolicySignature } from "../cgx/cgxStore.js";
@@ -3440,7 +3440,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, cgxPolicyForApi(options.workspace));
+        const out = await cgxPolicyForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3461,10 +3461,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = cgxPolicyApplyForApi({
+        const out = await cgxPolicyApplyForApi({
           workspace: options.workspace,
-          policy: parsed.policy as ReturnType<typeof cgxPolicyForApi>["policy"]
-        });
+          policy: parsed.policy as Awaited<ReturnType<typeof cgxPolicyForApi>>["policy"]
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CGX_POLICY_APPLIED",
@@ -3496,11 +3496,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const targetId = typeof parsed.targetId === "string" ? parsed.targetId : url.searchParams.get("targetId");
-        const built = cgxBuildForApi({
+        const built = await cgxBuildForApi({
           workspace: options.workspace,
           scope: scopeRaw as "workspace" | "agent",
           targetId
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (built === null) return;
         emitCgxSse({
           hub: orgSse,
           type: "CGX_GRAPH_UPDATED"
@@ -4690,7 +4690,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, valuePolicyForApi(options.workspace));
+        const out = await valuePolicyForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4711,10 +4711,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy is required" });
           return;
         }
-        const out = valuePolicyApplyForApi({
+        const out = await valuePolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4761,7 +4761,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           ? (JSON.parse(body) as { contract?: unknown; scopeType?: unknown; scopeId?: unknown; type?: unknown; deployment?: unknown })
           : {};
         if (!parsed.contract && typeof parsed.type === "string") {
-          const out = valueContractInitForApi({
+          const out = await valueContractInitForApi({
             workspace: options.workspace,
             scopeType:
               typeof parsed.scopeType === "string"
@@ -4770,7 +4770,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
             type: parsed.type as "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other",
             deployment: typeof parsed.deployment === "string" ? (parsed.deployment as "single" | "host" | "k8s" | "compose") : undefined
-          });
+          }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
           emitValueSse({
             hub: orgSse,
             type: "VALUE_UPDATED"
@@ -4782,12 +4782,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "contract or type is required" });
           return;
         }
-        const out = valueContractApplyForApi({
+        const out = await valueContractApplyForApi({
           workspace: options.workspace,
           contract: parsed.contract,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4847,7 +4847,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: scope.toUpperCase(),
           scopeId: scope === "workspace" ? "workspace" : scopeId,
           windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         if (out.status === "INSUFFICIENT_EVIDENCE") {
           emitValueSse({
             hub: orgSse,
@@ -4874,7 +4874,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: scope.toUpperCase(),
           scopeId: scope === "workspace" ? "workspace" : scopeId,
           windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4914,7 +4914,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           windowDays: typeof parsed.windowDays === "number" ? parsed.windowDays : undefined
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4936,10 +4936,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, valueSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await valueSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: true }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4950,10 +4947,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, valueSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await valueSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: false }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
