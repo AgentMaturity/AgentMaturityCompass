@@ -8,7 +8,10 @@ import { assertOwnerMode } from "../mode/mode.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import { parseDelegation, verifyDelegation } from "../keys/delegation.js";
 import { DELEGATION_REL, getSigningPublicKeyPem } from "../keys/signingKeys.js";
-import { signingRoute } from "../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
@@ -17,7 +20,7 @@ import {
   type AnchorReceiptV1, type TransparencyConfig
 } from "../transparency/anchors/anchor.js";
 import { submitRekorV2Entry } from "../transparency/anchors/rekorV2.js";
-import { NOTE_MAX_BYTES, signNote, verifySignedNote } from "../transparency/checkpointNote.js";
+import { NOTE_MAX_BYTES, formatSignedNote, verifyCanonicalSignedNote } from "../transparency/checkpointNote.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { merkleCurrentRootPath } from "../transparency/merklePaths.js";
 import type { PublicAnchoring } from "../trust/verifierReport.js";
@@ -256,7 +259,7 @@ export interface AnchorResult { anchor: string; sequence: number; status: Public
  * P1-26: the signed C2SP note for a checkpoint whose transparency tree is RFC 9162, written once to
  * `.amc/transparency/anchors/<sequence>.note`; an existing note must be that text signed by an auditor key.
  */
-function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
+async function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Promise<Buffer> {
   const { sequence, transparency } = entry.checkpoint;
   if (transparency?.algorithm !== "rfc9162-sha256") {
     throw new Error(`checkpoint ${sequence} covers no RFC 9162 transparency tree; run \`amc transparency merkle rebuild --algorithm rfc9162-sha256\``);
@@ -265,21 +268,45 @@ function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
     treeSize: transparency.leafCount, rootHash: transparency.root });
   const origin = text.slice(0, text.indexOf("\n"));
   const path = checkpointNotePath(workspace, sequence);
-  if (pathExists(path)) {
-    const existing = boundedFile(path, NOTE_MAX_BYTES);
-    if (!getPublicKeyHistory(workspace, "auditor").some(pem => verifySignedNote(existing, { name: origin, publicKeyPem: pem }) === text)) {
-      throw new Error(`${path} is not checkpoint ${sequence}'s note signed by an auditor key`);
-    }
-    return existing;
+  const readExisting = (): Buffer | null => {
+    if (!pathExists(path)) return null;
+    try {
+      const existing = boundedFile(path, NOTE_MAX_BYTES);
+      if (!getPublicKeyHistory(workspace, "auditor").some(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text)) throw new Error("signature refused");
+      return existing;
+    } catch (error) { throw new Error(`stored checkpoint ${sequence} note is not its canonical auditor signature`, { cause: error }); }
+  };
+  const existing = readExisting();
+  if (existing !== null) return existing; // Reading an already signed note does not mint a new signature.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize checkpoint note signing");
+  const signer = describePolicySigner(workspace, "MERKLE_ROOT");
+  if (signer.mode === "NOTARY") {
+    throw new Error("the trust config requires the notary for MERKLE_ROOT, and the notary does not provide raw-message C2SP note signing");
   }
-  // Mirrors signDigestWithPolicy: where the notary must sign Merkle roots, the vault key does not sign their checkpoints.
-  if (signingRoute(workspace, "MERKLE_ROOT") === "notary") {
-    throw new Error("the trust config requires the notary for MERKLE_ROOT, and a C2SP note needs a raw Ed25519 signature the notary does not make");
-  }
-  const note = Buffer.from(signNote(text, origin, getSigningKey(workspace, "artifact-seal")), "utf8");
-  ensureDir(anchorsDir(workspace));
-  writeFileSync(path, note, { flag: "wx", mode: 0o644 });
-  return note;
+  const policy = JSON.stringify(loadTrustConfig(workspace));
+  const captured = capturePurposePublication(workspace, "artifact-seal");
+  const sourcePath = join(checkpointsDir(workspace), `${sequence}.json`);
+  const readSource = (): Buffer => {
+    try { return boundedFile(sourcePath, 64 * 1024); }
+    catch (error) { throw new Error("the selected checkpoint note input is unreadable", { cause: error }); }
+  };
+  const source = readSource();
+  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(text, "utf8"));
+  const note = Buffer.from(formatSignedNote(text, origin, signed.publicKeyPem, signed.signature), "utf8");
+  return withControlFileLock({ root: anchorsDir(workspace), name: `checkpoint-note-${sequence}`, operation: () => {
+    assertPurposePublicationCurrent(workspace, captured, signed);
+    assertPolicySignerCurrent(workspace, signer);
+    if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("checkpoint note signing policy changed while signing");
+    let current: VerifiedCheckpoint | undefined;
+    try { current = readCheckpointChain(workspace, workspaceSelfTrust(workspace)).find(row => row.checkpoint.sequence === sequence); }
+    catch (error) { throw new Error("the selected checkpoint note input no longer verifies", { cause: error }); }
+    if (current?.sha256 !== entry.sha256 || canonicalize(current.checkpoint) !== canonicalize(entry.checkpoint)
+      || !readSource().equals(source)) throw new Error("the selected checkpoint changed while its note was signed");
+    const concurrent = readExisting();
+    if (concurrent !== null) return concurrent;
+    writeFileSync(path, note, { flag: "wx", mode: 0o644 });
+    return note;
+  } });
 }
 
 async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, anchor: TransparencyConfig["anchors"][number], trust: TrustContext): Promise<AnchorResult> {
@@ -289,7 +316,7 @@ async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, an
   const logs = pinnedTransparencyLogs(trust).filter(log => selected.logIds.includes(log.logId));
   if (!logs.length) return result("failed", `none of its logIds (${selected.logIds.join(", ")}) is in a verified trust list`);
   try {
-    const note = checkpointNote(workspace, entry);
+    const note = await checkpointNote(workspace, entry);
     const digest = sha256Hex(note);
     // The token first: a public log entry is permanent, so nothing is submitted that the anchor could not complete.
     const { grant, failures } = await timestampDigest(workspace, digest, trust);
