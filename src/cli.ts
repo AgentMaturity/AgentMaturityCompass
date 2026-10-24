@@ -49,8 +49,8 @@ import {
   suggestCommandPaths
 } from "./cliUx.js";
 import {
-  bindAgentRoute,
-  initGatewayConfig,
+  bindGatewayAgentAsync,
+  initGatewayConfigAsync,
   loadGatewayConfig,
   presetGatewayConfigForProvider,
   saveGatewayConfig,
@@ -123,7 +123,7 @@ import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsyn
 import {
   addAgentInteractive,
   buildAgentConfig,
-  initFleet,
+  initFleetAsync,
   listAgents,
   loadAgentConfig,
   removeAgent,
@@ -292,7 +292,7 @@ import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
-import { fixSignatures, inspectSignatures } from "./studio/signatures.js";
+import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
   completeOnboarding,
   createOnboardingState,
@@ -10179,7 +10179,7 @@ gateway
   .option("--header <name>", "header name for header_env", "x-api-key")
   .option("--param <name>", "query param for query_env", "key")
   .action(
-    (opts: {
+    async (opts: {
       provider: string;
       baseUrl?: string;
       authType: "bearer_env" | "header_env" | "query_env" | "none";
@@ -10212,7 +10212,7 @@ gateway
         };
       }
 
-      const created = initGatewayConfig(process.cwd(), config);
+      const created = await initGatewayConfigAsync(process.cwd(), config);
       console.log(chalk.green(`Gateway config created: ${created.configPath}`));
       console.log(chalk.green(`Gateway config signature: ${created.sigPath}`));
     }
@@ -10311,11 +10311,8 @@ gateway
   .requiredOption("--route <prefix>", "route prefix, e.g. /openai")
   .requiredOption("--agent <agentId>", "agent ID to bind")
   .option("--config <path>", "gateway config path", ".amc/gateway.yaml")
-  .action((opts: { route: string; agent: string; config: string }) => {
-    const cfg = loadGatewayConfig(process.cwd(), opts.config);
-    const updated = bindAgentRoute(cfg, opts.route, opts.agent);
-    saveGatewayConfig(process.cwd(), updated, opts.config);
-    signGatewayConfig(process.cwd(), opts.config);
+  .action(async (opts: { route: string; agent: string; config: string }) => {
+    await bindGatewayAgentAsync(process.cwd(), opts.route, opts.agent, opts.config);
     console.log(chalk.green(`Bound route ${opts.route} -> agent ${opts.agent}`));
   });
 
@@ -13931,14 +13928,19 @@ program
   .command("fix-signatures")
   .description("Verify and re-sign gateway/fleet/agent configs")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) => {
+  .action(async (opts: { agent?: string }) => {
     const preview = inspectSignatures(process.cwd(), opts.agent ?? activeAgent(program));
     const invalid = preview.statuses.filter((row) => !row.valid);
     if (invalid.length === 0) {
       console.log(chalk.green("All config signatures are valid."));
       return;
     }
-    const fixed = fixSignatures(process.cwd(), opts.agent ?? activeAgent(program));
+    const fixed = await fixSignaturesAsync(process.cwd(), opts.agent ?? activeAgent(program)).catch((error: unknown) => {
+      if (error instanceof FixSignaturesPublicationError) console.error(JSON.stringify({ phase: error.phase, resigned: error.resigned,
+        publishedPaths: error.publishedPaths, auditEventId: error.auditEventId, auditSessionId: error.auditSessionId,
+        cause: error.cause instanceof Error ? error.cause.message : String(error.cause) }, null, 2));
+      throw error;
+    });
     console.log(chalk.green("Re-signed invalid configs."));
     for (const row of fixed.statuses) {
       console.log(`- ${row.kind}: ${row.valid ? "valid" : "invalid"} (${row.reason ?? "ok"})`);
@@ -14239,8 +14241,8 @@ fleet
   .command("init")
   .description("Create and sign .amc/fleet.yaml")
   .option("--org <name>", "organization name", "AMC Fleet")
-  .action((opts: { org: string }) => {
-    const created = initFleet(process.cwd(), { orgName: opts.org });
+  .action(async (opts: { org: string }) => {
+    const created = await initFleetAsync(process.cwd(), { orgName: opts.org });
     console.log(chalk.green(`Fleet config created: ${created.fleetPath}`));
     console.log(chalk.green(`Fleet config signature: ${created.signaturePath}`));
   });

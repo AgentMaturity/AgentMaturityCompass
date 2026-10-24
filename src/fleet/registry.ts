@@ -4,7 +4,9 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import YAML from "yaml";
 import { z } from "zod";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { captureRawConfigPair, verifyRawConfigSignature, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "../targets/targetProfile.js";
 import type { RiskTier, TrustTier } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -78,22 +80,8 @@ const signatureSchema = z.object({
   signer: z.literal("auditor")
 });
 
-function signDigest(workspace: string, digest: string): string {
-  return signHexDigest(digest, getSigningKey(workspace, "config-signature"));
-}
-
 function writeSignedFile(workspace: string, filePath: string, content: string): string {
-  writeFileAtomic(filePath, content, 0o644);
-  const digest = sha256Hex(Buffer.from(content, "utf8"));
-  const payload = {
-    digestSha256: digest,
-    signature: signDigest(workspace, digest),
-    signedTs: Date.now(),
-    signer: "auditor" as const
-  };
-  const sigPath = `${filePath}.sig`;
-  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
-  return sigPath;
+  return captureRawConfigPair(workspace, filePath, Buffer.from(content, "utf8")).publishSync().sigPath;
 }
 
 function verifySignedFile(workspace: string, filePath: string): {
@@ -110,13 +98,15 @@ function verifySignedFile(workspace: string, filePath: string): {
     return { valid: false, signatureExists: false, reason: "signature missing", sigPath };
   }
   try {
-    const sig = signatureSchema.parse(JSON.parse(readFileSync(sigPath, "utf8")) as unknown);
-    const digest = sha256Hex(readFileSync(filePath));
+    const pair = captureOrgPairs([filePath]), body = orgPairBytes(pair, filePath), sidecar = orgPairBytes(pair, sigPath);
+    if (body === null || sidecar === null) throw new Error("config pair changed while reading");
+    const value: unknown = JSON.parse(sidecar.toString("utf8"));
+    if (value !== null && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, "envelope")) throw new Error("raw config signature does not carry an envelope");
+    const sig = signatureSchema.parse(value), digest = sha256Hex(body);
     if (digest !== sig.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch", sigPath };
     }
-    const keys = getPublicKeyHistory(workspace, "auditor");
-    const ok = verifyHexDigestAny(digest, sig.signature, keys);
+    const ok = verifyRawConfigSignature(workspace, digest, sig.signature);
     return { valid: ok, signatureExists: true, reason: ok ? null : "signature verify failed", sigPath };
   } catch (error) {
     return {
@@ -147,8 +137,7 @@ export function initFleet(workspace: string, config?: Partial<FleetConfig>): {
   signaturePath: string;
   fleet: FleetConfig;
 } {
-  ensureDir(join(workspace, ".amc"));
-  ensureDir(fleetAgentsDir(workspace));
+  assertOwnerMode(workspace, "fleet init");
   const base = defaultFleetConfig();
   const merged = fleetSchema.parse({
     ...base,
@@ -159,8 +148,23 @@ export function initFleet(workspace: string, config?: Partial<FleetConfig>): {
     }
   });
   const fleetPath = fleetConfigPath(workspace);
-  const signaturePath = writeSignedFile(workspace, fleetPath, YAML.stringify(merged));
+  const prepared = captureRawConfigPair(workspace, fleetPath, Buffer.from(YAML.stringify(merged)),
+    { beforePublish() { assertOwnerMode(workspace, "fleet init"); } });
+  const signed = prepared.prepareSync(); signed.assertCurrent();
+  ensureDir(fleetAgentsDir(workspace));
+  const signaturePath = signed.publish().sigPath;
   return { fleetPath, signaturePath, fleet: merged };
+}
+
+export async function initFleetAsync(workspace: string, config?: Partial<FleetConfig>): Promise<{ fleetPath: string; signaturePath: string; fleet: FleetConfig }> {
+  assertOwnerMode(workspace, "fleet init");
+  const base = defaultFleetConfig(), copied = structuredClone(config ?? {});
+  const fleet = fleetSchema.parse({ ...base, ...copied, globalPolicies: { ...base.globalPolicies, ...copied.globalPolicies } });
+  const prepared = await prepareFleetConfigPair(workspace, Buffer.from(YAML.stringify(fleet)),
+    { beforePublish() { assertOwnerMode(workspace, "fleet init"); } });
+  prepared.assertCurrent(); ensureDir(fleetAgentsDir(workspace));
+  const result = prepared.publish();
+  return { fleetPath: result.path, signaturePath: result.sigPath, fleet };
 }
 
 export function loadFleetConfig(workspace: string): FleetConfig {
@@ -190,12 +194,20 @@ export function verifyFleetConfigSignature(workspace: string): {
 
 export function signFleetConfig(workspace: string): { path: string; sigPath: string } {
   const path = fleetConfigPath(workspace);
-  if (!pathExists(path)) {
-    throw new Error(`Fleet config not found: ${path}`);
-  }
-  const raw = readFileSync(path, "utf8");
-  const sigPath = writeSignedFile(workspace, path, raw);
-  return { path, sigPath };
+  if (!pathExists(path)) throw new Error(`Fleet config not found: ${path}`);
+  const previous = captureOrgPairs([path]), raw = orgPairBytes(previous, path);
+  if (raw === null) throw new Error(`Fleet config not found: ${path}`);
+  return captureRawConfigPair(workspace, path, Buffer.from(raw.toString("utf8")), { previous }).publishSync();
+}
+/** Retains the fleet writer's original body replacement and four-field raw sidecar. */
+export function prepareFleetConfigPair(workspace: string, replacement?: Uint8Array, options: ConfigSignaturePairOptions = {}) {
+  const file = fleetConfigPath(workspace), previous = options.previous ?? captureOrgPairs([file]);
+  const bytes = replacement === undefined ? orgPairBytes(previous, file) : Buffer.from(replacement);
+  if (bytes === null) throw new Error(`Fleet config not found: ${file}`);
+  return captureRawConfigPair(workspace, file, Buffer.from(bytes.toString("utf8")), { ...options, previous }).prepare();
+}
+export async function signFleetConfigAsync(workspace: string): Promise<{ path: string; sigPath: string }> {
+  return (await prepareFleetConfigPair(workspace)).publish();
 }
 
 function defaultAgentArtifacts(paths: ReturnType<typeof getAgentPaths>): void {
@@ -342,6 +354,14 @@ export function saveAgentConfig(workspace: string, config: AgentConfig): {
   };
 }
 
+export async function saveAgentConfigAsync(workspace: string, config: AgentConfig): Promise<{ configPath: string; sigPath: string }> {
+  const copied = structuredClone(config), paths = getAgentPaths(workspace, copied.id);
+  const prepared = await captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(YAML.stringify(copied)), {
+    beforePublish() { if (getAgentPaths(workspace, copied.id).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing"); }
+  }).prepare();
+  const result = prepared.publish(); return { configPath: result.path, sigPath: result.sigPath };
+}
+
 export function updateAgentProvider(
   workspace: string,
   agentId: string,
@@ -389,20 +409,26 @@ export function verifyAgentConfigSignature(workspace: string, agentId?: string):
   };
 }
 
-export function signAgentConfig(workspace: string, agentId?: string): {
-  configPath: string;
-  sigPath: string;
-} {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!pathExists(paths.agentConfig)) {
-    throw new Error(`Agent config not found: ${paths.agentConfig}`);
-  }
-  const raw = readFileSync(paths.agentConfig, "utf8");
-  const sigPath = writeSignedFile(workspace, paths.agentConfig, raw);
-  return {
-    configPath: paths.agentConfig,
-    sigPath
-  };
+export function signAgentConfig(workspace: string, agentId?: string): { configPath: string; sigPath: string } {
+  const paths = getAgentPaths(workspace, agentId), previous = captureOrgPairs([paths.agentConfig]), raw = orgPairBytes(previous, paths.agentConfig);
+  if (raw === null) throw new Error(`Agent config not found: ${paths.agentConfig}`);
+  const sigPath = captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(raw.toString("utf8")), { previous,
+    beforePublish() { if (getAgentPaths(workspace, agentId).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing"); }
+  }).publishSync().sigPath;
+  return { configPath: paths.agentConfig, sigPath };
+}
+export function prepareAgentConfigPair(workspace: string, agentId?: string, options: ConfigSignaturePairOptions = {}) {
+  const paths = getAgentPaths(workspace, agentId), previous = options.previous ?? captureOrgPairs([paths.agentConfig]), raw = orgPairBytes(previous, paths.agentConfig);
+  if (raw === null) throw new Error(`Agent config not found: ${paths.agentConfig}`);
+  const caller = options.beforePublish;
+  return captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(raw.toString("utf8")), { previous, beforePublish() {
+    caller?.();
+    if (getAgentPaths(workspace, agentId).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing");
+  } }).prepare();
+}
+export async function signAgentConfigAsync(workspace: string, agentId?: string): Promise<{ configPath: string; sigPath: string }> {
+  const result = (await prepareAgentConfigPair(workspace, agentId)).publish();
+  return { configPath: result.path, sigPath: result.sigPath };
 }
 
 export function scaffoldAgent(workspace: string, config: AgentConfig): {

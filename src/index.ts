@@ -36,17 +36,17 @@ export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefu
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
 
 export {
-  initGatewayConfig,
+  initGatewayConfig, initGatewayConfigAsync, bindGatewayAgentAsync,
   loadGatewayConfig,
   resolveGatewayConfigEnv,
-  signGatewayConfig,
+  signGatewayConfig, signGatewayConfigAsync,
   verifyGatewayConfigSignature,
   routeBaseUrls
 } from "./gateway/config.js";
 export { startGateway, gatewayStatus } from "./gateway/server.js";
 
 export {
-  initFleet,
+  initFleet, initFleetAsync, signFleetConfigAsync, signAgentConfigAsync,
   loadFleetConfig,
   verifyFleetConfigSignature,
   addAgentInteractive,
@@ -544,7 +544,7 @@ export {
   taxonomyAllowsModel,
   type ModelTaxonomy
 } from "./bridge/modelTaxonomy.js";
-export { inspectSignatures, fixSignatures } from "./studio/signatures.js";
+export { inspectSignatures, fixSignatures, fixSignaturesAsync } from "./studio/signatures.js";
 export { startStudioApiServer } from "./studio/studioServer.js";
 export { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 export { createVault, unlockVault, lockVault, vaultStatus, ensureVaultAndPublicKeys } from "./vault/vault.js"; export { rotateMonitorKeyInVault } from "./keys/purposeKeys.js"; // P1-08: index.ts line budget
