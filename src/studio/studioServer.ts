@@ -207,11 +207,11 @@ import { frameworkChoices, type ComplianceFramework } from "../compliance/framew
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
 import { complianceFleetReportCli } from "../compliance/complianceCli.js";
 import { federateExportCli, federateImportCli, federatePeerListCli, federateVerifyCli } from "../federation/federationCli.js";
-import { integrationsDispatchCli, integrationsStatusCli, integrationsTestCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
+import { integrationsStatusCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
 import { verifyOpsReceiptForEvent } from "../integrations/opsReceipt.js";
 import {
-  dispatchIntegrationEvent,
-  drainDueIntegrationDeliveries
+  dispatchIntegrationEvent, dispatchIntegrationEventWithAuthority, dispatchIntegrationTestWithAuthority,
+  drainDueIntegrationDeliveriesWithAuthority
 } from "../integrations/integrationDispatcher.js";
 import { resolveSecretRef } from "../integrations/integrationStore.js";
 import {
@@ -1485,10 +1485,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
+  let shuttingDown = false;
+  const integrationQueueWork = new Set<Promise<void>>();
   const drainIntegrationQueue = (): void => {
-    void drainDueIntegrationDeliveries({ workspace: options.workspace }).catch(() => {
-      // Delivery state remains durable in SQLite and will be retried on a later tick.
-    });
+    const work = drainDueIntegrationDeliveriesWithAuthority({ workspace: options.workspace }, () => {
+      if (shuttingDown) throw new Error("integration queue worker stopped");
+    }).then(() => undefined, () => undefined); // Durable queue state remains available for a later tick.
+    integrationQueueWork.add(work); void work.then(() => integrationQueueWork.delete(work));
   };
   drainIntegrationQueue();
 
@@ -1567,7 +1570,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   }, 60_000);
 
-  let shuttingDown = false;
   let inFlightRequests = 0;
   const openSockets = new Set<Socket>();
 
@@ -8025,11 +8027,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { channelId?: string }) : {};
-        const out = await integrationsTestCli({
+        const out = await dispatchIntegrationTestWithAuthority({
           workspace: options.workspace,
           channelId: parsed.channelId
-        });
-        json(res, 200, out);
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -8045,14 +8047,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "eventName and agentId are required" });
           return;
         }
-        const out = await integrationsDispatchCli({
+        const out = await dispatchIntegrationEventWithAuthority({
           workspace: options.workspace,
           eventName: parsed.eventName,
           agentId: parsed.agentId,
-          summary: parsed.summary,
+          summary: parsed.summary ?? `AMC integration dispatch for ${parsed.eventName}`,
           details: parsed.details
-        });
-        json(res, 200, out);
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -8757,7 +8759,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     port,
     url: `http://${host}:${port}`,
     close: async () => {
-      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork]);
+      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork, ...integrationQueueWork]);
       let nativeCleanupError: unknown;
       try { await nativeTaskService.close(); } catch (error) { nativeCleanupError = error; }
       for (const socket of openSockets) {
