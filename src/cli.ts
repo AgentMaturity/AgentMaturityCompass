@@ -495,7 +495,7 @@ import {
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
 import {
-  outcomesAttestCli,
+  outcomesAttestCliAsync,
   outcomesDiffCli,
   outcomesFleetReportCli,
   outcomesInitCliAsync,
@@ -13135,9 +13135,9 @@ outcomes
   .option("--workorder <id>", "work order ID")
   .option("--unit <unit>", "unit label")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { metric: string; value: string; reason: string; workorder?: string; unit?: string; agent?: string }) => {
+  .action(async (opts: { metric: string; value: string; reason: string; workorder?: string; unit?: string; agent?: string }) => {
     assertOwnerMode(process.cwd(), commandPath(outcomes.commands.find((c) => c.name() === "attest") ?? outcomes));
-    const out = outcomesAttestCli({
+    const out = await outcomesAttestCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       metricId: opts.metric,

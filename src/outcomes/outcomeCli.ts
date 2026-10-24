@@ -1,6 +1,15 @@
+import { relative } from "node:path";
+import YAML from "yaml";
+import { readContainedOrNull } from "../utils/containedFs.js";
+import { outcomeContractSchema } from "./outcomeContractSchema.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { vaultStatus } from "../vault/vault.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -195,4 +204,52 @@ export function loadOutcomeReportCli(params: { workspace: string; agentId?: stri
 
 export async function outcomesResignCliAsync(params: { workspace: string; agentId?: string }): Promise<{ sigPath: string }> {
   return { sigPath: await signOutcomeContractAsync(params.workspace, params.agentId) };
+}
+
+function manualAttestationContract(workspace: string, agentId: string) {
+  const path = outcomeContractPath(workspace, agentId), rel = relative(workspace, path).replace(/\\/g, "/");
+  try {
+    const bytes = readContainedOrNull(workspace, rel, 1024 * 1024), signature = readContainedOrNull(workspace, rel + ".sig", 64 * 1024);
+    if (bytes === null || signature === null) throw new Error("missing contract pair");
+    const record = JSON.parse(signature.toString("utf8")) as { digestSha256?: unknown; signature?: unknown };
+    const digest = sha256Hex(bytes);
+    assertKeysetComplete(workspace);
+    if (record.digestSha256 !== digest || typeof record.signature !== "string"
+      || !verifyHexDigestAny(digest, record.signature, getPurposeKeyHistory(workspace, "config-signature"))) throw new Error("invalid contract signature");
+    return { path, bytes, signature, contract: outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8"))) };
+  } catch { throw new Error("Manual outcome attestation requires a verified outcome contract"); }
+}
+
+/** Checked signing happens before the short SQL transaction; the original manual row and raw signature wire are unchanged. */
+export async function outcomesAttestCliAsync(params: Parameters<typeof outcomesAttestCli>[0],
+  options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof outcomesAttestCli>> {
+  const input = Object.freeze({ ...params }), beforePublish = options.beforePublish;
+  if (Object.values(input).some(value => value !== undefined && typeof value !== "string")) throw new Error("Manual outcome attestation inputs must be strings");
+  beforePublish?.();
+  const agentId = resolveAgentId(input.workspace, input.agentId), authority = capturePurposePublication(input.workspace, "artifact-seal");
+  const contract = manualAttestationContract(input.workspace, agentId);
+  const metric = contract.contract.outcomeContract.metrics.find(row => row.metricId === input.metricId);
+  if (!metric) throw new Error("metricId not found in contract: " + input.metricId);
+  const value = parseValue(input.value);
+  const attestationDigest = sha256Hex(JSON.stringify({ agentId, metricId: input.metricId, value: input.value, reason: input.reason, ts: Date.now() }));
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(attestationDigest, "hex"));
+  const original = () => { if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked) throw new Error("vault locked; unlock required for manual outcome attestation"); assertPurposePublicationCurrent(input.workspace, authority, signed); };
+  original();
+  beforePublish?.(); original();
+  const ledger = openLedger(input.workspace);
+  try {
+    return ledger.db.transaction(() => {
+      const current = manualAttestationContract(input.workspace, agentId);
+      if (!current.bytes.equals(contract.bytes) || !current.signature.equals(contract.signature)) throw new Error("Manual outcome contract changed while signing was prepared");
+      original();
+      // The attestation binds no prior row; appendOutcomeEvent takes the current predecessor under this transaction.
+      const written = ledger.appendOutcomeEvent({
+        agentId, workOrderId: input.workOrderId ?? null, category: metric.category, metricId: input.metricId,
+        value, unit: input.unit ?? null, trustTier: "SELF_REPORTED", source: "manual",
+        meta: { attestation: { kind: "self_attested" }, reason: input.reason, attestationDigest,
+          auditorAttestationSig: signed.signature.toString("base64"), contractPath: contract.path }
+      });
+      return { outcomeEventId: written.outcomeEventId, eventHash: written.eventHash, receiptId: written.receiptId, trustTier: "SELF_REPORTED" as const };
+    }).immediate();
+  } finally { ledger.close(); }
 }
