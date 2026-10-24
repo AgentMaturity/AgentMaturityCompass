@@ -578,7 +578,7 @@ import {
   experimentOptimizeCli,
   experimentOptimizerListCli,
   experimentOptimizerShowCli,
-  experimentRunCli,
+  experimentRunCliAsync,
   experimentSetBaselineCli,
   experimentSetCandidateCli
 } from "./experiments/experimentCli.js";
@@ -13770,14 +13770,16 @@ experiment
   .description("Run deterministic experiment against signed casebook")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--mode <mode>", "supervise|sandbox")
+  .requiredOption("--candidate-window <window>", "evidence window covering the candidate's actual run")
+  .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; mode: string; agent?: string }) => {
+  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow: string; candidateAgent?: string }) => {
     const modeValue = opts.mode === "sandbox" ? "sandbox" : "supervise";
-    const out = experimentRunCli({
+    const out = await experimentRunCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      mode: modeValue
+      mode: modeValue, candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
     });
     console.log(chalk.green(`Experiment run recorded: ${out.report.runId}`));
     console.log(`json=${out.jsonPath}`);

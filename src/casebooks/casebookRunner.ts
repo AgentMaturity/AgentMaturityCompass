@@ -1,5 +1,6 @@
 import { parseWindowToMs } from "../utils/time.js";
-import { openLedger } from "../ledger/ledger.js";
+import { canonicalize } from "../utils/json.js";
+import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { readdirSync } from "node:fs";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
@@ -59,13 +60,13 @@ function latestCorrelationRatio(workspace: string, agentId: string): number {
   }
 }
 
-export function runCasebook(params: {
+function runCasebookAtWindow(params: {
   workspace: string;
   agentId?: string;
   casebookId: string;
   mode: "supervise" | "sandbox";
   window?: string;
-}): {
+}, windowBounds?: { startedTs: number; endedTs: number }, actualLedger?: Ledger): {
   casebookId: string;
   agentId: string;
   mode: "supervise" | "sandbox";
@@ -79,10 +80,11 @@ export function runCasebook(params: {
     throw new Error(`casebook verification failed: ${verify.reasons.join("; ")}`);
   }
   const loaded = loadCasebook(params.workspace, params.casebookId, agentId);
-  const start = Date.now() - parseWindowToMs(params.window ?? "14d");
-  const end = Date.now();
+  const start = windowBounds?.startedTs ?? Date.now() - parseWindowToMs(params.window ?? "14d");
+  const end = windowBounds?.endedTs ?? Date.now();
   const correlationRatio = latestCorrelationRatio(params.workspace, agentId);
-  const ledger = openLedger(params.workspace);
+  if (actualLedger !== undefined && actualLedger.workspace !== params.workspace) throw new Error("casebook reader belongs to another workspace");
+  const ledger = actualLedger ?? openLedger(params.workspace);
   try {
     const evidence = ledger.getEventsBetween(start, end).filter((event) => {
       try {
@@ -156,6 +158,17 @@ export function runCasebook(params: {
       results
     };
   } finally {
-    ledger.close();
+    if (actualLedger === undefined) ledger.close();
   }
+}
+
+/** Existing public API and return shape; default evidence clocks remain unchanged. */
+export function runCasebook(params: Parameters<typeof runCasebookAtWindow>[0]): ReturnType<typeof runCasebookAtWindow> {
+  return runCasebookAtWindow(params);
+}
+
+/** Internal experiment publication consumer: revalidate the same actual read-only evidence windows and validators. */
+export function assertCasebookRunCurrent(params: Parameters<typeof runCasebook>[0], prepared: ReturnType<typeof runCasebook>, actualLedger?: Ledger): void {
+  const current = runCasebookAtWindow(params, { startedTs: prepared.startedTs, endedTs: prepared.endedTs }, actualLedger);
+  if (canonicalize(current) !== canonicalize(prepared)) throw new Error("experiment casebook inputs changed while signing");
 }

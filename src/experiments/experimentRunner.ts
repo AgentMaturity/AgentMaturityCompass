@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import type { ExperimentReport } from "../types.js";
@@ -8,9 +8,18 @@ import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny }
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
+import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
-import { runCasebook } from "../casebooks/casebookRunner.js";
+import { runCasebook, assertCasebookRunCurrent } from "../casebooks/casebookRunner.js";
+import { loadCasebook } from "../casebooks/casebookStore.js";
+import { openLedger, type Ledger } from "../ledger/ledger.js";
+import { describePolicySigner, assertPolicySignerCurrent } from "../crypto/signing/signer.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { vaultStatus } from "../vault/vault.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { experimentGateSchema, experimentSchema, type ExperimentFile, type ExperimentGatePolicy } from "./experimentSchema.js";
 import { bootstrapDifferenceCI, deterministicSeed, effectSizeDifference } from "./stats.js";
 
@@ -231,7 +240,7 @@ export function setExperimentCandidate(params: {
  * @throws when no candidate evidence window is supplied, because AMC cannot
  * execute a candidate configuration itself.
  */
-export function runExperiment(params: {
+function prepareExperimentReport(params: {
   workspace: string;
   agentId?: string;
   experimentId: string;
@@ -243,7 +252,7 @@ export function runExperiment(params: {
   candidateWindow?: string;
   /** Agent id the candidate ran under, when it differs from the baseline. */
   candidateAgentId?: string;
-}): { report: ExperimentReport; jsonPath: string; mdPath: string } {
+}) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
   if (!experiment.experiment.candidateConfig || !experiment.experiment.candidateConfig.signatureValid) {
@@ -364,37 +373,175 @@ export function runExperiment(params: {
     effectSize: Number(effectSize.toFixed(6))
   } satisfies Omit<ExperimentReport, "reportJsonSha256" | "reportSealSig">;
 
-  const reportJsonSha256 = sha256Hex(canonicalize(base));
-  const reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(params.workspace, "artifact-seal"));
-  const report: ExperimentReport = {
-    ...base,
-    reportJsonSha256,
-    reportSealSig
-  };
-
   const runsDir = experimentRunsDir(params.workspace, agentId, params.experimentId);
+  return { agentId, experiment, baselineRun, candidateRun, base, runsDir,
+    jsonPath: join(runsDir, `${runId}.json`), mdPath: join(runsDir, `${runId}.md`) };
+}
+
+function recordExperimentReport(workspace: string, agentId: string, report: ExperimentReport): void {
+  appendTransparencyEntry({ workspace, type: "EXPERIMENT_RECORDED", agentId,
+    artifact: { kind: "policy", sha256: report.reportJsonSha256, id: report.runId } });
+}
+
+type ExperimentOutputState = { bytes: Buffer; mode: number } | null;
+function experimentOutputState(file: string): ExperimentOutputState {
+  try { return { bytes: readFileSync(file), mode: statSync(file).mode & 0o777 }; }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+function experimentOutputMatches(file: string, before: ExperimentOutputState): boolean {
+  const current = experimentOutputState(file);
+  return before === null ? current === null : current !== null && current.mode === before.mode && before.bytes.equals(current.bytes);
+}
+function experimentReportInputs(workspace: string, prepared: ReturnType<typeof prepareExperimentReport>, actualLedger?: Ledger): string {
+  try {
+    const { agentId, experiment, baselineRun, candidateRun } = prepared, config = experiment.experiment;
+    const files = [experimentFilePath(workspace, agentId, config.experimentId)];
+    if (config.baselineConfig.path) files.push(config.baselineConfig.path);
+    if (config.candidateConfig?.path) files.push(config.candidateConfig.path, `${config.candidateConfig.path}.sig`);
+    for (const id of new Set([baselineRun.agentId, candidateRun.agentId])) {
+      const root = join(getAgentPaths(workspace, id).rootDir, "casebooks", config.casebookId), file = join(root, "casebook.yaml");
+      const book = loadCasebook(workspace, config.casebookId, id);
+      files.push(file, `${file}.sig`);
+      for (const caseId of book.casebook.caseIds) { const path = join(root, "cases", `${caseId}.json`); files.push(path, `${path}.sig`); }
+    }
+    const ledger = actualLedger ?? openLedger(workspace);
+    try {
+      const windows = [baselineRun, candidateRun].map(run => ({ agentId: run.agentId, startedTs: run.startedTs, endedTs: run.endedTs,
+        evidence: ledger.getEventsBetween(run.startedTs, run.endedTs).filter(event => {
+          try { return (JSON.parse(event.meta_json).agentId ?? "default") === run.agentId; } catch { return false; }
+        }) }));
+      return canonicalize({ files: [...new Set(files)].sort().map(file => [file, readFileSync(file).toString("base64")]), windows });
+    } finally { if (actualLedger === undefined) ledger.close(); }
+  } catch { throw new Error("experiment report inputs could not be read"); }
+}
+function assertExperimentSourcesCurrent(workspace: string, prepared: ReturnType<typeof prepareExperimentReport>, actualLedger?: Ledger): void {
+  const candidate = prepared.experiment.experiment.candidateConfig;
+  if (candidate?.path) {
+    const admission = verifySignedCandidateFile(workspace, candidate.path);
+    if (!admission.valid || admission.digestSha256 !== candidate.digestSha256) throw new Error("experiment candidate admission changed while signing");
+  }
+  try {
+    for (const run of [prepared.baselineRun, prepared.candidateRun]) assertCasebookRunCurrent({
+      workspace, agentId: run.agentId, casebookId: run.casebookId, mode: run.mode
+    }, run, actualLedger);
+  } catch { throw new Error("experiment casebook inputs changed while signing"); }
+}
+
+class ExperimentReportPublicationError extends Error {
+  readonly code = "EXPERIMENT_REPORT_PUBLICATION_INCOMPLETE";
+  readonly entryHash: string | null;
+  readonly pendingRecorded: boolean | null;
+  constructor(readonly publishedFiles: readonly string[], cause: unknown,
+    readonly phase: "prepare" | "sign" | "members" | "log" | "close" = "members", readonly attemptedFile: string | null = null,
+    completedEntryHash: string | null = null, readonly closeCause?: unknown) {
+    super("Experiment report publication is incomplete; acknowledged files are retained", { cause }); this.name = "ExperimentReportPublicationError";
+    this.entryHash = cause instanceof TransparencyMerkleLagError || cause instanceof ExperimentReportPublicationError ? cause.entryHash : completedEntryHash;
+    this.pendingRecorded = cause instanceof TransparencyMerkleLagError || cause instanceof ExperimentReportPublicationError ? cause.pendingRecorded : null;
+  }
+}
+
+export function runExperiment(params: {
+  workspace: string;
+  agentId?: string;
+  experimentId: string;
+  mode: "supervise" | "sandbox";
+  /**
+   * Evidence window covering the candidate configuration's own run
+   * (e.g. "7d"). Required: without it there is nothing real to compare.
+   */
+  candidateWindow?: string;
+  /** Agent id the candidate ran under, when it differs from the baseline. */
+  candidateAgentId?: string;
+}): { report: ExperimentReport; jsonPath: string; mdPath: string } {
+  const prepared = prepareExperimentReport(params), { agentId, base, runsDir, jsonPath, mdPath } = prepared;
+  const reportJsonSha256 = sha256Hex(canonicalize(base));
+  const report: ExperimentReport = { ...base, reportJsonSha256,
+    reportSealSig: signHexDigest(reportJsonSha256, getSigningKey(params.workspace, "artifact-seal")) };
   ensureDir(runsDir);
-  const jsonPath = join(runsDir, `${runId}.json`);
-  const mdPath = join(runsDir, `${runId}.md`);
   writeFileAtomic(jsonPath, JSON.stringify(report, null, 2), 0o644);
   writeFileAtomic(mdPath, toMarkdown(report), 0o644);
+  recordExperimentReport(params.workspace, agentId, report);
+  return { report, jsonPath, mdPath };
+}
 
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "EXPERIMENT_RECORDED",
-    agentId,
-    artifact: {
-      kind: "policy",
-      sha256: reportJsonSha256,
-      id: runId
+/** Maintained async producer; raw artifact-seal report, then the actual awaitable workspace transparency append. */
+export async function runExperimentAsync(params: Parameters<typeof runExperiment>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runExperiment>> {
+  const input = { workspace: params.workspace, agentId: params.agentId, experimentId: params.experimentId, mode: params.mode,
+    candidateWindow: params.candidateWindow, candidateAgentId: params.candidateAgentId }, beforePublish = options.beforePublish;
+  beforePublish?.();
+  // All original authorities precede the first await. Log policy does not choose or replace the raw report purpose.
+  const captured = capturePurposePublication(input.workspace, "artifact-seal");
+  const logSigners = [describePolicySigner(input.workspace, "TRANSPARENCY_ROOT"), describePolicySigner(input.workspace, "MERKLE_ROOT")];
+  const logPolicy = JSON.stringify(loadTrustConfig(input.workspace)), prepared = prepareExperimentReport(input);
+  const evidencePath = join(input.workspace, ".amc", "evidence.sqlite"), evidenceFile = statSync(evidencePath);
+  const evidence = openLedger(input.workspace, { readonly: true }), publishedFiles: string[] = [];
+  let phase: "prepare" | "sign" | "members" | "log" = "prepare", attemptedFile: string | null = null, entryHash: string | null = null;
+  let failed = false, failure: unknown;
+  try {
+    const assertEvidenceFileCurrent = () => {
+      const current = statSync(evidencePath);
+      if (current.dev !== evidenceFile.dev || current.ino !== evidenceFile.ino) throw new Error("experiment evidence store changed while signing");
+    };
+    assertEvidenceFileCurrent();
+    assertExperimentSourcesCurrent(input.workspace, prepared, evidence);
+    const source = experimentReportInputs(input.workspace, prepared, evidence);
+    const locked = <T>(operation: () => T): T => withControlFileLock({ root: prepared.runsDir, name: "experiment-report", operation });
+    const destinations = locked(() => ({ json: experimentOutputState(prepared.jsonPath), markdown: experimentOutputState(prepared.mdPath) }));
+    const reportJsonSha256 = sha256Hex(canonicalize(prepared.base));
+    phase = "sign";
+    const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"));
+    // Do not let the inherited file getter reopen an explicitly locked vault through an environment passphrase.
+    const assertFileVaultCurrent = () => {
+      if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked)
+        throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.");
+    };
+    assertFileVaultCurrent(); phase = "members";
+    const report: ExperimentReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };
+    const json = JSON.stringify(report, null, 2), markdown = toMarkdown(report);
+    const assertUsedInputsCurrent = () => {
+      beforePublish?.(); assertEvidenceFileCurrent();
+      if (experimentReportInputs(input.workspace, prepared, evidence) !== source) throw new Error("experiment report inputs changed while signing");
+      assertExperimentSourcesCurrent(input.workspace, prepared, evidence);
+    };
+    const assertOriginalAuthority = () => {
+      assertFileVaultCurrent(); assertPurposePublicationCurrent(input.workspace, captured, signed);
+      for (const descriptor of logSigners) assertPolicySignerCurrent(input.workspace, descriptor);
+      if (JSON.stringify(loadTrustConfig(input.workspace)) !== logPolicy) throw new Error("experiment log signing policy changed while signing");
+    };
+    locked(() => {
+      assertUsedInputsCurrent(); assertOriginalAuthority();
+      if (!experimentOutputMatches(prepared.jsonPath, destinations.json) || !experimentOutputMatches(prepared.mdPath, destinations.markdown))
+        throw new Error("experiment report outputs changed while signing");
+      try {
+        attemptedFile = prepared.jsonPath; writeFileAtomic(prepared.jsonPath, json, 0o644); publishedFiles.push(prepared.jsonPath);
+        attemptedFile = prepared.mdPath; writeFileAtomic(prepared.mdPath, markdown, 0o644); publishedFiles.push(prepared.mdPath);
+      } catch (error) { throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), error, "members", attemptedFile); }
+    });
+    phase = "log"; attemptedFile = null;
+    const assertPublishedCurrent = () => {
+      assertUsedInputsCurrent(); assertOriginalAuthority();
+      if (!experimentOutputMatches(prepared.jsonPath, { bytes: Buffer.from(json), mode: 0o644 })
+        || !experimentOutputMatches(prepared.mdPath, { bytes: Buffer.from(markdown), mode: 0o644 }))
+        throw new Error("published experiment report changed before transparency publication");
+    };
+    try {
+      // Refuse earlier-operation drift before the log helper selects its own actual signing metadata.
+      locked(assertPublishedCurrent);
+      entryHash = (await appendTransparencyEntryAsync({ workspace: input.workspace, type: "EXPERIMENT_RECORDED", agentId: prepared.agentId,
+        artifact: { kind: "policy", sha256: reportJsonSha256, id: report.runId } }, { beforeCommit: () => {
+        // Common log -> report file lock. Reuse the owned readonly handle; no open/init/Sign or transaction here.
+        locked(assertPublishedCurrent);
+      } })).hash;
+    } catch (error) { throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), error, "log", null, entryHash); }
+    return { report, jsonPath: prepared.jsonPath, mdPath: prepared.mdPath };
+  } catch (error) { failed = true; failure = error; throw error; }
+  finally {
+    try { evidence.close(); }
+    catch (closeError) {
+      if (failed) throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), failure, phase, attemptedFile, entryHash, closeError);
+      throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), closeError, "close", null, entryHash);
     }
-  });
-
-  return {
-    report,
-    jsonPath,
-    mdPath
-  };
+  }
 }
 
 export function analyzeExperiment(params: {

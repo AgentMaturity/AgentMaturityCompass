@@ -3,7 +3,7 @@ import {
   createExperiment,
   gateExperiment,
   listExperiments,
-  runExperiment,
+  runExperiment, runExperimentAsync,
   setExperimentBaseline,
   setExperimentCandidate
 } from "./experimentRunner.js";
@@ -50,6 +50,10 @@ export function experimentRunCli(params: {
   candidateAgentId?: string;
 }) {
   return runExperiment(params);
+}
+
+export async function experimentRunCliAsync(params: Parameters<typeof experimentRunCli>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof experimentRunCli>> {
+  return await runExperimentAsync(params, options);
 }
 
 export function experimentAnalyzeCli(params: {

@@ -114,6 +114,7 @@ import { handleStudioApiDelegation } from "./apiDelegation.js";
 import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSHOT_UNAVAILABLE } from "./consoleSnapshot.js";
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
 import { authenticateStudioAgent } from "./agentCredentialAuth.js";
+import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
@@ -228,7 +229,7 @@ import {
   experimentOptimizeCli,
   experimentOptimizerListCli,
   experimentOptimizerShowCli,
-  experimentRunCli,
+  experimentRunCliAsync,
   experimentSetBaselineCli,
   experimentSetCandidateCli
 } from "../experiments/experimentCli.js";
@@ -7874,19 +7875,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentRunMatch = pathname.match(/^\/experiments\/([^/]+)\/run$/);
       if (experimentRunMatch && req.method === "POST") {
-        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
-          return;
-        }
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) return;
         const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { agentId?: string; mode?: "supervise" | "sandbox" }) : {};
-        const out = experimentRunCli({
-          workspace: options.workspace,
-          agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
-          experimentId,
-          mode: parsed.mode ?? "sandbox"
+        const parsed = body ? (JSON.parse(body) as { agentId?: string; mode?: "supervise" | "sandbox"; candidateWindow?: string; candidateAgentId?: string }) : {};
+        if (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim()) { json(res, 400, { error: "candidateWindow is required" }); return; }
+        if (parsed.candidateAgentId !== undefined && (typeof parsed.candidateAgentId !== "string" || !parsed.candidateAgentId.trim())) { json(res, 400, { error: "candidateAgentId must be a non-empty string" }); return; }
+        const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
+          experimentId, mode: parsed.mode ?? "sandbox", candidateWindow: parsed.candidateWindow, candidateAgentId: parsed.candidateAgentId
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
+          if (res.headersSent || respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;
         });
-        json(res, 200, out);
+        if (out) json(res, 200, out);
         return;
       }
 
