@@ -2,13 +2,14 @@ import { generateKeyPairSync } from "node:crypto";
 import { request as httpRequest, type RequestOptions } from "node:http";
 import { dirname, join, resolve } from "node:path";
 import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
+import { captureWorkspaceColdOrgPrerequisites, type WorkspaceColdOrgPrerequisites } from "../workspaceColdOrgPrerequisites.js";
 import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { actionPolicyPath, initActionPolicy } from "../governor/actionPolicyEngine.js";
 import { initToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { budgetsPath, initBudgets } from "../budgets/budgets.js";
 import { approvalPolicyPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapterConfigStore.js";
+import { adaptersConfigPath } from "../adapters/adapterConfigStore.js";
 import { bridgeConfigPath, initBridgeConfig } from "../bridge/bridgeConfigStore.js";
 import { initModelTaxonomy, modelTaxonomyPath } from "../bridge/modelTaxonomy.js";
 import { initOrgConfig, orgConfigPath } from "../org/orgStore.js";
@@ -18,8 +19,8 @@ import { keysetDeclared } from "../keys/keyset.js";
 import { initForecastPolicy } from "../forecast/forecastEngine.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initBenchPolicy, benchPolicyPath } from "../bench/benchPolicyStore.js";
-import { initCanon, canonPath } from "../canon/canonLoader.js";
-import { initDiagnosticBank, diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
+import { canonPath } from "../canon/canonLoader.js";
+import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
 import { initCgxPolicy, cgxPolicyPath } from "../cgx/cgxStore.js";
 import { initPluginWorkspace } from "../plugins/pluginApi.js";
 import { pluginsInstalledLockPath, pluginsRegistriesPath } from "../plugins/pluginStore.js";
@@ -115,8 +116,9 @@ function ensureOwnerUser(params: BootstrapOptions): { created: boolean } {
   return { created: true };
 }
 
-async function ensureSignedConfigs(workspace: string): Promise<Record<string, boolean>> {
-  const created: Record<string, boolean> = {};
+async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceColdOrgPrerequisites | null): Promise<Record<string, boolean>> {
+  const created: Record<string, boolean> = {}, cold = originalCold ?? captureWorkspaceColdOrgPrerequisites(workspace);
+  cold.assertCurrent();
   if (!pathExists(actionPolicyPath(workspace))) {
     initActionPolicy(workspace);
     created["action-policy.yaml"] = true;
@@ -138,7 +140,7 @@ async function ensureSignedConfigs(workspace: string): Promise<Record<string, bo
     created["approval-policy.yaml"] = true;
   }
   if (!pathExists(adaptersConfigPath(workspace))) {
-    await initAdaptersConfigAsync(workspace);
+    await cold.initializeAdapters();
     created["adapters.yaml"] = true;
   }
   if (!pathExists(bridgeConfigPath(workspace))) {
@@ -154,7 +156,7 @@ async function ensureSignedConfigs(workspace: string): Promise<Record<string, bo
     created["org.yaml"] = true;
   }
   if (!pathExists(opsPolicyPath(workspace))) {
-    await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
+    await initOpsPolicyAsync(workspace, { onlyIfMissing: true, beforePublish: cold.assertCurrent });
     created["ops-policy.yaml"] = true;
   }
   if (!pathExists(forecastPolicyPath(workspace))) {
@@ -162,11 +164,11 @@ async function ensureSignedConfigs(workspace: string): Promise<Record<string, bo
     created["forecast/policy.yaml"] = true;
   }
   if (!pathExists(canonPath(workspace))) {
-    initCanon(workspace);
+    await cold.initializeCanon();
     created["canon/canon.yaml"] = true;
   }
   if (!pathExists(diagnosticBankPath(workspace))) {
-    initDiagnosticBank(workspace);
+    await cold.initializeBank();
     created["diagnostic/bank/bank.yaml"] = true;
   }
   if (!pathExists(cgxPolicyPath(workspace))) {
@@ -202,7 +204,7 @@ async function ensureSignedConfigs(workspace: string): Promise<Record<string, bo
     initAssurancePolicy(workspace);
     created["assurance/policy.yaml"] = true;
   }
-  return created;
+  cold.assertCurrent(); return created;
 }
 
 async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions): Promise<{ pubkeyPem: string; fingerprint: string }> {
@@ -241,27 +243,35 @@ async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOpt
   });
 }
 
+export class BootstrapColdPrerequisitesIncompleteError extends Error {
+  readonly code = "BOOTSTRAP_COLD_PREREQUISITES_INCOMPLETE";
+  constructor(readonly completedColdPaths: readonly string[], cause: unknown) {
+    super("bootstrap did not complete; published canon/bank prerequisites and any earlier bootstrap effects remain", { cause });
+    this.name = "BootstrapColdPrerequisitesIncompleteError";
+  }
+}
 export async function runBootstrap(options: BootstrapOptions): Promise<BootstrapResult> {
   options = { ...options, allowedCidrs: [...options.allowedCidrs] };
   const previousVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
+  let cold: WorkspaceColdOrgPrerequisites | null = null;
   if (options.vaultPassphrase && options.vaultPassphrase.length > 0) {
     process.env.AMC_VAULT_PASSPHRASE = options.vaultPassphrase;
   }
 
   try {
     const workspace = resolve(options.workspace);
-    if (keysetDeclared(workspace) && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)))) {
-      ensureVault({ ...options, workspace }); // Preserve the existing selected passphrase gate before any provider request.
-      if (!pathExists(opsPolicyPath(workspace))) await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
-    }
-    await initWorkspaceAsync({
-      workspacePath: workspace,
-      trustBoundaryMode: "isolated"
-    });
+    const mature = keysetDeclared(workspace);
+    if (mature && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)) || !pathExists(canonPath(workspace)) || !pathExists(diagnosticBankPath(workspace))))
+      ensureVault({ ...options, workspace }); // Preserve the selected passphrase gate before any new cold provider request.
+    cold = mature ? captureWorkspaceColdOrgPrerequisites(workspace) : null;
+    if (mature && !pathExists(opsPolicyPath(workspace))) await initOpsPolicyAsync(workspace, { onlyIfMissing: true, beforePublish: cold!.assertCurrent });
+    cold?.assertCurrent();
+    if (cold !== null) await cold.initializeWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    else await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
 
     const vault = ensureVault({ ...options, workspace });
     const owner = ensureOwnerUser({ ...options, workspace });
-    const createdConfigs = await ensureSignedConfigs(workspace);
+    const createdConfigs = await ensureSignedConfigs(workspace, cold);
     if (options.lanMode) {
       enableLanMode({
         workspace,
@@ -338,6 +348,8 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       reportSigPath,
       transparencyHash: entry.hash
     };
+  } catch (cause) {
+    if (cold !== null && cold.completedPaths.length > 0) throw new BootstrapColdPrerequisitesIncompleteError(cold.completedPaths, cause); throw cause;
   } finally {
     if (typeof previousVaultEnv === "string") {
       process.env.AMC_VAULT_PASSPHRASE = previousVaultEnv;

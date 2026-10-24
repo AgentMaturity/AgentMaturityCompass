@@ -318,11 +318,12 @@ import { createBridgePairingCode, redeemBridgePairingCode } from "../bridge/brid
 import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
 import { bindRequestContext, resolveRequestId } from "../api/requestContext.js";
-import { canonApplyForApi, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
+import { canonApplyForPublicationAsync, CanonAuditIncompleteError, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
+import { loadDiagnosticBankAttemptAsync, DiagnosticBankFollowupError } from "../diagnostic/bank/bankLoader.js";
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import {
-  diagnosticBankApplyForApi,
-  diagnosticBankGetForApi,
+  diagnosticBankApplyForApiAsync as diagnosticBankApplyForApi,
+  diagnosticBankGetForApiAsync as diagnosticBankGetForApi,
   diagnosticBankVerifyForApi
 } from "../diagnostic/bank/bankApi.js";
 import { verifyDiagnosticBankSignature } from "../diagnostic/bank/bankLoader.js";
@@ -3430,11 +3431,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "canon object is required" });
           return;
         }
-        const out = canonApplyForApi({
+        const actorCurrent = signingAuthority(["OWNER"]), beforePublish = () => { actorCurrent(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); };
+        const applied = await canonApplyForPublicationAsync({
           workspace: options.workspace,
           canon: parsed.canon as ReturnType<typeof canonGetForApi>["canon"]
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; }); if (applied === null) return;
+        const out = applied.result;
+        let audit: ReturnType<typeof writeStudioAuditEvent>;
+        try { applied.assertCurrent(); audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CANON_APPLIED",
           severity: "LOW",
@@ -3442,7 +3446,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             path: out.path,
             sigPath: out.sigPath
           }
-        });
+        }); } catch (cause) { throw new CanonAuditIncompleteError(Object.freeze([out.path, out.sigPath]), cause); }
         json(res, 200, {
           ...out,
           auditEventId: audit.eventId
@@ -5946,7 +5950,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, diagnosticBankGetForApi(options.workspace));
+        const out = await diagnosticBankGetForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -5975,10 +5979,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "bank object is required" });
           return;
         }
-        const out = diagnosticBankApplyForApi({
+        const actorCurrent = signingAuthority(["OWNER"]), beforePublish = () => { actorCurrent(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); };
+        const out = await diagnosticBankApplyForApi({
           workspace: options.workspace,
-          bank: parsed.bank as ReturnType<typeof diagnosticBankGetForApi>["bank"]
-        });
+          bank: parsed.bank as Awaited<ReturnType<typeof diagnosticBankGetForApi>>["bank"]
+        }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -5988,11 +5993,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const selected = await loadDiagnosticBankAttemptAsync(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (selected === null) return;
+        try {
+        selected.assertCurrent();
         const render = renderContextualizedDiagnostic({
           workspace: options.workspace,
-          agentId
+          agentId, bank: selected.bank
         });
-        writeStudioAuditEvent({
+        selected.assertCurrent(); writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "DIAGNOSTIC_RENDERED",
           severity: "LOW",
@@ -6003,6 +6011,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         });
         json(res, 200, render);
+        } catch (cause) { if (res.headersSent) return; if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
         return;
       }
 

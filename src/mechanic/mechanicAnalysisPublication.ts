@@ -8,7 +8,9 @@ import { captureMechanicPair, requireMechanicPair } from "./mechanicPairs.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry } from "./mechanicPublication.js";
 import { mechanicRoot, mechanicTargetsPath, prepareInitialMechanicTargets } from "./targetsStore.js";
 import { mechanicTargetsSchema, type MechanicScope } from "./targetSchema.js";
-import { captureMechanicAnalysisBank, captureMechanicAnalysisCanon, captureMechanicAnalysisCgx, captureMechanicGap, captureMechanicEta } from "./mechanicAnalysisInputs.js";
+import { captureMechanicAnalysisCgx, captureMechanicGap, captureMechanicEta } from "./mechanicAnalysisInputs.js";
+import { captureMechanicAnalysisBankAttempt } from "./mechanicAnalysisBank.js";
+import { captureMechanicAnalysisCanon } from "./mechanicAnalysisCanon.js";
 import { assembleMechanicUpgradePlan } from "./upgradePlanner.js";
 import { captureMechanicPlanSelection, prepareMechanicPlan } from "./planStore.js";
 import { calculateMechanicSimulation, mechanicSimulationPath, prepareMechanicSimulation } from "./simulator.js";
@@ -74,10 +76,14 @@ export async function mechanicGapForAuthority(input: ScopeParams, beforePublish:
 }
 export async function mechanicCreatePlanForAuthority(input: ScopeParams, beforePublish: () => void) {
   const params = { ...input }, selectedScope = scope(params), run = captureMechanicRun(params.workspace, beforePublish), state = mechanicProgress();
+  const bankAttempt = captureMechanicAnalysisBankAttempt(params.workspace), canon = captureMechanicAnalysisCanon(params.workspace);
   try {
     // Preserve the actual planner's targets/bank/canon pre-measurement construction stages.
     const selected = existingTargets(params.workspace) ?? await initializeTargets(params.workspace, run, state);
-    const bank = captureMechanicAnalysisBank(params.workspace), canon = captureMechanicAnalysisCanon(params.workspace);
+    state.phase = "initial-bank";
+    const bank = await bankAttempt.initialize({ beforePublish: run.assertCurrent, assertInputsCurrent() { selected.assertCurrent(); canon.assertCurrent(); run.fixed(); } });
+    state.completed.push(...bank.completedPaths.map(path => relative(params.workspace, path)));
+    selected.assertCurrent(); canon.assertCurrent(); run.assertCurrent();
     const measured = await measure(params.workspace, selectedScope, run, state);
     const calculated = captureMechanicGap({ workspace: params.workspace, scope: selectedScope, targets: selected.targets, measured });
     const used: { cgx?: ReturnType<typeof captureMechanicAnalysisCgx>; eta?: ReturnType<typeof captureMechanicEta> } = {};

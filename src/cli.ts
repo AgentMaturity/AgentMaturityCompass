@@ -738,15 +738,15 @@ import {
   hostWorkspacePurgeCli
 } from "./workspaces/hostCli.js";
 import { bootstrapHostFromEnv } from "./workspaces/hostBootstrap.js";
-import { canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
+import { canonInitCliAsync as canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
 import { cgxBuildCliAsync as cgxBuildCli, cgxInitCliAsync as cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
 import { simulateImpact, renderSimulationMarkdown } from "./cgx/cgxSimulator.js";
 import { loadAndDiffSnapshots, renderGraphDiffMarkdown } from "./cgx/cgxDiff.js";
 import { loadLatestCgxGraph } from "./cgx/cgxStore.js";
 import { saveL5DeltaReport } from "./diagnostic/l5DeltaReport.js";
 import { classifyControls, renderControlClassificationMarkdown } from "./diagnostic/controlClassification.js";
-import { diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
-import { contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
+import { diagnosticBankInitCliAsync as diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
+import { contextualizedDiagnosticRenderCliAsync as contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
 import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
 import { domainProofCheckCli } from "./domainProof/domainProofCli.js";
 import { toErrorMessage } from "./utils/errors.js";
@@ -8377,9 +8377,9 @@ ops
 canon
   .command("init")
   .description("Create and sign .amc/canon/canon.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "canon init");
-    const out = canonInitCli(process.cwd());
+    const out = await canonInitCli(process.cwd());
     console.log(chalk.green("Compass Canon initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -9070,9 +9070,9 @@ const diagnosticBank = diagnostic.command("bank").description("Signed default di
 diagnosticBank
   .command("init")
   .description("Create and sign .amc/diagnostic/bank/bank.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "diagnostic bank init");
-    const out = diagnosticBankInitCli(process.cwd());
+    const out = await diagnosticBankInitCli(process.cwd());
     console.log(chalk.green("Diagnostic bank initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -9100,12 +9100,12 @@ diagnostic
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
-  .action((opts: { agent: string; format: string; out?: string }) => {
+  .action(async (opts: { agent: string; format: string; out?: string }) => {
     const format = opts.format.toLowerCase();
     if (format !== "json" && format !== "md") {
       throw new Error("format must be md|json");
     }
-    const out = contextualizedDiagnosticRenderCli({
+    const out = await contextualizedDiagnosticRenderCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       format: format as "json" | "md",

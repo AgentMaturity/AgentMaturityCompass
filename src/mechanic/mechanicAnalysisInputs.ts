@@ -2,7 +2,7 @@
 import YAML from "yaml";
 import { loadDiagnosticBank, diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
 import { diagnosticBankSchema } from "../diagnostic/bank/bankSchema.js";
-import { loadCanon } from "../canon/canonLoader.js";
+export { captureMechanicAnalysisCanon } from "./mechanicAnalysisCanon.js";
 import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { calculateForecast } from "../forecast/forecastEngine.js";
 import { canonicalize } from "../utils/json.js";
@@ -26,14 +26,6 @@ export function captureMechanicAnalysisBank(workspace: string) {
   };
   return { bank, assertCurrent(questionIds: readonly string[]) {
     if (project(read(), questionIds) !== project(bank, questionIds)) throw new Error("selected mechanic bank version or upgrade hints changed while signing");
-  } };
-}
-export function captureMechanicAnalysisCanon(workspace: string) {
-  const canon = loadCanon(workspace), version = canon.compassCanon.version;
-  return { canon, assertCurrent() {
-    // Plugin vocabulary does not change the sole canon field consumed by this plan.
-    if (loadCanon(workspace, { includePluginExtensions: false }).compassCanon.version !== version)
-      throw new Error("selected mechanic canon version changed while signing");
   } };
 }
 export function captureMechanicAnalysisCgx(workspace: string, agentId: string) {

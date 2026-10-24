@@ -1,4 +1,5 @@
-import { canonApplyForApi, canonGetForApi, canonInitForApi, canonVerifyForApi } from "./canonApi.js";
+import { canonApplyForApi, canonGetForApi, canonInitForApi, canonVerifyForApi, canonInitForApiAsync } from "./canonApi.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import type { CompassCanon } from "./canonSchema.js";
 
 export function canonInitCli(workspace: string) {
@@ -18,4 +19,8 @@ export function canonApplyCli(params: {
   canon: CompassCanon;
 }) {
   return canonApplyForApi(params);
+}
+
+export function canonInitCliAsync(workspace: string) {
+  return canonInitForApiAsync(workspace, { beforePublish: () => assertOwnerMode(workspace, "canon init") });
 }
