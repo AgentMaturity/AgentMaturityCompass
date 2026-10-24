@@ -102,6 +102,8 @@ import { agentExecuteClassCheck, scopeRefusal } from "./agentTokenScopeGuard.js"
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { getVaultSecret, vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
+import { ApprovalRequestContinuationError } from "../approvals/approvalRequestPublication.js";
+import { authenticate, hasScope, verifyLeaseForScope, captureStudioToolhubIntentAuthority, StudioToolhubIntentAuthorityError, type AuthContext } from "./toolhubIntentAuthority.js";
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
@@ -113,7 +115,6 @@ import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
 import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSHOT_UNAVAILABLE } from "./consoleSnapshot.js";
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
-import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
@@ -420,17 +421,6 @@ interface StudioApiOptions {
   nativeAllowedOrigins?: readonly string[];
   minFreeDiskMb?: number;
   publicConsoleBasePath?: string;
-}
-
-interface AuthContext {
-  isAdmin: boolean;
-  agentId: string | null;
-  scopes: Set<string>;
-  roles: Set<UserRole>;
-  username: string | null;
-  userId: string | null;
-  nativeCsrfToken: string | null;
-  sessionAuthSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -984,14 +974,6 @@ function setRateLimitHeaders(res: ServerResponse, decision: RateLimitDecision): 
   }
 }
 
-function leaseQueryCarrierEnabled(workspace: string): boolean {
-  try {
-    return loadGatewayConfig(workspace).lease.allowQueryCarrier === true;
-  } catch {
-    return false;
-  }
-}
-
 function requestUsesHttps(req: IncomingMessage): boolean {
   const forwarded = req.headers["x-forwarded-proto"];
   const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
@@ -999,53 +981,6 @@ function requestUsesHttps(req: IncomingMessage): boolean {
     return true;
   }
   return (req.socket as Socket & { encrypted?: boolean }).encrypted === true;
-}
-
-function authenticate(req: IncomingMessage, workspace: string, adminToken: string): AuthContext | null {
-  const suppliedAdmin = req.headers["x-amc-admin-token"];
-  if (typeof suppliedAdmin === "string" && suppliedAdmin === adminToken) {
-    return {
-      isAdmin: true,
-      agentId: null,
-      scopes: new Set(["*"]),
-      roles: new Set(["OWNER", "AUDITOR", "APPROVER", "OPERATOR", "VIEWER", "AGENT"]),
-      username: "bootstrap-admin",
-      userId: "bootstrap-admin",
-      nativeCsrfToken: null
-    };
-  }
-
-  const session = sessionFromRequest({
-    workspace,
-    req
-  });
-  if (session.ok && session.payload) {
-    return {
-      isAdmin: false,
-      agentId: null,
-      scopes: new Set(["console:session"]),
-      roles: new Set<UserRole>(session.payload.userId === "local-demo" ? ["VIEWER"] : session.payload.roles),
-      username: session.payload.username,
-      userId: session.payload.userId,
-      nativeCsrfToken: nativeCsrfTokenForSession(session.payload),
-      sessionAuthSource: session.authSource
-    };
-  }
-
-  const agent = authenticateStudioAgent({
-    workspace, headers: req.headers, rawHeaders: req.rawHeaders,
-    url: new URL(req.url ?? "/", `http://${req.headers.host ?? "127.0.0.1"}`),
-    allowQueryCarrier: leaseQueryCarrierEnabled(workspace)
-  });
-  return agent === null ? null : {
-    isAdmin: false, agentId: agent.agentId, scopes: agent.scopes,
-    roles: new Set(["AGENT"]), username: agent.username,
-    userId: null, nativeCsrfToken: null
-  };
-}
-
-function hasScope(auth: AuthContext, scope: string): boolean {
-  return auth.isAdmin || auth.scopes.has("*") || auth.scopes.has(scope);
 }
 
 function accessContext(auth: AuthContext): AccessContext {
@@ -1124,68 +1059,6 @@ function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"):
     }
   }
   return null;
-}
-
-function verifyLeaseForScope(params: {
-  workspace: string;
-  req: IncomingMessage;
-  expectedAgentId: string;
-  scope: "toolhub:intent" | "toolhub:execute" | "governor:check" | "receipt:verify" | "diagnostic:self-run";
-  routePath?: string;
-  model?: string | null;
-  actionClass?: ActionClass;
-}): { ok: true } | { ok: false; status: number; error: string } {
-  const parsedUrl = new URL(params.req.url ?? "/", `http://${params.req.headers.host ?? "127.0.0.1"}`);
-  const carrier = extractLeaseCarrier({
-    headers: params.req.headers,
-    url: parsedUrl,
-    allowQueryCarrier: leaseQueryCarrierEnabled(params.workspace)
-  });
-  const leaseToken = carrier.leaseToken ?? undefined;
-  if (!leaseToken) {
-    return {
-      ok: false,
-      status: 401,
-      error: "missing lease token"
-    };
-  }
-  const revocations = readRevokedLeaseIds(params.workspace);
-  if (!revocations.ok) {
-    return {
-      ok: false,
-      status: 401,
-      error: `lease revocation signature invalid: ${revocations.reason}`
-    };
-  }
-  const revoked = revocations.ids;
-  const expectedWorkspaceId = workspaceIdFromDirectory(params.workspace);
-  const verification = verifyLeaseToken({
-    workspace: params.workspace,
-    token: leaseToken,
-    expectedWorkspaceId,
-    expectedAgentId: params.expectedAgentId,
-    requiredScope: params.scope,
-    routePath: params.routePath,
-    model: params.model,
-    revokedLeaseIds: revoked,
-    ...(params.actionClass === undefined ? {} : { actionClass: params.actionClass })
-  });
-  if (!verification.ok) {
-    const message = verification.error ?? "lease verification failed";
-    const status = message.includes("scope denied") ||
-      message.includes("route denied") ||
-      message.includes("model denied") ||
-      message.includes("agent mismatch") ||
-      message.includes("workspace mismatch")
-      ? 403
-      : 401;
-    return {
-      ok: false,
-      status,
-      error: message
-    };
-  }
-  return { ok: true };
 }
 
 interface AgentLatestRunSummary {
@@ -6332,13 +6205,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, leaseCheck.status, { error: leaseCheck.error });
           return;
         }
-        const response = toolhub.createIntent({
+        const actor = captureStudioToolhubIntentAuthority(req, options, agentId,
+          { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId });
+        const created = await toolhub.createIntentAsync({
           agentId, initiator,
           workOrderId: parsed.workOrderId,
           toolName: parsed.toolName,
           args: parsed.args ?? {},
           requestedMode: parsed.requestedMode ?? "SIMULATE"
-        });
+        }, { beforePublish: actor });
+        const { response } = created;
+        created.assertCurrent();
         const intentRecord = toolhub.intent(response.intentId);
         const actionClass = intentRecord?.actionClass ?? "READ_ONLY";
         recordToolhubIntentMetric(agentId, actionClass, parsed.requestedMode ?? "SIMULATE");
@@ -6352,11 +6229,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               approvalRequestId: response.approvalRequestId,
               trigger: "REQUEST_CREATED",
               reviewBasePath: options.publicConsoleBasePath
-            })
+            }, { beforePublish: created.assertCurrent })
           : undefined;
+        created.assertCurrent();
         if (response.approvalRequired && response.approvalRequestId) {
           emitOrgEvent("APPROVAL_REQUEST_CREATED", orgNodeIdsForAgent(agentId));
         }
+        created.assertCurrent();
         json(res, 200, {
           ...response,
           ...(approvalDelivery ? { approvalDelivery } : {})
@@ -8790,6 +8669,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         json(res, 400, { error: "invalid JSON body" });
         return;
       }
+      const intentRefusal = error instanceof ApprovalRequestContinuationError ? error.primaryCause : error;
+      if (intentRefusal instanceof StudioToolhubIntentAuthorityError) { json(res, intentRefusal.status, { error: intentRefusal.message }); return; }
       if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
       if (error instanceof TransformPublicationError) { if (!res.headersSent) json(res, 409, { error: error.message, code: error.code, publishedPaths: error.publishedPaths, attemptedPhase: error.attemptedPhase, knownTransparencyHash: error.knownTransparencyHash }); return; }
       json(res, 500, { error: "internal server error" });

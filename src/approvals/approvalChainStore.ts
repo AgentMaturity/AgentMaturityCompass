@@ -259,8 +259,24 @@ export function createApprovalRequestRecord(input: {
   authorizationIntent?: Record<string, unknown>;
   initiator?: string;
 }): { request: ApprovalRequestRecord; path: string; sigPath: string } {
+  const { request, path } = prepareApprovalRequestRecord(input);
+  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
+  const sigPath = signArtifact(input.workspace, path);
+  return {
+    request,
+    path,
+    sigPath
+  };
+}
+
+export type ApprovalRequestRecordInput = Parameters<typeof createApprovalRequestRecord>[0];
+
+/** Shared native directory prefix and actual UUID/two-clock payload recipe; no signing or member write. */
+export function prepareApprovalRequestRecord(input: ApprovalRequestRecordInput, directories?: (phase: "attempted" | "returned") => void) {
   const agentId = resolveAgentId(input.workspace, input.agentId);
+  directories?.("attempted");
   ensureDirs(input.workspace, agentId);
+  directories?.("returned");
   const request = approvalRequestSchema.parse({
     v: 1,
     approvalRequestId: `apprreq_${randomUUID().replace(/-/g, "")}`,
@@ -291,13 +307,7 @@ export function createApprovalRequestRecord(input: {
     ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   const path = requestPath(input.workspace, agentId, request.approvalRequestId);
-  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
-  const sigPath = signArtifact(input.workspace, path);
-  return {
-    request,
-    path,
-    sigPath
-  };
+  return { request, path };
 }
 
 export function loadApprovalRequestRecord(params: {
