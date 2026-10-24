@@ -369,7 +369,7 @@ import {
   benchListImportsCli,
   benchPrintCli,
   benchPrintPolicyCli,
-  benchPublishExecuteCli,
+  benchPublishExecuteCliAsync as benchPublishExecuteCli,
   benchPublishRequestCli,
   benchRegistriesApplyCliAsync as benchRegistriesApplyCli,
   benchRegistriesCliAsync as benchRegistriesCli,
@@ -17499,7 +17499,7 @@ benchRegistry
       dir: opts.dir,
       registryId: opts.id,
       registryName: opts.name
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench registry init") });
     console.log(chalk.green("Bench registry initialized"));
     console.log(`Index: ${out.indexPath}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -17519,7 +17519,7 @@ benchRegistry
       benchFile: opts.file,
       registryKeyPath: opts.registryKey,
       version: opts.version
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench registry publish") });
     console.log(chalk.green("Bench published to registry"));
     console.log(`Bench: ${out.benchId}@${out.version}`);
     console.log(`Path: ${out.targetPath}`);
@@ -17686,12 +17686,12 @@ benchPublish
 benchPublish
   .command("execute")
   .requiredOption("--approval-request <id>", "approval request id")
-  .action((opts: { approvalRequest: string }) => {
+  .action(async (opts: { approvalRequest: string }) => {
     assertOwnerMode(process.cwd(), "bench publish execute");
-    const out = benchPublishExecuteCli({
+    const out = await benchPublishExecuteCli({
       workspace: process.cwd(),
       approvalRequestId: opts.approvalRequest
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench publish execute") });
     console.log(chalk.green("Bench published"));
     console.log(`bench: ${out.benchId}@${out.version}`);
     console.log(`target: ${out.targetPath}`);

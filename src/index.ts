@@ -637,7 +637,7 @@ export {
   benchRegistriesCli, benchRegistriesCliAsync,
   benchRegistriesApplyCli, benchRegistriesApplyCliAsync,
   benchPublishRequestCli,
-  benchPublishExecuteCli
+  benchPublishExecuteCli, benchPublishExecuteCliAsync
 } from "./bench/benchCli.js";
 export { createBenchArtifact, createBenchArtifactAsync, inspectBenchArtifact, listExportedBenchArtifacts } from "./bench/benchArtifact.js";
 export { verifyBenchArtifactFile } from "./bench/benchVerifier.js";
@@ -658,7 +658,7 @@ export {
   benchCompareForApi, benchCompareForApiAsync,
   benchComparisonLatestForApi,
   benchPublishRequestForApi,
-  benchPublishExecuteForApi
+  benchPublishExecuteForApi, benchPublishExecuteForApiAsync
 } from "./bench/benchApi.js";
 export { serveConsolePath } from "./console/consoleServer.js";
 export * from "./sdk/index.js";

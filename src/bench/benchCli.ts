@@ -1,3 +1,4 @@
+import type { BenchRegistryOptions } from "./benchRegistryPublication.js";
 import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { createBenchArtifactAsync } from "./benchArtifactAsync.js";
 import { benchCompareForApiAsync } from "./benchApi.js";
@@ -16,7 +17,7 @@ import {
   benchInitForApi,
   benchCompareForApi,
   benchComparisonLatestForApi,
-  benchPublishExecuteForApi,
+  benchPublishExecuteForApi, benchPublishExecuteForApiAsync,
   benchPublishRequestForApi,
   benchRegistriesForApi,
   benchRegistryApplyForApi
@@ -80,12 +81,12 @@ export function benchRegistryInitCli(params: {
   dir: string;
   registryId?: string;
   registryName?: string;
-}) {
+}, options: BenchRegistryOptions = {}) {
   return initBenchRegistry({
     dir: resolve(params.dir),
     registryId: params.registryId,
     registryName: params.registryName
-  });
+  }, options);
 }
 
 export function benchRegistryPublishCli(params: {
@@ -93,13 +94,13 @@ export function benchRegistryPublishCli(params: {
   benchFile: string;
   registryKeyPath: string;
   version?: string;
-}) {
+}, options: BenchRegistryOptions = {}) {
   return publishBenchToRegistry({
     dir: resolve(params.dir),
     benchFile: resolve(params.benchFile),
     registryKeyPath: resolve(params.registryKeyPath),
     version: params.version
-  });
+  }, options);
 }
 
 export function benchRegistryVerifyCli(dir: string, trust: TrustContext, pubkeyPath?: string) {
@@ -237,3 +238,7 @@ export async function benchCreateCliAsync(params: {
 }
 
 export async function benchCompareCliAsync(params: Parameters<typeof benchCompareCli>[0], options: OrgPairsOptions = {}) { return benchCompareForApiAsync({...params},options); }
+
+export async function benchPublishExecuteCliAsync(params: Parameters<typeof benchPublishExecuteCli>[0], options: OrgPairsOptions = {}) {
+  return benchPublishExecuteForApiAsync({ ...params }, options);
+}

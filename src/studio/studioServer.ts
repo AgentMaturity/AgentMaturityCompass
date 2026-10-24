@@ -160,7 +160,7 @@ import {
   benchImportsForApi,
   benchPolicyApplyForApiAsync as benchPolicyApplyForApi,
   benchPolicyForApi,
-  benchPublishExecuteForApi,
+  benchPublishExecuteForApiAsync as benchPublishExecuteForApi,
   benchPublishRequestForApi,
   benchRegistriesForApiAsync as benchRegistriesForApi,
   benchRegistryApplyForApiAsync as benchRegistryApplyForApi, benchRegistryAddForApiAsync,
@@ -211,7 +211,7 @@ import { federateExportCli, federateImportCli, federatePeerListCli, federateVeri
 import { integrationsStatusCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
 import { verifyOpsReceiptForEvent } from "../integrations/opsReceipt.js";
 import {
-  dispatchIntegrationEvent, dispatchIntegrationEventWithAuthority, dispatchIntegrationTestWithAuthority,
+  dispatchIntegrationEventWithAuthority, dispatchIntegrationTestWithAuthority,
   drainDueIntegrationDeliveriesWithAuthority
 } from "../integrations/integrationDispatcher.js";
 import { resolveSecretRef } from "../integrations/integrationStore.js";
@@ -7582,11 +7582,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             json(res, 400, { error: "approvalRequestId required when execute=true" });
             return;
           }
-          const executed = benchPublishExecuteForApi({
+          const initialAuthority = signingAuthority(["OWNER"]); let authorityRefused = false;
+          const beforePublish = () => { try { initialAuthority(); } catch (cause) { authorityRefused = true; throw cause; } };
+          const executed = await benchPublishExecuteForApi({
             workspace: options.workspace,
             approvalRequestId: parsed.approvalRequestId
-          });
-          writeStudioAuditEvent({
+          }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+          if (executed === null) return;
+          beforePublish(); writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_PUBLISHED",
             severity: "MEDIUM",
@@ -7601,7 +7604,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             type: "BENCH_PUBLISHED"
           });
           try {
-            await dispatchIntegrationEvent({
+            await dispatchIntegrationEventWithAuthority({
               workspace: options.workspace,
               eventName: "BENCH_PUBLISHED",
               agentId: "workspace",
@@ -7611,11 +7614,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                 version: executed.version,
                 targetPath: executed.targetPath
               }
-            });
-          } catch {
-            // best effort
+            }, beforePublish);
+          } catch (deliveryError) {
+            if (res.headersSent) return;
+            if (authorityRefused) throw new Error("benchmark published delivery authority refused", { cause: deliveryError });
           }
-          json(res, 200, executed);
+          if (res.headersSent) return;
+          beforePublish(); json(res, 200, executed);
           return;
         }
         if (!parsed.file || !parsed.registryDir || !parsed.registryKeyPath) {

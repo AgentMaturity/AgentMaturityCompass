@@ -1,3 +1,7 @@
+import { canonicalize } from "../utils/json.js";
+import { captureRegistryFiles, registryFileBytes, assertRegistryFiles, BenchRegistryPublicationError } from "./benchRegistryPublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { captureBenchImportLogAuthority } from "./benchImportLogAuthority.js";
 import { BenchImportPublicationError } from "./benchImportPublication.js";
 import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
@@ -18,7 +22,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { createBenchArtifact, inspectBenchArtifact, listExportedBenchArtifacts } from "./benchArtifact.js";
 import { createBenchComparison } from "./benchComparer.js";
 import { browseBenchRegistry, importBenchFromRegistryAttempt } from "./benchRegistryClient.js";
-import { publishBenchToRegistry } from "./benchRegistryServer.js";
+import { publishBenchToRegistry, prepareBenchRegistryPublish } from "./benchRegistryServer.js";
 import {
   benchImportsRegistriesPath, loadBenchRegistriesConfigAsync,
   benchComparisonLatestPath,
@@ -54,13 +58,15 @@ function pendingDir(workspace: string): string {
 }
 
 function pendingPath(workspace: string, approvalRequestId: string): string {
-  return join(pendingDir(workspace), `${approvalRequestId}.json`);
+  return containedPath(pendingDir(workspace), "the pending benchmark publication directory", `${approvalRequestId}.json`);
 }
 
 function savePendingPublish(workspace: string, pending: z.infer<typeof pendingPublishSchema>): string {
   ensureDir(pendingDir(workspace));
   const file = pendingPath(workspace, pending.approvalRequestId);
-  writeFileAtomic(file, JSON.stringify(pendingPublishSchema.parse(pending), null, 2), 0o600);
+  withControlFileLock({ root: pendingDir(workspace), name: "bench-pending-publish", operation: () => {
+    writeFileAtomic(file, JSON.stringify(pendingPublishSchema.parse(pending), null, 2), 0o600);
+  } });
   return file;
 }
 
@@ -74,9 +80,9 @@ function loadPendingPublish(workspace: string, approvalRequestId: string): z.inf
 
 function removePendingPublish(workspace: string, approvalRequestId: string): void {
   const file = pendingPath(workspace, approvalRequestId);
-  if (pathExists(file)) {
-    rmSync(file, { force: true });
-  }
+  withControlFileLock({ root: pendingDir(workspace), name: "bench-pending-publish", operation: () => {
+    if (pathExists(file)) rmSync(file, { force: true });
+  } });
 }
 
 function trustRank(label: "LOW" | "MEDIUM" | "HIGH"): number {
@@ -423,3 +429,51 @@ export async function benchCreateForApiAsync(params: {
 }
 
 export async function benchCompareForApiAsync(params: Parameters<typeof benchCompareForApi>[0], options: OrgPairsOptions = {}) { return createBenchComparisonAsync({...params},options); }
+
+export class BenchApprovedPublicationError extends Error {
+  readonly code = "BENCH_APPROVED_PUBLICATION_INCOMPLETE";
+  constructor(readonly completedRegistryPaths: readonly string[], readonly consumption: ReturnType<typeof consumeApprovedExecution> | null,
+    readonly completedLogHashes: readonly string[], readonly pendingRemoved: boolean, cause: unknown) {
+    super("approved benchmark publication did not complete; successful registry, approval and log effects are retained", { cause }); this.name = "BenchApprovedPublicationError";
+  }
+}
+/** Actual maintained execute flow; held approval request/consume primitives remain synchronous dependencies. */
+export async function benchPublishExecuteForApiAsync(params: Parameters<typeof benchPublishExecuteForApi>[0], options: OrgPairsOptions = {}) {
+  const { workspace: rawWorkspace, approvalRequestId } = params, workspace = rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const original = captureBenchImportLogAuthority(workspace, options), path = pendingPath(workspace, approvalRequestId), pendingBefore = captureRegistryFiles([path]);
+  const bytes = registryFileBytes(pendingBefore, path); if (bytes === null) throw new Error("pending benchmark publication is missing");
+  const pending = pendingPublishSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+  if (pending.approvalRequestId !== approvalRequestId) throw new Error("pending benchmark approval identity mismatch");
+  const expectedIntentHash = sha256Hex(canonicalize({ requestId: pending.requestId, benchId: pending.benchId, version: pending.version,
+    benchSha256: pending.fileSha256, registryFingerprint: pending.registryFingerprint, registryDir: resolve(pending.registryDir) }));
+  const approvalInput = { workspace, approvalId: pending.approvalRequestId, expectedAgentId: pending.agentId, expectedIntentId: pending.intentId,
+    expectedIntentHash, expectedToolName: "bench.publish", expectedActionClass: "SECURITY" as const };
+  const selected = () => { original(); assertRegistryFiles(pendingBefore); };
+  const executable = () => { selected(); const approval = verifyApprovalForExecution(approvalInput);
+    if (!approval.ok) throw new Error("benchmark publish approval is not executable"); };
+  executable();
+  const prepared = prepareBenchRegistryPublish({ dir: pending.registryDir, benchFile: pending.file, registryKeyPath: pending.registryKeyPath, version: pending.version }, { beforePublish: executable });
+  if (prepared.result.benchId !== pending.benchId || prepared.result.version !== pending.version || prepared.result.sha256 !== pending.fileSha256
+    || sha256Hex(readFileSync(join(resolve(pending.registryDir), "registry.pub"))) !== pending.registryFingerprint) throw new Error("selected benchmark or registry differs from approved facts");
+  let paths: readonly string[] = [], consumption: ReturnType<typeof consumeApprovedExecution> | null = null, pendingRemoved = false;
+  const completedLogs: string[] = [];
+  try {
+    const published = prepared.publish(); paths = published.completedPaths;
+    executable(); published.assertPublishedFiles();
+    consumption = consumeApprovedExecution({ workspace, approvalId: pending.approvalRequestId, expectedAgentId: pending.agentId, executionId: pending.requestId });
+    if (!consumption.consumed || consumption.replay) throw new Error("benchmark approval was not consumed by this execution");
+    const afterConsumption = () => { selected(); published.assertPublishedFiles(); const now = verifyApprovalForExecution(approvalInput);
+      if (now.ok || now.status !== "CONSUMED" || now.error !== "approval already consumed") throw new Error("benchmark consumed approval no longer verifies"); };
+    afterConsumption();
+    const logged = await appendTransparencyEntryAsync({ workspace, type: "BENCH_PUBLISHED", agentId: pending.agentId,
+      artifact: { kind: "amcbench", sha256: prepared.result.sha256, id: `${prepared.result.benchId}@${prepared.result.version}` } }, { beforeCommit: afterConsumption });
+    completedLogs.push(logged.hash);
+    withControlFileLock({ root: pendingDir(workspace), name: "bench-pending-publish", operation: () => {
+      afterConsumption(); assertRegistryFiles(pendingBefore); rmSync(path); pendingRemoved = true;
+    } });
+    original(); published.assertPublishedFiles();
+    return { benchId: published.result.benchId, version: published.result.version, targetPath: published.result.targetPath,
+      indexPath: published.result.indexPath, sigPath: published.result.sigPath, transparencyHash: logged.hash };
+  } catch (cause) { if (cause instanceof BenchRegistryPublicationError) paths = cause.completedPaths;
+    throw new BenchApprovedPublicationError(paths, consumption, Object.freeze([...completedLogs]), pendingRemoved, cause); }
+}
