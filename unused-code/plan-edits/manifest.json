@@ -521,6 +521,20 @@
       "sha256": "d8fcf3b4e4e7c79fa2841951a01adc7e6ca75feef40e38aba88784462aa1afd1"
     },
     {
+      "path": "src/prompt/promptPackArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackArtifact.ts.landed",
+      "sha256": "0cb3589919172da55dacb3eb2b1a02c4716230091ef4d5b7d28904b635dde674"
+    },
+    {
+      "path": "src/prompt/promptPackStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackStore.ts.landed",
+      "sha256": "85b638eaecab121b53687cfdd83b3d5faf16e3cb31567b0a3ab00e07ae13f1a3"
+    },
+    {
       "path": "src/prompt/promptPackVerifier.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
