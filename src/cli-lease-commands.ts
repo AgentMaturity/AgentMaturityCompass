@@ -7,8 +7,9 @@
  */
 import chalk from "chalk";
 import type { Command } from "commander";
-import { ensureLeaseRevocationStore, issueLeaseForCli, revokeLeaseForCli, verifyLeaseForCli } from "./leases/leaseCli.js";
+import { ensureLeaseRevocationStore, issueLeaseForCli, revokeLeaseForCliAsync, verifyLeaseForCli } from "./leases/leaseCli.js";
 import { workspaceIdFromDirectory } from "./workspaces/workspaceId.js";
+import { assertOwnerMode } from "./mode/mode.js";
 
 export function registerLeaseCliCommands(program: Command): void {
   const leases = program.command("lease").description("Issue/verify/revoke short-lived agent leases");
@@ -76,8 +77,14 @@ export function registerLeaseCliCommands(program: Command): void {
     .description("Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest")
     .requiredOption("--expect-digest <sha256>", "sha256 of the revocations.signed.json (or 1.x revocations.json) bytes you reviewed; anything else is refused")
     .action(async (opts: { expectDigest: string }) => {
-      const { resignLeaseRevocationsForCli } = await import("./leases/leaseCli.js");
-      const result = resignLeaseRevocationsForCli(process.cwd(), opts.expectDigest);
+      const { resignLeaseRevocationsForCliAsync } = await import("./leases/leaseCli.js");
+      const workspace = process.cwd(), reviewed = opts.expectDigest;
+      const assertInputs = () => {
+        if (process.cwd() !== workspace || opts.expectDigest !== reviewed) throw new Error("original lease repair CLI inputs changed");
+      };
+      const result = await resignLeaseRevocationsForCliAsync(workspace, reviewed, { beforeSign: assertInputs });
+      const assertCurrent = () => { result.assertCurrent(); assertInputs(); result.assertCurrent(); };
+      assertCurrent();
       if (result.wasValid) {
         console.log(chalk.green("Revocation store signature already valid; re-signed."));
         return;
@@ -85,6 +92,7 @@ export function registerLeaseCliCommands(program: Command): void {
       // The consequence is stated, not hidden: this certifies the reviewed bytes,
       // so an operator who did not review them is signing blind.
       console.log(chalk.yellow(`Previous signature did NOT verify (${result.previousReason ?? "unknown"}).`));
+      assertCurrent();
       console.log(chalk.yellow(`Re-signed ${result.revocationCount} revocation(s) as owner. You are vouching for the reviewed content.`));
     });
 
@@ -93,13 +101,15 @@ export function registerLeaseCliCommands(program: Command): void {
     .requiredOption("--lease-id <id>", "lease ID to revoke")
     .requiredOption("--reason <reason>", "revocation reason")
     .option("--token <lease>", "the lease token, so the revocation records its expiry and is pruned once it lapses")
-    .action((opts: { leaseId: string; reason: string; token?: string }) => {
-      const revoked = revokeLeaseForCli({
-        workspace: process.cwd(),
-        leaseId: opts.leaseId,
-        reason: opts.reason,
-        token: opts.token
-      });
+    .action(async (opts: { leaseId: string; reason: string; token?: string }) => {
+      const workspace = process.cwd(), leaseId = opts.leaseId, reason = opts.reason, token = opts.token;
+      const assertInputs = () => {
+        if (process.cwd() !== workspace || opts.leaseId !== leaseId || opts.reason !== reason || opts.token !== token)
+          throw new Error("original lease revoke CLI inputs changed");
+        assertOwnerMode(workspace, "lease revoke");
+      };
+      const revoked = await revokeLeaseForCliAsync({ workspace, leaseId, reason, token, beforeSign: assertInputs });
+      revoked.assertCurrent(); assertInputs(); revoked.assertCurrent();
       console.log(chalk.green(`Revoked lease: ${revoked.leaseId}`));
     });
 }

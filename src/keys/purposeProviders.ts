@@ -133,7 +133,7 @@ function assertPurposeSignerCurrent(workspace: string, purpose: LocalPurpose, de
  * The key that signs `purpose`: the vault, or the bound provider key, reached by the ref the key set records (never by
  * the editable config). `override` replaces the provider instance (tests) and must be the bound provider.
  */
-async function purposeSigner(workspace: string, purpose: LocalPurpose, override?: KeyProvider): Promise<{ provider: KeyProvider; description: KeyDescription; recheck: () => void }> {
+async function purposeSigner(workspace: string, purpose: LocalPurpose, override?: KeyProvider, afterDescribe?: () => void): Promise<{ provider: KeyProvider; description: KeyDescription; recheck: () => void }> {
   const bound = boundProviderKey(workspace, purpose);
   const config = loadKeysConfig(workspace);
   if (bound === null) {
@@ -144,6 +144,7 @@ async function purposeSigner(workspace: string, purpose: LocalPurpose, override?
     const vault = loadKeyProvider(workspace, "file");
     const ref: KeyRef = { provider: "file", id: purpose };
     const description = pinnedDescription(await attempt("file", "describe", () => vault.describe({ ...ref })), config);
+    afterDescribe?.();
     if (!sameRef(description.ref, ref) || description.publicKeyPem !== publicKeyPem) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the described key is not the requested original purpose key");
     const recheck = () => assertPurposeSignerCurrent(workspace, purpose, description, null);
     recheck();
@@ -155,6 +156,7 @@ async function purposeSigner(workspace: string, purpose: LocalPurpose, override?
   assertSigningKeyUsable(workspace, purpose, bound.publicKeyPem, ref.provider);
   const provider = override ?? loadKeyProvider(workspace, ref.provider);
   const description = pinnedDescription(await attempt(ref.provider, "describe", () => provider.describe({ ...ref })), config);
+  afterDescribe?.();
   // The key the provider presents, identified by its own bytes (never its reported id), must be the bound key.
   if (!sameRef(description.ref, ref) || signingKeyId(description.publicKeyPem) !== bound.binding.keyId) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the provider's ${purpose} key is not the key the key set binds`);
@@ -167,11 +169,15 @@ async function purposeSigner(workspace: string, purpose: LocalPurpose, override?
 export interface PurposeSignature { provider: KeyProviderId; algorithm: SigningAlgorithm; keyId: string; publicKeyPem: string; signature: Buffer }
 
 /** Preparation for the async owner revocation flow; no staging or publication occurs while the provider is awaited. */
-export async function signPurposeRevocationList(workspace: string, list: RevocationListV1, opts: { provider?: KeyProvider } = {}): Promise<{ signed: SignedRevocationList; description: KeyDescription; provider: KeyProviderId }> {
-  const { provider, description, recheck } = await purposeSigner(workspace, "revocation-list", opts.provider);
+export async function signPurposeRevocationList(workspace: string, list: RevocationListV1, opts: { provider?: KeyProvider; beforeSign?: () => void } = {}): Promise<{ signed: SignedRevocationList; description: KeyDescription; provider: KeyProviderId }> {
+  const beforeSign = opts.beforeSign, providerOverride = opts.provider;
+  beforeSign?.();
+  const { provider, description, recheck } = await purposeSigner(workspace, "revocation-list", providerOverride, beforeSign);
+  beforeSign?.();
   recheck(); // The outer await is a separate continuation before the real Sign.
   const signatureVersion = provider.id === "aws-kms" && revocationListSigningBytes(list).length > 4096 ? 2 : 1;
   const signed = await signRevocationListWithProvider(list, provider, description, { signatureVersion });
+  beforeSign?.();
   recheck();
   return { signed, description, provider: description.ref.provider };
 }
