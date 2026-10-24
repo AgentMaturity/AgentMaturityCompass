@@ -19,7 +19,7 @@ import { BudgetsPublicationError } from "./budgets/budgets.js";
 import { adaptersConfigPath, AdaptersConfigPublicationError } from "./adapters/adapterConfigStore.js";
 import { bridgeConfigPath } from "./bridge/bridgeConfigStore.js";
 import { modelTaxonomyPath } from "./bridge/modelTaxonomy.js";
-import { opsPolicyPath } from "./ops/policy.js";
+import { opsPolicyPath, captureMissingOpsPolicyInitialization, OpsPolicyInitializationPartialError } from "./ops/policy.js";
 import { trustConfigPath } from "./trust/trustConfig.js";
 import { forecastPolicyPath } from "./forecast/forecastStore.js";
 import { canonPath } from "./canon/canonLoader.js";
@@ -73,6 +73,7 @@ export class WorkspaceMatureInitializationPartialError extends WorkspaceInitiali
     nativeProgress: readonly Readonly<Progress>[]; configProgress: readonly Readonly<Progress>[];
     inherited: Readonly<Record<string, boolean>>; closeCauses: readonly unknown[]; cleanupCauses: readonly unknown[];
     lateSignatureFailure: { cause: unknown } | null;
+    ops: ReturnType<ReturnType<typeof captureMissingOpsPolicyInitialization>["observation"]> | null;
   }) {
     super(cause, paths); this.name = "WorkspaceMatureInitializationPartialError";
     this.message = "mature workspace initialization did not complete; actual attempted and returned prefixes remain";
@@ -88,8 +89,9 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
   const originalMark = canonicalize(markAtEntry);
   const options = structuredClone(supplied); options.workspacePath = workspace;
   const paths = getWorkspacePaths(workspace, options.agentId), selected = canonicalize(paths);
+  const opsMissing = !pathExists(opsPolicyPath(workspace));
   const skipped = [trustConfigPath(workspace), actionPolicyPath(workspace), toolsConfigPath(workspace), join(workspace, ".amc", "gateway.yaml"),
-    bridgeConfigPath(workspace), modelTaxonomyPath(workspace), opsPolicyPath(workspace), forecastPolicyPath(workspace), cgxPolicyPath(workspace),
+    bridgeConfigPath(workspace), modelTaxonomyPath(workspace), ...(opsMissing ? [] : [opsPolicyPath(workspace)]), forecastPolicyPath(workspace), cgxPolicyPath(workspace),
     mechanicTargetsPath(workspace), benchPolicyPath(workspace), promptPolicyPath(workspace), assurancePolicyPath(workspace), auditPolicyPath(workspace),
     auditMapBuiltinPath(workspace), auditMapActivePath(workspace)];
   if (skipped.some(path => !pathExists(path))) return null;
@@ -116,6 +118,7 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
     ensureSigningKeysReturned: false, ledgerOpenAttempted: false, ledgerOpenReturned: false, ledgerCloseAttempted: false, ledgerCloseReturned: false };
   const snapshot = () => Object.freeze(progress.map(row => Object.freeze({ ...row })));
   let config: ReturnType<typeof captureAmcConfigInitialization> | null = null;
+  let ops: ReturnType<typeof captureMissingOpsPolicyInitialization> | null = null;
   let cold: ReturnType<typeof captureWorkspaceColdOrgPrerequisites> | null = null, targetCurrent: (() => void) | null = null, entered = false, completed = false;
   const assertOriginal = () => {
     if (noSignAtEntry || process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize mature workspace signing");
@@ -127,19 +130,24 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
     for (const path of [...skipped, ...selectedFleetPresence]) if (!pathExists(path)) throw new Error("original initializer skip presence disappeared: " + path);
     if ((0o777 & ~process.umask()) !== directoryMode) throw new Error("original initializer creation mode changed");
   };
-  const assertCurrent = () => {
+  const assertBaseCurrent = () => {
     assertOriginal(); config?.assertCurrent(); cold?.assertCurrent(); targetCurrent?.(); assertOriginal();
     assertOrgPairsCurrent({ members: [...expected.values()] }); assertDirectoriesCurrent(originalDirectories);
   };
+  const assertCurrent = () => {
+    assertBaseCurrent();
+    if (ops !== null) { ops.assertCurrent(); assertBaseCurrent(); }
+  };
   const partial = (cause: unknown) => {
     const nested = cause instanceof OrgPairsPublicationError || cause instanceof BudgetsPublicationError || cause instanceof AdaptersConfigPublicationError
-      ? cause.publishedPaths : [];
-    const paths = [...(cold?.completedPaths ?? []), ...returnedPaths, ...(config?.returnedPaths ?? []), ...nested]
+      || cause instanceof OpsPolicyInitializationPartialError ? cause.publishedPaths : [];
+    const paths = [...(cold?.completedPaths ?? []), ...returnedPaths, ...(config?.returnedPaths ?? []), ...(ops?.publishedPaths() ?? []), ...nested]
       .map(path => relative(workspace, resolve(workspace, path)));
     // Preserve primary, close and cleanup causes independently; a thrown native call is not zero effects.
     return new WorkspaceMatureInitializationPartialError(cause, Object.freeze([...new Set(paths)]), Object.freeze({
       nativeProgress: snapshot(), configProgress: config?.nativeProgress ?? Object.freeze([]), inherited: Object.freeze({ ...inherited }),
-      closeCauses: Object.freeze([...closeCauses]), cleanupCauses: Object.freeze([...cleanupCauses]), lateSignatureFailure: config?.lateSignatureFailure ?? null
+      closeCauses: Object.freeze([...closeCauses]), cleanupCauses: Object.freeze([...cleanupCauses]), lateSignatureFailure: config?.lateSignatureFailure ?? null,
+      ops: ops?.observation() ?? null
     }));
   };
   const operation = <T>(path: string, stage: string, run: () => T): T => {
@@ -192,6 +200,9 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
   };
   try {
     assertCurrent(); config = captureAmcConfigInitialization(workspace, options.trustBoundaryMode); assertCurrent();
+    if (opsMissing) {
+      ops = captureMissingOpsPolicyInitialization(workspace, assertBaseCurrent); assertCurrent();
+    }
     inherited.coldCaptureAttempted = true; cold = captureWorkspaceColdOrgPrerequisites(workspace, options.agentId); inherited.coldCaptureReturned = true;
     assertCurrent();
   } catch (cause) { throw partial(cause); }
@@ -232,7 +243,11 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
       }
       assertCurrent(); inherited.ledgerOpenAttempted = true; const ledger = openLedger(workspace); inherited.ledgerOpenReturned = true;
       inherited.ledgerCloseAttempted = true; ledger.close(); inherited.ledgerCloseReturned = true; assertCurrent();
-      // Every non-cold signed default and optional default-fleet branch was an original presence/no-op decision.
+      if (ops !== null) {
+        assertCurrent(); await ops.initialize();
+        ops.assertCompleted(); assertCurrent();
+      }
+      // Every other non-cold signed default and optional default-fleet branch was an original presence/no-op decision.
       // Keep the old late best-effort signature contract; its real failure remains in the private attempt observation.
       try { await config!.signLate(assertCurrent); } catch { /* existing best-effort sidecar stage; no alternate signer or retry */ }
       // This independent original/owned gate is outside that catch: changed authority or destinations never grant completion.
