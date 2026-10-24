@@ -1,9 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { captureRawConfigPair, verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 
 interface LanSignature {
   digestSha256: string;
@@ -43,7 +45,11 @@ export function loadLanMode(workspace: string): LanModeConfig {
   if (!pathExists(path)) {
     return defaultLanMode();
   }
-  const parsed = YAML.parse(readUtf8(path)) as Partial<LanModeConfig> | null;
+  return parseLanMode(readUtf8(path));
+}
+
+function parseLanMode(bytes: string): LanModeConfig {
+  const parsed = YAML.parse(bytes) as Partial<LanModeConfig> | null;
   return {
     enabled: parsed?.enabled === true,
     bind: typeof parsed?.bind === "string" && parsed.bind.length > 0 ? parsed.bind : "127.0.0.1",
@@ -109,7 +115,7 @@ export function verifyLanModeSignature(workspace: string): {
         sigPath
       };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    const valid = verifyRawConfigSignature(workspace, digest, sig.signature);
     return {
       valid,
       signatureExists: true,
@@ -166,6 +172,33 @@ export function disableLanMode(workspace: string): { path: string; sigPath: stri
     path,
     sigPath: signLanMode(workspace)
   };
+}
+
+/** Actual raw config-purpose successors. Inputs/defaults and original target pair precede the first provider wait. */
+export async function enableLanModeAsync(supplied: Parameters<typeof enableLanMode>[0], beforePublish?: () => void): Promise<{ path: string; sigPath: string }> {
+  const params = { ...supplied, workspace: resolve(supplied.workspace), allowedCIDRs: supplied.allowedCIDRs === undefined ? undefined : [...supplied.allowedCIDRs] };
+  const config: LanModeConfig = { enabled: true, bind: params.bind, port: params.port,
+    allowedCIDRs: params.allowedCIDRs && params.allowedCIDRs.length > 0 ? params.allowedCIDRs : ["127.0.0.1/32"], requirePairing: params.requirePairing !== false };
+  const caller = beforePublish, stable = () => {
+    caller?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize LAN configuration signing");
+  };
+  stable();
+  const pair = captureRawConfigPair(params.workspace, lanPath(params.workspace), Buffer.from(YAML.stringify(config)), { beforePublish: stable });
+  const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
+}
+
+export async function disableLanModeAsync(workspaceInput: string, beforePublish?: () => void): Promise<{ path: string; sigPath: string }> {
+  const workspace = resolve(workspaceInput), caller = beforePublish, stable = () => {
+    caller?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize LAN configuration signing");
+  };
+  stable();
+  const path = lanPath(workspace), previous = captureOrgPairs([path]), original = orgPairBytes(previous, path);
+  const current = original === null ? defaultLanMode() : parseLanMode(original.toString("utf8"));
+  const next: LanModeConfig = { ...current, enabled: false, bind: "127.0.0.1", requirePairing: false };
+  const pair = captureRawConfigPair(workspace, path, Buffer.from(YAML.stringify(next)), { previous, beforePublish: stable });
+  const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
 }
 
 function ipToNumber(ip: string): number | null {

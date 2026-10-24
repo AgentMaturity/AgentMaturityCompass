@@ -435,7 +435,7 @@ import {
   scimTokenCreateCli
 } from "./identity/identityCli.js";
 import { createPairingCode } from "./pairing/pairingCodes.js";
-import { disableLanMode, enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
+import { disableLanModeAsync as disableLanMode, enableLanModeAsync as enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
 import { createBridgePairingCode } from "./bridge/bridgeAuth.js";
 import { redactBridgeText } from "./bridge/bridgeRedaction.js";
 import { stripProviderKeys } from "./utils/providerKeys.js";
@@ -4290,7 +4290,7 @@ studioLan
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = enableLanMode({
+    const out = await enableLanMode({
       workspace,
       bind: opts.bind,
       port: Number(opts.port),
@@ -4309,7 +4309,7 @@ studioLan
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = disableLanMode(workspace);
+    const out = await disableLanMode(workspace);
     console.log(chalk.green(`LAN mode disabled: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
