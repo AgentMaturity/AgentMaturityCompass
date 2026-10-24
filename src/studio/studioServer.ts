@@ -168,7 +168,7 @@ import {
 } from "../bench/benchApi.js";
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { emitBenchSse } from "../bench/benchSse.js";
-import { loadBudgetsConfig, signBudgetsConfig } from "../budgets/budgets.js";
+import { loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
 import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
@@ -5565,17 +5565,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
+        const actor = signingAuthority(["OWNER"]), beforePublish = () => { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } };
+        const writer = captureBudgetsPublication(options.workspace, beforePublish);
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { config?: unknown }) : {};
-        if (!parsed.config || typeof parsed.config !== "object") {
-          json(res, 400, { error: "config object is required" });
-          return;
-        }
-        const yaml = YAML.stringify(parsed.config as Record<string, unknown>);
-        const path = join(options.workspace, ".amc", "budgets.yaml");
-        writeFileAtomic(path, yaml, 0o644);
-        signBudgetsConfig(options.workspace);
-        writeStudioAuditEvent({
+        if (!parsed.config || typeof parsed.config !== "object") { json(res, 400, { error: "config object is required" }); return; }
+        const prepared = await writer.prepareAsync(Buffer.from(YAML.stringify(parsed.config as Record<string, unknown>)));
+        const saved = prepared.publish(), path = saved.configPath;
+        try { prepared.assertCurrent(); writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CONSOLE_BUDGETS_UPDATED",
           severity: "LOW",
@@ -5583,6 +5580,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             path
           }
         });
+        prepared.assertCurrent(); } catch (cause) { throw new BudgetsPublicationError([path, saved.sigPath], "studio-budget-audit", cause); }
         json(res, 200, { path });
         return;
       }

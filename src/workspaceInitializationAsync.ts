@@ -9,5 +9,5 @@ export { WorkspaceInitializationPartialError } from "./workspaceColdOrgPrerequis
 export async function initWorkspaceAsync(input: InitWorkspaceOptions = {}): Promise<ReturnType<typeof initWorkspace>> {
   const options = structuredClone(input), workspace = options.workspacePath ?? process.cwd();
   options.workspacePath = workspace;
-  return keysetDeclared(workspace) ? captureWorkspaceColdOrgPrerequisites(workspace).initializeWorkspace(options) : initWorkspace(options);
+  return keysetDeclared(workspace) ? captureWorkspaceColdOrgPrerequisites(workspace, options.agentId).initializeWorkspace(options) : initWorkspace(options);
 }

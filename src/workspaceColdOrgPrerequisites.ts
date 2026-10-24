@@ -1,6 +1,6 @@
 /** Fixed mature adapter/canon/bank prerequisite attempt. Fresh bootstrap keeps its synchronous key order. */
 import { relative, resolve } from "node:path";
-import { initWorkspace, type InitWorkspaceOptions } from "./workspace.js";
+import { initWorkspace, getWorkspacePaths, type InitWorkspaceOptions } from "./workspace.js";
 import { captureAdaptersConfigInitialization } from "./adapters/adapterConfigStore.js";
 import { canonPath, prepareCanonAsync } from "./canon/canonLoader.js";
 import { builtInCanon } from "./canon/canonBuiltin.js";
@@ -8,6 +8,8 @@ import { diagnosticBankPath, prepareDiagnosticBankAsync } from "./diagnostic/ban
 import { defaultDiagnosticBankV1 } from "./diagnostic/bank/bankV1.js";
 import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, OrgPairsPublicationError } from "./org/preparedOrgPairs.js";
 import { pathExists } from "./utils/fs.js";
+import YAML from "yaml";
+import { budgetsPath, defaultBudgets, captureBudgetsPublication, BudgetsPublicationError } from "./budgets/budgets.js";
 
 export class WorkspaceInitializationPartialError extends Error {
   readonly code = "WORKSPACE_INITIALIZATION_PARTIAL";
@@ -16,7 +18,7 @@ export class WorkspaceInitializationPartialError extends Error {
     this.name = "WorkspaceInitializationPartialError";
   }
 }
-export function captureWorkspaceColdOrgPrerequisites(workspace: string) {
+export function captureWorkspaceColdOrgPrerequisites(workspace: string, agentId?: string) {
   const canon = canonPath(workspace), bank = diagnosticBankPath(workspace);
   const initialCanon = pathExists(canon) ? null : captureOrgPairs([canon]), initialBank = pathExists(bank) ? null : captureOrgPairs([bank]);
   const canonValue = initialCanon === null ? null : structuredClone(builtInCanon()), bankValue = initialBank === null ? null : structuredClone(defaultDiagnosticBankV1());
@@ -24,7 +26,14 @@ export function captureWorkspaceColdOrgPrerequisites(workspace: string) {
   const original = initialCanon !== null || initialBank !== null ? captureOrgPairsAuthority(workspace) : () => {};
   let canonCurrent = () => { if (initialCanon !== null) assertOrgPairsCurrent(initialCanon); else if (!pathExists(canon)) throw new Error("existing canon disappeared during workspace initialization"); };
   let bankCurrent = () => { if (initialBank !== null) assertOrgPairsCurrent(initialBank); else if (!pathExists(bank)) throw new Error("existing diagnostic bank disappeared during workspace initialization"); };
-  const completed: string[] = [], ownCurrent = () => { original(); canonCurrent(); bankCurrent(); };
+  const budgetPath = budgetsPath(workspace), budget = pathExists(budgetPath) ? null : captureBudgetsPublication(workspace, original);
+  const budgetAgent = budget === null ? null : getWorkspacePaths(workspace, agentId).agentId;
+  const budgetBytes = budgetAgent === null ? null : Buffer.from(YAML.stringify(defaultBudgets(budgetAgent))); let budgetReturned = false;
+  const budgetCurrent = () => {
+    if (budget !== null) { if (getWorkspacePaths(workspace, agentId).agentId !== budgetAgent) throw new Error("workspace budget selected agent changed"); budget.assertCurrent(); }
+    else if (!pathExists(budgetPath)) throw new Error("existing budgets disappeared during workspace initialization");
+  };
+  const completed: string[] = [], ownCurrent = () => { original(); canonCurrent(); bankCurrent(); budgetCurrent(); };
   // This real C7 capture owns its original pair/default/authority before an earlier ops await.
   // Its callback is independent: calling the composed gate here would recurse through adapter.assertCurrent.
   const adapter = captureAdaptersConfigInitialization(workspace, ownCurrent);
@@ -40,17 +49,23 @@ export function captureWorkspaceColdOrgPrerequisites(workspace: string) {
     const prepared = await prepareDiagnosticBankAsync(workspace, bankValue!, { beforePublish: original, assertInputsCurrent: assertCurrent }, initialBank);
     const saved = prepared.publish()[0]!; bankCurrent = prepared.assertCurrent; completed.push(relative(workspace, saved.path), relative(workspace, saved.sigPath));
   };
-  return Object.freeze({ workspace, get completedPaths(): readonly string[] { return completedPaths(); }, assertCurrent, initializeCanon, initializeBank,
+  const initializeBudgets = async () => {
+    assertCurrent(); if (budget === null || budgetReturned) return;
+    const prepared = await budget.prepareAsync(budgetBytes!, assertCurrent);
+    prepared.publish({ recorded(path) { completed.push(relative(workspace, path)); } }); budgetReturned = true; assertCurrent();
+  };
+  return Object.freeze({ workspace, get completedPaths(): readonly string[] { return completedPaths(); }, assertCurrent, initializeCanon, initializeBank, initializeBudgets,
     async initializeAdapters() { assertCurrent(); const saved = await adapter.initialize(); assertCurrent(); return saved; },
     async initializeWorkspace(input: InitWorkspaceOptions) {
       const options = structuredClone(input); options.workspacePath ??= workspace;
       if (options.workspacePath !== workspace) throw new Error("workspace prerequisite attempt belongs to another workspace");
+      if (budget !== null && getWorkspacePaths(workspace, options.agentId).agentId !== budgetAgent) throw new Error("workspace initialization selected another budget agent");
       try {
         assertCurrent(); await adapter.initialize(); assertCurrent();
-        await initializeCanon(); await initializeBank(); assertCurrent(); return initWorkspace(options);
+        await initializeCanon(); await initializeBank(); await initializeBudgets(); assertCurrent(); return initWorkspace(options);
       } catch (cause) {
-        const paths = [...completedPaths(), ...(cause instanceof OrgPairsPublicationError ? cause.publishedPaths : [])];
-        if (paths.length > 0) throw new WorkspaceInitializationPartialError(cause, Object.freeze(paths)); throw cause;
+        const paths = [...completedPaths(), ...(cause instanceof OrgPairsPublicationError || cause instanceof BudgetsPublicationError ? cause.publishedPaths : [])];
+        if (paths.length > 0) throw new WorkspaceInitializationPartialError(cause, Object.freeze([...new Set(paths)])); throw cause;
       }
     }
   });

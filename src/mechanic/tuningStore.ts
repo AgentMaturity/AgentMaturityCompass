@@ -112,7 +112,7 @@ export function captureMechanicTuning(workspace: string) {
 }
 export async function prepareInitialMechanicTuning(params: Parameters<typeof initMechanicTuning>[0], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   const tuning = defaultMechanicTuning({ ...params.scope }), prepared = await prepareMechanicTuning({ workspace: params.workspace, tuning, reason: "initial mechanic tuning" }, options, previous);
-  return { assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), tuning }; } };
+  return { bytes: Buffer.from(prepared.bytes), assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), tuning }; } };
 }
 export async function initMechanicTuningAsync(params: Parameters<typeof initMechanicTuning>[0]) { return (await prepareInitialMechanicTuning(params)).publish(); }
 

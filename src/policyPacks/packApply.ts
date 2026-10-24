@@ -16,7 +16,7 @@ import {
 } from "../governor/actionPolicyEngine.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { signToolsConfig } from "../toolhub/toolhubValidators.js";
-import { signBudgetsConfig } from "../budgets/budgets.js";
+import { signBudgetsConfig, captureBudgetsPublication } from "../budgets/budgets.js";
 import { signAlertsConfig } from "../drift/alerts.js";
 import { signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { parseGatePolicy, writeSignedGatePolicy } from "../ci/gate.js";
@@ -216,6 +216,13 @@ export function publishPolicyPackCompatibility(workspace: string, pack: PolicyPa
   const files: Array<{ path: string; sha256: string }> = [];
   for (const row of rows) {
     const path = join(workspace, ".amc", row.name), text = YAML.stringify(row.value);
+    if (row.name === "budgets.yaml") {
+      // This inherited local compatibility phase already holds the action lock; prepare before the short budget lock.
+      let currentPath = path;
+      const prepared = captureBudgetsPublication(workspace, () => options.beforeMember?.(currentPath)).prepareLocal(Buffer.from(text));
+      prepared.publish({ beforeMember(member) { currentPath = member; options.beforeMember?.(member); }, recorded: options.recorded });
+      files.push({ path, sha256: hashFilePayload(text) }); continue;
+    }
     options.beforeMember?.(path); ensureDir(dirname(path)); writeFileAtomic(path, text, 0o644); options.recorded?.(path);
     files.push({ path, sha256: hashFilePayload(text) });
     options.beforeMember?.(`${path}.sig`); const signaturePath = row.sign(workspace); options.recorded?.(signaturePath);

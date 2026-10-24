@@ -7,7 +7,7 @@ import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } fr
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { actionPolicyPath, initActionPolicy } from "../governor/actionPolicyEngine.js";
 import { initToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
-import { budgetsPath, initBudgets } from "../budgets/budgets.js";
+import { budgetsPath } from "../budgets/budgets.js";
 import { approvalPolicyPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { adaptersConfigPath } from "../adapters/adapterConfigStore.js";
 import { bridgeConfigPath, initBridgeConfig } from "../bridge/bridgeConfigStore.js";
@@ -132,7 +132,7 @@ async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceCol
     created["tools.yaml"] = true;
   }
   if (!pathExists(budgetsPath(workspace))) {
-    initBudgets(workspace, "default");
+    await cold.initializeBudgets();
     created["budgets.yaml"] = true;
   }
   if (!pathExists(approvalPolicyPath(workspace))) {
