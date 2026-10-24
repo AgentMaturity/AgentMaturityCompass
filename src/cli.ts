@@ -435,7 +435,7 @@ import {
   scimTokenCreateCli
 } from "./identity/identityCli.js";
 import { createPairingCode } from "./pairing/pairingCodes.js";
-import { disableLanModeAsync as disableLanMode, enableLanModeAsync as enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
+import { captureLanModeEnableBeforeUnlock, captureLanModeDisableBeforeUnlock, disableLanModeAsync as disableLanMode, enableLanModeAsync as enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
 import { createBridgePairingCode } from "./bridge/bridgeAuth.js";
 import { redactBridgeText } from "./bridge/bridgeRedaction.js";
 import { stripProviderKeys } from "./utils/providerKeys.js";
@@ -4286,17 +4286,12 @@ studioLan
   .option("--port <port>", "port", "3212")
   .option("--cidr <cidr...>", "allowed CIDRs")
   .action(async (opts: { bind: string; port: string; cidr?: string[] }) => {
-    const workspace = process.cwd();
+    const workspace = process.cwd(), params = { workspace, bind: opts.bind, port: Number(opts.port), allowedCIDRs: opts.cidr === undefined ? undefined : [...opts.cidr], requirePairing: true };
+    const original = captureLanModeEnableBeforeUnlock(params);
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = await enableLanMode({
-      workspace,
-      bind: opts.bind,
-      port: Number(opts.port),
-      allowedCIDRs: opts.cidr,
-      requirePairing: true
-    });
+    const out = original === null ? await enableLanMode(params) : await original.publish();
     console.log(chalk.green(`LAN mode enabled: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -4305,11 +4300,11 @@ studioLan
   .command("disable")
   .description("Disable LAN mode and revert to localhost-only")
   .action(async () => {
-    const workspace = process.cwd();
+    const workspace = process.cwd(), original = captureLanModeDisableBeforeUnlock(workspace);
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = await disableLanMode(workspace);
+    const out = original === null ? await disableLanMode(workspace) : await original.publish();
     console.log(chalk.green(`LAN mode disabled: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });

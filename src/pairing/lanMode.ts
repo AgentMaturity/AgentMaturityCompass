@@ -5,7 +5,11 @@ import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { captureRawConfigPair, verifyRawConfigSignature } from "../config/configSignaturePair.js";
-import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { assertKeysetComplete, boundProviderKey, keysetCommittedMark } from "../keys/keyset.js";
+import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
+import { loadKeysConfig, parseKeysSection } from "../keys/keysConfig.js";
+import { canonicalize } from "../utils/json.js";
 
 interface LanSignature {
   digestSha256: string;
@@ -199,6 +203,73 @@ export async function disableLanModeAsync(workspaceInput: string, beforePublish?
   const next: LanModeConfig = { ...current, enabled: false, bind: "127.0.0.1", requirePairing: false };
   const pair = captureRawConfigPair(workspace, path, Buffer.from(YAML.stringify(next)), { previous, beforePublish: stable });
   const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
+}
+
+/** Public original-generation negative only. It does not unlock, probe a private key, or select a new signer.
+ * An unmarked workspace keeps the existing continuation; its own migration needs a genuine vault-owned handle.
+ */
+function captureMarkedLanAuthority(workspace: string): (() => void) | null {
+  const mark = keysetCommittedMark(workspace);
+  if (mark === null) return null;
+  const originalMark = canonicalize(mark), keyset = canonicalize(assertKeysetComplete(workspace));
+  const configPath = join(workspace, ".amc", "amc.config.yaml"), config = captureOrgPairs([configPath]);
+  const settings = canonicalize(parseKeysSection(orgPairBytes(config, configPath)));
+  const bound = boundProviderKey(workspace, "config-signature"), binding = canonicalize(bound), holder = bound?.binding.provider ?? "file";
+  const publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
+  const assertCurrent = () => {
+    if (canonicalize(keysetCommittedMark(workspace)) !== originalMark || canonicalize(assertKeysetComplete(workspace)) !== keyset)
+      throw new Error("original committed LAN signing generation changed; vault unlock effects, if any, remain");
+    assertOrgPairsCurrent(config);
+    const currentBound = boundProviderKey(workspace, "config-signature");
+    if (canonicalize(loadKeysConfig(workspace)) !== settings || canonicalize(currentBound) !== binding
+      || (currentBound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature")) !== publicKeyPem)
+      throw new Error("original public LAN config authority changed; vault unlock effects, if any, remain");
+    assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
+  };
+  assertCurrent(); return assertCurrent;
+}
+function capturedLanAfterUnlock(workspace: string, path: string, bytes: Buffer, previous: OrgPairsSnapshot, original: () => void, refusedNoSign: boolean) {
+  const stable = () => {
+    if (refusedNoSign || process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize LAN configuration signing");
+    original();
+  };
+  return Object.freeze({ async publish(): Promise<{ path: string; sigPath: string }> {
+    stable();
+    // The old target belongs only to C8's preparation/expected-own-state CAS, never the stable negative.
+    const pair = captureRawConfigPair(workspace, path, bytes, { previous, beforePublish: stable });
+    const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
+  } });
+}
+// Retain the existing CLI unlock attempt/effects even when a preprompt public snapshot already refused.
+function refusedLanAfterUnlock(cause: unknown, refusedNoSign: boolean) {
+  return Object.freeze({ async publish(): Promise<{ path: string; sigPath: string }> {
+    if (refusedNoSign || process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize LAN configuration signing", { cause });
+    throw cause;
+  } });
+}
+/** Internal maintained CLI handoff, captured before its existing interactive unlock await. No root SDK export. */
+export function captureLanModeEnableBeforeUnlock(supplied: Parameters<typeof enableLanMode>[0]) {
+  const refusedNoSign = process.env.AMC_NO_SIGN === "1";
+  try {
+    const params = { ...supplied, workspace: resolve(supplied.workspace), allowedCIDRs: supplied.allowedCIDRs === undefined ? undefined : [...supplied.allowedCIDRs] };
+    const original = captureMarkedLanAuthority(params.workspace);
+    if (original === null) return null;
+    const config: LanModeConfig = { enabled: true, bind: params.bind, port: params.port,
+      allowedCIDRs: params.allowedCIDRs && params.allowedCIDRs.length > 0 ? params.allowedCIDRs : ["127.0.0.1/32"], requirePairing: params.requirePairing !== false };
+    const path = lanPath(params.workspace), previous = captureOrgPairs([path]);
+    return capturedLanAfterUnlock(params.workspace, path, Buffer.from(YAML.stringify(config)), previous, original, refusedNoSign);
+  } catch (cause) { return refusedLanAfterUnlock(cause, refusedNoSign); }
+}
+export function captureLanModeDisableBeforeUnlock(workspaceInput: string) {
+  const refusedNoSign = process.env.AMC_NO_SIGN === "1";
+  try {
+    const workspace = resolve(workspaceInput), original = captureMarkedLanAuthority(workspace);
+    if (original === null) return null;
+    const path = lanPath(workspace), previous = captureOrgPairs([path]), bytes = orgPairBytes(previous, path);
+    const current = bytes === null ? defaultLanMode() : parseLanMode(bytes.toString("utf8"));
+    const next: LanModeConfig = { ...current, enabled: false, bind: "127.0.0.1", requirePairing: false };
+    return capturedLanAfterUnlock(workspace, path, Buffer.from(YAML.stringify(next)), previous, original, refusedNoSign);
+  } catch (cause) { return refusedLanAfterUnlock(cause, refusedNoSign); }
 }
 
 function ipToNumber(ip: string): number | null {
