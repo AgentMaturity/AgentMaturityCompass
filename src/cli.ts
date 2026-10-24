@@ -669,10 +669,10 @@ import {
 } from "./trust/temporalDecay.js";
 import {
   adaptersCapabilitiesCliAsync,
-  adaptersConfigureCli,
+  adaptersConfigureCliAsync,
   adaptersDetectCli,
   adaptersEnvCli,
-  adaptersInitCli,
+  adaptersInitCliAsync,
   adaptersInitProjectCli,
   adaptersListCli,
   adaptersRunCli,
@@ -4466,8 +4466,8 @@ const adapters = program.command("adapters").description("Built-in adapter syste
 adapters
   .command("init")
   .description("Create signed adapters.yaml defaults")
-  .action(() => {
-    const out = adaptersInitCli(process.cwd());
+  .action(async () => {
+    const out = await adaptersInitCliAsync(process.cwd());
     console.log(chalk.green(`Adapters config created: ${out.configPath}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -4567,8 +4567,8 @@ adapters
   .requiredOption("--model <model>", "preferred model id")
   .option("--mode <mode>", "SUPERVISE|SANDBOX", "SUPERVISE")
   .option("--launch-config <file>", "DSH only: JSON with approved executable/entrypoint paths and SHA-256 hashes")
-  .action((opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX"; launchConfig?: string }) => {
-    const out = adaptersConfigureCli({
+  .action(async (opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX"; launchConfig?: string }) => {
+    const out = await adaptersConfigureCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       adapterId: opts.adapter,

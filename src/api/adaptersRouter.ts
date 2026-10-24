@@ -7,6 +7,10 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 import { KeyProviderError } from '../keys/provider.js';
 
+class AdaptersActorChanged extends Error {
+  constructor() { super('authenticated authority changed while the request was prepared'); }
+}
+
 export async function handleAdaptersRoute(
   pathname: string,
   method: string,
@@ -16,14 +20,21 @@ export async function handleAdaptersRoute(
   revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/adapters')) return false;
+  const assertActor = () => { if (revalidateAuthority?.() === false) throw new AdaptersActorChanged(); };
 
   // POST /api/v1/adapters/init — create signed adapters.yaml defaults
   if (pathname === '/api/v1/adapters/init' && method === 'POST') {
     try {
-      const { adaptersInitCli } = await import('../adapters/adapterCli.js');
-      const out = adaptersInitCli(workspace);
+      assertActor();
+      const adapters = await import('../adapters/adapterCli.js');
+      assertActor(); // Recheck the actual caller after the dynamic-import wait, before preparing Sign.
+      const out = revalidateAuthority === undefined ? adapters.adaptersInitCli(workspace)
+        : (await adapters.prepareAdaptersInitForHttp(workspace)).publish(assertActor);
       apiSuccess(res, { initialized: true, ...out }, 201);
     } catch (err) {
+      if (res.headersSent) return true;
+      if (err instanceof AdaptersActorChanged) { apiError(res, 403, err.message); return true; }
+      if (err instanceof KeyProviderError) { apiError(res, err.status, err.message); return true; }
       apiError(res, 500, err instanceof Error ? err.message : 'Adapters init failed');
     }
     return true;
@@ -113,6 +124,7 @@ export async function handleAdaptersRoute(
   // POST /api/v1/adapters/configure — set adapter profile for an agent
   if (pathname === '/api/v1/adapters/configure' && method === 'POST') {
     try {
+      assertActor();
       const body = await bodyJson<{
         agentId?: string;
         adapterId: string;
@@ -124,17 +136,17 @@ export async function handleAdaptersRoute(
         apiError(res, 400, 'Required: adapterId, route, model, mode');
         return true;
       }
-      const { adaptersConfigureCli } = await import('../adapters/adapterCli.js');
-      const out = adaptersConfigureCli({
-        workspace,
-        agentId: body.agentId,
-        adapterId: body.adapterId,
-        route: body.route,
-        model: body.model,
-        mode: body.mode,
-      });
+      assertActor();
+      const adapters = await import('../adapters/adapterCli.js');
+      assertActor(); // Recheck the actual caller after the dynamic-import wait, before preparing Sign.
+      const input = { workspace, agentId: body.agentId, adapterId: body.adapterId, route: body.route, model: body.model, mode: body.mode };
+      const out = revalidateAuthority === undefined ? adapters.adaptersConfigureCli(input)
+        : (await adapters.prepareAdaptersConfigureForHttp(input)).publish(assertActor);
       apiSuccess(res, { configured: true, ...out });
     } catch (err) {
+      if (res.headersSent) return true;
+      if (err instanceof AdaptersActorChanged) { apiError(res, 403, err.message); return true; }
+      if (err instanceof KeyProviderError) { apiError(res, err.status, err.message); return true; }
       apiError(res, 500, err instanceof Error ? err.message : 'Adapters configure failed');
     }
     return true;

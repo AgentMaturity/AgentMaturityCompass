@@ -469,11 +469,11 @@ export type {
   OnboardingActivationStatus
 } from "./setup/onboardingActivation.js";
 export {
-  adaptersInitCli,
+  adaptersInitCli, adaptersInitCliAsync,
   adaptersVerifyCli,
   adaptersListCli,
   adaptersDetectCli,
-  adaptersConfigureCli,
+  adaptersConfigureCli, adaptersConfigureCliAsync,
   adaptersCapabilitiesCli, adaptersCapabilitiesCliAsync,
   adaptersRunCli,
   adaptersEnvCli,
