@@ -362,12 +362,12 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
   const signature = Buffer.from(JSON.stringify({ digestSha256: digest, signature: signed.signature.toString("base64"),
     signedTs: Date.now(), signer: "auditor" } satisfies UsersSignature, null, 2), "utf8");
   return withUsersConfigLock(workspace, () => {
+    assertAuthorized?.();
+    assertPurposePublicationCurrent(workspace, authority, signed);
     const current = usersPublicationSnapshot(workspace);
     if (!sameUsersBytes(prepared.predecessor.bytes, current.bytes) || !sameUsersBytes(prepared.predecessor.signature, current.signature)) {
       throw new Error("users config changed while signing; retry");
     }
-    assertPurposePublicationCurrent(workspace, authority, signed);
-    assertAuthorized?.();
     // Same YAML, digest and sidecar shape as the synchronous APIs; a partial pair still fails closed.
     writeFileAtomic(usersPath(workspace), prepared.bytes, 0o644);
     writeFileAtomic(usersSigPath(workspace), signature, 0o644);

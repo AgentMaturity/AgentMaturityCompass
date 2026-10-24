@@ -158,11 +158,10 @@ async function publishWorkOrderFile(workspace: string, agentId: string, filePath
   const digestSha256 = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digestSha256, "hex"));
   const payload: SignatureFile = { digestSha256, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" };
   withWorkOrderLock(workspace, agentId, () => {
-    assertPurposePublicationCurrent(workspace, captured, signed); assertCurrent();
+    options.beforePublish?.(); assertCurrent(); assertOwnerMode(workspace, ownerCommand);
+    assertPurposePublicationCurrent(workspace, captured, signed);
     const current = readPair();
     if (current.body !== null || current.signature !== null) throw new Error("work-order publication destination changed while signing was prepared; retry");
-    options.beforePublish?.();
-    assertOwnerMode(workspace, ownerCommand);
     writeContained(workspace, rel, bytes, 0o644); writeContained(workspace, sigRel, JSON.stringify(payload, null, 2), 0o644);
   });
   return filePath + ".sig";

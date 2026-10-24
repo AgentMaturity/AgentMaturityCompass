@@ -115,7 +115,8 @@ function assertPurposeSignerCurrent(workspace: string, purpose: LocalPurpose, de
   const current = boundProviderKey(workspace, purpose);
   if (expected === null) {
     if (current !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the purpose became provider-held while signing");
-    // The normal vault gate preserves lock/revocation error identity and refuses a newly configured provider.
+    // Entry may unlock normally; an asynchronous continuation must never reopen an explicitly locked session.
+    if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
     if (publicKeyFromPrivate(getSigningKey(workspace, purpose)) !== description.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault purpose key changed while signing");
     }
@@ -138,10 +139,12 @@ async function purposeSigner(workspace: string, purpose: LocalPurpose, override?
   if (bound === null) {
     const configured = configuredRef(config, purpose);
     if (configured !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", configured.provider, `the key set binds no ${configured.provider} key to ${purpose} yet; run amc keys rotate --purpose ${purpose}`);
+    // Warm/migrate only at entry, before Describe yields. Retain the actual original file key.
+    const publicKeyPem = publicKeyFromPrivate(getSigningKey(workspace, purpose));
     const vault = loadKeyProvider(workspace, "file");
     const ref: KeyRef = { provider: "file", id: purpose };
     const description = pinnedDescription(await attempt("file", "describe", () => vault.describe({ ...ref })), config);
-    if (!sameRef(description.ref, ref)) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the described key ref is not the requested purpose ref");
+    if (!sameRef(description.ref, ref) || description.publicKeyPem !== publicKeyPem) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the described key is not the requested original purpose key");
     const recheck = () => assertPurposeSignerCurrent(workspace, purpose, description, null);
     recheck();
     return { provider: vault, description, recheck };
@@ -166,6 +169,7 @@ export interface PurposeSignature { provider: KeyProviderId; algorithm: SigningA
 /** Preparation for the async owner revocation flow; no staging or publication occurs while the provider is awaited. */
 export async function signPurposeRevocationList(workspace: string, list: RevocationListV1, opts: { provider?: KeyProvider } = {}): Promise<{ signed: SignedRevocationList; description: KeyDescription; provider: KeyProviderId }> {
   const { provider, description, recheck } = await purposeSigner(workspace, "revocation-list", opts.provider);
+  recheck(); // The outer await is a separate continuation before the real Sign.
   const signatureVersion = provider.id === "aws-kms" && revocationListSigningBytes(list).length > 4096 ? 2 : 1;
   const signed = await signRevocationListWithProvider(list, provider, description, { signatureVersion });
   recheck();
@@ -176,6 +180,7 @@ export async function signPurposeRevocationList(workspace: string, list: Revocat
 export async function signWithPurposeKey(workspace: string, purpose: KeyPurpose, message: Uint8Array, opts: { provider?: KeyProvider } = {}): Promise<PurposeSignature> {
   const bytes = Buffer.from(message);
   const { provider, description, recheck } = await purposeSigner(workspace, assertLocal(purpose), opts.provider);
+  recheck(); // The outer await is a separate continuation before the real Sign.
   const signature = await signChecked(provider, description, bytes);
   recheck();
   return { provider: description.ref.provider, algorithm: description.algorithm, keyId: description.keyId, publicKeyPem: description.publicKeyPem, signature };
@@ -187,6 +192,7 @@ export async function exportPurposePublicKey(workspace: string, purpose: KeyPurp
 }> {
   const local = assertLocal(purpose);
   const { provider, description, recheck } = await purposeSigner(workspace, local, opts.provider);
+  recheck(); // The outer await is a separate continuation before the real Sign.
   const issuedAt = new Date().toISOString();
   const signature = await signChecked(provider, description, popBytes({ keyId: description.keyId, purpose: local, issuedAt }));
   recheck();
