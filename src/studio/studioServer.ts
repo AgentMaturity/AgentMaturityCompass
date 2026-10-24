@@ -194,7 +194,7 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { loadGatewayConfig } from "../gateway/config.js";
 import { policyPackApplyCliAsync, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { tailTransparencyEntries, verifyTransparencyLog } from "../transparency/logCli.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { captureStudioSelfRunTransparency } from "./studioSelfRunTransparency.js";
 import {
   currentTransparencyMerkleRoot,
   listTransparencyMerkleRoots,
@@ -6044,6 +6044,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, leaseCheck.status, { error: leaseCheck.error });
           return;
         }
+        const selfWorkspace = resolve(options.workspace), selfToken = options.token, selfIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
+        const selfTransparency = captureStudioSelfRunTransparency(selfWorkspace, selfIdentity.agentId, () => {
+          if (resolve(options.workspace) !== selfWorkspace || options.token !== selfToken) throw new Error("original self-run workspace or token changed");
+          const current = authenticate(req, selfWorkspace, selfToken);
+          if (!current || !current.roles.has("AGENT") || current.agentId !== selfIdentity.agentId || current.userId !== selfIdentity.userId
+            || current.isAdmin !== selfIdentity.isAdmin) throw new Error("original self-run actor changed while preparing transparency");
+          const live = verifyLeaseForScope({ workspace: selfWorkspace, req, expectedAgentId: selfIdentity.agentId, scope: "diagnostic:self-run" });
+          if (!live.ok) throw new Error(live.error);
+        });
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { answers?: unknown }) : {};
         if (typeof parsed.answers !== "undefined") {
@@ -6087,16 +6096,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshed.forecast.status
         });
-        const transparency = appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "DIAGNOSTIC_SELF_RUN",
-          agentId: auth.agentId,
-          artifact: {
-            kind: "policy",
-            id: `diagnostic-self-run-${out.runId}`,
-            sha256: sha256Hex(Buffer.from(JSON.stringify(out), "utf8"))
-          }
-        });
+        const transparency = await selfTransparency.append(out); selfTransparency.assertCurrent();
         json(res, 200, {
           ...out,
           transparencyHash: transparency.hash

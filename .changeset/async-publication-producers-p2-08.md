@@ -280,3 +280,6 @@ Studio broken-plugin-integrity, plugin execution and policy-pack application now
 
 
 Config async no-sign continuity: retain the original no-sign refusal before mixed capture callbacks and bracket actual signed-async authority, preparation and member callbacks. Existing synchronous pair methods retain their compatibility behavior. This finite change does not establish public policy/keyset/backend continuity before the initial callback, earlier private-session eligibility, or completed native/provider qualification.
+
+
+Diagnostic self-run now retains silent original lease/signing authority before its body wait and awaits the real mandatory late transparency suffix, including conditional seal initialization and checked TR/Merkle append. Exact late run output remains fixed through publication and an immediate final response guard. Primary run/forecast/JSON behavior stays at its existing slots. Actual selected signer metadata replaces the old auditor-first initialization field; malformed late predecessor errors remain typed follow-up failures (500), while primary body JSON errors retain 400. Native migration/replace attribution limits and deferred qualification remain explicit.
