@@ -571,7 +571,7 @@ export { issueLeaseToken } from "./leases/leaseSigner.js";
 export { verifyLeaseToken } from "./leases/leaseVerifier.js";
 export { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "./leases/leaseStore.js";
 export { initBudgets, verifyBudgetsConfigSignature, evaluateBudgetStatus, resetBudgetDay } from "./budgets/budgets.js";
-export { driftCheckCli, driftReportCli, freezeStatusCli, freezeLiftCli } from "./drift/driftCli.js";
+export { driftCheckCli, driftReportCli, freezeStatusCli, freezeLiftCli, driftCheckCliAsync, driftReportCliAsync, freezeLiftCliAsync } from "./drift/driftCli.js";
 export { initAlertsConfig, verifyAlertsConfigSignature, sendTestAlert } from "./drift/alerts.js";
 export { generateBom } from "./bom/bomGenerator.js";
 export { signBomFile, signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";

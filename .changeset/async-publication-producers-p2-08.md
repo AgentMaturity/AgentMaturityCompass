@@ -53,3 +53,5 @@ Prepare retention archive signatures before destructive phases, await maintained
 Add prepared asynchronous organization config editing through maintained CLI, Studio and SDK callers. Authenticate captured read-modify-write pairs, retain original signing and caller authority, and compare exact targets before body/sidecar publication; report partial member writes without claiming rollback.
 
 Prepare Studio console snapshots and stored-incident oversight signatures before publication, preserve existing raw formats and explicit unsigned diagnostic preflight, recheck current callers and exact target state after callbacks, and retain native partial-publication truth.
+
+Freeze incident and lift publication now prepares real asynchronous signatures before its short publication lock. Drift pins the selected reports, signed alerts and consumed assurance values, and retains incident identity and native cause when later effects fail. Maintained CLI, watch and Studio callers await the checked path; extra reserved API registry forwarding and forecast/organization suffixes remain pending. Validation and PR work for this development slice are deferred by user instruction.

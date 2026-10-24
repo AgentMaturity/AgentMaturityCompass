@@ -168,7 +168,7 @@ import {
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { emitBenchSse } from "../bench/benchSse.js";
 import { loadBudgetsConfig, signBudgetsConfig } from "../budgets/budgets.js";
-import { driftCheckCli } from "../drift/driftCli.js";
+import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
 import {
@@ -6090,37 +6090,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(driftCheckMatch[1] ?? ""));
-        const freezeBefore = activeFreezeStatus(options.workspace, agentId).active;
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { against?: "previous" }) : {};
-        const result = await driftCheckCli({
-          workspace: options.workspace,
-          agentId,
-          against: parsed.against ?? "previous"
-        });
-        const freezeAfter = activeFreezeStatus(options.workspace, agentId).active;
-        if (result.triggered) {
-          recomputeOrgAndEmit("INCIDENT_CREATED", orgNodeIdsForAgent(agentId));
-        }
-        if (!freezeBefore && freezeAfter) {
-          recomputeOrgAndEmit("FREEZE_APPLIED", orgNodeIdsForAgent(agentId));
-        } else if (freezeBefore && !freezeAfter) {
-          recomputeOrgAndEmit("FREEZE_LIFTED", orgNodeIdsForAgent(agentId));
-        }
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        emitForecastEvents({
-          agentId,
-          advisories: refreshed.advisories.map((advisory) => ({
-            severity: advisory.severity,
-            category: advisory.category
-          })),
-          status: refreshed.forecast.status
-        });
-        json(res, 200, result);
+        try {
+          const result = await driftCheckForStudio({ workspace: options.workspace, agentId, against: parsed.against ?? "previous",
+            beforePublish: signingAuthority(["OPERATOR", "OWNER"]), recompute: type => recomputeOrgAndEmit(type, orgNodeIdsForAgent(agentId)),
+            forecast: refreshed => emitForecastEvents({ agentId,
+              advisories: refreshed.advisories.map(advisory => ({ severity: advisory.severity, category: advisory.category })), status: refreshed.forecast.status }) });
+          json(res, 200, result);
+        } catch (error) { if (res.headersSent) return; throw error; }
         return;
       }
 

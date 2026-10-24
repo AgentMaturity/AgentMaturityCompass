@@ -5,7 +5,9 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -126,38 +128,40 @@ export function signAlertsConfig(workspace: string): string {
   return sigPath;
 }
 
-export function verifyAlertsConfigSignature(workspace: string): {
-  valid: boolean;
-  signatureExists: boolean;
-  reason: string | null;
-} {
-  const path = alertsPath(workspace);
-  const sigPath = alertsSigPath(workspace);
-  if (!pathExists(path)) {
-    return { valid: false, signatureExists: false, reason: "alerts config missing" };
+function captureAlertsPair(workspace: string): { bytes: Buffer; assertCurrent(): void } {
+  const path = alertsPath(workspace), sigPath = alertsSigPath(workspace);
+  let bytes: Buffer, sidecar: Buffer;
+  try { bytes = readFileSync(path); sidecar = readFileSync(sigPath); }
+  catch (cause) { throw new Error("alerts configuration pair is unreadable", { cause }); }
+  const payload = JSON.parse(sidecar.toString("utf8")) as SignedDigest;
+  if (sha256Hex(bytes) !== payload.digestSha256) throw new Error("digest mismatch");
+  assertKeysetComplete(workspace);
+  const keys = getPurposeKeyHistory(workspace, "config-signature");
+  if (keysetDeclared(workspace) && boundProviderKey(workspace, "config-signature") === null) {
+    const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+    keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
   }
-  if (!pathExists(sigPath)) {
-    return { valid: false, signatureExists: false, reason: "alerts signature missing" };
-  }
-  try {
-    const payload = JSON.parse(readFileSync(sigPath, "utf8")) as SignedDigest;
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== payload.digestSha256) {
-      return { valid: false, signatureExists: true, reason: "digest mismatch" };
-    }
-    const valid = verifyHexDigestAny(digest, payload.signature, getPublicKeyHistory(workspace, "auditor"));
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed"
-    };
-  } catch (error) {
-    return {
-      valid: false,
-      signatureExists: true,
-      reason: String(error)
-    };
-  }
+  if (typeof payload.signature !== "string" || !verifyHexDigestAny(payload.digestSha256, payload.signature, keys))
+    throw new Error("signature verification failed");
+  return { bytes, assertCurrent() {
+    let current: Buffer, signature: Buffer;
+    try { current = readFileSync(path); signature = readFileSync(sigPath); }
+    catch (cause) { throw new Error("alerts configuration pair changed or became unreadable while freeze signing was prepared", { cause }); }
+    if (!bytes.equals(current) || !sidecar.equals(signature)) throw new Error("alerts configuration changed while freeze signing was prepared");
+  } };
+}
+
+/** Internal same-read decision input; public signature verification does not newly require parsed YAML. */
+export function captureVerifiedAlertsConfig(workspace: string): { config: AlertsConfig; assertCurrent(): void } {
+  const pair = captureAlertsPair(workspace);
+  return { config: alertsSchema.parse(YAML.parse(pair.bytes.toString("utf8")) as unknown), assertCurrent: pair.assertCurrent };
+}
+
+export function verifyAlertsConfigSignature(workspace: string): { valid: boolean; signatureExists: boolean; reason: string | null } {
+  if (!pathExists(alertsPath(workspace))) return { valid: false, signatureExists: false, reason: "alerts config missing" };
+  if (!pathExists(alertsSigPath(workspace))) return { valid: false, signatureExists: false, reason: "alerts signature missing" };
+  try { captureAlertsPair(workspace); return { valid: true, signatureExists: true, reason: null }; }
+  catch (error) { return { valid: false, signatureExists: true, reason: String(error) }; }
 }
 
 function secretKeyFromRef(ref: string): string {
@@ -233,11 +237,7 @@ async function postWebhook(workspace: string, agentId: string, url: string, body
 export async function dispatchAlert(workspace: string, payload: AlertPayload): Promise<void> {
   const capturedWorkspace = workspace.trim() ? resolve(workspace) : workspace;
   const agentId = payload.agentId;
-  const config = loadAlertsConfig(capturedWorkspace);
-  const verify = verifyAlertsConfigSignature(capturedWorkspace);
-  if (!verify.valid) {
-    throw new Error(`alerts config signature invalid: ${verify.reason ?? "unknown"}`);
-  }
+  const config = captureVerifiedAlertsConfig(capturedWorkspace).config;
   const body = JSON.stringify(payload);
   for (const channel of config.alerts.channels) {
     const secret = getVaultSecret(capturedWorkspace, secretKeyFromRef(channel.secretRef));

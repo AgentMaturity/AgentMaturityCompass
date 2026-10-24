@@ -328,7 +328,7 @@ import {
 import { issueExecTicketAsync, verifyExecTicket } from "./tickets/execTicketVerify.js";
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
 import { registerBudgetCommands } from "./cli-budget-commands.js";
-import { driftCheckCli, driftReportCli, freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
+import { driftCheckCliAsync as driftCheckCli, driftReportCliAsync as driftReportCli, freezeLiftCliAsync as freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
 import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
@@ -16361,8 +16361,8 @@ freeze
   .requiredOption("--agent <agentId>", "agent ID")
   .requiredOption("--incident <id>", "incident ID")
   .requiredOption("--reason <text>", "reason for lifting freeze")
-  .action((opts: { agent: string; incident: string; reason: string }) => {
-    const out = freezeLiftCli({
+  .action(async (opts: { agent: string; incident: string; reason: string }) => {
+    const out = await freezeLiftCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       incidentId: opts.incident,

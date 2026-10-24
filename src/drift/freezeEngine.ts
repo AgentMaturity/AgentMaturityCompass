@@ -1,11 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { z } from "zod";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { prepareFreezeSignature, prepareFreezeSignatureAsync, type PreparedFreezeSignature } from "./freezePreparation.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { ActionClass } from "../types.js";
-import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -70,9 +75,34 @@ function incidentLiftPath(workspace: string, agentId: string, incidentId: string
   return join(incidentsDir(workspace, agentId), `${incidentId}.lift.json`);
 }
 
-function signIncidentPayload(workspace: string, payload: Omit<FreezeIncident, "signature">): string {
-  const digest = sha256Hex(canonicalize(payload));
-  return signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
+/** Historical local admission, never a carried signer or broad auditor-purpose union. */
+function freezeKeys(workspace: string): string[] {
+  assertKeysetComplete(workspace);
+  const keys = getPurposeKeyHistory(workspace, "artifact-seal");
+  if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
+    const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+    keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+  }
+  return keys;
+}
+
+function recordBytes(path: string): Buffer | null {
+  try { return readFileSync(path); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+function matches(path: string, expected: Buffer | null): boolean {
+  const current = recordBytes(path); return expected === null ? current === null : current !== null && expected.equals(current);
+}
+function publishRecord(workspace: string, agentId: string, target: string, expected: Buffer | null,
+  body: unknown, signed: PreparedFreezeSignature, beforePublish: () => void, source?: { path: string; bytes: Buffer }): void {
+  const bytes = JSON.stringify(body, null, 2), root = dirname(target);
+  withControlFileLock({ root, name: "freeze-publication", operation: () => {
+    beforePublish();
+    if (incidentsDir(workspace, agentId) !== root) throw new Error("selected freeze publication directory changed while signing was prepared");
+    signed.assertCurrent();
+    if ((source !== undefined && !matches(source.path, source.bytes)) || !matches(target, expected))
+      throw new Error("freeze source or destination changed while signing was prepared");
+    writeFileAtomic(target, bytes, 0o644);
+  } });
 }
 
 export function verifyIncidentSignature(workspace: string, incident: FreezeIncident): boolean {
@@ -89,10 +119,10 @@ export function verifyIncidentSignature(workspace: string, incident: FreezeIncid
     freeze: incident.freeze
   };
   const digest = sha256Hex(canonicalize(payload));
-  return verifyHexDigestAny(digest, incident.signature, getPublicKeyHistory(workspace, "auditor"));
+  try { return verifyHexDigestAny(digest, incident.signature, freezeKeys(workspace)); } catch { return false; }
 }
 
-export function createFreezeIncident(params: {
+interface CreateFreezeIncidentParams {
   workspace: string;
   agentId?: string;
   ruleId: string;
@@ -107,9 +137,13 @@ export function createFreezeIncident(params: {
   actionClasses: ActionClass[];
   reason: string;
   remediation?: FreezeIncident["remediation"];
-}): FreezeIncident {
+}
+
+function prepareIncident(input: CreateFreezeIncidentParams) {
+  const params = { ...input, deltas: { ...input.deltas }, actionClasses: [...input.actionClasses],
+    ...(input.remediation === undefined ? {} : { remediation: { concept: [...input.remediation.concept], culture: [...input.remediation.culture],
+      capabilities: [...input.remediation.capabilities], configuration: [...input.remediation.configuration] } }) };
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  ensureDir(incidentsDir(params.workspace, agentId));
   const payload: Omit<FreezeIncident, "signature"> = {
     v: 1,
     incidentId: `incident_${randomUUID().replace(/-/g, "")}`,
@@ -131,11 +165,32 @@ export function createFreezeIncident(params: {
       reason: params.reason
     }
   };
-  const incident: FreezeIncident = {
-    ...payload,
-    signature: signIncidentPayload(params.workspace, payload)
-  };
-  writeFileAtomic(incidentPath(params.workspace, agentId, incident.incidentId), JSON.stringify(incident, null, 2), 0o644);
+  const target = incidentPath(params.workspace, agentId, payload.incidentId), expected = recordBytes(target);
+  if (expected !== null) throw new Error("freeze incident destination already exists");
+  return { workspace: params.workspace, agentId, payload, target, expected, digest: sha256Hex(canonicalize(payload)) };
+}
+
+export function createFreezeIncident(params: CreateFreezeIncidentParams): FreezeIncident {
+  return createFreezeIncidentForSnapshot(params, () => {});
+}
+/** Internal retained synchronous decision path; the guard only adds a used-input refusal. */
+export function createFreezeIncidentForSnapshot(params: CreateFreezeIncidentParams, beforePublish: () => void): FreezeIncident {
+  const prepared = prepareIncident(params); beforePublish();
+  const signed = prepareFreezeSignature(prepared.workspace, prepared.digest), incident = { ...prepared.payload, signature: signed.signature };
+  publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, incident, signed, beforePublish);
+  return incident;
+}
+
+export async function createFreezeIncidentAsync(params: CreateFreezeIncidentParams): Promise<FreezeIncident> {
+  return createFreezeIncidentForAuthority(params, () => {});
+}
+
+/** Internal maintained handoff. The callback only adds refusal; it supplies no signer or positive authority. */
+export async function createFreezeIncidentForAuthority(params: CreateFreezeIncidentParams, beforePublish: () => void): Promise<FreezeIncident> {
+  const prepared = prepareIncident(params); beforePublish();
+  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest);
+  const incident = { ...prepared.payload, signature: signed.signature };
+  publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, incident, signed, beforePublish);
   return incident;
 }
 
@@ -167,7 +222,7 @@ function isLifted(workspace: string, agentId: string, incidentId: string): boole
     if (lift.v !== 1 || lift.incidentId !== incidentId || lift.agentId !== agentId
       || typeof lift.liftedTs !== "number" || typeof lift.reason !== "string" || typeof lift.signature !== "string") return false;
     const digest = sha256Hex(canonicalize({ v: 1, incidentId, agentId, liftedTs: lift.liftedTs, reason: lift.reason }));
-    return verifyHexDigestAny(digest, lift.signature, getPublicKeyHistory(workspace, "auditor"));
+    return verifyHexDigestAny(digest, lift.signature, freezeKeys(workspace));
   } catch {
     return false;
   }
@@ -223,35 +278,37 @@ export function activeFreezeStatus(workspace: string, agentId?: string): {
   };
 }
 
-export function liftFreeze(params: {
-  workspace: string;
-  agentId?: string;
-  incidentId: string;
-  reason: string;
-}): { liftPath: string } {
-  const agentId = resolveAgentId(params.workspace, params.agentId);
-  const incidents = listIncidents(params.workspace, agentId);
-  const incident = incidents.find((item) => item.incidentId === params.incidentId);
-  if (!incident) {
-    throw new Error(`Incident not found: ${params.incidentId}`);
-  }
-  if (!verifyIncidentSignature(params.workspace, incident)) {
+interface LiftFreezeParams { workspace: string; agentId?: string; incidentId: string; reason: string }
+
+function prepareLift(input: LiftFreezeParams) {
+  const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId);
+  const sourcePath = incidentPath(params.workspace, agentId, params.incidentId), sourceBytes = recordBytes(sourcePath);
+  if (sourceBytes === null) throw new Error(`Incident not found: ${params.incidentId}`);
+  const incident = incidentSchema.parse(JSON.parse(sourceBytes.toString("utf8")));
+  if (incident.incidentId !== params.incidentId || incident.agentId !== agentId || !verifyIncidentSignature(params.workspace, incident))
     throw new Error(`Incident signature invalid: ${params.incidentId}`);
-  }
-  const payload = {
-    v: 1,
-    incidentId: incident.incidentId,
-    agentId,
-    liftedTs: Date.now(),
-    reason: params.reason
-  };
-  const digest = sha256Hex(canonicalize(payload));
-  const signature = signHexDigest(digest, getSigningKey(params.workspace, "artifact-seal"));
-  const out = {
-    ...payload,
-    signature
-  };
-  const liftPath = incidentLiftPath(params.workspace, agentId, params.incidentId);
-  writeFileAtomic(liftPath, JSON.stringify(out, null, 2), 0o644);
-  return { liftPath };
+  const payload = { v: 1, incidentId: incident.incidentId, agentId, liftedTs: Date.now(), reason: params.reason };
+  const target = incidentLiftPath(params.workspace, agentId, params.incidentId);
+  return { workspace: params.workspace, agentId, payload, target, expected: recordBytes(target),
+    source: { path: sourcePath, bytes: sourceBytes }, digest: sha256Hex(canonicalize(payload)) };
+}
+
+export function liftFreeze(params: LiftFreezeParams): { liftPath: string } {
+  const prepared = prepareLift(params), signed = prepareFreezeSignature(prepared.workspace, prepared.digest);
+  publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, { ...prepared.payload, signature: signed.signature }, signed, () => {}, prepared.source);
+  return { liftPath: prepared.target };
+}
+
+export async function liftFreezeAsync(params: LiftFreezeParams): Promise<{ liftPath: string }> {
+  return liftFreezeForAuthority(params, () => {});
+}
+
+/** Internal trusted caller handoff; mode and original purpose remain mandatory after the caller guard. */
+export async function liftFreezeForAuthority(input: LiftFreezeParams, beforePublish: () => void): Promise<{ liftPath: string }> {
+  const params = { ...input }; assertOwnerMode(params.workspace, "freeze lift");
+  const prepared = prepareLift(params); beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift");
+  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest);
+  publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, { ...prepared.payload, signature: signed.signature }, signed,
+    () => { beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift"); }, prepared.source);
+  return { liftPath: prepared.target };
 }

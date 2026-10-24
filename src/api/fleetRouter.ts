@@ -4,6 +4,7 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { KeyProviderError } from '../keys/provider.js';
 import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
 import { buildFleetHealthDashboard } from '../fleet/governance.js';
 
@@ -12,7 +13,8 @@ export async function handleFleetRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/fleet')) return false;
 
@@ -255,11 +257,15 @@ export async function handleFleetRoute(
       if (!body.agentId || !body.incidentId || !body.reason) {
         apiError(res, 400, 'Required: agentId, incidentId, reason'); return true;
       }
-      const { liftFreeze } = await import('../drift/freezeEngine.js');
-      liftFreeze({ workspace, agentId: body.agentId, incidentId: body.incidentId, reason: body.reason });
+      const freeze = await import('../drift/freezeEngine.js');
+      const input = { workspace, agentId: body.agentId, incidentId: body.incidentId, reason: body.reason };
+      const guard = () => { if (!revalidateAuthority?.()) { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); } };
+      if (revalidateAuthority !== undefined) guard();
+      if (revalidateAuthority === undefined) freeze.liftFreeze(input); else await freeze.liftFreezeForAuthority(input, guard);
       apiSuccess(res, { lifted: true, agentId: body.agentId });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Freeze lift failed');
+      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Freeze lift failed' : err instanceof Error ? err.message : 'Freeze lift failed');
     }
     return true;
   }
