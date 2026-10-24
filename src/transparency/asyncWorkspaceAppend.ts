@@ -1,4 +1,5 @@
-import { appendFileSync } from "node:fs";
+import { appendFileSync, unlinkSync } from "node:fs";
+import { dirname } from "node:path";
 import type { z } from "zod";
 import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicyAsync,
   type PolicySignerDescriptor } from "../crypto/signing/signer.js";
@@ -12,18 +13,18 @@ import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { vaultStatus } from "../vault/vault.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
-import { writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { transparencyEntrySchema, transparencySealSchema, transparencySealSignatureSchema,
   type TransparencyArtifactKind, type TransparencyEntry } from "./logSchema.js";
 import { entryTreeRoot, type MerkleAlgorithm } from "./merkle.js";
-import { merkleCurrentRootPath, merkleCurrentRootSigPath, merkleMigrationPath, merkleMigrationSigPath } from "./merklePaths.js";
-import { clearMerklePendingMarker, TransparencyMerkleLagError, writeMerklePendingMarker } from "./merkleIndexState.js";
+import { merkleCurrentRootPath, merkleCurrentRootSigPath, merkleMigrationPath, merkleMigrationSigPath, merklePendingPath } from "./merklePaths.js";
+import { prepareMerklePendingMarkerBytes, TransparencyAppendRootCoveredError, TransparencyMerkleLagError } from "./merkleIndexState.js";
 import { merkleMigrationSchema, merkleRootRowSchema, rootSignatureSchema } from "./merkleRows.js";
-import { prepareMerkle, preparedRootSignature, publishPreparedMerkle } from "./preparedMerkle.js";
-import { assertTransparencyStateCurrent, captureTransparencyState, publishTransparencyState, stateBytes,
-  workspaceLogPath, workspaceSealPath, workspaceSealSigPath, type TransparencyState } from "./workspacePublication.js";
+import { prepareMerkle, preparedRootSignature, publishPreparedMerkle, type PreparedMerkleMember } from "./preparedMerkle.js";
+import { assertTransparencyStateCurrent, captureTransparencyState, captureTransparencyAppendPublication, withTransparencyPublicationLock, stateBytes,
+  workspaceLogPath, workspaceSealPath, workspaceSealSigPath, type TransparencyState, type TransparencyAppendProgress } from "./workspacePublication.js";
 
 export interface TransparencyAppendInput {
   workspace: string; type: string; agentId: string;
@@ -124,25 +125,44 @@ export function captureWorkspaceLogAuthority(workspace: string, beforeCommit?: (
   const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
   const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
   const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
-  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
-    beforeCommit?.();
+  const assertIntrinsicCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
     assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
   };
-  assertCurrent(); return { sealSigner, rootSigner, assertCurrent };
+  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => { beforeCommit?.(); assertIntrinsicCurrent(signedSeal, signedRoot); };
+  assertCurrent(); return { sealSigner, rootSigner, assertCurrent, assertIntrinsicCurrent };
 }
 
-/** One prepared attempt. A competing writer refuses before this attempt appends; callers may explicitly retry.
- * beforeCommit is an internal repeatable negative gate: it runs before each Sign and again inside final publication.
- * It must not advance business state, sign, await, or retain a lock/SQL transaction after returning.
- */
-export async function appendTransparencyEntryAsync(input: TransparencyAppendInput, options: { beforeCommit?: () => void } = {}): Promise<TransparencyEntry> {
+/** Internal trusted negative seams. Neither callback can select a signer or provide positive authority. */
+export interface TransparencyAppendOptions {
+  /** Legacy preparation-only gate: capture, each real Sign, and final pre-first-write. May retain OLD proof/log state. */
+  beforeCommit?: () => void;
+  /** Stable actor/static-input gate: capture/each Sign/pre-line, each member and final continuation; tolerates own log progress. */
+  beforeMember?: () => void;
+}
+export interface TransparencyAppendAttempt {
+  readonly entry: TransparencyEntry;
+  /** Intrinsic original TR/Merkle authority + exact owned postimages; no external/predecessor callbacks. */
+  assertCurrent(): void;
+}
+/** Setup or append is incomplete without exact line acknowledgment. No committed-entry claim is made. */
+export class TransparencyAppendPublicationError extends Error {
+  readonly code = "TRANSPARENCY_APPEND_INCOMPLETE";
+  constructor(readonly candidateEntry: TransparencyEntry, readonly progress: TransparencyAppendProgress, cause: unknown) {
+    super("transparency append did not complete; inspect native-return and acknowledgment progress before retrying", { cause });
+    this.name = "TransparencyAppendPublicationError";
+  }
+}
+
+/** Actual one-attempt path. Every real Sign completes before any publication lock; no automatic predecessor retry. */
+export async function appendTransparencyEntryAttemptAsync(input: TransparencyAppendInput, options: TransparencyAppendOptions = {}): Promise<TransparencyAppendAttempt> {
   const params = { workspace: input.workspace, type: input.type, agentId: input.agentId, artifact: { ...input.artifact } };
-  const beforeCommit = options.beforeCommit, workspace = params.workspace;
+  const beforeCommit = options.beforeCommit, beforeMember = options.beforeMember, workspace = params.workspace;
+  beforeMember?.();
   const original = captureWorkspaceLogAuthority(workspace, beforeCommit), { sealSigner, rootSigner } = original;
-  const before = captureTransparencyState(workspace, true), predecessor = verifiedPredecessor(workspace, before);
-  assertTransparencyStateCurrent(before);
+  const publication = captureTransparencyAppendPublication(workspace), before = publication.state, predecessor = verifiedPredecessor(workspace, before);
+  publication.assertCurrent();
   const payload = { v: 1 as const, ts: Date.now(), type: params.type, agentId: params.agentId,
     artifact: { kind: params.artifact.kind, sha256: params.artifact.sha256, ...(params.artifact.id ? { id: params.artifact.id } : {}) },
     prev: predecessor.entries.at(-1)?.hash ?? "" };
@@ -151,31 +171,93 @@ export async function appendTransparencyEntryAsync(input: TransparencyAppendInpu
     signerFingerprint: sealSigner.descriptor.fingerprint, merkleAlgorithm: predecessor.algorithm }), null, 2));
   const plan = prepareMerkle({ workspace, algorithm: predecessor.algorithm, log: stateBytes(before, workspaceLogPath(workspace)),
     append: { entryHash: entry.hash, prevEntryHash: entry.prev }, rebuild: true });
-  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
-    original.assertCurrent(signedSeal, signedRoot); assertTransparencyStateCurrent(before);
+  const assertPreparing = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
+    beforeMember?.(); original.assertCurrent(signedSeal, signedRoot); publication.assertCurrent();
   };
-  assertCurrent();
+  assertPreparing();
   const signedSeal = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: sha256Hex(seal), expectedSigner: sealSigner.descriptor,
-    beforeSign: () => assertCurrent() });
+    beforeSign: () => assertPreparing() });
   const sealSignature = Buffer.from(JSON.stringify(transparencySealSignatureSchema.parse({ digestSha256: sha256Hex(seal),
     signature: signedSeal.signature, signedTs: signedSeal.signedTs, signer: "auditor", envelope: signedSeal.envelope }), null, 2));
-  assertCurrent(signedSeal);
+  assertPreparing(signedSeal);
   const signedRoot = await signDigestWithPolicyAsync({ workspace, kind: "MERKLE_ROOT", digestHex: plan.digest, expectedSigner: rootSigner.descriptor,
-    beforeSign: () => assertCurrent(signedSeal) });
+    beforeSign: () => assertPreparing(signedSeal) });
   const rootSignature = preparedRootSignature(plan, signedRoot);
-  return publishTransparencyState(workspace, before, () => {
-    // All provider waits finished before this lock. Reuse the exact original gates and actual returned signing metadata.
-    assertCurrent(signedSeal, signedRoot);
-    const oldLog = stateBytes(before, workspaceLogPath(workspace));
-    const separator = oldLog !== null && oldLog.length > 0 && oldLog[oldLog.length - 1] !== 10 ? "\n" : "";
-    appendFileSync(workspaceLogPath(workspace), separator + JSON.stringify(entry) + "\n", "utf8");
+  const logPath = workspaceLogPath(workspace), pendingPath = merklePendingPath(workspace);
+  const oldLog = stateBytes(before, logPath), separator = oldLog !== null && oldLog.length > 0 && oldLog[oldLog.length - 1] !== 10 ? "\n" : "";
+  const line = Buffer.from(separator + JSON.stringify(entry) + "\n");
+  let phase = "lock-setup", lockSetupAttempted = false, lockEntered = false, attemptedPath: string | null = null;
+  let lineWriteReturned = false, lineAcknowledged = false, rootCovered = false;
+  const directoryAttempts: string[] = [], directoryReturns: string[] = [];
+  const returnedMembers: { path: string; operation: "append" | "replace" | "remove" }[] = [];
+  const progress = (): TransparencyAppendProgress => Object.freeze({ phase, lockSetupAttempted, lockEntered,
+    directoryAttempts: Object.freeze([...directoryAttempts]), directoryReturns: Object.freeze([...directoryReturns]),
+    returnedMembers: Object.freeze(returnedMembers.map(row => Object.freeze({ ...row }))), attemptedPath,
+    lineWriteReturned, lineAcknowledged, rootCovered });
+  const intrinsic = () => original.assertIntrinsicCurrent(signedSeal, signedRoot);
+  const assertStable = () => { beforeMember?.(); intrinsic(); publication.assertCurrent(); };
+  const directory = (path: string) => {
+    phase = `directory:${path}`; directoryAttempts.push(path); ensureDir(path); directoryReturns.push(path);
+  };
+  // This sink is fixed owned native plumbing, never forwarded from caller input/options.
+  const publishMember = (member: PreparedMerkleMember, diagnostic = false) => {
+    attemptedPath = null; phase = `${member.operation}:${member.path}`;
+    const gate = diagnostic ? () => publication.assertCurrent() : assertStable;
+    gate(); directory(dirname(member.path)); phase = `${member.operation}:${member.path}`; gate();
+    const previous = member.operation === "append" ? publication.appendBytes(member.path) : null;
+    const expected = member.operation === "append" ? Buffer.concat([previous ?? Buffer.alloc(0), member.bytes]) : Buffer.from(member.bytes);
+    const mode = member.operation === "append" ? publication.mode(member.path) ?? (0o666 & ~process.umask()) : member.mode ?? (0o666 & ~process.umask());
+    attemptedPath = member.path; // Enter the actual writer only after all negative gates and directory setup.
+    if (member.operation === "append") appendFileSync(member.path, member.bytes); else writeFileAtomic(member.path, member.bytes, member.mode);
+    returnedMembers.push({ path: member.path, operation: member.operation });
+    if (member.path === logPath) lineWriteReturned = true;
+    publication.acknowledge(member.path, expected, mode, member.operation);
+    if (member.path === logPath) lineAcknowledged = true;
+    if (member.path === merkleCurrentRootSigPath(workspace)) rootCovered = true;
+    attemptedPath = null;
+  };
+  lockSetupAttempted = true;
+  // Lock/contender setup may have local effects even when a later pure first gate refuses with attemptedPath=null.
+  try { return withTransparencyPublicationLock(workspace, () => {
+    lockEntered = true;
+    // Preserve the legacy external gate through the final PRE-LINE point only.
+    assertPreparing(signedSeal, signedRoot);
     try {
-      writeFileAtomic(workspaceSealPath(workspace), seal, 0o644); writeFileAtomic(workspaceSealSigPath(workspace), sealSignature, 0o644);
-      publishPreparedMerkle(workspace, plan, rootSignature); clearMerklePendingMarker(workspace); return entry;
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-      const pendingRecorded = writeMerklePendingMarker({ workspace, entryHash: entry.hash, reason });
-      throw new TransparencyMerkleLagError({ entryHash: entry.hash, pendingRecorded, reason, cause: error });
+      publishMember({ path: logPath, bytes: line, operation: "append" });
+      publishMember({ path: workspaceSealPath(workspace), bytes: seal, operation: "replace", mode: 0o644 });
+      publishMember({ path: workspaceSealSigPath(workspace), bytes: sealSignature, operation: "replace", mode: 0o644 });
+      publishPreparedMerkle(workspace, plan, rootSignature, publishMember);
+      attemptedPath = null; phase = "pending-clear"; assertStable();
+      if (publication.present(pendingPath)) {
+        attemptedPath = pendingPath;
+        try { unlinkSync(pendingPath); } catch (cause) { if ((cause as NodeJS.ErrnoException).code !== "ENOENT") throw cause; }
+        returnedMembers.push({ path: pendingPath, operation: "remove" });
+      }
+      publication.acknowledgeAbsent(pendingPath); attemptedPath = null;
+      phase = "final-continuation"; assertStable();
+      const assertCurrent = () => { intrinsic(); publication.assertCurrent(); };
+      return Object.freeze({ entry, assertCurrent });
+    } catch (cause) {
+      const failed = progress();
+      if (!lineAcknowledged) {
+        if (attemptedPath === null && returnedMembers.length === 0 && directoryAttempts.length === 0) throw cause; // Genuine pure first refusal stays typed; later setup progress is retained.
+        throw new TransparencyAppendPublicationError(entry, failed, cause);
+      }
+      const reason = cause instanceof Error ? cause.message : String(cause);
+      if (rootCovered) throw new TransparencyAppendRootCoveredError({ entryHash: entry.hash, pendingRecorded: false, reason, cause, progress: failed });
+      // The unsigned diagnostic marker must remain possible after a signing refusal. It cannot overwrite changed expected state.
+      let pendingRecorded = false, pendingCause: unknown;
+      try { publishMember({ path: pendingPath, bytes: prepareMerklePendingMarkerBytes({ ts: Date.now(), entryHash: entry.hash, reason }), operation: "replace", mode: 0o644 }, true); pendingRecorded = true; }
+      catch (error) { pendingCause = error; }
+      throw new TransparencyMerkleLagError({ entryHash: entry.hash, pendingRecorded, reason, cause, progress: failed, pendingCause, pendingProgress: progress() });
     }
-  });
+  }); } catch (cause) {
+    if (!lockEntered) throw new TransparencyAppendPublicationError(entry, progress(), cause); // Setup/contender failure, no file-attempt claim.
+    throw cause;
+  }
+}
+
+/** Compatibility API: the real same attempt path still returns exactly the historical entry value. */
+export async function appendTransparencyEntryAsync(input: TransparencyAppendInput, options: TransparencyAppendOptions = {}): Promise<TransparencyEntry> {
+  return (await appendTransparencyEntryAttemptAsync(input, options)).entry;
 }

@@ -6,8 +6,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { transparencyEntrySchema } from "./logSchema.js";
 import { entryLeafHash, type MerkleAlgorithm } from "./merkle.js";
 import { appendLeafToFrontier, buildFrontierFromEntryHashes, frontierRoot, type MerkleFrontier } from "./merkleFrontier.js";
-import { frontierResumeBlocker, leavesFileBytes, readMerkleFrontierState, writeMerkleFrontierState } from "./merkleIndexState.js";
-import { merkleCurrentRootPath, merkleCurrentRootSigPath, merkleLeavesPath, merkleRootsPath } from "./merklePaths.js";
+import { frontierResumeBlocker, leavesFileBytes, prepareMerkleFrontierState, readMerkleFrontierState, writeMerkleFrontierState } from "./merkleIndexState.js";
+import { merkleCurrentRootPath, merkleCurrentRootSigPath, merkleFrontierPath, merkleLeavesPath, merkleRootsPath } from "./merklePaths.js";
 import { merkleLeafRowSchema, merkleRootRowSchema, rootSignatureSchema } from "./merkleRows.js";
 
 export interface TransparencyMerkleUpdate {
@@ -75,17 +75,30 @@ export function preparedRootSignature(plan: PreparedMerkle, signed: SignedDigest
     signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope }), null, 2));
 }
 
+/** Trusted INTERNAL native sink, never input/options/JSON or a signing/admission capability. */
+export interface PreparedMerkleMember {
+  readonly path: string; readonly bytes: Buffer; readonly operation: "append" | "replace"; readonly mode?: number;
+}
 /** Called only inside the common short publication lock, with the signature already checked/prepared. */
-export function publishPreparedMerkle(workspace: string, plan: PreparedMerkle, signature: Buffer): void {
-  const leaves = merkleLeavesPath(workspace); ensureDir(dirname(leaves));
-  if (plan.update.mode === "incremental") appendFileSync(leaves, plan.leaves, "utf8");
-  else writeFileAtomic(leaves, plan.leaves, 0o644);
-  const frontier = () => writeMerkleFrontierState({ workspace, frontier: plan.frontier, leafCount: plan.row.leafCount,
-    lastEntryHash: plan.row.lastEntryHash, root: plan.row.root });
+export function publishPreparedMerkle(workspace: string, plan: PreparedMerkle, signature: Buffer,
+  publishMember?: (member: PreparedMerkleMember) => void): void {
+  const leaves = merkleLeavesPath(workspace); if (publishMember === undefined) ensureDir(dirname(leaves));
+  const write = (member: PreparedMerkleMember) => {
+    if (publishMember !== undefined) { publishMember(member); return; }
+    if (member.operation === "append") appendFileSync(member.path, member.bytes); else writeFileAtomic(member.path, member.bytes, member.mode);
+  };
+  write({ path: leaves, bytes: Buffer.from(plan.leaves), operation: plan.update.mode === "incremental" ? "append" : "replace", mode: 0o644 });
+  const frontier = () => {
+    const input = { workspace, frontier: plan.frontier, leafCount: plan.row.leafCount, lastEntryHash: plan.row.lastEntryHash, root: plan.row.root };
+    if (publishMember === undefined) { writeMerkleFrontierState(input); return; }
+    const row = prepareMerkleFrontierState({ ...input, ts: Date.now(), leavesBytes: leavesFileBytes(workspace) });
+    write({ path: merkleFrontierPath(workspace), bytes: Buffer.from(JSON.stringify(row, null, 2)), operation: "replace", mode: 0o644 });
+  };
   // Retain rebuild/incremental publication order and append-only historical rows.
   if (plan.update.mode === "rebuild") frontier();
-  const roots = merkleRootsPath(workspace); ensureDir(dirname(roots)); appendFileSync(roots, JSON.stringify(plan.row) + "\n", "utf8");
-  writeFileAtomic(merkleCurrentRootPath(workspace), plan.bytes, 0o644);
-  writeFileAtomic(merkleCurrentRootSigPath(workspace), signature, 0o644);
+  const roots = merkleRootsPath(workspace); if (publishMember === undefined) ensureDir(dirname(roots));
+  write({ path: roots, bytes: Buffer.from(JSON.stringify(plan.row) + "\n"), operation: "append" });
+  write({ path: merkleCurrentRootPath(workspace), bytes: plan.bytes, operation: "replace", mode: 0o644 });
+  write({ path: merkleCurrentRootSigPath(workspace), bytes: signature, operation: "replace", mode: 0o644 });
   if (plan.update.mode === "incremental") frontier();
 }
