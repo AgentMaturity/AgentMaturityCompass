@@ -6,6 +6,7 @@ import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { publishTrustConfig, verifyTrustConfigPublication } from "./trustConfigPublication.js";
+import { publishNotaryEnablement } from "./notaryEnablementPublication.js";
 import { assertKeysetComplete, keysetDeclared } from "../keys/keyset.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { verifyNotaryAttestResponse } from "../notary/notaryVerify.js";
@@ -109,7 +110,7 @@ export function trustConfigSigPath(workspace: string): string {
   return `${trustConfigPath(workspace)}.sig`;
 }
 
-function defaultTrustConfig(): TrustConfig {
+export function defaultTrustConfig(): TrustConfig {
   return trustConfigSchema.parse({
     trust: {
       version: 1,
@@ -403,6 +404,16 @@ export async function enableNotaryTrust(params: {
     sigPath: saved.sigPath,
     fingerprint
   };
+}
+
+/** Direct CLI continuation; genuine no-sign/fresh compatibility retains the legacy recipe. */
+export async function enableNotaryTrustAsync(params: Parameters<typeof enableNotaryTrust>[0], beforePublish?: () => void): ReturnType<typeof enableNotaryTrust> {
+  if (process.env.AMC_NO_SIGN === "1") return enableNotaryTrust(params);
+  const keyset = assertKeysetComplete(params.workspace);
+  if (keyset === null && !keysetDeclared(params.workspace)) return enableNotaryTrust(params);
+  const completed = await publishNotaryEnablement(params, beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, fingerprint: completed.fingerprint };
 }
 
 export function shouldRequireNotaryForKind(workspace: string, kind: SignKind): boolean {

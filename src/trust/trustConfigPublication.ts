@@ -1,5 +1,6 @@
 /** Fixed direct trust-config operation. The configuration being replaced cannot select its own signer. */
 import { lstatSync, readFileSync, realpathSync } from "node:fs";
+import YAML from "yaml";
 import { relative, resolve } from "node:path";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { signDigestWithPurpose } from "../crypto/signing/signerPurpose.js";
@@ -15,7 +16,7 @@ import { orgSignatureSchema } from "../org/orgSchema.js";
 import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, OrgPairsPublicationError, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { distrustAt } from "./admissionRule.js";
 import { loadTrustContext } from "./trustContext.js";
-import { trustConfigPath } from "./trustConfig.js";
+import { defaultTrustConfig, trustConfigPath, trustConfigSchema } from "./trustConfig.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -58,9 +59,37 @@ export function verifyTrustConfigPublication(workspace: string) {
   }
 }
 
-/** Only this fixed publisher creates its completed handle; no caller provides authority, paths or acknowledgments. */
+/** Direct initializer retains its original input copy before authority/predecessor capture. */
 export async function publishTrustConfig(workspace: string, input: Uint8Array, beforePublish?: () => void) {
-  const bytes = Buffer.from(input), actor = beforePublish, root = resolve(workspace);
+  const bytes = Buffer.from(input);
+  return publishTrustConfigOperation(workspace, () => bytes, beforePublish);
+}
+
+/** Fixed NOTARY successor: the actual captured old body supplies every retained configuration field. */
+export async function publishNotaryTrustConfig(workspace: string, input: {
+  baseUrl: string; unixSocketPath: string | null; fingerprint: string;
+  requiredAttestationLevel: "SOFTWARE" | "HARDWARE";
+}, beforePublish?: () => void) {
+  const params = { ...input };
+  return publishTrustConfigOperation(workspace, previous => {
+    const body = previous.members.find(member => member.path === trustConfigPath(workspace));
+    if (body === undefined) throw new Error("trust predecessor was not captured");
+    const current = body.bytes === null ? defaultTrustConfig() : trustConfigSchema.parse(YAML.parse(body.bytes.toString("utf8")) as unknown);
+    const next = trustConfigSchema.parse({ trust: {
+      ...current.trust, mode: "NOTARY", notary: {
+        ...current.trust.notary, baseUrl: params.baseUrl, unixSocketPath: params.unixSocketPath,
+        pinnedPubkeyFingerprint: params.fingerprint,
+        auth: { secretRef: "vault:notary/auth", headerName: "x-amc-notary-auth", hmacAlg: "sha256" },
+        requiredAttestationLevel: params.requiredAttestationLevel
+      }
+    } });
+    return Buffer.from(YAML.stringify(next), "utf8");
+  }, beforePublish);
+}
+
+/** Only fixed exports choose preparation; no caller supplies a checked predecessor or authority. */
+async function publishTrustConfigOperation(workspace: string, prepare: (previous: OrgPairsSnapshot) => Buffer, beforePublish?: () => void) {
+  const actor = beforePublish, root = resolve(workspace);
   const realRoot = realpathSync(root), originalRoot = lstatSync(root);
   if (!originalRoot.isDirectory()) throw new Error("trust initialization root must be a directory");
   const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
@@ -74,6 +103,7 @@ export async function publishTrustConfig(workspace: string, input: Uint8Array, b
   const fileCurrent = holder === "file" ? captureVaultPurposeContinuity(workspace, "artifact-seal") : null;
   const path = trustConfigPath(workspace), sigPath = `${path}.sig`;
   const previous = withConfigSignaturePairLock(workspace, () => captureOrgPairs([path]));
+  const bytes = prepare(previous);
   const expected = new Map(previous.members.map(member => [member.path, { ...member, bytes: member.bytes === null ? null : Buffer.from(member.bytes) }]));
   const expectedPair = (): OrgPairsSnapshot => ({ members: [...expected.values()] });
   let signatureCurrent: (() => void) | null = null, refused = false, firstRefusal: unknown;

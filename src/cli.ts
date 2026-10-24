@@ -657,7 +657,7 @@ import {
 import { registerNotaryStartCommand } from "./cli-notary-commands.js";
 import {
   checkNotaryTrust,
-  enableNotaryTrust,
+  enableNotaryTrustAsync as enableNotaryTrust,
   initTrustConfigAsync,
   loadTrustConfig,
   verifyTrustConfigSignature
@@ -11780,15 +11780,22 @@ trust
   .option("--require <level>", "SOFTWARE|HARDWARE", "HARDWARE")
   .option("--unix-socket <path>", "optional unix socket path")
   .action(async (opts: { baseUrl: string; pin: string; require: string; unixSocket?: string }) => {
-    assertOwnerMode(process.cwd(), "trust enable-notary");
-    const required = opts.require.toUpperCase() === "SOFTWARE" ? "SOFTWARE" : "HARDWARE";
+    const workspace = process.cwd(), fixed = { ...opts };
+    const assertCurrent = () => {
+      if (process.cwd() !== workspace || opts.baseUrl !== fixed.baseUrl || opts.pin !== fixed.pin
+        || opts.require !== fixed.require || opts.unixSocket !== fixed.unixSocket) throw new Error("original notary enablement CLI inputs changed");
+      assertOwnerMode(workspace, "trust enable-notary");
+    };
+    assertCurrent();
+    const required = fixed.require.toUpperCase() === "SOFTWARE" ? "SOFTWARE" : "HARDWARE";
     const enabled = await enableNotaryTrust({
-      workspace: process.cwd(),
-      baseUrl: opts.baseUrl,
-      pinPubkeyPath: opts.pin,
+      workspace,
+      baseUrl: fixed.baseUrl,
+      pinPubkeyPath: fixed.pin,
       requiredAttestationLevel: required,
-      unixSocketPath: opts.unixSocket ?? null
-    });
+      unixSocketPath: fixed.unixSocket ?? null
+    }, assertCurrent);
+    assertCurrent();
     console.log(chalk.green("Notary trust mode enabled."));
     console.log(`Trust config: ${enabled.path}`);
     console.log(`Signature: ${enabled.sigPath}`);
