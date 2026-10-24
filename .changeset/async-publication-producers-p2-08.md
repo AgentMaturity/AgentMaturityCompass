@@ -289,3 +289,6 @@ Restore the retained original self-run signer parameter at the private initializ
 
 
 Forward the existing trusted Studio revalidation callback through the two adapters/BOM API registry entries. Existing signed adapter init/configure/capability and BOM sign handlers now select their maintained awaited signing branches. Existing roles, routes, request fields and callback-absent compatibility remain. This applies only the two additional exact lines authorized by Sid; other reserved source remains held.
+
+
+Add a fixed mature workspace initializer continuation for an already marked, admitted signing cohort. Original options, context, target intent, generation, public policy and native expectations survive the real adapter/canon/bank/budget prefix, core publication and late best-effort AMC sidecar. Retained unsupported and unsigned entries keep their existing options and path spelling; unsigned selection performs no new committed-mark read. Fixed native members retain actual opened staging inode acknowledgments and separate failure causes. Fresh/locked/missing-tail/private-session and larger initializer-to-score flows remain unfinished; executable qualification is deferred.

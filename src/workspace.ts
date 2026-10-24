@@ -154,10 +154,13 @@ export function applyAMCConfigProfile(profile: AMCConfigProfileName, baseConfig?
 
 export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
   const paths = getWorkspacePaths(workspace);
-  if (!pathExists(paths.config)) {
-    return defaultAMCConfig();
-  }
-  const raw = YAML.parse(readUtf8(paths.config)) as Partial<AMCConfig> | null;
+  return parseAMCConfigBytes(pathExists(paths.config) ? Buffer.from(readUtf8(paths.config), "utf8") : null);
+}
+
+/** The existing normalizer, shared so initialization consumes its captured original body. */
+export function parseAMCConfigBytes(bytes: Buffer | null): AMCConfig {
+  if (bytes === null) return defaultAMCConfig();
+  const raw = YAML.parse(bytes.toString("utf8")) as Partial<AMCConfig> | null;
   const base = defaultAMCConfig();
   return {
     profile: raw?.profile === "ci" || raw?.profile === "prod" || raw?.profile === "dev" ? raw.profile : base.profile,
@@ -212,7 +215,7 @@ export interface InitWorkspaceOptions {
   trustBoundaryMode?: "isolated" | "shared";
 }
 
-function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
+export function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
   const riskTier = opts.riskTier ?? "med";
   const agentName = opts.agentName ?? "Agent";
   const primaryTasks = opts.primaryTasks ?? ["general assistance"];
@@ -258,6 +261,27 @@ function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown
   };
 }
 
+/** Literal initializer artifacts; fleet scaffold text is a different recipe. */
+export function defaultWorkspaceArtifactBodies(paths: Pick<WorkspacePaths, "guardrails" | "promptAddendum" | "evalHarness">) {
+  return [
+    { path: paths.guardrails, bytes: Buffer.from(YAML.stringify({
+      honesty: { requireKnownUnknownAssumptions: true, requireEvidenceRefs: true },
+      compliance: { requireConsentForSensitive: true, requireAuditEvents: true },
+      verification: { requireTestsForHighRisk: true }, thresholds: { minIntegrityIndex: 0.6 }
+    })) },
+    { path: paths.promptAddendum, bytes: Buffer.from([
+      "# AMC Prompt Addendum", "", "Always structure high-impact outputs as:",
+      "1) Known facts (with evidence refs)", "2) Unknowns", "3) Assumptions",
+      "4) Verification plan", "5) Escalation/consent checkpoints"
+    ].join("\n")) },
+    { path: paths.evalHarness, bytes: Buffer.from(YAML.stringify({ suites: [
+      { name: "truthfulness", checks: ["evidence-link", "uncertainty-label"] },
+      { name: "compliance", checks: ["consent-required", "policy-refusal"] },
+      { name: "verification", checks: ["test-evidence", "reproducibility"] }
+    ] })) }
+  ];
+}
+
 export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath: string; contextGraphHash: string } {
   const workspace = opts.workspacePath ?? process.cwd();
   const paths = getWorkspacePaths(workspace, opts.agentId);
@@ -290,48 +314,8 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   }
   saveAMCConfig(workspace, config);
 
-  if (!pathExists(paths.guardrails)) {
-    writeFileAtomic(
-      paths.guardrails,
-      YAML.stringify({
-        honesty: { requireKnownUnknownAssumptions: true, requireEvidenceRefs: true },
-        compliance: { requireConsentForSensitive: true, requireAuditEvents: true },
-        verification: { requireTestsForHighRisk: true },
-        thresholds: { minIntegrityIndex: 0.6 }
-      }),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.promptAddendum)) {
-    writeFileAtomic(
-      paths.promptAddendum,
-      [
-        "# AMC Prompt Addendum",
-        "",
-        "Always structure high-impact outputs as:",
-        "1) Known facts (with evidence refs)",
-        "2) Unknowns",
-        "3) Assumptions",
-        "4) Verification plan",
-        "5) Escalation/consent checkpoints"
-      ].join("\n"),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.evalHarness)) {
-    writeFileAtomic(
-      paths.evalHarness,
-      YAML.stringify({
-        suites: [
-          { name: "truthfulness", checks: ["evidence-link", "uncertainty-label"] },
-          { name: "compliance", checks: ["consent-required", "policy-refusal"] },
-          { name: "verification", checks: ["test-evidence", "reproducibility"] }
-        ]
-      }),
-      0o644
-    );
+  for (const artifact of defaultWorkspaceArtifactBodies(paths)) {
+    if (!pathExists(artifact.path)) writeFileAtomic(artifact.path, artifact.bytes, 0o644);
   }
 
   const targetFile = join(paths.targetsDir, "default.target.json");
