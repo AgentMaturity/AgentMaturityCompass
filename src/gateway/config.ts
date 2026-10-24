@@ -3,7 +3,7 @@ import { isIP } from "node:net";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { captureGatewayConfigPair, verifyRawConfigSignature, withConfigSignaturePairLock, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
+import { captureGatewayConfigPair, captureGatewayConfigPairForAsync, verifyRawConfigSignature, withConfigSignaturePairLock, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
 import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { isCredentialValuePresent } from "../credentials/credentialValue.js";
@@ -386,7 +386,7 @@ export function signGatewayConfig(workspace: string, explicitPath?: string): str
 export function prepareGatewayConfigPair(workspace: string, replacement?: Uint8Array,
   options: ConfigSignaturePairOptions & { explicitPath?: string } = {}) {
   const targetPath = options.explicitPath ? resolve(workspace, options.explicitPath) : gatewayPaths(workspace).configPath;
-  return captureGatewayConfigPair(workspace, targetPath, replacement, options).prepare();
+  return captureGatewayConfigPairForAsync(workspace, targetPath, replacement, options).prepare();
 }
 export async function signGatewayConfigAsync(workspace: string, explicitPath?: string): Promise<string> {
   const targetPath = explicitPath ? resolve(workspace, explicitPath) : gatewayPaths(workspace).configPath;

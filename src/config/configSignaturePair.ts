@@ -1,8 +1,8 @@
 import { join } from "node:path";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { canonicalSigningKey, verifyWithKey } from "../keys/algorithmPolicy.js";
-import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
-import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { assertKeysetComplete, boundProviderKey, keysetCommittedMark } from "../keys/keyset.js";
+import { configuredRef, keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
 import { KeyProviderError } from "../keys/provider.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
@@ -16,6 +16,45 @@ import { canonicalize } from "../utils/json.js";
 import { vaultStatus } from "../vault/vault.js";
 
 function signingEnabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
+
+/** Actual original public config-purpose negative. No private probe, unlock, migration, Describe or Sign.
+ * Authenticated keyset/revocation reads can record high-water/adoption state; this capture is not globally pure.
+ */
+function capturePublicConfigAuthority(workspace: string): () => void {
+  signingEnabled();
+  const committedMark = () => {
+    const mark = keysetCommittedMark(workspace);
+    return canonicalize(mark === null ? null : { sequence: mark.sequence, sha256: mark.sha256 });
+  };
+  const originalMark = committedMark(), selectedKeyset = assertKeysetComplete(workspace);
+  if (selectedKeyset === null) throw new Error("original config-signature public authority needs an existing complete key set");
+  const keyset = canonicalize(selectedKeyset), bound = boundProviderKey(workspace, "config-signature"), binding = canonicalize(bound);
+  const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
+  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm, settings = loadKeysConfig(workspace), selectedPolicy = keyPolicy(settings);
+  const policy = canonicalize(selectedPolicy);
+  if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original public config signer is unsupported");
+  if (!selectedPolicy.allowed.includes(algorithm) || (holder === "file" && selectedPolicy.requireNonExportable))
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original public config policy refuses signing");
+  // A bound ref comes from the committed binding. Only an unbound file signer consults an editable configured ref.
+  if (bound === null) {
+    const ref = configuredRef(settings, "config-signature");
+    if (ref !== null) throw new KeyProviderError("KEY_PROVIDER_HELD", ref.provider, "the original config purpose is configured to an unbound provider key");
+  }
+  const assertCurrent = () => {
+    signingEnabled();
+    if (committedMark() !== originalMark || canonicalize(assertKeysetComplete(workspace)) !== keyset
+      || canonicalize(keyPolicy(loadKeysConfig(workspace))) !== policy || canonicalize(boundProviderKey(workspace, "config-signature")) !== binding)
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original public config authority changed before signing");
+    assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
+    if (holder === "file") {
+      assertVaultMaySign(workspace, "config-signature");
+      if (getSigningPublicKeyPem(workspace, "config-signature") !== publicKeyPem)
+        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original public config key changed before signing");
+    }
+    signingEnabled();
+  };
+  assertCurrent(); return assertCurrent;
+}
 
 /** Private compatibility core for the retained synchronous pair methods. */
 function captureCompatibilityAuthority(workspace: string, beforePublish?: () => void) {
@@ -41,8 +80,12 @@ function captureCompatibilityAuthority(workspace: string, beforePublish?: () => 
 
 /** Fixed signed-async authority; callbacks can only add refusal. No kind, key or provider override. */
 export function captureConfigSignatureAuthority(workspace: string, beforePublish?: () => void) {
-  const caller = beforePublish;
-  return captureCompatibilityAuthority(workspace, () => { signingEnabled(); caller?.(); signingEnabled(); });
+  const publicCurrent = capturePublicConfigAuthority(workspace), caller = beforePublish;
+  const actual = captureCompatibilityAuthority(workspace, () => {
+    signingEnabled(); publicCurrent(); caller?.(); signingEnabled(); publicCurrent();
+  });
+  // Normal local warming remains after the actor; its generation change cannot become a fresh original.
+  publicCurrent(); return actual;
 }
 
 /** Exact config-purpose/current-refusal rule; the unlabelled wire is verified in each key's canonical algorithm. */
@@ -66,14 +109,17 @@ export class ConfigSignaturePublicationError extends Error {
     super("config pair publication is incomplete; earlier members remain committed", { cause }); this.name = "ConfigSignaturePublicationError";
   }
 }
-function capture(workspace: string, file: string, field: "configSha256" | "digestSha256", replacement?: Uint8Array, options: ConfigSignaturePairOptions = {}) {
+function capture(workspace: string, file: string, field: "configSha256" | "digestSha256", replacement?: Uint8Array,
+  options: ConfigSignaturePairOptions = {}, publicCurrent?: () => void) {
   let refusedNoSign = process.env.AMC_NO_SIGN === "1";
   const caller = options.beforePublish, copy = replacement === undefined ? undefined : Buffer.from(replacement);
-  // Capture has not selected an async signer yet; record negatives without changing compatibility effects.
+  // Retained mixed entries record negatives without new public reads; only the source-fixed async entry supplies publicCurrent.
   const beforePublish = () => {
     if (process.env.AMC_NO_SIGN === "1") refusedNoSign = true;
+    if (publicCurrent !== undefined) { signingEnabled(); publicCurrent(); }
     caller?.();
     if (process.env.AMC_NO_SIGN === "1") refusedNoSign = true;
+    if (publicCurrent !== undefined) { signingEnabled(); publicCurrent(); }
   };
   const assertAsyncSigning = () => {
     if (refusedNoSign) throw new Error("no-sign mode does not authorize policy signing");
@@ -86,7 +132,9 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
   const bytes = copy ?? orgPairBytes(previous, file);
   if (bytes === null) throw new Error("config file missing: " + file);
   orgPairBytes(previous, `${file}.sig`); // Both actual destinations must belong to the captured pair.
-  const original = captureCompatibilityAuthority(workspace), digestSha256 = sha256Hex(bytes);
+  const original = captureCompatibilityAuthority(workspace);
+  publicCurrent?.(); // Refuse a changed generation after the actual existing private warm, before another actor or await.
+  const digestSha256 = sha256Hex(bytes);
   const beforeSign = () => { beforePublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); };
   const beforeAsyncSign = () => { beforeAsyncPublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); };
   beforeSign();
@@ -96,7 +144,7 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
     let published: OrgPairsSnapshot | null = null;
     const assertSignatureCurrent = () => {
       if (checkedCurrent !== undefined) assertAsyncSigning();
-      original.assertCurrent(); checkedCurrent?.();
+      publicCurrent?.(); original.assertCurrent(); checkedCurrent?.(); publicCurrent?.();
       if (!verifyWithKey(Buffer.from(digestSha256, "hex"), original.publicKeyPem, Buffer.from(signature, "base64")))
         throw new Error("prepared config signature does not match the original actual signer");
     };
@@ -149,4 +197,20 @@ export function captureGatewayConfigPair(workspace: string, file: string, replac
 /** Fixed raw config wire used by actual fleet/agent publishers: digestSha256 and four existing fields. */
 export function captureRawConfigPair(workspace: string, file: string, replacement?: Uint8Array, options: ConfigSignaturePairOptions = {}) {
   return capture(workspace, file, "digestSha256", replacement, options);
+}
+
+/** Source-fixed async entry. The private negative comes only from its real public constructor above. */
+function captureForAsync(workspace: string, file: string, field: "configSha256" | "digestSha256", replacement: Uint8Array | undefined,
+  options: ConfigSignaturePairOptions) {
+  const publicCurrent = capturePublicConfigAuthority(workspace), actual = capture(workspace, file, field, replacement, options, publicCurrent);
+  return Object.freeze({ bytes: Buffer.from(actual.bytes), digestSha256: actual.digestSha256,
+    assertInputsCurrent: actual.assertInputsCurrent, prepare: actual.prepare });
+}
+/** Internal maintained signed-async gateway capture; retained mixed/sync exports above keep their existing recipe. */
+export function captureGatewayConfigPairForAsync(workspace: string, file: string, replacement?: Uint8Array, options: ConfigSignaturePairOptions = {}) {
+  return captureForAsync(workspace, file, "configSha256", replacement, options);
+}
+/** Internal maintained signed-async raw capture. No sync method or caller mode/purpose/provider choice is exposed. */
+export function captureRawConfigPairForAsync(workspace: string, file: string, replacement?: Uint8Array, options: ConfigSignaturePairOptions = {}) {
+  return captureForAsync(workspace, file, "digestSha256", replacement, options);
 }

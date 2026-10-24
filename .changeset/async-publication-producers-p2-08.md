@@ -298,3 +298,6 @@ Feedback/outcome routes retain their actual chosen session or HMAC authority for
 
 
 Complete the finite scheduler and drift optional org continuations. Retain the original scheduler work set and drift incident/freeze observations, await genuine secondary work in its existing effect slots, and remove the now-unused Studio alias while retaining the compatibility helper. Optional public capture can advance authenticated high-water state before later scheduler no-op or refusal; it cannot attest original private-vault eligibility. Execution and all native qualification remain deferred by the user.
+
+
+Capture the original public config-signature authority before the first actual actor for maintained signed async entries. Preserve committed provider binding, complete normalized policy and public currentness through genuine signature preparation and pair publication. Keep retained mixed/sync constructors and their native recipes unchanged; thirteen actual async pair captures use fixed internal entries. Earlier public refusal and authenticated high-water effects are deliberate. Original private-session, migration and earlier outer callback boundaries remain separate work. All executable qualification remains deferred by the user.

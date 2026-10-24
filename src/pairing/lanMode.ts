@@ -4,7 +4,7 @@ import YAML from "yaml";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { captureRawConfigPair, verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { captureRawConfigPairForAsync, verifyRawConfigSignature } from "../config/configSignaturePair.js";
 import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { assertKeysetComplete, boundProviderKey, keysetCommittedMark } from "../keys/keyset.js";
 import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
@@ -188,7 +188,7 @@ export async function enableLanModeAsync(supplied: Parameters<typeof enableLanMo
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize LAN configuration signing");
   };
   stable();
-  const pair = captureRawConfigPair(params.workspace, lanPath(params.workspace), Buffer.from(YAML.stringify(config)), { beforePublish: stable });
+  const pair = captureRawConfigPairForAsync(params.workspace, lanPath(params.workspace), Buffer.from(YAML.stringify(config)), { beforePublish: stable });
   const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
 }
 
@@ -201,7 +201,7 @@ export async function disableLanModeAsync(workspaceInput: string, beforePublish?
   const path = lanPath(workspace), previous = captureOrgPairs([path]), original = orgPairBytes(previous, path);
   const current = original === null ? defaultLanMode() : parseLanMode(original.toString("utf8"));
   const next: LanModeConfig = { ...current, enabled: false, bind: "127.0.0.1", requirePairing: false };
-  const pair = captureRawConfigPair(workspace, path, Buffer.from(YAML.stringify(next)), { previous, beforePublish: stable });
+  const pair = captureRawConfigPairForAsync(workspace, path, Buffer.from(YAML.stringify(next)), { previous, beforePublish: stable });
   const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
 }
 
@@ -236,7 +236,7 @@ function capturedLanAfterUnlock(workspace: string, path: string, bytes: Buffer, 
   return Object.freeze({ async publish(): Promise<{ path: string; sigPath: string }> {
     stable();
     // The old target belongs only to C8's preparation/expected-own-state CAS, never the stable negative.
-    const pair = captureRawConfigPair(workspace, path, bytes, { previous, beforePublish: stable });
+    const pair = captureRawConfigPairForAsync(workspace, path, bytes, { previous, beforePublish: stable });
     const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result;
   } });
 }

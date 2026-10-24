@@ -1,7 +1,7 @@
 import { mkdirSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
-import { captureConfigSignatureAuthority, captureRawConfigPair, ConfigSignaturePublicationError, withConfigSignaturePairLock } from "../config/configSignaturePair.js";
+import { captureConfigSignatureAuthority, captureRawConfigPairForAsync, ConfigSignaturePublicationError, withConfigSignaturePairLock } from "../config/configSignaturePair.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { defaultTargetMapping } from "../targets/targetProfile.js";
@@ -151,7 +151,7 @@ async function prepareAndPublishScaffold(workspace: string, input: AgentConfig, 
   assertStable();
   // Capture BOTH actual purpose authorities and all old targets before the first provider await.
   // This callback contains no stale own agent-pair target; C8 owns that pair's expected-state transition.
-  const configAttempt = captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(YAML.stringify(config)), {
+  const configAttempt = captureRawConfigPairForAsync(workspace, paths.agentConfig, Buffer.from(YAML.stringify(config)), {
     previous: previousConfig, beforePublish: assertStable
   });
   const target = await prepareTargetProfileSignatureAsync({ workspace, name: "default", contextGraphHash: contextHash,

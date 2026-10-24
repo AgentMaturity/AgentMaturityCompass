@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { captureConfigSignatureAuthority, captureRawConfigPair, ConfigSignaturePublicationError, verifyRawConfigSignature, withConfigSignaturePairLock } from "../../config/configSignaturePair.js";
+import { captureConfigSignatureAuthority, captureRawConfigPairForAsync, ConfigSignaturePublicationError, verifyRawConfigSignature, withConfigSignaturePairLock } from "../../config/configSignaturePair.js";
 import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, type OrgPairsSnapshot } from "../../org/preparedOrgPairs.js";
 import { join, relative, resolve } from "node:path";
 import { readFileSync } from "node:fs";
@@ -318,7 +318,7 @@ async function prepareBlobKeyStages(workspace: string, previous: OrgPairsSnapsho
       const captured = withConfigSignaturePairLock(workspace, () => {
         assertCurrent(); const snapshot = captureOrgPairs([blobCurrentKeyPath(workspace)]); assertCurrent(); return snapshot;
       });
-      const pair = captureRawConfigPair(workspace, blobCurrentKeyPath(workspace), bytes, { previous: captured, beforePublish: stable });
+      const pair = captureRawConfigPairForAsync(workspace, blobCurrentKeyPath(workspace), bytes, { previous: captured, beforePublish: stable });
       pair.assertInputsCurrent();
       const material = generateBlobKeyMaterial(), secret = { keyVersion: version, attempted: true, returned: false, acknowledged: false };
       secretWrites.push(secret); progress.phase = "secret-write";

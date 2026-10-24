@@ -6,7 +6,7 @@ import { z } from "zod";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { captureOrgPairs, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
-import { captureRawConfigPair, ConfigSignaturePublicationError, verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { captureRawConfigPair, captureRawConfigPairForAsync, ConfigSignaturePublicationError, verifyRawConfigSignature } from "../config/configSignaturePair.js";
 import { safeIdSchema } from "../utils/pathSafety.js";
 import { federationConfigSchema, federationPeerSchema, type FederationConfigFile, type FederationPeer } from "./federationSchema.js";
 
@@ -66,7 +66,10 @@ function publishPair(plan: PairPlan, prepared: ReturnType<ReturnType<typeof capt
   }
 }
 function publishPairSync(plan: PairPlan) { return publishPair(plan, capturePair(plan).prepareSync()); }
-async function publishPairAsync(plan: PairPlan) { return publishPair(plan, await capturePair(plan).prepare()); }
+async function publishPairAsync(plan: PairPlan) {
+  const captured = captureRawConfigPairForAsync(plan.workspace, plan.path, plan.bytes, { previous: plan.previous, beforePublish: plan.beforeSign });
+  return publishPair(plan, await captured.prepare());
+}
 const signedDigestSchema = z.object({ digestSha256: z.string().length(64), signature: z.string().min(1), signedTs: z.number().int(), signer: z.literal("auditor") });
 function verifyCaptured(workspace: string, bytes: Uint8Array, signatureBytes: Uint8Array) {
   const value: unknown = JSON.parse(Buffer.from(signatureBytes).toString("utf8"));

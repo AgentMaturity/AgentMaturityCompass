@@ -12,7 +12,7 @@ import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { captureRawConfigPair } from "../config/configSignaturePair.js";
+import { captureRawConfigPairForAsync } from "../config/configSignaturePair.js";
 import { captureOrgPairs } from "../org/preparedOrgPairs.js";
 import { vaultStatus } from "../vault/vault.js";
 
@@ -198,7 +198,7 @@ export async function signAlertsConfigAsync(workspaceInput: string, beforePublis
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize alerts configuration signing");
   };
   assertCurrent();
-  const pair = captureRawConfigPair(workspace, alertsPath(workspace), undefined, { beforePublish: assertCurrent });
+  const pair = captureRawConfigPairForAsync(workspace, alertsPath(workspace), undefined, { beforePublish: assertCurrent });
   const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result.sigPath;
 }
 
@@ -234,7 +234,7 @@ export async function initAlertsConfigAsync(workspaceInput: string, beforePublis
       for (const [key, secret] of selected) if (getVaultSecret(workspace, key) !== secret)
         throw new Error("the selected alerts secret changed while configuration signing was prepared");
     };
-    const pair = captureRawConfigPair(workspace, path, bytes, { previous, beforePublish: assertInputsCurrent });
+    const pair = captureRawConfigPairForAsync(workspace, path, bytes, { previous, beforePublish: assertInputsCurrent });
     const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent();
     return { configPath: result.path, sigPath: result.sigPath };
   } catch (cause) {

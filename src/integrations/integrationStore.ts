@@ -4,7 +4,7 @@ import { join } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
-import { captureRawConfigPair, verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { captureRawConfigPairForAsync, verifyRawConfigSignature } from "../config/configSignaturePair.js";
 import { captureOrgPairs } from "../org/preparedOrgPairs.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -164,7 +164,7 @@ export async function initIntegrationsConfigAsync(workspace: string, beforePubli
       if (!vaultStatus(workspace).unlocked || getVaultSecret(workspace, secretKey) !== originalSecret)
         throw new Error("integration secret authority changed while config signing was prepared");
     };
-    const pair = captureRawConfigPair(workspace, path, body, { previous, beforePublish: assertInputsCurrent });
+    const pair = captureRawConfigPairForAsync(workspace, path, body, { previous, beforePublish: assertInputsCurrent });
     const prepared = await pair.prepare();
     const result = prepared.publish(); prepared.assertCurrent();
     return result;

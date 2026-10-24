@@ -5,7 +5,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import YAML from "yaml";
 import { z } from "zod";
-import { captureRawConfigPair, verifyRawConfigSignature, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
+import { captureRawConfigPair, captureRawConfigPairForAsync, verifyRawConfigSignature, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
 import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "../targets/targetProfile.js";
@@ -207,7 +207,7 @@ export function prepareFleetConfigPair(workspace: string, replacement?: Uint8Arr
   const file = fleetConfigPath(workspace), previous = options.previous ?? captureOrgPairs([file]);
   const bytes = replacement === undefined ? orgPairBytes(previous, file) : Buffer.from(replacement);
   if (bytes === null) throw new Error(`Fleet config not found: ${file}`);
-  return captureRawConfigPair(workspace, file, Buffer.from(bytes.toString("utf8")), { ...options, previous }).prepare();
+  return captureRawConfigPairForAsync(workspace, file, Buffer.from(bytes.toString("utf8")), { ...options, previous }).prepare();
 }
 export async function signFleetConfigAsync(workspace: string): Promise<{ path: string; sigPath: string }> {
   return (await prepareFleetConfigPair(workspace)).publish();
@@ -275,7 +275,7 @@ export function saveAgentConfig(workspace: string, config: AgentConfig): {
 
 export async function saveAgentConfigAsync(workspace: string, config: AgentConfig): Promise<{ configPath: string; sigPath: string }> {
   const copied = structuredClone(config), paths = getAgentPaths(workspace, copied.id);
-  const prepared = await captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(YAML.stringify(copied)), {
+  const prepared = await captureRawConfigPairForAsync(workspace, paths.agentConfig, Buffer.from(YAML.stringify(copied)), {
     beforePublish() { if (getAgentPaths(workspace, copied.id).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing"); }
   }).prepare();
   const result = prepared.publish(); return { configPath: result.path, sigPath: result.sigPath };
@@ -340,7 +340,7 @@ export function prepareAgentConfigPair(workspace: string, agentId?: string, opti
   const paths = getAgentPaths(workspace, agentId), previous = options.previous ?? captureOrgPairs([paths.agentConfig]), raw = orgPairBytes(previous, paths.agentConfig);
   if (raw === null) throw new Error(`Agent config not found: ${paths.agentConfig}`);
   const caller = options.beforePublish;
-  return captureRawConfigPair(workspace, paths.agentConfig, Buffer.from(raw.toString("utf8")), { previous, beforePublish() {
+  return captureRawConfigPairForAsync(workspace, paths.agentConfig, Buffer.from(raw.toString("utf8")), { previous, beforePublish() {
     caller?.();
     if (getAgentPaths(workspace, agentId).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing");
   } }).prepare();
