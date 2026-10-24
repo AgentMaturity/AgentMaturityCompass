@@ -90,14 +90,17 @@ export function captureReceiptOwnerPredecessor(workspace: string) {
   assertTransparencyStateCurrent(state); return { state, ...verified };
 }
 
+function signingEnabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
 function captureSigner(workspace: string, descriptor: PolicySignerDescriptor) {
   const purpose = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
   const holder: KeyProviderId = boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file";
-  return { descriptor, purpose, holder };
+  return { descriptor, purpose, holder, policy: purpose === null ? null : canonicalize(keyPolicy(loadKeysConfig(workspace))) };
 }
 function assertSignerCurrent(workspace: string, original: ReturnType<typeof captureSigner>, signed?: SignedDigest): void {
   assertPolicySignerCurrent(workspace, original.descriptor);
   if (original.purpose !== null) {
+    if (canonicalize(keyPolicy(loadKeysConfig(workspace))) !== original.policy)
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", original.holder, "the original transparency key policy changed while preparing publication");
     if (signed === undefined) {
       // Before this kind has signed, check its real captured authority; never invent signature material or recapture/warm a new authority.
       const current = assertKeysetComplete(workspace), policy = keyPolicy(loadKeysConfig(workspace));
@@ -121,16 +124,17 @@ function assertSignerCurrent(workspace: string, original: ReturnType<typeof capt
 
 /** Internal fixed TR/Merkle authority for the actual producer phase before an earlier await. */
 export function captureWorkspaceLogAuthority(workspace: string, beforeCommit?: () => void) {
-  beforeCommit?.();
+  signingEnabled(); beforeCommit?.(); signingEnabled();
   const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
   const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
   const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
   const assertIntrinsicCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
+    signingEnabled();
     assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
   };
-  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => { beforeCommit?.(); assertIntrinsicCurrent(signedSeal, signedRoot); };
+  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => { signingEnabled(); beforeCommit?.(); signingEnabled(); assertIntrinsicCurrent(signedSeal, signedRoot); };
   assertCurrent(); return { sealSigner, rootSigner, assertCurrent, assertIntrinsicCurrent };
 }
 
@@ -158,8 +162,9 @@ export class TransparencyAppendPublicationError extends Error {
 /** Actual one-attempt path. Every real Sign completes before any publication lock; no automatic predecessor retry. */
 export async function appendTransparencyEntryAttemptAsync(input: TransparencyAppendInput, options: TransparencyAppendOptions = {}): Promise<TransparencyAppendAttempt> {
   const params = { workspace: input.workspace, type: input.type, agentId: input.agentId, artifact: { ...input.artifact } };
-  const beforeCommit = options.beforeCommit, beforeMember = options.beforeMember, workspace = params.workspace;
-  beforeMember?.();
+  const beforeCommit = options.beforeCommit, memberCaller = options.beforeMember, workspace = params.workspace;
+  const beforeMember = () => { signingEnabled(); memberCaller?.(); signingEnabled(); };
+  beforeMember();
   const original = captureWorkspaceLogAuthority(workspace, beforeCommit), { sealSigner, rootSigner } = original;
   const publication = captureTransparencyAppendPublication(workspace), before = publication.state, predecessor = verifiedPredecessor(workspace, before);
   publication.assertCurrent();
