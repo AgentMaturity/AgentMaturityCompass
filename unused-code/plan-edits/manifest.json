@@ -157,6 +157,13 @@
       "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
     },
     {
+      "path": "src/bench/benchPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchPolicyStore.ts.landed",
+      "sha256": "83d47eb7e0216f15ba8cb04ee932f24c52b3cada9a80913ade52fd1c6350d1f1"
+    },
+    {
       "path": "src/bench/benchRegistryClient.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -505,6 +512,13 @@
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
       "archivePath": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
       "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad"
+    },
+    {
+      "path": "src/prompt/promptPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPolicyStore.ts.landed",
+      "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
     },
     {
       "path": "src/sdk/nativeAgentClient.ts",
