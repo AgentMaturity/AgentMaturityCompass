@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { resolve } from "node:path";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -163,7 +168,7 @@ function verifyGrantSignature(workspace: string, grant: SignedLeastPrivilegeTool
   if (digest !== grant.grantDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, grant.grantSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(grant.grantSignature, "base64"));
 }
 
 function expirationFrom(requestedAt: string, requestedDurationMs: number): string {
@@ -259,6 +264,33 @@ export function createSignedLeastPrivilegeToolGrant(input: {
     signedTs: Date.now(),
     metadataOnlyAccepted: false
   };
+}
+
+/** Direct-module async sibling; approval/expiry values remain the original grant recipe, not new signing authority. */
+export async function createSignedLeastPrivilegeToolGrantAsync(input: Parameters<typeof createSignedLeastPrivilegeToolGrant>[0],
+  options: { beforePublish?: () => void } = {}): Promise<SignedLeastPrivilegeToolGrant> {
+  const assertSigningEnabled = () => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize least-privilege grant signing");
+  };
+  assertSigningEnabled();
+  const params = structuredClone(input), workspace = resolve(params.workspace), beforePublish = options.beforePublish;
+  const approvedAt = params.approvedAt ?? new Date().toISOString();
+  const expiresAt = params.expiresAt ?? expirationFrom(params.request.requestedAt, params.request.requestedDurationMs);
+  const payload = unsignedGrantPayload({
+    schemaVersion: "2026-06-25", grantId: params.request.grantId, agentId: params.request.agentId, runId: params.request.runId,
+    taskId: params.request.taskId, toolName: params.request.toolName, actionClass: params.request.actionClass,
+    requestedAt: params.request.requestedAt, approvedAt, expiresAt, requestedDurationMs: params.request.requestedDurationMs,
+    requestedScope: params.request.requestedScope, approvedScope: params.approvedScope, approvalReceiptId: params.approvalReceiptId,
+    policyId: params.policyId, approvedBy: params.approvedBy, sourceCitations: params.request.sourceCitations
+  });
+  const digest = sha256Hex(canonicalize(payload)), bytes = Buffer.from(digest, "hex");
+  const original = captureConfigSignatureAuthority(workspace, () => { assertSigningEnabled(); beforePublish?.(); assertSigningEnabled(); });
+  const signed = await signWithPurposeKey(workspace, "config-signature", bytes, { beforeSign: original.assertCurrent });
+  original.assertCurrent(); assertPurposePublicationCurrent(workspace, original.captured, signed);
+  if (!verifyCurrentPurposeCredentialSignature(workspace, "config-signature", bytes, signed.signature))
+    throw new Error("prepared least-privilege grant is no longer admitted for config-signature");
+  original.assertCurrent();
+  return { ...payload, grantDigestSha256: digest, grantSignature: signed.signature.toString("base64"), signer: "auditor", signedTs: Date.now(), metadataOnlyAccepted: false };
 }
 
 export function evaluateLeastPrivilegeToolGrantUsage(input: {
