@@ -8,17 +8,70 @@ import { appendTransparencyEntry } from "../../transparency/logChain.js";
 import { openLedger } from "../../ledger/ledger.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { pathExists, writeFileAtomic } from "../../utils/fs.js";
+import { canonicalize } from "../../utils/json.js";
+import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes } from "../../org/preparedOrgPairs.js";
+import { assertKeysetComplete, boundProviderKey, keysetCommittedMark } from "../../keys/keyset.js";
+import { canonicalSigningKey } from "../../keys/algorithmPolicy.js";
+import { keyPolicy, loadKeysConfig } from "../../keys/keysConfig.js";
+import { assertSigningKeyUsable, assertVaultMaySign, getSigningPublicKeyPem } from "../../keys/signingKeys.js";
+import { RECEIPT_AUTHORITY_CURRENT } from "../../keys/receiptAuthority.js";
+import { readReceiptAuthorityState } from "../../keys/receiptAuthorityState.js";
+import { vaultStatus } from "../../vault/vault.js";
 
-function writeAudit(workspace: string, auditType: string, payload: Record<string, unknown>): void {
+/** Original public SQL authority only; excluded ordinary cohorts retain their compatibility recipe. */
+function captureRotationAuditAuthority(workspace: string): (() => void) | null {
+  if (process.env.AMC_NO_SIGN === "1" || !vaultStatus(workspace).unlocked) return null;
+  const committed = keysetCommittedMark(workspace);
+  if (committed === null) return null;
+  const keyset = assertKeysetComplete(workspace);
+  if (keyset === null) throw new Error("marked blob rotation audit key set is unavailable");
+  const purposes = ["ledger-row", "receipt"] as const;
+  if (purposes.some(purpose => boundProviderKey(workspace, purpose) !== null)) return null;
+  const pointerPath = join(workspace, RECEIPT_AUTHORITY_CURRENT), pointer = captureOrgFiles([pointerPath]);
+  if (readReceiptAuthorityState(workspace) !== null || orgPairBytes(pointer, pointerPath) !== null)
+    throw new Error("original blob rotation audit requires the direct receipt path");
+  const originalKeyset = canonicalize(keyset), originalMark = canonicalize(committed);
+  const originalPolicy = canonicalize(keyPolicy(loadKeysConfig(workspace)));
+  const originals = purposes.map(purpose => {
+    const key = canonicalSigningKey(getSigningPublicKeyPem(workspace, purpose));
+    if (key === null) throw new Error("original blob rotation audit public key is unsupported");
+    return Object.freeze({ purpose, publicKeyPem: key.pem, algorithm: key.algorithm });
+  });
+  const assertCurrent = () => {
+    if (process.env.AMC_NO_SIGN === "1" || !vaultStatus(workspace).unlocked)
+      throw new Error("original blob rotation audit signing state is unavailable");
+    if (canonicalize(keysetCommittedMark(workspace)) !== originalMark || canonicalize(assertKeysetComplete(workspace)) !== originalKeyset)
+      throw new Error("original blob rotation audit committed authority changed");
+    const policy = keyPolicy(loadKeysConfig(workspace));
+    if (canonicalize(policy) !== originalPolicy || policy.requireNonExportable)
+      throw new Error("original blob rotation audit policy changed or refuses file signing");
+    assertOrgPairsCurrent(pointer);
+    if (readReceiptAuthorityState(workspace) !== null) throw new Error("original blob rotation audit receipt authority changed");
+    for (const original of originals) {
+      const current = canonicalSigningKey(getSigningPublicKeyPem(workspace, original.purpose));
+      if (boundProviderKey(workspace, original.purpose) !== null || current === null || current.pem !== original.publicKeyPem
+        || current.algorithm !== original.algorithm || !policy.allowed.includes(original.algorithm))
+        throw new Error("original blob rotation audit public signing identity changed or is refused");
+      assertVaultMaySign(workspace, original.purpose);
+      assertSigningKeyUsable(workspace, original.purpose, original.publicKeyPem, "file");
+    }
+  };
+  assertCurrent(); return assertCurrent;
+}
+
+function writeAudit(workspace: string, auditType: string, payload: Record<string, unknown>, assertAuditCurrent?: () => void): void {
+  assertAuditCurrent?.();
   const ledger = openLedger(workspace);
   const sessionId = `ops-blobs-${Date.now()}`;
   try {
+    assertAuditCurrent?.();
     ledger.startSession({
       sessionId,
       runtime: "unknown",
       binaryPath: "amc",
       binarySha256: sha256Hex(Buffer.from("amc", "utf8"))
     });
+    assertAuditCurrent?.();
     ledger.appendEvidenceWithReceipt({
       sessionId,
       runtime: "unknown",
@@ -40,10 +93,12 @@ function writeAudit(workspace: string, auditType: string, payload: Record<string
         bodySha256: sha256Hex(Buffer.from(JSON.stringify({ auditType, ...payload }), "utf8"))
       }
     });
+    assertAuditCurrent?.();
     ledger.sealSession(sessionId);
   } finally {
     ledger.close();
   }
+  assertAuditCurrent?.();
 }
 
 export function blobKeyInitCli(workspace: string): { keyVersion: number } {
@@ -168,11 +223,13 @@ export async function blobKeyInitCliAsync(workspace: string, options: BlobKeyPub
 }
 export async function blobKeyRotateCliAsync(workspace: string, options: BlobKeyPublicationOptions = {}): Promise<{ fromVersion: number; toVersion: number }> {
   workspace = resolve(workspace);
-  const caller = options.beforePublish, attempt = await prepareBlobKeyRotationAsync(workspace, { beforePublish: caller });
+  const caller = options.beforePublish, auditCurrent = captureRotationAuditAuthority(workspace);
+  const beforePublish = auditCurrent === null ? caller : () => { auditCurrent(); caller?.(); auditCurrent(); };
+  const attempt = await prepareBlobKeyRotationAsync(workspace, { beforePublish });
   let auditAttempted = false, auditReturned = false;
   try {
     attempt.assertCurrent(); auditAttempted = true;
-    writeAudit(workspace, "BLOB_KEY_ROTATED", { fromVersion: attempt.before.keyVersion, toVersion: attempt.key.keyVersion }); auditReturned = true;
+    writeAudit(workspace, "BLOB_KEY_ROTATED", { fromVersion: attempt.before.keyVersion, toVersion: attempt.key.keyVersion }, auditCurrent ?? undefined); auditReturned = true;
     attempt.assertCurrent(); return { fromVersion: attempt.before.keyVersion, toVersion: attempt.key.keyVersion };
   } catch (cause) { throw new BlobKeyAuditIncompleteError(Object.freeze([attempt.before.keyVersion, attempt.key.keyVersion]), attempt.progress, auditAttempted, auditReturned, cause); }
 }
