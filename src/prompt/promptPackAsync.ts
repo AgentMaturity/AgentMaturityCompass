@@ -33,12 +33,15 @@ function noInputAlias(outputs: PromptFiles, inputs: PromptFiles) {
   for (const output of outputs) for (const input of inputs)
     if (output.path === input.path || (output.identity !== null && output.identity === input.identity)) throw new Error("prompt output must differ from its selected input files");
 }
-async function archive(workspace: string, compiled: Awaited<ReturnType<typeof prepareCompiledPromptPackAsync>>, original: ReturnType<typeof capturePromptPackAuthority>) {
+async function archive(workspace: string, compiled: Awaited<ReturnType<typeof prepareCompiledPromptPackAsync>>, original: ReturnType<typeof capturePromptPackAuthority>, assertTargetsCurrent: () => void) {
   const assertInputs = () => { original.assertCurrent(); compiled.assertCurrent(); };
-  assertInputs();
-  const pack = await prepareFileSignatureWithAuditor(workspace, "pack.json", Buffer.from(canonicalize(compiled.compiled.pack)), "BUNDLE"); assertInputs(); pack.assertCurrent();
+  // Old output targets are a preparation-only negative; own publication must not replay them.
+  const beforeSign = () => { assertInputs(); assertTargetsCurrent(); assertInputs(); };
+  beforeSign();
+  const pack = await prepareFileSignatureWithAuditor(workspace, "pack.json", Buffer.from(canonicalize(compiled.compiled.pack)), "BUNDLE", beforeSign); beforeSign(); pack.assertCurrent();
   const lintBytes = Buffer.from(`${canonicalize(promptLintSchema.parse(compiled.compiled.lint))}\n`);
-  const lint = await prepareFileSignatureWithAuditor(workspace, "lint.json", lintBytes, "BUNDLE"); assertInputs(); pack.assertCurrent(); lint.assertCurrent();
+  const beforeLintSign = () => { beforeSign(); pack.assertCurrent(); };
+  const lint = await prepareFileSignatureWithAuditor(workspace, "lint.json", lintBytes, "BUNDLE", beforeLintSign); beforeLintSign(); lint.assertCurrent();
   const signature = promptPackSignatureSchema.parse(JSON.parse(pack.signatureBytes));
   const signerPub = signature.envelope ? Buffer.from(signature.envelope.pubkeyB64, "base64").toString("utf8") : original.descriptor.publicKeyPem;
   if (signerPub !== original.descriptor.publicKeyPem) throw new Error("prompt pack signer changed while preparing");
@@ -52,7 +55,7 @@ export async function buildPromptPackArtifactAsync(params: { workspace: string; 
   const original = capturePromptPackAuthority(input.workspace, options.beforePublish, false), before = capturePromptFiles([input.outFile]);
   const inputFiles = capturePromptFiles(promptCompilerInputPaths(input.workspace, input.agentId)); noInputAlias(before, inputFiles);
   const compiled = await prepareCompiledPromptPackAsync(input, { beforePublish: original.assertCurrent, assertInputsCurrent: options.assertInputsCurrent });
-  const prepared = await archive(input.workspace, compiled, original);
+  const prepared = await archive(input.workspace, compiled, original, () => { noInputAlias(before, inputFiles); assertPromptFilesCurrent(before); });
   publishPromptFiles(input.workspace, before, [{ path: input.outFile, bytes: prepared.bytes }], prepared.assertCurrent);
   return { outFile: input.outFile, sha256: sha256Hex(prepared.bytes), pack: compiled.compiled.pack, signature: prepared.signature,
     lint: compiled.compiled.lint, providerFiles: compiled.compiled.providerFiles };
@@ -80,9 +83,12 @@ export async function buildPromptPackForApiAsync(params: { workspace: string; ag
     const snapshotPath = join(promptSnapshotsDir(input.workspace, input.agentId), `${compiled.compiled.pack.generatedTs}.amcprompt`), snapshotShaPath = `${snapshotPath}.sha256`;
     const chosen = [snapshotPath, snapshotShaPath].filter(path => !before.some(row => row.path === resolve(path)));
     const allBefore = [...before, ...capturePromptFiles(chosen)]; noInputAlias(allBefore, inputFiles);
-    const prepared = await archive(input.workspace, compiled, original), lintBytes = Buffer.from(JSON.stringify(promptLintSchema.parse(compiled.compiled.lint), null, 2));
+    const assertTargets = () => { noInputAlias(allBefore, inputFiles); assertPromptFilesCurrent(allBefore); };
+    const prepared = await archive(input.workspace, compiled, original, assertTargets), lintBytes = Buffer.from(JSON.stringify(promptLintSchema.parse(compiled.compiled.lint), null, 2));
     assertInputs?.(); original.assertCurrent(); prepared.assertCurrent();
-    const latestLint = await prepareFileSignatureWithAuditor(input.workspace, lintPath, lintBytes, "BUNDLE");
+    const beforeLintSign = () => { assertInputs?.(); original.assertCurrent(); prepared.assertCurrent(); assertTargets(); };
+    const latestLint = await prepareFileSignatureWithAuditor(input.workspace, lintPath, lintBytes, "BUNDLE", beforeLintSign);
+    beforeLintSign();
     const assertCurrent = () => { assertInputs?.(); original.assertCurrent(); prepared.assertCurrent(); latestLint.assertCurrent(); };
     assertCurrent(); const sha256 = sha256Hex(prepared.bytes), checksum = Buffer.from(`${sha256}\n`);
     published = publishPromptFiles(input.workspace, allBefore, [{ path: outFile, bytes: prepared.bytes }, { path: latestPath, bytes: prepared.bytes },

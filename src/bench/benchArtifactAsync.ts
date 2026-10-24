@@ -24,7 +24,8 @@ export async function createBenchArtifactAsync(params:Parameters<typeof createBe
     if(row.identity!==null)for(const path of inputPaths){let identity:string|null=null;try{const stat=statSync(path);if(stat.isFile())identity=`${stat.dev}:${stat.ino}`;}catch(error){if((error as NodeJS.ErrnoException).code!=="ENOENT")throw error;}
       if(identity===row.identity)throw new Error("bench outputs must differ from selected policy and proof inputs");}}};noInputAlias();
   let paths:readonly string[]=[],logs:string[]=[];
-  try{selected();const prepared=await prepareFileSignatureWithAuditor(workspace,"bench.json",Buffer.from(JSON.stringify(bench)),"BUNDLE");selected();prepared.assertCurrent();
+  const beforeSign=()=>{selected();noInputAlias();selected();assertBenchArchiveTargets(before);};
+  try{beforeSign();const prepared=await prepareFileSignatureWithAuditor(workspace,"bench.json",Buffer.from(JSON.stringify(bench)),"BUNDLE",beforeSign);beforeSign();prepared.assertCurrent();
     const signature=benchSignatureSchema.parse(JSON.parse(prepared.signatureBytes)),signerPub=signature.envelope?Buffer.from(signature.envelope.pubkeyB64,"base64").toString("utf8"):authority.descriptor.publicKeyPem;
     if(signerPub!==authority.descriptor.publicKeyPem)throw new Error("bench signer changed while preparing");
     const bytes=benchArchiveBytes({bench,signature,signerPub,proofs:proofFiles,calculationManifest:data.calculationManifest,piiScan:data.piiScan,buildMeta});
