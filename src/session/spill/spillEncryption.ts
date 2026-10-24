@@ -2,11 +2,14 @@
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync } from "node:fs";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
+import { join } from "node:path";
+import { getAuthenticatedKeyHistory, getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import { verifySignedDigest } from "../../crypto/signing/signer.js";
-import { opsPolicyPath, opsPolicySigPath } from "../../ops/policy.js";
-import { blobCurrentKeyPath, blobCurrentKeySigPath, readBlobKeyMaterial } from "../../storage/blobs/blobKeys.js";
+import { opsPolicyPath, opsPolicySigPath, verifyOpsPolicyBytes } from "../../ops/policy.js";
+import { blobCurrentKeyPath, blobCurrentKeySigPath, captureBlobMetadataBytes, readBlobKeyMaterial } from "../../storage/blobs/blobKeys.js";
 import { blobKeyCurrentSchema, blobKeyCurrentSigSchema } from "../../storage/blobs/blobSchema.js";
+import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes } from "../../org/preparedOrgPairs.js";
+import { canonicalize } from "../../utils/json.js";
 import { decodeBlobV1, decryptBlobV1, encodeBlobV1, encryptBlobV1, type BlobEnvelopeV1 } from "../../storage/blobs/blobEncryptor.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { parseSpillLocator, type SpillRefV2 } from "./spillTypes.js";
@@ -58,18 +61,42 @@ function readKeyMetadata(path: string): Buffer {
   }
 }
 
+/** Exception-only negative gate; the actual original history or its absence must remain current. */
+function captureSpillAuditorHistory(workspace: string): () => void {
+  const path = join(workspace, ".amc", "keys", "auditor_history.json"), snapshot = captureOrgFiles([path]);
+  const bytes = orgPairBytes(snapshot, path);
+  const value = bytes === null ? null : canonicalize(JSON.parse(bytes.toString("utf8")) as unknown);
+  const assertCurrent = () => {
+    assertOrgPairsCurrent(snapshot);
+    if (bytes !== null) {
+      const actual = getAuthenticatedKeyHistory(workspace, "auditor");
+      if (actual === null || canonicalize(actual) !== value) throw new Error("original spill auditor history is not authenticated");
+    }
+    assertOrgPairsCurrent(snapshot);
+  };
+  assertCurrent(); return assertCurrent;
+}
+
 function writerKey(workspace: string): { keyVersion: number; key: Buffer } {
   requireVaultMode();
   try {
     // Parse precisely the bytes whose digest is verified. A separate verify-
     // then-load call would leave selection dependent on a second file read.
     const metadata = readKeyMetadata(blobCurrentKeyPath(workspace));
-    const signature = blobKeyCurrentSigSchema.parse(JSON.parse(readKeyMetadata(blobCurrentKeySigPath(workspace)).toString("utf8")));
+    const sidecar = readKeyMetadata(blobCurrentKeySigPath(workspace));
+    const signature = blobKeyCurrentSigSchema.parse(JSON.parse(sidecar.toString("utf8")));
     const digest = sha256Hex(metadata);
-    if (digest !== signature.digestSha256 || !verifyHexDigestAny(digest, signature.signature, getPublicKeyHistory(workspace, "auditor"))) {
-      throw new Error("blob key metadata signature verification failed");
+    if (digest !== signature.digestSha256) throw new Error("blob key metadata signature verification failed");
+    const legacy = verifyHexDigestAny(digest, signature.signature, getPublicKeyHistory(workspace, "auditor"));
+    let current: z.infer<typeof blobKeyCurrentSchema>;
+    if (legacy) current = blobKeyCurrentSchema.parse(JSON.parse(metadata.toString("utf8")));
+    else {
+      try {
+        const assertHistoryCurrent = captureSpillAuditorHistory(workspace);
+        const selected = captureBlobMetadataBytes(workspace, metadata, sidecar);
+        assertHistoryCurrent(); current = selected.key;
+      } catch { throw new Error("blob key metadata signature verification failed"); }
     }
-    const current = blobKeyCurrentSchema.parse(JSON.parse(metadata.toString("utf8")));
     requireVaultMode(current.keyVersion);
     return { keyVersion: current.keyVersion, key: readBlobKeyMaterial(workspace, current.keyVersion) };
   } catch (error) {
@@ -92,13 +119,20 @@ const policySignatureSchema = z.object({
 
 function signedWritePolicy(workspace: string): z.infer<typeof spillWritePolicySchema>["opsPolicy"] {
   const bytes = readKeyMetadata(opsPolicyPath(workspace));
-  const signature = policySignatureSchema.parse(JSON.parse(readKeyMetadata(opsPolicySigPath(workspace)).toString("utf8")));
+  const sidecar = readKeyMetadata(opsPolicySigPath(workspace));
+  const signature = policySignatureSchema.parse(JSON.parse(sidecar.toString("utf8")));
   const digest = sha256Hex(bytes);
-  // Preserve the existing ops-policy verifier's envelope/legacy signature
-  // compatibility while authenticating precisely the YAML parsed below.
-  if (digest !== signature.digestSha256 || !verifySignedDigest({ workspace, digestHex: digest, signed: signature })) {
-    throw new Error("spill operations policy signature verification failed");
+  if (digest !== signature.digestSha256) throw new Error("spill operations policy signature verification failed");
+  // Preserve the actual legacy observation; native failures never enter the purpose extension.
+  let valid = verifySignedDigest({ workspace, digestHex: digest, signed: signature });
+  if (!valid) {
+    try {
+      const assertHistoryCurrent = captureSpillAuditorHistory(workspace);
+      valid = verifyOpsPolicyBytes(workspace, bytes, sidecar).valid;
+      assertHistoryCurrent();
+    } catch { valid = false; }
   }
+  if (!valid) throw new Error("spill operations policy signature verification failed");
   return spillWritePolicySchema.parse(YAML.parse(bytes.toString("utf8"))).opsPolicy;
 }
 

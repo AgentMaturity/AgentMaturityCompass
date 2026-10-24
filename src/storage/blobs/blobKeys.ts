@@ -266,11 +266,10 @@ export class BlobKeyPublicationError extends Error {
     super("blob key metadata preparation did not finish; earlier secret and metadata effects may remain", { cause }); this.name = "BlobKeyPublicationError";
   }
 }
-function capturedBlobMetadata(workspace: string, previous: OrgPairsSnapshot) {
-  const bytes = orgPairBytes(previous, blobCurrentKeyPath(workspace));
-  if (bytes === null) return null;
+/** Fixed raw metadata admission. Owned input bytes are never a caller's supplied admission verdict. */
+export function captureBlobMetadataBytes(workspace: string, metadata: Uint8Array, sidecar: Uint8Array | null) {
+  const bytes = Buffer.from(metadata), signatureBytes = sidecar === null ? null : Buffer.from(sidecar);
   const key = blobKeyCurrentSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
-  const signatureBytes = orgPairBytes(previous, blobCurrentKeySigPath(workspace));
   const assertAdmission = () => {
     if (signatureBytes === null) throw new Error("blob key metadata signature missing");
     const raw: unknown = JSON.parse(signatureBytes.toString("utf8"));
@@ -281,6 +280,12 @@ function capturedBlobMetadata(workspace: string, previous: OrgPairsSnapshot) {
       throw new Error("blob key metadata is not authenticated by current config-signature admission");
   };
   assertAdmission(); return { key, assertAdmission };
+}
+function capturedBlobMetadata(workspace: string, previous: OrgPairsSnapshot) {
+  const bytes = orgPairBytes(previous, blobCurrentKeyPath(workspace));
+  if (bytes === null) return null;
+  const signatureBytes = orgPairBytes(previous, blobCurrentKeySigPath(workspace));
+  return captureBlobMetadataBytes(workspace, bytes, signatureBytes);
 }
 function freezeBlobProgress(progress: BlobKeyPublicationProgress): Readonly<BlobKeyPublicationProgress> {
   return Object.freeze({ ...progress, secretWrites: Object.freeze(progress.secretWrites.map(row => Object.freeze({ ...row }))),

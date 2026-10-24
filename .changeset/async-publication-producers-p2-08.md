@@ -367,3 +367,5 @@ Direct notary enablement now prepares its actual artifact-seal trust signature b
 
 
 Compiled tool-policy approval guards now reuse the existing same-byte verified policy reader, accepting genuinely admitted config-purpose policy signatures before applying the unchanged monotonic strength checks. Invalid or missing shared-reader verdicts deny with the existing generic verification message. Source only; executable qualification and PR work remain deferred.
+
+Encrypted-spill reader source proposal: actual clean legacy signature refusals can extend through retained authenticated auditor-history or true-absence checks to the genuine same-byte OPS policy and shared raw blob metadata purpose readers. Original native/schema/digest/legacy failure boundaries, vault material/version access, encryption wire and signed-commit-before-persist behavior remain. This private two-path source proposal is unqualified and unapplied; different concrete review and root fresh scope/current-state admission remain pending. Tests and PRs are deferred.
