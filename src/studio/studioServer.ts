@@ -197,10 +197,10 @@ import { tailTransparencyEntries, verifyTransparencyLog } from "../transparency/
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import {
   currentTransparencyMerkleRoot,
-  exportTransparencyProofBundle,
   listTransparencyMerkleRoots,
   verifyTransparencyMerkle
 } from "../transparency/merkleIndexStore.js";
+import { exportTransparencyProofBundleAsync } from "../transparency/merkleProofPublication.js";
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { writeStudioAuditEvent, writeStudioAuditEventAsync } from "./studioAudit.js";
@@ -8185,11 +8185,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "entryHash is required" });
           return;
         }
-        const out = exportTransparencyProofBundle({
+        const out = await exportTransparencyProofBundleAsync({
           workspace: options.workspace,
           entryHash: parsed.entryHash,
           outFile: `.amc/transparency/proofs/${parsed.entryHash}.amcproof`
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) });
         json(res, 200, out);
         return;
       }

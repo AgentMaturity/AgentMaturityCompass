@@ -447,9 +447,9 @@ import {
   verifyTransparencyLog
 } from "./transparency/logCli.js";
 import {
-  transparencyMerkleProofCli,
-  transparencyMerkleRebuildCli,
-  transparencyMerkleRootCli,
+  transparencyMerkleProofCliAsync,
+  transparencyMerkleRebuildCliAsync,
+  transparencyMerkleRootCliAsync,
   transparencyMerkleVerifyProofCli
 } from "./transparency/transparencyMerkleCli.js";
 import {
@@ -12436,8 +12436,8 @@ transparencyMerkle
   .description("Rebuild Merkle leaves/roots from transparency log")
   .addOption(new Option("--algorithm <algorithm>", "migrate the log's tree (only amc-legacy-v1 to rfc9162-sha256; signs a migration record)")
     .choices(["amc-legacy-v1", "rfc9162-sha256"]))
-  .action((opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
-    const out = transparencyMerkleRebuildCli(process.cwd(), { algorithm: opts.algorithm });
+  .action(async (opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
+    const out = await transparencyMerkleRebuildCliAsync(process.cwd(), { algorithm: opts.algorithm });
     console.log(chalk.green("Transparency Merkle rebuilt"));
     console.log(`algorithm=${out.algorithm}`);
     if (out.migration) console.log(`migration=${out.migration.path} (log entry ${out.migration.entryHash})`);
@@ -12450,8 +12450,8 @@ transparencyMerkle
 transparencyMerkle
   .command("root")
   .description("Show current Merkle root and history")
-  .action(() => {
-    const out = transparencyMerkleRootCli(process.cwd());
+  .action(async () => {
+    const out = await transparencyMerkleRootCliAsync(process.cwd());
     console.log(
       JSON.stringify(
         {
@@ -12470,8 +12470,8 @@ transparencyMerkle
   .description("Export signed inclusion proof bundle for entry hash")
   .requiredOption("--entry-hash <hash>", "transparency entry hash")
   .requiredOption("--out <file>", "output .amcproof file")
-  .action((opts: { entryHash: string; out: string }) => {
-    const out = transparencyMerkleProofCli({
+  .action(async (opts: { entryHash: string; out: string }) => {
+    const out = await transparencyMerkleProofCliAsync({
       workspace: process.cwd(),
       entryHash: opts.entryHash,
       outFile: opts.out

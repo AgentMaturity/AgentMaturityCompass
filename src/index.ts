@@ -839,6 +839,8 @@ export {
   verifyTransparencyProofBundle,
   generateTransparencyInclusionProof
 } from "./transparency/merkleIndexStore.js";
+export { rebuildTransparencyMerkleAsync } from "./transparency/merkleProducerPublication.js";
+export { exportTransparencyProofBundleAsync } from "./transparency/merkleProofPublication.js";
 export {
   federateInitCli,
   federateVerifyCli,
