@@ -397,7 +397,7 @@ import {
 import {
   blobKeyInitCliAsync as blobKeyInitCli,
   blobKeyRotateCliAsync as blobKeyRotateCli,
-  blobsReencryptCli,
+  blobsReencryptCliAsync as blobsReencryptCli,
   blobsVerifyCli
 } from "./storage/blobs/blobCli.js";
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
@@ -9222,8 +9222,8 @@ blobs
   .requiredOption("--from <version>", "source key version")
   .requiredOption("--to <version>", "target key version")
   .option("--limit <n>", "max blobs to process", "1000")
-  .action((opts: { from: string; to: string; limit: string }) => {
-    const result = blobsReencryptCli(process.cwd(), {
+  .action(async (opts: { from: string; to: string; limit: string }) => {
+    const result = await blobsReencryptCli(process.cwd(), {
       fromVersion: Number(opts.from),
       toVersion: Number(opts.to),
       limit: Math.max(1, Number(opts.limit) || 1000)
