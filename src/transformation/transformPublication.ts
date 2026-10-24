@@ -39,10 +39,6 @@ export async function prepareTransformPairs(workspace: string, command: Command,
   for (const row of descriptors) if (row.descriptor.mode === "VAULT") capturePurposePublication(workspace, row.kind === "TRANSFORM_PLAN" ? "config-signature" : "artifact-seal");
   const generation = canonicalize(assertKeysetComplete(workspace)), policy = JSON.stringify(loadTrustConfig(workspace));
   const prepared: Awaited<ReturnType<typeof prepareFileSignatureWithAuditor>>[] = [];
-  for (let index = 0; index < own.length; index += 1) {
-    const row = own[index]!;
-    prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, kinds[index]!));
-  }
   const assertCurrent = () => {
     assertOwnerMode(workspace, command);
     for (const row of descriptors) assertPolicySignerCurrent(workspace, row.descriptor);
@@ -50,6 +46,15 @@ export async function prepareTransformPairs(workspace: string, command: Command,
       throw new Error("original transformation signing authority changed while signing");
     for (const row of prepared) row.assertCurrent();
   };
+  const beforeSign = () => {
+    beforePublish?.(); assertInputsCurrent?.(); assertCurrent(); assertOrgPairsCurrent(before);
+  };
+  for (let index = 0; index < own.length; index += 1) {
+    const row = own[index]!;
+    beforeSign();
+    prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, kinds[index]!, beforeSign));
+    beforeSign();
+  }
   const assertPublished = () => {
     for (let index = 0; index < own.length; index += 1) {
       const row = own[index]!;

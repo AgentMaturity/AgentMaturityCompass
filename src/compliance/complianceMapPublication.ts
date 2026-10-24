@@ -55,6 +55,12 @@ export function publishComplianceMaps(workspace: string, file?: ComplianceMapsFi
 }
 export async function publishComplianceMapsAsync(workspace: string, file?: ComplianceMapsFile, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
   const plan = prepare(workspace, file, options);
-  const prepared = await prepareFileSignatureWithAuditor(workspace, plan.path, plan.bytes, "COMPLIANCE_MAPS");
+  const beforeSign = () => {
+    plan.beforePublish?.();
+    const current = readComplianceMapsPair(plan.path);
+    if (!equal(current.body, plan.previous.body) || !equal(current.sidecar, plan.previous.sidecar))
+      throw new Error("compliance maps pair changed while signing; retry");
+  };
+  const prepared = await prepareFileSignatureWithAuditor(workspace, plan.path, plan.bytes, "COMPLIANCE_MAPS", beforeSign);
   return publish(plan, prepared.signatureBytes, prepared.assertCurrent);
 }

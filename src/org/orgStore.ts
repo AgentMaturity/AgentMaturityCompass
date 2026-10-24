@@ -151,7 +151,13 @@ function publishOrgConfigSync(plan: ReturnType<typeof orgPairPlan>, input: OrgCo
 async function publishOrgConfigAsync(plan: ReturnType<typeof asyncOrgPairPlan>, input: OrgConfig,
   initialize = false): Promise<OrgConfigResult> {
   const config = normalizeOrgConfig(input), bytes = Buffer.from(YAML.stringify(config));
-  const prepared = await prepareFileSignatureWithAuditor(plan.workspace, plan.path, bytes, "BUNDLE");
+  const beforeSign = () => {
+    plan.beforePublish?.(); plan.assertOriginalCurrent();
+    const current = readOrgPair(plan.path);
+    if (!equalOrgFile(current.body, plan.previous.body) || !equalOrgFile(current.sidecar, plan.previous.sidecar))
+      throw new Error("org config pair changed while signing; retry");
+  };
+  const prepared = await prepareFileSignatureWithAuditor(plan.workspace, plan.path, bytes, "BUNDLE", beforeSign);
   return publishOrgPair(plan, config, bytes, prepared.signatureBytes, () => {
     plan.assertOriginalCurrent(); prepared.assertCurrent();
   }, initialize);
