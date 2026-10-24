@@ -251,9 +251,13 @@ export function prepareIntegrationEnqueue(params: EnqueueInput, options: { befor
     const { signWithPurposeKey } = await import("../keys/purposeProviders.js");
     assertCurrent();
     const signatures: Awaited<ReturnType<typeof signWithPurposeKey>>[] = [];
-    for (const row of rows) {
+    const beforeSign = () => {
       assertCurrent();
-      const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(row.bindingDigest, "hex"));
+      for (const signed of signatures) assertPurposePublicationCurrent(input.workspace, captured!, signed);
+    };
+    for (const row of rows) {
+      beforeSign();
+      const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(row.bindingDigest, "hex"), { beforeSign });
       assertCurrent(); assertPurposePublicationCurrent(input.workspace, captured!, signed); signatures.push(signed);
     }
     assertCurrent(); // The opener may create/migrate/scrub the database, before the insert transaction.

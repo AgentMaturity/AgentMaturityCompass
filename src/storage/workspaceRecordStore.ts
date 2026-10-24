@@ -1,3 +1,4 @@
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 /**
  * Durable, signed, hash-chained record store scoped to a workspace.
  *
@@ -162,13 +163,16 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
   if (before.file !== resolve(join(recordDir(root, location), `${ownId}.json`))) throw new Error("workspace record predecessor names another destination");
   // Internal negative-only continuation. It cannot replace this record's captured authority or choose a signer.
   const beforePublish = options.beforePublish; beforePublish?.();
-  const captured = capturePurposePublication(root, "artifact-seal");
+  const captured = capturePurposePublication(root, "artifact-seal"), original = captureRunHashAuthority(root, false);
   const hash = sha256Hex(canonicalize({ ...ownBody, prev_record_hash: before.head }));
-  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
+  const beforeSign = () => withWorkspaceRecordPublicationLock(root, location, () => {
+    beforePublish?.(); original(); assertPredecessorCurrent(root, location, ownId, before);
+  });
+  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"), { beforeSign });
   const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("vault locked; unlock required for workspace record publication"); };
   const assertCurrent = () => {
     beforePublish?.();
-    assertVaultCurrent();
+    assertVaultCurrent(); original();
     assertPurposePublicationCurrent(root, captured, signed);
   };
   assertCurrent();
