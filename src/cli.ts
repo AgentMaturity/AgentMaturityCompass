@@ -394,8 +394,8 @@ import {
   maintenanceVacuumCli
 } from "./ops/maintenance/maintenanceCli.js";
 import {
-  blobKeyInitCli,
-  blobKeyRotateCli,
+  blobKeyInitCliAsync as blobKeyInitCli,
+  blobKeyRotateCliAsync as blobKeyRotateCli,
   blobsReencryptCli,
   blobsVerifyCli
 } from "./storage/blobs/blobCli.js";
@@ -9201,16 +9201,16 @@ const blobKeys = blobs.command("key").description("Blob key management");
 blobKeys
   .command("init")
   .description("Initialize encrypted blob key material")
-  .action(() => {
-    const key = blobKeyInitCli(process.cwd());
+  .action(async () => {
+    const key = await blobKeyInitCli(process.cwd());
     console.log(chalk.green(`Blob key initialized (version ${key.keyVersion})`));
   });
 
 blobKeys
   .command("rotate")
   .description("Rotate encrypted blob key material")
-  .action(() => {
-    const rotated = blobKeyRotateCli(process.cwd());
+  .action(async () => {
+    const rotated = await blobKeyRotateCli(process.cwd());
     console.log(chalk.green(`Blob key rotated: ${rotated.fromVersion} -> ${rotated.toVersion}`));
   });
 

@@ -78,7 +78,7 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
     };
     const assertCurrent = () => { beforePublish?.(); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? previous); };
     assertCurrent();
-    return Object.freeze({ bytes: Buffer.from(bytes), digestSha256, assertCurrent, publish() {
+    return Object.freeze({ bytes: Buffer.from(bytes), digestSha256, assertCurrent, assertSignatureCurrent, publish() {
       return withConfigSignaturePairLock(workspace, () => {
         const signatureBytes = Buffer.from(JSON.stringify({ [field]: digestSha256, signature, signedTs: Date.now(), signer: "auditor" }, null, 2));
         const expected = new Map(previous.members.map(row => [row.path, row]));

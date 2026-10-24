@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { decodeBlobV1, decryptBlobV1, encodeBlobV1, encryptBlobV1 } from "./blobEncryptor.js";
-import { blobV1Dir, ensureBlobKey, readBlobKeyMaterial, rotateBlobKey } from "./blobKeys.js";
+import { blobV1Dir, ensureBlobKey, prepareBlobKeyInitializationAsync, prepareBlobKeyRotationAsync, readBlobKeyMaterial, rotateBlobKey, type BlobKeyPublicationOptions, type BlobKeyPublicationProgress } from "./blobKeys.js";
 import { storeEncryptedBlob, verifyBlobIndexChain } from "./blobStore.js";
 import { verifyBlobStore } from "./blobVerify.js";
 import { appendTransparencyEntry } from "../../transparency/logChain.js";
@@ -147,3 +147,32 @@ export function blobsIndexVerifyCli(workspace: string): { ok: boolean; errors: s
   return verifyBlobIndexChain(workspace);
 }
 
+
+/** Metadata may already be committed when the unchanged local audit suffix refuses or throws. */
+export class BlobKeyAuditIncompleteError extends Error {
+  readonly code = "BLOB_KEY_AUDIT_PARTIAL";
+  constructor(readonly keyVersions: readonly number[], readonly metadataProgress: Readonly<BlobKeyPublicationProgress> | null,
+    readonly auditAttempted: boolean, readonly auditReturned: boolean, cause: unknown) {
+    super("blob key command did not finish its audit/final continuation; metadata and audit effects may remain", { cause }); this.name = "BlobKeyAuditIncompleteError";
+  }
+}
+export async function blobKeyInitCliAsync(workspace: string, options: BlobKeyPublicationOptions = {}): Promise<{ keyVersion: number }> {
+  workspace = resolve(workspace);
+  const caller = options.beforePublish, attempt = await prepareBlobKeyInitializationAsync(workspace, { beforePublish: caller });
+  let auditAttempted = false, auditReturned = false;
+  try {
+    attempt.assertCurrent(); auditAttempted = true;
+    writeAudit(workspace, "BLOB_KEY_ROTATED", { keyVersion: attempt.key.keyVersion, initialized: true }); auditReturned = true;
+    attempt.assertCurrent(); return { keyVersion: attempt.key.keyVersion };
+  } catch (cause) { throw new BlobKeyAuditIncompleteError(Object.freeze([attempt.key.keyVersion]), attempt.progress, auditAttempted, auditReturned, cause); }
+}
+export async function blobKeyRotateCliAsync(workspace: string, options: BlobKeyPublicationOptions = {}): Promise<{ fromVersion: number; toVersion: number }> {
+  workspace = resolve(workspace);
+  const caller = options.beforePublish, attempt = await prepareBlobKeyRotationAsync(workspace, { beforePublish: caller });
+  let auditAttempted = false, auditReturned = false;
+  try {
+    attempt.assertCurrent(); auditAttempted = true;
+    writeAudit(workspace, "BLOB_KEY_ROTATED", { fromVersion: attempt.before.keyVersion, toVersion: attempt.key.keyVersion }); auditReturned = true;
+    attempt.assertCurrent(); return { fromVersion: attempt.before.keyVersion, toVersion: attempt.key.keyVersion };
+  } catch (cause) { throw new BlobKeyAuditIncompleteError(Object.freeze([attempt.before.keyVersion, attempt.key.keyVersion]), attempt.progress, auditAttempted, auditReturned, cause); }
+}
