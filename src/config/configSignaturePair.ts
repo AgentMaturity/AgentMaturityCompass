@@ -20,7 +20,7 @@ function signingEnabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error
 /** Actual original public config-purpose negative. No private probe, unlock, migration, Describe or Sign.
  * Authenticated keyset/revocation reads can record high-water/adoption state; this capture is not globally pure.
  */
-function capturePublicConfigAuthority(workspace: string): () => void {
+export function capturePublicConfigAuthority(workspace: string): () => void {
   signingEnabled();
   const committedMark = () => {
     const mark = keysetCommittedMark(workspace);
