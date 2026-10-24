@@ -13,7 +13,7 @@ import { loadTrustConfig } from "../trust/trustConfig.js";
 import { canonicalize } from "../utils/json.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { appendTransparencyEntryAsync, type TransparencyAppendInput } from "../transparency/asyncWorkspaceAppend.js";
-import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import { dispatchIntegrationEventWithAuthority } from "../integrations/integrationDispatcher.js";
 
 type Command = "transform init" | "transform map apply" | "transform plan" | "transform track" | "transform attest";
 export interface TransformPublicationChecks { beforePublish?: () => void; assertInputsCurrent?: () => void }
@@ -80,7 +80,7 @@ export async function prepareTransformPairs(workspace: string, command: Command,
 /** A later failure cannot undo already published pairs. Dispatch retains its existing best-effort contract. */
 export interface TransformDispatchWarning { phase: "integration-dispatch"; message: string; readonly cause?: unknown }
 export async function finishTransformPublication(prepared: { assertCommittedCurrent(): void }, publishedPaths: readonly string[],
-  log: TransparencyAppendInput, events: readonly Parameters<typeof dispatchIntegrationEvent>[0][] = []): Promise<TransformDispatchWarning[]> {
+  log: TransparencyAppendInput, events: readonly Parameters<typeof dispatchIntegrationEventWithAuthority>[0][] = []): Promise<TransformDispatchWarning[]> {
   const acknowledged = Object.freeze(publishedPaths.map(path => relative(log.workspace, path)));
   let transparencyHash: string | null = null;
   try {
@@ -89,10 +89,13 @@ export async function finishTransformPublication(prepared: { assertCommittedCurr
   } catch (cause) { throw new TransformPublicationError(acknowledged, transparencyHash === null ? "transparency" : "after-transparency", cause, transparencyHash); }
   const warnings: TransformDispatchWarning[] = [];
   for (const event of events) {
+    let authorityRefused = false;
+    const beforeDispatch = () => { try { prepared.assertCommittedCurrent(); } catch (cause) { authorityRefused = true; throw cause; } };
     try {
-      prepared.assertCommittedCurrent(); await dispatchIntegrationEvent(event); prepared.assertCommittedCurrent();
+      beforeDispatch(); await dispatchIntegrationEventWithAuthority(event, beforeDispatch); beforeDispatch();
     } catch (cause) {
-      // Dispatcher has no final actor hook. Its suffix remains a separate integration dependency, never an atomic pair effect.
+      if (authorityRefused) throw new TransformPublicationError(acknowledged, "integration-authority", cause, transparencyHash);
+      // Ordinary dispatch failure remains best effort; original authority refusal retains the already-published paths.
       const warning: TransformDispatchWarning = { phase: "integration-dispatch", message: "integration dispatch unavailable after durable transformation publication; delivery progress may already exist" };
       Object.defineProperty(warning, "cause", { value: cause, enumerable: false }); warnings.push(warning);
     }

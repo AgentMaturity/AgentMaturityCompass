@@ -7,7 +7,7 @@ import { canonicalize } from "../utils/json.js";
 import { valuePolicySchema } from "./valuePolicySchema.js";
 import { valueContractSchema } from "./valueContracts.js";
 import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
-import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import { dispatchIntegrationEventWithAuthority } from "../integrations/integrationDispatcher.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadTrustConfig, checkNotaryTrust } from "../trust/trustConfig.js";
 import { latestAssuranceRun } from "../assurance/assuranceStore.js";
@@ -25,6 +25,14 @@ import {
   prepareValueSnapshotAsync, prepareValueReportAsync
 } from "./valueStore.js";
 import { valueReportSchema, valueSnapshotSchema, type ValueReport, type ValueSnapshot } from "./valueSchema.js";
+
+/** Retain original value authority inside every delivery effect while keeping ordinary integration failure best effort. */
+async function dispatchValueSecondary(event: Parameters<typeof dispatchIntegrationEventWithAuthority>[0], beforeCommit: () => void): Promise<void> {
+  let authorityRefused = false;
+  const original = () => { try { beforeCommit(); } catch (cause) { authorityRefused = true; throw cause; } };
+  try { await dispatchIntegrationEventWithAuthority(event, original); }
+  catch (cause) { if (authorityRefused) throw cause; }
+}
 
 function scopeIdHash(scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): string {
   return sha256Hex(`${scope.type}:${scope.id}`).slice(0, 16);
@@ -272,6 +280,7 @@ async function createValueSnapshotRun(params: {
   };
   const prepared = await prepareValueSnapshotAsync(params.workspace, finalized, { beforePublish, assertInputsCurrent }, snapshotPrevious);
   const saved = prepared.publish(), transparencyHashes: string[] = [];
+  let phase = "snapshot-transparency";
   try {
   prepared.assertCurrent(); const created = await appendTransparencyEntryAsync({
     workspace: params.workspace,
@@ -295,7 +304,8 @@ async function createValueSnapshotRun(params: {
         id: `${scope.type}:${scope.id}`
       }
     }, { beforeCommit: prepared.assertCurrent }); transparencyHashes.push(insufficientEntry.hash);
-    void dispatchIntegrationEvent({
+    phase = "snapshot-integration-dispatch";
+    await dispatchValueSecondary({
       workspace: params.workspace,
       eventName: "VALUE_EVIDENCE_INSUFFICIENT",
       agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -304,10 +314,11 @@ async function createValueSnapshotRun(params: {
         scope,
         reasons: gates.reasons
       }
-    }).catch(() => undefined);
+    }, prepared.assertCurrent);
   }
 
   if (regression.regressed) {
+    phase = "snapshot-transparency";
     prepared.assertCurrent(); const regressionEntry = await appendTransparencyEntryAsync({
       workspace: params.workspace,
       type: "VALUE_REGRESSION_DETECTED",
@@ -318,7 +329,8 @@ async function createValueSnapshotRun(params: {
         id: `${scope.type}:${scope.id}`
       }
     }, { beforeCommit: prepared.assertCurrent }); transparencyHashes.push(regressionEntry.hash);
-    void dispatchIntegrationEvent({
+    phase = "snapshot-integration-dispatch";
+    await dispatchValueSecondary({
       workspace: params.workspace,
       eventName: "VALUE_REGRESSION_DETECTED",
       agentId: scope.type === "AGENT" ? scope.id : "workspace",
@@ -329,11 +341,11 @@ async function createValueSnapshotRun(params: {
         previousValueScore: previousSnapshot?.valueDimensions.valueScore ?? null,
         currentValueScore: finalized.valueDimensions.valueScore
       }
-    }).catch(() => undefined);
+    }, prepared.assertCurrent);
   }
 
   return { result: { snapshot: finalized, saved, transparencyHash: created.hash, regressionDetected: regression.regressed }, assertCurrent: prepared.assertCurrent };
-  } catch (error) { throw new ValueOutputsPartialError([saved.path, saved.sigPath], "snapshot-transparency", error, transparencyHashes); }
+  } catch (error) { throw new ValueOutputsPartialError([saved.path, saved.sigPath], phase, error, transparencyHashes); }
   } catch (error) {
     if (observedPaths.length === 0) throw error;
     throw new ValueOutputsPartialError([...observedPaths, ...(error instanceof ValueOutputsPartialError ? error.publishedPaths : [])],
