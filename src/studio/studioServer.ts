@@ -143,9 +143,9 @@ import {
   studioApprovalDenyInputSchema
 } from "../approvals/approvalStudioService.js";
 import { questionBank } from "../diagnostic/questionBank.js";
-import { loadTargetProfile, saveTargetProfile } from "../targets/targetProfile.js";
+import { loadTargetProfile } from "../targets/targetProfile.js";
 import { simulateTargetWhatIf } from "../simulator/targetWhatIf.js";
-import { createSignedTargetProfile } from "../targets/targetProfile.js";
+import { captureStudioTargetPublication } from "../targets/targetProfilePublication.js";
 import { loadContextGraph } from "../context/contextGraph.js";
 import { exportBenchmarkArtifact } from "../benchmarks/benchExport.js";
 import { ingestBenchmarks } from "../benchmarks/benchImport.js";
@@ -5754,25 +5754,23 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTargetsApplyMatch[1] ?? ""));
+        const targetWorkspace = options.workspace, targetToken = options.token;
+        const humanTarget = humanAuditAuthority(["OWNER"]);
+        const target = captureStudioTargetPublication(targetWorkspace, agentId, () => {
+          if (shuttingDown || options.workspace !== targetWorkspace || resolve(targetWorkspace) !== targetRoot || options.token !== targetToken)
+            throw new Error("original target actor inputs changed");
+          humanTarget();
+          if (shuttingDown || options.workspace !== targetWorkspace || resolve(targetWorkspace) !== targetRoot || options.token !== targetToken)
+            throw new Error("original target actor inputs changed");
+        });
+        const targetRoot = target.workspace; target.observe();
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { mapping?: Record<string, number>; name?: string }) : {};
-        const graph = loadContextGraph(options.workspace, agentId);
+        const graph = loadContextGraph(targetRoot, agentId);
         const contextGraphHash = sha256Hex(JSON.stringify(graph));
         const name = parsed.name ?? "default";
-        const oldTarget = (() => {
-          try {
-            return loadTargetProfile(options.workspace, name, agentId);
-          } catch {
-            return null;
-          }
-        })();
-        const profile = createSignedTargetProfile({
-          workspace: options.workspace,
-          name,
-          contextGraphHash,
-          mapping: parsed.mapping ?? oldTarget?.mapping ?? {}
-        });
-        const targetPath = saveTargetProfile(options.workspace, profile, agentId);
+        const { oldTarget, profile, targetPath } = await target.publish({ name, contextGraphHash, mapping: parsed.mapping });
+        target.assertCurrent();
         const diffHash = sha256Hex(
           JSON.stringify({
             before: oldTarget?.mapping ?? {},
@@ -5780,7 +5778,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })
         );
         const auditA = writeStudioAuditEvent({
-          workspace: options.workspace,
+          workspace: targetRoot,
           auditType: "TARGET_PROFILE_UPDATED",
           severity: "MEDIUM",
           agentId,
@@ -5791,7 +5789,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         });
         const auditB = await writeStudioAuditEventAsync({
-          workspace: options.workspace,
+          workspace: targetRoot,
           auditType: "CONSOLE_TARGET_DRAFT_APPLIED",
           severity: "LOW",
           agentId,
@@ -5800,16 +5798,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             targetPath,
             diffHash
           }
-        }, humanAuditAuthority(["OWNER"]));
+        }, target.assertCurrent);
+        target.assertCurrent();
         try {
           buildDashboard({
-            workspace: options.workspace,
+            workspace: targetRoot,
             agentId,
             outDir: `.amc/agents/${agentId}/dashboard`
           });
         } catch {
           // ignore if no runs yet
         }
+        target.assertCurrent();
         json(res, 200, {
           agentId,
           targetPath,

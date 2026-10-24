@@ -11,6 +11,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { captureTargetWizardPublication } from "./targetProfilePublication.js";
 
 const targetProfileSchema = z.object({
   id: z.string(),
@@ -62,6 +63,16 @@ export function createSignedTargetProfile(params: {
   };
 }
 
+/** Internal maintained compatibility recipe; the original public synchronous APIs remain unchanged. */
+export function createMaintainedCompatibleTargetProfile(params: {
+  workspace: string; name: string; contextGraphHash: string; mapping: Record<string, number>;
+}, beforeSign: () => void): TargetProfile {
+  const payload = targetProfilePayload(params);
+  beforeSign();
+  const signature = signTargetPayload(params.workspace, payload);
+  return { ...payload, signature };
+}
+
 export function saveTargetProfile(workspace: string, profile: TargetProfile, agentId?: string): string {
   ensureDir(targetDir(workspace, agentId));
   const file = targetPath(workspace, profile.name, agentId);
@@ -106,9 +117,12 @@ export async function setTargetProfileInteractive(params: {
   contextGraphHash: string;
   agentId?: string;
 }): Promise<TargetProfile> {
+  const input = { ...params };
+  const target = captureTargetWizardPublication(input.workspace, input.agentId);
   const mapping: Record<string, number> = {};
 
   for (const question of questionBank) {
+    target.observe();
     const response = await inquirer.prompt<{ level: number }>([
       {
         type: "list",
@@ -119,17 +133,12 @@ export async function setTargetProfileInteractive(params: {
       }
     ]);
     mapping[question.id] = response.level;
+    target.observe();
   }
 
-  const profile = createSignedTargetProfile({
-    workspace: params.workspace,
-    name: params.name,
-    contextGraphHash: params.contextGraphHash,
-    mapping
-  });
-
-  saveTargetProfile(params.workspace, profile, params.agentId);
-  return profile;
+  const result = await target.publish({ name: input.name, contextGraphHash: input.contextGraphHash, mapping });
+  target.assertCurrent();
+  return result.profile;
 }
 
 export function diffRunToTarget(report: DiagnosticReport, profile: TargetProfile): Array<{
