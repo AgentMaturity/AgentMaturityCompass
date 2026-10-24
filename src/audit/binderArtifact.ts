@@ -9,7 +9,7 @@ import { scanBinderForPii } from "./binderRedaction.js";
 import type { signBinderJson } from "./binderSigner.js";
 import type { AuditBinderJson } from "./binderSchema.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
-export { createAuditBinderArtifact } from "./binderArtifactAsync.js";
+export { createAuditBinderArtifact, createAuditBinderArtifactAttempt, type AuditBinderArtifactAttempt } from "./binderArtifactAsync.js";
 
 const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
   maxEntries: 10_000,

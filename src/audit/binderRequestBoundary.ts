@@ -41,7 +41,7 @@ export function captureBinderFulfillment(workspace: string, requestId: string, a
     if (!verified.ok) throw new Error("audit fulfillment approval is not executable");
     assertOriginal(); selected.assertCurrent(); assertOrgPairsCurrent(before);
   };
-  assertCurrent(); return { request, assertCurrent, assertOutputsSafe(paths: readonly string[]) {
+  assertCurrent(); return { request, pending: structuredClone(pending), assertCurrent, assertPendingCurrent: () => assertOrgPairsCurrent(before), assertOutputsSafe(paths: readonly string[]) {
     selected.assertOutputsSafe(paths); captureAuditOutputAliases(paths, [path])();
   } };
 }

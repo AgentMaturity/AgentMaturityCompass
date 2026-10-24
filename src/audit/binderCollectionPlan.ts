@@ -28,7 +28,9 @@ export function captureAuditBinderPolicies(workspace: string, includeBuiltin: bo
   const policy = auditPolicySchema.parse(YAML.parse(checked(policyPath, "BUNDLE").toString("utf8")) as unknown);
   const map = auditMapSchema.parse(YAML.parse(checked(mapPath, "COMPLIANCE_MAPS").toString("utf8")) as unknown);
   if (includeBuiltin) checked(builtinPath, "COMPLIANCE_MAPS");
-  return { policy, map, inputPaths: Object.freeze(before.members.map(row => row.path)), assertCurrent: () => assertOrgPairsCurrent(before) };
+  return { policy, map, inputPaths: Object.freeze(before.members.map(row => row.path)), assertCurrent() {
+    assertOrgPairsCurrent(before); checked(policyPath, "BUNDLE"); checked(mapPath, "COMPLIANCE_MAPS"); if (includeBuiltin) checked(builtinPath, "COMPLIANCE_MAPS"); assertOrgPairsCurrent(before);
+  } };
 }
 /** All local facts/selected window rows are observed before the first actual notary await. */
 export function prepareAuditBinderCollection(input: AuditBinderCollectionInput, assertOriginal: () => void, includeProofs: boolean) {

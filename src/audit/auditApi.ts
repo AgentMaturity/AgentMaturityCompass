@@ -1,4 +1,5 @@
 import { captureAuditOutputAliases } from "./binderOutputAliases.js";
+import { fulfillAuditEvidenceRequestAsync } from "./evidenceRequestFulfillment.js";
 import { captureAuditPolicyMapPublication, AuditPolicyMapPublicationError, verifyAuditMapSelection } from "./auditPolicyMapPublication.js";
 import { defaultAuditMapBuiltin } from "./auditMapBuiltin.js";
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
@@ -6,7 +7,7 @@ import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js"
 import { KeyProviderError } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { captureOrgFiles, orgPairBytes, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
-import { captureAuditApiAuthority, captureBinderEvidenceRequest, captureBinderFulfillment, AuditBinderExecutionError } from "./binderRequestBoundary.js";
+import { captureAuditApiAuthority, captureBinderEvidenceRequest, AuditBinderExecutionError } from "./binderRequestBoundary.js";
 import { AuditBinderPublicationError, type AuditPublicationOptions } from "./binderPublication.js";
 import { randomUUID } from "node:crypto";
 import { join, relative, resolve } from "node:path";
@@ -46,7 +47,7 @@ import { loadBinderCache } from "./binderStore.js";
 import {
   createAuditEvidenceRequest, createAuditEvidenceRequestAsync,
   listAuditEvidenceRequests,
-  markAuditEvidenceRequestFulfilled,
+
   rejectAuditEvidenceRequest, rejectAuditEvidenceRequestAsync,
   requestAuditEvidenceApproval
 } from "./evidenceRequests.js";
@@ -533,43 +534,9 @@ export async function auditRequestFulfillForApi(params: {
   requestId: string;
   outFile?: string | null;
 }, options: AuditPublicationOptions = {}) {
-  try {
-  params = { ...params }; options = { ...options };
-  const original = captureAuditApiAuthority(params.workspace, options), selected = captureBinderFulfillment(params.workspace, params.requestId, original);
-  const request = selected.request;
-  const scope = parseScope({
-    scopeType: request.scope.type,
-    scopeId: request.scope.id
-  });
-  const outFile = params.outFile?.trim() || defaultAuditPublicationPath({
-    workspace: params.workspace,
-    scopeType: scope.scopeType,
-    scopeId: scope.scopeId
-  });
-  const created = await createAuditBinderArtifact({
-    workspace: params.workspace,
-    scopeType: scope.scopeType,
-    scopeId: scope.scopeId,
-    outFile: resolve(params.workspace, outFile),
-    request
-  }, { beforePublish: selected.assertCurrent, assertInputsCurrent: options.assertInputsCurrent, assertPreparationInputsCurrent: options.assertPreparationInputsCurrent,
-    assertOutputsSafe: paths => { options.assertOutputsSafe?.(paths); selected.assertOutputsSafe(paths); } });
-  try {
-  selected.assertCurrent();
-  const fulfilled = markAuditEvidenceRequestFulfilled({
-    workspace: params.workspace,
-    requestId: request.requestId,
-    binderSha256: created.sha256
-  });
-  return {
-    request: fulfilled.request,
-    approvalRequestId: fulfilled.approvalRequestId,
-    export: created
-  };
-  } catch (cause) { throw new AuditBinderExecutionError("request-fulfillment", { outFile: created.outFile, sha256: created.sha256 }, null, false, cause); }
-  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+  try { return await fulfillAuditEvidenceRequestAsync({ ...params }, { ...options }); }
+  catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
     throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
-
 }
 
 export function auditSchedulerStatusForApi(workspace: string) {
