@@ -67,8 +67,11 @@ export function writeOrgScorecard(workspace: string, scorecard: OrgScorecard): W
 export async function prepareOrgScorecardAsync(workspace: string, scorecard: OrgScorecard, options: OrgEffectOptions = {}) {
   const copied = structuredClone(scorecard), beforePublish = options.beforePublish;
   const assertAuthority = captureOrgScorecardAuthority(workspace, beforePublish), plan = scorecardPlan(workspace, copied);
-  const latest = await prepareFileSignatureWithAuditor(workspace, plan.latestPath, plan.payload, "ORG_SCORECARD");
-  const history = await prepareFileSignatureWithAuditor(workspace, plan.historyPath, plan.payload, "ORG_SCORECARD");
+  const beforeSign = () => { assertAuthority(); assertOrgPairsCurrent(plan.previous); };
+  const latest = await prepareFileSignatureWithAuditor(workspace, plan.latestPath, plan.payload, "ORG_SCORECARD", beforeSign);
+  const beforeHistorySign = () => { beforeSign(); latest.assertCurrent(); };
+  beforeHistorySign();
+  const history = await prepareFileSignatureWithAuditor(workspace, plan.historyPath, plan.payload, "ORG_SCORECARD", beforeHistorySign);
   let published: ReturnType<typeof captureOrgPairs> | null = null;
   const assertCurrent = () => {
     assertAuthority(); latest.assertCurrent(); history.assertCurrent();
