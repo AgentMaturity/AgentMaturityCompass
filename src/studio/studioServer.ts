@@ -232,11 +232,10 @@ import {
   experimentSetCandidateCli
 } from "../experiments/experimentCli.js";
 import {
-  addOrgNode,
-  assignAgentToNode,
+  addOrgNodeAsync,
+  assignAgentToNodeAsync,
   loadOrgConfig,
-  saveOrgConfig,
-  unassignAgentFromNode,
+  unassignAgentFromNodeAsync,
   verifyOrgConfigSignature
 } from "../org/orgStore.js";
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
@@ -2786,13 +2785,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "invalid node type" });
           return;
         }
-        const saved = addOrgNode({
+        const saved = await addOrgNodeAsync({
           workspace: options.workspace,
           id: parsed.id,
           type: type as "ENTERPRISE" | "TEAM" | "FUNCTION" | "PROCESS" | "ECOSYSTEM",
           name: parsed.name,
           parentId: parsed.parentId ?? null
-        });
+        }, { beforePublish: signingAuthority(["OWNER"]) });
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_NODE_ADDED",
@@ -2838,12 +2837,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
-        const saved = assignAgentToNode({
+        const saved = await assignAgentToNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId,
           weight: parsed.weight ?? 1
-        });
+        }, { beforePublish: signingAuthority(["OWNER"]) });
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_ASSIGNED",
@@ -2890,11 +2889,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
-        const saved = unassignAgentFromNode({
+        const saved = await unassignAgentFromNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId
-        });
+        }, { beforePublish: signingAuthority(["OWNER"]) });
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_UNASSIGNED",

@@ -1,15 +1,15 @@
 import { dirname, resolve } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { parseWindowToMs } from "../utils/time.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { computeOrgScorecard, recomputeAndPersistOrgScorecard, scorecardNodeComparison } from "./orgEngine.js";
 import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "./orgCommitments.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown } from "./orgReports.js";
 import {
-  addOrgNode,
-  assignAgentToNode,
-  initOrgConfig,
-  loadOrgConfig,
-  unassignAgentFromNode,
+  addOrgNode, addOrgNodeAsync,
+  assignAgentToNode, assignAgentToNodeAsync,
+  initOrgConfig, initOrgConfigAsync,
+  unassignAgentFromNode, unassignAgentFromNodeAsync,
   verifyOrgConfigSignature
 } from "./orgStore.js";
 import type { OrgNodeType } from "./orgSchema.js";
@@ -21,10 +21,7 @@ export function orgInitCli(params: {
   path: string;
   sigPath: string;
 } {
-  return initOrgConfig(params.workspace, params.enterpriseName ? {
-    ...loadOrgConfig(params.workspace),
-    enterpriseName: params.enterpriseName
-  } : undefined);
+  return initOrgConfig(params.workspace, undefined, { enterpriseName: params.enterpriseName });
 }
 
 export function orgVerifyCli(workspace: string): ReturnType<typeof verifyOrgConfigSignature> {
@@ -77,6 +74,28 @@ export function orgUnassignCli(params: {
     path: out.path,
     sigPath: out.sigPath
   };
+}
+
+// These maintained CLI adapters retain the existing command keys at entry and immediately before publication.
+function orgOwnerContinuation(workspace: string, command: "org init" | "org add node" | "org assign" | "org unassign") {
+  const beforePublish = () => assertOwnerMode(workspace, command);
+  beforePublish(); return { beforePublish };
+}
+export async function orgInitCliAsync(params: Parameters<typeof orgInitCli>[0]): Promise<ReturnType<typeof orgInitCli>> {
+  const input = { ...params }, options = orgOwnerContinuation(input.workspace, "org init");
+  return initOrgConfigAsync(input.workspace, undefined, { ...options, enterpriseName: input.enterpriseName });
+}
+export async function orgAddNodeCliAsync(params: Parameters<typeof orgAddNodeCli>[0]): Promise<ReturnType<typeof orgAddNodeCli>> {
+  const input = { ...params }, out = await addOrgNodeAsync(input, orgOwnerContinuation(input.workspace, "org add node"));
+  return { path: out.path, sigPath: out.sigPath };
+}
+export async function orgAssignCliAsync(params: Parameters<typeof orgAssignCli>[0]): Promise<ReturnType<typeof orgAssignCli>> {
+  const input = { ...params }, out = await assignAgentToNodeAsync(input, orgOwnerContinuation(input.workspace, "org assign"));
+  return { path: out.path, sigPath: out.sigPath };
+}
+export async function orgUnassignCliAsync(params: Parameters<typeof orgUnassignCli>[0]): Promise<ReturnType<typeof orgUnassignCli>> {
+  const input = { ...params }, out = await unassignAgentFromNodeAsync(input, orgOwnerContinuation(input.workspace, "org unassign"));
+  return { path: out.path, sigPath: out.sigPath };
 }
 
 export function orgScoreCli(params: {

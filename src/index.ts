@@ -1046,13 +1046,13 @@ export type {
 } from "./ops/circuitBreaker.js";
 export {
   defaultOrgConfig,
-  initOrgConfig,
+  initOrgConfig, initOrgConfigAsync,
   loadOrgConfig,
-  saveOrgConfig,
+  saveOrgConfig, saveOrgConfigAsync,
   verifyOrgConfigSignature,
-  addOrgNode,
-  assignAgentToNode,
-  unassignAgentFromNode
+  addOrgNode, addOrgNodeAsync,
+  assignAgentToNode, assignAgentToNodeAsync,
+  unassignAgentFromNode, unassignAgentFromNodeAsync
 } from "./org/orgStore.js";
 export {
   computeOrgScorecard,
@@ -1069,11 +1069,11 @@ export {
 } from "./org/orgScorecard.js";
 export { OrgSseHub } from "./org/orgSse.js";
 export {
-  orgInitCli,
+  orgInitCli, orgInitCliAsync,
   orgVerifyCli,
-  orgAddNodeCli,
-  orgAssignCli,
-  orgUnassignCli,
+  orgAddNodeCli, orgAddNodeCliAsync,
+  orgAssignCli, orgAssignCliAsync,
+  orgUnassignCli, orgUnassignCliAsync,
   orgScoreCli,
   orgReportCli,
   orgCompareCli,

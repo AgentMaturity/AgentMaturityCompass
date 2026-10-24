@@ -49,3 +49,5 @@ Add checked asynchronous DAG and governance-lineage SDK producers, preserving ra
 Prepare the human-action aggregate signature before file publication and await maintained Studio secondary audits. Preserve compact seal signing and pretty stored bytes, verify captured exact-purpose signatures, refuse partial predecessors, and retain primary effects with truthful secondary publication failures.
 
 Prepare retention archive signatures before destructive phases, await maintained CLI and Studio publication, preserve original authority and exact selected state, contain managed blob reads/removal, and report actual archive, pruning and log partial progress.
+
+Add prepared asynchronous organization config editing through maintained CLI, Studio and SDK callers. Authenticate captured read-modify-write pairs, retain original signing and caller authority, and compare exact targets before body/sidecar publication; report partial member writes without claiming rollback.

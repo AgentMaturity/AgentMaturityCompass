@@ -590,16 +590,16 @@ import {
 } from "./experiments/experimentGatePolicy.js";
 import { experimentGateSchema } from "./experiments/experimentSchema.js";
 import {
-  orgAddNodeCli,
-  orgAssignCli,
+  orgAddNodeCliAsync,
+  orgAssignCliAsync,
   orgCommitCli,
   orgCompareCli,
-  orgInitCli,
+  orgInitCliAsync,
   orgLearnCli,
   orgOwnCli,
   orgReportCli,
   orgScoreCli,
-  orgUnassignCli,
+  orgUnassignCliAsync,
   orgVerifyCli
 } from "./org/orgCli.js";
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "./org/orgRun.js";
@@ -16834,8 +16834,8 @@ org
 org
   .command("init")
   .option("--enterprise <name>", "enterprise display name", "AMC Enterprise")
-  .action((opts: { enterprise: string }) => {
-    const out = orgInitCli({
+  .action(async (opts: { enterprise: string }) => {
+    const out = await orgInitCliAsync({
       workspace: process.cwd(),
       enterpriseName: opts.enterprise
     });
@@ -16862,13 +16862,13 @@ org
   .requiredOption("--id <id>", "node ID")
   .requiredOption("--name <name>", "node name")
   .option("--parent <id>", "parent node ID")
-  .action((opts: { type: string; id: string; name: string; parent?: string }) => {
+  .action(async (opts: { type: string; id: string; name: string; parent?: string }) => {
     const allowed = new Set(["ENTERPRISE", "TEAM", "FUNCTION", "PROCESS", "ECOSYSTEM"]);
     const type = opts.type.toUpperCase();
     if (!allowed.has(type)) {
       throw new Error(`Invalid node type: ${opts.type}`);
     }
-    const out = orgAddNodeCli({
+    const out = await orgAddNodeCliAsync({
       workspace: process.cwd(),
       id: opts.id,
       type: type as "ENTERPRISE" | "TEAM" | "FUNCTION" | "PROCESS" | "ECOSYSTEM",
@@ -16885,8 +16885,8 @@ org
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--node <id>", "node ID")
   .option("--weight <n>", "membership weight", "1")
-  .action((opts: { agent: string; node: string; weight: string }) => {
-    const out = orgAssignCli({
+  .action(async (opts: { agent: string; node: string; weight: string }) => {
+    const out = await orgAssignCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       nodeId: opts.node,
@@ -16901,8 +16901,8 @@ org
   .command("unassign")
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--node <id>", "node ID")
-  .action((opts: { agent: string; node: string }) => {
-    const out = orgUnassignCli({
+  .action(async (opts: { agent: string; node: string }) => {
+    const out = await orgUnassignCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       nodeId: opts.node
