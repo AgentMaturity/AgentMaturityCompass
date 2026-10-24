@@ -118,7 +118,7 @@ import {
   recordIncidentClockEvent
 } from "./incidents/incidentClockEvents.js";
 import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
-import { oversightRecordPath, readOversightRecords, recordWorkspaceOversight } from "./incidents/oversightRecord.js";
+import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsync, workspaceOversightPublicKeys } from "./incidents/oversightRecord.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
@@ -7967,7 +7967,7 @@ incident
         const packet = buildEvidencePacket({
           incident: found, station, generatedTs, clocks, transitions, causalEdges: edges,
           oversightRecords: readOversightRecords(oversightRecordPath(workspace, id)),
-          oversightPublicKeys: getPublicKeyHistory(workspace, "auditor")
+          oversightPublicKeys: workspaceOversightPublicKeys(workspace)
         });
         const dir = resolve(workspace, opts.packet);
         mkdirSync(dir, { recursive: true });
@@ -8206,30 +8206,22 @@ incident
   .requiredOption("--reviewer <id>", "reviewer id, stored as stated")
   .requiredOption("--rationale <text>", "why the reviewer decided this")
   .option("--clock <clockId...>", "clock ids the decision covers")
-  .action((id: string, opts: { decision: string; reviewer: string; rationale: string; clock?: string[] }) => {
+  .action(async (id: string, opts: { decision: string; reviewer: string; rationale: string; clock?: string[] }) => {
     const workspace = process.cwd();
-    const ledger = openLedger(workspace);
-    try {
-      const store = createIncidentStore(ledger.db);
-      store.initTables();
-      const found = store.getIncident(id);
-      if (!found) {
-        console.log(chalk.red(`Incident not found: ${id}`));
-        process.exit(1);
-        return;
-      }
-      const record = recordWorkspaceOversight({
-        workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
-        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getSigningKey(workspace, "artifact-seal"),
-        publicKeys: getPublicKeyHistory(workspace, "auditor")
-      });
-      console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
-      console.log(`recordHash=${record.recordHash}`);
-      console.log(`file=${oversightRecordPath(workspace, id)}`);
-      console.log(chalk.gray("Signed with this workspace's auditor key and chained to the file's verified records: a local audit trail of which workspace wrote it, not proof of who reviewed."));
-    } finally {
-      ledger.close();
-    }
+    const found = (() => {
+      const ledger = openLedger(workspace);
+      try { const store = createIncidentStore(ledger.db); store.initTables(); return store.getIncident(id); }
+      finally { ledger.close(); }
+    })();
+    if (!found) { console.log(chalk.red(`Incident not found: ${id}`)); process.exit(1); return; }
+    const record = await recordWorkspaceOversightAsync({
+      workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
+      clockIds: opts.clock ?? [], reviewedTs: Date.now()
+    });
+    console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
+    console.log(`recordHash=${record.recordHash}`);
+    console.log(`file=${oversightRecordPath(workspace, id)}`);
+    console.log(chalk.gray("Signed with this workspace's auditor key and chained to the file's verified records: a local audit trail of which workspace wrote it, not proof of who reviewed."));
   });
 
 ops

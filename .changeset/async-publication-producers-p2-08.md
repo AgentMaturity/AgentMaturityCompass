@@ -51,3 +51,5 @@ Prepare the human-action aggregate signature before file publication and await m
 Prepare retention archive signatures before destructive phases, await maintained CLI and Studio publication, preserve original authority and exact selected state, contain managed blob reads/removal, and report actual archive, pruning and log partial progress.
 
 Add prepared asynchronous organization config editing through maintained CLI, Studio and SDK callers. Authenticate captured read-modify-write pairs, retain original signing and caller authority, and compare exact targets before body/sidecar publication; report partial member writes without claiming rollback.
+
+Prepare Studio console snapshots and stored-incident oversight signatures before publication, preserve existing raw formats and explicit unsigned diagnostic preflight, recheck current callers and exact target state after callbacks, and retain native partial-publication truth.

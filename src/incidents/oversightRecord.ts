@@ -1,7 +1,7 @@
 /**
  * Human-oversight record for an incident: who reviewed it, when, and what they
- * decided. Signed with the same Ed25519 digest-signing primitive the incident
- * store uses (src/crypto/keys.ts), bound to the incident hash, and chained by
+ * decided. Signed over the same raw32 digest as the explicit-private compatibility API
+ * (src/crypto/keys.ts); async workspace calls use the checked artifact-purpose signer, bound to the incident hash, and chained by
  * prevRecordHash. Storage is an append-only JSONL file; the receipts chain
  * (src/receipts/receiptChain.ts) is being rewritten by another session, so this
  * module does not depend on it.
@@ -16,16 +16,23 @@
  * workspace's own auditor key history: a local audit trail that exposes edits,
  * deletions and reordering by anyone without that key, not who reviewed.
  */
+import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { signHexDigest, verifyHexDigestAny, getPublicKeyPem } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { IncidentInputError, MAX_FUTURE_SKEW_MS } from "./incidentClockEvents.js";
 import type { Incident } from "./incidentTypes.js";
 import { REGULATORY_CLOCK_TABLE } from "./regulatoryClocksTable.js";
+import { createIncidentStore } from "./incidentStore.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 
 export type OversightDecision =
   | "ACKNOWLEDGED"
@@ -92,7 +99,7 @@ export function computeOversightRecordHash(record: OversightPayload): string {
   return sha256Hex(canonicalize(payloadOf(record)));
 }
 
-export function createOversightRecord(input: CreateOversightRecordInput): HumanOversightRecord {
+function prepareOversightRecord(input: Omit<CreateOversightRecordInput, "privateKeyPem">): Omit<HumanOversightRecord, "signature"> {
   const reviewerId = input.reviewerId.trim();
   const rationale = input.rationale.trim();
   if (!reviewerId) throw new Error("oversight record requires a non-empty reviewerId");
@@ -125,7 +132,12 @@ export function createOversightRecord(input: CreateOversightRecordInput): HumanO
     prevRecordHash: input.prevRecordHash ?? null
   };
   const recordHash = computeOversightRecordHash(payload);
-  return { ...payload, recordHash, signature: signHexDigest(recordHash, input.privateKeyPem) };
+  return { ...payload, recordHash };
+}
+
+export function createOversightRecord(input: CreateOversightRecordInput): HumanOversightRecord {
+  const record = prepareOversightRecord(input);
+  return { ...record, signature: signHexDigest(record.recordHash, input.privateKeyPem) };
 }
 
 export function verifyOversightRecord(
@@ -192,14 +204,23 @@ export function oversightRecordPath(workspace: string, incidentId: string): stri
   return join(workspace, ".amc", "incidents", "oversight", `${incidentId}.jsonl`);
 }
 
-export function appendOversightRecord(filePath: string, record: HumanOversightRecord): void {
+function withOversightLock<T>(filePath: string, operation: () => T): T {
+  return withControlFileLock({ root: dirname(filePath), name: "oversight-record", operation });
+}
+function appendUnlocked(filePath: string, record: HumanOversightRecord): void {
   mkdirSync(dirname(filePath), { recursive: true });
   appendFileSync(filePath, `${JSON.stringify(record)}\n`, "utf8");
 }
+export function appendOversightRecord(filePath: string, record: HumanOversightRecord): void {
+  withOversightLock(filePath, () => appendUnlocked(filePath, record));
+}
 
-export function readOversightRecords(filePath: string): HumanOversightRecord[] {
-  if (!existsSync(filePath)) return [];
-  const lines = readFileSync(filePath, "utf8").split("\n").filter((line) => line.trim().length > 0);
+function readOversightBytes(filePath: string): Buffer | null {
+  return existsSync(filePath) ? readFileSync(filePath) : null;
+}
+function parseOversightRecords(filePath: string, bytes: Buffer | null): HumanOversightRecord[] {
+  if (bytes === null) return [];
+  const lines = bytes.toString("utf8").split("\n").filter((line) => line.trim().length > 0);
   return lines.map((line, index) => {
     const parsed = JSON.parse(line) as Partial<HumanOversightRecord>;
     if (parsed.v !== 1 || typeof parsed.recordId !== "string" || typeof parsed.recordHash !== "string") {
@@ -208,6 +229,11 @@ export function readOversightRecords(filePath: string): HumanOversightRecord[] {
     return parsed as HumanOversightRecord;
   });
 }
+
+export function readOversightRecords(filePath: string): HumanOversightRecord[] {
+  return parseOversightRecords(filePath, readOversightBytes(filePath));
+}
+const sameBytes = (a: Buffer | null, b: Buffer | null) => a === null ? b === null : b !== null && a.equals(b);
 
 export interface RecordWorkspaceOversightInput {
   workspace: string;
@@ -241,7 +267,8 @@ export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): 
   const unknown = input.clockIds.filter((clockId) => !REGULATORY_CLOCK_TABLE.some((clock) => clock.clockId === clockId));
   if (unknown.length > 0) throw new IncidentInputError(`unknown clock id: ${unknown.join(", ")}`);
   const path = oversightRecordPath(input.workspace, input.incident.incidentId);
-  const existing = readOversightRecords(path);
+  const before = readOversightBytes(path);
+  const existing = parseOversightRecords(path, before);
   const chain = verifyOversightChain(existing, input.incident, input.publicKeys);
   if (!chain.ok) throw new Error(`refusing to append: ${path} failed verification: ${chain.errors.join("; ")}`);
   const previous = existing.at(-1);
@@ -259,6 +286,79 @@ export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): 
     privateKeyPem: input.privateKeyPem,
     now: input.now
   });
-  appendOversightRecord(path, record);
+  withOversightLock(path, () => {
+    if (!sameBytes(readOversightBytes(path), before)) throw new Error("oversight records changed while signing was prepared; retry");
+    appendUnlocked(path, record);
+  });
+  return record;
+}
+
+
+/** Exact artifact-purpose history; only authenticated explicit legacy imports supplement an unbound workspace. */
+export function workspaceOversightPublicKeys(workspace: string): string[] {
+  assertKeysetComplete(workspace);
+  const keys = getPurposeKeyHistory(workspace, "artifact-seal");
+  if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
+    const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+    keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+  }
+  return [...new Set(keys)];
+}
+export type RecordWorkspaceOversightAsyncInput = Omit<RecordWorkspaceOversightInput, "privateKeyPem" | "publicKeys"> & { beforePublish?: () => void };
+export class OversightPublicationError extends Error {
+  readonly code = "OVERSIGHT_PUBLICATION_INCOMPLETE";
+  constructor(readonly recordHash: string, readonly appendAttempted: boolean, readonly appended: boolean, cause: unknown) {
+    super("Oversight publication did not complete", { cause }); this.name = "OversightPublicationError";
+  }
+}
+const usedIncident = (incident: Incident | undefined) => incident === undefined ? null : canonicalize({
+  incidentId: incident.incidentId, incident_hash: incident.incident_hash, createdTs: incident.createdTs
+});
+function assertStoredIncident(db: Database.Database, incident: Incident): void {
+  if (usedIncident(createIncidentStore(db).getIncident(incident.incidentId)) !== usedIncident(incident))
+    throw new IncidentInputError("stored incident signing facts changed or are unavailable; retry");
+}
+
+/** Actual stored incident producer: no connection, transaction or file lock crosses the checked signing await. */
+export async function recordWorkspaceOversightAsync(supplied: RecordWorkspaceOversightAsyncInput): Promise<HumanOversightRecord> {
+  const input = { ...supplied, incident: structuredClone(supplied.incident), clockIds: [...supplied.clockIds] };
+  assertOwnerMode(input.workspace, "incident oversight");
+  if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) throw new IncidentInputError("unknown oversight decision");
+  if (!input.reviewerId.trim() || !input.rationale.trim()) throw new IncidentInputError("reviewer and rationale must not be empty");
+  if (input.clockIds.some(id => !REGULATORY_CLOCK_TABLE.some(clock => clock.clockId === id))) throw new IncidentInputError("unknown clock id");
+  const database = join(input.workspace, ".amc", "evidence.sqlite"), path = oversightRecordPath(input.workspace, input.incident.incidentId);
+  const read = new Database(database, { readonly: true, fileMustExist: true, timeout: 0 });
+  try { assertStoredIncident(read, input.incident); } finally { read.close(); }
+  const before = readOversightBytes(path), records = parseOversightRecords(path, before);
+  if (!verifyOversightChain(records, input.incident, workspaceOversightPublicKeys(input.workspace)).ok)
+    throw new IncidentInputError("existing oversight records failed verification");
+  const previous = records.at(-1);
+  if (previous && input.reviewedTs < previous.reviewedTs) throw new IncidentInputError("reviewedTs precedes the last record");
+  const prepared = prepareOversightRecord({ ...input, decision: input.decision as OversightDecision, prevRecordHash: previous?.recordHash ?? null });
+  const captured = capturePurposePublication(input.workspace, "artifact-seal");
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(prepared.recordHash, "hex"));
+  const record = { ...prepared, signature: signed.signature.toString("base64") };
+  let db: Database.Database | undefined, appendAttempted = false, appended = false, failed = false, failure: unknown;
+  try {
+    db = new Database(database, { fileMustExist: true, timeout: 0 }); db.exec("BEGIN IMMEDIATE");
+    assertStoredIncident(db, input.incident);
+    withOversightLock(path, () => {
+      input.beforePublish?.();
+      assertOwnerMode(input.workspace, "incident oversight");
+      assertPurposePublicationCurrent(input.workspace, captured, signed);
+      if (!sameBytes(readOversightBytes(path), before)) throw new IncidentInputError("oversight records changed while signing was prepared; retry");
+      appendAttempted = true; appendUnlocked(path, record); appended = true;
+    });
+    db.exec("COMMIT");
+  } catch (cause) {
+    failed = true; failure = cause;
+    try { if (db?.inTransaction) db.exec("ROLLBACK"); } catch (rollback) { failure = new AggregateError([cause, rollback], "Oversight SQL cleanup did not complete"); }
+  } finally {
+    try { db?.close(); } catch (close) { failure = failed ? new AggregateError([failure, close], "Oversight connection cleanup did not complete") : close; failed = true; }
+  }
+  if (failed) {
+    if (appendAttempted) throw new OversightPublicationError(record.recordHash, appendAttempted, appended, failure);
+    throw failure;
+  }
   return record;
 }

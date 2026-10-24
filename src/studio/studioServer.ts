@@ -111,6 +111,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSHOT_UNAVAILABLE } from "./consoleSnapshot.js";
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
 import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
@@ -1324,11 +1325,20 @@ function agentLastStatus(workspace: string, agentId: string): AgentStatusRespons
 }
 
 
-function writeConsoleSnapshot(workspace: string): {
-  path: string;
-  sigPath: string | null;
-  payload: Record<string, unknown>;
-} {
+function currentSigningAuthority(req: IncomingMessage, res: ServerResponse, workspace: string, token: string,
+  initial: NonNullable<ReturnType<typeof authenticate>>, requested: UserRole[]) {
+  const roles = [...requested], expected = { isAdmin: initial.isAdmin, userId: initial.userId, agentId: initial.agentId };
+  return () => {
+    const current = authenticate(req, workspace, token);
+    if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) {
+      if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" });
+      throw new Error("authenticated authority changed while signing");
+    }
+    if (!requireRoles({ auth: current, res, workspace, roles })) throw new Error("authenticated authority changed while signing");
+  };
+}
+
+async function writeConsoleSnapshot(workspace: string, beforePublish: () => void) {
   const state = readStudioState(workspace);
   const agents = listAgents(workspace).map((agent) => agent.id);
   if (!agents.includes("default")) {
@@ -1351,32 +1361,7 @@ function writeConsoleSnapshot(workspace: string): {
       : { running: false },
     agents: agentSummaries
   };
-  const studioDir = join(workspace, ".amc", "studio");
-  const path = join(studioDir, "console-snapshot.json");
-  const sigPath = `${path}.sig`;
-  ensureDir(studioDir);
-  writeFileAtomic(path, JSON.stringify(payload, null, 2), 0o644);
-  try {
-    const digest = sha256Hex(Buffer.from(JSON.stringify(payload), "utf8"));
-    const sig = {
-      digestSha256: digest,
-      signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
-      signedTs: Date.now(),
-      signer: "auditor"
-    };
-    writeFileAtomic(sigPath, JSON.stringify(sig, null, 2), 0o644);
-    return {
-      path,
-      sigPath,
-      payload
-    };
-  } catch {
-    return {
-      path,
-      sigPath: null,
-      payload
-    };
-  }
+  return publishConsoleSnapshotAsync(workspace, payload, beforePublish);
 }
 
 function pickAgentApproval(workspace: string, approvalId: string): { agentId: string; approval: ReturnType<typeof loadApprovalRequestRecord> } | null {
@@ -1717,12 +1702,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
           return;
         }
-        const snapshot = writeConsoleSnapshot(options.workspace);
-        json(res, 200, {
-          ...snapshot.payload,
-          snapshotPath: snapshot.path,
-          signaturePath: snapshot.sigPath
-        });
+        try {
+          const snapshot = await writeConsoleSnapshot(options.workspace, currentSigningAuthority(req, res, options.workspace, options.token, auth,
+            ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
+          json(res, 200, { ...snapshot.payload, snapshotPath: snapshot.path, signaturePath: snapshot.sigPath });
+        } catch (error) {
+          if (!res.headersSent) json(res, consoleSnapshotErrorStatus(error), { error: "Console snapshot unavailable", code: CONSOLE_SNAPSHOT_UNAVAILABLE });
+        }
         return;
       }
 
@@ -2161,13 +2147,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
-      const signingAuthority = (requested: UserRole[]) => {
-        const roles = [...requested], expected = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
-        return () => {
-          const current = authenticate(req, options.workspace, options.token);
-          if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) { if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" }); throw new Error("authenticated authority changed while signing"); }
-          if (!requireRoles({ auth: current, res, workspace: options.workspace, roles })) throw new Error("authenticated authority changed while signing");
-        };
+      const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
+      const refreshConsole = async () => {
+        const recheck = signingAuthority(["OWNER"]);
+        try { await writeConsoleSnapshot(options.workspace, recheck); return {}; }
+        catch {
+          if (res.headersSent) return null;
+          try { recheck(); } catch (error) { if (res.headersSent) return null; throw error; }
+          return { warning: { code: CONSOLE_SNAPSHOT_UNAVAILABLE } };
+        }
       };
       const assertUsersMutationAuthorized = createUsersMutationGuard({ workspace: options.workspace, expected: auth,
         authenticate: () => authenticate(req, options.workspace, options.token), access: accessContext, readOnly: () => requiresReadOnlyMode(options.workspace) });
@@ -8420,8 +8408,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         });
         const currentAgent = resolveAgentId(options.workspace);
         recomputeOrgAndEmit(eventType, orgNodeIdsForAgent(currentAgent));
-        writeConsoleSnapshot(options.workspace);
-        json(res, 200, executed);
+        const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
+        json(res, 200, { ...executed, ...snapshotStatus });
         return;
       }
 
@@ -8632,10 +8620,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         }, humanAuditAuthority(["OWNER"]));
         recomputeOrgAndEmit("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
-        writeConsoleSnapshot(options.workspace);
-        json(res, 200, {
-          applied
-        });
+        const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
+        json(res, 200, { applied, ...snapshotStatus });
         return;
       }
 
