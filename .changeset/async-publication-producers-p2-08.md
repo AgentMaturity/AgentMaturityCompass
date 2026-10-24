@@ -45,3 +45,5 @@ Await both rollback-pack signatures in the maintained CLI and SDK, retaining ori
 Admit committed receipt authority in ActionJournal reads and writes, separate receipt-purpose tokens from ledger-row signatures, verify selected signed event preimages, and recheck live signing refusal on each transition while retaining the existing synchronous API and legacy pruning compatibility.
 
 Add checked asynchronous DAG and governance-lineage SDK producers, preserving raw digest signatures and synchronous compatibility while checking original authority, selected predecessors, and atomic intent links before publication.
+
+Prepare the human-action aggregate signature before file publication and await maintained Studio secondary audits. Preserve compact seal signing and pretty stored bytes, verify captured exact-purpose signatures, refuse partial predecessors, and retain primary effects with truthful secondary publication failures.

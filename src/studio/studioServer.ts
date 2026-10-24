@@ -179,7 +179,7 @@ import {
   revokeSessionByToken,
   sessionFromRequest,
   setSessionCookie,
-  verifyUsersConfigSignature
+  verifyUsersConfigSignature, verifyTrackedSessionToken
 } from "../auth/authApi.js";
 import { parseCookieHeader } from "../auth/sessionTokens.js";
 import { enforceRoleOrAdmin, hasAnyRole, type AccessContext } from "../auth/rbac.js";
@@ -201,7 +201,7 @@ import {
 } from "../transparency/merkleIndexStore.js";
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
-import { appendHumanActionEvent } from "../auth/humanLog.js";
+import { writeStudioAuditEvent, writeStudioAuditEventAsync } from "./studioAudit.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
 import { complianceFleetReportCli } from "../compliance/complianceCli.js";
@@ -1324,102 +1324,6 @@ function agentLastStatus(workspace: string, agentId: string): AgentStatusRespons
   };
 }
 
-function writeStudioAuditEvent(params: {
-  workspace: string;
-  auditType: string;
-  severity?: "LOW" | "MEDIUM" | "HIGH";
-  agentId?: string;
-  payload: Record<string, unknown>;
-}): {
-  eventId: string;
-  receiptId: string;
-} {
-  const humanType = (() => {
-    if (params.auditType === "HUMAN_LOGIN_SUCCESS") return "HUMAN_LOGIN_SUCCESS";
-    if (params.auditType === "HUMAN_LOGIN_FAILED") return "HUMAN_LOGIN_FAILED";
-    if (params.auditType === "APPROVAL_DECIDED" || params.auditType === "CONSOLE_APPROVAL_DECIDED") return "HUMAN_APPROVAL_DECISION";
-    if (params.auditType === "CONSOLE_TARGET_DRAFT_APPLIED") return "HUMAN_TARGET_APPLY";
-    if (params.auditType === "POLICY_PACK_APPLIED" || params.auditType === "HUMAN_POLICY_PACK_APPLY") return "HUMAN_POLICY_PACK_APPLY";
-    if (params.auditType === "HUMAN_FREEZE_LIFT") return "HUMAN_FREEZE_LIFT";
-    if (params.auditType.startsWith("OPS_")) return "HUMAN_OPS_ACTION";
-    if (params.auditType.startsWith("ORG_")) return "HUMAN_ORG_ACTION";
-    return null;
-  })();
-  if (humanType) {
-    try {
-      appendHumanActionEvent({
-        workspace: params.workspace,
-        type: humanType,
-        agentId: params.agentId ?? null,
-        username: typeof params.payload.username === "string" ? params.payload.username : null,
-        payload: params.payload
-      });
-    } catch {
-      // Do not fail primary audit path if human log append fails.
-    }
-  }
-  const ledger = openLedger(params.workspace);
-  const sessionId = `studio-audit-${Date.now()}`;
-  const body = JSON.stringify({
-    auditType: params.auditType,
-    severity: params.severity ?? "MEDIUM",
-    ...params.payload
-  });
-  const bodySha = sha256Hex(Buffer.from(body, "utf8"));
-  try {
-    ledger.startSession({
-      sessionId,
-      runtime: "unknown",
-      binaryPath: "amc-studio",
-      binarySha256: "amc-studio"
-    });
-    const out = ledger.appendEvidenceWithReceipt({
-      sessionId,
-      runtime: "unknown",
-      eventType: "audit",
-      payload: body,
-      payloadExt: "json",
-      inline: true,
-      meta: {
-        auditType: params.auditType,
-        severity: params.severity ?? "MEDIUM",
-        trustTier: "OBSERVED",
-        bodySha256: bodySha,
-        ...(params.agentId ? { agentId: params.agentId } : {}),
-        ...params.payload
-      },
-      receipt: {
-        kind: "guard_check",
-        agentId: params.agentId ?? "unknown",
-        providerId: "unknown",
-        model: null,
-        bodySha256: bodySha
-      }
-    });
-    ledger.sealSession(sessionId);
-    // Fire-and-forget integration routing for deterministic ops hooks.
-    if (params.auditType !== "INTEGRATION_DISPATCHED") {
-      void dispatchIntegrationEvent({
-        workspace: params.workspace,
-        eventName: params.auditType,
-        agentId: params.agentId ?? "system",
-        summary: `AMC audit event ${params.auditType}`,
-        details: {
-          source: "studio-audit",
-          auditEventId: out.id
-        }
-      }).catch(() => {
-        // Integration channel failures must not block core audit persistence.
-      });
-    }
-    return {
-      eventId: out.id,
-      receiptId: out.receiptId
-    };
-  } finally {
-    ledger.close();
-  }
-}
 
 function writeConsoleSnapshot(workspace: string): {
   path: string;
@@ -2041,7 +1945,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           password: parsed.password
         });
         if (!authUser.ok || !authUser.user) {
-          writeStudioAuditEvent({
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "HUMAN_LOGIN_FAILED",
             severity: "MEDIUM",
@@ -2058,7 +1962,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         });
         const maxAgeSec = Math.max(60, Math.floor((session.payload.expiresTs - Date.now()) / 1000));
         setSessionCookie(res, session.token, maxAgeSec, "/", requestUsesHttps(req));
-        writeStudioAuditEvent({
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_LOGIN_SUCCESS",
           severity: "LOW",
@@ -2067,7 +1971,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             username: authUser.user.username,
             roles: authUser.user.roles
           }
-        });
+        }, () => { if (!verifyTrackedSessionToken({ workspace: options.workspace, token: session.token }).ok) throw new Error("issued login session is no longer current"); });
         json(res, 200, {
           ok: true,
           user: {
@@ -2268,6 +2172,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       };
       const assertUsersMutationAuthorized = createUsersMutationGuard({ workspace: options.workspace, expected: auth,
         authenticate: () => authenticate(req, options.workspace, options.token), access: accessContext, readOnly: () => requiresReadOnlyMode(options.workspace) });
+      const humanAuditAuthority = (requested: UserRole[], needsVault = false) => {
+        const roles = [...requested], expected = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
+        return () => {
+          const current = authenticate(req, options.workspace, options.token);
+          if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) throw new Error("human audit actor changed");
+          const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: roles,
+            usersConfigValid: verifyUsersConfigSignature(options.workspace).valid || current.sessionAuthSource === "WORKSPACE_ROUTER" });
+          if (!check.ok || requiresReadOnlyMode(options.workspace) || (needsVault && !vaultStatus(options.workspace).unlocked)) throw new Error("human audit actor is no longer authorized");
+        };
+      };
       const requireUnlockedVaultForSigning = (): boolean => {
         if (vaultStatus(options.workspace).unlocked) return true;
         json(res, 423, { error: "vault locked; unlock required for signing" });
@@ -2600,7 +2514,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         setRetentionSegmentsMetric(retentionStatusCli(options.workspace).segmentCount);
         setBlobMetrics(stats.blobs.count, stats.blobs.bytes);
         setDbSizeMetric(stats.dbSizeBytes);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_RETENTION_RUN",
           severity: "MEDIUM",
@@ -2612,7 +2526,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             prunedBlobCount: result.prunedBlobCount,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2646,7 +2560,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         setRetentionSegmentsMetric(stats.archive.segmentCount);
         setBlobMetrics(stats.blobs.count, stats.blobs.bytes);
         setDbSizeMetric(stats.dbSizeBytes);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_MAINTENANCE_VACUUM",
           severity: "LOW",
@@ -2654,7 +2568,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             lastVacuumTs: result.lastVacuumTs,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2672,7 +2586,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const result = maintenancePruneCacheCli(options.workspace);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_MAINTENANCE_PRUNE",
           severity: "LOW",
@@ -2682,7 +2596,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             removedGenericCacheFiles: result.removedGenericCacheFiles.length,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2762,7 +2676,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           source: "studio",
           command: "Studio org run"
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_RUN_CREATED",
           severity: result.artifact.status === "completed" ? "LOW" : "MEDIUM",
@@ -2771,7 +2685,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             roleCount: result.artifact.summary.roleCount,
             status: result.artifact.status
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         emitOrgEvent("ORG_RUN_CREATED");
         json(res, 201, {
           ...result,
@@ -2825,7 +2739,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           window: parsed.window ?? "14d"
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_SCORECARD_UPDATED",
           severity: "LOW",
@@ -2834,7 +2748,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             latestPath: out.latestPath,
             latestSigPath: out.latestSigPath
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitOrgEvent("ORG_SCORECARD_UPDATED");
         json(res, 200, {
           ...out,
@@ -2874,7 +2788,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           name: parsed.name,
           parentId: parsed.parentId ?? null
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_NODE_ADDED",
           severity: "LOW",
@@ -2882,7 +2796,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeId: parsed.id,
             nodeType: type
           }
-        });
+        }, humanAuditAuthority(["OWNER"], true));
         appendTransparencyEntry({
           workspace: options.workspace,
           type: "ORG_CONFIG_UPDATED",
@@ -2925,7 +2839,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           nodeId: parsed.nodeId,
           weight: parsed.weight ?? 1
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_ASSIGNED",
           severity: "LOW",
@@ -2934,7 +2848,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeId: parsed.nodeId,
             weight: parsed.weight ?? 1
           }
-        });
+        }, humanAuditAuthority(["OWNER"], true));
         appendTransparencyEntry({
           workspace: options.workspace,
           type: "ORG_CONFIG_UPDATED",
@@ -2976,7 +2890,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           agentId: parsed.agentId,
           nodeId: parsed.nodeId
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_UNASSIGNED",
           severity: "LOW",
@@ -2984,7 +2898,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             agentId: parsed.agentId,
             nodeId: parsed.nodeId
           }
-        });
+        }, humanAuditAuthority(["OWNER"], true));
         appendTransparencyEntry({
           workspace: options.workspace,
           type: "ORG_CONFIG_UPDATED",
@@ -3090,7 +3004,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               nodeId: parsed.nodeId,
               days: parsed.days === 14 || parsed.days === 30 || parsed.days === 90 ? parsed.days : 30
             });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_COMMITMENT_GENERATED",
           severity: "LOW",
@@ -3099,7 +3013,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             kind,
             outPath: out.outPath
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitOrgEvent("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
         json(res, 200, {
           ...out,
@@ -5815,7 +5729,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             diffHash
           }
         });
-        const auditB = writeStudioAuditEvent({
+        const auditB = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "CONSOLE_TARGET_DRAFT_APPLIED",
           severity: "LOW",
@@ -5825,7 +5739,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             targetPath,
             diffHash
           }
-        });
+        }, humanAuditAuthority(["OWNER"]));
         try {
           buildDashboard({
             workspace: options.workspace,
@@ -8703,7 +8617,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
           packId
         });
-        writeStudioAuditEvent({
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_POLICY_PACK_APPLY",
           severity: "LOW",
@@ -8712,7 +8626,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             packId: applied.packId,
             transparencyHash: applied.transparencyHash
           }
-        });
+        }, humanAuditAuthority(["OWNER"]));
         recomputeOrgAndEmit("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
         writeConsoleSnapshot(options.workspace);
         json(res, 200, {
