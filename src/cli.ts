@@ -341,6 +341,7 @@ import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/a
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
 import { exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
+import { assertBenchmarkExportOwnerMode } from "./benchmarks/benchCli.js";
 import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
@@ -17710,6 +17711,7 @@ benchmark
   .option("--public-agent-id <id>", "public agent id override")
   .action(async (opts: { agent: string; run: string; out: string; publisher?: string; publicAgentId?: string }) => {
     const workspace = process.cwd();
+    assertBenchmarkExportOwnerMode(workspace);
     const out = await exportBenchmarkArtifactAsync({
       workspace,
       agentId: opts.agent,
@@ -17717,7 +17719,7 @@ benchmark
       outFile: opts.out,
       publisherOrgName: opts.publisher,
       publicAgentId: opts.publicAgentId ?? null
-    }, { beforePublish: () => assertOwnerMode(workspace, "benchmark export") });
+    }, { beforePublish: () => assertBenchmarkExportOwnerMode(workspace) });
     console.log(chalk.green(`Benchmark exported: ${out.outFile}`));
   });
 
