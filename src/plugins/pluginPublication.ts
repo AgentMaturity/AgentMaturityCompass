@@ -10,6 +10,8 @@ import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy, 
 import { signingPurposeForKind, type SignKind, type SignedDigest } from "../crypto/signing/signerTypes.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { captureOrgPairsAuthority } from "../org/preparedOrgPairs.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
 import { signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
 import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
@@ -105,11 +107,12 @@ class PluginInitializationPublicationError extends Error {
     this.name = "PluginInitializationPublicationError";
   }
 }
-function publish(workspace: string, plan: Plan, signatures: SignedDigest[], ownerCommand: "plugin init" | null): void {
+function publish(workspace: string, plan: Plan, signatures: SignedDigest[], ownerCommand: "plugin init" | null, beforeOutput?: () => void): void {
   withPluginPublicationLock(workspace, () => {
     if (ownerCommand !== null) assertOwnerMode(workspace, ownerCommand);
     if (stamp(state(workspace)) !== stamp(plan.before)) throw new Error("plugin initialization inputs changed while signatures were prepared; retry");
     plan.targets.forEach((item, index) => current(workspace, item.authority, signatures[index]!));
+    beforeOutput?.();
     ensureDir(join(workspace, BASE, "installed")); ensureDir(join(workspace, BASE, "pending"));
     const published: string[] = [];
     try {
@@ -127,8 +130,32 @@ export function initializePluginFiles(workspace: string, registries: PluginRegis
 }
 export async function initializePluginFilesAsync(workspace: string, registries: PluginRegistryConfig, emptyLock: InstalledPluginsLock): Promise<PluginInitializationResult> {
   const plan = prepare(workspace, registries, emptyLock), signatures: SignedDigest[] = [];
-  for (const item of plan.targets) signatures.push(await signDigestWithPolicyAsync({ workspace, kind: item.kind, digestHex: sha256Hex(item.bytes), expectedSigner: item.authority.descriptor }));
-  publish(workspace, plan, signatures, "plugin init"); return result(workspace);
+  // Capture both actual missing-pair purposes before either signature can yield. Existing pairs need admission, not new signing authority.
+  const keyset = plan.targets.length === 0 ? null : canonicalize(assertKeysetComplete(workspace));
+  const original = plan.targets.map(item => item.kind === "BUNDLE" ? captureOrgPairsAuthority(workspace)
+    : item.authority.descriptor.mode === "VAULT" ? captureConfigSignatureAuthority(workspace).assertCurrent : null);
+  const assertBeforeOutput = () => {
+    assertOwnerMode(workspace, "plugin init");
+    if (keyset !== null && canonicalize(assertKeysetComplete(workspace)) !== keyset)
+      throw new Error("original plugin initialization key set changed while signing");
+    plan.targets.forEach((item, index) => {
+      assertPolicySignerCurrent(workspace, item.authority.descriptor); original[index]?.();
+      if (item.authority.captured !== null && canonicalize(assertKeysetComplete(workspace)) !== item.authority.captured.keyset)
+        throw new Error("original plugin initialization purpose generation changed while signing");
+    });
+    for (const [rel, kind] of [[REG, "BUNDLE"], [LOCK, "INSTALLED_LOCK"]] as const) {
+      const body = plan.before.get(rel)!, sidecar = plan.before.get(`${rel}.sig`)!;
+      if (body !== null && !verifyPluginSignedBytes(workspace, rel, kind, body, sidecar).valid)
+        throw new Error("plugin initialization existing signed pair is no longer admitted");
+    }
+    signatures.forEach((signed, index) => current(workspace, plan.targets[index]!.authority, signed));
+    if (stamp(state(workspace)) !== stamp(plan.before)) throw new Error("plugin initialization inputs changed while signatures were prepared; retry");
+  };
+  const beforeSign = () => withPluginPublicationLock(workspace, assertBeforeOutput);
+  for (const item of plan.targets) signatures.push(await signDigestWithPolicyAsync({ workspace, kind: item.kind,
+    digestHex: sha256Hex(item.bytes), expectedSigner: item.authority.descriptor, beforeSign }));
+  // This old-plan gate is preparation-only: publication never replays it after replacing one of its own members.
+  publish(workspace, plan, signatures, "plugin init", assertBeforeOutput); return result(workspace);
 }
 
 /** Existing synchronous compatibility saves sign before replacing either member, then join the same publication lock. */
