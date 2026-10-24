@@ -153,23 +153,30 @@ export function updateWorkspaceRecord<T extends Record<string, unknown>>(
 /** Internal prepared writer consumed by actual family publishers, never a remote Sign inside a file lock or SQL transaction. */
 export async function prepareWorkspaceRecordAsync<T extends Record<string, unknown>>(
   workspace: string, at: RecordLocation, id: string, body: T, now: number,
-  predecessor?: WorkspaceRecordPredecessor
-): Promise<{ publish(): T & RecordEnvelope }> {
+  predecessor?: WorkspaceRecordPredecessor,
+  options: { beforePublish?: () => void } = {}
+): Promise<{ assertCurrent(): void; publish(): T & RecordEnvelope }> {
   const root = resolve(workspace), location = { area: [...at.area], kind: at.kind }, ownId = id, ownBody = structuredClone(body), storedTs = now;
   const prior = predecessor ?? captureWorkspaceRecordPredecessor(root, location, ownId);
   const before = { file: prior.file, head: prior.head, target: prior.target === null ? null : Buffer.from(prior.target) };
   if (before.file !== resolve(join(recordDir(root, location), `${ownId}.json`))) throw new Error("workspace record predecessor names another destination");
+  // Internal negative-only continuation. It cannot replace this record's captured authority or choose a signer.
+  const beforePublish = options.beforePublish; beforePublish?.();
   const captured = capturePurposePublication(root, "artifact-seal");
   const hash = sha256Hex(canonicalize({ ...ownBody, prev_record_hash: before.head }));
   const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
   const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("vault locked; unlock required for workspace record publication"); };
-  assertVaultCurrent();
+  const assertCurrent = () => {
+    beforePublish?.();
+    assertVaultCurrent();
+    assertPurposePublicationCurrent(root, captured, signed);
+  };
+  assertCurrent();
   const record = { ...ownBody, prev_record_hash: before.head, record_hash: hash,
     signature: signed.signature.toString("base64"), storedTs } as T & RecordEnvelope;
   const bytes = JSON.stringify(record, null, 2);
-  return Object.freeze({ publish(): T & RecordEnvelope {
-    assertVaultCurrent();
-    assertPurposePublicationCurrent(root, captured, signed);
+  return Object.freeze({ assertCurrent, publish(): T & RecordEnvelope {
+    assertCurrent();
     assertPredecessorCurrent(root, location, ownId, before);
     ensureDir(recordDir(root, location));
     writeFileAtomic(before.file, bytes, 0o644);

@@ -18694,7 +18694,7 @@ program
   .option("--description <desc>", "experiment description", "")
   .action(async (opts: { kind: string; name: string; model: string; description: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const experiment = lab.createLabExperiment({
+    const experiment = await lab.createLabExperimentAsync({
       kind: opts.kind as never,
       name: opts.name,
       description: opts.description || `${opts.kind} experiment on ${opts.model}`,
@@ -18711,7 +18711,7 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const results = lab.simulateExperiment(opts.experiment, process.cwd());
+    const results = await lab.simulateExperimentAsync(opts.experiment, process.cwd());
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
       process.exitCode = 1;
