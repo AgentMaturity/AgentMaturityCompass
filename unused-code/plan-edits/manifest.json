@@ -17,6 +17,13 @@
       "sha256": "f1aaf94001038ab59a7e8713c8fbd7e7076a8bcbb9a8f5b44138b35411138043"
     },
     {
+      "path": "dist/runtime/firewall.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/runtime/firewall.d.ts.landed",
+      "sha256": "b9d0d6ea421896588b78b7b7dc5c6afe3529209d06b0a7031642f7875e162527"
+    },
+    {
       "path": "dist/sdk/nativeAgentClient.d.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -288,6 +295,13 @@
       "baseCommit": "29118e02e5ae3c1ea46d2df04a7dc4838134a852",
       "archivePath": "unused-code/plan-edits/P2-01/src/drift/alerts.ts.landed",
       "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a"
+    },
+    {
+      "path": "src/enforce/guardrailControlState.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/enforce/guardrailControlState.ts.landed",
+      "sha256": "fae71491ec4db25ba4c5969e84bb81249f6a8b3dbc23eb9f2be5854858647486"
     },
     {
       "path": "src/enforce/resourceManifest.ts",
@@ -568,6 +582,13 @@
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
       "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPolicyStore.ts.landed",
       "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
+    },
+    {
+      "path": "src/runtime/firewall.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/runtime/firewall.ts.landed",
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
     },
     {
       "path": "src/sdk/nativeAgentClient.ts",
