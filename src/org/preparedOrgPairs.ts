@@ -118,7 +118,8 @@ export function publishOrgPairs(workspace: string, writes: readonly OrgPairWrite
 export async function prepareOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   const beforePublish = captureOrgPairsAuthority(workspace, options.beforePublish), assertInputsCurrent = options.assertInputsCurrent;
   beforePublish(); const planned = plan(writes, previous), prepared = [];
-  for (const row of planned.own) { beforePublish(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE")); beforePublish(); }
+  const beforeSign = () => { beforePublish(); assertInputsCurrent?.(); beforePublish(); };
+  for (const row of planned.own) { beforeSign(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE", beforeSign)); beforePublish(); }
   let published = false;
   const assertCurrent = () => { beforePublish?.(); for (const row of prepared) row.assertCurrent();
     if (published) for (let index = 0; index < planned.own.length; index += 1) {

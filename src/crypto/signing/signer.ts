@@ -365,8 +365,9 @@ export function assertPolicySignerCurrent(workspace: string, expected: PolicySig
   assertPolicySignerNotRefused(workspace, expected.kind, expected.fingerprint);
 }
 
-export async function signDigestWithPolicyAsync(input: PolicySignInput): Promise<SignedDigest> {
+export async function signDigestWithPolicyAsync(input: PolicySignInput & { beforeSign?: () => void }): Promise<SignedDigest> {
   if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  const beforeSign = input.beforeSign; beforeSign?.();
   const params = { workspace: input.workspace, kind: input.kind, digestHex: input.digestHex,
     ...(input.expectedSigner === undefined ? {} : { expectedSigner: { ...input.expectedSigner } }) };
   assertSha256HexDigest(params.digestHex);
@@ -376,8 +377,12 @@ export async function signDigestWithPolicyAsync(input: PolicySignInput): Promise
     throw new Error("policy signing response does not match the signer described in signed metadata");
   }
   const policy = JSON.stringify(loadTrustConfig(params.workspace));
-  const signed = selected.mode === "VAULT" ? await signDigestWithPurpose(params) : await (async () => {
-    const prepared = prepareNotarySigning(params);
+  const current = () => {
+    beforeSign?.(); assertPolicySignerCurrent(params.workspace, selected);
+    if (JSON.stringify(loadTrustConfig(params.workspace)) !== policy) throw new Error("policy signing state changed before Sign");
+  };
+  const signed = selected.mode === "VAULT" ? await signDigestWithPurpose({ ...params, beforeSign: current }) : await (async () => {
+    const prepared = prepareNotarySigning(params); current();
     return acceptNotarySigning(params, prepared, await postNotaryAsync(params.workspace, prepared.request));
   })();
   // The original descriptor and complete enforcement policy remain authoritative after the remote wait.

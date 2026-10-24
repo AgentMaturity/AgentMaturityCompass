@@ -177,10 +177,12 @@ export async function signPurposeRevocationList(workspace: string, list: Revocat
 }
 
 /** Signs `message` with the purpose's key wherever it lives; the signature is checked against that key before it is returned. */
-export async function signWithPurposeKey(workspace: string, purpose: KeyPurpose, message: Uint8Array, opts: { provider?: KeyProvider } = {}): Promise<PurposeSignature> {
-  const bytes = Buffer.from(message);
-  const { provider, description, recheck } = await purposeSigner(workspace, assertLocal(purpose), opts.provider);
-  recheck(); // The outer await is a separate continuation before the real Sign.
+export async function signWithPurposeKey(workspace: string, purpose: KeyPurpose, message: Uint8Array, opts: { provider?: KeyProvider; beforeSign?: () => void } = {}): Promise<PurposeSignature> {
+  const bytes = Buffer.from(message), beforeSign = opts.beforeSign, providerOverride = opts.provider;
+  beforeSign?.();
+  const { provider, description, recheck } = await purposeSigner(workspace, assertLocal(purpose), providerOverride);
+  beforeSign?.(); // A trusted negative continuation after Describe, immediately before checked Sign.
+  recheck(); // Caller cannot replace the original purpose/ref/policy or locked-state gate.
   const signature = await signChecked(provider, description, bytes);
   recheck();
   return { provider: description.ref.provider, algorithm: description.algorithm, keyId: description.keyId, publicKeyPem: description.publicKeyPem, signature };
