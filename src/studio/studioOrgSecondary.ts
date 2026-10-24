@@ -12,7 +12,7 @@ import { vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
-/** The six unconverted callers retain their synchronous, best-effort recipe and event order. */
+/** The two unconverted callers retain their synchronous, best-effort recipe and event order. */
 export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["type"], nodeIds: string[] | undefined,
   emitOrgEvent: EmitOrgEvent): void {
   try {
@@ -65,13 +65,13 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
   return { workspace, assertCurrent };
 }
 
-/** The eleven converted routes consume this optional secondary attempt.
+/** The fifteen converted callers consume this optional secondary attempt.
  * Capture refusal stays private and best-effort; it cannot send a response or authorize the primary operation. */
 export function captureStudioOrgSecondary(workspace: string, actor: () => void, emitOrgEvent: EmitOrgEvent) {
   let original: ReturnType<typeof captureSecondaryAuthority> | null = null, captureFailure: unknown;
   try { original = captureSecondaryAuthority(workspace, actor); }
   catch (error) { captureFailure = error; }
-  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED" | "BENCHMARK_INGESTED" | "PLUGIN_INSTALL_REQUESTED" | "PLUGIN_INTEGRITY_BROKEN" | "PLUGIN_INSTALLED" | "PLUGIN_UPGRADED" | "PLUGIN_REMOVED" | "POLICY_PACK_APPLIED", nodeIds?: string[]): Promise<void> {
+  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED" | "BENCHMARK_INGESTED" | "PLUGIN_INSTALL_REQUESTED" | "PLUGIN_INTEGRITY_BROKEN" | "PLUGIN_INSTALLED" | "PLUGIN_UPGRADED" | "PLUGIN_REMOVED" | "POLICY_PACK_APPLIED" | "OUTCOMES_UPDATED", nodeIds?: string[]): Promise<void> {
     const ids = nodeIds === undefined ? undefined : [...nodeIds];
     try {
       if (original === null) throw captureFailure;
@@ -84,4 +84,19 @@ export function captureStudioOrgSecondary(workspace: string, actor: () => void, 
     emitOrgEvent(type, ids);
     emitOrgEvent("ORG_SCORECARD_UPDATED", ids);
   } };
+}
+
+/** Per-server lifetime tracker for only the four post-response outcome org promises. */
+export function createStudioOutcomeOrgWork() {
+  const pending = new Set<Promise<void>>();
+  return {
+    track(work: Promise<void>): Promise<void> {
+      pending.add(work);
+      void work.then(() => pending.delete(work), () => pending.delete(work));
+      return work;
+    },
+    snapshot() { return [...pending]; },
+    hasPending() { return pending.size > 0; },
+    waitCurrent() { return Promise.allSettled([...pending]); }
+  };
 }

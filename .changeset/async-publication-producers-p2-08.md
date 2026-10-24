@@ -292,3 +292,6 @@ Forward the existing trusted Studio revalidation callback through the two adapte
 
 
 Add a fixed mature workspace initializer continuation for an already marked, admitted signing cohort. Original options, context, target intent, generation, public policy and native expectations survive the real adapter/canon/bank/budget prefix, core publication and late best-effort AMC sidecar. Retained unsupported and unsigned entries keep their existing options and path spelling; unsigned selection performs no new committed-mark read. Fixed native members retain actual opened staging inode acknowledgments and separate failure causes. Fresh/locked/missing-tail/private-session and larger initializer-to-score flows remain unfinished; executable qualification is deferred.
+
+
+Feedback/outcome routes retain their actual chosen session or HMAC authority for optional awaited org recompute after the original response. Webhook continuation rereads only the genuine selected ref/material without fallback or unlock; session rules stay admin or OWNER/OPERATOR. A per-server set tracks those four genuine promises and shutdown drains them before closing score stores. Earlier body/private eligibility and broader primary shutdown limits remain explicit. Primary ingestion, SELF_REPORTED status, JSON-before-org and notification order remain.

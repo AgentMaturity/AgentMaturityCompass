@@ -100,7 +100,7 @@ import {
 } from "./studioState.js";
 import { agentExecuteClassCheck, scopeRefusal } from "./agentTokenScopeGuard.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { vaultStatus } from "../vault/vault.js";
+import { getVaultSecret, vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
@@ -243,7 +243,7 @@ import {
 } from "../org/orgStore.js";
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
 import { computeOrgScorecard, nodeHierarchy } from "../org/orgEngine.js";
-import { captureStudioOrgSecondary, recomputeStudioOrgLegacy } from "./studioOrgSecondary.js";
+import { captureStudioOrgSecondary, createStudioOutcomeOrgWork, recomputeStudioOrgLegacy } from "./studioOrgSecondary.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
 import { generateOrgEocAsync, recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
 import { prepareOrgConfigUpdateLog } from "../org/orgPublication.js";
@@ -1115,7 +1115,7 @@ function hmacHeaderValue(req: IncomingMessage): string | null {
   return null;
 }
 
-function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"): string | null {
+function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"): { ref: string; secret: string } | null {
   const refs =
     kind === "feedback"
       ? ["vault:integrations/feedback-webhook", "vault:integrations/ops-webhook"]
@@ -1124,7 +1124,7 @@ function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"):
     try {
       const secret = resolveSecretRef(workspace, ref);
       if (secret && secret.length > 0) {
-        return secret;
+        return { ref, secret };
       }
     } catch {
       // ignore and try fallback ref
@@ -1486,7 +1486,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
-  let shuttingDown = false;
+  let shuttingDown = false; const outcomeOrgWork = createStudioOutcomeOrgWork();
   const integrationQueueWork = new Set<Promise<void>>();
   const drainIntegrationQueue = (): void => {
     const work = drainDueIntegrationDeliveriesWithAuthority({ workspace: options.workspace }, () => {
@@ -2038,7 +2038,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const canIngestAsOperator =
           sessionAuth && (sessionAuth.isAdmin || hasAnyRole([...sessionAuth.roles], ["OWNER", "OPERATOR"]));
         if (canIngestAsOperator) {
-          const ingested = ingestFeedbackOutcome({
+          const orgSourceWorkspace = options.workspace, orgWorkspace = resolve(orgSourceWorkspace), orgToken = options.token, orgIdentity = { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original outcome workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgSourceWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId || !(current.isAdmin || hasAnyRole([...current.roles], ["OWNER", "OPERATOR"]))) throw new Error("original outcome session authority changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestFeedbackOutcome({
             workspace: options.workspace,
             payload,
             attestationKind: "self_attested"
@@ -2048,16 +2048,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             trustTier: "SELF_REPORTED",
             auth: "session"
           });
-          recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+          await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
           return;
         }
         const provided = hmacHeaderValue(req);
-        const secret = resolveWebhookSecret(options.workspace, "feedback");
+        const orgSourceWorkspace = options.workspace, selectedSecret = resolveWebhookSecret(orgSourceWorkspace, "feedback"), secret = selectedSecret?.secret ?? null;
         if (!provided || !secret || !verifyHmacSignature(body, secret, provided)) {
           json(res, 401, { error: "invalid feedback webhook authentication" });
           return;
         }
-        const ingested = ingestFeedbackOutcome({
+        const orgWorkspace = resolve(orgSourceWorkspace), orgSecret = secret, orgSecretKey = selectedSecret!.ref.slice("vault:".length); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace) throw new Error("original outcome workspace changed while preparing optional org recompute"); if (!vaultStatus(orgSourceWorkspace).unlocked || getVaultSecret(orgSourceWorkspace, orgSecretKey) !== orgSecret) throw new Error("original outcome webhook credential is unavailable or changed"); const carrier = hmacHeaderValue(req); if (!carrier || !verifyHmacSignature(body, orgSecret, carrier)) throw new Error("original outcome webhook authentication changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestFeedbackOutcome({
           workspace: options.workspace,
           payload,
           attestationKind: "external_report"
@@ -2067,7 +2067,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
-        recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+        await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
         return;
       }
 
@@ -2084,7 +2084,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const canIngestAsOperator =
           sessionAuth && (sessionAuth.isAdmin || hasAnyRole([...sessionAuth.roles], ["OWNER", "OPERATOR"]));
         if (canIngestAsOperator) {
-          const ingested = ingestOutcomeWebhook({
+          const orgSourceWorkspace = options.workspace, orgWorkspace = resolve(orgSourceWorkspace), orgToken = options.token, orgIdentity = { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original outcome workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgSourceWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId || !(current.isAdmin || hasAnyRole([...current.roles], ["OWNER", "OPERATOR"]))) throw new Error("original outcome session authority changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestOutcomeWebhook({
             workspace: options.workspace,
             payload,
             attestationKind: "self_attested",
@@ -2095,16 +2095,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             trustTier: "SELF_REPORTED",
             auth: "session"
           });
-          recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+          await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
           return;
         }
         const provided = hmacHeaderValue(req);
-        const secret = resolveWebhookSecret(options.workspace, "outcomes");
+        const orgSourceWorkspace = options.workspace, selectedSecret = resolveWebhookSecret(orgSourceWorkspace, "outcomes"), secret = selectedSecret?.secret ?? null;
         if (!provided || !secret || !verifyHmacSignature(body, secret, provided)) {
           json(res, 401, { error: "invalid outcomes webhook authentication" });
           return;
         }
-        const ingested = ingestOutcomeWebhook({
+        const orgWorkspace = resolve(orgSourceWorkspace), orgSecret = secret, orgSecretKey = selectedSecret!.ref.slice("vault:".length); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace) throw new Error("original outcome workspace changed while preparing optional org recompute"); if (!vaultStatus(orgSourceWorkspace).unlocked || getVaultSecret(orgSourceWorkspace, orgSecretKey) !== orgSecret) throw new Error("original outcome webhook credential is unavailable or changed"); const carrier = hmacHeaderValue(req); if (!carrier || !verifyHmacSignature(body, orgSecret, carrier)) throw new Error("original outcome webhook authentication changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestOutcomeWebhook({
           workspace: options.workspace,
           payload,
           attestationKind: "external_report",
@@ -2115,7 +2115,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
-        recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+        await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
         return;
       }
 
@@ -8826,7 +8826,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     port,
     url: `http://${host}:${port}`,
     close: async () => {
-      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork, ...integrationQueueWork]);
+      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork, ...integrationQueueWork, ...outcomeOrgWork.snapshot()]);
       let nativeCleanupError: unknown;
       try { await nativeTaskService.close(); } catch (error) { nativeCleanupError = error; }
       for (const socket of openSockets) {
@@ -8850,7 +8850,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       while (inFlightRequests > 0 && Date.now() < waitUntil) {
         await new Promise((resolvePromise) => setTimeout(resolvePromise, 50));
       }
-      closeScoreSessionStores(options.workspace);
+      while (outcomeOrgWork.hasPending()) await outcomeOrgWork.waitCurrent(); closeScoreSessionStores(options.workspace);
       if (nativeCleanupError) throw nativeCleanupError;
     }
   };
