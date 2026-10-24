@@ -343,7 +343,12 @@ async function signPreparedArtifactProvenance(input: SignArtifactProvenanceInput
   });
   const prepared = prepareArtifactProvenance({ ...input, workspace, file }, output ?? original[0]!.bytes!, true);
   const monitor = getPublicKeyPem(workspace, "monitor"), signedTs = Date.now();
-  const signed = await signWithPurposeKey(workspace, "receipt", Buffer.from(prepared.manifestSha256, "hex"));
+  const beforeSign = () => withProvenanceFiles(paths, () => {
+    provenanceMaySign();
+    assertSelectedProvenanceEvidence(workspace, prepared.evidence.usedLedgerRefs);
+    paths.forEach((path, index) => assertProvenanceFile(path, original[index]!)); assertDistinctProvenanceFiles(paths, original);
+  });
+  const signed = await signWithPurposeKey(workspace, "receipt", Buffer.from(prepared.manifestSha256, "hex"), { beforeSign });
   const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("vault locked; unlock required for artifact provenance publication"); };
   assertVaultCurrent();
   const legacy = signed.provider === "file" && signed.algorithm === "ed25519" && canonicalSigningKey(monitor)?.pem === monitor && signed.publicKeyPem === monitor;
