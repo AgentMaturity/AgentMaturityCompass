@@ -154,16 +154,18 @@ export function addDebtEntry(
 }
 
 /** Internal preparation used by both actual add layers; the captured body is never exposed before publication. */
-export async function prepareDebtEntryAsync(workspace: string, params: Parameters<typeof addDebtEntry>[1]): Promise<{ publish(): PolicyDebtEntry }> {
-  const root = resolve(workspace), input = { ...params, affectedPolicies: [...params.affectedPolicies] };
+export async function prepareDebtEntryAsync(workspace: string, params: Parameters<typeof addDebtEntry>[1],
+  options: { beforePublish?: () => void } = {}): Promise<{ publish(): PolicyDebtEntry }> {
+  const root = resolve(workspace), input = { ...params, affectedPolicies: [...params.affectedPolicies] }, beforePublish = options.beforePublish;
+  beforePublish?.();
   const debtId = `dbt_${randomUUID().slice(0, 12)}`, now = Date.now(), before = captureDebtState(root, debtId);
   const body = debtBody(input, debtId, now, before.head), captured = capturePurposePublication(root, "artifact-seal");
-  const hash = sha256Hex(canonicalize(body)), signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
+  const hash = sha256Hex(canonicalize(body)), signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"), { beforeSign: beforePublish });
   const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup."); };
-  assertVaultCurrent();
+  beforePublish?.(); assertVaultCurrent();
   const entry: PolicyDebtEntry = { ...body, debt_hash: hash, signature: signed.signature.toString("base64") }, bytes = JSON.stringify(entry, null, 2);
   return Object.freeze({ publish(): PolicyDebtEntry {
-    assertVaultCurrent();
+    beforePublish?.(); assertVaultCurrent();
     assertPurposePublicationCurrent(root, captured, signed);
     assertDebtStateCurrent(root, debtId, before);
     saveDebtEntry(root, entry, bytes);
