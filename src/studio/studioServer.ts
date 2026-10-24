@@ -3789,10 +3789,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
+        const authority = signingAuthority(["OWNER"]);
+        const beforePublish = () => {
+          authority();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("forecast read-only gate changed while signing"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
         const out = await applyForecastPolicyForApiForAuthority({
           workspace: options.workspace,
           policy: parsed.policy as ReturnType<typeof getForecastPolicyForApi>["policy"]
-        }, signingAuthority(["OWNER"]))
+        }, beforePublish)
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (out === null) return;
         const audit = writeStudioAuditEvent({
@@ -3853,11 +3859,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const targetId = typeof parsed.targetId === "string" ? parsed.targetId : url.searchParams.get("targetId");
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
         const out = await refreshForecastForAuthority({
           workspace: options.workspace,
           scope: scopeRaw as "workspace" | "agent" | "node",
           targetId
-        }, signingAuthority(["OWNER", "OPERATOR"]))
+        }, beforePublish)
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (out === null) return;
         const audit = writeStudioAuditEvent({
@@ -3901,9 +3912,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireUnlockedVaultForSigning()) {
           return;
         }
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
         const out = await forecastSchedulerRunNowForApiForAuthority({
           workspace: options.workspace
-        }, signingAuthority(["OWNER", "OPERATOR"]))
+        }, beforePublish)
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (out === null) return;
         emitOrgEvent("FORECAST_UPDATED");
@@ -5352,12 +5368,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { note?: string }) : {};
         const note = typeof parsed.note === "string" && parsed.note.trim().length > 0 ? parsed.note.trim() : "acknowledged";
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
         const advisory = await ackAdvisoryForAuthority({
           workspace: options.workspace,
           advisoryId,
           by: auth.username ?? "operator",
           note
-        }, signingAuthority(["OWNER", "OPERATOR"]))
+        }, beforePublish)
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (advisory === null) return;
         const audit = writeStudioAuditEvent({
