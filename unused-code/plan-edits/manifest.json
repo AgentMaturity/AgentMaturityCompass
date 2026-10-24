@@ -143,11 +143,25 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/auditPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditPolicyStore.ts.landed",
+      "sha256": "fa36b73619fedde92914778acc6d3bfb24276d5a14ab38b3540acecbc2eaa8bf"
+    },
+    {
       "path": "src/audit/binderArtifact.ts",
       "issue": "P1-16",
       "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
       "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
       "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
+      "path": "src/audit/binderStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderStore.ts.landed",
+      "sha256": "25fc1e815c526d8cb1d4627acc81b6c5fca72b06dae19e12ac0c4e8decfe05a0"
     },
     {
       "path": "src/audit/binderVerifier.ts",
