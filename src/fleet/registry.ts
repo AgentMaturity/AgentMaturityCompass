@@ -1,3 +1,4 @@
+import { defaultAgentArtifactBodies, defaultAgentContextGraph as defaultContextGraph, scaffoldAgentForAddAsync } from "./agentScaffoldPublication.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -5,7 +6,7 @@ import inquirer from "inquirer";
 import YAML from "yaml";
 import { z } from "zod";
 import { captureRawConfigPair, verifyRawConfigSignature, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
-import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "../targets/targetProfile.js";
 import type { RiskTier, TrustTier } from "../types.js";
@@ -25,6 +26,8 @@ import {
   resolveAgentId,
   setCurrentAgent
 } from "./paths.js";
+
+export { scaffoldAgentAsync } from "./agentScaffoldPublication.js";
 
 const authSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("bearer_env"), env: z.string().min(1) }),
@@ -211,91 +214,7 @@ export async function signFleetConfigAsync(workspace: string): Promise<{ path: s
 }
 
 function defaultAgentArtifacts(paths: ReturnType<typeof getAgentPaths>): void {
-  if (!pathExists(paths.guardrails)) {
-    writeFileAtomic(
-      paths.guardrails,
-      YAML.stringify({
-        honesty: { requireKnownUnknownAssumptions: true, requireEvidenceRefs: true },
-        compliance: { requireConsentForSensitive: true, requireAuditEvents: true },
-        verification: { requireTestsForHighRisk: true },
-        thresholds: { minIntegrityIndex: 0.6 }
-      }),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.promptAddendum)) {
-    writeFileAtomic(
-      paths.promptAddendum,
-      [
-        "# AMC Prompt Addendum",
-        "",
-        "Use this structure for material outputs:",
-        "1) Known facts [ev:<id>]",
-        "2) Unknowns",
-        "3) Assumptions",
-        "4) Verification plan",
-        "5) Escalation checkpoints"
-      ].join("\n"),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.evalHarness)) {
-    writeFileAtomic(
-      paths.evalHarness,
-      YAML.stringify({
-        suites: [
-          { name: "truthfulness", checks: ["evidence-link", "uncertainty-label"] },
-          { name: "compliance", checks: ["consent-required", "policy-refusal"] },
-          { name: "verification", checks: ["test-evidence", "reproducibility"] }
-        ]
-      }),
-      0o644
-    );
-  }
-}
-
-function defaultContextGraph(params: {
-  agentName: string;
-  role: string;
-  domain: string;
-  primaryTasks: string[];
-  stakeholders: string[];
-  riskTier: RiskTier;
-}): Record<string, unknown> {
-  return {
-    mission: `${params.agentName} (${params.role}) delivers reliable outcomes in ${params.domain}.`,
-    successMetrics: [
-      "verified task completion",
-      "low contradiction rate",
-      "stakeholder trust growth"
-    ],
-    constraints: [
-      "No fabricated evidence",
-      "Respect role boundaries and approvals",
-      "Minimize sensitive data exposure"
-    ],
-    forbiddenActions: [
-      "exfiltrate secrets",
-      "bypass policy checks",
-      "perform irreversible high-risk actions without consent"
-    ],
-    riskTier: params.riskTier,
-    escalationRules: [
-      "Escalate when confidence is low for high-risk actions",
-      "Escalate on policy conflicts",
-      "Escalate when required evidence is missing"
-    ],
-    entities: [
-      { id: "goal-1", type: "Goal", label: "Reliable verified outcomes" },
-      { id: "stakeholder-1", type: "Stakeholder", label: params.stakeholders.join(", ") },
-      { id: "risk-1", type: "RiskTier", label: params.riskTier },
-      { id: "tool-1", type: "Tool", label: "gateway, supervised runtime" },
-      { id: "policy-1", type: "Policy", label: "Evidence-gated scoring" },
-      { id: "constraint-1", type: "Constraint", label: "No unsupported claims" }
-    ]
-  };
+  for (const row of defaultAgentArtifactBodies(paths)) if (!pathExists(row.path)) writeFileAtomic(row.path, row.bytes, 0o644);
 }
 
 export function buildAgentConfig(params: {
@@ -549,7 +468,14 @@ export async function addAgentInteractive(workspace: string): Promise<{
   configSigPath: string;
   targetPath: string;
 }> {
-  const fleet = pathExists(fleetConfigPath(workspace)) ? loadFleetConfig(workspace) : defaultFleetConfig();
+  assertOwnerMode(workspace, "agent add");
+  const fleetFile = fleetConfigPath(workspace), fleetBefore = captureOrgFiles([fleetFile]);
+  const selectionBefore = captureOrgFiles([currentAgentPath(workspace)]);
+  const fleetBytes = orgPairBytes(fleetBefore, fleetFile);
+  const fleet = fleetBytes === null ? defaultFleetConfig() : fleetSchema.parse(YAML.parse(fleetBytes.toString("utf8")));
+  const assertStableInputs = () => { assertOwnerMode(workspace, "agent add"); assertOrgPairsCurrent(fleetBefore); };
+  const assertOriginalInputs = () => { assertStableInputs(); assertOrgPairsCurrent(selectionBefore); };
+  assertOriginalInputs();
   const answer = await inquirer.prompt<{
     agentId: string;
     agentName: string;
@@ -617,6 +543,7 @@ export async function addAgentInteractive(workspace: string): Promise<{
     }
   ]);
 
+  assertOriginalInputs();
   const auth =
     answer.authType === "bearer_env"
       ? ({ type: "bearer_env", env: answer.authEnv || "API_KEY" } as const)
@@ -640,8 +567,7 @@ export async function addAgentInteractive(workspace: string): Promise<{
     auth
   });
 
-  const scaffolding = scaffoldAgent(workspace, config);
-  setCurrentAgent(workspace, config.id);
+  const scaffolding = await scaffoldAgentForAddAsync(workspace, config, assertStableInputs, selectionBefore);
   return {
     agentId: scaffolding.agentId,
     configPath: scaffolding.configPath,

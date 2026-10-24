@@ -4,7 +4,8 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import { z } from "zod";
 import type { DiagnosticReport, TargetProfile } from "../types.js";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { verifyRawConfigSignature } from "../config/configSignaturePair.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -42,20 +43,18 @@ export function defaultTargetMapping(level = 3): Record<string, number> {
   return out;
 }
 
+/** Shared v1 payload recipe. Signed field order, UUID, timestamp and mapping semantics stay unchanged. */
+export function targetProfilePayload(params: { name: string; contextGraphHash: string; mapping: Record<string, number> }): Omit<TargetProfile, "signature"> {
+  return { id: randomUUID(), name: params.name, createdTs: Date.now(), contextGraphHash: params.contextGraphHash, mapping: params.mapping };
+}
+
 export function createSignedTargetProfile(params: {
   workspace: string;
   name: string;
   contextGraphHash: string;
   mapping: Record<string, number>;
 }): TargetProfile {
-  const payload = {
-    id: randomUUID(),
-    name: params.name,
-    createdTs: Date.now(),
-    contextGraphHash: params.contextGraphHash,
-    mapping: params.mapping
-  };
-
+  const payload = targetProfilePayload(params);
   const signature = signTargetPayload(params.workspace, payload);
   return {
     ...payload,
@@ -95,8 +94,7 @@ export function verifyTargetProfileSignature(workspace: string, profile: TargetP
     mapping: profile.mapping
   };
   const digest = sha256Hex(canonicalize(payload));
-  const auditorPubs = getPublicKeyHistory(workspace, "auditor");
-  return verifyHexDigestAny(digest, profile.signature, auditorPubs);
+  return verifyRawConfigSignature(workspace, digest, profile.signature);
 }
 
 export async function setTargetProfileInteractive(params: {

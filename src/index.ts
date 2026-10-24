@@ -55,7 +55,7 @@ export {
   useAgent,
   loadAgentConfig,
   verifyAgentConfigSignature,
-  scaffoldAgent,
+  scaffoldAgent, scaffoldAgentAsync,
   updateAgentProvider
 } from "./fleet/registry.js";
 export { getAgentPaths, resolveAgentId, setCurrentAgent, getCurrentAgent } from "./fleet/paths.js";
