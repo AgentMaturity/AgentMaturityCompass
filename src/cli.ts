@@ -631,15 +631,15 @@ import {
   type RuntimeRunSource
 } from "./runtime/runManager.js";
 import {
-  transformAttestCli,
+  transformAttestCliAsync,
   transformAttestVerifyCli,
-  transformInitCli,
-  transformMapApplyCli,
+  transformInitCliAsync,
+  transformMapApplyCliAsync,
   transformMapReadCli,
-  transformPlanCli,
+  transformPlanCliAsync,
   transformReportCli,
   transformStatusCli,
-  transformTrackCli,
+  transformTrackCliAsync,
   transformVerifyCli
 } from "./transformation/transformCli.js";
 import {
@@ -16505,8 +16505,8 @@ const transform = program.command("transform").description("Transformation OS (4
 transform
   .command("init")
   .description("Initialize signed .amc/transform-map.yaml")
-  .action(() => {
-    const out = transformInitCli(process.cwd());
+  .action(async () => {
+    const out = await transformInitCliAsync(process.cwd());
     console.log(chalk.green(`Transform map initialized: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -16540,10 +16540,10 @@ transformMap
 transformMap
   .command("apply")
   .requiredOption("--file <path>", "transform map file (yaml/json)")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     const raw = readUtf8(resolve(process.cwd(), opts.file));
     const parsed = (opts.file.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as ReturnType<typeof transformMapReadCli>;
-    const out = transformMapApplyCli({
+    const out = await transformMapApplyCliAsync({
       workspace: process.cwd(),
       map: parsed
     });
@@ -16559,7 +16559,7 @@ transform
   .option("--window <window>", "e.g. 14d", "14d")
   .option("--preview", "do not persist plan")
   .option("--target-file <path>", "custom target mapping json")
-  .action((opts: { agent?: string; node?: string; to: string; window: string; preview?: boolean; targetFile?: string }) => {
+  .action(async (opts: { agent?: string; node?: string; to: string; window: string; preview?: boolean; targetFile?: string }) => {
     if (!opts.agent && !opts.node) {
       throw new Error("Provide either --agent <id> or --node <id>");
     }
@@ -16570,7 +16570,7 @@ transform
     const targetOverride = opts.targetFile
       ? (JSON.parse(readUtf8(resolve(process.cwd(), opts.targetFile))) as Record<string, number>)
       : undefined;
-    const out = transformPlanCli({
+    const out = await transformPlanCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       to,
@@ -16612,11 +16612,11 @@ transform
   .option("--agent <agentId>", "agent ID")
   .option("--node <nodeId>", "org node ID")
   .option("--window <window>", "e.g. 14d")
-  .action((opts: { agent?: string; node?: string; window?: string }) => {
+  .action(async (opts: { agent?: string; node?: string; window?: string }) => {
     if (!opts.agent && !opts.node) {
       throw new Error("Provide either --agent <id> or --node <id>");
     }
-    const out = transformTrackCli({
+    const out = await transformTrackCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       window: opts.window
@@ -16656,7 +16656,7 @@ transform
   .option("--role <role>", "OWNER|AUDITOR", "OWNER")
   .option("--files <paths...>", "related file paths")
   .option("--evidence-links <refs...>", "evidence links")
-  .action((opts: {
+  .action(async (opts: {
     agent?: string;
     node?: string;
     task: string;
@@ -16672,7 +16672,7 @@ transform
     if (role !== "OWNER" && role !== "AUDITOR") {
       throw new Error(`Invalid role '${opts.role}', expected OWNER or AUDITOR`);
     }
-    const out = transformAttestCli({
+    const out = await transformAttestCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       taskId: opts.task,

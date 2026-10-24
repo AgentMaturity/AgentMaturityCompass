@@ -246,18 +246,19 @@ import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwners
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "../org/orgRun.js";
 import { OrgSseHub } from "../org/orgSse.js";
 import {
-  applyTransformMapForApi,
-  attestAgentTransformTaskForApi,
-  attestNodeTransformTaskForApi,
-  createAgentTransformPlanForApi,
-  createNodeTransformPlanForApi,
+  applyTransformMapForApiAsync,
+  attestAgentTransformTaskForApiAsync,
+  attestNodeTransformTaskForApiAsync,
+  createAgentTransformPlanForApiAsync,
+  createNodeTransformPlanForApiAsync,
   getLatestAgentTransformPlanForApi,
   getLatestNodeTransformPlanForApi,
   getTransformMapForApi,
-  trackAgentTransformPlanForApi,
-  trackNodeTransformPlanForApi
+  trackAgentTransformPlanForApiAsync,
+  trackNodeTransformPlanForApiAsync
 } from "../transformation/transformApi.js";
 import { renderTransformReportMarkdown } from "../transformation/transformReports.js";
+import { TransformPublicationError } from "../transformation/transformPublication.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../ops/policy.js";
 import { retentionStatusCli, retentionRunStudioAsync } from "../ops/retention/retentionCli.js";
 import {
@@ -3060,10 +3061,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "map payload is required" });
           return;
         }
-        const applied = applyTransformMapForApi({
+        const applied = await applyTransformMapForApiAsync({
           workspace: options.workspace,
           map: parsed.map as ReturnType<typeof getTransformMapForApi>["map"]
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_MAP_UPDATED",
@@ -3112,14 +3118,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const parsed = body
           ? (JSON.parse(body) as { to?: "targets" | "excellence" | "custom"; window?: string; preview?: boolean; targetOverride?: Record<string, number> })
           : {};
-        const out = createAgentTransformPlanForApi({
+        const out = await createAgentTransformPlanForApiAsync({
           workspace: options.workspace,
           agentId,
           to: parsed.to ?? "targets",
           window: parsed.window ?? "14d",
           preview: parsed.preview === true,
           targetOverride: parsed.targetOverride
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_CREATED",
@@ -3154,11 +3165,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformTrackMatch[1] ?? "default"));
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = trackAgentTransformPlanForApi({
+        const out = await trackAgentTransformPlanForApiAsync({
           workspace: options.workspace,
           agentId,
           window: parsed.window
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_UPDATED",
@@ -3197,7 +3213,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const role: "OWNER" | "AUDITOR" = auth.roles.has("AUDITOR") ? "AUDITOR" : "OWNER";
-        const out = attestAgentTransformTaskForApi({
+        const out = await attestAgentTransformTaskForApiAsync({
           workspace: options.workspace,
           agentId,
           taskId: parsed.taskId,
@@ -3206,7 +3222,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           evidenceLinks: Array.isArray(parsed.evidenceLinks) ? parsed.evidenceLinks : [],
           createdByUser: auth.username ?? "owner",
           role
-        });
+        }, { beforePublish: () => {
+          signingAuthority([role])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_TASK_ATTESTED",
@@ -3257,14 +3278,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const parsed = body
           ? (JSON.parse(body) as { to?: "targets" | "excellence" | "custom"; window?: string; preview?: boolean; targetOverride?: Record<string, number> })
           : {};
-        const out = createNodeTransformPlanForApi({
+        const out = await createNodeTransformPlanForApiAsync({
           workspace: options.workspace,
           nodeId,
           to: parsed.to ?? "targets",
           window: parsed.window ?? "14d",
           preview: parsed.preview === true,
           targetOverride: parsed.targetOverride
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_CREATED",
@@ -3299,11 +3325,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const nodeId = decodeURIComponent(nodeTransformTrackMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = trackNodeTransformPlanForApi({
+        const out = await trackNodeTransformPlanForApiAsync({
           workspace: options.workspace,
           nodeId,
           window: parsed.window
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_UPDATED",
@@ -3342,7 +3373,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const role: "OWNER" | "AUDITOR" = auth.roles.has("AUDITOR") ? "AUDITOR" : "OWNER";
-        const out = attestNodeTransformTaskForApi({
+        const out = await attestNodeTransformTaskForApiAsync({
           workspace: options.workspace,
           nodeId,
           taskId: parsed.taskId,
@@ -3351,7 +3382,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           evidenceLinks: Array.isArray(parsed.evidenceLinks) ? parsed.evidenceLinks : [],
           createdByUser: auth.username ?? "owner",
           role
-        });
+        }, { beforePublish: () => {
+          signingAuthority([role])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_TASK_ATTESTED",
@@ -8670,6 +8706,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       json(res, 404, { error: "not found" });
     } catch (error) {
+      if (res.headersSent) return;
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("PAYLOAD_TOO_LARGE")) {
         json(res, 413, { error: "payload too large" });
@@ -8680,6 +8717,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
       if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
+      if (error instanceof TransformPublicationError) { if (!res.headersSent) json(res, 409, { error: error.message, code: error.code, publishedPaths: error.publishedPaths, attemptedPhase: error.attemptedPhase, knownTransparencyHash: error.knownTransparencyHash }); return; }
       json(res, 500, { error: "internal server error" });
     }
   });

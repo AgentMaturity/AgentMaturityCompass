@@ -1082,16 +1082,16 @@ export {
   orgCommitCli
 } from "./org/orgCli.js";
 export {
-  initTransformMap,
+  initTransformMap, initTransformMapAsync,
   loadTransformMap,
-  saveTransformMap,
+  saveTransformMap, saveTransformMapAsync,
   verifyTransformMap,
-  createTransformPlan
+  createTransformPlan, createTransformPlanAsync
 } from "./transformation/transformPlanner.js";
 export {
   loadLatestTransformPlan,
-  writeSignedTransformPlan,
-  writeSignedTransformSnapshot,
+  writeSignedTransformPlan, writeSignedTransformPlanAsync,
+  writeSignedTransformSnapshot, writeSignedTransformSnapshotAsync,
   verifyLatestTransformPlan
 } from "./transformation/transformTasks.js";
 export {
@@ -1128,24 +1128,24 @@ export {
   applyForecastPolicyForApi
 } from "./forecast/forecastApi.js";
 export { verifyForecastPolicy, verifyLatestForecast } from "./forecast/forecastVerifier.js";
-export { runTransformTracker } from "./transformation/transformTracker.js";
+export { runTransformTracker, runTransformTrackerAsync } from "./transformation/transformTracker.js";
 export {
-  writeTransformAttestation,
+  writeTransformAttestation, writeTransformAttestationAsync,
   verifyTransformAttestation,
   listTransformAttestations,
   findLatestAttestationForTask
 } from "./transformation/transformAttestations.js";
 export { renderTransformReportMarkdown, compactTransformStatus } from "./transformation/transformReports.js";
 export {
-  transformInitCli,
+  transformInitCli, transformInitCliAsync,
   transformVerifyCli,
   transformMapReadCli,
-  transformMapApplyCli,
-  transformPlanCli,
+  transformMapApplyCli, transformMapApplyCliAsync,
+  transformPlanCli, transformPlanCliAsync,
   transformStatusCli,
-  transformTrackCli,
+  transformTrackCli, transformTrackCliAsync,
   transformReportCli,
-  transformAttestCli,
+  transformAttestCli, transformAttestCliAsync,
   transformAttestVerifyCli
 } from "./transformation/transformCli.js";
 export { releaseManifestSchema } from "./release/releaseSchema.js";

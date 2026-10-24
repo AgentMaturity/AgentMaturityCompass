@@ -8,15 +8,19 @@ import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
 import { computeOrgScorecard } from "../org/orgEngine.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import { loadContextGraph } from "../context/contextGraph.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { sha256Hex } from "../utils/hash.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureTransformPlanInputs } from "./transformInputs.js";
+import { prepareTransformPairs, publishTransformPairs, finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
+import { prepareTransformOutputsAsync } from "./transformTasks.js";
 import { defaultTransformMap } from "./builtInTransformMap.js";
 import { transformMapSchema, type TransformMap } from "./transformMapSchema.js";
 import type { FourC } from "./fourCs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { percentDone, topBlockers, nextTasks } from "./transformScoring.js";
 import { summarizeBy4C, transformMapPath, transformPlanSchema, type TransformPlan, type TransformTask, writeSignedTransformPlan } from "./transformTasks.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -55,11 +59,10 @@ export function initTransformMap(workspace: string): {
   sigPath: string;
   map: TransformMap;
 } {
-  ensureDir(join(workspace, ".amc"));
   const map = defaultTransformMap();
   const path = transformMapPath(workspace);
-  writeFileAtomic(path, YAML.stringify(map), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
+  publishTransformPairs(workspace, "transform init", [{ path, bytes: Buffer.from(YAML.stringify(map)) }]);
+  const sigPath = `${path}.sig`;
   appendTransparencyEntry({
     workspace,
     type: "TRANSFORM_MAP_UPDATED",
@@ -92,8 +95,8 @@ export function saveTransformMap(workspace: string, map: TransformMap): {
 } {
   const parsed = transformMapSchema.parse(map);
   const path = transformMapPath(workspace);
-  writeFileAtomic(path, YAML.stringify(parsed), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
+  publishTransformPairs(workspace, "transform map apply", [{ path, bytes: Buffer.from(YAML.stringify(parsed)) }]);
+  const sigPath = `${path}.sig`;
   appendTransparencyEntry({
     workspace,
     type: "TRANSFORM_MAP_UPDATED",
@@ -194,10 +197,10 @@ function deriveAgentBaseline(workspace: string, agentId: string): AgentBaseline 
   };
 }
 
-function deriveNodeBaseline(workspace: string, nodeId: string, window: string): NodeBaseline {
+function deriveNodeBaseline(workspace: string, nodeId: string, window: string, asOfTs?: number): NodeBaseline {
   const scorecard = computeOrgScorecard({
     workspace,
-    window
+    window, asOfTs
   });
   const node = scorecard.nodes.find((item) => item.nodeId === nodeId);
   if (!node) {
@@ -248,7 +251,7 @@ function targetMapForAgent(workspace: string, agentId: string, mode: "SIGNED_EQU
   }
 }
 
-function targetMapForNode(workspace: string, nodeId: string, mode: "SIGNED_EQUALIZER" | "EXCELLENCE_5" | "CUSTOM", override?: Record<string, number>): Record<string, number> {
+function targetMapForNode(workspace: string, nodeId: string, mode: "SIGNED_EQUALIZER" | "EXCELLENCE_5" | "CUSTOM", override?: Record<string, number>, asOfTs?: number): Record<string, number> {
   if (mode === "EXCELLENCE_5") {
     return Object.fromEntries(questionIds.map((id) => [id, 5]));
   }
@@ -259,7 +262,7 @@ function targetMapForNode(workspace: string, nodeId: string, mode: "SIGNED_EQUAL
     }
     return out;
   }
-  const scorecard = computeOrgScorecard({ workspace, window: "14d" });
+  const scorecard = computeOrgScorecard({ workspace, window: "14d", asOfTs });
   const node = scorecard.nodes.find((item) => item.nodeId === nodeId);
   if (!node) {
     throw new Error(`Node not found for targets: ${nodeId}`);
@@ -507,6 +510,7 @@ function planForScope(params: {
   mode: "SIGNED_EQUALIZER" | "EXCELLENCE_5" | "CUSTOM";
   window: string;
   targetOverride?: Record<string, number>;
+  asOfTs?: number;
 }): TransformPlan {
   const map = loadTransformMap(params.workspace);
   const mapVersion = map.transformMap.version;
@@ -515,11 +519,11 @@ function planForScope(params: {
 
   const baseline = params.scope.type === "AGENT"
     ? deriveAgentBaseline(params.workspace, params.scope.agentId)
-    : deriveNodeBaseline(params.workspace, params.scope.nodeId, params.window);
+    : deriveNodeBaseline(params.workspace, params.scope.nodeId, params.window, params.asOfTs);
 
   const targetMap = params.scope.type === "AGENT"
     ? targetMapForAgent(params.workspace, params.scope.agentId, params.mode, params.targetOverride)
-    : targetMapForNode(params.workspace, params.scope.nodeId, params.mode, params.targetOverride);
+    : targetMapForNode(params.workspace, params.scope.nodeId, params.mode, params.targetOverride, params.asOfTs);
 
   const signatureStatus = configSignatureCheckStatus(params.workspace);
   const tasks: TransformTask[] = [];
@@ -699,4 +703,45 @@ export function createTransformPlan(params: {
     plan,
     written
   };
+}
+
+async function saveTransformMapPrepared(workspace: string, input: TransformMap, command: "transform init" | "transform map apply", checks: TransformPublicationChecks) {
+  assertOwnerMode(workspace, command);
+  const map = transformMapSchema.parse(structuredClone(input)), path = transformMapPath(workspace);
+  const bytes = Buffer.from(YAML.stringify(map));
+  const prepared = await prepareTransformPairs(workspace, command, [{ path, bytes }], checks);
+  prepared.publish();
+  const secondaryWarnings = await finishTransformPublication(prepared, [path, `${path}.sig`], {
+    workspace, type: "TRANSFORM_MAP_UPDATED", agentId: "system", artifact: { kind: "policy", sha256: sha256Hex(bytes), id: "transform-map" }
+  });
+  return { path, sigPath: `${path}.sig`, map, secondaryWarnings };
+}
+export async function initTransformMapAsync(workspace: string, checks: TransformPublicationChecks = {}) {
+  return saveTransformMapPrepared(workspace, defaultTransformMap(), "transform init", checks);
+}
+export async function saveTransformMapAsync(workspace: string, map: TransformMap, checks: TransformPublicationChecks = {}) {
+  return saveTransformMapPrepared(workspace, map, "transform map apply", checks);
+}
+
+export async function createTransformPlanAsync(input: Parameters<typeof createTransformPlan>[0], checks: TransformPublicationChecks = {}) {
+  const params = structuredClone(input), workspace = params.workspace;
+  assertOwnerMode(workspace, "transform plan"); checks.beforePublish?.();
+  const asOfTs = Date.now(), mode = params.to === "excellence" ? "EXCELLENCE_5" : params.to === "custom" ? "CUSTOM" : "SIGNED_EQUALIZER";
+  const reads = captureTransformPlanInputs(workspace, params.scope, params.window ?? "14d", asOfTs, mode !== "EXCELLENCE_5" && !(mode === "CUSTOM" && params.targetOverride));
+  const assertInputs = reads.assertCurrent;
+  const plan = planForScope({ workspace, scope: params.scope,
+    mode: params.to === "excellence" ? "EXCELLENCE_5" : params.to === "custom" ? "CUSTOM" : "SIGNED_EQUALIZER",
+    window: params.window ?? "14d", targetOverride: params.targetOverride, asOfTs });
+  assertInputs();
+  if (params.preview) return { plan, written: null, secondaryWarnings: [] };
+  const prepared = await prepareTransformOutputsAsync(workspace, plan, false, "transform plan", {
+    beforePublish: checks.beforePublish, assertInputsCurrent() { checks.assertInputsCurrent?.(); assertInputs(); }
+  });
+  const { written } = prepared.publish();
+  const secondaryWarnings = await finishTransformPublication(prepared, Object.values(written), {
+    workspace, type: "TRANSFORM_PLAN_CREATED", agentId: params.scope.type === "AGENT" ? params.scope.agentId : `node:${params.scope.nodeId}`,
+    artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(plan, null, 2))), id: plan.planId }
+  }, [{ workspace, eventName: "TRANSFORM_PLAN_CREATED", agentId: params.scope.type === "AGENT" ? params.scope.agentId : `node:${params.scope.nodeId}`,
+    summary: `Transformation plan created (${plan.planId})`, details: { scope: plan.scope, planId: plan.planId, percentDone: plan.summary.percentDone, next3Tasks: plan.summary.next3Tasks } }]);
+  return { plan, written, secondaryWarnings };
 }

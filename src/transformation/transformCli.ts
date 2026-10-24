@@ -13,6 +13,11 @@ import { loadLatestTransformPlan, verifyLatestTransformPlan } from "./transformT
 import { runTransformTracker } from "./transformTracker.js";
 import { compactTransformStatus, renderTransformReportMarkdown } from "./transformReports.js";
 import type { TransformMap } from "./transformMapSchema.js";
+import { initTransformMapAsync, saveTransformMapAsync, createTransformPlanAsync } from "./transformPlanner.js";
+import { runTransformTrackerAsync } from "./transformTracker.js";
+import { writeTransformAttestationAsync } from "./transformAttestations.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { transformLatestPath } from "./transformTasks.js";
 import type { TransformPlan } from "./transformTasks.js";
 
 type TransformScope =
@@ -158,4 +163,19 @@ export function transformAttestVerifyCli(params: {
 }): ReturnType<typeof verifyTransformAttestation> {
   const file = resolve(params.workspace, params.file);
   return verifyTransformAttestation(params.workspace, file);
+}
+
+export async function transformInitCliAsync(workspace: string) { return initTransformMapAsync(workspace); }
+export async function transformMapApplyCliAsync(params: Parameters<typeof transformMapApplyCli>[0]) { return saveTransformMapAsync(params.workspace, params.map); }
+export async function transformPlanCliAsync(input: Parameters<typeof transformPlanCli>[0]) {
+  const params = structuredClone(input); return createTransformPlanAsync({ ...params, scope: normalizeScope(params.workspace, params.scope) });
+}
+export async function transformTrackCliAsync(input: Parameters<typeof transformTrackCli>[0]) {
+  const params = structuredClone(input); return runTransformTrackerAsync({ ...params, scope: normalizeScope(params.workspace, params.scope) });
+}
+export async function transformAttestCliAsync(input: Parameters<typeof transformAttestCli>[0]) {
+  const params = structuredClone(input), scope = normalizeScope(params.workspace, params.scope);
+  const previous = captureOrgPairs([transformLatestPath(params.workspace, scope)]);
+  const status = transformStatusCli({ workspace: params.workspace, scope }); assertOrgPairsCurrent(previous);
+  return writeTransformAttestationAsync({ ...params, scope, plan: status.plan }, { assertInputsCurrent() { assertOrgPairsCurrent(previous); } });
 }

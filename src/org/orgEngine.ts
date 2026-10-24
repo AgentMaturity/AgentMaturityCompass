@@ -508,10 +508,11 @@ export function computeOrgScorecard(params: {
   workspace: string;
   window: string;
   config?: OrgConfig;
+  asOfTs?: number;
 }): OrgScorecard {
   const config = params.config ?? loadOrgConfig(params.workspace);
   const orgSig = verifyOrgConfigSignature(params.workspace);
-  const now = Date.now();
+  const now = params.asOfTs ?? Date.now();
   const windowMs = parseWindowToMs(params.window);
   const windowStartTs = now - windowMs;
   const windowEndTs = now;
