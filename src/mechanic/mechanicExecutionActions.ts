@@ -2,7 +2,7 @@ import YAML from "yaml";
 import { assertVaultMaySign } from "../keys/signingKeys.js";
 import { KeyProviderError } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
-import { loadBudgetsConfig, budgetsPath, signBudgetsConfig } from "../budgets/budgets.js";
+import { updateMechanicBudgets } from "./mechanicBudgetAction.js";
 import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { loadApprovalPolicy, approvalPolicyPath, signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
@@ -21,37 +21,6 @@ import { loadMechanicTuning } from "./tuningStore.js";
 
 export function selectAgentId(plan: MechanicUpgradePlan): string {
   return plan.scope.type === "AGENT" ? plan.scope.id : "default";
-}
-
-function updateBudgetsFromTuning(workspace: string, agentId: string): string {
-  const tuning = loadMechanicTuning(workspace).mechanicTuning.knobs;
-  const budgets = loadBudgetsConfig(workspace);
-  const existing = budgets.budgets.perAgent[agentId] ?? budgets.budgets.perAgent.default;
-  if (!existing) {
-    throw new Error(`budgets profile missing for agent ${agentId}`);
-  }
-  budgets.budgets.perAgent[agentId] = {
-    ...existing,
-    daily: {
-      ...existing.daily,
-      maxLlmRequests: Math.max(1, tuning.maxToolCallsPerRun),
-      maxLlmTokens: Math.max(1000, tuning.maxTokensPerRun),
-      maxCostUsd: Math.max(0.01, tuning.maxCostPerDayUsd),
-      maxToolExecutes: Object.fromEntries(
-        Object.entries(existing.daily.maxToolExecutes).map(([actionClass]) => [
-          actionClass,
-          Math.max(0, tuning.maxToolCallsPerRun)
-        ])
-      ) as typeof existing.daily.maxToolExecutes
-    },
-    perMinute: {
-      maxLlmRequests: Math.max(1, Math.ceil(tuning.maxToolCallsPerRun / 2)),
-      maxLlmTokens: Math.max(1000, Math.ceil(tuning.maxTokensPerRun / 12))
-    }
-  };
-  writeFileAtomic(budgetsPath(workspace), YAML.stringify(budgets), 0o644);
-  signBudgetsConfig(workspace);
-  return budgetsPath(workspace);
 }
 
 function updateToolsFromTuning(workspace: string): string {
@@ -142,8 +111,7 @@ export async function executeAction(params: {
       };
     }
     case "BUDGETS_APPLY": {
-      assertVaultMaySign(params.workspace, "config-signature");
-      const path = updateBudgetsFromTuning(params.workspace, agentId);
+      const path = await updateMechanicBudgets({ workspace: params.workspace, agentId, beforeEffect: params.beforeEffect, recordEffect: params.recordEffect });
       return { status: "EXECUTED", note: `budgets updated (${path})` };
     }
     case "TOOLS_APPLY": {
@@ -180,7 +148,7 @@ export async function executeAction(params: {
     case "ASSURANCE_RUN": {
       let report: Awaited<ReturnType<typeof runAssurance>>;
       try {
-        report = await runAssurance({ workspace: params.workspace, agentId, mode: "supervise", window: "14d", packId: "governance_bypass" });
+        report = await runAssurance({ workspace: params.workspace, agentId, mode: "supervise", window: "14d", packId: "governance_bypass" }, { beforePublish: params.beforeEffect });
       } catch (error) {
         params.beforeEffect();
         if (knownSigningRefusal(error)) throw error;

@@ -2,8 +2,10 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
@@ -153,7 +155,13 @@ export function verifyBudgetsConfigSignature(workspace: string, content?: Buffer
     if (digest !== payload.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
     }
-    const valid = verifyHexDigestAny(digest, payload.signature, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const keys = getPurposeKeyHistory(workspace, "config-signature");
+    if (keysetDeclared(workspace) && boundProviderKey(workspace, "config-signature") === null) {
+      const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+      keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+    }
+    const valid = typeof payload.signature === "string" && verifyHexDigestAny(digest, payload.signature, keys);
     return {
       valid,
       signatureExists: true,

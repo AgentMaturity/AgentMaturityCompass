@@ -43,7 +43,7 @@ async function initializeTargets(workspace: string, run: Run, state: Progress) {
 }
 async function measure(workspace: string, selectedScope: MechanicScope, run: Run, state: Progress) {
   state.phase = "diagnostic-measurement"; state.entryHash = null; state.pendingRecorded = null; run.assertCurrent();
-  const produced = await runAutoAnswer({ workspace, agentId: selectedScope.type === "AGENT" ? selectedScope.id : "default", createPlan: false });
+  const produced = await runAutoAnswer({ workspace, agentId: selectedScope.type === "AGENT" ? selectedScope.id : "default", createPlan: false }, { beforePublish: run.assertCurrent });
   state.completed.push(`diagnostic-run:${produced.runId}`); run.assertCurrent(); return structuredClone(produced);
 }
 async function gap(params: ScopeParams, selectedScope: MechanicScope, run: Run, state: Progress) {
