@@ -13,18 +13,22 @@ import { assertSigningKeyUsable, getSigningKey, getSigningPublicKeyPem, getPurpo
 export interface RunHashPublicationOptions { beforePublish?: () => void; synchronousSeal?: boolean }
 export interface PreparedRunHashSignature { readonly signature: string; assertCurrent(): void }
 
+function signingEnabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
+
 /** Capture before a producer's FIRST await. No response or signature is fabricated for this original-authority gate. */
 export function captureRunHashAuthority(workspace: string, unsigned: boolean): () => void {
   if (unsigned) return () => {};
+  signingEnabled();
   const captured = capturePurposePublication(workspace, "artifact-seal"), bound = boundProviderKey(workspace, "artifact-seal");
   const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "artifact-seal");
-  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm;
+  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm, selectedPolicy = canonicalize(keyPolicy(loadKeysConfig(workspace)));
   if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original run signer has no supported public key");
   const assertCurrent = () => {
+    signingEnabled();
     if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset)
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original run purpose generation changed while preparing publication");
     const policy = keyPolicy(loadKeysConfig(workspace));
-    if (!policy.allowed.includes(algorithm) || (holder === "file" && policy.requireNonExportable))
+    if (canonicalize(policy) !== selectedPolicy || !policy.allowed.includes(algorithm) || (holder === "file" && policy.requireNonExportable))
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "current policy refuses the original run signer");
     assertSigningKeyUsable(workspace, "artifact-seal", publicKeyPem, holder);
     if (holder === "file") {
@@ -38,6 +42,8 @@ export function captureRunHashAuthority(workspace: string, unsigned: boolean): (
 
 /** Raw 32-byte run digest, checked artifact-purpose signer, original holder retained across import and Describe waits. */
 export async function prepareRunHashSignature(workspace: string, hashHex: string, unsigned: boolean, beforePublish?: () => void): Promise<PreparedRunHashSignature> {
+  const actor = beforePublish;
+  if (!unsigned) beforePublish = () => { signingEnabled(); actor?.(); signingEnabled(); };
   beforePublish?.();
   if (unsigned) return Object.freeze({ signature: "unsigned", assertCurrent() {} });
   if (!/^[0-9a-f]{64}$/i.test(hashHex)) throw new Error("Run seal requires a SHA-256 digest");
