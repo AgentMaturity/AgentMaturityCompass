@@ -1,5 +1,6 @@
 import type { AuditPublicationOptions } from "./binderPublication.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { resolve } from "node:path";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
@@ -29,6 +30,15 @@ import {
   auditSchedulerStatusForApi
 } from "./auditApi.js";
 import { verifyAuditWorkspace } from "./binderVerifier.js";
+
+/** Reuse the registered operations owner gate; commandPath is error context only, never an authority choice. */
+export function assertAuditCliOwnerMode(workspace: string, commandPath: string): void {
+  try { assertOwnerMode(workspace, "ops init"); }
+  catch (cause) {
+    if (!(cause instanceof Error) || cause.message !== "Command 'ops init' is blocked in agent mode. Switch to owner mode with: amc mode owner") throw cause;
+    throw new Error(`Command '${commandPath}' is blocked in agent mode. Switch to owner mode with: amc mode owner`, { cause });
+  }
+}
 
 function parseJsonOrYaml(raw: string): unknown {
   try {

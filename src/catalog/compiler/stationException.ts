@@ -44,7 +44,7 @@ export function stationExceptionDigest(exception: StationMergeException): string
 
 /** Uses the existing plan-signing route; the operator must separately admit its key for config-signature. */
 export function signStationMergeException(workspace: string, exception: Omit<StationMergeException, "signature">): StationMergeException {
-  assertOwnerMode(workspace, "catalog reviewer exception");
+  assertOwnerMode(workspace, "catalog compile");
   const body = stationMergeExceptionSchema.parse(exception);
   const digestHex = stationExceptionDigest(body).slice("sha256:".length);
   return { ...body, signature: signDigestWithPolicy({ workspace, kind: "CONTROL_PLAN", digestHex }) };
@@ -54,7 +54,7 @@ export function signStationMergeException(workspace: string, exception: Omit<Sta
 export async function signStationMergeExceptionAsync(workspace: string, exception: Omit<StationMergeException, "signature">,
   options: { beforePublish?: () => void } = {}): Promise<StationMergeException> {
   const beforePublish = options.beforePublish;
-  const beforeSign = () => { beforePublish?.(); assertOwnerMode(workspace, "catalog reviewer exception"); };
+  const beforeSign = () => { beforePublish?.(); assertOwnerMode(workspace, "catalog compile"); };
   beforeSign();
   const { signature: _signature, ...body } = stationMergeExceptionSchema.parse(structuredClone(exception));
   const prepared = await prepareFileSignatureWithAuditor(workspace, "station-merge-exception.json",

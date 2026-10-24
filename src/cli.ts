@@ -249,7 +249,7 @@ import {
   assuranceWaiverStatusCli
 } from "./assurance/assuranceCli.js";
 import {
-  auditApplyPolicyCli,
+  auditApplyPolicyCli, assertAuditCliOwnerMode,
   auditBinderCreateCli,
   auditBinderExportExecuteCli,
   auditBinderExportRequestCli,
@@ -17149,7 +17149,7 @@ auditBinder
   .option("--id <id>", "scope id for node/agent")
   .option("--request-id <id>", "restricted evidence request id")
   .action(async (opts: { scope: string; out: string; id?: string; requestId?: string }) => {
-    assertOwnerMode(process.cwd(), "audit binder create");
+    assertAuditCliOwnerMode(process.cwd(), "audit binder create");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
@@ -17160,7 +17160,7 @@ auditBinder
       id: opts.id,
       outFile: opts.out,
       requestId: opts.requestId
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit binder create") });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit binder create") });
     if (!("outFile" in out) || !("sha256" in out)) {
       throw new Error("audit binder create did not produce an export artifact");
     }
@@ -17226,11 +17226,11 @@ auditBinder
   .description("Execute previously approved external binder export")
   .requiredOption("--approval <id>", "approval request id")
   .action(async (opts: { approval: string }) => {
-    assertOwnerMode(process.cwd(), "audit binder export-execute");
+    assertAuditCliOwnerMode(process.cwd(), "audit binder export-execute");
     const out = await auditBinderExportExecuteCli({
       workspace: process.cwd(),
       approvalRequestId: opts.approval
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit binder export-execute") });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit binder export-execute") });
     console.log(chalk.green("Audit binder export executed"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
@@ -17304,12 +17304,12 @@ auditRequest
   .argument("<requestId>")
   .requiredOption("--out <file.amcaudit>", "output artifact path")
   .action(async (requestId: string, opts: { out: string }) => {
-    assertOwnerMode(process.cwd(), "audit request fulfill");
+    assertAuditCliOwnerMode(process.cwd(), "audit request fulfill");
     const out = await auditRequestFulfillCli({
       workspace: process.cwd(),
       requestId,
       outFile: opts.out
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit request fulfill") });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit request fulfill") });
     console.log(chalk.green("Evidence request fulfilled"));
     console.log(`requestId: ${out.request.requestId}`);
     console.log(`binder sha256: ${out.export.sha256}`);
@@ -17329,7 +17329,7 @@ auditScheduler
   .option("--scope <scope>", "workspace|node|agent", "workspace")
   .option("--id <id>", "scope id for node/agent")
   .action(async (opts: { scope: string; id?: string }) => {
-    assertOwnerMode(process.cwd(), "audit scheduler run-now");
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler run-now");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
@@ -17338,7 +17338,7 @@ auditScheduler
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler run-now") });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler run-now") });
     console.log(chalk.green("Audit scheduler refresh completed"));
     console.log(`binderId: ${out.binder.binderId}`);
     console.log(`cache: ${out.cache.path}`);
@@ -17348,22 +17348,22 @@ auditScheduler
   .command("enable")
   .description("Enable audit scheduler")
   .action(async () => {
-    assertOwnerMode(process.cwd(), "audit scheduler enable");
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler enable");
     console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: true
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler enable") }), null, 2));
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler enable") }), null, 2));
   });
 
 auditScheduler
   .command("disable")
   .description("Disable audit scheduler")
   .action(async () => {
-    assertOwnerMode(process.cwd(), "audit scheduler disable");
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler disable");
     console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: false
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler disable") }), null, 2));
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler disable") }), null, 2));
   });
 
 audit
