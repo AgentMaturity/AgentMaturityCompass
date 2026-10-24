@@ -276,16 +276,27 @@ export function applyVerifyRepair(workspace: string, input: RepairPlan, deps: Re
 
 /** Internal async preparation used by the maintained repair CLI; apply is synchronous and performs no signing. */
 export async function prepareVerifyRepairAsync(workspace: string, input: RepairPlan, deps: RepairDependencies & {
-  prepareSignature: (path: string, bytes: Buffer) => Promise<PreparedRepairSignature>;
+  prepareSignature: (path: string, bytes: Buffer, beforeSign?: () => void) => Promise<PreparedRepairSignature>;
 }): Promise<{ apply(): RepairResult }> {
   const prepareSignature = deps.prepareSignature, plan = prepareRepair(workspace, input, deps);
-  const first = await prepareSignature(join(plan.quarantineDir, "repair-plan.json"), Buffer.from(plan.planJson));
+  // Preparation-only source/hold/target decisions stop before the actual quarantine move.
+  const assertPreparing = () => {
+    holdClear(plan.legalHolds);
+    const current = currentStore(plan.workspace);
+    if (!sameBytes(current.marker, plan.store.marker) || JSON.stringify(current.files) !== JSON.stringify(plan.store.files))
+      throw new RepairRefused("evidence changed since the plan");
+    if (pathPresent(plan.quarantineDir)) throw new RepairRefused(`quarantine folder already exists: ${plan.relativeDir}`);
+  };
+  assertPreparing();
+  const first = await prepareSignature(join(plan.quarantineDir, "repair-plan.json"), Buffer.from(plan.planJson), assertPreparing);
   if (first.digestSha256 !== sha256Hex(plan.planJson)) throw new RepairRefused("prepared plan signature digest mismatch");
   const firstCurrent = first.assertCurrent.bind(first);
-  firstCurrent();
-  const second = await prepareSignature(join(plan.quarantineDir, "repair-receipt.json"), Buffer.from(plan.receiptJson));
+  const beforeSecondSign = () => { assertPreparing(); firstCurrent(); };
+  beforeSecondSign();
+  const second = await prepareSignature(join(plan.quarantineDir, "repair-receipt.json"), Buffer.from(plan.receiptJson), beforeSecondSign);
   if (second.digestSha256 !== sha256Hex(plan.receiptJson)) throw new RepairRefused("prepared receipt signature digest mismatch");
   const secondCurrent = second.assertCurrent.bind(second), signatureBytes = second.signatureBytes;
+  beforeSecondSign(); secondCurrent();
   return Object.freeze({ apply: () => publishRepair(plan, signatureBytes, () => { firstCurrent(); secondCurrent(); }) });
 }
 

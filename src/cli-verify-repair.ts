@@ -77,7 +77,7 @@ async function applyPlan(workspace: string, plan: RepairPlan, yes: boolean): Pro
   try {
     const prepared = await prepareVerifyRepairAsync(workspace, plan, {
       legalHolds: () => workspaceLegalHolds(workspace),
-      prepareSignature: (path, bytes) => prepareFileSignatureWithAuditor(workspace, path, bytes, "REPAIR_RECEIPT")
+      prepareSignature: (path, bytes, beforeSign) => prepareFileSignatureWithAuditor(workspace, path, bytes, "REPAIR_RECEIPT", beforeSign)
     });
     const { receipt } = withLegalHoldLock(workspace, () => prepared.apply());
     console.log(chalk.green(`Archived ${receipt.moved.length} file(s) to ${QUARANTINE_DIR}/${receipt.id}/`));
