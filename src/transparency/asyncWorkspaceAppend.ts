@@ -118,6 +118,21 @@ function assertSignerCurrent(workspace: string, original: ReturnType<typeof capt
   }
 }
 
+/** Internal fixed TR/Merkle authority for the actual producer phase before an earlier await. */
+export function captureWorkspaceLogAuthority(workspace: string, beforeCommit?: () => void) {
+  beforeCommit?.();
+  const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
+  const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
+  const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
+  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
+    beforeCommit?.();
+    assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
+    if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
+    if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
+  };
+  assertCurrent(); return { sealSigner, rootSigner, assertCurrent };
+}
+
 /** One prepared attempt. A competing writer refuses before this attempt appends; callers may explicitly retry.
  * beforeCommit is an internal repeatable negative gate: it runs before each Sign and again inside final publication.
  * It must not advance business state, sign, await, or retain a lock/SQL transaction after returning.
@@ -125,9 +140,7 @@ function assertSignerCurrent(workspace: string, original: ReturnType<typeof capt
 export async function appendTransparencyEntryAsync(input: TransparencyAppendInput, options: { beforeCommit?: () => void } = {}): Promise<TransparencyEntry> {
   const params = { workspace: input.workspace, type: input.type, agentId: input.agentId, artifact: { ...input.artifact } };
   const beforeCommit = options.beforeCommit, workspace = params.workspace;
-  const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
-  const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
-  const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
+  const original = captureWorkspaceLogAuthority(workspace, beforeCommit), { sealSigner, rootSigner } = original;
   const before = captureTransparencyState(workspace, true), predecessor = verifiedPredecessor(workspace, before);
   assertTransparencyStateCurrent(before);
   const payload = { v: 1 as const, ts: Date.now(), type: params.type, agentId: params.agentId,
@@ -139,11 +152,7 @@ export async function appendTransparencyEntryAsync(input: TransparencyAppendInpu
   const plan = prepareMerkle({ workspace, algorithm: predecessor.algorithm, log: stateBytes(before, workspaceLogPath(workspace)),
     append: { entryHash: entry.hash, prevEntryHash: entry.prev }, rebuild: true });
   const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
-    beforeCommit?.();
-    assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
-    if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
-    if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
-    assertTransparencyStateCurrent(before);
+    original.assertCurrent(signedSeal, signedRoot); assertTransparencyStateCurrent(before);
   };
   assertCurrent();
   const signedSeal = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: sha256Hex(seal), expectedSigner: sealSigner.descriptor,

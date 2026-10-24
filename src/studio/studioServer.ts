@@ -397,11 +397,11 @@ import {
 import { verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { emitPassportSse } from "../passport/passportSse.js";
 import {
-  standardGenerateForApi,
+  standardGenerateForApiAsync as standardGenerateForApi,
   standardSchemaReadForApi,
   standardSchemasForApi,
   standardValidateForApi,
-  standardVerifyForApi
+  standardVerifyForApiAsync as standardVerifyForApi
 } from "../standard/standardApi.js";
 
 interface StudioApiOptions {
@@ -5262,7 +5262,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireUnlockedVaultForSigning()) {
           return;
         }
-        const out = standardGenerateForApi(options.workspace);
+        const beforePublish = signingAuthority(["OWNER"]), out = await standardGenerateForApi(options.workspace, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return; beforePublish();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "STANDARD_SCHEMAS_GENERATED",
@@ -5287,7 +5288,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, standardVerifyForApi(options.workspace));
+        const beforePublish = signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]), out = await standardVerifyForApi(options.workspace, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return; beforePublish(); json(res, 200, out);
         return;
       }
 

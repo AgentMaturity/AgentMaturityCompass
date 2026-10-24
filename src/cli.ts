@@ -787,11 +787,11 @@ import {
   passportVerifyPolicyCli
 } from "./passport/passportCli.js";
 import {
-  standardGenerateCli,
+  standardGenerateCliAsync as standardGenerateCli,
   standardListCli,
   standardPrintCli,
   standardValidateCli,
-  standardVerifyCli
+  standardVerifyCliAsync as standardVerifyCli
 } from "./standard/standardCli.js";
 import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
 import { registerA4Commands } from "./cli-a4-commands.js";
@@ -8998,9 +8998,9 @@ passport
 standard
   .command("generate")
   .description("Generate signed Open Compass schema bundle under .amc/standard/")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "standard generate");
-    const out = standardGenerateCli(process.cwd());
+    const out = await standardGenerateCli(process.cwd(), { beforePublish: () => assertOwnerMode(process.cwd(), "standard generate") });
     console.log(chalk.green("Standard schemas generated"));
     console.log(`Root: ${out.root}`);
     console.log(`Meta: ${out.metaPath}`);
@@ -9011,8 +9011,8 @@ standard
 standard
   .command("verify")
   .description("Verify schema bundle signatures and manifest digests")
-  .action(() => {
-    const out = standardVerifyCli(process.cwd());
+  .action(async () => {
+    const out = await standardVerifyCli(process.cwd());
     if (!out.ok) {
       console.log(chalk.red("Standard schema verify failed"));
       for (const error of out.errors) {

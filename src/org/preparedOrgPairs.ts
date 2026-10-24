@@ -57,8 +57,11 @@ function read(path: string): Member {
     return { path, bytes, mode: last.mode & 0o777, identity: `${last.dev}:${last.ino}` };
   } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return { path, bytes: null, mode: null, identity: null }; throw error; }
 }
+export function captureOrgFiles(paths: readonly string[]): OrgPairsSnapshot {
+  return { members: [...new Set(paths)].map(read) };
+}
 export function captureOrgPairs(paths: readonly string[]): OrgPairsSnapshot {
-  return { members: [...new Set(paths.flatMap(path => [path, `${path}.sig`]))].map(read) };
+  return captureOrgFiles(paths.flatMap(path => [path, `${path}.sig`]));
 }
 export function assertOrgPairsCurrent(before: OrgPairsSnapshot): void {
   for (const old of before.members) {

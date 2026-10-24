@@ -38,3 +38,5 @@ export function standardListCli(workspace: string) {
   return standardSchemasForApi(workspace);
 }
 
+
+export { standardGenerateForApiAsync as standardGenerateCliAsync, standardVerifyForApiAsync as standardVerifyCliAsync } from "./standardApi.js";
