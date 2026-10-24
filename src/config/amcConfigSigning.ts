@@ -1,3 +1,6 @@
+import { captureConfigSignatureAuthority } from "./configSignaturePair.js";
+import { canonicalSigningKey } from "../keys/algorithmPolicy.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { join } from "node:path";
 import { vaultStatus } from "../vault/vault.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -22,11 +25,25 @@ export async function saveSignedAmcConfig(workspace: string, candidate?: Uint8Ar
   const bytes = owned ?? captured.config;
   if (bytes === null || bytes.length > MAX_CONFIG_BYTES) throw new Error("amc.config.yaml is missing or exceeds 1 MiB");
   const policy = parseKeysSection(bytes);
-  const digest = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"));
+  const original = captureConfigSignatureAuthority(workspace);
+  const holder = boundProviderKey(workspace, "config-signature")?.binding.provider ?? "file";
+  const algorithm = canonicalSigningKey(original.publicKeyPem)!.algorithm;
+  const beforeSign = () => withAmcConfigPublicationLock(workspace, () => {
+    assertOwnerMode(workspace, "keys commit"); original.assertCurrent();
+    for (const config of [loadKeysConfig(workspace), policy]) {
+      if (!config.algorithmPolicy.allowed.includes(algorithm) || (config.requireNonExportable && holder === "file"))
+        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the current or candidate policy refuses this config signer");
+    }
+    if (holder === "file" && configuredRef(policy, "config-signature") !== null)
+      throw new KeyProviderError("KEY_PROVIDER_HELD", "file", "use amc keys rotate --purpose config-signature --config-candidate <file> to select a provider backing key");
+    assertConfigPublicationCurrent(workspace, captured);
+  });
+  const digest = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"), { beforeSign });
   const sidecar = configSignatureBytes(digest, signed.signature);
   return withAmcConfigPublicationLock(workspace, () => {
     assertOwnerMode(workspace, "keys commit");
     assertConfigPublicationCurrent(workspace, captured);
+    original.assertCurrent(); assertPurposePublicationCurrent(workspace, original.captured, signed);
     // Recheck after the await at the publication boundary; no second remote describe is needed.
     assertSigningKeyUsable(workspace, "config-signature", signed.publicKeyPem, signed.provider);
     const current = loadKeysConfig(workspace);
