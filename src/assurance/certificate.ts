@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { vaultStatus } from "../vault/vault.js";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
@@ -698,6 +699,7 @@ function publishCertificateRevocation(params: { workspace: string; outFile: stri
 
 /** Provider-capable certificate revocation; the synchronous private-key API stays unchanged. */
 export async function revokeCertificateAsync(params: Parameters<typeof revokeCertificate>[0]): Promise<ReturnType<typeof revokeCertificate>> {
+  params = { ...params };
   const certificateSha256 = sha256Hex(readFileSync(params.certFile));
   const inspect = inspectCertificate(params.certFile);
   if (sha256Hex(readFileSync(params.certFile)) !== certificateSha256) throw new Error("certificate input changed while it was inspected; retry");
@@ -721,6 +723,7 @@ export async function revokeCertificateAsync(params: Parameters<typeof revokeCer
     }
     assertSigningKeyUsable(params.workspace, "revocation-list", signed.publicKeyPem, signed.provider);
     if (signed.provider === "file") {
+      if (!vaultStatus(params.workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
       assertVaultMaySign(params.workspace, "revocation-list");
       if (publicKeyFromPrivate(getSigningKey(params.workspace, "revocation-list")) !== auditorPub) {
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault revocation key changed while signing");

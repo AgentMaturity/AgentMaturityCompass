@@ -86,7 +86,8 @@ export async function createRollbackPackAsync(agentId: string, policyContent: st
   const captured = capturePurposePublication(root, "artifact-seal");
   const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(sha256Hex(canonicalize(body)), "hex"));
   const pack: RollbackPack = { ...body, policyContent, signature: signed.signature.toString("base64") };
-  const prepared = await prepareWorkspaceRecordAsync(root, ROLLBACK_PACKS_AT, pack.packId, { ...pack }, now);
+  const prepared = await prepareWorkspaceRecordAsync(root, ROLLBACK_PACKS_AT, pack.packId, { ...pack }, now, undefined,
+    { beforePublish: () => assertPurposePublicationCurrent(root, captured, signed) });
   return withWorkspaceRecordPublicationLock(root, ROLLBACK_PACKS_AT, () => {
     assertPurposePublicationCurrent(root, captured, signed);
     prepared.publish();

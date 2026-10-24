@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { vaultStatus } from "../vault/vault.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -24,6 +25,7 @@ export async function saveSignedAmcConfig(workspace: string, candidate?: Uint8Ar
   const digest = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"));
   const sidecar = configSignatureBytes(digest, signed.signature);
   return withAmcConfigPublicationLock(workspace, () => {
+    assertOwnerMode(workspace, "keys commit");
     assertConfigPublicationCurrent(workspace, captured);
     // Recheck after the await at the publication boundary; no second remote describe is needed.
     assertSigningKeyUsable(workspace, "config-signature", signed.publicKeyPem, signed.provider);
@@ -33,6 +35,7 @@ export async function saveSignedAmcConfig(workspace: string, candidate?: Uint8Ar
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current or candidate policy refuses this config signer");
       }
     }
+    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
     if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, "config-signature")) !== signed.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault config signer changed while signing");
     }

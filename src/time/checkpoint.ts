@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { vaultStatus } from "../vault/vault.js";
 import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
@@ -211,6 +212,7 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current key policy refuses the checkpoint signer");
     }
     assertSigningKeyUsable(workspace, "ledger-row", signed.publicKeyPem, signed.provider);
+    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
     if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, "ledger-row")) !== signed.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault ledger key changed while the checkpoint was signed");
     }

@@ -31,6 +31,8 @@ export async function createHandoffPacketAsync(workspace: string, params: Handof
     ...prepared.senderReceiptWithoutSignature, signature: sender.signature.toString("base64")
   });
   const body = { ...prepared.baseBody, senderReceipt };
+  assertAsyncHandoffSigning(); assertPacketAdmission(prepared.baseBody, capturedOptions);
+  assertPurposePublicationCurrent(workspace, authority, sender);
   const outer = await signWithPurposeKey(workspace, "artifact-seal", digest(body));
   const packet = handoffPacketSchema.parse({ ...body, signature: outer.signature.toString("base64") });
   publishHandoffPacket(workspace, packet, files, () => {

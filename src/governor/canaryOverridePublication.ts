@@ -40,6 +40,8 @@ function fileRefusal(error: unknown): never {
 export async function publishCanaryOverride(workspace: string, override: EmergencyOverride, prepared: PreparedOverride): Promise<EmergencyOverride> {
   const own = structuredClone(override), body = { ...own, override_signature: own.signature }, rel = `${REL}/${own.overrideId}.json`;
   if (body.override_signature !== prepared.signed.signature.toString("base64") || !verifyOverrideDigest(workspace, canaryOverrideDigest(own), own.signature).valid) throw new BreakGlassSigningError();
+  // Retain the first real config-purpose signature before a second capture can warm the file vault.
+  assertOverridePublicationCurrent(workspace, prepared.captured, prepared.signed);
   let artifact: ReturnType<typeof capturePurposePublication>;
   try { artifact = capturePurposePublication(workspace, "artifact-seal"); } catch (error) { fileRefusal(error); }
   const predecessor = withCanaryOverridePublicationLock(workspace, () => {
