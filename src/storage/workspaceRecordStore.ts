@@ -30,6 +30,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { vaultStatus } from "../vault/vault.js";
 
 /**
  * Where a family of records lives, relative to the workspace root.
@@ -161,10 +162,13 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
   const captured = capturePurposePublication(root, "artifact-seal");
   const hash = sha256Hex(canonicalize({ ...ownBody, prev_record_hash: before.head }));
   const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
+  const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("vault locked; unlock required for workspace record publication"); };
+  assertVaultCurrent();
   const record = { ...ownBody, prev_record_hash: before.head, record_hash: hash,
     signature: signed.signature.toString("base64"), storedTs } as T & RecordEnvelope;
   const bytes = JSON.stringify(record, null, 2);
   return Object.freeze({ publish(): T & RecordEnvelope {
+    assertVaultCurrent();
     assertPurposePublicationCurrent(root, captured, signed);
     assertPredecessorCurrent(root, location, ownId, before);
     ensureDir(recordDir(root, location));
