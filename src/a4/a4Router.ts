@@ -32,9 +32,10 @@ import { conformanceView } from "./a4Conformance.js";
 import { A4BlobError, getPrivate } from "./a4Blobs.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
-  acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGate, resumeProject, retireProject,
+  acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGateAsync, resumeProject, retireProject,
   signedA4Floor, tuneProject, type A4Call
 } from "./a4Gates.js";
+import { captureA4RequestActor, gateRequestActor, A4TransitionPublicationError } from "./a4TransitionSigning.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
 import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
@@ -64,6 +65,8 @@ const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "a
  */
 export interface A4Route {
   readonly workspace: string;
+  readonly assertAuthority?: () => void;
+  readonly assertGateRequestCurrent?: () => void;
   readonly store: A4Store;
   readonly native?: NativeTaskApiContext;
   readonly principal: A4Principal | null;
@@ -242,6 +245,7 @@ function sendError(res: ServerResponse, error: unknown, projectId: string | null
     const issue = error.issues[0];
     return send(409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
   }
+  if (error instanceof A4TransitionPublicationError) return send(error.status, error.code, error.message, { detail: error.detail });
   if (error instanceof A4StoreError) {
     const stale = error.code === "A4_STALE_HEAD" && projectId !== null
       ? { head: error.detail ?? null, diff: `${A4_API_PREFIX}/projects/${projectId}/transitions` } : {};
@@ -446,17 +450,26 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
           column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request });
       }, 201);
     case "/gate-policy":
-      // A proposal opens the `policy` gate (always a distinct approver); a gate id applies the decided proposal.
-      return mutate(route, projectId, gatePolicySchema, (body, request) => {
+      {
+        // A proposal opens the policy gate; the existing decided-policy apply branch stays synchronous.
+        const { body, request } = await readJson(route, gatePolicySchema);
+        const replay = priorReplay(store, request, projectId);
+        if (replay) { apiSuccess(route.res, replay); return true; }
         const call = callOf(route, request);
-        if (!("proposedGatePolicy" in body)) return changeGatePolicy(store, projectId, { ...call, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
+        if (!("proposedGatePolicy" in body)) {
+          apiSuccess(route.res, mutationResult(changeGatePolicy(store, projectId, { ...call, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq })));
+          return true;
+        }
         const head = headOf();
-        const result = requestGate(store, projectId, { ...call, stage: headStage(head), gate: "policy", proposedGatePolicy: body.proposedGatePolicy,
-          expectedHeadSeq: body.expectedHeadSeq });
+        const attempt = await requestGateAsync(store, projectId, { ...call, stage: headStage(head), gate: "policy", proposedGatePolicy: body.proposedGatePolicy,
+          expectedHeadSeq: body.expectedHeadSeq }, gateRequestActor(route));
+        const result = attempt.result;
+        attempt.assertCurrent();
         if (!result.replay) auditA4(route.workspace, { type: "A4_GATE_OPENED", agentId: head.agent_id, projectId, username: principal.username,
           summary: `A4 policy gate opened on ${head.name}`, details: { gate: "policy", seq: result.seq } });
-        return result;
-      });
+        attempt.assertCurrent();
+        apiSuccess(route.res, mutationResult(result)); return true;
+      }
     case "/hold":
       return mutate(route, projectId, OWNER_SCHEMAS.hold, (body, request) => {
         const head = headOf();
@@ -730,9 +743,9 @@ function refuse(res: ServerResponse, status: number, code: string, message: stri
 }
 
 export async function handleA4Route(pathname: string, method: string, req: IncomingMessage, res: ServerResponse,
-  context: { workspace: string; nativeTasks?: NativeTaskApiContext }): Promise<boolean> {
+  context: { workspace: string; nativeTasks?: NativeTaskApiContext; revalidateAuthority?: () => boolean }): Promise<boolean> {
   if (pathname !== A4_API_PREFIX && !pathname.startsWith(`${A4_API_PREFIX}/`)) return false;
-  const nativeTasks = context.nativeTasks;
+  const nativeTasks = context.nativeTasks, revalidateAuthority = context.revalidateAuthority;
   if (!nativeTasks) return refuse(res, 401, "A4_AUTH_REQUIRED", "A4 routes are served only through authenticated Studio sessions.");
   if (nativeTasks.demo) return refuse(res, 403, "DEMO_REFUSED", "The demo session cannot reach A4 projects.");
   if (!a4PreviewEnabled()) return refuse(res, 404, "A4_PREVIEW_DISABLED", "A4 Forge is not enabled in this workspace.");
@@ -742,7 +755,9 @@ export async function handleA4Route(pathname: string, method: string, req: Incom
   if (verb !== "GET" && verb !== "POST") return refuse(res, 405, "METHOD_NOT_ALLOWED", "A4 routes take GET or POST.");
   res.setHeader("cache-control", "no-store");
   await serveA4({ workspace: context.workspace, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
-    params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+    params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res, assertAuthority: () => {
+      if (revalidateAuthority?.() !== true) throw a4Fail(401, "A4_AUTH_REQUIRED", "The original Studio admission is no longer current.");
+    } });
   return true;
 }
 
@@ -751,7 +766,7 @@ export async function handleA4Route(pathname: string, method: string, req: Incom
  * it after its refusals; the CLI (P1-65, src/cli-a4-commands.ts) calls it with the principal its login token resolved
  * to (admission native_login_token), so both run the same routes, gate functions and refusals.
  */
-export async function serveA4(route: Omit<A4Route, "store">): Promise<void> {
+export async function serveA4(route: Omit<A4Route, "store" | "assertGateRequestCurrent">): Promise<void> {
   let store: A4Store;
   try {
     store = openA4Store(route.workspace);
@@ -760,7 +775,10 @@ export async function serveA4(route: Omit<A4Route, "store">): Promise<void> {
     return;
   }
   try {
-    await dispatch({ ...route, store });
+    const tail = PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[2];
+    const original = route.method === "POST" && (tail === "/gate-policy" || /^\/stages\/[a-z]+\/gates\/(direction|completion)\/request$/.test(tail ?? ""))
+      ? captureA4RequestActor(route) : undefined;
+    await dispatch({ ...route, store, assertGateRequestCurrent: original });
   } catch (error) {
     sendError(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
   } finally {

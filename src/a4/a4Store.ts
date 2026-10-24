@@ -37,14 +37,18 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { a4AuditProblems } from "./a4AuditReader.js";
+import { prepareA4Record, SIDE_TABLE_KEYS, NEW_HEAD, headProblems, type A4Actor, type Cell, type A4SideTable, type A4SideRow,
+  type A4ChangeSpec, type A4HeadState, type A4RequestKey, type A4TransitionOptions, type A4TransitionResult, type Build, type NewHead } from "./a4TransitionRecords.js";
+export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4TransitionResult } from "./a4TransitionRecords.js";
+import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
-  A4_ENVELOPE_KINDS, A4_STAGE_STATES, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
+  A4_ENVELOPE_KINDS, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
   a4RevisionRowSchema, a4TransitionRowSchema, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gatePolicyWeakenings,
   laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
-  type A4Member, type A4Principal, type A4ProjectRow, type A4RefKind, type A4ResourceDigests, type A4Stage, type A4TransitionKind,
+  type A4Member, type A4Principal, type A4ProjectRow, type A4RefKind, type A4ResourceDigests, type A4Stage,
   type A4TransitionRow, a4ResourceDigestsSchema
 } from "./a4Schema.js";
 
@@ -73,73 +77,6 @@ export class A4StoreError extends Error {
 }
 class HeadMoved extends Error {}
 
-type A4StageState = (typeof A4_STAGE_STATES)[number];
-export type A4Actor = Pick<A4Principal, "key" | "username">;
-type Cell = string | number | null;
-/** The append-only tables a transition may insert into, with their key columns. */
-const SIDE_TABLE_KEYS = {
-  a4_revisions: ["project_id", "revision_no"], a4_gates: ["gate_id"], a4_decisions: ["decision_id"], a4_members: ["project_id", "seq"],
-  a4_comments: ["comment_id"], a4_evidence_refs: ["project_id", "seq"], a4_releases: ["release_id"], a4_deployments: ["deployment_id"]
-} as const;
-type A4SideTable = keyof typeof SIDE_TABLE_KEYS;
-/** Every column except `evidence_event_id`, which the store fills from the transition's audit row. */
-interface A4SideRow { readonly table: A4SideTable; readonly values: Readonly<Record<string, Cell>> }
-/** The head's mutable state. Every body signs it as `headAfter`, so readers and writes never trust the unsigned head row. */
-const HEAD_COLUMNS = ["stage", "step", "hold", "hold_reason", "revision_no", "deployed_release_id", "base_release_id"] as const;
-type A4HeadState = Pick<A4ProjectRow, (typeof HEAD_COLUMNS)[number]>;
-/** The state a new project's head row is inserted with. */
-const NEW_HEAD: A4HeadState = { stage: "aspire", step: "asked", hold: 0, hold_reason: null, revision_no: 0, deployed_release_id: null, base_release_id: null };
-const headStateOf = (row: A4HeadState): A4HeadState => Object.fromEntries(HEAD_COLUMNS.map((column) => [column, row[column]])) as A4HeadState;
-/** Which head columns differ from the state the last signed body left. */
-const headProblems = (head: A4ProjectRow, body: Record<string, unknown>): string[] => {
-  const after = (body.headAfter ?? {}) as Record<string, unknown>;
-  return HEAD_COLUMNS.filter((column) => head[column] !== after[column]).map((column) => `head column ${column} differs from the signed head`);
-};
-
-/** What a change records; the actor is the one `transition` was called with, never part of the built change. */
-export interface A4ChangeSpec {
-  readonly kind: A4TransitionKind;
-  readonly stage?: A4StageState | null;
-  readonly revisionNo?: number;
-  /** Merged into the signed body; it may not reuse a field the store sets. */
-  readonly payload: Record<string, unknown>;
-  readonly sideRows?: readonly A4SideRow[];
-  readonly head?: Partial<A4HeadState>;
-  /** EFFECT_STARTED: the a4_effects liveness row inserted beside it (this process is its owner). */
-  readonly startEffect?: { readonly effectId: string; readonly gateId: string; readonly executionId: string; readonly approvalRequestId: string | null };
-  /** EFFECT_FINISHED / EFFECT_FAILED: the liveness row's state set in the same transaction. */
-  readonly settleEffect?: { readonly effectId: string; readonly state: "finished" | "failed" };
-}
-export interface A4RequestKey {
-  readonly principalKey: string;
-  readonly clientRequestId: string;
-  /**
-   * sha256 over the method, the route and the project id as well as the body: one (principal, clientRequestId)
-   * namespace spans every A4 route. The store also refuses a replay whose stored project differs (REQUEST_CONFLICT).
-   */
-  readonly bodyHash: string;
-  /** Credential-bearing routes store only this allowlist projection, never the response; a replay answers token: null. */
-  readonly credential?: { readonly releaseId: string; readonly leaseIds: readonly string[] };
-}
-export interface A4TransitionOptions {
-  /** 409 A4_STALE_HEAD unless the head is at this seq. Omit for changes that may land on any head (decisions). */
-  readonly expectedHeadSeq?: number;
-  readonly request?: A4RequestKey;
-  /** P1-57's readiness, as the fullDigest of an evaluation on rows read here; evaluated before signing and again inside the tx. */
-  readonly readiness?: (db: Database.Database, projectId: string) => string;
-  /** What the caller answers beside the transition (an attempt id, a minted agent id), stored so a replay answers it too. */
-  readonly response?: Readonly<Record<string, unknown>>;
-}
-export type A4TransitionResult =
-  | { readonly replay: false; readonly projectId: string; readonly seq: number; readonly kind: A4TransitionKind; readonly bodyDigest: string;
-      readonly evidenceEventId: string; readonly envelope: SignedDigest | null }
-  | { readonly replay: true; readonly response: Record<string, unknown> };
-/** One change, or several recorded in one transaction (each its own chained row, in order); `seq` is the first one's. */
-type Build = (ctx: { head: A4ProjectRow | null; seq: number; ts: number }) => A4ChangeSpec | readonly A4ChangeSpec[];
-type NewHead = Pick<A4ProjectRow, "project_id" | "workspace_id" | "agent_id" | "name" | "created_by_key">;
-
-const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256",
-  "headAfter", "sideRows", "population"]);
 const COLUMN = /^[a-z][a-z0-9_]*$/;
 /** The minted id shape (`randomId("a4p")`); it names a lock file and a blob directory, so nothing else is accepted. */
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
@@ -450,126 +387,212 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
     }
   };
 
-  const commit = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
+  const validateTransition = (projectId: string, actor: A4Actor, options: A4TransitionOptions): void => {
     assertProjectId(projectId);
-    // The replay namespace is the actor's own: a request key naming anyone else would read or block their replays.
     if (options.request && options.request.principalKey !== actor.key) throw new A4StoreError(400, "INPUT_INVALID", "The request key names another principal.");
-    requireSigningKey();
+  };
+  const prepareTransition = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null,
+    sign: ((digest: string) => SignedDigest) | null) => {
+    const replay = options.request ? dedupeRequest(options.request, projectId, create !== null, null, 0) : null;
+    if (replay) return { replayed: true as const, replay };
+    // A write to an existing project verifies the whole chain and every side table first, under the project lock but
+    // outside the ledger transaction (design §7 rule 2); the transaction then checks that this head has not moved.
+    const head0 = create === null ? verifyChain(projectId) : readHeadRow(projectId);
+    if (create === null && head0 === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
+    if (create !== null && head0 !== null) throw new A4StoreError(409, "A4_PROJECT_EXISTS", projectId);
+    if (options.expectedHeadSeq !== undefined && head0?.head_seq !== options.expectedHeadSeq) {
+      throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: head0?.head_seq ?? null });
+    }
+    // (a) Build and sign outside the ledger transaction: a notary round trip must never hold the ledger write lock.
+    // One commit may record several transitions (GATE_CONSUMED + EFFECT_STARTED), each its own chained, signed row.
+    const ts = Date.now();
+    const seq0 = head0 === null ? 0 : head0.head_seq + 1;
+    // Signed on every transition, so any write made while two or more principals were active ratchets self-approval (§5.3).
+    const population = populationFacts(workspace);
+    const specs = [build({ head: head0, seq: seq0, ts })].flat();
+    const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
+    let prevDigest = head0?.head_digest ?? "GENESIS";
+    let headState: A4HeadState = head0 ?? NEW_HEAD;
+    const entries = specs.map((spec, index) => {
+      const made = prepareA4Record(spec, index, { projectId, actor, create, seq0, ts, headState, previousDigest: prevDigest,
+        readinessSha256, population }, assertGatePolicyChange, rows => rows.map(row => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })));
+      headState = made.headAfter;
+      const entry = { ...made, envelope: A4_ENVELOPE_KINDS.includes(spec.kind) && sign !== null ? sign(made.digest) : null };
+      prevDigest = made.digest; return entry;
+    });
+    const last = entries.at(-1);
+    if (last === undefined) throw new Error("a commit records at least one transition");
+    const agentId = create?.agent_id ?? head0!.agent_id;
+    return { replayed: false as const, projectId, actor, options, create, head0, ts, readinessSha256, entries, last, agentId };
+  };
+  const finalizeTransition = (prepared: Exclude<ReturnType<typeof prepareTransition>, { replayed: true }>, current?: () => void): A4TransitionResult => {
+    const { projectId, actor, options, create, head0, ts, readinessSha256, entries, last, agentId } = prepared;
+    return runImmediateTransaction(db, (): A4TransitionResult => {
+      // (b) One transaction on rows read inside it.
+      const replayed = options.request
+        ? dedupeRequest(options.request, projectId, create !== null, { ...options.response, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest }, ts) : null;
+      if (replayed) return replayed;
+      const head = readHeadRow(projectId);
+      if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
+      if (head) verifyIncremental(projectId, head);
+      if (options.readiness && options.readiness(db, projectId) !== readinessSha256) throw new HeadMoved();
+      current?.();
+      let evidence: { id: string } | undefined;
+      for (const entry of entries) {
+        current?.();
+        const { spec, seq, stage, revisionNo } = entry;
+        const sessionId = `a4-${projectId}-${seq}`;
+        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
+        try {
+          current?.();
+          evidence = ledger.appendEvidenceWithReceipt({
+            sessionId, runtime: "unknown", eventType: "audit", payload: entry.bytes, inline: true,
+            // Key order is load-bearing for the row hash; these are human statements recorded by AMC, never observations.
+            meta: { source: "a4-store", trustTier: "SELF_REPORTED", auditType: "A4_STATE", a4Kind: spec.kind, projectId, seq, revisionNo, stage,
+              claimKind: "self_reported", actorKey: actor.key, prevDigest: entry.prevDigest },
+            receipt: { kind: "guard_check", agentId, providerId: A4_STORE_BINARY, model: null, bodySha256: entry.digest }
+          });
+        } finally {
+          ledger.sealSession(sessionId);
+        }
+        current?.();
+        if (create && seq === 0) {
+          db.prepare(`INSERT INTO a4_projects (project_id, workspace_id, agent_id, name, stage, step, hold, hold_reason, revision_no, head_seq,
+                    head_digest, created_by_key, created_ts, updated_ts) VALUES (?, ?, ?, ?, 'aspire', 'asked', 0, NULL, 0, 0, ?, ?, ?, ?)`)
+            .run(create.project_id, create.workspace_id, create.agent_id, create.name, entry.digest, create.created_by_key, ts, ts);
+        }
+        db.prepare(`INSERT INTO a4_transitions (project_id, seq, kind, stage, revision_no, actor_key, actor_username, body_json, body_digest,
+                  prev_digest, readiness_sha256, envelope_json, evidence_event_id, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+          .run(projectId, seq, spec.kind, stage, revisionNo, actor.key, actor.username, entry.bytes, entry.digest, entry.prevDigest, readinessSha256,
+            entry.envelope ? JSON.stringify(entry.envelope) : null, evidence.id, ts);
+        for (const row of entry.sideRows) {
+          current?.();
+          const columns = [...Object.keys(row.values), "evidence_event_id"];
+          if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${row.table}`);
+          db.prepare(`INSERT INTO ${row.table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`).run(...Object.values(row.values), evidence.id);
+          // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
+          if (storedSideRowDigest(row) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
+        }
+        // The liveness index beside EFFECT_STARTED (design §6.5): the sweeper reads its owner; the chain stays the state.
+        current?.();
+        const start = spec.startEffect;
+        if (start) db.prepare(`INSERT INTO a4_effects (effect_id, project_id, gate_id, execution_id, approval_request_id, owner_pid, owner_host, started_ts,
+                heartbeat_ts, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'running')`).run(start.effectId, projectId, start.gateId, start.executionId, start.approvalRequestId, process.pid, hostname(), ts, ts);
+        if (spec.settleEffect) db.prepare("UPDATE a4_effects SET state = ? WHERE effect_id = ? AND project_id = ?").run(spec.settleEffect.state, spec.settleEffect.effectId, projectId);
+      }
+      current?.();
+      const patch = { ...last.headAfter, head_seq: last.seq, head_digest: last.digest, verified_seq: last.seq, verified_digest: last.digest, updated_ts: ts };
+      db.prepare(`UPDATE a4_projects SET ${Object.keys(patch).map((column) => `${column} = @${column}`).join(", ")} WHERE project_id = @project_id`)
+        .run({ ...patch, project_id: projectId });
+      current?.();
+      db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
+      return { replay: false, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest, evidenceEventId: evidence!.id, envelope: last.envelope };
+    });
+  };
+  const commitFailure = (error: unknown, attempt: number, create: NewHead | null): void => {
+    if (error instanceof HeadMoved) {
+      if (attempt === 0) return;
+      throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved twice while this change was signed; reload and retry.");
+    }
+    if (create && /UNIQUE constraint failed: a4_projects\.agent_id/.test(String(error))) {
+      throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${create.agent_id} already has an active A4 project; retire it first`);
+    }
+    throw error;
+  };
+  const commit = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
+    validateTransition(projectId, actor, options); requireSigningKey();
     return withControlFileLock({ root: a4ProjectsRoot(workspace), name: create ? "a4-requests" : `project-${projectId}`, operation: () => {
       for (let attempt = 0; ; attempt += 1) {
-        const replay = options.request ? dedupeRequest(options.request, projectId, create !== null, null, 0) : null;
-        if (replay) return replay;
-        // A write to an existing project verifies the whole chain and every side table first, under the project lock but
-        // outside the ledger transaction (design §7 rule 2); the transaction then checks that this head has not moved.
-        const head0 = create === null ? verifyChain(projectId) : readHeadRow(projectId);
-        if (create === null && head0 === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
-        if (create !== null && head0 !== null) throw new A4StoreError(409, "A4_PROJECT_EXISTS", projectId);
-        if (options.expectedHeadSeq !== undefined && head0?.head_seq !== options.expectedHeadSeq) {
-          throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: head0?.head_seq ?? null });
-        }
-        // (a) Build and sign outside the ledger transaction: a notary round trip must never hold the ledger write lock.
-        // One commit may record several transitions (GATE_CONSUMED + EFFECT_STARTED), each its own chained, signed row.
-        const ts = Date.now();
-        const seq0 = head0 === null ? 0 : head0.head_seq + 1;
-        // Signed on every transition, so any write made while two or more principals were active ratchets self-approval (§5.3).
-        const population = populationFacts(workspace);
-        const specs = [build({ head: head0, seq: seq0, ts })].flat();
-        const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
-        let prevDigest = head0?.head_digest ?? "GENESIS";
-        let headState: A4HeadState = head0 ?? NEW_HEAD;
-        const entries = specs.map((spec, index) => {
-          if ((spec.kind === "CREATED") !== (create !== null && index === 0)) throw new Error("CREATED is a project's first transition and only that");
-          for (const key of Object.keys(spec.payload)) if (RESERVED_BODY_KEYS.has(key)) throw new Error(`A4 payload may not set ${key}`);
-          if ((spec.kind === "CREATED" || spec.kind === "GATE_POLICY_CHANGED") && !a4GatePolicyV1Schema.safeParse(spec.payload.gatePolicy).success) {
-            throw new A4StoreError(400, "INPUT_INVALID", "The gate policy is not an amc.a4-gate-policy/v1 document.");
-          }
-          if (spec.kind === "GATE_POLICY_CHANGED") assertGatePolicyChange(projectId, actor, a4GatePolicyV1Schema.parse(spec.payload.gatePolicy));
-          const sideRows = spec.sideRows ?? [];
-          // The store is the completeness root: a row filed under another project would break both projects' counts for good.
-          for (const row of sideRows) if (row.values.project_id !== projectId) throw new Error(`A4 side row in ${row.table} names another project`);
-          const seq = seq0 + index;
-          const stage = spec.stage !== undefined ? spec.stage : headState.stage;
-          const revisionNo = spec.revisionNo ?? headState.revision_no;
-          // head0 is the head verifyChain verified; the transaction checks it is unmoved and still signed (verifyIncremental).
-          headState = headStateOf({ ...headState, ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
-          const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
-            ts, prevDigest, readinessSha256, population, headAfter: headState, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
-          const bytes = canonicalize(body);
-          const digest = sha256Hex(bytes);
-          const entry = { spec, sideRows, seq, stage, revisionNo, prevDigest, bytes, digest, headAfter: headState,
-            envelope: A4_ENVELOPE_KINDS.includes(spec.kind) ? signEnvelope(digest) : null };
-          prevDigest = digest;
-          return entry;
-        });
-        const last = entries.at(-1);
-        if (last === undefined) throw new Error("a commit records at least one transition");
-        const agentId = create?.agent_id ?? head0!.agent_id;
-        try {
-          return runImmediateTransaction(db, (): A4TransitionResult => {
-            // (b) One transaction on rows read inside it.
-            const replayed = options.request
-              ? dedupeRequest(options.request, projectId, create !== null, { ...options.response, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest }, ts) : null;
-            if (replayed) return replayed;
-            const head = readHeadRow(projectId);
-            if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
-            if (head) verifyIncremental(projectId, head);
-            if (options.readiness && options.readiness(db, projectId) !== readinessSha256) throw new HeadMoved();
-            let evidence: { id: string } | undefined;
-            for (const entry of entries) {
-              const { spec, seq, stage, revisionNo } = entry;
-              const sessionId = `a4-${projectId}-${seq}`;
-              ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
-              try {
-                evidence = ledger.appendEvidenceWithReceipt({
-                  sessionId, runtime: "unknown", eventType: "audit", payload: entry.bytes, inline: true,
-                  // Key order is load-bearing for the row hash; these are human statements recorded by AMC, never observations.
-                  meta: { source: "a4-store", trustTier: "SELF_REPORTED", auditType: "A4_STATE", a4Kind: spec.kind, projectId, seq, revisionNo, stage,
-                    claimKind: "self_reported", actorKey: actor.key, prevDigest: entry.prevDigest },
-                  receipt: { kind: "guard_check", agentId, providerId: A4_STORE_BINARY, model: null, bodySha256: entry.digest }
-                });
-              } finally {
-                ledger.sealSession(sessionId);
-              }
-              if (create && seq === 0) {
-                db.prepare(`INSERT INTO a4_projects (project_id, workspace_id, agent_id, name, stage, step, hold, hold_reason, revision_no, head_seq,
-                    head_digest, created_by_key, created_ts, updated_ts) VALUES (?, ?, ?, ?, 'aspire', 'asked', 0, NULL, 0, 0, ?, ?, ?, ?)`)
-                  .run(create.project_id, create.workspace_id, create.agent_id, create.name, entry.digest, create.created_by_key, ts, ts);
-              }
-              db.prepare(`INSERT INTO a4_transitions (project_id, seq, kind, stage, revision_no, actor_key, actor_username, body_json, body_digest,
-                  prev_digest, readiness_sha256, envelope_json, evidence_event_id, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-                .run(projectId, seq, spec.kind, stage, revisionNo, actor.key, actor.username, entry.bytes, entry.digest, entry.prevDigest, readinessSha256,
-                  entry.envelope ? JSON.stringify(entry.envelope) : null, evidence.id, ts);
-              for (const row of entry.sideRows) {
-                const columns = [...Object.keys(row.values), "evidence_event_id"];
-                if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${row.table}`);
-                db.prepare(`INSERT INTO ${row.table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`).run(...Object.values(row.values), evidence.id);
-                // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
-                if (storedSideRowDigest(row) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
-              }
-              // The liveness index beside EFFECT_STARTED (design §6.5): the sweeper reads its owner; the chain stays the state.
-              const start = spec.startEffect;
-              if (start) db.prepare(`INSERT INTO a4_effects (effect_id, project_id, gate_id, execution_id, approval_request_id, owner_pid, owner_host, started_ts,
-                heartbeat_ts, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'running')`).run(start.effectId, projectId, start.gateId, start.executionId, start.approvalRequestId, process.pid, hostname(), ts, ts);
-              if (spec.settleEffect) db.prepare("UPDATE a4_effects SET state = ? WHERE effect_id = ? AND project_id = ?").run(spec.settleEffect.state, spec.settleEffect.effectId, projectId);
-            }
-            const patch = { ...last.headAfter, head_seq: last.seq, head_digest: last.digest, verified_seq: last.seq, verified_digest: last.digest, updated_ts: ts };
-            db.prepare(`UPDATE a4_projects SET ${Object.keys(patch).map((column) => `${column} = @${column}`).join(", ")} WHERE project_id = @project_id`)
-              .run({ ...patch, project_id: projectId });
-            db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
-            return { replay: false, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest, evidenceEventId: evidence!.id, envelope: last.envelope };
-          });
-        } catch (error) {
-          if (error instanceof HeadMoved) {
-            if (attempt === 0) continue;
-            throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved twice while this change was signed; reload and retry.");
-          }
-          if (create && /UNIQUE constraint failed: a4_projects\.agent_id/.test(String(error))) {
-            throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${create.agent_id} already has an active A4 project; retire it first`);
-          }
-          throw error;
-        }
+        const prepared = prepareTransition(projectId, actor, build, options, create, signEnvelope);
+        if (prepared.replayed) return prepared.replay;
+        try { return finalizeTransition(prepared); } catch (error) { commitFailure(error, attempt, create); }
       }
     } });
+  };
+  const commitAsync = async (projectId: string, actor: A4Actor, build: Build, supplied: A4TransitionOptions,
+    beforeSign: () => void): Promise<A4TransitionAttempt> => {
+    const progress: A4TransitionProgress = { signCalls: 0, signatures: 0, lockAttempts: 0, lockEntered: 0, lockReturned: 0, nativeEntered: 0, nativeReturned: 0 };
+    let completed: A4TransitionResult | null = null;
+    const observedCurrent = createA4CurrentLatch();
+    try {
+      actor = { ...actor };
+      const options = { ...supplied, request: supplied.request === undefined ? undefined : structuredClone(supplied.request),
+        response: supplied.response === undefined ? undefined : structuredClone(supplied.response) };
+      validateTransition(projectId, actor, options);
+      const authority = captureA4RecordSigner(workspace);
+      const actorCurrent = () => observedCurrent(() => { authority.assertCurrent(); beforeSign(); authority.assertCurrent(); });
+      actorCurrent(); assertA4HotWriters(workspace);
+      const locked = <T>(operation: () => T): T => {
+        progress.lockAttempts++;
+        const result = withControlFileLock({ root: a4ProjectsRoot(workspace), name: `project-${projectId}`, operation: () => {
+          progress.lockEntered++; return operation();
+        } });
+        progress.lockReturned++; return result;
+      };
+      const replayCurrent = (result: A4TransitionResult) => {
+        const next = options.request ? dedupeRequest(options.request, projectId, false, null, 0) : null;
+        if (next === null || canonicalize(next) !== canonicalize(result)) throw new A4StoreError(409, "A4_STALE_HEAD", "The replayed request changed.");
+      };
+      for (let attempt = 0; ; attempt += 1) {
+        const prepared = locked(() => { actorCurrent(); return prepareTransition(projectId, actor, ctx => structuredClone(build(ctx)), options, null, null); });
+        if (prepared.replayed) {
+          completed = structuredClone(prepared.replay);
+          const result = completed;
+          return Object.freeze({ result: structuredClone(result), assertCurrent() {
+            try { observedCurrent(() => { authority.assertCurrent(); actorCurrent(); authority.assertCurrent(); replayCurrent(result); }); } catch (cause) { throw new A4TransitionPublicationError(progress, cause, result); }
+          } });
+        }
+        const signatures: Array<() => void> = [];
+        const current = () => observedCurrent(() => {
+          authority.assertCurrent();
+          for (const check of signatures) check();
+          for (const entry of prepared.entries) if (A4_ENVELOPE_KINDS.includes(entry.spec.kind) && entry.envelope === null)
+            throw new A4StoreError(409, "A4_SIGNING_UNAVAILABLE", "An actual A4 record signature is missing.");
+        });
+        const inputs = () => {
+          authority.assertCurrent(); for (const check of signatures) check();
+          actorCurrent();
+          if (canonicalize(readHeadRow(projectId)) !== canonicalize(prepared.head0)) throw new HeadMoved();
+          if (options.readiness && options.readiness(db, projectId) !== prepared.readinessSha256) throw new HeadMoved();
+          authority.assertCurrent(); for (const check of signatures) check();
+        };
+        try {
+          for (const entry of prepared.entries) if (A4_ENVELOPE_KINDS.includes(entry.spec.kind)) {
+            inputs();
+            progress.signCalls++;
+            const signed = await authority.sign(entry.digest, inputs);
+            progress.signatures++; entry.envelope = signed.signed; signatures.push(signed.assertCurrent); inputs();
+          }
+          const result = locked(() => {
+            inputs(); current(); verifyChain(projectId);
+            progress.nativeEntered++;
+            const committed = finalizeTransition(prepared, current);
+            progress.nativeReturned++; return committed;
+          });
+          completed = structuredClone(result);
+          const assertOwn = () => observedCurrent(() => {
+            current(); actorCurrent(); current();
+            if (result.replay) { replayCurrent(result); return; }
+            const head = verifyChain(projectId), last = prepared.last;
+            if (head?.head_seq !== last.seq || head.head_digest !== last.digest || head.verified_seq !== last.seq || head.verified_digest !== last.digest)
+              throw new A4StoreError(409, "A4_STALE_HEAD", "The committed A4 head changed.");
+            for (const entry of prepared.entries) {
+              const row = a4TransitionRowSchema.parse(db.prepare("SELECT * FROM a4_transitions WHERE project_id = ? AND seq = ?").get(projectId, entry.seq));
+              if (row.kind !== entry.spec.kind || row.stage !== entry.stage || row.revision_no !== entry.revisionNo || row.actor_key !== actor.key
+                || row.actor_username !== actor.username || row.body_json !== entry.bytes || row.body_digest !== entry.digest || row.prev_digest !== entry.prevDigest
+                || row.readiness_sha256 !== prepared.readinessSha256 || row.envelope_json !== (entry.envelope ? JSON.stringify(entry.envelope) : null) || row.ts !== prepared.ts
+                || ledger.getEventById(row.evidence_event_id)?.payload_sha256 !== entry.digest
+                || (entry.seq === last.seq && row.evidence_event_id !== result.evidenceEventId))
+                throw new A4StoreError(409, "A4_STALE_HEAD", "The committed A4 transition changed.");
+            }
+          });
+          assertOwn();
+          return Object.freeze({ result: structuredClone(result), assertCurrent() {
+            try { assertOwn(); } catch (cause) { throw new A4TransitionPublicationError(progress, cause, result); }
+          } });
+        } catch (error) { commitFailure(error, attempt, null); }
+      }
+    } catch (cause) { throw new A4TransitionPublicationError(progress, cause, completed); }
   };
 
   /** The current members: the latest event per principal of the chain-named member rows. */
@@ -620,6 +643,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
     heartbeatEffect: (effectId: string): unknown => db.prepare("UPDATE a4_effects SET heartbeat_ts = ? WHERE effect_id = ? AND state = 'running'").run(Date.now(), effectId),
     verifyIncremental,
     transition: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, actor, build, options, null),
+    transitionAsync: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, beforeSign: () => void) => commitAsync(projectId, actor, build, options, beforeSign),
     readRevision: (projectId: string, revisionNo: number) => {
       const row = namedSideRows(projectId, "a4_revisions").find((candidate) => candidate.revision_no === revisionNo);
       return row === undefined ? null : a4RevisionRowSchema.parse(row);

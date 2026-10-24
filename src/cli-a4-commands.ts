@@ -16,10 +16,11 @@ import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
+import { verifyTrackedSessionToken } from "./auth/authApi.js";
 import { pendingExecutors } from "./a4/a4Gates.js";
 import { resolveA4LoginPrincipal } from "./a4/a4Identity.js";
 import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Principal } from "./a4/a4Schema.js";
-import { readOnlyNow } from "./a4/a4Store.js";
+import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
 import { verifyA4Bundle, verifyA4Chain } from "./a4/a4Verify.js";
 import { exportEvidenceBundle } from "./bundles/bundle.js";
 import { envelopeForUnboundResult } from "./claims/eligibility/adapters.js";
@@ -28,7 +29,7 @@ import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from ".
 import { emitClaimResult, printClaimResult, runIdClaim, withClaimFields } from "./cli/claimOutput.js";
 import { openLedger } from "./ledger/ledger.js";
 import { assertOwnerMode } from "./mode/mode.js";
-import { readNativeApprovalActor } from "./setup/nativeApprovalIdentity.js";
+import { readNativeApprovalSession } from "./setup/nativeApprovalIdentity.js";
 import { containedPath, isWithin, safeIdSchema } from "./utils/pathSafety.js";
 
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
@@ -93,34 +94,51 @@ function readJsonFile(path: string, what: string): Data {
 }
 
 /** The login token's user for `pathname`, live; never a flag. The file is the token itself: a regular, private (0600) file. */
-function loginPrincipal(workspace: string, tokenFile: string, pathname: string, method: string): A4Principal {
-  let actor: ReturnType<typeof readNativeApprovalActor>;
+function loginPrincipal(workspace: string, tokenFile: string, pathname: string, method: string) {
+  let session: ReturnType<typeof readNativeApprovalSession>;
   try {
     if (lstatSync(tokenFile).isSymbolicLink()) throw new Error("The session token file must not be a symbolic link");
-    actor = readNativeApprovalActor(workspace, tokenFile);
+    session = readNativeApprovalSession(workspace, tokenFile);
   } catch (error) {
     // An open error would name the path; only the token checks' own messages pass through.
     const reason = error instanceof Error && (error as NodeJS.ErrnoException).code === undefined ? error.message : "The session token file could not be opened";
     throw new A4Refusal(401, "A4_SESSION_REQUIRED", `${reason}. Run \`amc approvals login\` for a new token file.`);
   }
-  const resolved = resolveA4LoginPrincipal({ workspace, actor, pathname, method });
+  const resolved = resolveA4LoginPrincipal({ workspace, actor: session.payload, pathname, method });
   if (!resolved.ok) throw new A4Refusal(resolved.status, resolved.code, resolved.message);
   if (resolved.principal === null) throw new A4Refusal(401, "A4_SESSION_REQUIRED", "A login token names a user.");
-  return resolved.principal;
+  return { principal: resolved.principal, session };
 }
 
 /**
  * One API route, run in this process through the router behind admission. A write needs a login token and a workspace
  * that is not read-only (Studio's NATIVE_READ_ONLY rule; unreadable counts as read-only). A refusal throws.
  */
-async function route(tokenFile: string | undefined, method: "GET" | "POST", path: string, body?: Data, query: Record<string, string> = {}): Promise<Data> {
+async function route(tokenFile: string | undefined, method: "GET" | "POST", path: string, body?: Data, query: Record<string, string> = {}, beforeWrite?: () => void): Promise<Data> {
   const workspace = process.cwd();
   const pathname = `${A4_API_PREFIX}${path}`;
-  const principal = tokenFile === undefined ? null : loginPrincipal(workspace, tokenFile, pathname, method);
+  const admitted = tokenFile === undefined ? null : loginPrincipal(workspace, tokenFile, pathname, method);
+  const principal = admitted?.principal ?? null;
   if (method === "POST") {
     if (principal === null) throw new A4Refusal(401, "A4_SESSION_REQUIRED", "Writes need --session-token-file (an `amc approvals login` token).");
     if (readOnlyNow(workspace) !== false) throw new A4Refusal(403, "NATIVE_READ_ONLY", "The workspace is read-only until its users and trust signatures verify.");
   }
+  const root = resolve(workspace);
+  const identity = (value: A4Principal) => JSON.stringify([value.key, value.authSource, value.userId, value.username,
+    value.admission, value.identityCheck, [...value.roles].sort()]);
+  const original = principal === null ? null : identity(principal);
+  const assertAuthority = () => {
+    if (process.cwd() !== workspace || resolve(workspace) !== root || admitted === null || original === null)
+      throw new A4StoreError(401, "A4_SESSION_REQUIRED", "The original A4 login/workspace is no longer current.");
+    beforeWrite?.();
+    const checked = verifyTrackedSessionToken({ workspace, token: admitted.session.token });
+    if (!checked.ok || checked.payload === null) throw new A4StoreError(401, "A4_SESSION_REQUIRED", "The original tracked A4 login is expired, revoked or untrusted.");
+    const live = resolveA4LoginPrincipal({ workspace, actor: checked.payload, pathname, method });
+    if (!live.ok) throw new A4StoreError(live.status, live.code, live.message);
+    if (live.principal === null || identity(live.principal) !== original) throw new A4StoreError(409, "A4_STALE_HEAD", "The original A4 login identity or roles changed.");
+    if (readOnlyNow(workspace) !== false) throw new A4StoreError(403, "NATIVE_READ_ONLY", "The workspace is read-only until its users and trust signatures verify.");
+    if (process.cwd() !== workspace || resolve(workspace) !== root) throw new A4StoreError(409, "A4_STALE_HEAD", "The original A4 workspace changed.");
+  };
   const text = body === undefined ? null : JSON.stringify(body);
   let status = 0;
   let out = "";
@@ -131,7 +149,7 @@ async function route(tokenFile: string | undefined, method: "GET" | "POST", path
     end: (chunk?: string) => { out += chunk ?? ""; }
   };
   const req = Object.assign(Readable.from(text === null ? [] : [Buffer.from(text, "utf8")]), { headers: {}, url: pathname });
-  await serveA4({ workspace, principal, pathname, method, params: new URLSearchParams(query),
+  await serveA4({ workspace, principal, pathname, method, params: new URLSearchParams(query), assertAuthority,
     req: req as unknown as IncomingMessage, res: res as unknown as ServerResponse });
   let reply: { ok?: unknown; data?: unknown; error?: unknown; code?: unknown; detail?: unknown } = {};
   try {
@@ -190,8 +208,15 @@ async function drained(): Promise<void> {
 
 /** A POST with its request key; owner mode is asserted here too (the governed functions assert it again). */
 async function write(name: string, opts: Write, path: string, body: Data): Promise<Data> {
-  assertOwnerMode(process.cwd(), `a4 ${name}`);
-  const data = await route(opts.sessionTokenFile, "POST", path, { ...body, clientRequestId: opts.requestId ?? randomBytes(16).toString("hex") });
+  const workspace = process.cwd(), command = `a4 ${name}`;
+  assertOwnerMode(workspace, command);
+  const data = await route(opts.sessionTokenFile, "POST", path, { ...body, clientRequestId: opts.requestId ?? randomBytes(16).toString("hex") }, {}, () => {
+    try { assertOwnerMode(workspace, command); }
+    catch (cause) {
+      const error = new A4StoreError(403, "AGENT_MODE", "This A4 write is blocked in agent mode.");
+      Object.defineProperty(error, "cause", { value: cause }); throw error;
+    }
+  });
   await drained();
   return data;
 }

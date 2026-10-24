@@ -22,8 +22,9 @@ import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeStage, inlineEffect, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
   assertAllowed, driftedSlots, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
-  requestChanges, requestGate, RESOURCE_SLOTS
+  requestChanges, requestGateAsync, RESOURCE_SLOTS
 } from "./a4Gates.js";
+import { gateRequestActor } from "./a4TransitionSigning.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
 import {
@@ -481,13 +482,16 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     const stage = stageInput(gateRequest[1]);
     const gate = gateRequest[2] as "direction" | "completion";
     const { body, request } = await readJson(route, z.strictObject(base));
-    return respond(route, projectId, request, () => {
-      const result = requestGate(store, projectId, { ...callOf(route, request), stage, gate, expectedHeadSeq: body.expectedHeadSeq });
-      const head = store.readHead(projectId);
-      if (!result.replay && head) auditA4(route.workspace, { type: "A4_GATE_OPENED", agentId: head.agent_id, projectId, username: requirePrincipal(route).username,
-        summary: `A4 ${stage}.${gate} gate opened on ${head.name}`, details: { stage, gate, seq: result.seq } });
-      return result;
-    }, 201);
+    const replay = priorReplay(store, request, projectId);
+    if (replay) { apiSuccess(route.res, replay); return true; }
+    const attempt = await requestGateAsync(store, projectId, { ...callOf(route, request), stage, gate, expectedHeadSeq: body.expectedHeadSeq }, gateRequestActor(route));
+    const result = attempt.result;
+    attempt.assertCurrent();
+    const head = store.readHead(projectId);
+    if (!result.replay && head) auditA4(route.workspace, { type: "A4_GATE_OPENED", agentId: head.agent_id, projectId, username: requirePrincipal(route).username,
+      summary: `A4 ${stage}.${gate} gate opened on ${head.name}`, details: { stage, gate, seq: result.seq } });
+    attempt.assertCurrent();
+    apiSuccess(route.res, mutationResult(result), 201); return true;
   }
   const decision = /^\/gates\/(a4gate_[0-9a-f]{32})\/(approve|deny|request-changes)$/.exec(tail);
   if (decision !== null) {
