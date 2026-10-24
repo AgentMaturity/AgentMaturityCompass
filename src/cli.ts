@@ -19043,7 +19043,7 @@ program
       console.log(chalk.red("Provide --region or --list."));
       return;
     }
-    const policy = dr.createResidencyPolicy({
+    const policy = await dr.createResidencyPolicyAsync({
       region: opts.region as never,
       isolationLevel: opts.isolation as never,
       keyCustodyMode: opts.custody as never,
@@ -19060,7 +19060,7 @@ program
   .option("--isolation <level>", "isolation level", "strict")
   .action(async (opts: { tenant: string; workspace: string; region: string; isolation: string }) => {
     const dr = await import("./compliance/dataResidency.js");
-    const boundary = dr.registerTenant({
+    const boundary = await dr.registerTenantAsync({
       tenantId: opts.tenant,
       workspaceId: opts.workspace,
       region: opts.region as never,

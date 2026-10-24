@@ -1474,11 +1474,11 @@ export type {
 
 // Data Residency & Tenant Isolation Controls
 export {
-  createResidencyPolicy,
+  createResidencyPolicy, createResidencyPolicyAsync,
   getResidencyPolicies,
   getResidencyPolicy,
   getPolicyForRegion,
-  registerTenant,
+  registerTenant, registerTenantAsync,
   getTenants,
   getTenant,
   checkTenantIsolation,
