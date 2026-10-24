@@ -15,6 +15,7 @@ import { containedExists, readContainedOrNull } from "../utils/containedFs.js";
 import { BLOB_AUTHORITY_CURRENT, BLOB_CHILD_FILE, blobAuthorityDigest, blobChildEnvelopeSchema, openBlobChild, parseBlobIndexAuthority } from "../keys/blobIndexAuthority.js";
 import { RECEIPT_AUTHORITY_CURRENT, RECEIPT_CHILD_FILE, receiptAuthorityDigest, receiptChildEnvelopeSchema, openReceiptChild, parseReceiptAuthority } from "../keys/receiptAuthority.js";
 import { canonicalize } from "../utils/json.js";
+import { captureVaultPurposeMaterial } from "./vaultPurposeContinuity.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
   type LocalPurpose, type VaultPayloadV2
@@ -44,6 +45,7 @@ interface VaultSession {
 }
 
 const sessions = new Map<string, VaultSession>();
+const purposeContinuity = new WeakMap<VaultSession, object>();
 const blobChildren = new Map<string, { stamp: string; key: KeyObject }>();
 const receiptChildren = new Map<string, { stamp: string; key: KeyObject }>();
 // Verification can read encrypted evidence without granting ordinary vault
@@ -466,7 +468,7 @@ function openVaultSession(workspace: string, phrase: string): void {
   }
   // Publish the session only once its payload is complete.
   session.unlocked = true;
-  session.payload = payload;
+  session.payload = payload; purposeContinuity.set(session, {});
   session.lastUnlockedTs = Date.now();
   session.passphrase = phrase;
   session.envelopeDigest = openedDigest;
@@ -477,7 +479,7 @@ export function lockVault(workspace: string): void {
   blobChildren.delete(workspace); receiptChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
-  session.unlocked = false;
+  session.unlocked = false; purposeContinuity.set(session, {});
   session.payload = null;
   session.passphrase = null;
   session.envelopeDigest = null;
@@ -557,6 +559,24 @@ export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): st
   if (!(KEY_KINDS as readonly string[]).includes(kind)) throw new Error(`${JSON.stringify(kind)} is not a vault key role`);
   const resolved = signingPayload(workspace);
   return resolved === null ? generateEphemeralKey(kind) : usableKey(workspace, resolved, ROLE_PRIMARY_PURPOSE[kind]);
+}
+
+function vaultPurposeNegative(workspace: string, original: WeakRef<VaultSession>, token: object, material: ReturnType<typeof captureVaultPurposeMaterial>): () => void {
+  return () => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("original vault purpose authority is unavailable or changed");
+    evictStaleSessions(); const current = sessions.get(workspace);
+    if (!current?.unlocked || current !== original.deref()
+      || purposeContinuity.get(current) !== token) throw new Error("original vault purpose authority is unavailable or changed");
+    material(current.payload, assertKeysetComplete(workspace));
+  };
+}
+/** Supplemental original/cache negative only; never opens or refreshes a vault, and never authorizes signing. */
+export function captureVaultPurposeContinuity(workspace: string, purpose: LocalPurpose): () => void {
+  if (process.env.AMC_NO_SIGN === "1" || !isLocalPurpose(purpose)) throw new Error("vault purpose continuity capture refused");
+  evictStaleSessions(); const current = sessions.get(workspace);
+  if (!current?.unlocked || !current.payload) throw new Error("original vault purpose authority is unavailable or changed");
+  const token = purposeContinuity.get(current) ?? {}; purposeContinuity.set(current, token);
+  return vaultPurposeNegative(workspace, new WeakRef(current), token, captureVaultPurposeMaterial(current.payload, assertKeysetComplete(workspace), purpose));
 }
 
 /** P1-08: the private key for one local signing purpose (src/keys/purposeKeys.ts getSigningKey). */
@@ -653,7 +673,7 @@ function requireUnlockedPayload(workspace: string): VaultPayload {
     const envelopeRaw = readEnvelopeRaw(workspace);
     const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
     if (session.envelopeDigest !== envelopeDigest) {
-      session.payload = decodePayload(envelopeRaw, session.passphrase).payload;
+      session.payload = decodePayload(envelopeRaw, session.passphrase).payload; purposeContinuity.set(session, {});
       session.envelopeDigest = envelopeDigest;
     }
   } catch {
@@ -689,7 +709,7 @@ export function setVaultSecret(workspace: string, secretKey: string, value: stri
   const payload = requireUnlockedPayload(workspace);
   const next = { ...payload, secrets: safeSecrets({ ...payload.secrets, [secretKey]: value }) };
   rewriteUnlockedVault(workspace, next);
-  sessionFor(workspace).payload = next;
+  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
 }
 
 /** Rewrites the vault envelope without `secretKey`; refuses when the vault is locked. True when a secret was removed. */
@@ -699,7 +719,7 @@ export function deleteVaultSecret(workspace: string, secretKey: string): boolean
   if (!Object.hasOwn(payload.secrets, secretKey)) return false;
   const next = { ...payload, secrets: safeSecrets(Object.fromEntries(Object.entries(payload.secrets).filter(([key]) => key !== secretKey))) };
   rewriteUnlockedVault(workspace, next);
-  sessionFor(workspace).payload = next;
+  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
   return true;
 }
 

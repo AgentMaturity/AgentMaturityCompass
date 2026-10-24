@@ -8,7 +8,7 @@ import { recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
 import type { OrgSseEvent } from "../org/orgSse.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { canonicalize } from "../utils/json.js";
-import { vaultStatus } from "../vault/vault.js";
+import { captureVaultPurposeContinuity, vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
@@ -29,15 +29,14 @@ export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["t
   }
 }
 
-/** Public metadata only: no private-key warming, vault reopening, provider Describe or Sign here.
- * Existing authenticated readers may advance their high-water state; this is not a pure snapshot.
- * The later genuine org producer still supplies all signing authority and checked signatures.
- * Public metadata cannot attest original private-vault/session eligibility across an earlier primary wait;
- * later genuine producer capture cannot establish that retrospectively. */
+/** Original public authority plus conditional already-cached file-purpose continuity; no private warming or reopening.
+ * Authenticated readers may advance high-water state and TTL may evict sessions before the first actor.
+ * Managed cache replacements/locks refuse this optional attempt; restored transient live mutations are not observed.
+ * Genuine org producers still supply signing authority and checked signatures; remote private availability is unproven. */
 function captureSecondaryAuthority(workspace: string, actor: () => void) {
   workspace = resolve(workspace);
   const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
-  enabled(); actor(); enabled();
+  enabled();
   const descriptors = (["ORG_SCORECARD", "TRANSPARENCY_ROOT", "MERKLE_ROOT"] as const)
     .map(kind => describePolicySigner(workspace, kind));
   const keyset = canonicalize(assertKeysetComplete(workspace)), trust = canonicalize(loadTrustConfig(workspace));
@@ -45,8 +44,8 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
   const vault = descriptors.find(row => row.mode === "VAULT"), bound = vault === undefined ? null : boundProviderKey(workspace, "artifact-seal");
   const selectedPolicy = vault === undefined ? null : canonicalize(keyPolicy(loadKeysConfig(workspace)));
   const holder = bound?.binding.provider ?? "file";
-  const assertCurrent = () => {
-    enabled(); actor(); enabled();
+  const assertPublicCurrent = () => {
+    enabled();
     for (const descriptor of descriptors) assertPolicySignerCurrent(workspace, descriptor);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset || canonicalize(loadTrustConfig(workspace)) !== trust)
       throw new Error("original optional org signing authority changed while primary work was running");
@@ -61,7 +60,13 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
       assertSigningKeyUsable(workspace, "artifact-seal", vault.publicKeyPem, holder);
     }
   };
-  assertCurrent();
+  // Refuse public file ineligibility before observing any irrelevant private cache.
+  assertPublicCurrent();
+  const privateCurrent = vault !== undefined && holder === "file" ? captureVaultPurposeContinuity(workspace, "artifact-seal") : null;
+  const assertOriginal = () => { enabled(); privateCurrent?.(); assertPublicCurrent(); privateCurrent?.(); };
+  const assertCurrent = () => { assertOriginal(); actor(); assertOriginal(); };
+  assertCurrent(); // Existing initial actor slot one, now fenced by its original observations.
+  assertCurrent(); // Existing initial actor slot two; later assertCurrent calls still invoke one actor each.
   return { workspace, assertCurrent };
 }
 
