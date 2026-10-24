@@ -395,6 +395,13 @@
       "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
     },
     {
+      "path": "src/integrations/integrationDeadLetters.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/integrationDeadLetters.ts.landed",
+      "sha256": "d11408dc51ac383c7d23e0972e7f4de28010f3365306ca29c4badd30f4a8d291"
+    },
+    {
       "path": "src/leases/leaseCli.ts",
       "issue": "P0-30",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
