@@ -27,7 +27,7 @@ import { pluginsInstalledLockPath, pluginsRegistriesPath } from "../plugins/plug
 import { initMechanicWorkspace } from "../mechanic/mechanicApi.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
 import { initPromptPolicy, promptPolicyPath } from "../prompt/promptPolicyStore.js";
-import { assurancePolicyPath, initAssurancePolicy } from "../assurance/assurancePolicyStore.js";
+import { assurancePolicyPath, captureAssurancePolicyInitialization } from "../assurance/assurancePolicyStore.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { appendTransparencyEntry, initTransparencyLog } from "../transparency/logChain.js";
 import { rebuildTransparencyMerkle } from "../transparency/merkleIndexStore.js";
@@ -116,9 +116,9 @@ function ensureOwnerUser(params: BootstrapOptions): { created: boolean } {
   return { created: true };
 }
 
-async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceColdOrgPrerequisites | null): Promise<Record<string, boolean>> {
-  const created: Record<string, boolean> = {}, cold = originalCold ?? captureWorkspaceColdOrgPrerequisites(workspace);
-  cold.assertCurrent();
+async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceColdOrgPrerequisites | null, originalAssurance: ReturnType<typeof captureAssurancePolicyInitialization> | null): Promise<{ created: Record<string, boolean>; assurance: ReturnType<typeof captureAssurancePolicyInitialization> }> {
+  const created: Record<string, boolean> = {}, cold = originalCold ?? captureWorkspaceColdOrgPrerequisites(workspace), assurance = originalAssurance ?? captureAssurancePolicyInitialization(workspace, { beforePublish: cold.assertCurrent });
+  cold.assertCurrent(); assurance.assertCurrent();
   if (!pathExists(actionPolicyPath(workspace))) {
     initActionPolicy(workspace);
     created["action-policy.yaml"] = true;
@@ -200,11 +200,10 @@ async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceCol
     initPromptPolicy(workspace);
     created["prompt/policy.yaml"] = true;
   }
-  if (!pathExists(assurancePolicyPath(workspace))) {
-    initAssurancePolicy(workspace);
-    created["assurance/policy.yaml"] = true;
-  }
-  cold.assertCurrent(); return created;
+  try {
+    if ((await assurance.initialize()).created) created["assurance/policy.yaml"] = true;
+    cold.assertCurrent(); assurance.assertCurrent(); return { created, assurance };
+  } catch (cause) { throw Object.assign(new Error("bootstrap assurance stage incomplete; earlier cold effects remain", { cause }), { completedAssurancePaths: assurance.publishedPaths() }); }
 }
 
 async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions): Promise<{ pubkeyPem: string; fingerprint: string }> {
@@ -246,14 +245,14 @@ async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOpt
 export class BootstrapColdPrerequisitesIncompleteError extends Error {
   readonly code = "BOOTSTRAP_COLD_PREREQUISITES_INCOMPLETE";
   constructor(readonly completedColdPaths: readonly string[], cause: unknown) {
-    super("bootstrap did not complete; published canon/bank prerequisites and any earlier bootstrap effects remain", { cause });
+    super("bootstrap did not complete; published cold prerequisites and any earlier bootstrap effects remain", { cause });
     this.name = "BootstrapColdPrerequisitesIncompleteError";
   }
 }
 export async function runBootstrap(options: BootstrapOptions): Promise<BootstrapResult> {
   options = { ...options, allowedCidrs: [...options.allowedCidrs] };
   const previousVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
-  let cold: WorkspaceColdOrgPrerequisites | null = null;
+  let cold: WorkspaceColdOrgPrerequisites | null = null, assurance: ReturnType<typeof captureAssurancePolicyInitialization> | null = null;
   if (options.vaultPassphrase && options.vaultPassphrase.length > 0) {
     process.env.AMC_VAULT_PASSPHRASE = options.vaultPassphrase;
   }
@@ -261,9 +260,10 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
   try {
     const workspace = resolve(options.workspace);
     const mature = keysetDeclared(workspace);
-    if (mature && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)) || !pathExists(canonPath(workspace)) || !pathExists(diagnosticBankPath(workspace))))
+    if (mature && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)) || !pathExists(canonPath(workspace)) || !pathExists(diagnosticBankPath(workspace)) || !pathExists(assurancePolicyPath(workspace))))
       ensureVault({ ...options, workspace }); // Preserve the selected passphrase gate before any new cold provider request.
     cold = mature ? captureWorkspaceColdOrgPrerequisites(workspace) : null;
+    assurance = mature ? captureAssurancePolicyInitialization(workspace, { beforePublish: cold!.assertCurrent }) : null;
     if (mature && !pathExists(opsPolicyPath(workspace))) await initOpsPolicyAsync(workspace, { onlyIfMissing: true, beforePublish: cold!.assertCurrent });
     cold?.assertCurrent();
     if (cold !== null) await cold.initializeWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
@@ -271,7 +271,8 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
 
     const vault = ensureVault({ ...options, workspace });
     const owner = ensureOwnerUser({ ...options, workspace });
-    const createdConfigs = await ensureSignedConfigs(workspace, cold);
+    const signedConfigs = await ensureSignedConfigs(workspace, cold, assurance); assurance = signedConfigs.assurance;
+    const createdConfigs = signedConfigs.created;
     if (options.lanMode) {
       enableLanMode({
         workspace,
@@ -349,7 +350,9 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       transparencyHash: entry.hash
     };
   } catch (cause) {
-    if (cold !== null && cold.completedPaths.length > 0) throw new BootstrapColdPrerequisitesIncompleteError(cold.completedPaths, cause); throw cause;
+    const stagePaths = cause instanceof Error ? (cause as Error & { completedAssurancePaths?: readonly string[] }).completedAssurancePaths ?? [] : [];
+    const completed = [...(cold?.completedPaths ?? []), ...(assurance?.publishedPaths() ?? stagePaths)];
+    if (completed.length > 0) throw new BootstrapColdPrerequisitesIncompleteError(completed, cause); throw cause;
   } finally {
     if (typeof previousVaultEnv === "string") {
       process.env.AMC_VAULT_PASSPHRASE = previousVaultEnv;

@@ -170,8 +170,8 @@ export async function issueAssuranceCertificate(input: {
   workspace: string;
   runId: string;
   outFile?: string;
-}): Promise<AssuranceIssueCertificateResult> {
-  const params = { ...input };
+}, options: { beforePublish?: () => void } = {}): Promise<AssuranceIssueCertificateResult> {
+  const params = { ...input }, beforePublish = options.beforePublish; beforePublish?.();
   const runPath = assuranceRunJsonPath(params.workspace, params.runId);
   const findingsPath = join(dirname(runPath), "findings.json");
   const policyPath = assurancePolicyPath(params.workspace);
@@ -216,7 +216,7 @@ export async function issueAssuranceCertificate(input: {
   const signingPolicy = JSON.stringify(trust), purposeCurrent = signer.mode === "VAULT" ? captureRunHashAuthority(params.workspace, false) : () => {};
   const logAuthority = captureWorkspaceLogAuthority(params.workspace);
   const assertSigningCurrent = () => {
-    assertPolicySignerCurrent(params.workspace, signer); purposeCurrent(); logAuthority.assertCurrent();
+    beforePublish?.(); assertPolicySignerCurrent(params.workspace, signer); purposeCurrent(); logAuthority.assertCurrent();
     if (JSON.stringify(loadTrustConfig(params.workspace)) !== signingPolicy) throw new Error("assurance certificate signing policy changed while preparing");
   };
   const promptPath = promptPolicyPath(params.workspace), cgxPath = run.scope.type === "AGENT" ? cgxLatestPackPath(params.workspace, run.scope.id) : null;

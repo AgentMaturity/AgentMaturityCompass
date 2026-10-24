@@ -69,18 +69,18 @@ import { emitValueSse } from "../value/valueSse.js";
 import {
   assuranceCertIssueForApi,
   assuranceCertLatestForApi,
-  assurancePolicyApplyForApi,
-  assurancePolicyForApi,
+  assurancePolicyApplyForApiAsync as assurancePolicyApplyForApi,
+  assurancePolicyForApiAsync as assurancePolicyForApi,
   assuranceReadinessGate,
   assuranceRunDetailForApi,
   assuranceRunForApi,
   assuranceRunsForApi,
-  assuranceSchedulerEnableForApi,
+  assuranceSchedulerEnableForApiAsync as assuranceSchedulerEnableForApi,
   assuranceSchedulerRunNowForApi,
   assuranceSchedulerStatusForApi,
   assuranceWaiverRequestForApi,
-  assuranceWaiverRevokeForApi,
-  assuranceWaiverStatusForApi
+  assuranceWaiverRevokeForApiAsync as assuranceWaiverRevokeForApi,
+  assuranceWaiverStatusForApiAsync as assuranceWaiverStatusForApi
 } from "../assurance/assuranceControlPlane.js";
 import { verifyAssurancePolicySignature } from "../assurance/assurancePolicyStore.js";
 import { assuranceSchedulerTick } from "../assurance/assuranceScheduler.js";
@@ -1514,7 +1514,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const assuranceTick = await assuranceSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("assurance scheduler stopped"); } });
         const auditTick = await auditSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
@@ -2173,6 +2173,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
       const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
+      const assurancePublication = (roles: UserRole[], readOnly = false, vault = false) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (readOnly && requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
       const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
       const refreshConsole = async () => {
         const recheck = signingAuthority(["OWNER"]);
@@ -3969,7 +3970,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, assurancePolicyForApi(options.workspace));
+        const out = await assurancePolicyForApi(options.workspace, assurancePublication(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -3990,10 +3991,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = assurancePolicyApplyForApi({
+        const out = await assurancePolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, assurancePublication(["OWNER"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_POLICY_APPLIED",
@@ -4125,7 +4126,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           runId: parsed.runId,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, assurancePublication(["OWNER", "OPERATOR"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_CERT_ISSUED",
@@ -4197,7 +4198,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, assuranceWaiverStatusForApi(options.workspace));
+        const out = await assuranceWaiverStatusForApi(options.workspace, assurancePublication(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4211,10 +4212,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { waiverId?: unknown }) : {};
-        const out = assuranceWaiverRevokeForApi({
+        const out = await assuranceWaiverRevokeForApi({
           workspace: options.workspace,
           waiverId: typeof parsed.waiverId === "string" ? parsed.waiverId : undefined
-        });
+        }, assurancePublication(["OWNER"], true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         if (out.revoked) {
           writeStudioAuditEvent({
             workspace: options.workspace,
@@ -4250,7 +4251,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const out = await assuranceSchedulerRunNowForApi({
           workspace: options.workspace
-        });
+        }, assurancePublication(["OWNER", "OPERATOR"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAssuranceSse({
           hub: orgSse,
           type: "ASSURANCE_RUN_UPDATED"
@@ -4276,10 +4277,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, assuranceSchedulerEnableForApi({
+        const out = await assuranceSchedulerEnableForApi({
           workspace: options.workspace,
           enabled: true
-        }));
+        }, assurancePublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4287,10 +4288,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, assuranceSchedulerEnableForApi({
+        const out = await assuranceSchedulerEnableForApi({
           workspace: options.workspace,
           enabled: false
-        }));
+        }, assurancePublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 

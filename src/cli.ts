@@ -231,22 +231,22 @@ import { issueCertificate, inspectCertificate, revokeCertificateAsync, verifyCer
 import { generateTrustCertificateAsync } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
 import {
-  assuranceApplyPolicyCli,
+  assuranceApplyPolicyCliAsync as assuranceApplyPolicyCli,
   assuranceDefaultPolicyCli,
-  assuranceInitCli,
+  assuranceInitCliAsync as assuranceInitCli,
   assuranceIssueCertCli,
-  assurancePrintPolicyCli,
+  assurancePrintPolicyCliAsync as assurancePrintPolicyCli,
   assuranceRunCli,
   assuranceRunsCli,
-  assuranceSchedulerEnableCli,
+  assuranceSchedulerEnableCliAsync as assuranceSchedulerEnableCli,
   assuranceSchedulerRunNowCli,
   assuranceSchedulerStatusCli,
   assuranceShowRunCli,
   assuranceVerifyCertCli,
   assuranceVerifyPolicyCli,
   assuranceWaiverRequestCli,
-  assuranceWaiverRevokeCli,
-  assuranceWaiverStatusCli
+  assuranceWaiverRevokeCliAsync as assuranceWaiverRevokeCli,
+  assuranceWaiverStatusCliAsync as assuranceWaiverStatusCli
 } from "./assurance/assuranceCli.js";
 import {
   auditApplyPolicyCli, assertAuditCliOwnerMode,
@@ -10959,8 +10959,8 @@ assurance
 assurance
   .command("init")
   .description("Initialize signed assurance policy")
-  .action(() => {
-    const out = assuranceInitCli(process.cwd());
+  .action(async () => {
+    const out = await assuranceInitCli(process.cwd());
     console.log(chalk.green(`Initialized assurance policy: ${out.path}`));
     console.log(`sig=${out.sigPath}`);
   });
@@ -10983,16 +10983,16 @@ assurance
 assurance
   .command("policy")
   .description("Print current assurance policy")
-  .action(() => {
-    console.log(JSON.stringify(assurancePrintPolicyCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await assurancePrintPolicyCli(process.cwd()), null, 2));
   });
 
 assurance
   .command("policy-apply")
   .description("Apply assurance policy from YAML/JSON file")
   .requiredOption("--file <path>", "policy file path")
-  .action((opts: { file: string }) => {
-    const out = assuranceApplyPolicyCli({
+  .action(async (opts: { file: string }) => {
+    const out = await assuranceApplyPolicyCli({
       workspace: process.cwd(),
       file: resolve(process.cwd(), opts.file)
     });
@@ -11239,8 +11239,8 @@ assuranceScheduler
 assuranceScheduler
   .command("enable")
   .description("Enable assurance scheduler")
-  .action(() => {
-    const out = assuranceSchedulerEnableCli({
+  .action(async () => {
+    const out = await assuranceSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: true
     });
@@ -11250,8 +11250,8 @@ assuranceScheduler
 assuranceScheduler
   .command("disable")
   .description("Disable assurance scheduler")
-  .action(() => {
-    const out = assuranceSchedulerEnableCli({
+  .action(async () => {
+    const out = await assuranceSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: false
     });
@@ -11280,16 +11280,16 @@ assuranceWaiver
 assuranceWaiver
   .command("status")
   .description("Show waiver status (activates approved pending waivers)")
-  .action(() => {
-    console.log(JSON.stringify(assuranceWaiverStatusCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await assuranceWaiverStatusCli(process.cwd()), null, 2));
   });
 
 assuranceWaiver
   .command("revoke")
   .description("Revoke active or specific waiver")
   .option("--waiver <id>", "waiver ID")
-  .action((opts: { waiver?: string }) => {
-    const out = assuranceWaiverRevokeCli({
+  .action(async (opts: { waiver?: string }) => {
+    const out = await assuranceWaiverRevokeCli({
       workspace: process.cwd(),
       waiverId: opts.waiver
     });

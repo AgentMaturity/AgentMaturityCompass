@@ -1,24 +1,19 @@
 import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
 import { randomUUID } from "node:crypto";
-import { readdirSync, rmSync } from "node:fs";
-import { join } from "node:path";
 import { z } from "zod";
-import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
-import { listApprovalDecisions } from "../approvals/approvalChainStore.js";
+import { createApprovalForIntent } from "../approvals/approvalEngine.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultAssurancePolicy, assurancePolicySchema } from "./assurancePolicySchema.js";
 import {
   activeAssuranceWaiver,
   assurancePolicyPath,
-  assuranceWaiversDir,
-  initAssurancePolicy,
+  initAssurancePolicy, initAssurancePolicyAsync, captureAssurancePolicy, captureAssurancePolicyInitialization, prepareAssurancePolicyAsync,
   latestAssuranceWaiver,
   listAssuranceWaivers,
   loadAssurancePolicy,
   saveAssurancePolicy,
-  saveAssuranceWaiver,
   verifyAssurancePolicySignature
 } from "./assurancePolicyStore.js";
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
@@ -27,152 +22,17 @@ import type { TrustContext } from "../trust/trustContext.js";
 import { latestAssuranceCertificateSummary } from "./assuranceStore.js";
 import {
   assuranceSchedulerRunNow,
-  assuranceSchedulerSetEnabled,
+  assuranceSchedulerSetEnabled, assuranceSchedulerSetEnabledAsync,
   assuranceSchedulerStatus
 } from "./assuranceScheduler.js";
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
 import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
+import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
+import { captureTransparencyAppendPublication } from "../transparency/workspacePublication.js";
+import { pendingWaiverSchema, savePendingWaiver, listPendingWaivers, maybeActivatePendingWaivers, maybeActivatePendingWaiversAsync, revokeAssuranceWaiver, revokeAssuranceWaiverAsync } from "./assuranceWaiverPublication.js";
 
-const pendingWaiverSchema = z.object({
-  v: z.literal(1),
-  requestId: z.string().min(1),
-  approvalRequestId: z.string().min(1),
-  intentId: z.string().min(1),
-  agentId: z.string().min(1),
-  reason: z.string().min(1),
-  hours: z.number().int().min(1).max(72),
-  policySha256: z.string().length(64),
-  lastCertSha256: z.string().length(64),
-  createdTs: z.number().int()
-});
-
-function pendingWaiversDir(workspace: string): string {
-  return join(assuranceWaiversDir(workspace), "pending");
-}
-
-function pendingWaiverPath(workspace: string, approvalRequestId: string): string {
-  return join(pendingWaiversDir(workspace), `${approvalRequestId}.json`);
-}
-
-function savePendingWaiver(workspace: string, pending: z.infer<typeof pendingWaiverSchema>): string {
-  ensureDir(pendingWaiversDir(workspace));
-  const path = pendingWaiverPath(workspace, pending.approvalRequestId);
-  writeFileAtomic(path, JSON.stringify(pendingWaiverSchema.parse(pending), null, 2), 0o600);
-  return path;
-}
-
-function loadPendingWaiver(workspace: string, approvalRequestId: string): z.infer<typeof pendingWaiverSchema> {
-  const path = pendingWaiverPath(workspace, approvalRequestId);
-  if (!pathExists(path)) {
-    throw new Error(`pending waiver not found: ${approvalRequestId}`);
-  }
-  return pendingWaiverSchema.parse(JSON.parse(readUtf8(path)) as unknown);
-}
-
-function removePendingWaiver(workspace: string, approvalRequestId: string): void {
-  const path = pendingWaiverPath(workspace, approvalRequestId);
-  if (pathExists(path)) {
-    rmSync(path, { force: true });
-  }
-}
-
-function listPendingWaivers(workspace: string): z.infer<typeof pendingWaiverSchema>[] {
-  const dir = pendingWaiversDir(workspace);
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => b.localeCompare(a))
-    .map((name) => pendingWaiverSchema.parse(JSON.parse(readUtf8(join(dir, name))) as unknown));
-}
-
-function activateApprovedWaiver(workspace: string, pending: z.infer<typeof pendingWaiverSchema>, nowTs = Date.now()): AssuranceWaiver | null {
-  const approval = verifyApprovalForExecution({
-    workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    expectedIntentId: pending.intentId,
-    expectedToolName: "assurance.waiver",
-    expectedActionClass: "SECURITY"
-  });
-  if (!approval.ok) {
-    return null;
-  }
-
-  const decisions = listApprovalDecisions({
-    workspace,
-    agentId: pending.agentId,
-    approvalRequestId: pending.approvalRequestId
-  }).filter((row) => row.decision === "APPROVE_EXECUTE" || row.decision === "APPROVE_SIMULATE");
-
-  const ownerDecision = decisions.find((row) => row.roles.includes("OWNER"));
-  const auditorDecision = decisions.find((row) => row.roles.includes("AUDITOR"));
-  if (!ownerDecision || !auditorDecision) {
-    return null;
-  }
-
-  const waiver = assuranceWaiverSchema.parse({
-    v: 1,
-    waiverId: `wvr_${randomUUID().replace(/-/g, "")}`,
-    createdTs: nowTs,
-    expiresTs: nowTs + pending.hours * 60 * 60 * 1000,
-    reason: pending.reason,
-    scope: {
-      type: "WORKSPACE",
-      id: "workspace"
-    },
-    allowReadyDespiteAssuranceFail: true,
-    approvedBy: [
-      {
-        userIdHash: sha256Hex(ownerDecision.userId).slice(0, 16),
-        role: "OWNER",
-        approvalEventHash: sha256Hex(ownerDecision.approvalDecisionId)
-      },
-      {
-        userIdHash: sha256Hex(auditorDecision.userId).slice(0, 16),
-        role: "AUDITOR",
-        approvalEventHash: sha256Hex(auditorDecision.approvalDecisionId)
-      }
-    ],
-    bindings: {
-      lastCertSha256: pending.lastCertSha256,
-      policySha256: pending.policySha256
-    }
-  });
-
-  saveAssuranceWaiver(workspace, waiver);
-  consumeApprovedExecution({
-    workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: pending.requestId
-  });
-  removePendingWaiver(workspace, pending.approvalRequestId);
-  appendTransparencyEntry({
-    workspace,
-    type: "ASSURANCE_WAIVER_ACTIVE",
-    agentId: "workspace",
-    artifact: {
-      kind: "approval",
-      sha256: sha256Hex(Buffer.from(JSON.stringify(waiver), "utf8")),
-      id: waiver.waiverId
-    }
-  });
-  return waiver;
-}
-
-function maybeActivatePendingWaivers(workspace: string): AssuranceWaiver[] {
-  const activated: AssuranceWaiver[] = [];
-  for (const pending of listPendingWaivers(workspace)) {
-    const waiver = activateApprovedWaiver(workspace, pending);
-    if (waiver) {
-      activated.push(waiver);
-    }
-  }
-  return activated;
-}
 
 export function assuranceInitForApi(workspace: string) {
   return initAssurancePolicy(workspace);
@@ -324,8 +184,12 @@ export async function assuranceRunForApi(params: {
   windowDays?: number;
 }, options: RunHashPublicationOptions = {}) {
   params = { ...params }; options = { ...options }; const actor = options.beforePublish; actor?.();
-  const fixed = captureRunHashAuthority(params.workspace, Boolean(options.synchronousSeal || process.env.AMC_NO_SIGN === "1")), beforePublish = () => { actor?.(); fixed(); };
-  const policy = loadAssurancePolicy(params.workspace);
+  const fixed = captureRunHashAuthority(params.workspace, Boolean(options.synchronousSeal || process.env.AMC_NO_SIGN === "1"));
+  const baseCurrent = () => { actor?.(); fixed(); }, initialization = captureAssurancePolicyInitialization(params.workspace, { beforePublish: baseCurrent });
+  let selectedPolicy = captureAssurancePolicy(params.workspace);
+  if (selectedPolicy.parsePolicy() === null) { await initialization.initialize(); selectedPolicy = captureAssurancePolicy(params.workspace); }
+  const beforePublish = () => { baseCurrent(); initialization.assertCurrent(); assertOrgPairsCurrent(selectedPolicy.snapshot); };
+  beforePublish(); const policy = selectedPolicy.parsePolicy()!;
   const selected = resolvePackId(params.pack ?? "all");
   const report = await runAssurance({
     workspace: params.workspace,
@@ -428,8 +292,8 @@ export async function assuranceCertIssueForApi(params: {
   workspace: string;
   runId: string;
   outFile?: string;
-}) {
-  return issueAssuranceCertificate(params);
+}, options: { beforePublish?: () => void } = {}) {
+  return issueAssuranceCertificate(params, options);
 }
 
 export function assuranceCertLatestForApi(workspace: string) {
@@ -605,38 +469,8 @@ export function assuranceWaiverStatusForApi(workspace: string) {
   };
 }
 
-export function assuranceWaiverRevokeForApi(params: {
-  workspace: string;
-  waiverId?: string;
-}) {
-  const waivers = listAssuranceWaivers(params.workspace);
-  const waiver = params.waiverId
-    ? waivers.find((row) => row.waiverId === params.waiverId) ?? null
-    : activeAssuranceWaiver(params.workspace);
-  if (!waiver) {
-    return {
-      revoked: false,
-      reason: "waiver not found"
-    };
-  }
-  const path = join(assuranceWaiversDir(params.workspace), `waiver_${waiver.createdTs}.json`);
-  if (pathExists(path)) {
-    rmSync(path, { force: true });
-  }
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "ASSURANCE_WAIVER_REVOKED",
-    agentId: "workspace",
-    artifact: {
-      kind: "approval",
-      sha256: sha256Hex(Buffer.from(waiver.waiverId, "utf8")),
-      id: waiver.waiverId
-    }
-  });
-  return {
-    revoked: true,
-    waiverId: waiver.waiverId
-  };
+export function assuranceWaiverRevokeForApi(params: { workspace: string; waiverId?: string }) {
+  return revokeAssuranceWaiver(params);
 }
 
 export function assuranceSchedulerStatusForApi(workspace: string) {
@@ -645,12 +479,12 @@ export function assuranceSchedulerStatusForApi(workspace: string) {
 
 export async function assuranceSchedulerRunNowForApi(params: {
   workspace: string;
-}) {
+}, options: OrgPairsOptions = {}) {
   return assuranceSchedulerRunNow({
     workspace: params.workspace,
     scopeType: "WORKSPACE",
     selectedPack: "all"
-  });
+  }, options);
 }
 
 export function assuranceSchedulerEnableForApi(params: {
@@ -665,3 +499,41 @@ export function assuranceDefaultPolicyForApi() {
 }
 
 type AssuranceWaiver = z.infer<typeof assuranceWaiverSchema>;
+
+export function assuranceInitForApiAsync(workspace: string, options: OrgPairsOptions = {}) { return initAssurancePolicyAsync(workspace, options); }
+export async function assurancePolicyForApiAsync(workspace: string, options: OrgPairsOptions = {}) {
+  options = { ...options }; options.beforePublish?.(); const selected = captureAssurancePolicy(workspace);
+  if (selected.parsePolicy() !== null) return { policy: selected.parsePolicy()!, signature: selected.signature };
+  const cold = captureAssurancePolicyInitialization(workspace, { ...options, assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(selected.snapshot); } }); await cold.initialize(); cold.assertCurrent();
+  const own = captureAssurancePolicy(workspace); cold.assertCurrent(); return { policy: own.parsePolicy()!, signature: own.signature };
+}
+export class AssurancePolicyPublicationError extends Error {
+  readonly code = "ASSURANCE_POLICY_INCOMPLETE";
+  constructor(readonly completedStages: readonly string[], readonly attemptedStage: string, readonly transparency: unknown, cause: unknown) {
+    super("assurance policy publication did not complete; pair and transparency effects may remain", { cause }); this.name = "AssurancePolicyPublicationError";
+  }
+}
+export async function assurancePolicyApplyForApiAsync(input: { workspace: string; policy: unknown }, options: OrgPairsOptions = {}) {
+  options = { ...options }; const params = { workspace: input.workspace, policy: structuredClone(input.policy) }, actor = options.beforePublish; actor?.();
+  const parsed = assurancePolicySchema.parse(params.policy), original = captureOrgPairs([assurancePolicyPath(params.workspace)]);
+  const fixed = captureOrgPairsAuthority(params.workspace, actor), log = captureWorkspaceLogAuthority(params.workspace), predecessor = captureTransparencyAppendPublication(params.workspace);
+  const beforePublish = () => { actor?.(); fixed(); log.assertCurrent(); };
+  const completed: string[] = []; let stage = "policy-pair", transparency: unknown = null;
+  try {
+    const prepared = await prepareAssurancePolicyAsync(params.workspace, parsed,
+      { beforePublish, assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(original); predecessor.assertCurrent(); } }, original);
+    const [saved] = prepared.publish(); completed.push("policy-pair"); stage = "transparency";
+    const logged = await appendTransparencyEntryAttemptAsync({ workspace: params.workspace, type: "ASSURANCE_POLICY_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(parsed), "utf8")), id: "assurance-policy" } },
+      { beforeCommit: () => { prepared.assertCurrent(); predecessor.assertCurrent(); }, beforeMember: prepared.assertCurrent });
+    transparency = logged.entry; completed.push("transparency"); stage = "return"; prepared.assertCurrent(); logged.assertCurrent(); return saved!;
+  } catch (cause) { throw new AssurancePolicyPublicationError(Object.freeze([...completed]), stage, transparency, cause); }
+}
+export async function assuranceWaiverStatusForApiAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const attempt = await maybeActivatePendingWaiversAsync(workspace, { ...options });
+  try { attempt.assertCurrent(); return { active: activeAssuranceWaiver(workspace), latest: latestAssuranceWaiver(workspace),
+    waivers: listAssuranceWaivers(workspace), pending: listPendingWaivers(workspace), activated: attempt.activated, deferredTimestampCollisions: attempt.deferredTimestampCollisions }; }
+  catch (cause) { throw Object.assign(new Error("waiver activation returned but status projection failed", { cause }), { activated: attempt.activated }); }
+}
+export function assuranceWaiverRevokeForApiAsync(params: { workspace: string; waiverId?: string }, options: OrgPairsOptions = {}) { return revokeAssuranceWaiverAsync(params, options); }
+export function assuranceSchedulerEnableForApiAsync(params: { workspace: string; enabled: boolean }, options: OrgPairsOptions = {}) { return assuranceSchedulerSetEnabledAsync(params, options); }
