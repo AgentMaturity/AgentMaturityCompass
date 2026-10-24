@@ -1,3 +1,4 @@
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 /** Internal freeze raw32 preparation. Actual signing and initialization precede the shared publication lock; final local gates remain mandatory. */
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
@@ -36,13 +37,16 @@ export function prepareFreezeSignature(workspace: string, digest: string): Prepa
   } };
 }
 
-export async function prepareFreezeSignatureAsync(workspace: string, digest: string): Promise<PreparedFreezeSignature> {
-  const captured = capturePurposePublication(workspace, "artifact-seal");
+export async function prepareFreezeSignatureAsync(workspace: string, digest: string, beforeSign?: () => void): Promise<PreparedFreezeSignature> {
+  const negative = beforeSign; negative?.();
+  const captured = capturePurposePublication(workspace, "artifact-seal"), original = captureRunHashAuthority(workspace, false);
+  const assertPreparing = () => { negative?.(); original(); };
   const { signWithPurposeKey } = await import("../keys/purposeProviders.js");
-  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"));
+  assertPreparing();
+  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"), { beforeSign: assertPreparing });
   return { signature: signed.signature.toString("base64"), assertCurrent() {
     if (signed.provider === "file" && !vaultStatus(workspace).unlocked)
       throw new Error("Vault locked; unlock before preparing freeze publication");
-    assertPurposePublicationCurrent(workspace, captured, signed);
+    original(); assertPurposePublicationCurrent(workspace, captured, signed);
   } };
 }

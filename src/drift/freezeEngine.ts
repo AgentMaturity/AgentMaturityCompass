@@ -105,6 +105,17 @@ function publishRecord(workspace: string, agentId: string, target: string, expec
   } });
 }
 
+/** Preparation-only old source/target negative. No signer, await or positive authority enters this short lock. */
+function freezePreparationGuard(prepared: { workspace: string; agentId: string; target: string; expected: Buffer | null;
+  source?: { path: string; bytes: Buffer } }, beforePublish: () => void): () => void {
+  return () => withControlFileLock({ root: dirname(prepared.target), name: "freeze-publication", operation: () => {
+    beforePublish();
+    if (incidentsDir(prepared.workspace, prepared.agentId) !== dirname(prepared.target))
+      throw new Error("selected freeze publication directory changed while signing was prepared");
+    if ((prepared.source !== undefined && !matches(prepared.source.path, prepared.source.bytes)) || !matches(prepared.target, prepared.expected))
+      throw new Error("freeze source or destination changed while signing was prepared");
+  } });
+}
 export function verifyIncidentSignature(workspace: string, incident: FreezeIncident): boolean {
   const payload: Omit<FreezeIncident, "signature"> = {
     v: incident.v,
@@ -188,7 +199,7 @@ export async function createFreezeIncidentAsync(params: CreateFreezeIncidentPara
 /** Internal maintained handoff. The callback only adds refusal; it supplies no signer or positive authority. */
 export async function createFreezeIncidentForAuthority(params: CreateFreezeIncidentParams, beforePublish: () => void): Promise<FreezeIncident> {
   const prepared = prepareIncident(params); beforePublish();
-  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest);
+  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest, freezePreparationGuard(prepared, beforePublish));
   const incident = { ...prepared.payload, signature: signed.signature };
   publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, incident, signed, beforePublish);
   return incident;
@@ -307,7 +318,8 @@ export async function liftFreezeAsync(params: LiftFreezeParams): Promise<{ liftP
 export async function liftFreezeForAuthority(input: LiftFreezeParams, beforePublish: () => void): Promise<{ liftPath: string }> {
   const params = { ...input }; assertOwnerMode(params.workspace, "freeze lift");
   const prepared = prepareLift(params); beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift");
-  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest);
+  const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest,
+    freezePreparationGuard(prepared, () => { beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift"); }));
   publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, { ...prepared.payload, signature: signed.signature }, signed,
     () => { beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift"); }, prepared.source);
   return { liftPath: prepared.target };
