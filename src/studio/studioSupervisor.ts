@@ -24,7 +24,7 @@ import { initForecastPolicyAsync } from "../forecast/forecastPublication.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { checkNotaryTrust, verifyTrustConfigSignature } from "../trust/trustConfig.js";
-import { initMechanicWorkspace } from "../mechanic/mechanicApi.js";
+import { initMechanicWorkspaceForAuthority } from "../mechanic/mechanicSettingsPublication.js";
 import { mechanicTargetsPath, verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
 import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
@@ -113,11 +113,11 @@ async function ensureWorkspace(workspace: string): Promise<void> {
     await initForecastPolicyAsync(workspace, { onlyIfMissing: true });
   }
   if (!existsSync(mechanicTargetsPath(workspace))) {
-    initMechanicWorkspace({
+    await initMechanicWorkspaceForAuthority({
       workspace,
       scopeType: "WORKSPACE",
       scopeId: "workspace"
-    });
+    }, () => {}, true);
   }
   if (!existsSync(promptPolicyPath(workspace))) {
     initPromptPolicy(workspace);

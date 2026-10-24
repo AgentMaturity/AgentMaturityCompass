@@ -336,6 +336,7 @@ import { verifyCgxPolicySignature } from "../cgx/cgxStore.js";
 import { renderContextualizedDiagnostic } from "../diagnostic/contextualizer/contextualizer.js";
 import { emitCgxSse } from "../cgx/cgxSse.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
+import { mechanicTargetsApplyForAuthority as mechanicTargetsApplyForApi, mechanicProfileApplyForAuthority as mechanicProfileApplyForApi, mechanicTuningApplyForAuthority as mechanicTuningApplyForApi } from "../mechanic/mechanicSettingsPublication.js";
 import {
   initMechanicWorkspace,
   mechanicCreatePlanForApi,
@@ -345,12 +346,9 @@ import {
   mechanicPlanDiffForApi,
   mechanicPlanExecuteForApi,
   mechanicPlanRequestApprovalForApi,
-  mechanicProfileApplyForApi,
   mechanicProfilesForApi,
   mechanicSimulateForApi,
-  mechanicTargetsApplyForApi,
   mechanicTargetsForApi,
-  mechanicTuningApplyForApi,
   mechanicTuningForApi,
   verifyMechanicWorkspace
 } from "../mechanic/mechanicApi.js";
@@ -6741,12 +6739,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const reason = typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "";
-        const out = mechanicTargetsApplyForApi({
+        const out = await mechanicTargetsApplyForApi({
           workspace: options.workspace,
           targets: parsed.targets as Parameters<typeof mechanicTargetsApplyForApi>[0]["targets"],
           reason,
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_TARGETS_APPLIED",
@@ -6804,7 +6804,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "profileId is required" });
           return;
         }
-        const out = mechanicProfileApplyForApi({
+        const out = await mechanicProfileApplyForApi({
           workspace: options.workspace,
           profileId: parsed.profileId,
           mode: parsed.mode === "EXCELLENCE" ? "EXCELLENCE" : "DESIRED",
@@ -6812,7 +6812,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: (parsed.scopeId ?? (parsed.scopeType === "WORKSPACE" ? "workspace" : "default")).trim(),
           reason: typeof parsed.reason === "string" ? parsed.reason : "apply mechanic profile",
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_PROFILE_APPLIED",
@@ -6863,12 +6865,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const reason = typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "apply mechanic tuning";
-        const out = mechanicTuningApplyForApi({
+        const out = await mechanicTuningApplyForApi({
           workspace: options.workspace,
           tuning: parsed.tuning as Parameters<typeof mechanicTuningApplyForApi>[0]["tuning"],
           reason,
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_TARGETS_APPLIED",

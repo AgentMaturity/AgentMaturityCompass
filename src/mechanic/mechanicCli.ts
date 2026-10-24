@@ -1,5 +1,10 @@
+import { captureMechanicRun, mechanicProgress, mechanicFailed } from "./mechanicPublication.js";
+import { captureMechanicPair } from "./mechanicPairs.js";
+import { mechanicTargetsPath, captureMechanicTargets, prepareMechanicTargets, prepareInitialMechanicTargets, initMechanicTargetsAsync } from "./targetsStore.js";
+import { mechanicTuningPath, captureMechanicTuning, prepareMechanicTuning, prepareInitialMechanicTuning, initMechanicTuningAsync } from "./tuningStore.js";
+import { initMechanicWorkspaceAsync, mechanicTargetsApplyForApiAsync, mechanicTuningApplyForApiAsync, mechanicProfileApplyForApiAsync } from "./mechanicSettingsPublication.js";
 import { readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, resolve, relative } from "node:path";
 import YAML from "yaml";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { loadMechanicTargets, initMechanicTargets, saveMechanicTargets } from "./targetsStore.js";
@@ -366,4 +371,63 @@ export function mechanicTuneExportCli(params: {
 
 export function mechanicVerifyCli(workspace: string) {
   return verifyMechanicWorkspace(workspace);
+}
+
+export async function mechanicInitCliAsync(params: Parameters<typeof mechanicInitCli>[0]) {
+  const input = { ...params }, scope = normalizeScope(input.scope ?? "workspace", input.id);
+  return initMechanicWorkspaceAsync({ workspace: input.workspace, scopeType: scope.type, scopeId: scope.id });
+}
+export async function mechanicTargetsInitCliAsync(params: Parameters<typeof mechanicTargetsInitCli>[0]) {
+  const input = { ...params }; return initMechanicTargetsAsync({ workspace: input.workspace, scope: normalizeScope(input.scope, input.id), mode: input.mode });
+}
+export async function mechanicTuningInitCliAsync(params: Parameters<typeof mechanicTuningInitCli>[0]) {
+  const input = { ...params }; return initMechanicTuningAsync({ workspace: input.workspace, scope: normalizeScope(input.scope, input.id) });
+}
+export async function mechanicTargetsApplyCliAsync(params: Parameters<typeof mechanicTargetsApplyCli>[0]) {
+  const input = { ...params }, path = resolve(input.workspace, input.filePath), raw = readUtf8(path);
+  const targets = (input.filePath.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as MechanicTargets;
+  return mechanicTargetsApplyForApiAsync({ workspace: input.workspace, targets, reason: input.reason, actor: input.actor });
+}
+export async function mechanicTuningApplyCliAsync(params: Parameters<typeof mechanicTuningApplyCli>[0]) {
+  const input = { ...params }, path = resolve(input.workspace, input.filePath), raw = readUtf8(path);
+  const tuning = (input.filePath.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as MechanicTuning;
+  return mechanicTuningApplyForApiAsync({ workspace: input.workspace, tuning, reason: input.reason, actor: input.actor });
+}
+export async function mechanicProfileApplyCliAsync(params: Parameters<typeof mechanicProfileApplyCli>[0]) {
+  const input = { ...params }, scope = normalizeScope(input.scope, input.id);
+  return mechanicProfileApplyForApiAsync({ workspace: input.workspace, profileId: input.profileId, mode: input.mode, scopeType: scope.type, scopeId: scope.id, reason: input.reason, actor: input.actor });
+}
+export async function mechanicTargetsSetCliAsync(params: Parameters<typeof mechanicTargetsSetCli>[0]) {
+  const input = { ...params }, run = captureMechanicRun(input.workspace, () => {}), state = mechanicProgress();
+  let constructorTargets: MechanicTargets | undefined, initialCurrent = () => {};
+  try {
+    const initial = captureMechanicPair(input.workspace, mechanicTargetsPath(input.workspace), "mechanic targets missing");
+    if (initial.bytes === null && initial.hasSidecar) throw new Error("existing mechanic sidecar has no body; initialization refuses replacement");
+    if (initial.bytes === null) { state.phase = "initial-targets";
+      const prepared = await prepareInitialMechanicTargets({ workspace: input.workspace, scope: { type: "WORKSPACE", id: "workspace" }, mode: "DESIRED" }, { assertInputsCurrent: run.fixed }, initial.before);
+      const saved = prepared.publish(); constructorTargets = saved.targets; initialCurrent = prepared.assertCurrent; state.completed.push(relative(input.workspace, saved.path), relative(input.workspace, saved.sigPath)); prepared.assertCurrent(); run.fixed(); }
+    const selected = captureMechanicTargets(input.workspace), next: MechanicTargets = { mechanicTargets: { ...(constructorTargets ?? selected.targets).mechanicTargets, targets: { ...(constructorTargets ?? selected.targets).mechanicTargets.targets, [input.qid]: input.value } } };
+    state.phase = "targets-pair";
+    const prepared = await prepareMechanicTargets({ workspace: input.workspace, targets: next, reason: input.reason }, {
+      assertInputsCurrent() { initialCurrent(); selected.assertCurrent(); run.fixed(); }
+    }, selected.before);
+    return prepared.publish();
+  } catch (error) { mechanicFailed(state, error); }
+}
+export async function mechanicTuningSetCliAsync(params: Parameters<typeof mechanicTuningSetCli>[0]) {
+  const input = { ...params }, run = captureMechanicRun(input.workspace, () => {}), state = mechanicProgress();
+  let initialCurrent = () => {};
+  try {
+    const initial = captureMechanicPair(input.workspace, mechanicTuningPath(input.workspace), "mechanic tuning missing");
+    if (initial.bytes === null && initial.hasSidecar) throw new Error("existing mechanic sidecar has no body; initialization refuses replacement");
+    if (initial.bytes === null) { state.phase = "initial-tuning";
+      const prepared = await prepareInitialMechanicTuning({ workspace: input.workspace, scope: { type: "WORKSPACE", id: "workspace" } }, { assertInputsCurrent: run.fixed }, initial.before);
+      const saved = prepared.publish(); initialCurrent = prepared.assertCurrent; state.completed.push(relative(input.workspace, saved.path), relative(input.workspace, saved.sigPath)); prepared.assertCurrent(); run.fixed(); }
+    const selected = captureMechanicTuning(input.workspace), next = structuredClone(selected.tuning) as unknown as Record<string, unknown>;
+    setByPath(next, input.keyPath, parseValue(input.value)); state.phase = "tuning-pair";
+    const prepared = await prepareMechanicTuning({ workspace: input.workspace, tuning: next as unknown as MechanicTuning, reason: input.reason }, {
+      assertInputsCurrent() { initialCurrent(); selected.assertCurrent(); run.fixed(); }
+    }, selected.before);
+    return prepared.publish();
+  } catch (error) { mechanicFailed(state, error); }
 }

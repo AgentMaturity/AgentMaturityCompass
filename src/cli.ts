@@ -540,27 +540,27 @@ import {
 } from "./forecast/forecastCli.js";
 import {
   mechanicGapCli,
-  mechanicInitCli,
+  mechanicInitCliAsync as mechanicInitCli,
   mechanicPlanCreateCli,
   mechanicPlanDiffCli,
   mechanicPlanExecuteCli,
   mechanicPlanRequestApprovalCli,
   mechanicPlanShowCli,
-  mechanicProfileApplyCli,
+  mechanicProfileApplyCliAsync as mechanicProfileApplyCli,
   mechanicProfileListCli,
   mechanicProfilesVerifyCli,
   mechanicSimulateCli,
   mechanicSimulationLatestCli,
   mechanicTuneExportCli,
-  mechanicTargetsApplyCli,
-  mechanicTargetsInitCli,
+  mechanicTargetsApplyCliAsync as mechanicTargetsApplyCli,
+  mechanicTargetsInitCliAsync as mechanicTargetsInitCli,
   mechanicTargetsPrintCli,
-  mechanicTargetsSetCli,
+  mechanicTargetsSetCliAsync as mechanicTargetsSetCli,
   mechanicTargetsVerifyCli,
-  mechanicTuningApplyCli,
-  mechanicTuningInitCli,
+  mechanicTuningApplyCliAsync as mechanicTuningApplyCli,
+  mechanicTuningInitCliAsync as mechanicTuningInitCli,
   mechanicTuningPrintCli,
-  mechanicTuningSetCli,
+  mechanicTuningSetCliAsync as mechanicTuningSetCli,
   mechanicTuningVerifyCli,
   mechanicVerifyCli
 } from "./mechanic/mechanicCli.js";
@@ -17984,9 +17984,9 @@ mechanic
   .command("init")
   .option("--scope <scope>", "workspace|agent|node", "workspace")
   .option("--id <id>", "scope id")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
     assertOwnerMode(process.cwd(), "mechanic init");
-    const out = mechanicInitCli({
+    const out = await mechanicInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id
@@ -18002,9 +18002,9 @@ mechanicTargets
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <id>", "scope id")
   .option("--mode <mode>", "DESIRED|EXCELLENCE", "DESIRED")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE" }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE" }) => {
     assertOwnerMode(process.cwd(), "mechanic targets init");
-    const out = mechanicTargetsInitCli({
+    const out = await mechanicTargetsInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id,
@@ -18019,13 +18019,13 @@ mechanicTargets
   .requiredOption("--q <qid>", "question id, e.g. AMC-3.2.4")
   .requiredOption("--value <n>", "target value 0..5")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { q: string; value: string; reason: string }) => {
+  .action(async (opts: { q: string; value: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic targets set");
     const value = Number(opts.value);
     if (!Number.isInteger(value) || value < 0 || value > 5) {
       throw new Error("--value must be an integer 0..5");
     }
-    const out = mechanicTargetsSetCli({
+    const out = await mechanicTargetsSetCli({
       workspace: process.cwd(),
       qid: opts.q,
       value,
@@ -18039,9 +18039,9 @@ mechanicTargets
   .command("apply")
   .requiredOption("--file <path>", "targets yaml/json path")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic targets apply");
-    const out = mechanicTargetsApplyCli({
+    const out = await mechanicTargetsApplyCli({
       workspace: process.cwd(),
       filePath: opts.file,
       reason: opts.reason,
@@ -18089,9 +18089,9 @@ mechanicProfile
   .option("--id <id>", "scope id")
   .option("--mode <mode>", "DESIRED|EXCELLENCE", "DESIRED")
   .requiredOption("--reason <text>", "reason for profile apply")
-  .action((profileId: string, opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE"; reason: string }) => {
+  .action(async (profileId: string, opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE"; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic profile apply");
-    const out = mechanicProfileApplyCli({
+    const out = await mechanicProfileApplyCli({
       workspace: process.cwd(),
       profileId,
       scope: opts.scope,
@@ -18123,9 +18123,9 @@ mechanicTuning
   .command("init")
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <id>", "scope id")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning init");
-    const out = mechanicTuningInitCli({
+    const out = await mechanicTuningInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id
@@ -18139,9 +18139,9 @@ mechanicTuning
   .requiredOption("--key <key>", "dot path in tuning object, e.g. knobs.maxTokensPerRun")
   .requiredOption("--value <value>", "value (number/bool/json/csv/string)")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { key: string; value: string; reason: string }) => {
+  .action(async (opts: { key: string; value: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning set");
-    const out = mechanicTuningSetCli({
+    const out = await mechanicTuningSetCli({
       workspace: process.cwd(),
       keyPath: opts.key,
       value: opts.value,
@@ -18155,9 +18155,9 @@ mechanicTuning
   .command("apply")
   .requiredOption("--file <path>", "tuning yaml/json path")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning apply");
-    const out = mechanicTuningApplyCli({
+    const out = await mechanicTuningApplyCli({
       workspace: process.cwd(),
       filePath: opts.file,
       reason: opts.reason,

@@ -4,8 +4,10 @@ import { questionBank } from "../diagnostic/questionBank.js";
 import { loadRunReport } from "../diagnostic/runner.js";
 import { latestRunId } from "../diagnostic/runReportResolution.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { captureOrgPairs, orgPairBytes, publishOrgPairs, prepareOrgPairsAsync, type OrgPairsSnapshot, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { canonicalize } from "../utils/json.js";
+import { captureMechanicPair, requireMechanicPair, verifyMechanicPair } from "./mechanicPairs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { mechanicTargetsSchema, type MechanicScope, type MechanicTargets } from "./targetSchema.js";
 
 export function mechanicRoot(workspace: string): string {
@@ -84,17 +86,18 @@ export function loadMechanicTargets(workspace: string): MechanicTargets {
   return mechanicTargetsSchema.parse(YAML.parse(readUtf8(path)) as unknown);
 }
 
-export function saveMechanicTargets(params: {
+function planMechanicTargets(params: {
   workspace: string;
   targets: MechanicTargets;
   reason?: string;
   measured?: Record<string, number> | null;
-}): { path: string; sigPath: string } {
+}, previous?: OrgPairsSnapshot) {
   const path = mechanicTargetsPath(params.workspace);
-  ensureDir(mechanicRoot(params.workspace));
   const parsed = mechanicTargetsSchema.parse(params.targets);
-  const current = pathExists(path) ? mechanicTargetsSchema.parse(YAML.parse(readUtf8(path)) as unknown) : null;
-  const measured = params.measured ?? measuredTargetMapping(params.workspace, parsed.mechanicTargets.scope);
+  const before = previous ?? captureOrgPairs([path]), currentBytes = orgPairBytes(before, path);
+  const current = currentBytes === null ? null : mechanicTargetsSchema.parse(YAML.parse(currentBytes.toString("utf8")) as unknown);
+  const explicit = params.measured === undefined || params.measured === null ? null : structuredClone(params.measured);
+  const measured = explicit ?? measuredTargetMapping(params.workspace, parsed.mechanicTargets.scope), measuredProjection = canonicalize(measured);
 
   if (parsed.mechanicTargets.locking.requireReasonForChange) {
     const changed = current
@@ -136,10 +139,47 @@ export function saveMechanicTargets(params: {
     normalized.mechanicTargets.createdTs = normalized.mechanicTargets.updatedTs;
   }
 
-  writeFileAtomic(path, YAML.stringify(normalized), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
-  return { path, sigPath };
+  const bytes = Buffer.from(YAML.stringify(normalized));
+  return { before, path, bytes, assertInputsCurrent() {
+    if (parsed.mechanicTargets.locking.preventLoweringBelowMeasured && explicit === null && canonicalize(measuredTargetMapping(params.workspace, parsed.mechanicTargets.scope)) !== measuredProjection)
+      throw new Error("selected mechanic measured target floor changed while signing");
+  } };
 }
+
+export function saveMechanicTargets(params: {
+  workspace: string;
+  targets: MechanicTargets;
+  reason?: string;
+  measured?: Record<string, number> | null;
+}): { path: string; sigPath: string } {
+  const plan = planMechanicTargets(params);
+  return publishOrgPairs(params.workspace, [{ path: plan.path, bytes: plan.bytes }], { assertInputsCurrent: plan.assertInputsCurrent }, plan.before)[0]!;
+}
+/** Internal checked preparation; callers retain the real gate across later independent log waits. */
+export async function prepareMechanicTargets(params: Parameters<typeof saveMechanicTargets>[0], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const plan = planMechanicTargets({ ...params, targets: mechanicTargetsSchema.parse(params.targets) }, previous);
+  if (orgPairBytes(plan.before, plan.path) !== null) requireMechanicPair(captureMechanicPair(params.workspace, plan.path, "mechanic targets missing", plan.before));
+  const prepared = await prepareOrgPairsAsync(params.workspace, [{ path: plan.path, bytes: plan.bytes }], {
+    beforePublish: options.beforePublish, assertInputsCurrent() { plan.assertInputsCurrent(); options.assertInputsCurrent?.(); }
+  }, plan.before);
+  return { bytes: Buffer.from(plan.bytes), assertCurrent: prepared.assertCurrent, publish() { return prepared.publish()[0]!; } };
+}
+export function captureMechanicTargets(workspace: string) {
+  const captured = captureMechanicPair(workspace, mechanicTargetsPath(workspace), "mechanic targets missing");
+  const targets = mechanicTargetsSchema.parse(YAML.parse(requireMechanicPair(captured).toString("utf8")) as unknown);
+  return { ...captured, targets };
+}
+export async function prepareInitialMechanicTargets(params: Parameters<typeof initMechanicTargets>[0], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const input = { ...params, scope: { ...params.scope } }, measured = measuredTargetMapping(input.workspace, input.scope);
+  const targets = defaultTargets(input.scope, input.mode, measured), expected = canonicalize(measured);
+  const prepared = await prepareMechanicTargets({ workspace: input.workspace, targets, reason: "initial mechanic targets", measured }, {
+    beforePublish: options.beforePublish, assertInputsCurrent() {
+      if (canonicalize(measuredTargetMapping(input.workspace, input.scope)) !== expected) throw new Error("selected initial mechanic measurement changed while signing");
+      options.assertInputsCurrent?.(); }
+  }, previous);
+  return { assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), targets }; } };
+}
+export async function initMechanicTargetsAsync(params: Parameters<typeof initMechanicTargets>[0]) { return (await prepareInitialMechanicTargets(params)).publish(); }
 
 export function initMechanicTargets(params: {
   workspace: string;
@@ -161,15 +201,5 @@ export function initMechanicTargets(params: {
 }
 
 export function verifyMechanicTargetsSignature(workspace: string) {
-  const path = mechanicTargetsPath(workspace);
-  if (!pathExists(path)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "mechanic targets missing",
-      path,
-      sigPath: `${path}.sig`
-    };
-  }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyMechanicPair(workspace, mechanicTargetsPath(workspace), "mechanic targets missing");
 }
