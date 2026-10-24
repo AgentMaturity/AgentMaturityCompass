@@ -435,9 +435,14 @@ export function calculateForecast(input: ForecastCreationParams) {
     advisories
   };
 
-  return { forecast, advisories, policy, assertInputsCurrent() {
-    policySnapshot.assertCurrent(); signalSnapshot.assertCurrent(); leadingSnapshot.assertCurrent(); recommendations?.assertCurrent();
-  } };
+  return { forecast, advisories, policy,
+    /** Internal mechanic read: preserve this calculation's selector clock without pinning unused advisory/leading inputs. */
+    readMechanicCurrent() {
+      policySnapshot.assertCurrent(); const current = signalSnapshot.readCurrent();
+      return { series: forecastScopeSeries(current, policy.forecastPolicy.horizons, evidenceGateFailures(policy, current).length === 0), etaToTarget: computeEta(current) };
+    }, assertInputsCurrent() {
+      policySnapshot.assertCurrent(); signalSnapshot.assertCurrent(); leadingSnapshot.assertCurrent(); recommendations?.assertCurrent();
+    } };
 }
 
 export function createForecast(input: ForecastCreationParams): {

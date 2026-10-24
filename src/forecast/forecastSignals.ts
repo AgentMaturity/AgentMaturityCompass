@@ -592,7 +592,7 @@ export function captureForecastSignals(input: { workspace: string; scope: Foreca
   const params = { ...input, scope: { ...input.scope } }, selectionTs = Date.now(), signals = collectForecastSignalsAt(params, selectionTs);
   const project = (value: ForecastSignalBundle) => canonicalize({ ...value, generatedTs: 0 });
   const original = project(signals);
-  return { signals, assertCurrent() {
+  return { signals, readCurrent() { return collectForecastSignalsAt(params, selectionTs); }, assertCurrent() {
     if (project(collectForecastSignalsAt(params, selectionTs)) !== original) throw new Error("selected forecast signal inputs changed while signing");
   } };
 }

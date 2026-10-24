@@ -108,12 +108,16 @@ function selectedPlan(workspace: string, planId: string) {
   }
   throw new Error(`mechanic plan not found: ${planId}`);
 }
-export function captureMechanicPlanById(workspace: string, planId: string) {
-  const selected = selectedPlan(workspace, planId), destinations = captureOrgPairs(planWrites(workspace, selected.plan).rows.map(row => row.path));
-  return { plan: selected.plan, destinations, assertCurrent() {
+export function captureMechanicPlanSelection(workspace: string, planId: string) {
+  const selected = selectedPlan(workspace, planId);
+  return { plan: selected.plan, assertCurrent() {
     if (selectedPlan(workspace, planId).path !== selected.path) throw new Error("mechanic plan selection changed while executing");
-    assertOrgPairsCurrent(selected.snapshot); assertOrgPairsCurrent(destinations);
+    assertOrgPairsCurrent(selected.snapshot);
   } };
+}
+export function captureMechanicPlanById(workspace: string, planId: string) {
+  const selected = captureMechanicPlanSelection(workspace, planId), destinations = captureOrgPairs(planWrites(workspace, selected.plan).rows.map(row => row.path));
+  return { plan: selected.plan, destinations, assertCurrent() { selected.assertCurrent(); assertOrgPairsCurrent(destinations); } };
 }
 export async function prepareMechanicPlan(workspace: string, input: MechanicUpgradePlan, options: OrgPairsOptions = {}, before?: OrgPairsSnapshot) {
   const writes = planWrites(workspace, input), prepared = await prepareOrgPairsAsync(workspace, writes.rows, options, before);

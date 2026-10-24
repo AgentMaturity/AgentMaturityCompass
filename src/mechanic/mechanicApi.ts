@@ -1,17 +1,13 @@
+import { mechanicGapForAuthority, mechanicCreatePlanForAuthority, mechanicSimulateForAuthority } from "./mechanicAnalysisPublication.js";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { signFileWithAuditor } from "../org/orgSigner.js";
-import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
-import { loadLatestMechanicPlan, loadMechanicPlanById, saveMechanicPlan, verifyMechanicPlanSignatures } from "./planStore.js";
+import { loadLatestMechanicPlan, loadMechanicPlanById, verifyMechanicPlanSignatures } from "./planStore.js";
 import {
   initMechanicTargets,
   loadMechanicTargets,
   saveMechanicTargets,
-  verifyMechanicTargetsSignature,
-  mechanicRoot
+  verifyMechanicTargetsSignature
 } from "./targetsStore.js";
 import {
   initMechanicProfiles,
@@ -25,13 +21,10 @@ import {
   saveMechanicTuning,
   verifyMechanicTuningSignature
 } from "./tuningStore.js";
-import { buildGapAnalysis } from "./gapAnalysis.js";
-import { createMechanicUpgradePlan } from "./upgradePlanner.js";
 import { diffMechanicPlanAgainstCurrent } from "./planDiff.js";
 import { requestPlanApprovals } from "./executionEngine.js";
 import { mechanicPlanExecuteForAuthority } from "./mechanicExecutionPublication.js";
-import { loadLatestMechanicSimulation, simulateMechanicPlan, verifyMechanicSimulationSignature } from "./simulator.js";
-import { mechanicGapReportSchema } from "./mechanicSchema.js";
+import { loadLatestMechanicSimulation, verifyMechanicSimulationSignature } from "./simulator.js";
 import type { MechanicScope, MechanicTargets } from "./targetSchema.js";
 import type { MechanicTuning } from "./tuningSchema.js";
 
@@ -43,24 +36,6 @@ function normalizeScope(params: {
   const type = typeRaw === "AGENT" || typeRaw === "NODE" ? typeRaw : "WORKSPACE";
   const id = (params.scopeId ?? (type === "WORKSPACE" ? "workspace" : "default")).trim() || (type === "WORKSPACE" ? "workspace" : "default");
   return { type, id } as MechanicScope;
-}
-
-function gapReportPath(workspace: string, ts: number): string {
-  return join(mechanicRoot(workspace), "reports", `gap_${ts}.json`);
-}
-
-function saveGapReport(workspace: string, report: ReturnType<typeof mechanicGapReportSchema.parse>): {
-  path: string;
-  sigPath: string;
-} {
-  const path = gapReportPath(workspace, report.generatedTs);
-  ensureDir(join(mechanicRoot(workspace), "reports"));
-  writeFileAtomic(path, `${JSON.stringify(report, null, 2)}\n`, 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
 }
 
 function appendMechanicTransparency(params: {
@@ -235,27 +210,7 @@ export async function mechanicGapForApi(params: {
   scopeType?: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
 }) {
-  const scope = normalizeScope({
-    scopeType: params.scopeType,
-    scopeId: params.scopeId
-  });
-  const measured = await runAutoAnswer({
-    workspace: params.workspace,
-    agentId: scope.type === "AGENT" ? scope.id : "default",
-    createPlan: false
-  });
-  const gap = buildGapAnalysis({
-    workspace: params.workspace,
-    scope,
-    targets: loadMechanicTargets(params.workspace),
-    measured
-  });
-  const saved = saveGapReport(params.workspace, gap);
-  return {
-    gap,
-    measured,
-    ...saved
-  };
+  return mechanicGapForAuthority(params, () => {});
 }
 
 export async function mechanicCreatePlanForApi(params: {
@@ -263,29 +218,7 @@ export async function mechanicCreatePlanForApi(params: {
   scopeType?: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
 }) {
-  const scope = normalizeScope({
-    scopeType: params.scopeType,
-    scopeId: params.scopeId
-  });
-  const created = await createMechanicUpgradePlan({
-    workspace: params.workspace,
-    scopeType: scope.type,
-    scopeId: scope.id
-  });
-  const saved = saveMechanicPlan(params.workspace, created.plan);
-  const digest = sha256Hex(readFileSync(saved.latestPath));
-  const transparencyHash = appendMechanicTransparency({
-    workspace: params.workspace,
-    type: "MECHANIC_PLAN_CREATED",
-    scopeId: scope.id,
-    sha256: digest,
-    artifactId: created.plan.planId
-  });
-  return {
-    ...created,
-    ...saved,
-    transparencyHash
-  };
+  return mechanicCreatePlanForAuthority(params, () => {});
 }
 
 export function mechanicLatestPlanForApi(workspace: string): {
@@ -346,30 +279,7 @@ export async function mechanicSimulateForApi(params: {
   workspace: string;
   planId: string;
 }) {
-  const plan = loadMechanicPlanById(params.workspace, params.planId);
-  const gap = await mechanicGapForApi({
-    workspace: params.workspace,
-    scopeType: plan.scope.type,
-    scopeId: plan.scope.id
-  });
-  const simulated = simulateMechanicPlan({
-    workspace: params.workspace,
-    plan,
-    integrityIndex: gap.gap.global.integrityIndex,
-    correlationRatio: gap.gap.global.correlationRatio
-  });
-  const digest = sha256Hex(readFileSync(simulated.path));
-  const transparencyHash = appendMechanicTransparency({
-    workspace: params.workspace,
-    type: "MECHANIC_SIMULATION_CREATED",
-    scopeId: plan.scope.id,
-    sha256: digest,
-    artifactId: simulated.simulation.simulationId
-  });
-  return {
-    ...simulated,
-    transparencyHash
-  };
+  return mechanicSimulateForAuthority(params, () => {});
 }
 
 export function mechanicLatestSimulationForApi(workspace: string): {

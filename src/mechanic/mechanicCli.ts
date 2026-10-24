@@ -1,3 +1,6 @@
+import { mechanicGapForPublication } from "./mechanicAnalysisPublication.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { mechanicPlanRequestApprovalForApiAsync, mechanicPlanRequestApprovalForAuthority, mechanicPlanExecuteForAuthority } from "./mechanicExecutionPublication.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed } from "./mechanicPublication.js";
 import { captureMechanicPair } from "./mechanicPairs.js";
@@ -25,7 +28,6 @@ import {
   mechanicProfileApplyForApi,
   mechanicTuningForApi,
   mechanicTuningApplyForApi,
-  mechanicGapForApi,
   mechanicCreatePlanForApi,
   mechanicLatestPlanForApi,
   mechanicPlanDiffForApi,
@@ -267,16 +269,19 @@ export async function mechanicGapCli(params: {
   id?: string;
   outFile?: string;
 }) {
-  const scope = normalizeScope(params.scope ?? "workspace", params.id);
-  const out = await mechanicGapForApi({
-    workspace: params.workspace,
-    scopeType: scope.type,
-    scopeId: scope.id
-  });
-  if (params.outFile) {
-    writeFileAtomic(resolve(params.workspace, params.outFile), `${JSON.stringify(out.gap, null, 2)}\n`, 0o644);
-  }
-  return out;
+  const input = { ...params }, scope = normalizeScope(input.scope ?? "workspace", input.id), output = input.outFile ? resolve(input.workspace, input.outFile) : null;
+  const selectedConfig = [mechanicTargetsPath(input.workspace), forecastPolicyPath(input.workspace)].map(path => resolve(path));
+  if (output !== null && selectedConfig.some(path => output === path || output === `${path}.sig`)) throw new Error("mechanic gap output must differ from its selected configuration");
+  const before = output === null ? null : captureOrgPairs([output]);
+  const published = await mechanicGapForPublication({ workspace: input.workspace, scopeType: scope.type, scopeId: scope.id }, () => {});
+  try {
+    if (output !== null && before !== null) {
+      if (output === resolve(published.result.sigPath)) throw new Error("mechanic gap output must differ from its signature sidecar");
+      published.assertCurrent(); if (output !== resolve(published.result.path)) assertOrgPairsCurrent(before);
+      writeFileAtomic(output, `${JSON.stringify(published.result.gap, null, 2)}\n`, 0o644);
+    }
+    return published.result;
+  } catch (cause) { published.failOutput(cause); }
 }
 
 export async function mechanicPlanCreateCli(params: {

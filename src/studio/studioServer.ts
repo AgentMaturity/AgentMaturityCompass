@@ -338,15 +338,13 @@ import { renderContextualizedDiagnostic } from "../diagnostic/contextualizer/con
 import { emitCgxSse } from "../cgx/cgxSse.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
 import { mechanicTargetsApplyForAuthority as mechanicTargetsApplyForApi, mechanicProfileApplyForAuthority as mechanicProfileApplyForApi, mechanicTuningApplyForAuthority as mechanicTuningApplyForApi } from "../mechanic/mechanicSettingsPublication.js";
+import { mechanicGapForAuthority as mechanicGapForApi, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
 import {
   initMechanicWorkspace,
-  mechanicCreatePlanForApi,
-  mechanicGapForApi,
   mechanicLatestPlanForApi,
   mechanicLatestSimulationForApi,
   mechanicPlanDiffForApi,
   mechanicProfilesForApi,
-  mechanicSimulateForApi,
   mechanicTargetsForApi,
   mechanicTuningForApi,
   verifyMechanicWorkspace
@@ -6933,7 +6931,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
           scopeId: targetId
-        });
+        }, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -6950,12 +6949,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { scopeType?: "WORKSPACE" | "NODE" | "AGENT"; scopeId?: string }) : {};
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
         const out = await mechanicCreatePlanForApi({
           workspace: options.workspace,
           scopeType: parsed.scopeType ?? "WORKSPACE",
           scopeId: parsed.scopeId ?? (parsed.scopeType === "WORKSPACE" ? "workspace" : "default")
-        });
-        writeStudioAuditEvent({
+        }, () => { authority(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_PLAN_CREATED",
           severity: "LOW",
@@ -6964,7 +6965,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             scopeType: out.plan.scope.type,
             scopeId: out.plan.scope.id
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_PLAN_UPDATED"
@@ -7123,8 +7124,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const out = await mechanicSimulateForApi({
           workspace: options.workspace,
           planId
-        });
-        writeStudioAuditEvent({
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_SIMULATION_CREATED",
           severity: "LOW",
@@ -7133,7 +7135,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             simulationId: out.simulation.simulationId,
             status: out.simulation.status
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_SIMULATION_UPDATED"

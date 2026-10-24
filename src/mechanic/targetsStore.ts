@@ -177,7 +177,7 @@ export async function prepareInitialMechanicTargets(params: Parameters<typeof in
       if (canonicalize(measuredTargetMapping(input.workspace, input.scope)) !== expected) throw new Error("selected initial mechanic measurement changed while signing");
       options.assertInputsCurrent?.(); }
   }, previous);
-  return { assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), targets }; } };
+  return { bytes: Buffer.from(prepared.bytes), assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), targets }; } };
 }
 export async function initMechanicTargetsAsync(params: Parameters<typeof initMechanicTargets>[0]) { return (await prepareInitialMechanicTargets(params)).publish(); }
 
