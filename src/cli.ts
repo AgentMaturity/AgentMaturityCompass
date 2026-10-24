@@ -283,6 +283,7 @@ import { serveDashboard } from "./dashboard/serve.js";
 import { assignOwnership, createCommitmentPlan, learnQuestion } from "./eoc/flows.js";
 import inquirer from "inquirer";
 import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
+import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
 import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
@@ -608,10 +609,8 @@ import {
   exportRuntimeFirewallDecisions,
   inspectRuntimeFirewallPolicy,
   listRuntimeFirewallDecisions,
-  migrateRuntimeFirewallPolicySignature,
   renderRuntimeFirewallStatusText,
   runtimeFirewallStatus,
-  writeRuntimeFirewallPolicy,
   type RuntimeFirewallDirection,
   type RuntimeFirewallMode
 } from "./runtime/firewall.js";
@@ -9608,7 +9607,7 @@ firewall
   .option("--mode <mode>", "observe, warn, or block", "warn")
   .option("--fail-open", "do not fail closed when a required runtime policy is missing", false)
   .option("--json", "emit JSON output", false)
-  .action((opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
+  .action(async (opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
     const workspace = process.cwd();
     const requested = {
       mode: parseRuntimeFirewallModeCli(opts.mode),
@@ -9644,7 +9643,7 @@ firewall
       console.log("To change the mode deliberately: amc firewall enable --mode observe|warn|block. To inspect: amc firewall status.");
       return;
     }
-    const out = writeRuntimeFirewallPolicy({ workspace, ...requested });
+    const out = await writeRuntimeFirewallPolicyAsync({ workspace, ...requested });
     if (opts.json) {
       console.log(JSON.stringify({ changed: true, previousIntegrity: before.integrity, ...out }, null, 2));
       return;
@@ -9670,8 +9669,8 @@ firewall
   .command("disable")
   .description("Disable Runtime Firewall for this workspace")
   .option("--json", "emit JSON output", false)
-  .action((opts: { json?: boolean }) => {
-    const out = writeRuntimeFirewallPolicy({
+  .action(async (opts: { json?: boolean }) => {
+    const out = await writeRuntimeFirewallPolicyAsync({
       workspace: process.cwd(),
       mode: "observe",
       enabled: false,
@@ -9690,8 +9689,8 @@ firewall
   .description("Preserve and journal an existing verified Runtime Firewall policy")
   .option("--approve-legacy-kind", "acknowledge that legacy sidecars did not bind artifactKind", false)
   .option("--json", "emit JSON output", false)
-  .action((opts: { approveLegacyKind?: boolean; json?: boolean }) => {
-    const out = migrateRuntimeFirewallPolicySignature({
+  .action(async (opts: { approveLegacyKind?: boolean; json?: boolean }) => {
+    const out = await migrateRuntimeFirewallPolicySignatureAsync({
       workspace: process.cwd(),
       approveLegacyArtifactKind: opts.approveLegacyKind === true
     });
