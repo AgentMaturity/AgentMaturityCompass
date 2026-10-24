@@ -5,8 +5,12 @@ import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicyAs
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { verifyArtifactBindingLogSignature, verifyWorkspaceLogSignature, type WorkspaceLogKind } from "./workspaceSignature.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
-import { boundProviderKey } from "../keys/keyset.js";
-import type { KeyProviderId } from "../keys/provider.js";
+import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
+import { KeyProviderError, type KeyProviderId } from "../keys/provider.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { vaultStatus } from "../vault/vault.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -90,22 +94,40 @@ function captureSigner(workspace: string, descriptor: PolicySignerDescriptor) {
   const holder: KeyProviderId = boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file";
   return { descriptor, purpose, holder };
 }
-function assertSignerCurrent(workspace: string, original: ReturnType<typeof captureSigner>, signed: SignedDigest): void {
+function assertSignerCurrent(workspace: string, original: ReturnType<typeof captureSigner>, signed?: SignedDigest): void {
   assertPolicySignerCurrent(workspace, original.descriptor);
   if (original.purpose !== null) {
+    if (signed === undefined) {
+      // Before this kind has signed, check its real captured authority; never invent signature material or recapture/warm a new authority.
+      const current = assertKeysetComplete(workspace), policy = keyPolicy(loadKeysConfig(workspace));
+      if (current === null || canonicalize(current) !== original.purpose.keyset)
+        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", original.holder, "the original transparency purpose authority changed while signing was prepared");
+      if (!policy.allowed.includes(original.descriptor.algorithm) || (original.holder === "file" && policy.requireNonExportable))
+        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", original.holder, "the current key policy refuses the original transparency signer");
+      assertSigningKeyUsable(workspace, "artifact-seal", original.descriptor.publicKeyPem, original.holder);
+      if (original.holder === "file") {
+        if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+        if (publicKeyFromPrivate(getSigningKey(workspace, "artifact-seal")) !== original.descriptor.publicKeyPem)
+          throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the original transparency vault purpose key changed while signing was prepared");
+      }
+      return;
+    }
     if (signed.envelope === undefined) throw new Error("prepared transparency signature envelope is missing");
     assertPurposePublicationCurrent(workspace, original.purpose, { provider: original.holder, algorithm: signed.envelope.alg,
       publicKeyPem: original.descriptor.publicKeyPem, keyId: original.descriptor.fingerprint, signature: Buffer.from(signed.signature, "base64") });
   }
 }
 
-/** One prepared attempt. A competing writer refuses before this attempt appends; callers may explicitly retry. */
+/** One prepared attempt. A competing writer refuses before this attempt appends; callers may explicitly retry.
+ * beforeCommit is an internal repeatable negative gate: it runs before each Sign and again inside final publication.
+ * It must not advance business state, sign, await, or retain a lock/SQL transaction after returning.
+ */
 export async function appendTransparencyEntryAsync(input: TransparencyAppendInput, options: { beforeCommit?: () => void } = {}): Promise<TransparencyEntry> {
   const params = { workspace: input.workspace, type: input.type, agentId: input.agentId, artifact: { ...input.artifact } };
   const beforeCommit = options.beforeCommit, workspace = params.workspace;
   const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
   const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
-  const policy = JSON.stringify(loadTrustConfig(workspace));
+  const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
   const before = captureTransparencyState(workspace, true), predecessor = verifiedPredecessor(workspace, before);
   assertTransparencyStateCurrent(before);
   const payload = { v: 1 as const, ts: Date.now(), type: params.type, agentId: params.agentId,
@@ -116,17 +138,25 @@ export async function appendTransparencyEntryAsync(input: TransparencyAppendInpu
     signerFingerprint: sealSigner.descriptor.fingerprint, merkleAlgorithm: predecessor.algorithm }), null, 2));
   const plan = prepareMerkle({ workspace, algorithm: predecessor.algorithm, log: stateBytes(before, workspaceLogPath(workspace)),
     append: { entryHash: entry.hash, prevEntryHash: entry.prev }, rebuild: true });
-  const signedSeal = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: sha256Hex(seal), expectedSigner: sealSigner.descriptor });
-  const sealSignature = Buffer.from(JSON.stringify(transparencySealSignatureSchema.parse({ digestSha256: sha256Hex(seal),
-    signature: signedSeal.signature, signedTs: signedSeal.signedTs, signer: "auditor", envelope: signedSeal.envelope }), null, 2));
-  const signedRoot = await signDigestWithPolicyAsync({ workspace, kind: "MERKLE_ROOT", digestHex: plan.digest, expectedSigner: rootSigner.descriptor });
-  const rootSignature = preparedRootSignature(plan, signedRoot);
-  return publishTransparencyState(workspace, before, () => {
-    // Internal maintained-consumer gate: synchronous local checks only, no signing/history initialization or await.
+  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
     beforeCommit?.();
     assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
+    if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
     assertTransparencyStateCurrent(before);
+  };
+  assertCurrent();
+  const signedSeal = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: sha256Hex(seal), expectedSigner: sealSigner.descriptor,
+    beforeSign: () => assertCurrent() });
+  const sealSignature = Buffer.from(JSON.stringify(transparencySealSignatureSchema.parse({ digestSha256: sha256Hex(seal),
+    signature: signedSeal.signature, signedTs: signedSeal.signedTs, signer: "auditor", envelope: signedSeal.envelope }), null, 2));
+  assertCurrent(signedSeal);
+  const signedRoot = await signDigestWithPolicyAsync({ workspace, kind: "MERKLE_ROOT", digestHex: plan.digest, expectedSigner: rootSigner.descriptor,
+    beforeSign: () => assertCurrent(signedSeal) });
+  const rootSignature = preparedRootSignature(plan, signedRoot);
+  return publishTransparencyState(workspace, before, () => {
+    // All provider waits finished before this lock. Reuse the exact original gates and actual returned signing metadata.
+    assertCurrent(signedSeal, signedRoot);
     const oldLog = stateBytes(before, workspaceLogPath(workspace));
     const separator = oldLog !== null && oldLog.length > 0 && oldLog[oldLog.length - 1] !== 10 ? "\n" : "";
     appendFileSync(workspaceLogPath(workspace), separator + JSON.stringify(entry) + "\n", "utf8");
