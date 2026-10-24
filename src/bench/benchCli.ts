@@ -1,3 +1,6 @@
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { createBenchArtifactAsync } from "./benchArtifactAsync.js";
+import { benchCompareForApiAsync } from "./benchApi.js";
 import { benchInitForApiAsync, benchRegistriesForApiAsync, benchRegistryApplyForApiAsync } from "./benchPolicyAsync.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
@@ -207,3 +210,30 @@ export async function benchRegistriesCliAsync(workspace: string) { return benchR
 export async function benchRegistriesApplyCliAsync(params: Parameters<typeof benchRegistriesApplyCli>[0]) {
   const workspace = params.workspace, config = params.config; return benchRegistryApplyForApiAsync({ workspace, config });
 }
+
+export async function benchCreateCliAsync(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id?: string;
+  outFile: string;
+  windowDays?: number;
+  named?: boolean;
+  labels?: {
+    industry?: "software" | "fintech" | "health" | "manufacturing" | "other";
+    agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
+    deployment?: "single" | "host" | "k8s" | "compose";
+  };
+}, options: OrgPairsOptions = {}) {
+  params = structuredClone(params);
+  return createBenchArtifactAsync({
+    workspace: params.workspace,
+    scope: params.scope,
+    id: params.id,
+    outFile: resolve(params.workspace, params.outFile),
+    windowDays: params.windowDays,
+    named: params.named,
+    labels: params.labels
+  }, options);
+}
+
+export async function benchCompareCliAsync(params: Parameters<typeof benchCompareCli>[0], options: OrgPairsOptions = {}) { return benchCompareForApiAsync({...params},options); }

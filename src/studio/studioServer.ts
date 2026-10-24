@@ -152,9 +152,9 @@ import { ingestBenchmarks } from "../benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "../benchmarks/benchStore.js";
 import { benchmarkStats } from "../benchmarks/benchStats.js";
 import {
-  benchCompareForApi,
+  benchCompareForApiAsync as benchCompareForApi,
   benchComparisonLatestForApi,
-  benchCreateForApi,
+  benchCreateForApiAsync as benchCreateForApi,
   benchExportsForApi,
   benchImportForApi,
   benchImportsForApi,
@@ -7229,7 +7229,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               };
             })
           : {};
-        const created = benchCreateForApi({
+        const created = await benchCreateForApi({
           workspace: options.workspace,
           scope: parsed.scope ?? "workspace",
           id: parsed.id ?? (parsed.scope === "agent" ? resolveAgentId(options.workspace, "default") : "workspace"),
@@ -7237,7 +7237,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           windowDays: parsed.windowDays,
           named: parsed.named,
           labels: parsed.labels
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (created === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_CREATED",
@@ -7505,12 +7506,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               against?: "imported" | `registry:${string}`;
             })
           : {};
-        const compared = benchCompareForApi({
+        const compared = await benchCompareForApi({
           workspace: options.workspace,
           scope: parsed.scope ?? "workspace",
           id: parsed.id ?? (parsed.scope === "agent" ? resolveAgentId(options.workspace, "default") : "workspace"),
           against: parsed.against
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (compared === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_COMPARISON_CREATED",

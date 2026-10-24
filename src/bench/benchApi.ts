@@ -1,3 +1,6 @@
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { createBenchArtifactAsync } from "./benchArtifactAsync.js";
+import { createBenchComparisonAsync } from "./benchComparisonAsync.js";
 import { randomUUID } from "node:crypto";
 import { readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -372,3 +375,41 @@ export function benchPublishExecuteForApi(params: {
     transparencyHash: transparency.hash
   };
 }
+
+export async function benchCreateForApiAsync(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id?: string | null;
+  outFile?: string | null;
+  windowDays?: number;
+  named?: boolean;
+  labels?: {
+    industry?: "software" | "fintech" | "health" | "manufacturing" | "other";
+    agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
+    deployment?: "single" | "host" | "k8s" | "compose";
+  };
+}, options: OrgPairsOptions = {}) {
+  params = structuredClone(params);
+  const outFile = params.outFile
+    ? resolve(params.workspace, params.outFile)
+    : join(
+        params.workspace,
+        ".amc",
+        "bench",
+        "exports",
+        params.scope,
+        (params.id ?? "workspace").replace(/[^a-zA-Z0-9_-]/g, "_"),
+        `${Date.now()}.amcbench`
+      );
+  return createBenchArtifactAsync({
+    workspace: params.workspace,
+    scope: params.scope,
+    id: params.id,
+    outFile,
+    windowDays: params.windowDays,
+    named: params.named,
+    labels: params.labels
+  }, options);
+}
+
+export async function benchCompareForApiAsync(params: Parameters<typeof benchCompareForApi>[0], options: OrgPairsOptions = {}) { return createBenchComparisonAsync({...params},options); }

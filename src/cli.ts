@@ -359,9 +359,9 @@ import {
   type ReplayBenchmarkCorpusInput,
 } from "./benchmarks/replayBenchmarkCorpus.js";
 import {
-  benchCompareCli,
+  benchCompareCliAsync as benchCompareCli,
   benchComparisonLatestCli,
-  benchCreateCli,
+  benchCreateCliAsync as benchCreateCli,
   benchImportCli,
   benchInitCliAsync as benchInitCli,
   benchListExportsCli,
@@ -17431,7 +17431,7 @@ bench
   .option("--industry <value>", "software|fintech|health|manufacturing|other")
   .option("--agent-type <value>", "code-agent|support-agent|ops-agent|research-agent|sales-agent|other")
   .option("--deployment <value>", "single|host|k8s|compose")
-  .action((opts: {
+  .action(async (opts: {
     scope: string;
     out: string;
     id?: string;
@@ -17446,7 +17446,7 @@ bench
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`Invalid scope: ${opts.scope}`);
     }
-    const out = benchCreateCli({
+    const out = await benchCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -17458,7 +17458,7 @@ bench
         agentType: opts.agentType,
         deployment: opts.deployment
       }
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench create") });
     console.log(chalk.green("Bench artifact created"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
@@ -17608,18 +17608,18 @@ bench
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--id <id>", "scope id (workspace for workspace scope)")
   .option("--against <mode>", "imported|registry:<id>", "imported")
-  .action((opts: { scope: string; id: string; against: string }) => {
+  .action(async (opts: { scope: string; id: string; against: string }) => {
     assertOwnerMode(process.cwd(), "bench compare");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`Invalid scope: ${opts.scope}`);
     }
-    const out = benchCompareCli({
+    const out = await benchCompareCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
       against: opts.against as "imported" | `registry:${string}`
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench compare") });
     console.log(chalk.green("Bench comparison updated"));
     console.log(`Path: ${out.path}`);
     console.log(`Warnings: ${out.comparison.warnings.length}`);

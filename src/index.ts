@@ -621,7 +621,7 @@ export {
   benchInitCli, benchInitCliAsync,
   benchVerifyPolicyCli,
   benchPrintPolicyCli,
-  benchCreateCli,
+  benchCreateCli, benchCreateCliAsync,
   benchVerifyCli,
   benchPrintCli,
   benchRegistryInitCli,
@@ -632,30 +632,30 @@ export {
   benchImportCli,
   benchListImportsCli,
   benchListExportsCli,
-  benchCompareCli,
+  benchCompareCli, benchCompareCliAsync,
   benchComparisonLatestCli,
   benchRegistriesCli, benchRegistriesCliAsync,
   benchRegistriesApplyCli, benchRegistriesApplyCliAsync,
   benchPublishRequestCli,
   benchPublishExecuteCli
 } from "./bench/benchCli.js";
-export { createBenchArtifact, inspectBenchArtifact, listExportedBenchArtifacts } from "./bench/benchArtifact.js";
+export { createBenchArtifact, createBenchArtifactAsync, inspectBenchArtifact, listExportedBenchArtifacts } from "./bench/benchArtifact.js";
 export { verifyBenchArtifactFile } from "./bench/benchVerifier.js";
 export { initBenchRegistry, verifyBenchRegistry, publishBenchToRegistry, serveBenchRegistry } from "./bench/benchRegistryServer.js";
 export { browseBenchRegistry, importBenchFromRegistry, listImportedBenchArtifacts } from "./bench/benchRegistryClient.js";
-export { createBenchComparison } from "./bench/benchComparer.js";
+export { createBenchComparison, createBenchComparisonAsync } from "./bench/benchComparer.js";
 export {
   benchInitForApi, benchInitForApiAsync,
   benchPolicyForApi,
   benchPolicyApplyForApi, benchPolicyApplyForApiAsync,
-  benchCreateForApi,
+  benchCreateForApi, benchCreateForApiAsync,
   benchExportsForApi,
   benchImportsForApi,
   benchRegistriesForApi, benchRegistriesForApiAsync,
   benchRegistryApplyForApi, benchRegistryApplyForApiAsync,
   benchRegistryBrowseForApi,
   benchImportForApi,
-  benchCompareForApi,
+  benchCompareForApi, benchCompareForApiAsync,
   benchComparisonLatestForApi,
   benchPublishRequestForApi,
   benchPublishExecuteForApi

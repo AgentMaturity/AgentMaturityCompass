@@ -1,7 +1,6 @@
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor } from "../org/orgSigner.js";
 import { captureOrgPairs, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { readFileSync } from "node:fs";
@@ -142,9 +141,7 @@ export function saveBenchComparison(workspace: string, comparison: BenchComparis
 } {
   ensureBenchDirs(workspace);
   const path = benchComparisonLatestPath(workspace);
-  writeFileAtomic(path, JSON.stringify(benchComparisonSchema.parse(comparison), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{path,bytes:Buffer.from(JSON.stringify(benchComparisonSchema.parse(comparison),null,2))}])[0]!;
 }
 
 export function loadBenchComparison(workspace: string): BenchComparison | null {

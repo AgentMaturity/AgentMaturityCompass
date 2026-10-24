@@ -195,56 +195,21 @@ export function verifyProofsAgainstSignedRoot(params: {
     : { status: "unanchored", detail: "inclusion proofs do not resolve to a verified signed merkle root" } };
 }
 
-export function writeBenchProofFiles(params: {
-  outDir: string;
-  bundle: BenchProofBundle;
-}): {
-  proofIds: string[];
-  transparencyRootSha256: string;
-  merkleRootSha256: string;
-} {
-  const proofsDir = join(params.outDir, "proofs");
-  const inclDir = join(proofsDir, "inclusion");
-  const checksDir = join(params.outDir, "checks");
-  const metaDir = join(params.outDir, "meta");
-  ensureDir(proofsDir);
-  ensureDir(inclDir);
-  ensureDir(checksDir);
-  ensureDir(metaDir);
-  writeFileAtomic(join(metaDir, ".keep"), "", 0o644);
-  writeFileAtomic(join(checksDir, ".keep"), "", 0o644);
-
-  let transparencyRootSha256 = "0".repeat(64);
-  let merkleRootSha256 = "0".repeat(64);
-
-  if (params.bundle.transparencyRoot) {
-    const rootPath = join(proofsDir, "transparency.root.json");
-    const sigPath = join(proofsDir, "transparency.root.sig");
-    writeFileAtomic(rootPath, JSON.stringify(params.bundle.transparencyRoot.seal, null, 2), 0o644);
-    writeFileAtomic(sigPath, JSON.stringify(params.bundle.transparencyRoot.signature, null, 2), 0o644);
-    transparencyRootSha256 = sha256Hex(readFileSync(rootPath));
-  }
-  if (params.bundle.merkleRoot) {
-    const rootPath = join(proofsDir, "merkle.root.json");
-    const sigPath = join(proofsDir, "merkle.root.sig");
-    writeFileAtomic(rootPath, JSON.stringify(params.bundle.merkleRoot.root, null, 2), 0o644);
-    writeFileAtomic(sigPath, JSON.stringify(params.bundle.merkleRoot.signature, null, 2), 0o644);
-    merkleRootSha256 = sha256Hex(readFileSync(rootPath));
-  }
-
-  const proofIds: string[] = [];
-  for (const proof of params.bundle.proofs) {
-    const proofPath = join(inclDir, `${proof.proofId}.json`);
-    writeFileAtomic(proofPath, JSON.stringify(proof, null, 2), 0o644);
-    proofIds.push(proof.proofId);
-  }
-  proofIds.sort((a, b) => a.localeCompare(b));
-
-  return {
-    proofIds,
-    transparencyRootSha256,
-    merkleRootSha256
-  };
+/** Pure existing proof member recipe, including the original pretty JSON and .keep files. */
+export function benchProofFileBytes(bundle: BenchProofBundle) {
+  const files: {path:string;bytes:Buffer}[] = [{path:"meta/.keep",bytes:Buffer.alloc(0)},{path:"checks/.keep",bytes:Buffer.alloc(0)}];
+  let transparencyRootSha256 = "0".repeat(64), merkleRootSha256 = "0".repeat(64);
+  const pretty = (value:unknown) => Buffer.from(JSON.stringify(value,null,2));
+  if(bundle.transparencyRoot){const bytes=pretty(bundle.transparencyRoot.seal);files.push({path:"proofs/transparency.root.json",bytes},{path:"proofs/transparency.root.sig",bytes:pretty(bundle.transparencyRoot.signature)});transparencyRootSha256=sha256Hex(bytes);}
+  if(bundle.merkleRoot){const bytes=pretty(bundle.merkleRoot.root);files.push({path:"proofs/merkle.root.json",bytes},{path:"proofs/merkle.root.sig",bytes:pretty(bundle.merkleRoot.signature)});merkleRootSha256=sha256Hex(bytes);}
+  const proofIds:string[]=[];for(const proof of bundle.proofs){files.push({path:`proofs/inclusion/${proof.proofId}.json`,bytes:pretty(proof)});proofIds.push(proof.proofId);}proofIds.sort((a,b)=>a.localeCompare(b));
+  return {files,proofIds,transparencyRootSha256,merkleRootSha256};
+}
+export function writeBenchProofFiles(params:{outDir:string;bundle:BenchProofBundle}):{proofIds:string[];transparencyRootSha256:string;merkleRootSha256:string}{
+  const prepared=benchProofFileBytes(params.bundle);
+  for(const dir of ["proofs","proofs/inclusion","checks","meta"])ensureDir(join(params.outDir,dir));
+  for(const row of prepared.files)writeFileAtomic(join(params.outDir,row.path),row.bytes,0o644);
+  return {proofIds:prepared.proofIds,transparencyRootSha256:prepared.transparencyRootSha256,merkleRootSha256:prepared.merkleRootSha256};
 }
 
 export function transparencyAndMerkleHealthy(workspace: string): boolean {
