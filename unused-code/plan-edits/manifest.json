@@ -157,6 +157,13 @@
       "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
     },
     {
+      "path": "src/bench/benchArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchArtifact.ts.landed",
+      "sha256": "1b3467ee2b3b6662bea9893f843c75d663a43d23f226be9be4f8ab9617852964"
+    },
+    {
       "path": "src/bench/benchPolicyStore.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
