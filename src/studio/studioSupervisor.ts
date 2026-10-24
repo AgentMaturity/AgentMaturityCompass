@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -30,7 +30,8 @@ import { initMechanicWorkspaceForAuthority } from "../mechanic/mechanicSettingsP
 import { mechanicTargetsPath, verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
 import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
-import { initPromptPolicy, promptPolicyPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
+import { ensurePromptDirs, initPromptPolicy, loadPromptPolicyAttemptAsync, promptPolicyPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import {
   clearStudioState,
   ensureAdminToken,
@@ -130,7 +131,18 @@ async function ensureWorkspace(workspace: string): Promise<void> {
     }, () => {}, true);
   }
   if (!existsSync(promptPolicyPath(workspace))) {
-    initPromptPolicy(workspace);
+    if (process.env.AMC_NO_SIGN === "1") {
+      initPromptPolicy(workspace);
+    } else {
+      const root = resolve(workspace), path = promptPolicyPath(root), before = captureOrgPairs([path]);
+      if (orgPairBytes(before, path) !== null) throw new Error("missing prompt policy appeared before initialization; retry");
+      const assertWorkspace = () => {
+        if (resolve(workspace) !== root) throw new Error("original prompt-policy workspace changed before publication");
+      };
+      ensurePromptDirs(root);
+      const attempt = await loadPromptPolicyAttemptAsync(root, { beforePublish: assertWorkspace }, before);
+      attempt.assertCurrent();
+    }
   }
 }
 
