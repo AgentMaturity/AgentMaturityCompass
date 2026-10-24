@@ -396,7 +396,7 @@ import {
   passportReadinessGate,
   passportVerifyForApi
 } from "../passport/passportApi.js";
-import { verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { verifyPassportPolicySignatureForApi as verifyPassportPolicySignature } from "../passport/passportReadAdmission.js";
 import { passportPublicationFailure } from "../passport/passportPublication.js";
 import { emitPassportSse } from "../passport/passportSse.js";
 import { handleStudioPassportBadge } from "./passportBadgeRead.js";

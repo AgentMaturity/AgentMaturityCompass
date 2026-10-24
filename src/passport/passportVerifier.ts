@@ -14,12 +14,11 @@ import { passportJsonSchema, passportPiiScanSchema, passportSignatureSchema, typ
 import { digestFile } from "./passportSigner.js";
 import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { listPassportExportFiles, getPassportRevocation } from "./passportStore.js";
 import {
-  verifyPassportPolicySignature,
-  listPassportExportFiles,
-  verifyPassportCacheSignature,
-  getPassportRevocation
-} from "./passportStore.js";
+  verifyPassportPolicySignatureForApi as verifyPassportPolicySignature,
+  verifyPassportCacheSignatureForApi as verifyPassportCacheSignature
+} from "./passportReadAdmission.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import {
   extractValidatedTarGzipArchive,
