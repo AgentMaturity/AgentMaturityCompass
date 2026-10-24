@@ -3,7 +3,7 @@
  * project's control-file lock, verify the whole chain and every side table (`verifyChain`), build the transition body
  * on the head it verified and sign any A4_RECORD envelope OUTSIDE the ledger transaction; then, in one `BEGIN
  * IMMEDIATE`, dedupe the request, check the head has not moved (else rebuild and re-sign once, then 409
- * A4_STALE_HEAD) and that its own row is still signed (`verifyIncremental`, O(1)), append the signed audit row,
+ * A4_STALE_HEAD) and that its own row remains admitted (`verifyIncremental`; global authority reads), append the signed audit row,
  * insert the transition and the side rows its body names, and advance the head. Readers (`readHead`,
  * `listProjects`, `readChain`, `membersOf`, `readRevision`, `ratcheted`) use only a chain that verifies whole up to its
  * signed head.
@@ -11,8 +11,8 @@
  * Every row this store writes is `meta.source: "a4-store"`, `trustTier: "SELF_REPORTED"`, `claimKind: "self_reported"`;
  * there is no producer parameter and no path to OBSERVED. Observed facts enter only by reference (src/a4/a4Evidence.ts).
  * Only this file may contain the literal `auditType: "A4_STATE"` (`npm run check:gates` scans literals per file and
- * `NON_MATURITY_AUDIT_MODULES` classifies this module alone). Signatures are checked against the workspace's own
- * keys: a local audit trail, not a portable verdict.
+ * `NON_MATURITY_AUDIT_MODULES` classifies this module alone). Audit readers use actual local purpose math
+ * and provider delegation/receipt admission under operator trust: a local trail, not a portable verdict.
  */
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
@@ -21,21 +21,22 @@ import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPol
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
-import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
-import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/ledger.js";
+import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { verifyReceipt } from "../receipts/receipt.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { a4AuditProblems } from "./a4AuditReader.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
@@ -210,9 +211,9 @@ export function openA4Store(workspace: string): A4Store {
 }
 
 /** The store's readers and verifiers over a ledger opened elsewhere (read-only for `verifyA4Chain`); never for writes. */
-export const readA4Store = (ledger: Ledger): A4Store => createStore(ledger.workspace, ledger);
+export const readA4Store = (ledger: Ledger, trust?: TrustContext): A4Store => createStore(ledger.workspace, ledger, trust);
 
-function createStore(workspace: string, ledger: Ledger) {
+function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
   const db = ledger.db;
   /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
   const workspaceId = workspaceIdFromDirectory(workspace);
@@ -250,33 +251,8 @@ function createStore(workspace: string, ledger: Ledger) {
     return Object.entries(columns).filter(([field, value]) => body[field] !== value).map(([field]) => `transition ${row.seq} column ${field} differs from its body`);
   };
 
-  /**
-   * Why one transition is not what its signed audit row recorded (mirrors actionJournal's checkEvidence): the audit row
-   * carries exactly these bytes, recomputes to its event hash, is signed by a monitor key of this workspace, names this
-   * project and seq, and holds a signed receipt over the same body and event. The meta binding also means one audit row
-   * can back only one transition.
-   */
-  const auditProblems = (row: A4TransitionRow, keys: string[]): string[] => {
-    const event = ledger.getEventById(row.evidence_event_id);
-    if (!event || event.event_type !== "audit" || event.payload_sha256 !== row.body_digest
-      || [event.payload_inline, event.canonical_payload_inline].some((inline) => inline != null && inline !== row.body_json)) {
-      return [`transition ${row.seq} audit row missing or carries other bytes`];
-    }
-    const recomputed = sha256Hex(`${event.prev_event_hash}${canonicalMetadataForHash({ id: event.id, ts: event.ts, sessionId: event.session_id,
-      runtime: event.runtime, eventType: event.event_type, payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline, metaJson: event.meta_json })}${event.payload_sha256}`);
-    if (recomputed !== event.event_hash || !verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) {
-      return [`transition ${row.seq} audit row signature does not verify`];
-    }
-    const problems: string[] = [];
-    const meta = eventMeta(event);
-    if (meta.auditType !== A4_AUDIT_TYPE || meta.projectId !== row.project_id || meta.seq !== row.seq) problems.push(`transition ${row.seq} audit row is for another transition`);
-    const receipt = typeof meta.receipt === "string" ? verifyReceipt(meta.receipt, keys) : null;
-    if (!receipt?.ok || receipt.payload?.body_sha256 !== row.body_digest || receipt.payload.event_hash !== event.event_hash) {
-      problems.push(`transition ${row.seq} signed receipt does not bind it`);
-    }
-    return problems;
-  };
+  /** Actual audit bytes and purpose/delegation/receipt admission within the caller's SQL transaction. */
+  const auditProblems = (row: A4TransitionRow): string[] => a4AuditProblems(ledger, row, trust);
 
   /**
    * Hash-links rows from seq 0: contiguous seqs, each body hashing to its digest, stating its own columns and naming the
@@ -317,7 +293,7 @@ function createStore(workspace: string, ledger: Ledger) {
       || head.verified_seq !== head.head_seq || head.verified_digest !== head.head_digest) {
       problems.push("the chain does not end at the verified head");
     } else {
-      problems.push(...auditProblems(last.row, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, last.body));
+      problems.push(...auditProblems(last.row), ...headProblems(head, last.body));
     }
     if (problems.length > 0) throw integrityFailed(projectId, problems);
     return { head, links };
@@ -377,10 +353,10 @@ function createStore(workspace: string, ledger: Ledger) {
   })();
 
   /**
-   * Inside the write transaction, O(1) (design §7 rule 2: O(new rows), never O(chain), under the ledger write lock the
-   * action journal shares). `verifyChain` verified this head before the transaction and the caller has seen it unmoved,
-   * so no transition is new: only the head's own row is re-read, which must hash to the head digest, be the verified
-   * row, state its columns, carry a verifying signed audit row and sign this head state, with no later A4 session.
+   * Inside the write transaction, only this unchanged head transition is re-read, not the project chain. Authority
+   * admission can scan global SQL even for unbound receipts; bound row admission also reads all three global streams.
+   * `verifyChain` verified this head before the transaction and the caller has seen it unmoved. It must still hash to
+   * the verified digest, state its columns, carry an admitted audit row and sign this head, with no later A4 session.
    */
   const verifyIncremental = (projectId: string, head: A4ProjectRow): void => {
     const problems: string[] = [];
@@ -389,7 +365,7 @@ function createStore(workspace: string, ledger: Ledger) {
       problems.push("head does not equal the last verified transition");
     } else {
       const body = parseBody(parsed.data.body_json);
-      problems.push(...bodyProblems(parsed.data, body), ...auditProblems(parsed.data, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, body ?? {}));
+      problems.push(...bodyProblems(parsed.data, body), ...auditProblems(parsed.data), ...headProblems(head, body ?? {}));
     }
     if (a4WitnessExists(db, projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     if (problems.length > 0) throw integrityFailed(projectId, problems);

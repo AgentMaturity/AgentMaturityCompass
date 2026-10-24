@@ -72,7 +72,7 @@ export function buildA4BinderSlice(workspace: string, input: { projectId: string
     built = ledger.db.transaction(() => {
       const report = verifyA4Chain(ledger, input.projectId, trust, now);
       if (report.integrity.status === "fail") throw new A4StoreError(409, "A4_INTEGRITY_FAILED", "A binder slice is built only from a chain that verifies.", report.integrity.errors);
-      const { head, links, rows } = readA4Store(ledger).snapshot(input.projectId);
+      const { head, links, rows } = readA4Store(ledger, trust).snapshot(input.projectId);
       if (head.head_digest !== report.artifact.sha256) throw new A4StoreError(409, "A4_INTEGRITY_FAILED", "The slice's head is not the head the report verified.");
       // The agent named by the signed CREATED body, in the store's id shape; never the unsigned head row's column.
       const created = links.find((link) => link.seq === 0)?.body.agentId;
