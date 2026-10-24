@@ -7,7 +7,9 @@ import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/
 import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
-import { getWorkspacePaths, initWorkspace } from "../workspace.js";
+import { getWorkspacePaths } from "../workspace.js";
+import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
+import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapterConfigStore.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { vaultExists, unlockVault, vaultStatus } from "../vault/vault.js";
@@ -98,7 +100,7 @@ function enforceStudioLogRetention(workspace: string, retentionDays: number): vo
 
 async function ensureWorkspace(workspace: string): Promise<void> {
   if (!existsSync(join(workspace, ".amc"))) {
-    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   }
   ensureSigningKeys(workspace);
   if (!existsSync(opsPolicyPath(workspace))) {
@@ -108,6 +110,14 @@ async function ensureWorkspace(workspace: string): Promise<void> {
       unlockVault(workspace, passphrase);
     }
     await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
+  }
+  if (!existsSync(adaptersConfigPath(workspace))) {
+    if (!vaultStatus(workspace).unlocked) {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+      if (!passphrase) throw new Error("Vault locked. Unlock the vault before initializing the missing adapters config.");
+      unlockVault(workspace, passphrase);
+    }
+    await initAdaptersConfigAsync(workspace);
   }
   if (!existsSync(forecastPolicyPath(workspace))) {
     await initForecastPolicyAsync(workspace, { onlyIfMissing: true });
@@ -299,7 +309,7 @@ export async function runStudioForeground(params: {
     }
     const defaultWorkspaceDir = hostWorkspaceDir(hostDir, defaultWorkspaceId);
     if (!existsSync(join(defaultWorkspaceDir, ".amc", "amc.config.yaml"))) {
-      initWorkspace({
+      await initWorkspaceAsync({
         workspacePath: defaultWorkspaceDir,
         trustBoundaryMode: "isolated"
       });

@@ -660,7 +660,8 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
       .map((item) => item.trim())
       .filter(Boolean);
 
-  initWorkspace({
+  const { initWorkspaceAsync } = await import("./workspaceInitializationAsync.js");
+  await initWorkspaceAsync({
     workspacePath: workspace,
     agentName: answers.agentName,
     role: answers.role,

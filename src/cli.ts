@@ -36,6 +36,7 @@ import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteracti
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfigAsync, signAmcConfigAsync } from "./workspace.js";
+import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
@@ -2162,7 +2163,7 @@ async function initializeMinimalStartupWorkspace(opts: {
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
-  const init = initWorkspace({
+  const init = await initWorkspaceAsync({
     trustBoundaryMode: opts.trustBoundary,
     agentName: "Startup Agent",
     role: "assistant",
@@ -2278,7 +2279,7 @@ program
       }
     }
 
-    const init = initWorkspace({ trustBoundaryMode: opts.trustBoundary });
+    const init = await initWorkspaceAsync({ trustBoundaryMode: opts.trustBoundary });
     const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
     if (opts.trustBoundary) {
       profiled.security.trustBoundaryMode = opts.trustBoundary;
@@ -3612,7 +3613,7 @@ program
       return;
     }
     await ensureUpVaultPassphrase(workspace, opts.remember !== false);
-    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const actionPolicyFile = join(workspace, ".amc", "action-policy.yaml");
     if (!pathExists(actionPolicyFile)) {
       if (process.stdin.isTTY) {

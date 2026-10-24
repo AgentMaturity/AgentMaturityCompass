@@ -1,14 +1,14 @@
 import { generateKeyPairSync } from "node:crypto";
 import { request as httpRequest, type RequestOptions } from "node:http";
 import { dirname, join, resolve } from "node:path";
-import { initWorkspace } from "../workspace.js";
+import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
 import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { actionPolicyPath, initActionPolicy } from "../governor/actionPolicyEngine.js";
 import { initToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { budgetsPath, initBudgets } from "../budgets/budgets.js";
 import { approvalPolicyPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { adaptersConfigPath, initAdaptersConfig } from "../adapters/adapterConfigStore.js";
+import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapterConfigStore.js";
 import { bridgeConfigPath, initBridgeConfig } from "../bridge/bridgeConfigStore.js";
 import { initModelTaxonomy, modelTaxonomyPath } from "../bridge/modelTaxonomy.js";
 import { initOrgConfig, orgConfigPath } from "../org/orgStore.js";
@@ -138,7 +138,7 @@ async function ensureSignedConfigs(workspace: string): Promise<Record<string, bo
     created["approval-policy.yaml"] = true;
   }
   if (!pathExists(adaptersConfigPath(workspace))) {
-    initAdaptersConfig(workspace);
+    await initAdaptersConfigAsync(workspace);
     created["adapters.yaml"] = true;
   }
   if (!pathExists(bridgeConfigPath(workspace))) {
@@ -242,6 +242,7 @@ async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOpt
 }
 
 export async function runBootstrap(options: BootstrapOptions): Promise<BootstrapResult> {
+  options = { ...options, allowedCidrs: [...options.allowedCidrs] };
   const previousVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
   if (options.vaultPassphrase && options.vaultPassphrase.length > 0) {
     process.env.AMC_VAULT_PASSPHRASE = options.vaultPassphrase;
@@ -249,11 +250,11 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
 
   try {
     const workspace = resolve(options.workspace);
-    if (keysetDeclared(workspace) && !pathExists(opsPolicyPath(workspace))) {
-      ensureVault({ ...options, workspace }); // Preserve the existing bootstrap passphrase gate before any provider request.
-      await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
+    if (keysetDeclared(workspace) && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)))) {
+      ensureVault({ ...options, workspace }); // Preserve the existing selected passphrase gate before any provider request.
+      if (!pathExists(opsPolicyPath(workspace))) await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
     }
-    initWorkspace({
+    await initWorkspaceAsync({
       workspacePath: workspace,
       trustBoundaryMode: "isolated"
     });

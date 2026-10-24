@@ -1,7 +1,7 @@
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import inquirer from "inquirer";
-import { setAgentAdapterProfile } from "../adapters/adapterConfigStore.js";
+import { prepareAgentAdapterProfileAsync } from "../adapters/adapterConfigStore.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
@@ -445,22 +445,31 @@ function preferredGatewayRoute(workspace: string): string {
   }
 }
 
-function autoConfigureDetectedFrameworkAdapters(params: {
+export class SetupAdaptersPublicationError extends Error {
+  readonly code = "SETUP_ADAPTERS_PARTIAL";
+  constructor(readonly completedAgentIds: readonly string[], cause: unknown) {
+    super("setup stopped after publishing adapter profiles; completed agents remain configured", { cause });
+    this.name = "SetupAdaptersPublicationError";
+  }
+}
+
+async function autoConfigureDetectedFrameworkAdapters(params: {
   workspace: string;
   detections: FrameworkDetection[];
   agentId?: string;
-}): ConfiguredAdapterProfile[] {
+}, recheckInputs: () => void): Promise<ConfiguredAdapterProfile[]> {
   if (params.detections.length === 0) {
     return [];
   }
 
   const route = preferredGatewayRoute(params.workspace);
   const baseAgentId = resolveAgentId(params.workspace, params.agentId);
+  recheckInputs(); // Bind the actual route/detection selection to its captured bytes before Sign.
   const configured: ConfiguredAdapterProfile[] = [];
 
-  for (const [index, detection] of params.detections.entries()) {
+  try { for (const [index, detection] of params.detections.entries()) {
     const agentId = index === 0 ? baseAgentId : `${baseAgentId}-${detection.framework.toLowerCase()}`;
-    setAgentAdapterProfile(params.workspace, agentId, {
+    const prepared = await prepareAgentAdapterProfileAsync(params.workspace, agentId, {
       preferredAdapter: detection.adapterId,
       preferredProviderRoute: route,
       preferredModel: "gpt-4o-mini",
@@ -469,11 +478,20 @@ function autoConfigureDetectedFrameworkAdapters(params: {
       routeAllowlist: [route],
       modelAllowlist: ["*"]
     });
+    prepared.publish(() => {
+      recheckInputs();
+      if (preferredGatewayRoute(params.workspace) !== route || resolveAgentId(params.workspace, params.agentId) !== baseAgentId) {
+        throw new Error("setup adapter selection changed while signing; retry");
+      }
+    });
     configured.push({
       framework: detection.framework,
       adapterId: detection.adapterId,
       agentId
     });
+  } } catch (error) {
+    if (configured.length > 0) throw new SetupAdaptersPublicationError(Object.freeze(configured.map(row => row.agentId)), error);
+    throw error;
   }
   return configured;
 }
@@ -483,29 +501,42 @@ export async function runSetupWizard(params: {
   interactive: boolean;
   agentId?: string;
 }): Promise<SetupWizardResult> {
-  const detections = detectFrameworksForOnboarding(params.workspace);
-  const configuredAdapters = autoConfigureDetectedFrameworkAdapters({
-    workspace: params.workspace,
-    detections,
-    agentId: params.agentId
-  });
-  const eta = estimateTimeToL3({
-    workspace: params.workspace,
-    detectedFrameworks: detections,
-    configuredAdapterCount: configuredAdapters.length
-  });
-  const priority = await choosePriority(params.interactive);
-  const firstWeekPlan = generateFirstWeekPlan({
-    detectedFrameworks: detections,
-    priority,
-    etaToL3Hours: eta.hours
-  });
-
-  return {
-    detectedFrameworks: detections,
-    configuredAdapters,
-    etaToL3: eta,
-    firstWeekPlan,
-    priority
+  params = { ...params };
+  const readInput = (path: string) => pathExists(path) ? readFileSync(path) : null;
+  const inputs = ["package.json", "requirements.txt", "requirements-dev.txt", "pyproject.toml", "Pipfile", ".amc/gateway.yaml"]
+    .map(path => [join(params.workspace, path), readInput(join(params.workspace, path))] as const);
+  const recheckInputs = () => {
+    if (inputs.some(([path, bytes]) => { const current = readInput(path); return bytes === null ? current !== null : current === null || !bytes.equals(current); })) {
+      throw new Error("setup adapter selection inputs changed while signing; retry");
+    }
   };
+  const detections = structuredClone(detectFrameworksForOnboarding(params.workspace));
+  recheckInputs(); // The detectors used these unchanged selector inputs before any Sign.
+  const configuredAdapters = await autoConfigureDetectedFrameworkAdapters({
+    workspace: params.workspace, detections, agentId: params.agentId
+  }, recheckInputs);
+  try {
+    const eta = estimateTimeToL3({
+      workspace: params.workspace,
+      detectedFrameworks: detections,
+      configuredAdapterCount: configuredAdapters.length
+    });
+    const priority = await choosePriority(params.interactive);
+    const firstWeekPlan = generateFirstWeekPlan({
+      detectedFrameworks: detections,
+      priority,
+      etaToL3Hours: eta.hours
+    });
+
+    return {
+      detectedFrameworks: detections,
+      configuredAdapters,
+      etaToL3: eta,
+      firstWeekPlan,
+      priority
+    };
+  } catch (error) {
+    if (configuredAdapters.length > 0) throw new SetupAdaptersPublicationError(Object.freeze(configuredAdapters.map(row => row.agentId)), error);
+    throw error;
+  }
 }
