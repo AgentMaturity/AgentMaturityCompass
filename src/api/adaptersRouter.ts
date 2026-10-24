@@ -83,8 +83,9 @@ export async function handleAdaptersRoute(
   // POST /api/v1/adapters/capability-receipts — issue a signed Passport adapter receipt
   if (pathname === '/api/v1/adapters/capability-receipts' && method === 'POST') {
     try {
-      if (revalidateAuthority?.() === false) { if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while the request was prepared'); return true; }
+      assertActor();
       const body = await bodyJson<unknown>(req);
+      assertActor();
       if (!body || typeof body !== 'object' || Array.isArray(body)) {
         apiError(res, 400, 'Request body must be an object');
         return true;
@@ -103,18 +104,20 @@ export async function handleAdaptersRoute(
         return true;
       }
       const adapters = await import('../adapters/adapterCli.js');
+      assertActor();
       // The dispatcher must explicitly supply trusted revalidation before this HTTP route awaits signing.
       const input = {
         workspace,
         agentId: record.agentId as string | undefined,
         adapterId: record.adapterId,
       };
-      const receipt = revalidateAuthority === undefined ? adapters.adaptersCapabilitiesCli(input) : await adapters.adaptersCapabilitiesCliAsync(input);
-      if (revalidateAuthority?.() === false) { if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while the request was prepared'); return true; }
+      const receipt = revalidateAuthority === undefined ? adapters.adaptersCapabilitiesCli(input) : await adapters.adaptersCapabilitiesCliAsync(input, assertActor);
+      assertActor();
       apiSuccess(res, { receipt }, 201);
     } catch (err) {
       if (res.headersSent) return true;
       if (err instanceof KeyProviderError) { apiError(res, err.status, err.message); return true; }
+      if (err instanceof AdaptersActorChanged) { apiError(res, 403, err.message); return true; }
       const message = err instanceof Error ? err.message : 'Adapter capability receipt failed';
       apiError(res, message.startsWith('Unknown adapter:') ? 404 : 500, message);
     }

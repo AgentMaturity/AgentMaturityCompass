@@ -1,5 +1,5 @@
-import { resolve, join } from "node:path";
-import { readFileSync, lstatSync, openSync, fstatSync, closeSync, constants } from "node:fs";
+import { resolve, join, dirname, delimiter, isAbsolute } from "node:path";
+import { readFileSync, lstatSync, openSync, fstatSync, closeSync, constants, mkdirSync, writeFileSync } from "node:fs";
 import { resolveAgentId } from "../fleet/paths.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { listBuiltInAdapters, hasBuiltInAdapter } from "./registry.js";
@@ -12,7 +12,15 @@ import type { AdapterAgentProfile } from "./adapterConfigSchema.js";
 import { runAdapterCommand, initAdapterProjectSample } from "./adapterRunner.js";
 import { assembleAdapterEnv } from "./envAssembler.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
-import { issueAdapterCapabilityReceipt, issueAdapterCapabilityReceiptAsync } from "../passport/adapterCapabilityReceipt.js";
+import { issueAdapterCapabilityReceipt, issueAdapterCapabilityReceiptAsync, prepareAdapterCapabilityReceiptIssueAsync } from "../passport/adapterCapabilityReceipt.js";
+import { captureOrgFiles, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { physicalPathWithMissingSuffix, isWithin } from "../utils/pathSafety.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { trustConfigPath, trustConfigSigPath } from "../trust/trustConfig.js";
+import { resolveAmcHome } from "../credentials/credentialsPaths.js";
+import { highWaterPath } from "../keys/highWater.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { sha256Hex } from "../utils/hash.js";
 import { readDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
 
 export function adaptersInitCli(workspace: string): { configPath: string; sigPath: string } {
@@ -69,8 +77,100 @@ export async function adaptersCapabilitiesCliAsync(params: {
   workspace: string;
   agentId?: string;
   adapterId: string;
-}): Promise<Awaited<ReturnType<typeof issueAdapterCapabilityReceiptAsync>>> {
-  return issueAdapterCapabilityReceiptAsync({ workspace: params.workspace, agentId: params.agentId, adapterId: params.adapterId });
+}, beforeSign?: () => void): Promise<Awaited<ReturnType<typeof issueAdapterCapabilityReceiptAsync>>> {
+  return issueAdapterCapabilityReceiptAsync({ workspace: params.workspace, agentId: params.agentId, adapterId: params.adapterId }, beforeSign);
+}
+
+/** The single CLI output retains its genuine receipt attempt; this is not exported from the root SDK. */
+class AdapterCapabilityOutputError extends Error {
+  readonly code = "ADAPTER_CAPABILITY_OUTPUT_INCOMPLETE";
+  constructor(readonly attemptedPath: string, readonly writeReturned: boolean, readonly acknowledged: boolean, cause: unknown) {
+    super(acknowledged ? "adapter capability receipt output was acknowledged; final continuation failed"
+      : writeReturned ? "adapter capability receipt writer returned; exact acknowledgment failed"
+        : "adapter capability receipt writer threw; inspect the uncertain destination", { cause });
+    this.name = "AdapterCapabilityOutputError";
+  }
+}
+function capabilityOutputInputs(params: { workspace: string; agentId?: string; adapterId: string }) {
+  const workspace = params.workspace, home = resolveAmcHome();
+  const paths = [trustConfigPath(workspace), trustConfigSigPath(workspace), highWaterPath(),
+    join(home, "trust", "amc-trust-list.json"), join(home, "trust", "trust-roots.json"),
+    ...Object.keys(assertKeysetComplete(workspace)?.files ?? {}).map(path => join(workspace, ".amc", path)),
+    ...["adapters.yaml", "adapters.yaml.sig", "amc.config.yaml", "amc.config.yaml.sig", "vault.amcvault", "vault.amcvault.meta.json",
+      "keys/keyset.json", "keys/keyset.pending.json", "keys/revocations.signed.json", "keys/revocations.signed.json.pending",
+      ...["artifact-seal", "auditor", "lease", "receipt", "revocation-list", "ledger-row", "monitor"].flatMap(key =>
+        [`keys/${key}.pub`, `keys/${key}_ed25519.pub`, `keys/${key}_history.json`])].map(path => join(workspace, ".amc", path))];
+  if (!params.agentId?.trim()) paths.push(join(workspace, ".amc", "current-agent"));
+  const roots = [join(workspace, ".amc", "keys"), join(home, "trust"), join(home, "state", "root-rotations")];
+  const definition = getAdapterDefinition(workspace, params.adapterId);
+  if (hasBuiltInAdapter(params.adapterId)) for (const command of definition.detection.commandCandidates) {
+    if (command.includes("/") || isAbsolute(command)) paths.push(resolve(command));
+    else paths.push(...(process.env.PATH ?? "").split(delimiter).filter(Boolean).map(root => resolve(root, command)));
+  }
+  else {
+    const root = join(workspace, ".amc", "plugins"), lockPath = join(root, "installed.lock.json");
+    paths.push(lockPath, `${lockPath}.sig`, join(root, "overrides.yaml"), join(root, "overrides.yaml.sig"));
+    const lock = installedPluginsLockSchema.parse(JSON.parse(readFileSync(lockPath, "utf8")));
+    paths.push(...lock.installed.map(row => pluginInstalledPackagePath(workspace, row.id, row.version)));
+  }
+  const provider = params.adapterId === "claude-cli" ? "claude-code" : params.adapterId === "gemini-cli" ? "gemini-cli" : null;
+  if (provider !== null) {
+    const base = join(workspace, ".amc", "hooks", provider), manifest = `${base}.json`;
+    paths.push(provider === "claude-code" ? join(workspace, ".claude", "settings.local.json") : join(workspace, ".gemini", "settings.json"),
+      join(workspace, ".gitignore"), `${base}.lease`, manifest, `${manifest}.sig`,
+      ...["studio/leases/revocations.signed.json", "studio/leases/revocations.signed.json.pending", "studio/leases/revocations.json", "studio/leases/revocations.json.sig",
+        "transparency/log.jsonl", "evidence.sqlite", "evidence.sqlite-wal", "evidence.sqlite-shm"].map(path => join(workspace, ".amc", path)));
+    if (provider === "claude-code") {
+      roots.push(join(workspace, ".amc", "blobs"), join(workspace, ".amc", "retention"));
+      try {
+        // These paths only add alias refusals; this parse never admits a hook or selects a signer.
+        const binding = (JSON.parse(readFileSync(manifest, "utf8")) as { claudeCode?: { forwarder?: { path?: unknown }; install?: { binaryPath?: unknown } } }).claudeCode;
+        if (typeof binding?.forwarder?.path === "string") paths.push(binding.forwarder.path);
+        if (typeof binding?.install?.binaryPath === "string") paths.push(binding.install.binaryPath);
+      } catch { /* The actual maintained hook predicate owns invalid/missing manifest behavior. */ }
+    }
+  }
+  return { paths: [...new Set(paths)], roots, home };
+}
+export async function adaptersCapabilitiesWithOutputCliAsync(params: { workspace: string; agentId?: string; adapterId: string },
+  outputFile: string, beforeSign?: () => void) {
+  const request = { ...params }, outputPath = resolve(outputFile), mask = process.umask();
+  let expected = captureOrgFiles([outputPath]);
+  const original = expected.members[0]!, physical = physicalPathWithMissingSuffix(outputPath), inputs = capabilityOutputInputs(request);
+  const protectedPaths = inputs.paths.map(path => ({ path, physical: physicalPathWithMissingSuffix(path) }));
+  const protectedRoots = inputs.roots.map(path => ({ path, physical: physicalPathWithMissingSuffix(path) }));
+  const assertOutputCurrent = () => {
+    beforeSign?.();
+    if (process.umask() !== mask || resolveAmcHome() !== inputs.home || physicalPathWithMissingSuffix(outputPath) !== physical) throw new Error("adapter capability output selection changed while signing");
+    assertOrgPairsCurrent(expected);
+    const target = expected.members[0]!;
+    for (const source of [...protectedPaths, ...protectedRoots]) {
+      if (physicalPathWithMissingSuffix(source.path) !== source.physical) throw new Error("adapter capability used input physical selection changed while signing");
+      if (source.physical === physical) throw new Error("adapter capability output aliases a used input or authority");
+      if (target.identity !== null) {
+        try { const stat = lstatSync(source.path); if (`${stat.dev}:${stat.ino}` === target.identity) throw new Error("adapter capability output hardlinks a used input or authority"); }
+        catch (cause) { if ((cause as NodeJS.ErrnoException).code !== "ENOENT") throw cause; }
+      }
+    }
+    if (protectedRoots.some(root => isWithin(root.physical, physical))) throw new Error("adapter capability output is inside a used authority or evidence area");
+  };
+  assertOutputCurrent();
+  const prepared = await prepareAdapterCapabilityReceiptIssueAsync(request, assertOutputCurrent);
+  const text = `${JSON.stringify(prepared.receipt, null, 2)}\n`, bytes = Buffer.from(text, "utf8");
+  let attempted = false, writeReturned = false, acknowledged = false;
+  try {
+    prepared.assertCurrent(); mkdirSync(dirname(outputPath), { recursive: true });
+    withControlFileLock({ root: dirname(outputPath), name: `adapter-capability-output-${sha256Hex(outputPath).slice(0, 24)}`, operation: () => {
+      prepared.assertCurrent(); assertOutputCurrent();
+      attempted = true; writeFileSync(outputPath, text, { encoding: "utf8", mode: 0o644 }); writeReturned = true;
+      const own = captureOrgFiles([outputPath]), row = own.members[0]!;
+      if (row.bytes === null || !row.bytes.equals(bytes) || row.mode !== (original.mode ?? (0o644 & ~mask))
+        || (original.identity !== null && row.identity !== original.identity)) throw new Error("adapter capability output differs from its exact prepared bytes, mode or existing inode");
+      expected = own; acknowledged = true; prepared.assertCurrent();
+    } });
+    prepared.assertCurrent();
+  } catch (cause) { if (!attempted) throw cause; throw new AdapterCapabilityOutputError(outputPath, writeReturned, acknowledged, cause); }
+  return { receipt: prepared.receipt, outPath: outputPath };
 }
 
 // Only actual package/control inputs consumed by plugin adapter resolution; no extraction or signing in this gate.

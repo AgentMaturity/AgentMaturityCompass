@@ -670,6 +670,7 @@ import {
 } from "./trust/temporalDecay.js";
 import {
   adaptersCapabilitiesCliAsync,
+  adaptersCapabilitiesWithOutputCliAsync,
   adaptersConfigureCliAsync,
   adaptersDetectCli,
   adaptersEnvCli,
@@ -4519,17 +4520,10 @@ adapters
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
   .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const receipt = await adaptersCapabilitiesCliAsync({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      adapterId: opts.adapter
-    });
-    if (opts.out) {
-      const outPath = resolve(opts.out);
-      mkdirSync(dirname(outPath), { recursive: true });
-      writeFileSync(outPath, `${JSON.stringify(receipt, null, 2)}\n`, { encoding: "utf8", mode: 0o644 });
-      if (!opts.json) console.log(chalk.green(`Adapter capability receipt: ${outPath}`));
-    }
+    const params = { workspace: process.cwd(), agentId: opts.agent, adapterId: opts.adapter };
+    const output = opts.out ? await adaptersCapabilitiesWithOutputCliAsync(params, opts.out) : null;
+    const receipt = output?.receipt ?? await adaptersCapabilitiesCliAsync(params);
+    if (output !== null && !opts.json) console.log(chalk.green(`Adapter capability receipt: ${output.outPath}`));
     if (opts.json) {
       console.log(JSON.stringify(receipt, null, 2));
       return;

@@ -1,7 +1,12 @@
-import { basename } from "node:path";
+import { basename, join } from "node:path";
+import { lstatSync } from "node:fs";
+import YAML from "yaml";
 import { z } from "zod";
 import { detectAdapter } from "../adapters/adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "../adapters/adapterConfigStore.js";
+import { adapterConfigSchema } from "../adapters/adapterConfigSchema.js";
+import { captureOrgPairsAuthority, captureOrgFiles } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { getAdapterDefinition } from "../adapters/catalog.js";
 import { hasBuiltInAdapter } from "../adapters/registry.js";
 import { getHookIntegrationStatus, type HookProvider } from "../adapters/hookIntegration.js";
@@ -293,13 +298,16 @@ export function buildAdapterCapabilityReceipt(input: BuildAdapterCapabilityRecei
   return signedAdapterCapabilityReceipt(base, digestSha256, signature);
 }
 
-function receiptSigningAuthority(workspace: string) {
-  const selected = describePolicySigner(workspace, "BUNDLE");
-  return { selected, captured: selected.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null,
+function receiptSigningAuthority(workspace: string, beforeSign?: () => void) {
+  const selected = describePolicySigner(workspace, "BUNDLE"), original = captureOrgPairsAuthority(workspace, beforeSign);
+  const captured = selected.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
+  const assertCurrent = () => { original(); if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); assertPolicySignerCurrent(workspace, selected); };
+  assertCurrent();
+  return { selected, captured, assertCurrent,
     provider: boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? ("file" as const) };
 }
 function assertReceiptSigningAuthorityCurrent(workspace: string, authority: ReturnType<typeof receiptSigningAuthority>, receipt: AdapterCapabilityReceipt): void {
-  assertPolicySignerCurrent(workspace, authority.selected);
+  authority.assertCurrent();
   const signed = receipt.signature, envelope = signed.envelope;
   if (envelope === undefined || envelope.sigB64 !== signed.signature
     || !verifySignatureEnvelope(receipt.receiptHash, envelope, { trustedPublicKeys: [authority.selected.publicKeyPem], requireTrustedKey: true })) {
@@ -313,14 +321,28 @@ function assertReceiptSigningAuthorityCurrent(workspace: string, authority: Retu
   }
 }
 
+async function prepareSignedCapabilityReceipt(workspace: string, base: z.infer<typeof adapterCapabilityReceiptBaseSchema>,
+  authority: ReturnType<typeof receiptSigningAuthority>, assertInputsCurrent?: () => void) {
+  const digestSha256 = receiptHash(base);
+  const beforeSign = () => { authority.assertCurrent(); assertInputsCurrent?.(); authority.assertCurrent(); };
+  beforeSign();
+  const signature = await signDigestWithPolicyAsync({ workspace, kind: "BUNDLE", digestHex: digestSha256,
+    expectedSigner: authority.selected, beforeSign });
+  const receipt = signedAdapterCapabilityReceipt(base, digestSha256, signature), receiptState = canonicalize(receipt);
+  const assertCurrent = () => {
+    beforeSign();
+    if (canonicalize(receipt) !== receiptState) throw new Error("prepared adapter capability receipt bytes changed before return");
+    assertReceiptSigningAuthorityCurrent(workspace, authority, receipt);
+  };
+  assertCurrent();
+  return Object.freeze({ receipt, assertCurrent });
+}
+
 /** Existing v1 receipt bytes through the selected asynchronous policy route; no new purpose binding. */
-export async function buildAdapterCapabilityReceiptAsync(input: BuildAdapterCapabilityReceiptInput): Promise<AdapterCapabilityReceipt> {
-  const workspace = input.workspace, base = prepareAdapterCapabilityReceipt(input), digestSha256 = receiptHash(base);
-  const authority = receiptSigningAuthority(workspace);
-  const signature = await signDigestWithPolicyAsync({ workspace, kind: "BUNDLE", digestHex: digestSha256, expectedSigner: authority.selected });
-  const receipt = signedAdapterCapabilityReceipt(base, digestSha256, signature);
-  assertReceiptSigningAuthorityCurrent(workspace, authority, receipt);
-  return receipt;
+export async function buildAdapterCapabilityReceiptAsync(input: BuildAdapterCapabilityReceiptInput, beforeSign?: () => void): Promise<AdapterCapabilityReceipt> {
+  const workspace = input.workspace, base = prepareAdapterCapabilityReceipt(input);
+  const authority = receiptSigningAuthority(workspace, beforeSign);
+  return (await prepareSignedCapabilityReceipt(workspace, base, authority)).receipt;
 }
 
 function inspectConfiguration(workspace: string, agentId: string, adapterId: string): AdapterCapabilityInspection["configuration"] {
@@ -341,11 +363,11 @@ function hookProviderForAdapter(adapterId: string): Exclude<HookProvider, "pi"> 
   return null;
 }
 
-function inspectHook(workspace: string, agentId: string, adapterId: string): AdapterCapabilityInspection["hook"] {
+function inspectHook(workspace: string, agentId: string, adapterId: string, readonly = false): AdapterCapabilityInspection["hook"] {
   const provider = hookProviderForAdapter(adapterId);
   if (!provider) return { status: "not_applicable", provider: null, mode: null };
   try {
-    const status = getHookIntegrationStatus({ workspace, provider });
+    const status = getHookIntegrationStatus({ workspace, provider, readonly });
     if (status.state === "not-installed") return { status: "not_installed", provider, mode: null };
     if (status.agentId !== agentId) return { status: "agent_mismatch", provider, mode: status.mode };
     if (status.state === "installed" && status.mode === "observe") return { status: "observe", provider, mode: "observe" };
@@ -385,31 +407,73 @@ function inspectAdapterCapabilityReceipt(input: IssueAdapterCapabilityReceiptInp
   };
 }
 
-/** Only hashes/public projections are retained in memory; the receipt never carries configuration bytes or paths. */
-function capabilityReceiptInputs(workspace: string, agentId: string, adapterId: string): string {
-  const digest = (relative: string) => {
-    const bytes = readContainedOrNull(workspace, relative, 1024 * 1024);
-    return bytes === null ? null : sha256Hex(bytes);
-  };
-  return canonicalize({ definition: getAdapterDefinition(workspace, adapterId), source: hasBuiltInAdapter(adapterId) ? "builtin" : "plugin",
-    config: digest(".amc/adapters.yaml"), configSignature: digest(".amc/adapters.yaml.sig"),
-    configuration: inspectConfiguration(workspace, agentId, adapterId), hook: inspectHook(workspace, agentId, adapterId) });
+function hookReceiptFileInputs(workspace: string, adapterId: string) {
+  const provider = hookProviderForAdapter(adapterId);
+  if (provider === null) return [];
+  const base = join(workspace, ".amc", "hooks", provider);
+  const paths = [provider === "claude-code" ? join(workspace, ".claude", "settings.local.json") : join(workspace, ".gemini", "settings.json"),
+    join(workspace, ".gitignore"), `${base}.lease`, `${base}.json`, `${base}.json.sig`,
+    ...["revocations.signed.json", "revocations.signed.json.pending", "revocations.json", "revocations.json.sig"].map(path => join(workspace, ".amc", "studio", "leases", path))];
+  return paths.map(path => {
+    try {
+      const stat = lstatSync(path);
+      if (!stat.isFile()) return { path, nonregular: true, mode: stat.mode, identity: `${stat.dev}:${stat.ino}`, size: stat.size, mtimeMs: stat.mtimeMs };
+      const row = captureOrgFiles([path]).members[0]!;
+      return { path, sha256: row.bytes === null ? null : sha256Hex(row.bytes), mode: row.mode, identity: row.identity };
+    } catch (cause) {
+      if ((cause as NodeJS.ErrnoException).code === "ENOENT") return { path, missing: true };
+      return { path, unreadable: (cause as NodeJS.ErrnoException).code ?? String(cause) };
+    }
+  });
+}
+
+/** Verify and parse exactly the captured pair; the receipt never carries configuration bytes or paths. */
+function capabilityReceiptInputs(workspace: string, agentId: string, adapterId: string) {
+  const config = readContainedOrNull(workspace, ".amc/adapters.yaml", 1024 * 1024);
+  const sidecar = readContainedOrNull(workspace, ".amc/adapters.yaml.sig", 1024 * 1024);
+  let configuration: AdapterCapabilityInspection["configuration"] = { status: "missing" };
+  if (config !== null && sidecar !== null) {
+    configuration = { status: "invalid" };
+    if (verifyAuditorSignatureBytes(workspace, "BUNDLE", config, sidecar).valid) {
+      try {
+        const profile = adapterConfigSchema.parse(YAML.parse(config.toString("utf8"))).adapters.perAgent[agentId];
+        configuration = { status: profile?.preferredAdapter === adapterId ? "signed_selected" : "not_selected" };
+      } catch { /* Invalid configuration keeps the existing fail-closed projection. */ }
+    }
+  }
+  const definition = getAdapterDefinition(workspace, adapterId), source = hasBuiltInAdapter(adapterId) ? "builtin" as const : "plugin" as const;
+  const hook = inspectHook(workspace, agentId, adapterId, true);
+  return { definition, source, configuration, hook, state: canonicalize({ definition, source,
+    config: config === null ? null : sha256Hex(config), configSignature: sidecar === null ? null : sha256Hex(sidecar), configuration, hook, hookFiles: hookReceiptFileInputs(workspace, adapterId) }) };
 }
 
 export function issueAdapterCapabilityReceipt(input: IssueAdapterCapabilityReceiptInput): AdapterCapabilityReceipt {
   return buildAdapterCapabilityReceipt(inspectAdapterCapabilityReceipt(input));
 }
 
-/** Runtime probing is the existing synchronous bounded inspection; only policy signing becomes awaitable. */
-export async function issueAdapterCapabilityReceiptAsync(input: IssueAdapterCapabilityReceiptInput): Promise<AdapterCapabilityReceipt> {
+/** Internal genuine issue attempt; the old SDK return and the CLI output path share this actual signing flow. */
+export async function prepareAdapterCapabilityReceiptIssueAsync(input: IssueAdapterCapabilityReceiptInput, beforeSign?: () => void) {
   const request = { ...input }, workspace = request.workspace, agentId = resolveAgentId(workspace, request.agentId);
-  const authority = receiptSigningAuthority(workspace), before = capabilityReceiptInputs(workspace, agentId, request.adapterId);
-  const inspected = inspectAdapterCapabilityReceipt({ ...request, agentId });
-  if (before !== capabilityReceiptInputs(workspace, agentId, request.adapterId)) throw new Error("adapter capability receipt inputs changed while signing");
-  const receipt = await buildAdapterCapabilityReceiptAsync(inspected);
-  if (before !== capabilityReceiptInputs(workspace, agentId, request.adapterId)) throw new Error("adapter capability receipt inputs changed while signing");
-  assertReceiptSigningAuthorityCurrent(workspace, authority, receipt);
-  return receipt;
+  const authority = receiptSigningAuthority(workspace, beforeSign);
+  const observed = inspectAdapterCapabilityReceipt({ ...request, agentId }); // Original bounded probe/control preparation, before the first await.
+  const selected = capabilityReceiptInputs(workspace, agentId, request.adapterId);
+  if (canonicalize({ definition: observed.definition, source: observed.source, hook: observed.inspection.hook })
+    !== canonicalize({ definition: selected.definition, source: selected.source, hook: selected.hook }))
+    throw new Error("adapter capability receipt inputs changed during inspection");
+  const assertInputsCurrent = () => {
+    if (resolveAgentId(workspace, request.agentId) !== agentId
+      || selected.state !== capabilityReceiptInputs(workspace, agentId, request.adapterId).state)
+      throw new Error("adapter capability receipt inputs changed while signing");
+  };
+  const inspected = { ...observed, definition: selected.definition, source: selected.source,
+    inspection: { ...observed.inspection, configuration: selected.configuration, hook: selected.hook } };
+  assertInputsCurrent(); authority.assertCurrent();
+  return prepareSignedCapabilityReceipt(workspace, prepareAdapterCapabilityReceipt(inspected), authority, assertInputsCurrent);
+}
+
+/** Runtime probing is the existing synchronous bounded inspection; only policy signing becomes awaitable. */
+export async function issueAdapterCapabilityReceiptAsync(input: IssueAdapterCapabilityReceiptInput, beforeSign?: () => void): Promise<AdapterCapabilityReceipt> {
+  return (await prepareAdapterCapabilityReceiptIssueAsync(input, beforeSign)).receipt;
 }
 
 function verifyTrustedSignature(
