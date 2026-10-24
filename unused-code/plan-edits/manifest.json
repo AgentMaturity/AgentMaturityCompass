@@ -416,6 +416,13 @@
       "sha256": "f7015e224378afe91406f387f52380ffaf474da9a23ee4b7d082298b35886b99"
     },
     {
+      "path": "src/org/orgScorecard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/org/orgScorecard.ts.landed",
+      "sha256": "c8e87d768c30921a9032d5174335d46e4a0c7f5d9a9e8980bdf6fb64e1573c67"
+    },
+    {
       "path": "src/outcomes/outcomeContractEngine.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
