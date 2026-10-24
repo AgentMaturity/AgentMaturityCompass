@@ -1,3 +1,4 @@
+import { benchInitForApiAsync, benchRegistriesForApiAsync, benchRegistryApplyForApiAsync } from "./benchPolicyAsync.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
 import { benchArtifactSchema } from "./benchSchema.js";
@@ -199,4 +200,10 @@ export function parseBenchPolicy(input: string): BenchPolicy {
 
 export function parseBenchArtifact(input: string) {
   return benchArtifactSchema.parse(JSON.parse(input) as unknown);
+}
+
+export async function benchInitCliAsync(workspace: string) { return benchInitForApiAsync(workspace); }
+export async function benchRegistriesCliAsync(workspace: string) { return benchRegistriesForApiAsync(workspace); }
+export async function benchRegistriesApplyCliAsync(params: Parameters<typeof benchRegistriesApplyCli>[0]) {
+  const workspace = params.workspace, config = params.config; return benchRegistryApplyForApiAsync({ workspace, config });
 }

@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync } from "./promptPolicyAsync.js";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
 import {
@@ -111,3 +112,12 @@ export function promptSchedulerDisableCli(workspace: string) {
   });
 }
 
+
+export async function promptInitCliAsync(workspace: string) { return promptInitForApiAsync(workspace); }
+export async function promptPolicyPrintCliAsync(workspace: string) { return (await promptPolicyForApiAsync(workspace)).policy; }
+export async function promptPolicyApplyCliAsync(params: Parameters<typeof promptPolicyApplyCli>[0]) {
+  const input = { ...params }, policy = promptPolicySchema.parse(YAML.parse(readUtf8(resolve(input.file))) as unknown);
+  return promptPolicyApplyForApiAsync({ workspace: input.workspace, policy, reason: input.reason, actor: input.actor });
+}
+export async function promptSchedulerEnableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: true }); }
+export async function promptSchedulerDisableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: false }); }

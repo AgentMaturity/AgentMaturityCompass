@@ -363,15 +363,15 @@ import {
   benchComparisonLatestCli,
   benchCreateCli,
   benchImportCli,
-  benchInitCli,
+  benchInitCliAsync as benchInitCli,
   benchListExportsCli,
   benchListImportsCli,
   benchPrintCli,
   benchPrintPolicyCli,
   benchPublishExecuteCli,
   benchPublishRequestCli,
-  benchRegistriesApplyCli,
-  benchRegistriesCli,
+  benchRegistriesApplyCliAsync as benchRegistriesApplyCli,
+  benchRegistriesCliAsync as benchRegistriesCli,
   benchRegistryInitCli,
   benchRegistryPublishCli,
   benchRegistryServeCli,
@@ -758,15 +758,15 @@ import { registerControlInspectionCommands } from "./enforce/controlInspectionCl
 import { registerScopeTemplateCommands } from "./enforce/scopeTemplateCli.js";
 import { registerActionEvidenceLogicCommands } from "./enforce/actionEvidenceLogicCli.js";
 import {
-  promptInitCli,
+  promptInitCliAsync as promptInitCli,
   promptPackBuildCli,
   promptPackDiffCli,
   promptPackShowCli,
   promptPackVerifyCli,
-  promptPolicyApplyCli,
-  promptPolicyPrintCli,
-  promptSchedulerDisableCli,
-  promptSchedulerEnableCli,
+  promptPolicyApplyCliAsync as promptPolicyApplyCli,
+  promptPolicyPrintCliAsync as promptPolicyPrintCli,
+  promptSchedulerDisableCliAsync as promptSchedulerDisableCli,
+  promptSchedulerEnableCliAsync as promptSchedulerEnableCli,
   promptSchedulerRunNowCli,
   promptSchedulerStatusCli,
   promptStatusCli,
@@ -8602,9 +8602,9 @@ const prompt = program.command("prompt").description("Northstar prompt policy + 
 prompt
   .command("init")
   .description("Create and sign .amc/prompt/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt init");
-    const out = promptInitCli(process.cwd());
+    const out = await promptInitCli(process.cwd());
     console.log(chalk.green("Prompt policy initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -8631,8 +8631,8 @@ const promptPolicy = prompt.command("policy").description("Prompt policy operati
 promptPolicy
   .command("print")
   .description("Print prompt policy")
-  .action(() => {
-    console.log(JSON.stringify(promptPolicyPrintCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await promptPolicyPrintCli(process.cwd()), null, 2));
   });
 
 promptPolicy
@@ -8640,9 +8640,9 @@ promptPolicy
   .description("Apply prompt policy from YAML file and sign")
   .requiredOption("--file <path>", "policy yaml path")
   .option("--reason <reason>", "change reason", "prompt policy update")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "prompt policy apply");
-    const out = promptPolicyApplyCli({
+    const out = await promptPolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file,
       reason: opts.reason,
@@ -8755,17 +8755,17 @@ promptScheduler
 promptScheduler
   .command("enable")
   .description("Enable prompt scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt scheduler enable");
-    console.log(JSON.stringify(promptSchedulerEnableCli(process.cwd()), null, 2));
+    console.log(JSON.stringify(await promptSchedulerEnableCli(process.cwd()), null, 2));
   });
 
 promptScheduler
   .command("disable")
   .description("Disable prompt scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt scheduler disable");
-    console.log(JSON.stringify(promptSchedulerDisableCli(process.cwd()), null, 2));
+    console.log(JSON.stringify(await promptSchedulerDisableCli(process.cwd()), null, 2));
   });
 
 passport
@@ -17386,9 +17386,9 @@ registerHarnessComparisonCommands(bench);
 bench
   .command("init")
   .description("Initialize signed bench policy")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "bench init");
-    const out = benchInitCli(process.cwd());
+    const out = await benchInitCli(process.cwd());
     console.log(chalk.green("Bench policy initialized"));
     console.log(`Policy: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -17634,8 +17634,8 @@ bench
 bench
   .command("registries")
   .description("Print signed bench registry allowlist")
-  .action(() => {
-    const out = benchRegistriesCli(process.cwd());
+  .action(async () => {
+    const out = await benchRegistriesCli(process.cwd());
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -17643,10 +17643,10 @@ bench
   .command("registries-apply")
   .description("Apply bench registries config from JSON file")
   .requiredOption("--in <file>", "JSON file matching benchRegistries schema")
-  .action((opts: { in: string }) => {
+  .action(async (opts: { in: string }) => {
     assertOwnerMode(process.cwd(), "bench registries-apply");
-    const config = JSON.parse(readUtf8(resolve(process.cwd(), opts.in))) as ReturnType<typeof benchRegistriesCli>["registries"];
-    const out = benchRegistriesApplyCli({
+    const config = JSON.parse(readUtf8(resolve(process.cwd(), opts.in))) as Awaited<ReturnType<typeof benchRegistriesCli>>["registries"];
+    const out = await benchRegistriesApplyCli({
       workspace: process.cwd(),
       config
     });

@@ -1,7 +1,9 @@
 import { join } from "node:path";
 import YAML from "yaml";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
+import { captureOrgPairs, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { readFileSync } from "node:fs";
 import {
   defaultPromptPolicy,
   defaultPromptSchedulerState,
@@ -72,9 +74,7 @@ export function savePromptPolicy(workspace: string, policy: PromptPolicy): {
 } {
   ensurePromptDirs(workspace);
   const path = promptPolicyPath(workspace);
-  writeFileAtomic(path, YAML.stringify(promptPolicySchema.parse(policy)), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{ path, bytes: Buffer.from(YAML.stringify(promptPolicySchema.parse(policy))) }])[0]!;
 }
 
 export function initPromptPolicy(workspace: string): {
@@ -109,7 +109,7 @@ export function verifyPromptPolicySignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyPromptPair(workspace, path);
 }
 
 export function savePromptSchedulerState(workspace: string, state: PromptSchedulerState): {
@@ -118,9 +118,7 @@ export function savePromptSchedulerState(workspace: string, state: PromptSchedul
 } {
   ensurePromptDirs(workspace);
   const path = promptSchedulerPath(workspace);
-  writeFileAtomic(path, JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{ path, bytes: Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2)) }])[0]!;
 }
 
 export function loadPromptSchedulerState(workspace: string): PromptSchedulerState {
@@ -142,5 +140,36 @@ export function verifyPromptSchedulerStateSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyPromptPair(workspace, path);
+}
+
+function verifyPromptPair(workspace: string, path: string) {
+  const sigPath = `${path}.sig`, signatureExists = pathExists(sigPath);
+  if (!signatureExists) return { valid: false, signatureExists, reason: "signature missing", path, sigPath };
+  try { return { ...verifyAuditorSignatureBytes(workspace, "BUNDLE", readFileSync(path), readFileSync(sigPath)), signatureExists, path, sigPath }; }
+  catch { return { valid: false, signatureExists, reason: "invalid file signature", path, sigPath }; }
+}
+export async function savePromptPolicyAsync(workspace: string, policy: PromptPolicy, options: OrgPairsOptions = {}) {
+  ensurePromptDirs(workspace);
+  const path = promptPolicyPath(workspace), bytes = Buffer.from(YAML.stringify(promptPolicySchema.parse(policy)));
+  return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
+}
+export async function initPromptPolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
+  const policy = defaultPromptPolicy(), saved = await savePromptPolicyAsync(workspace, policy, options);
+  return { ...saved, policy };
+}
+/** Existing-body reads remain public; only an actually missing body prepares a default signed pair. */
+export async function loadPromptPolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<PromptPolicy> {
+  const path = promptPolicyPath(workspace);
+  if (pathExists(path)) return promptPolicySchema.parse(YAML.parse(readUtf8(path)) as unknown);
+  const previous = captureOrgPairs([path]), bytes = orgPairBytes(previous, path);
+  if (bytes !== null) return promptPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const policy = defaultPromptPolicy();
+  await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(YAML.stringify(policy)) }], options, previous);
+  return policy;
+}
+export async function savePromptSchedulerStateAsync(workspace: string, state: PromptSchedulerState, options: OrgPairsOptions = {}) {
+  ensurePromptDirs(workspace);
+  const path = promptSchedulerPath(workspace), bytes = Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2));
+  return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
 }

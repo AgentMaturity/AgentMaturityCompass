@@ -23,7 +23,7 @@ import {
   verifyBenchRegistriesSignature
 } from "./benchPolicyStore.js";
 import { listImportedBenches } from "./benchRegistryStore.js";
-
+export { benchInitForApiAsync, benchPolicyApplyForApiAsync, benchRegistriesForApiAsync, benchRegistryApplyForApiAsync, benchRegistryAddForApiAsync } from "./benchPolicyAsync.js";
 const pendingPublishSchema = z.object({
   v: z.literal(1),
   requestId: z.string().min(1),

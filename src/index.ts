@@ -618,7 +618,7 @@ export { ingestBenchmarks } from "./benchmarks/benchImport.js";
 export { listImportedBenchmarks } from "./benchmarks/benchStore.js";
 export { benchmarkStats } from "./benchmarks/benchStats.js";
 export {
-  benchInitCli,
+  benchInitCli, benchInitCliAsync,
   benchVerifyPolicyCli,
   benchPrintPolicyCli,
   benchCreateCli,
@@ -634,8 +634,8 @@ export {
   benchListExportsCli,
   benchCompareCli,
   benchComparisonLatestCli,
-  benchRegistriesCli,
-  benchRegistriesApplyCli,
+  benchRegistriesCli, benchRegistriesCliAsync,
+  benchRegistriesApplyCli, benchRegistriesApplyCliAsync,
   benchPublishRequestCli,
   benchPublishExecuteCli
 } from "./bench/benchCli.js";
@@ -645,14 +645,14 @@ export { initBenchRegistry, verifyBenchRegistry, publishBenchToRegistry, serveBe
 export { browseBenchRegistry, importBenchFromRegistry, listImportedBenchArtifacts } from "./bench/benchRegistryClient.js";
 export { createBenchComparison } from "./bench/benchComparer.js";
 export {
-  benchInitForApi,
+  benchInitForApi, benchInitForApiAsync,
   benchPolicyForApi,
-  benchPolicyApplyForApi,
+  benchPolicyApplyForApi, benchPolicyApplyForApiAsync,
   benchCreateForApi,
   benchExportsForApi,
   benchImportsForApi,
-  benchRegistriesForApi,
-  benchRegistryApplyForApi,
+  benchRegistriesForApi, benchRegistriesForApiAsync,
+  benchRegistryApplyForApi, benchRegistryApplyForApiAsync,
   benchRegistryBrowseForApi,
   benchImportForApi,
   benchCompareForApi,
@@ -1177,10 +1177,10 @@ export {
   releasePrintCli
 } from "./release/releaseCli.js";
 export {
-  promptInitCli,
+  promptInitCli, promptInitCliAsync,
   promptVerifyCli,
-  promptPolicyPrintCli,
-  promptPolicyApplyCli,
+  promptPolicyPrintCli, promptPolicyPrintCliAsync,
+  promptPolicyApplyCli, promptPolicyApplyCliAsync,
   promptStatusCli,
   promptPackBuildCli,
   promptPackVerifyCli,
@@ -1188,21 +1188,21 @@ export {
   promptPackDiffCli,
   promptSchedulerStatusCli,
   promptSchedulerRunNowCli,
-  promptSchedulerEnableCli,
-  promptSchedulerDisableCli
+  promptSchedulerEnableCli, promptSchedulerEnableCliAsync,
+  promptSchedulerDisableCli, promptSchedulerDisableCliAsync
 } from "./prompt/promptPackCli.js";
 export {
-  promptInitForApi,
+  promptInitForApi, promptInitForApiAsync,
   promptVerifyForApi,
-  promptPolicyForApi,
-  promptPolicyApplyForApi,
+  promptPolicyForApi, promptPolicyForApiAsync,
+  promptPolicyApplyForApi, promptPolicyApplyForApiAsync,
   buildPromptPackForApi,
   promptStatusForApi,
   promptShowForApi,
   promptDiffForApi,
   promptSchedulerStatusForApi,
   promptSchedulerRunNowForApi,
-  promptSchedulerSetEnabledForApi,
+  promptSchedulerSetEnabledForApi, promptSchedulerSetEnabledForApiAsync,
   promptSchedulerTick,
   preparePromptForBridgeRequest,
   validateBridgeResponseWithPromptPolicy

@@ -157,12 +157,12 @@ import {
   benchExportsForApi,
   benchImportForApi,
   benchImportsForApi,
-  benchPolicyApplyForApi,
+  benchPolicyApplyForApiAsync as benchPolicyApplyForApi,
   benchPolicyForApi,
   benchPublishExecuteForApi,
   benchPublishRequestForApi,
-  benchRegistriesForApi,
-  benchRegistryApplyForApi,
+  benchRegistriesForApiAsync as benchRegistriesForApi,
+  benchRegistryApplyForApiAsync as benchRegistryApplyForApi, benchRegistryAddForApiAsync,
   benchRegistryBrowseForApi
 } from "../bench/benchApi.js";
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
@@ -361,11 +361,11 @@ import { emitMechanicSse } from "../mechanic/mechanicSse.js";
 import {
   buildPromptPackForApi,
   promptDiffForApi,
-  promptInitForApi,
-  promptPolicyApplyForApi,
-  promptPolicyForApi,
+  promptInitForApiAsync as promptInitForApi,
+  promptPolicyApplyForApiAsync as promptPolicyApplyForApi,
+  promptPolicyForApiAsync as promptPolicyForApi,
   promptSchedulerRunNowForApi,
-  promptSchedulerSetEnabledForApi,
+  promptSchedulerSetEnabledForApiAsync as promptSchedulerSetEnabledForApi,
   promptSchedulerStatusForApi,
   promptSchedulerTick,
   promptShowForApi,
@@ -651,7 +651,7 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   let promptPolicyEnforced = true;
   let promptPolicyLoaded: ReturnType<typeof loadPromptPolicy> | null = null;
   try {
-    promptPolicyLoaded = loadPromptPolicy(options.workspace);
+    promptPolicyLoaded = promptPolicySchema.parse(YAML.parse(readUtf8(join(options.workspace, ".amc", "prompt", "policy.yaml"))) as unknown);
     promptPolicyEnforced = promptPolicyLoaded.promptPolicy.enforcement.mode === "ENFORCE";
   } catch {
     promptPolicyEnforced = true;
@@ -1395,7 +1395,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   url: string;
   close: () => Promise<void>;
 }> {
-  promptInitForApi(options.workspace);
+  await promptInitForApi(options.workspace);
   passportInitForApi(options.workspace);
   const toolhub = new ToolHubService(options.workspace);
   const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
@@ -3580,7 +3580,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
-        json(res, 200, promptPolicyForApi(options.workspace));
+        const out = await promptPolicyForApi(options.workspace, { beforePublish: signingAuthority(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3609,12 +3610,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = promptPolicyApplyForApi({
+        const out = await promptPolicyApplyForApi({
           workspace: options.workspace,
           policy: promptPolicySchema.parse(parsed.policy),
           reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason : "prompt policy update",
           actor: auth.username ?? "owner"
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("prompt signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_POLICY_UPDATED"
@@ -3750,10 +3752,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, promptSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await promptSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: true }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3761,10 +3761,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, promptSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await promptSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: false }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -7156,10 +7154,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object required" });
           return;
         }
-        const applied = benchPolicyApplyForApi({
+        const applied = await benchPolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy as ReturnType<typeof loadBenchPolicy>
-        });
+        }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (applied === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_POLICY_UPDATED",
@@ -7265,7 +7264,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "lease-auth cannot access bench APIs" });
           return;
         }
-        json(res, 200, benchRegistriesForApi(options.workspace));
+        const out = await benchRegistriesForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -7307,7 +7307,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             })
           : {};
         if (parsed.replaceAll && parsed.config?.benchRegistries?.registries) {
-          const saved = benchRegistryApplyForApi({
+          const saved = await benchRegistryApplyForApi({
             workspace: options.workspace,
             config: {
               benchRegistries: {
@@ -7326,7 +7326,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                   .sort((a, b) => a.id.localeCompare(b.id))
               }
             }
-          });
+          }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+          if (saved === null) return;
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_REGISTRY_UPDATED",
@@ -7347,27 +7348,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "id,type,base,pinnedRegistryFingerprint required" });
           return;
         }
-        const existing = benchRegistriesForApi(options.workspace).registries;
-        const filtered = existing.benchRegistries.registries.filter((row) => row.id !== parsed.id);
-        filtered.push({
-          id: parsed.id,
-          type: parsed.type,
-          base: parsed.base,
-          pinnedRegistryFingerprint: parsed.pinnedRegistryFingerprint,
-          allowSignerFingerprints: parsed.allowSignerFingerprints ?? [],
-          allowTrustLabels: parsed.allowTrustLabels ?? ["HIGH", "MEDIUM", "LOW"],
-          requireBenchProofs: parsed.requireBenchProofs ?? true,
-          autoUpdate: parsed.autoUpdate ?? false
-        });
-        const saved = benchRegistryApplyForApi({
-          workspace: options.workspace,
-          config: {
-            benchRegistries: {
-              version: 1,
-              registries: filtered.sort((a, b) => a.id.localeCompare(b.id))
-            }
-          }
-        });
+        const saved = await benchRegistryAddForApiAsync({ workspace: options.workspace, registry: {
+          id: parsed.id, type: parsed.type, base: parsed.base, pinnedRegistryFingerprint: parsed.pinnedRegistryFingerprint,
+          allowSignerFingerprints: parsed.allowSignerFingerprints ?? [], allowTrustLabels: parsed.allowTrustLabels ?? ["HIGH", "MEDIUM", "LOW"],
+          requireBenchProofs: parsed.requireBenchProofs ?? true, autoUpdate: parsed.autoUpdate ?? false
+        } }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (saved === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_REGISTRY_UPDATED",

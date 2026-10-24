@@ -31,7 +31,7 @@ import { compilePromptPack } from "./promptCompiler.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
 import { truthguardResultSchema } from "../truthguard/truthguardSchema.js";
 import type { PromptPolicy } from "./promptPolicySchema.js";
-
+export { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync, PromptPolicyPublicationError } from "./promptPolicyAsync.js";
 function currentPolicySha(workspace: string): string {
   if (!pathExists(promptPolicyPath(workspace))) {
     return "0".repeat(64);
