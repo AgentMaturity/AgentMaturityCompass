@@ -482,8 +482,8 @@ import { benchmarkResultClaim, runBenchmarkSuite, compareBenchmarks, renderBench
 import {
   federateExportCli,
   federateImportCli,
-  federateInitCli,
-  federatePeerAddCli,
+  federateInitCliAsync as federateInitCli,
+  federatePeerAddCliAsync as federatePeerAddCli,
   federatePeerListCli,
   federateVerifyBundleCli,
   federateVerifyCli
@@ -12889,8 +12889,8 @@ federate
   .command("init")
   .description("Initialize federation identity and signed config")
   .option("--org <name>", "organization name", "AMC Federation")
-  .action((opts: { org: string }) => {
-    const out = federateInitCli({
+  .action(async (opts: { org: string }) => {
+    const out = await federateInitCli({
       workspace: process.cwd(),
       orgName: opts.org
     });
@@ -12920,8 +12920,8 @@ federatePeer
   .requiredOption("--peerId <id>", "peer ID")
   .requiredOption("--name <name>", "peer display name")
   .requiredOption("--pubkey <file>", "publisher public key file")
-  .action((opts: { peerId: string; name: string; pubkey: string }) => {
-    const out = federatePeerAddCli({
+  .action(async (opts: { peerId: string; name: string; pubkey: string }) => {
+    const out = await federatePeerAddCli({
       workspace: process.cwd(),
       peerId: opts.peerId,
       name: opts.name,

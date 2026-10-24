@@ -43,3 +43,14 @@ export function signFederationDigest(workspace: string, digestHex: string): stri
   return sign(null, Buffer.from(digestHex, "hex"), privateKeyPem).toString("base64");
 }
 
+/** Negative continuation for the exact custom publisher selected by the real ensure call; never creates or unlocks. */
+export function captureFederationPublisherIdentity(workspace: string, selected: ReturnType<typeof ensureFederationPublisherKey>): () => void {
+  const privateKeyPem = selected.privateKeyPem, publicKeyPem = selected.publicKeyPem, fingerprint = selected.fingerprint;
+  const assertCurrent = () => {
+    if (!vaultStatus(workspace).unlocked) throw new Error("federation publisher vault is locked; unlock before publication");
+    if (sha256Hex(Buffer.from(publicKeyPem, "utf8")) !== fingerprint
+      || getVaultSecret(workspace, FED_PRIVATE_KEY) !== privateKeyPem || getVaultSecret(workspace, FED_PUBLIC_KEY) !== publicKeyPem)
+      throw new Error("selected federation publisher identity changed before publication");
+  };
+  assertCurrent(); return assertCurrent;
+}
