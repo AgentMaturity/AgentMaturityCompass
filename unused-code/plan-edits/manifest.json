@@ -311,6 +311,13 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/forecast/forecastStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/forecast/forecastStore.ts.landed",
+      "sha256": "2cac2b32bc50f665bc05033d52754fcb45b1ceb1a65eb6ff59dfa386d2fd07da"
+    },
+    {
       "path": "src/gateway/config.ts",
       "issue": "P1-24",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
