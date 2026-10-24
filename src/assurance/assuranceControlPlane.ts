@@ -28,8 +28,11 @@ import {
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
 import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
-import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { captureOrgPairs, captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { getAuthenticatedKeyHistory } from "../crypto/keys.js";
+import { canonicalize } from "../utils/json.js";
+import { join } from "node:path";
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
 import { captureTransparencyAppendPublication } from "../transparency/workspacePublication.js";
 import { pendingWaiverSchema, savePendingWaiver, listPendingWaivers, maybeActivatePendingWaivers, maybeActivatePendingWaiversAsync, revokeAssuranceWaiver, revokeAssuranceWaiverAsync } from "./assuranceWaiverPublication.js";
@@ -393,37 +396,92 @@ function refusedReadiness(reason: string): AssuranceReadiness {
 /** One actual waiver batch; policy baseline starts at the old post-activation read stage. */
 export async function prepareAssuranceReadinessAsync(workspace: string, beforePublish: () => void) {
   let batch: Awaited<ReturnType<typeof maybeActivatePendingWaiversAsync>> | null = null;
-  let selected: ReturnType<typeof captureAssurancePolicy> | null = null, policy: ReturnType<typeof loadAssurancePolicy> | null = null;
+  let policy: ReturnType<typeof loadAssurancePolicy> | null = null;
   let untrustedReason: string | null = null, failure: { cause: unknown; reason: string } | null = null;
   const failed = (cause: unknown) => ({ cause, reason: `ASSURANCE_READY_CHECK_FAILED:${String(cause)}` });
+  let assertPolicyCurrent: (() => void) | null = null;
+  const caller = beforePublish;
+  const actor = () => {
+    assertPolicyCurrent?.();
+    caller();
+    assertPolicyCurrent?.();
+  };
   try {
-    batch = await maybeActivatePendingWaiversAsync(workspace, { beforePublish });
-    // Negative classification only: missing body never strict-reads an orphan sidecar or initializes policy.
+    // The intrinsic remains null through the actual activation; the old policy baseline starts afterward.
+    batch = await maybeActivatePendingWaiversAsync(workspace, { beforePublish: actor });
     const legacy = verifyAssurancePolicySignature(workspace);
-    if (!legacy.valid) untrustedReason = `ASSURANCE_POLICY_UNTRUSTED:${legacy.reason ?? "unknown"}`;
+    const legacyReason = `ASSURANCE_POLICY_UNTRUSTED:${legacy.reason ?? "unknown"}`;
+    if (!legacy.valid && legacy.reason !== "signature verify failed") untrustedReason = legacyReason;
     else {
-      selected = captureAssurancePolicy(workspace);
-      if (!selected.signature.valid) throw new Error(`assurance policy signature invalid: ${selected.signature.reason ?? "unknown"}`);
-      policy = selected.parsePolicy();
-      if (policy === null) throw new Error("captured assurance policy is missing");
+      const roleException = !legacy.valid;
+      let selected: ReturnType<typeof captureAssurancePolicy> | null = null;
+      let checkPolicyInputs: (() => void) | null = null;
+      try {
+        const captured = captureAssurancePolicy(workspace);
+        selected = captured;
+        if (!captured.signature.valid) throw new Error(`assurance policy signature invalid: ${captured.signature.reason ?? "unknown"}`);
+        const body = orgPairBytes(captured.snapshot, captured.path);
+        const sidecar = orgPairBytes(captured.snapshot, `${captured.path}.sig`);
+        if (body === null || sidecar === null) throw new Error("captured assurance policy pair is incomplete");
+        const historyPath = join(workspace, ".amc", "keys", "auditor_history.json");
+        const history = roleException ? captureOrgFiles([historyPath]) : null;
+        const historyBytes = history === null ? null : orgPairBytes(history, historyPath);
+        const historyValue = historyBytes === null ? null : canonicalize(JSON.parse(historyBytes.toString("utf8")) as unknown);
+        const historyCurrent = () => {
+          if (history === null) return;
+          assertOrgPairsCurrent(history);
+          if (historyBytes !== null) {
+            const admitted = getAuthenticatedKeyHistory(workspace, "auditor");
+            if (admitted === null || canonicalize(admitted) !== historyValue)
+              throw new Error("assurance readiness auditor history returned no matching authenticated envelope");
+          }
+          // True absence remains absent; a later appearance or replacement is not a fresh original.
+          assertOrgPairsCurrent(history);
+        };
+        checkPolicyInputs = () => {
+          assertOrgPairsCurrent(captured.snapshot);
+          historyCurrent();
+          const admission = verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar);
+          if (!admission.valid) throw new Error(`assurance policy signature invalid: ${admission.reason ?? "unknown"}`);
+          assertOrgPairsCurrent(captured.snapshot);
+          if (history !== null) assertOrgPairsCurrent(history);
+        };
+        checkPolicyInputs();
+      } catch (cause) {
+        if (!roleException) throw cause;
+        // Failed exception admission keeps the actual original role-refusal classification and exposed cause.
+        failure = { cause, reason: legacyReason };
+      }
+      if (failure === null) {
+        // Parsing follows genuine conjunction admission; its real YAML/schema failures keep the ordinary failed reason.
+        policy = selected!.parsePolicy();
+        if (policy === null) throw new Error("captured assurance policy is missing");
+        const intrinsic = checkPolicyInputs!;
+        assertPolicyCurrent = () => {
+          if (failure !== null) throw failure.cause;
+          try { intrinsic(); }
+          catch (cause) {
+            failure = failed(cause);
+            throw cause;
+          }
+        };
+      }
     }
-  } catch (cause) { failure = failed(cause); }
+  } catch (cause) { if (failure === null) failure = failed(cause); }
   return Object.freeze({ current(): AssuranceReadiness {
     // Failures remain private and sticky; every returned ordinary result has fresh arrays and objects.
     if (failure !== null) return refusedReadiness(failure.reason);
     if (untrustedReason !== null) return refusedReadiness(untrustedReason);
     try {
-      beforePublish();
+      actor();
       const gate = readinessProjection(workspace, policy!);
       batch!.assertCurrent(); // Its own pairs and latest genuine log, never the old preparation predecessor.
-      assertOrgPairsCurrent(selected!.snapshot);
-      const body = orgPairBytes(selected!.snapshot, selected!.path), sidecar = orgPairBytes(selected!.snapshot, `${selected!.path}.sig`);
-      if (body === null || sidecar === null) throw new Error("captured assurance policy pair is incomplete");
-      const admission = verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar);
-      if (!admission.valid) throw new Error(`assurance policy signature invalid: ${admission.reason ?? "unknown"}`);
-      assertOrgPairsCurrent(selected!.snapshot); // No external actor follows this final original-pair/admission boundary.
+      assertPolicyCurrent!(); // No external actor follows this final original-policy/history/admission fence.
       return gate;
-    } catch (cause) { failure = failed(cause); return refusedReadiness(failure.reason); }
+    } catch (cause) {
+      if (failure === null) failure = failed(cause);
+      return refusedReadiness(failure.reason);
+    }
   } });
 }
 
