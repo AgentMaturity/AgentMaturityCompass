@@ -87,8 +87,8 @@ export {
 } from "./fleet/trustComposition.js";
 // Orchestration DAG
 export {
-  createDag,
-  appendDagNode,
+  createDag, createDagAsync,
+  appendDagNode, appendDagNodeAsync,
   loadDag,
   listDags,
   queryDagsByAgent,
@@ -1255,6 +1255,7 @@ export {
   renderGovernanceLineageMarkdown,
   renderClaimLineageMarkdown
 } from "./claims/governanceLineage.js";
+export { linkTransitionToTransparencyAsync, recordPolicyChangeIntentAsync } from "./claims/governanceLineageAsync.js";
 export type {
   ClaimTransparencyLink,
   PolicyChangeCategory,

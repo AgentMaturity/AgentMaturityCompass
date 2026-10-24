@@ -43,3 +43,5 @@ Add awaited canary postmortem SDK filing with same-read target capture and check
 Await both rollback-pack signatures in the maintained CLI and SDK, retaining original first authority through outer preparation and caching only after durable publication.
 
 Admit committed receipt authority in ActionJournal reads and writes, separate receipt-purpose tokens from ledger-row signatures, verify selected signed event preimages, and recheck live signing refusal on each transition while retaining the existing synchronous API and legacy pruning compatibility.
+
+Add checked asynchronous DAG and governance-lineage SDK producers, preserving raw digest signatures and synchronous compatibility while checking original authority, selected predecessors, and atomic intent links before publication.

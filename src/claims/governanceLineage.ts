@@ -23,6 +23,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import type { Claim, ClaimTransition, ClaimLifecycleState } from "./claimTypes.js";
+import { insertTransparencyLinkRow, insertPolicyIntentRow } from "./governanceLineageRows.js";
 import {
   getClaimById,
   getClaimTransitions,
@@ -395,23 +396,7 @@ export function linkTransitionToTransparency(
 
   const link: ClaimTransparencyLink = { ...body, signature };
 
-  db.prepare(`
-    INSERT INTO claim_transparency_links (
-      link_id, claim_id, transition_id, transparency_entry_hash,
-      from_state, to_state, reason, evidence_refs_json, ts, signature
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    link.linkId,
-    link.claimId,
-    link.transitionId,
-    link.transparencyEntryHash,
-    link.fromState,
-    link.toState,
-    link.reason,
-    JSON.stringify(link.evidenceRefs),
-    link.ts,
-    link.signature,
-  );
+  insertTransparencyLinkRow(db, link);
 
   return link;
 }
@@ -533,35 +518,7 @@ export function recordPolicyChangeIntent(
     signature,
   };
 
-  db.prepare(`
-    INSERT INTO policy_change_intents (
-      intent_id, agent_id, policy_file_path,
-      policy_file_sha256_before, policy_file_sha256_after,
-      category, rationale, impact_summary,
-      claim_ids_json, evidence_refs_json,
-      reversible, rollback_instructions,
-      created_ts, created_by,
-      prev_intent_hash, intent_hash, signature
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    intent.intentId,
-    intent.agentId,
-    intent.policyFilePath,
-    intent.policyFileSha256Before,
-    intent.policyFileSha256After,
-    intent.category,
-    intent.rationale,
-    intent.impactSummary,
-    JSON.stringify(intent.claimIds),
-    JSON.stringify(intent.evidenceRefs),
-    intent.reversible ? 1 : 0,
-    intent.rollbackInstructions,
-    intent.createdTs,
-    intent.createdBy,
-    intent.prev_intent_hash,
-    intent.intent_hash,
-    intent.signature,
-  );
+  insertPolicyIntentRow(db, intent);
 
   // Auto-create claim-policy links for all referenced claims
   for (const claimId of intent.claimIds) {
