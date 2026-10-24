@@ -563,6 +563,13 @@
       "sha256": "9fabef38494baa090d30775430a2260ed9830ff3920c27b3dac65306e92ef3d8"
     },
     {
+      "path": "src/passport/passportArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportArtifact.ts.landed",
+      "sha256": "c9b5586946209565a8a0714a41161401868bb0b0078629b5eb7924af67c91533"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
@@ -575,6 +582,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
       "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd"
+    },
+    {
+      "path": "src/passport/passportStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportStore.ts.landed",
+      "sha256": "d4782f22d568b62f10d62d4eac7bd2fa73d4ab2ec67a9813c28c0cc6c961cab1"
     },
     {
       "path": "src/passport/passportVerifier.ts",
