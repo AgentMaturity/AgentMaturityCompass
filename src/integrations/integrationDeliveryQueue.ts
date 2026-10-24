@@ -624,12 +624,12 @@ export async function processIntegrationChannelQueue(params: ChannelQueueInput):
 
 /** Internal maintained-caller counterpart. The callback can only refuse; selected rows are immutable snapshots. */
 export async function processIntegrationChannelQueueWithAuthority(params: ChannelQueueInput, beforeCommit: () => void,
-  selectedRows: readonly IntegrationQueueRow[], terminalWrites: IntegrationQueueDeliveryStatus[] = []): Promise<ProcessIntegrationQueueResult> {
-  return processChannelQueueAttempt(params, beforeCommit, selectedRows, terminalWrites);
+  selectedRows: readonly IntegrationQueueRow[], terminalWrites: IntegrationQueueDeliveryStatus[] = [], ownRows?: IntegrationQueueRow[]): Promise<ProcessIntegrationQueueResult> {
+  return processChannelQueueAttempt(params, beforeCommit, selectedRows, terminalWrites, ownRows);
 }
 
 async function processChannelQueueAttempt(params: ChannelQueueInput, beforeCommit?: () => void,
-  selectedRows?: readonly IntegrationQueueRow[], terminalWrites?: IntegrationQueueDeliveryStatus[]): Promise<ProcessIntegrationQueueResult> {
+  selectedRows?: readonly IntegrationQueueRow[], terminalWrites?: IntegrationQueueDeliveryStatus[], ownRows?: IntegrationQueueRow[]): Promise<ProcessIntegrationQueueResult> {
   const input = { ...params };
   const workspace = input.workspace.trim() ? resolve(input.workspace) : input.workspace;
   const maxRows = Math.max(1, Math.min(500, Math.floor(input.maxRows ?? DEFAULT_MAX_PROCESS_ROWS)));
@@ -723,6 +723,7 @@ async function processChannelQueueAttempt(params: ChannelQueueInput, beforeCommi
           guard(); operation();
           return db.prepare("SELECT * FROM integration_delivery_queue WHERE queue_id = ?").get(row.queue_id) as IntegrationQueueRow;
         }).immediate();
+        ownRows?.push({ ...written });
         if (written.state === "DELIVERED" || written.state === "DEAD_LETTER") terminalWrites?.push(mapDeliveryStatus(written));
       };
       const readNow = () => { try { return now(); } catch (cause) {
