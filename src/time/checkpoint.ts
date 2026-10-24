@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { vaultStatus } from "../vault/vault.js";
-import { readdirSync, writeFileSync } from "node:fs";
+import { lstatSync, readdirSync, writeFileSync, type Stats } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
@@ -8,7 +8,7 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import { parseDelegation, verifyDelegation } from "../keys/delegation.js";
-import { DELEGATION_REL, getSigningPublicKeyPem } from "../keys/signingKeys.js";
+import { DELEGATION_REL, getPurposeKeyHistory, getSigningPublicKeyPem, keyFile, readHistory } from "../keys/signingKeys.js";
 import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
@@ -30,10 +30,14 @@ import { localLedgerRowKeys } from "../keys/operationalLedgerReader.js";
 import { readOperationalDelegationState } from "../keys/operationalDelegationState.js";
 import { verifyOperationalCheckpoints, type DelegationCheckpoint } from "../keys/operationalDelegation.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
-import { boundProviderKey } from "../keys/keyset.js";
+import { assertBoundPublicKey, assertNoPendingKeyset, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
 import { assertSigningKeyUsable } from "../keys/signingKeys.js";
 import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
 import { KeyProviderError } from "../keys/provider.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
+import { assertKeyNotRevoked } from "../keys/keyRevocations.js";
+import { builtInDistrust } from "../trust/builtInDistrust.js";
+import { distrustAt } from "../trust/admissionRule.js";
 import { withDelegationUseLock } from "../keys/delegationUsage.js";
 import type { TimestampAuthority } from "../trust/trustList.js";
 import type { EvidenceEvent } from "../types.js";
@@ -259,7 +263,7 @@ export interface AnchorResult { anchor: string; sequence: number; status: Public
 
 /**
  * P1-26: the signed C2SP note for a checkpoint whose transparency tree is RFC 9162, written once to
- * `.amc/transparency/anchors/<sequence>.note`; an existing note must be that text signed by an auditor key.
+ * `.amc/transparency/anchors/<sequence>.note`; retry admission also requires a currently admitted artifact-purpose key.
  */
 async function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Promise<Buffer> {
   const { sequence, transparency } = entry.checkpoint;
@@ -274,7 +278,62 @@ async function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Pro
     if (!pathExists(path)) return null;
     try {
       const existing = boundedFile(path, NOTE_MAX_BYTES);
-      if (!getPublicKeyHistory(workspace, "auditor").some(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text)) throw new Error("signature refused");
+      const legacy = getPublicKeyHistory(workspace, "auditor").some(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text);
+      // Point identities only: boundedFile does not return the identity of its opened descriptor.
+      const identity = (stat: Stats): string => canonicalize(
+        [stat.dev, stat.ino, stat.mode, stat.nlink, stat.size, stat.mtimeMs, stat.ctimeMs]);
+      const noteState = (): string => {
+        const before = lstatSync(path), stamp = identity(before);
+        if (!before.isFile() || before.nlink !== 1) throw new Error("stored checkpoint note is not a single-link regular file");
+        if (!boundedFile(path, NOTE_MAX_BYTES).equals(existing) || identity(lstatSync(path)) !== stamp) {
+          throw new Error("stored checkpoint note changed during admission");
+        }
+        return stamp;
+      };
+      const selected = noteState();
+      const historyRel = ".amc/keys/auditor_history.json";
+      const historyState = () => {
+        const bytes = readContainedOrNull(workspace, historyRel, 1024 * 1024);
+        return { bytes, stamp: bytes === null ? null : identity(lstatSync(join(workspace, historyRel))) };
+      };
+      const history = legacy ? null : historyState();
+      const assertHistoryCurrent = (): void => {
+        if (history === null) return;
+        const current = historyState();
+        const sameBytes = history.bytes === null ? current.bytes === null : current.bytes?.equals(history.bytes) === true;
+        if (current.stamp !== history.stamp || !sameBytes) {
+          throw new Error("original auditor history changed during checkpoint note admission");
+        }
+      };
+      let rolePem: string | null = null;
+      if (history !== null && history.bytes !== null) {
+        assertHistoryCurrent();
+        assertNoPendingKeyset(workspace);
+        rolePem = keyFile(workspace, "auditor_ed25519.pub");
+        if (rolePem === null) throw new Error("auditor public key is missing");
+        assertBoundPublicKey(workspace, "artifact-seal", rolePem);
+        const admitted = readHistory(workspace, "auditor", rolePem);
+        if (admitted === null || canonicalize(admitted) !== canonicalize(JSON.parse(history.bytes.toString("utf8")))) {
+          throw new Error("original auditor history is not currently authenticated");
+        }
+      }
+      const required = keysetDeclared(workspace), now = Date.now(), distrust = builtInDistrust();
+      const matching = getPurposeKeyHistory(workspace, "artifact-seal")
+        .filter(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text);
+      if (matching.length === 0) throw new Error("signature refused");
+      for (const pem of matching) {
+        const keyId = signingKeyId(pem);
+        if (keyId === null) throw new Error("checkpoint note key is not canonical");
+        assertKeyNotRevoked(workspace, required, keyId, "artifact-seal");
+        if (distrustAt(distrust, keyId, now) !== undefined) throw new Error("checkpoint note key is distrusted");
+      }
+      if (rolePem !== null) {
+        assertNoPendingKeyset(workspace);
+        if (keyFile(workspace, "auditor_ed25519.pub") !== rolePem) throw new Error("original auditor public key changed during admission");
+        assertBoundPublicKey(workspace, "artifact-seal", rolePem);
+      }
+      assertHistoryCurrent();
+      if (noteState() !== selected) throw new Error("stored checkpoint note identity changed during admission");
       return existing;
     } catch (error) { throw new Error(`stored checkpoint ${sequence} note is not its canonical auditor signature`, { cause: error }); }
   };
