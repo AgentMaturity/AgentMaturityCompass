@@ -17,7 +17,7 @@ import { KeyProviderError } from "../keys/provider.js";
 import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
 import { vaultStatus } from "../vault/vault.js";
 import { canonicalize } from "../utils/json.js";
-import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 
 export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
 
@@ -340,7 +340,29 @@ function completeActionPolicyPlan(plan: ReturnType<typeof captureActionPolicyPla
   };
   assertSignatureCurrent();
   const assertCurrent = () => { plan.beforePublish?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? plan.before); };
-  return { bytes: Buffer.from(bytes), digestSha256: digest, assertCurrent, publish() {
+  // Only the observed branch adds member callbacks; the old no-observer publisher below is literal.
+  const publishObserved = (recorded: (path: string) => void) => {
+    let expected = plan.before;
+    const signatureBytes = Buffer.from(JSON.stringify({ digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" } satisfies ActionPolicySignature, null, 2));
+    const guard = () => { plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent(); assertOrgPairsCurrent(expected); };
+    const committed: string[] = []; let attemptedPath = plan.replacement ? file : signaturePath;
+    try {
+      for (const member of plan.replacement ? [{ path: file, bytes }, { path: signaturePath, bytes: signatureBytes }] : [{ path: signaturePath, bytes: signatureBytes }]) {
+        guard(); attemptedPath = member.path;
+        writeFileAtomic(member.path, member.bytes, 0o644); committed.push(member.path);
+        const own = captureOrgFiles([member.path]).members[0];
+        if (own === undefined || own.mode !== 0o644 || own.bytes === null || !own.bytes.equals(member.bytes))
+          throw new Error("published action-policy member differs from its actual prepared bytes");
+        expected = { members: expected.members.map(old => old.path === member.path ? own : old) };
+        recorded(member.path); guard();
+      }
+      published = expected; return { policyPath: file, signaturePath };
+    } catch (cause) { throw new ActionPolicyPublicationError(Object.freeze([...committed]), attemptedPath, cause); }
+  };
+  return { bytes: Buffer.from(bytes), digestSha256: digest, assertCurrent,
+    publishWithLockHeld(recorded: (path: string) => void) { return publishObserved(recorded); },
+    publish(recorded?: (path: string) => void) {
+    if (recorded !== undefined) return withActionPolicyLock(file, () => publishObserved(recorded));
     return withActionPolicyLock(file, () => {
       plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent();
       const sidecar: ActionPolicySignature = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };

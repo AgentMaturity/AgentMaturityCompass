@@ -19,7 +19,7 @@ import { KeyProviderError } from "../keys/provider.js";
 import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
 import { vaultStatus } from "../vault/vault.js";
 import { canonicalize } from "../utils/json.js";
-import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -144,7 +144,26 @@ function completeToolsConfigPlan(plan: ReturnType<typeof captureToolsConfigPlan>
   };
   assertSignatureCurrent();
   const assertCurrent = () => { plan.beforePublish?.(); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? plan.previous.before); };
-  return { bytes: Buffer.from(bytes), digestSha256: digest, assertCurrent, publish() {
+  const publishObserved = (recorded: (path: string) => void) => {
+    let expected = plan.previous.before;
+    const signatureBytes = Buffer.from(toolsSignatureBytes(digest, signature));
+    const guard = () => { plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertSignatureCurrent(); assertOrgPairsCurrent(expected); };
+    const committed: string[] = []; let attemptedPath = plan.replacement ? file : sigPath;
+    try {
+      for (const member of plan.replacement ? [{ path: file, bytes }, { path: sigPath, bytes: signatureBytes }] : [{ path: sigPath, bytes: signatureBytes }]) {
+        guard(); attemptedPath = member.path;
+        writeFileAtomic(member.path, member.bytes, 0o644); committed.push(member.path);
+        const own = captureOrgFiles([member.path]).members[0];
+        if (own === undefined || own.mode !== 0o644 || own.bytes === null || !own.bytes.equals(member.bytes))
+          throw new Error("published tools member differs from its actual prepared bytes");
+        expected = { members: expected.members.map(old => old.path === member.path ? own : old) };
+        recorded(member.path); guard();
+      }
+      published = expected; return { configPath: file, sigPath };
+    } catch (cause) { throw new ToolsConfigPublicationError(Object.freeze([...committed]), attemptedPath, cause); }
+  };
+  return { bytes: Buffer.from(bytes), digestSha256: digest, assertCurrent, publish(recorded?: (path: string) => void) {
+    if (recorded !== undefined) return withToolsConfigLock(file, () => publishObserved(recorded));
     return withToolsConfigLock(file, () => {
       plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertSignatureCurrent();
       const signatureBytes = Buffer.from(toolsSignatureBytes(digest, signature));
