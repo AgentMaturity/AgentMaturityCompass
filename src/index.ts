@@ -284,8 +284,8 @@ export {
 export {
   artifactProvenanceManifestSchema,
   artifactProvenanceSignatureSchema,
-  signArtifactProvenance,
-  signArtifactOutput,
+  signArtifactProvenance, signArtifactProvenanceAsync,
+  signArtifactOutput, signArtifactOutputAsync,
   verifyArtifactProvenance,
   detectArtifactTampering
 } from "./artifact/artifactProvenance.js";
