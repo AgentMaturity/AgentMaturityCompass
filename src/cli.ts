@@ -202,7 +202,8 @@ import {
 } from "./bundles/bundle.js";
 import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
-import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
+import { describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
+import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
@@ -10735,6 +10736,11 @@ archetype
       console.log(`- ... ${preview.targetChanges.length - 20} more changes`);
     }
 
+    const publication = captureArchetypeApply({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      archetypeId
+    });
     const confirm = await inquirer.prompt([
       {
         type: "confirm",
@@ -10748,15 +10754,15 @@ archetype
       return;
     }
 
-    const applied = applyArchetype({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      archetypeId
-    });
+    const applied = await publication.apply();
+    publication.assertCurrent();
     console.log(chalk.green(`Archetype applied to agent ${applied.agentId}`));
+    publication.assertCurrent();
     console.log(`Target: ${applied.targetPath}`);
+    publication.assertCurrent();
     console.log(`Audit session: ${applied.auditSessionId}`);
     for (const file of applied.changedFiles) {
+      publication.assertCurrent();
       console.log(`- ${file}`);
     }
   });
