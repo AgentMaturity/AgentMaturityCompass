@@ -85,7 +85,7 @@ type Original = ReturnType<typeof captureOriginal>;
 
 /** Real old initialization phase at its late position: optional seal Sign, log/body/signature order, lock even on no-op.
  * Atomic helper internals and replace acknowledgments retain their inherited point-in-time attribution limits. */
-async function initialize(workspace: string, progress: InitializationProgress, assertCurrent: () => void) {
+async function initialize(workspace: string, original: Original, progress: InitializationProgress, assertCurrent: () => void) {
   progress.phase = "initialization-capture"; assertCurrent();
   const publication = captureTransparencyAppendPublication(workspace), logPath = workspaceLogPath(workspace);
   const log = stateBytes(publication.state, logPath), bodyPath = workspaceSealPath(workspace), sigPath = workspaceSealSigPath(workspace);
@@ -160,7 +160,7 @@ export function captureStudioSelfRunTransparency(workspace: string, agentId: str
       initialization = { phase: "initialization-start", signingCallAttempted: false, signingCallReturned: false,
         lockSetupAttempted: false, lockEntered: false, lockReturned: false, attemptedPath: null,
         returnedMembers: [], acknowledgedMembers: [], completed: false };
-      const initialized = await initialize(workspace, initialization, assertCurrent);
+      const initialized = await initialize(workspace, fixed, initialization, assertCurrent);
       phase = "append";
       const attempt = await appendTransparencyEntryAttemptAsync(input, {
         beforeCommit() { assertCurrent(); initialized.assertCurrent(); },

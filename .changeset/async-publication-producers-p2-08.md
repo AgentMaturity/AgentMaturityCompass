@@ -283,3 +283,6 @@ Config async no-sign continuity: retain the original no-sign refusal before mixe
 
 
 Diagnostic self-run now retains silent original lease/signing authority before its body wait and awaits the real mandatory late transparency suffix, including conditional seal initialization and checked TR/Merkle append. Exact late run output remains fixed through publication and an immediate final response guard. Primary run/forecast/JSON behavior stays at its existing slots. Actual selected signer metadata replaces the old auditor-first initialization field; malformed late predecessor errors remain typed follow-up failures (500), while primary body JSON errors retain 400. Native migration/replace attribution limits and deferred qualification remain explicit.
+
+
+Restore the retained original self-run signer parameter at the private initialization call. The conditional initial seal body and expected signer both consume it; the reviewed output-continuity correction did not make it unused. No primary route or protocol change.
