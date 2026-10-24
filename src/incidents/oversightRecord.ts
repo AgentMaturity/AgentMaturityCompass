@@ -18,7 +18,7 @@
  */
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { signHexDigest, verifyHexDigestAny, getPublicKeyPem } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -33,6 +33,7 @@ import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 
 export type OversightDecision =
   | "ACKNOWLEDGED"
@@ -258,7 +259,7 @@ export interface RecordWorkspaceOversightInput {
  */
 export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): HumanOversightRecord {
   // Signs with the workspace auditor key: never from agent mode.
-  assertOwnerMode(input.workspace, "incident oversight");
+  assertOversightOwner(input.workspace);
   if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) {
     throw new IncidentInputError(`unknown decision ${input.decision}; expected one of ${OVERSIGHT_DECISIONS.join(", ")}`);
   }
@@ -311,7 +312,34 @@ export class OversightPublicationError extends Error {
     super("Oversight publication did not complete", { cause }); this.name = "OversightPublicationError";
   }
 }
-const usedIncident = (incident: Incident | undefined) => incident === undefined ? null : canonicalize({
+/** Fixed registered policy for this existing owner-only operation; no caller-selected mode key. */
+function assertOversightOwner(workspace: string): void {
+  try { assertOwnerMode(workspace, "control results sign"); }
+  catch (cause) {
+    if (cause instanceof Error && cause.message === "Command 'control results sign' is blocked in agent mode. Switch to owner mode with: amc mode owner")
+      throw new Error("Command 'incident oversight' is blocked in agent mode. Switch to owner mode with: amc mode owner", { cause });
+    throw cause;
+  }
+}
+function oversightDatabaseIdentity(path: string): string {
+  const file = lstatSync(path);
+  if (!file.isFile() || file.nlink !== 1) throw new IncidentInputError("oversight requires the original regular incident database");
+  return `${file.dev}:${file.ino}:${file.mode}`;
+}
+function assertReadOnlyIncident(path: string, identity: string, incident: Incident): void {
+  const assertIdentity = () => {
+    if (oversightDatabaseIdentity(path) !== identity) throw new IncidentInputError("incident database identity changed while signing; retry");
+  };
+  assertIdentity();
+  const read = new Database(path, { readonly: true, fileMustExist: true, timeout: 0 });
+  try { assertStoredIncident(read, incident); }
+  catch (cause) {
+    try { read.close(); } catch (close) { throw new AggregateError([cause, close], "Oversight readonly cleanup did not complete"); }
+    throw cause;
+  }
+  read.close(); assertIdentity();
+}
+const usedIncident = (incident: Incident | null | undefined) => incident == null ? null : canonicalize({
   incidentId: incident.incidentId, incident_hash: incident.incident_hash, createdTs: incident.createdTs
 });
 function assertStoredIncident(db: Database.Database, incident: Incident): void {
@@ -322,31 +350,47 @@ function assertStoredIncident(db: Database.Database, incident: Incident): void {
 /** Actual stored incident producer: no connection, transaction or file lock crosses the checked signing await. */
 export async function recordWorkspaceOversightAsync(supplied: RecordWorkspaceOversightAsyncInput): Promise<HumanOversightRecord> {
   const input = { ...supplied, incident: structuredClone(supplied.incident), clockIds: [...supplied.clockIds] };
-  assertOwnerMode(input.workspace, "incident oversight");
+  input.beforePublish?.();
+  assertOversightOwner(input.workspace);
   if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) throw new IncidentInputError("unknown oversight decision");
   if (!input.reviewerId.trim() || !input.rationale.trim()) throw new IncidentInputError("reviewer and rationale must not be empty");
   if (input.clockIds.some(id => !REGULATORY_CLOCK_TABLE.some(clock => clock.clockId === id))) throw new IncidentInputError("unknown clock id");
   const database = join(input.workspace, ".amc", "evidence.sqlite"), path = oversightRecordPath(input.workspace, input.incident.incidentId);
-  const read = new Database(database, { readonly: true, fileMustExist: true, timeout: 0 });
-  try { assertStoredIncident(read, input.incident); } finally { read.close(); }
+  const databaseIdentity = oversightDatabaseIdentity(database);
+  assertReadOnlyIncident(database, databaseIdentity, input.incident);
   const before = readOversightBytes(path), records = parseOversightRecords(path, before);
   if (!verifyOversightChain(records, input.incident, workspaceOversightPublicKeys(input.workspace)).ok)
     throw new IncidentInputError("existing oversight records failed verification");
   const previous = records.at(-1);
   if (previous && input.reviewedTs < previous.reviewedTs) throw new IncidentInputError("reviewedTs precedes the last record");
   const prepared = prepareOversightRecord({ ...input, decision: input.decision as OversightDecision, prevRecordHash: previous?.recordHash ?? null });
-  const captured = capturePurposePublication(input.workspace, "artifact-seal");
-  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(prepared.recordHash, "hex"));
+  const captured = capturePurposePublication(input.workspace, "artifact-seal"), original = captureRunHashAuthority(input.workspace, false);
+  const assertOriginalRecords = () => {
+    if (!verifyOversightChain(records, input.incident, workspaceOversightPublicKeys(input.workspace)).ok)
+      throw new IncidentInputError("the captured oversight records no longer verify under current authority");
+    if (!sameBytes(readOversightBytes(path), before)) throw new IncidentInputError("oversight records changed while signing was prepared; retry");
+  };
+  const beforeSign = () => {
+    input.beforePublish?.(); assertOversightOwner(input.workspace); original();
+    assertReadOnlyIncident(database, databaseIdentity, input.incident);
+    withOversightLock(path, () => {
+      input.beforePublish?.(); assertOversightOwner(input.workspace); original(); assertOriginalRecords();
+    });
+  };
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(prepared.recordHash, "hex"), { beforeSign });
   const record = { ...prepared, signature: signed.signature.toString("base64") };
   let db: Database.Database | undefined, appendAttempted = false, appended = false, failed = false, failure: unknown;
   try {
+    if (oversightDatabaseIdentity(database) !== databaseIdentity) throw new IncidentInputError("incident database identity changed while signing; retry");
     db = new Database(database, { fileMustExist: true, timeout: 0 }); db.exec("BEGIN IMMEDIATE");
+    if (oversightDatabaseIdentity(database) !== databaseIdentity) throw new IncidentInputError("incident database identity changed while signing; retry");
     assertStoredIncident(db, input.incident);
     withOversightLock(path, () => {
       input.beforePublish?.();
-      assertOwnerMode(input.workspace, "incident oversight");
-      assertPurposePublicationCurrent(input.workspace, captured, signed);
-      if (!sameBytes(readOversightBytes(path), before)) throw new IncidentInputError("oversight records changed while signing was prepared; retry");
+      assertOversightOwner(input.workspace);
+      original(); assertPurposePublicationCurrent(input.workspace, captured, signed);
+      if (oversightDatabaseIdentity(database) !== databaseIdentity) throw new IncidentInputError("incident database identity changed while signing; retry");
+      assertOriginalRecords();
       appendAttempted = true; appendUnlocked(path, record); appended = true;
     });
     db.exec("COMMIT");

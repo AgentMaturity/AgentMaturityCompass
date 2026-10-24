@@ -1,3 +1,4 @@
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
@@ -45,6 +46,7 @@ function localUnsignedPreflight(workspace: string): string | null {
 export async function publishConsoleSnapshotAsync(workspace: string, supplied: Record<string, unknown>, beforePublish?: () => void): Promise<{
   path: string; sigPath: string | null; payload: Record<string, unknown>;
 }> {
+  beforePublish?.();
   const payload = structuredClone(supplied), path = join(workspace, ".amc", "studio", "console-snapshot.json"), sigPath = path + ".sig";
   const body = JSON.stringify(payload, null, 2), digest = sha256Hex(Buffer.from(JSON.stringify(payload), "utf8"));
   const before = { body: bytes(path), signature: bytes(sigPath) };
@@ -52,18 +54,26 @@ export async function publishConsoleSnapshotAsync(workspace: string, supplied: R
   let unsigned: string | null = null;
   if (boundProviderKey(workspace, "artifact-seal") === null) unsigned = localUnsignedPreflight(workspace);
   const captured = unsigned === null ? capturePurposePublication(workspace, "artifact-seal") : null;
-  const signed = captured === null ? null : await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"));
+  const original = captured === null ? null : captureRunHashAuthority(workspace, false);
+  const assertPredecessor = () => {
+    if (!same(bytes(path), before.body) || !same(bytes(sigPath), before.signature))
+      throw new ConsoleSnapshotPublicationError("predecessor", false, false, undefined);
+  };
+  const beforeSign = () => withConsoleSnapshotLock(workspace, () => {
+    beforePublish?.(); original?.(); assertPredecessor();
+  });
+  const signed = captured === null ? null : await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"), { beforeSign });
   const sidecar = signed === null ? null : JSON.stringify({ digestSha256: digest, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" }, null, 2);
   let bodyWritten = false, signatureRemoved = false, phase: ConsoleSnapshotPublicationError["phase"] = "predecessor";
   const publish = () => withConsoleSnapshotLock(workspace, () => {
     beforePublish?.();
-    if (captured !== null && signed !== null) assertPurposePublicationCurrent(workspace, captured, signed);
+    if (captured !== null && signed !== null) { original!(); assertPurposePublicationCurrent(workspace, captured, signed); }
     else {
       assertVaultMaySign(workspace, "artifact-seal");
       if (canonicalize({ keyset: assertKeysetComplete(workspace), policy: loadKeysConfig(workspace) }) !== unsigned)
         throw new ConsoleSnapshotPublicationError("predecessor", false, false, undefined);
     }
-    if (!same(bytes(path), before.body) || !same(bytes(sigPath), before.signature)) throw new ConsoleSnapshotPublicationError("predecessor", false, false, undefined);
+    assertPredecessor();
     try {
       if (sidecar === null && before.signature !== null) { phase = "signature-removal"; unlinkSync(sigPath); signatureRemoved = true; }
       phase = "body"; writeFileAtomic(path, body, 0o644); bodyWritten = true;
