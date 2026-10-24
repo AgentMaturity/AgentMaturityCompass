@@ -402,6 +402,13 @@
       "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17"
     },
     {
+      "path": "src/mechanic/planStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/planStore.ts.landed",
+      "sha256": "9a09f6df9655b6ed9fdb7ee2850d80b0d8fd14d0ec2e65a1d0a368478748b60e"
+    },
+    {
       "path": "src/mechanic/profiles.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
