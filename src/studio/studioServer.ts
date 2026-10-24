@@ -8326,7 +8326,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string; registryId?: string; pluginRef?: string }) : {};
         if (!parsed.registryId || !parsed.pluginRef) {
           json(res, 400, { error: "registryId and pluginRef are required" });
@@ -8351,7 +8351,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
@@ -8364,7 +8364,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body
           ? (JSON.parse(body) as { agentId?: string; registryId?: string; pluginId?: string; to?: string })
           : {};
@@ -8392,7 +8392,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
@@ -8405,7 +8405,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string; pluginId?: string }) : {};
         if (!parsed.pluginId) {
           json(res, 400, { error: "pluginId is required" });
@@ -8429,7 +8429,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
