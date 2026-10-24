@@ -249,19 +249,19 @@ import {
   assuranceWaiverStatusCliAsync as assuranceWaiverStatusCli
 } from "./assurance/assuranceCli.js";
 import {
-  auditApplyPolicyCli, assertAuditCliOwnerMode,
+  auditApplyPolicyCliAsync, assertAuditCliOwnerMode,
   auditBinderCreateCli,
   auditBinderExportExecuteCli,
   auditBinderExportRequestCli,
   auditEnterpriseExportCli,
   auditBinderVerifyCli,
   auditBindersCli,
-  auditInitCli,
-  auditMapApplyCli,
-  auditMapListCli,
-  auditMapShowCli,
+  auditInitCliAsync,
+  auditMapApplyCliAsync,
+  auditMapListCliAsync,
+  auditMapShowCliAsync,
   auditMapVerifyCli,
-  auditPrintPolicyCli,
+  auditPrintPolicyCliAsync,
   auditRequestApproveCli,
   auditRequestCreateCli,
   auditRequestFulfillCli,
@@ -270,7 +270,7 @@ import {
   auditSchedulerEnableCliAsync,
   auditSchedulerRunNowCli,
   auditSchedulerStatusCli,
-  auditVerifyPolicyCli,
+  auditVerifyPolicyCliAsync,
   auditVerifyWorkspaceCli
 } from "./audit/auditCli.js";
 import { auditVibeCode } from "./score/vibeCodeAudit.js";
@@ -16999,9 +16999,9 @@ org
 audit
   .command("init")
   .description("Initialize signed audit policy and compliance maps")
-  .action(() => {
-    assertOwnerMode(process.cwd(), "audit init");
-    const out = auditInitCli(process.cwd());
+  .action(async () => {
+    assertAuditCliOwnerMode(process.cwd(), "audit init");
+    const out = await auditInitCliAsync(process.cwd());
     console.log(chalk.green("Audit policy and maps initialized"));
     console.log(`Policy: ${out.policy.path}`);
     console.log(`Policy signature: ${out.policy.sigPath}`);
@@ -17012,8 +17012,8 @@ audit
 audit
   .command("verify-policy")
   .description("Verify signed audit policy")
-  .action(() => {
-    const verify = auditVerifyPolicyCli(process.cwd());
+  .action(async () => {
+    const verify = await auditVerifyPolicyCliAsync(process.cwd());
     if (!verify.valid) {
       console.log(chalk.red("Audit policy verification failed"));
       console.log(`Reason: ${verify.reason ?? "unknown"}`);
@@ -17061,17 +17061,17 @@ const auditScheduler = audit.command("scheduler").description("Audit binder cach
 auditPolicy
   .command("print")
   .description("Print effective audit policy")
-  .action(() => {
-    console.log(JSON.stringify(auditPrintPolicyCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await auditPrintPolicyCliAsync(process.cwd()), null, 2));
   });
 
 auditPolicy
   .command("apply")
   .description("Apply and sign audit policy from file")
   .requiredOption("--file <path>", "audit policy file (yaml/json)")
-  .action((opts: { file: string }) => {
-    assertOwnerMode(process.cwd(), "audit policy apply");
-    const out = auditApplyPolicyCli({
+  .action(async (opts: { file: string }) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit policy apply");
+    const out = await auditApplyPolicyCliAsync({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -17084,8 +17084,8 @@ auditPolicy
 auditMap
   .command("list")
   .description("List builtin/active audit maps")
-  .action(() => {
-    const rows = auditMapListCli(process.cwd());
+  .action(async () => {
+    const rows = await auditMapListCliAsync(process.cwd());
     for (const row of rows) {
       console.log(`- ${row.source}: ${row.id} (${row.name})`);
     }
@@ -17095,9 +17095,9 @@ auditMap
   .command("show")
   .description("Show audit map")
   .option("--id <id>", "builtin|active", "active")
-  .action((opts: { id: string }) => {
+  .action(async (opts: { id: string }) => {
     const id = opts.id === "builtin" ? "builtin" : "active";
-    console.log(JSON.stringify(auditMapShowCli({
+    console.log(JSON.stringify(await auditMapShowCliAsync({
       workspace: process.cwd(),
       id
     }), null, 2));
@@ -17107,9 +17107,9 @@ auditMap
   .command("apply")
   .description("Apply active audit map from file")
   .requiredOption("--file <path>", "audit map file (yaml/json)")
-  .action((opts: { file: string }) => {
-    assertOwnerMode(process.cwd(), "audit map apply");
-    const out = auditMapApplyCli({
+  .action(async (opts: { file: string }) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit map apply");
+    const out = await auditMapApplyCliAsync({
       workspace: process.cwd(),
       file: opts.file
     });

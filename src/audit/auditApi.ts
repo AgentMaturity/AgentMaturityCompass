@@ -1,4 +1,8 @@
 import { captureAuditOutputAliases } from "./binderOutputAliases.js";
+import { captureAuditPolicyMapPublication, AuditPolicyMapPublicationError, verifyAuditMapSelection } from "./auditPolicyMapPublication.js";
+import { defaultAuditMapBuiltin } from "./auditMapBuiltin.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
+import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { KeyProviderError } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { captureOrgFiles, orgPairBytes, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
@@ -14,9 +18,9 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditMapSchema, type AuditMapFile } from "./auditMapSchema.js";
-import { auditPolicySchema, type AuditPolicy } from "./auditPolicySchema.js";
+import { auditPolicySchema, defaultAuditPolicy, type AuditPolicy } from "./auditPolicySchema.js";
 import {
-  initAuditMaps,
+  initAuditMaps, prepareAuditMapActiveAsync, loadAuditMapsAttemptAsync,
   loadAuditMapActive,
   loadAuditMapBuiltin,
   saveAuditMapActive,
@@ -25,7 +29,7 @@ import {
 } from "./auditMapStore.js";
 import {
   auditBindersExportsDir,
-  initAuditPolicy,
+  initAuditPolicy, prepareAuditPolicyAsync, loadAuditPolicyAttemptAsync,
   loadAuditPolicy,
   saveAuditPolicy,
   verifyAuditPolicySignature
@@ -603,4 +607,59 @@ export async function auditSchedulerEnableForApiAsync(params: Parameters<typeof 
   } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
     throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
 
+}
+
+/** Explicit initialization prepares all three real recipes before replacing any member. */
+export async function auditInitForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const policy = defaultAuditPolicy(), map = defaultAuditMapBuiltin();
+  const prepared = await captureAuditPolicyMapPublication(workspace, { policy, builtin: map, active: map }, options).prepare();
+  const saved = prepared.publish(); prepared.assertCurrent();
+  return { policy: { ...saved.policy!, policy }, maps: { builtinPath: saved.builtin!.path, builtinSigPath: saved.builtin!.sigPath,
+    activePath: saved.active!.path, activeSigPath: saved.active!.sigPath, map } };
+}
+export async function auditPolicyForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const selected = await loadAuditPolicyAttemptAsync(workspace, options); selected.assertCurrent();
+  return { policy: selected.policy, signature: selected.verification() };
+}
+export async function auditMapListForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const selected = await loadAuditMapsAttemptAsync(workspace, "list", options); selected.assertCurrent();
+  return [{ id: selected.builtin!.auditMap.id, name: selected.builtin!.auditMap.name, source: "builtin" as const },
+    { id: selected.active!.auditMap.id, name: selected.active!.auditMap.name, source: "active" as const }];
+}
+export async function auditMapShowForApiAsync(params: Parameters<typeof auditMapShowForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = { ...params }, id = input.id ?? "active", selected = await loadAuditMapsAttemptAsync(input.workspace, id, options);
+  selected.assertCurrent(); const signatures = { builtin: verifyAuditMapSelection(input.workspace, "builtin"), active: verifyAuditMapSelection(input.workspace, "active") };
+  selected.assertCurrent(); return { map: selected.map, signatures };
+}
+export async function auditPolicyApplyForApiAsync(params: Parameters<typeof auditPolicyApplyForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, parsed = auditPolicySchema.parse(input.policy);
+  caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const originalLog = captureWorkspaceLogAuthority(input.workspace), beforePublish = () => { caller.beforePublish?.(); originalLog.assertCurrent(); };
+  const prepared = await prepareAuditPolicyAsync(input.workspace, parsed, { ...caller, beforePublish }), saved = prepared.publish().policy!;
+  let hash: string | null = null;
+  try {
+    const stable = () => { prepared.assertCurrent(); originalLog.assertCurrent(); };
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "AUDIT_POLICY_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(canonicalize(parsed), "utf8")), id: "audit-policy" } }, { beforeCommit: stable, beforeMember: stable });
+    hash = attempt.entry.hash; stable(); attempt.assertCurrent(); return { ...saved, transparencyHash: hash };
+  } catch (cause) {
+    if (cause instanceof TransparencyMerkleLagError) hash = cause.entryHash;
+    throw new AuditPolicyMapPublicationError("policy-log", prepared.paths, hash === null ? [] : [hash], cause, prepared.createdDirectories, null, true);
+  }
+}
+export async function auditMapApplyForApiAsync(params: Parameters<typeof auditMapApplyForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, parsed = auditMapSchema.parse(input.map);
+  caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const originalLog = captureWorkspaceLogAuthority(input.workspace), beforePublish = () => { caller.beforePublish?.(); originalLog.assertCurrent(); };
+  const prepared = await prepareAuditMapActiveAsync(input.workspace, parsed, { ...caller, beforePublish }), saved = prepared.publish().active!;
+  let hash: string | null = null;
+  try {
+    const stable = () => { prepared.assertCurrent(); originalLog.assertCurrent(); };
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "AUDIT_MAP_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(canonicalize(parsed), "utf8")), id: parsed.auditMap.id } }, { beforeCommit: stable, beforeMember: stable });
+    hash = attempt.entry.hash; stable(); attempt.assertCurrent(); return { ...saved, transparencyHash: hash };
+  } catch (cause) {
+    if (cause instanceof TransparencyMerkleLagError) hash = cause.entryHash;
+    throw new AuditPolicyMapPublicationError("map-log", prepared.paths, hash === null ? [] : [hash], cause, prepared.createdDirectories, null, true);
+  }
 }

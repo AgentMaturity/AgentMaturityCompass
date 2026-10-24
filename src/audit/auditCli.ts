@@ -1,4 +1,8 @@
 import type { AuditPublicationOptions } from "./binderPublication.js";
+import { captureOrgFiles, orgPairBytes, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { auditPolicyPath } from "./auditPolicyStore.js";
+import { auditMapActivePath } from "./auditMapStore.js";
+import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolve } from "node:path";
@@ -13,13 +17,13 @@ import {
   auditBinderExportRequestForApi,
   auditBinderVerifyFile,
   auditBindersForApi,
-  auditInitForApi,
-  auditMapApplyForApi,
-  auditMapListForApi,
-  auditMapShowForApi,
+  auditInitForApi, auditInitForApiAsync,
+  auditMapApplyForApi, auditMapApplyForApiAsync,
+  auditMapListForApi, auditMapListForApiAsync,
+  auditMapShowForApi, auditMapShowForApiAsync,
   auditMapVerifyForApi,
-  auditPolicyApplyForApi,
-  auditPolicyForApi,
+  auditPolicyApplyForApi, auditPolicyApplyForApiAsync,
+  auditPolicyForApi, auditPolicyForApiAsync,
   auditRequestApproveForApi,
   auditRequestCreateForApi,
   auditRequestFulfillForApi,
@@ -262,4 +266,27 @@ export function auditEnterpriseExportCli(params: {
 
 export async function auditSchedulerEnableCliAsync(params: Parameters<typeof auditSchedulerEnableCli>[0], options: AuditPublicationOptions = {}) {
   return auditSchedulerEnableForApiAsync(params, options);
+}
+
+export async function auditInitCliAsync(workspace: string) {
+  const beforePublish = () => assertAuditCliOwnerMode(workspace, "audit init"); beforePublish();
+  return auditInitForApiAsync(workspace, { beforePublish });
+}
+export async function auditVerifyPolicyCliAsync(workspace: string) { return (await auditPolicyForApiAsync(workspace)).signature; }
+export async function auditPrintPolicyCliAsync(workspace: string) { return (await auditPolicyForApiAsync(workspace)).policy; }
+export async function auditMapListCliAsync(workspace: string) { return auditMapListForApiAsync(workspace); }
+export async function auditMapShowCliAsync(params: Parameters<typeof auditMapShowCli>[0]) { return auditMapShowForApiAsync({ ...params }); }
+export async function auditApplyPolicyCliAsync(params: Parameters<typeof auditApplyPolicyCli>[0]) {
+  const input = { ...params }; assertAuditCliOwnerMode(input.workspace, "audit policy apply");
+  const file = resolve(input.file), before = captureOrgFiles([file]), bytes = orgPairBytes(before, file), sameTarget = [auditPolicyPath(input.workspace), `${auditPolicyPath(input.workspace)}.sig`].some(path => physicalPathWithMissingSuffix(path) === physicalPathWithMissingSuffix(file));
+  if (bytes === null) throw new Error("audit policy input file is missing");
+  const policy = parseJsonOrYaml(bytes.toString("utf8")), beforePublish = () => { assertAuditCliOwnerMode(input.workspace, "audit policy apply"); if (!sameTarget) assertOrgPairsCurrent(before); };
+  beforePublish(); return auditPolicyApplyForApiAsync({ workspace: input.workspace, policy }, { beforePublish, assertPreparationInputsCurrent() { assertOrgPairsCurrent(before); } });
+}
+export async function auditMapApplyCliAsync(params: Parameters<typeof auditMapApplyCli>[0]) {
+  const input = { ...params }; assertAuditCliOwnerMode(input.workspace, "audit map apply");
+  const file = resolve(input.file), before = captureOrgFiles([file]), bytes = orgPairBytes(before, file), sameTarget = [auditMapActivePath(input.workspace), `${auditMapActivePath(input.workspace)}.sig`].some(path => physicalPathWithMissingSuffix(path) === physicalPathWithMissingSuffix(file));
+  if (bytes === null) throw new Error("audit map input file is missing");
+  const map = parseJsonOrYaml(bytes.toString("utf8")), beforePublish = () => { assertAuditCliOwnerMode(input.workspace, "audit map apply"); if (!sameTarget) assertOrgPairsCurrent(before); };
+  beforePublish(); return auditMapApplyForApiAsync({ workspace: input.workspace, map }, { beforePublish, assertPreparationInputsCurrent() { assertOrgPairsCurrent(before); } });
 }

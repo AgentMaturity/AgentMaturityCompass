@@ -26,11 +26,11 @@ import {
   auditBinderExportRequestForApi,
   auditBinderVerifyForApi,
   auditBindersForApi,
-  auditMapApplyForApi,
-  auditMapShowForApi,
+  auditMapApplyForApiAsync,
+  auditMapShowForApiAsync,
   auditMapVerifyForApi,
-  auditPolicyApplyForApi,
-  auditPolicyForApi,
+  auditPolicyApplyForApiAsync,
+  auditPolicyForApiAsync,
   auditReadinessGate,
   auditRequestApproveForApi,
   auditRequestCreateForApi,
@@ -40,7 +40,7 @@ import {
   auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
-} from "../audit/auditApi.js";
+} from "../audit/auditApi.js"; import { captureAuditPolicyMapReadiness } from "../audit/auditPolicyMapPublication.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
 import { auditBindersExportsDir, verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { containedPath } from "../utils/pathSafety.js";
@@ -2174,7 +2174,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         requireRoles({ auth, res, workspace: options.workspace, roles });
       const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
       const assurancePublication = (roles: UserRole[], readOnly = false, vault = false) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (readOnly && requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
-      const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
+      const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; }; let policyMapReadiness: ReturnType<typeof captureAuditPolicyMapReadiness> | null = null;
       const refreshConsole = async () => {
         const recheck = signingAuthority(["OWNER"]);
         try { await writeConsoleSnapshot(options.workspace, recheck); return {}; }
@@ -4305,6 +4305,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           return;
         }
+        if ((req.method === "GET" && (pathname === "/audit/policy" || pathname === "/audit/map/active")) || (req.method === "POST" && (pathname === "/audit/policy/apply" || pathname === "/audit/map/apply"))) policyMapReadiness = captureAuditPolicyMapReadiness(options.workspace, req.method === "POST" ? pathname === "/audit/policy/apply" ? "policy" : "active" : null);
       }
 
       if (pathname === "/audit/policy" && req.method === "GET") {
@@ -4314,7 +4315,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, auditPolicyForApi(options.workspace));
+        const out = await auditPolicyForApiAsync(options.workspace, policyMapReadiness!.withOptions({ beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) })).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4335,10 +4336,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy is required" });
           return;
         }
-        const out = auditPolicyApplyForApi({
+        const out = await auditPolicyApplyForApiAsync({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, policyMapReadiness!.withOptions(auditPublication(["OWNER"], false))).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4354,10 +4355,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, auditMapShowForApi({
+        const out = await auditMapShowForApiAsync({
           workspace: options.workspace,
           id: "active"
-        }));
+        }, policyMapReadiness!.withOptions({ beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) })).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4378,10 +4379,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "map is required" });
           return;
         }
-        const out = auditMapApplyForApi({
+        const out = await auditMapApplyForApiAsync({
           workspace: options.workspace,
           map: parsed.map
-        });
+        }, policyMapReadiness!.withOptions(auditPublication(["OWNER"], false))).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
