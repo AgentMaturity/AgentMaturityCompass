@@ -1,4 +1,8 @@
 import { escapePdfText as escapeSharedPdfText, renderPdfFromLines as renderSharedPdfLines } from "../utils/textPdf.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureOrgFiles, assertOrgPairsCurrent, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { passportPolicyPath } from "./passportStore.js";
+import { passportPolicyForApiAsync, passportPolicyApplyForApiAsync, passportCreateForApiAsync } from "./passportApi.js";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -290,4 +294,31 @@ export function passportCompareCli(params: {
     },
     dimensions
   };
+}
+
+/** Fixed registered owner gate for these maintained leaves; it adds no mode key or caller-selected policy. */
+function assertPassportCliOwner(workspace: string, command: "passport init" | "passport policy apply" | "passport create"): void {
+  try { assertOwnerMode(workspace, "control results sign"); }
+  catch (cause) {
+    if (cause instanceof Error && cause.message === "Command 'control results sign' is blocked in agent mode. Switch to owner mode with: amc mode owner")
+      throw new Error(`Command '${command}' is blocked in agent mode. Switch to owner mode with: amc mode owner`, { cause });
+    throw cause;
+  }
+}
+export async function passportInitCliAsync(workspace: string) {
+  const beforePublish = () => assertPassportCliOwner(workspace, "passport init"); beforePublish();
+  return passportPolicyForApiAsync(workspace, { beforePublish });
+}
+export async function passportPolicyApplyCliAsync(params: Parameters<typeof passportPolicyApplyCli>[0]) {
+  assertPassportCliOwner(params.workspace, "passport policy apply");
+  const input = { ...params }, file = resolve(input.file), before = captureOrgFiles([file]), bytes = orgPairBytes(before, file);
+  if (bytes === null) throw new Error("passport policy input file is missing");
+  const policy = parseJsonOrYaml(bytes.toString("utf8")), sameTarget = file === resolve(passportPolicyPath(input.workspace));
+  const beforePublish = () => { assertPassportCliOwner(input.workspace, "passport policy apply"); if (!sameTarget) assertOrgPairsCurrent(before); };
+  beforePublish(); assertOrgPairsCurrent(before);
+  return passportPolicyApplyForApiAsync({ workspace: input.workspace, policy }, { beforePublish, assertInputsCurrent() { assertOrgPairsCurrent(before); } });
+}
+export async function passportCreateCliAsync(params: Parameters<typeof passportCreateCli>[0]) {
+  const input = { ...params }, beforePublish = () => assertPassportCliOwner(input.workspace, "passport create"); beforePublish();
+  return passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
 }

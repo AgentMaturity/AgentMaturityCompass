@@ -776,10 +776,10 @@ import {
 import {
   passportBadgeCli,
   passportCompareCli,
-  passportCreateCli,
+  passportCreateCliAsync as passportCreateCli,
   passportExportLatestCli,
-  passportInitCli,
-  passportPolicyApplyCli,
+  passportInitCliAsync as passportInitCli,
+  passportPolicyApplyCliAsync as passportPolicyApplyCli,
   passportPolicyPrintCli,
   passportShareCli,
   passportShowCli,
@@ -8772,9 +8772,9 @@ promptScheduler
 passport
   .command("init")
   .description("Create and sign .amc/passport/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "passport init");
-    const out = passportInitCli(process.cwd());
+    const out = await passportInitCli(process.cwd());
     console.log(chalk.green("Passport policy initialized"));
     console.log(`Signature valid: ${out.signature.valid}`);
   });
@@ -8808,9 +8808,9 @@ passportPolicy
   .command("apply")
   .description("Apply passport policy from JSON/YAML file")
   .requiredOption("--file <path>", "policy file")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     assertOwnerMode(process.cwd(), "passport policy apply");
-    const out = passportPolicyApplyCli({
+    const out = await passportPolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -8826,13 +8826,13 @@ passport
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--out <file.amcpass>", "output passport path")
   .option("--id <id>", "scope id for node/agent")
-  .action((opts: { scope: string; out: string; id?: string }) => {
+  .action(async (opts: { scope: string; out: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "passport create");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "node" && scope !== "agent") {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = passportCreateCli({
+    const out = await passportCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,

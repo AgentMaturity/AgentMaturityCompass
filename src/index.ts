@@ -2142,6 +2142,10 @@ export type {
   PassportSchemaImportExportResult,
 } from "./passport/passportSchemaCompatibility.js";
 
+export { createPassportArtifactAsync } from "./passport/passportArtifact.js";
+export { savePassportPolicyAsync, loadPassportPolicyAsync, savePassportCacheAsync } from "./passport/passportStore.js";
+export { signPassportJsonAsync } from "./passport/passportSigner.js";
+
 // ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
 export {
   DEFAULT_REGULATORY_FEEDS,

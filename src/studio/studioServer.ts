@@ -385,18 +385,19 @@ import { emitPromptPackSse } from "../prompt/promptPackSse.js";
 import {
   passportBadgeForApi,
   passportCacheLatestForApi,
-  passportCreateForApi,
+  passportCreateAttemptForApiAsync,
   passportExportExecuteForApi,
   passportExportLatestForApi,
   passportExportRequestForApi,
   passportExportsForApi,
-  passportInitForApi,
-  passportPolicyApplyForApi,
+  capturePassportInitialization,
+  passportPolicyApplyAttemptForApiAsync,
   passportPolicyForApi,
   passportReadinessGate,
   passportVerifyForApi
 } from "../passport/passportApi.js";
 import { verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { passportPublicationFailure } from "../passport/passportPublication.js";
 import { emitPassportSse } from "../passport/passportSse.js";
 import {
   standardGenerateForApiAsync as standardGenerateForApi,
@@ -1393,8 +1394,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   url: string;
   close: () => Promise<void>;
 }> {
+  const passportStartup = capturePassportInitialization(options.workspace);
   await promptInitForApi(options.workspace);
-  passportInitForApi(options.workspace);
+  await passportStartup.initialize();
   const toolhub = new ToolHubService(options.workspace);
   const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
   const orgSse = new OrgSseHub();
@@ -5037,10 +5039,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = passportPolicyApplyForApi({
+        const passportActor = auditPublication(["OWNER"]).beforePublish;
+        const passportAttempt = await passportPolicyApplyAttemptForApiAsync({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, { beforePublish: passportActor });
+        const out = passportAttempt.result;
+        try { passportAttempt.assertCurrent(); passportActor();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "PASSPORT_POLICY_APPLIED",
@@ -5050,11 +5055,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             sigPath: out.sigPath
           }
         });
+        passportAttempt.assertCurrent(); passportActor();
         emitPassportSse({
           hub: orgSse,
           type: "PASSPORT_UPDATED"
         });
+        passportAttempt.assertCurrent(); passportActor();
         json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(options.workspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null, cause, out.transparencyHash, null, true);
+        }
         return;
       }
 
@@ -5070,12 +5080,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { scopeType?: unknown; scopeId?: unknown; outFile?: unknown }) : {};
-        const out = passportCreateForApi({
+        const passportActor = auditPublication(["OWNER", "OPERATOR"]).beforePublish;
+        const passportAttempt = await passportCreateAttemptForApiAsync({
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, { beforePublish: passportActor });
+        const out = passportAttempt.result;
+        try { passportAttempt.assertCurrent(); passportActor();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "PASSPORT_CREATED",
@@ -5086,11 +5099,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             sha256: out.sha256
           }
         });
+        passportAttempt.assertCurrent(); passportActor();
         emitPassportSse({
           hub: orgSse,
           type: "PASSPORT_UPDATED"
         });
+        passportAttempt.assertCurrent(); passportActor();
         json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(options.workspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null, cause, out.transparencyCreatedHash, out.transparencyExportedHash, true);
+        }
         return;
       }
 

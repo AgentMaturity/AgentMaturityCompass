@@ -1,6 +1,6 @@
 import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { readFileSync } from "node:fs";
-import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { prepareFileSignatureWithAuditor, signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -49,4 +49,14 @@ export function verifyPassportDigestSignature(params: {
 
 export function digestFile(path: string): string {
   return sha256Hex(readFileSync(path));
+}
+
+/** Internal actual passport signature: canonical payload WITHOUT the tar member's trailing LF. */
+export async function preparePassportJsonSignatureAsync(workspace: string, passport: PassportJson, beforeSign?: () => void) {
+  const prepared = await prepareFileSignatureWithAuditor(workspace, "passport.json", Buffer.from(canonicalize(structuredClone(passport))), "BUNDLE", beforeSign);
+  const signature = passportSignatureSchema.parse(JSON.parse(prepared.signatureBytes));
+  return Object.freeze({ signature, assertCurrent: prepared.assertCurrent });
+}
+export async function signPassportJsonAsync(workspace: string, passport: PassportJson) {
+  return (await preparePassportJsonSignatureAsync(workspace, passport)).signature;
 }
