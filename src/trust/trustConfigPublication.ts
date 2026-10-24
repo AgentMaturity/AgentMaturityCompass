@@ -65,30 +65,43 @@ export async function publishTrustConfig(workspace: string, input: Uint8Array, b
   return publishTrustConfigOperation(workspace, () => bytes, beforePublish);
 }
 
-/** Fixed NOTARY successor: the actual captured old body supplies every retained configuration field. */
-export async function publishNotaryTrustConfig(workspace: string, input: {
+interface NotaryTrustInputs {
   baseUrl: string; unixSocketPath: string | null; fingerprint: string;
   requiredAttestationLevel: "SOFTWARE" | "HARDWARE";
-}, beforePublish?: () => void) {
-  const params = { ...input };
-  return publishTrustConfigOperation(workspace, previous => {
-    const body = previous.members.find(member => member.path === trustConfigPath(workspace));
-    if (body === undefined) throw new Error("trust predecessor was not captured");
-    const current = body.bytes === null ? defaultTrustConfig() : trustConfigSchema.parse(YAML.parse(body.bytes.toString("utf8")) as unknown);
-    const next = trustConfigSchema.parse({ trust: {
-      ...current.trust, mode: "NOTARY", notary: {
-        ...current.trust.notary, baseUrl: params.baseUrl, unixSocketPath: params.unixSocketPath,
-        pinnedPubkeyFingerprint: params.fingerprint,
-        auth: { secretRef: "vault:notary/auth", headerName: "x-amc-notary-auth", hmacAlg: "sha256" },
-        requiredAttestationLevel: params.requiredAttestationLevel
-      }
-    } });
-    return Buffer.from(YAML.stringify(next), "utf8");
-  }, beforePublish);
 }
-
-/** Only fixed exports choose preparation; no caller supplies a checked predecessor or authority. */
+/** The captured old body supplies every retained field; only fixed drivers choose this recipe. */
+function notaryTrustBytes(workspace: string, previous: OrgPairsSnapshot, params: NotaryTrustInputs): Buffer {
+  const body = previous.members.find(member => member.path === trustConfigPath(workspace));
+  if (body === undefined) throw new Error("trust predecessor was not captured");
+  const current = body.bytes === null ? defaultTrustConfig() : trustConfigSchema.parse(YAML.parse(body.bytes.toString("utf8")) as unknown);
+  const next = trustConfigSchema.parse({ trust: {
+    ...current.trust, mode: "NOTARY", notary: {
+      ...current.trust.notary, baseUrl: params.baseUrl, unixSocketPath: params.unixSocketPath,
+      pinnedPubkeyFingerprint: params.fingerprint,
+      auth: { secretRef: "vault:notary/auth", headerName: "x-amc-notary-auth", hmacAlg: "sha256" },
+      requiredAttestationLevel: params.requiredAttestationLevel
+    }
+  } });
+  return Buffer.from(YAML.stringify(next), "utf8");
+}
+/** Fixed direct driver; no policy-routed BUNDLE signer can select the trust replacement authority. */
+export async function publishNotaryTrustConfig(workspace: string, input: NotaryTrustInputs, beforePublish?: () => void) {
+  const params = { ...input };
+  return publishTrustConfigOperation(workspace, previous => notaryTrustBytes(workspace, previous, params), beforePublish);
+}
+/** Fixed bootstrap staging. No caller supplies an authority, predecessor or generic preparation callback. */
+export function captureNotaryTrustConfig(workspace: string, beforePublish?: () => void) {
+  const operation = captureTrustConfigOperation(workspace, beforePublish);
+  return Object.freeze({ assertCurrent: operation.assertCurrent, publish(input: NotaryTrustInputs) {
+    const params = { ...input };
+    return operation.publish(previous => notaryTrustBytes(workspace, previous, params));
+  } });
+}
+/** The unchanged initializer and fixed direct driver keep the same private Promise boundary. */
 async function publishTrustConfigOperation(workspace: string, prepare: (previous: OrgPairsSnapshot) => Buffer, beforePublish?: () => void) {
+  return captureTrustConfigOperation(workspace, beforePublish).publish(prepare);
+}
+function captureTrustConfigOperation(workspace: string, beforePublish?: () => void) {
   const actor = beforePublish, root = resolve(workspace);
   const realRoot = realpathSync(root), originalRoot = lstatSync(root);
   if (!originalRoot.isDirectory()) throw new Error("trust initialization root must be a directory");
@@ -103,10 +116,10 @@ async function publishTrustConfigOperation(workspace: string, prepare: (previous
   const fileCurrent = holder === "file" ? captureVaultPurposeContinuity(workspace, "artifact-seal") : null;
   const path = trustConfigPath(workspace), sigPath = `${path}.sig`;
   const previous = withConfigSignaturePairLock(workspace, () => captureOrgPairs([path]));
-  const bytes = prepare(previous);
   const expected = new Map(previous.members.map(member => [member.path, { ...member, bytes: member.bytes === null ? null : Buffer.from(member.bytes) }]));
   const expectedPair = (): OrgPairsSnapshot => ({ members: [...expected.values()] });
   let signatureCurrent: (() => void) | null = null, refused = false, firstRefusal: unknown;
+  let started = false, failed = false, failure: unknown;
   const intrinsic = () => {
     enabled();
     const currentRoot = lstatSync(root), settings = keyPolicy(loadKeysConfig(workspace));
@@ -128,44 +141,53 @@ async function publishTrustConfigOperation(workspace: string, prepare: (previous
     signatureCurrent?.(); assertOrgPairsCurrent(expectedPair()); enabled();
   };
   const gate = () => {
+    if (failed) throw failure;
     if (refused) throw firstRefusal;
     try { intrinsic(); actor?.(); intrinsic(); }
     catch (error) { if (!refused) { refused = true; firstRefusal = error; } throw firstRefusal; }
   };
-  const digest = sha256Hex(bytes), published: string[] = []; let attempted = "";
+  const published: string[] = []; let attempted = "";
   const fail = (cause: unknown): never => {
+    failed = true; failure = cause;
     if (published.length === 0 && attempted === "") throw cause;
     throw new OrgPairsPublicationError(Object.freeze([...published]), attempted, cause);
   };
-  try {
-    gate();
-    const signed = await signDigestWithPurpose({ workspace, kind: "BUNDLE", digestHex: digest, beforeSign: gate });
-    signatureCurrent = () => {
-      if (signed.digestSha256 !== digest || signed.signer !== "auditor" || signed.envelope === undefined
-        || signed.envelope.signer.type !== "VAULT" || signed.envelope.alg !== algorithm || signed.signature !== signed.envelope.sigB64
-        || !verifySignatureEnvelope(digest, signed.envelope, { trustedPublicKeys: [publicKeyPem], requireTrustedKey: true })) {
-        throw new Error("prepared trust signature does not match its original direct signer");
-      }
-    };
-    gate();
-    const sidecar = Buffer.from(JSON.stringify({ digestSha256: digest, signature: signed.signature, signedTs: signed.signedTs,
-      signer: "auditor", envelope: signed.envelope }, null, 2));
-    withConfigSignaturePairLock(workspace, () => {
+  return Object.freeze({ assertCurrent: gate, async publish(prepare: (previous: OrgPairsSnapshot) => Buffer) {
+    if (failed) throw failure;
+    if (refused) throw firstRefusal;
+    if (started) throw new Error("trust publication was already attempted");
+    started = true;
+    try {
+      const bytes = prepare(previous), digest = sha256Hex(bytes);
       gate();
-      for (const member of [{ path, bytes }, { path: sigPath, bytes: sidecar }]) {
-        gate(); attempted = relative(workspace, member.path);
-        writeFileAtomic(member.path, member.bytes, 0o644); published.push(attempted);
-        const actual = captureOrgFiles([member.path]).members[0];
-        if (actual === undefined || actual.mode !== 0o644 || actual.bytes === null || !actual.bytes.equals(member.bytes)) {
-          throw new Error("published trust member differs from its prepared bytes or mode");
+      const signed = await signDigestWithPurpose({ workspace, kind: "BUNDLE", digestHex: digest, beforeSign: gate });
+      signatureCurrent = () => {
+        if (signed.digestSha256 !== digest || signed.signer !== "auditor" || signed.envelope === undefined
+          || signed.envelope.signer.type !== "VAULT" || signed.envelope.alg !== algorithm || signed.signature !== signed.envelope.sigB64
+          || !verifySignatureEnvelope(digest, signed.envelope, { trustedPublicKeys: [publicKeyPem], requireTrustedKey: true })) {
+          throw new Error("prepared trust signature does not match its original direct signer");
         }
-        expected.set(member.path, { ...actual, bytes: Buffer.from(actual.bytes) }); attempted = "";
-      }
+      };
       gate();
-    });
-    gate();
-  } catch (error) { return fail(error); }
-  return Object.freeze({ path, sigPath, assertCurrent() {
-    try { gate(); } catch (error) { fail(error); }
+      const sidecar = Buffer.from(JSON.stringify({ digestSha256: digest, signature: signed.signature, signedTs: signed.signedTs,
+        signer: "auditor", envelope: signed.envelope }, null, 2));
+      withConfigSignaturePairLock(workspace, () => {
+        gate();
+        for (const member of [{ path, bytes }, { path: sigPath, bytes: sidecar }]) {
+          gate(); attempted = relative(workspace, member.path);
+          writeFileAtomic(member.path, member.bytes, 0o644); published.push(attempted);
+          const actual = captureOrgFiles([member.path]).members[0];
+          if (actual === undefined || actual.mode !== 0o644 || actual.bytes === null || !actual.bytes.equals(member.bytes)) {
+            throw new Error("published trust member differs from its prepared bytes or mode");
+          }
+          expected.set(member.path, { ...actual, bytes: Buffer.from(actual.bytes) }); attempted = "";
+        }
+        gate();
+      });
+      gate();
+    } catch (error) { return fail(error); }
+    return Object.freeze({ path, sigPath, assertCurrent() {
+      try { gate(); } catch (error) { fail(error); }
+    } });
   } });
 }

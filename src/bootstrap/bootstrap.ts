@@ -3,7 +3,7 @@ import { request as httpRequest, type RequestOptions } from "node:http";
 import { dirname, join, resolve } from "node:path";
 import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
 import { captureWorkspaceColdOrgPrerequisites, type WorkspaceColdOrgPrerequisites } from "../workspaceColdOrgPrerequisites.js";
-import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
+import { createVault, getVaultSecret, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { actionPolicyPath, initActionPolicy } from "../governor/actionPolicyEngine.js";
 import { initToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
@@ -37,6 +37,9 @@ import { enableLanMode } from "../pairing/lanMode.js";
 import { enableNotaryTrust } from "../trust/trustConfig.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
 import { captureBootstrapSuffixInputs, publishBootstrapProviderSuffix } from "./bootstrapProviderSuffix.js";
+import { captureBootstrapNotaryEnablement } from "../trust/notaryEnablementPublication.js";
+import { assertOrgPairsCurrent, captureOrgFiles } from "../org/preparedOrgPairs.js";
+import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 
 export interface BootstrapOptions {
   workspace: string;
@@ -207,9 +210,10 @@ async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceCol
   } catch (cause) { throw Object.assign(new Error("bootstrap assurance stage incomplete; earlier cold effects remain", { cause }), { completedAssurancePaths: assurance.publishedPaths() }); }
 }
 
-async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions): Promise<{ pubkeyPem: string; fingerprint: string }> {
+async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions, beforeRequest?: () => void): Promise<{ pubkeyPem: string; fingerprint: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
     checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+    beforeRequest?.();
     const req = httpRequest(endpoint, requestOptions, (res) => {
       const chunks: Buffer[] = [];
       res.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
@@ -241,6 +245,67 @@ async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOpt
     });
     req.end();
   });
+}
+
+interface BootstrapNotaryInputs {
+  workspace: string; baseUrl: string; requiredAttestationLevel: "SOFTWARE" | "HARDWARE";
+  endpoint: string; requestOptions: RequestOptions; secret: string; vaultEnvironment: string | undefined;
+}
+class BootstrapNotaryPrefetchError extends Error {
+  readonly code = "BOOTSTRAP_NOTARY_PREFETCH_INCOMPLETE";
+  constructor(readonly progress: Readonly<{ phase: string; directoryAttempted: boolean; directoryReturned: boolean;
+    writeAttempted: boolean; writeReturned: boolean; acknowledged: boolean; enablementReturned: boolean }>,
+    readonly firstRefusalObserved: boolean, readonly firstRefusal: unknown, cause: unknown) {
+    super("bootstrap notary continuation did not complete; earlier native effects may remain", { cause });
+    this.name = "BootstrapNotaryPrefetchError";
+  }
+}
+async function publishBootstrapNotaryPrefetch(input: BootstrapNotaryInputs) {
+  const params = { ...input, requestOptions: { ...input.requestOptions } }, workspace = params.workspace;
+  let refused = false, first: unknown;
+  const negative = (check: () => void) => {
+    if (refused) throw first;
+    try { check(); } catch (cause) { refused = true; first = cause; throw cause; }
+  };
+  const progress = { phase: "capture", directoryAttempted: false, directoryReturned: false,
+    writeAttempted: false, writeReturned: false, acknowledged: false, enablementReturned: false };
+  const fail = (cause: unknown): never => {
+    if (!progress.directoryAttempted) throw cause;
+    throw new BootstrapNotaryPrefetchError(Object.freeze({ ...progress }), refused, first, cause);
+  };
+  try {
+    if (getVaultSecret(workspace, "notary/auth") !== params.secret) throw new Error("required bootstrap notary auth secret did not read back");
+    const inputs = captureBootstrapSuffixInputs(workspace, params.vaultEnvironment);
+    const path = join(workspace, ".amc", "bootstrap", "notary.pub");
+    const physicalPin = physicalPathWithMissingSuffix(path);
+    let expected = captureOrgFiles([path]);
+    // This fixed lower input callback never calls the staged or completed notary operation.
+    const stable = () => negative(() => {
+      inputs();
+      if (getVaultSecret(workspace, "notary/auth") !== params.secret) throw new Error("original bootstrap notary auth secret changed");
+      if (physicalPathWithMissingSuffix(path) !== physicalPin) throw new Error("original bootstrap notary pin route changed");
+      assertOrgPairsCurrent(expected); inputs();
+    });
+    const stage = captureBootstrapNotaryEnablement({ workspace, baseUrl: params.baseUrl,
+      requiredAttestationLevel: params.requiredAttestationLevel, requiredSecret: params.secret }, stable);
+    const preparing = () => negative(() => { stable(); stage.assertCurrent(); stable(); });
+    preparing(); progress.phase = "pubkey-request";
+    const notary = await fetchNotaryPubkey(params.endpoint, workspace, params.requestOptions, preparing);
+    preparing(); progress.phase = "pin-directory"; progress.directoryAttempted = true;
+    ensureDir(dirname(path)); progress.directoryReturned = true;
+    preparing(); progress.phase = "pin-write"; progress.writeAttempted = true;
+    writeFileAtomic(path, notary.pubkeyPem, 0o644); progress.writeReturned = true;
+    progress.phase = "pin-readback";
+    const own = captureOrgFiles([path]), member = own.members[0];
+    if (member === undefined || member.mode !== 0o644 || member.bytes === null || !member.bytes.equals(Buffer.from(notary.pubkeyPem, "utf8")))
+      throw new Error("returned bootstrap notary pin differs from its exact bytes or mode");
+    expected = own; progress.acknowledged = true;
+    preparing(); progress.phase = "enablement";
+    const completed = await stage.publishPin(path); progress.enablementReturned = true;
+    const current = () => negative(() => { stable(); completed.assertCurrent(); stable(); });
+    current(); progress.phase = "complete";
+    return Object.freeze({ assertCurrent() { try { current(); } catch (cause) { fail(cause); } } });
+  } catch (cause) { return fail(cause); }
 }
 
 export class BootstrapColdPrerequisitesIncompleteError extends Error {
@@ -286,6 +351,7 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       });
       createdConfigs["studio/lan.yaml"] = true;
     }
+    let notaryCurrent: (() => void) | null = null;
     if (options.enableNotary) {
       if (!options.notaryAuthSecret || options.notaryAuthSecret.trim().length === 0) {
         throw new Error("AMC_ENABLE_NOTARY requires AMC_NOTARY_AUTH_SECRET_FILE (or AMC_NOTARY_AUTH_SECRET).");
@@ -297,20 +363,29 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       const requestOptions: RequestOptions = { method: "GET" };
       checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
       setVaultSecret(workspace, "notary/auth", notarySecret);
-      const notary = await fetchNotaryPubkey(endpoint, workspace, requestOptions);
-      const pubPath = join(workspace, ".amc", "bootstrap", "notary.pub");
-      ensureDir(dirname(pubPath));
-      writeFileAtomic(pubPath, notary.pubkeyPem, 0o644);
-      await enableNotaryTrust({
-        workspace,
-        baseUrl: notaryBaseUrl,
-        pinPubkeyPath: pubPath,
-        requiredAttestationLevel
-      });
+      if (noSignAtEntry) {
+        const notary = await fetchNotaryPubkey(endpoint, workspace, requestOptions);
+        const pubPath = join(workspace, ".amc", "bootstrap", "notary.pub");
+        ensureDir(dirname(pubPath));
+        writeFileAtomic(pubPath, notary.pubkeyPem, 0o644);
+        await enableNotaryTrust({
+          workspace,
+          baseUrl: notaryBaseUrl,
+          pinPubkeyPath: pubPath,
+          requiredAttestationLevel
+        });
+      } else {
+        const completed = await publishBootstrapNotaryPrefetch({ workspace, baseUrl: notaryBaseUrl, requiredAttestationLevel,
+          endpoint, requestOptions, secret: notarySecret, vaultEnvironment: activeVaultEnv });
+        completed.assertCurrent(); notaryCurrent = completed.assertCurrent;
+      }
       createdConfigs["trust.yaml"] = true;
     }
     if (!noSignAtEntry) {
-      const assertInputsCurrent = captureBootstrapSuffixInputs(workspace, activeVaultEnv);
+      const notaryCompleted = notaryCurrent;
+      notaryCompleted?.();
+      const inputs = captureBootstrapSuffixInputs(workspace, activeVaultEnv);
+      const assertInputsCurrent = () => { inputs(); notaryCompleted?.(); inputs(); };
       const completed = await publishBootstrapProviderSuffix(workspace, {
         vaultCreated: vault.created, ownerCreated: owner.created, createdConfigs, notaryEnabled: options.enableNotary
       }, assertInputsCurrent);
