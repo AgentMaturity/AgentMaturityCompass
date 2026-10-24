@@ -1,3 +1,5 @@
+import YAML from "yaml";
+import { benchRegistryConfigSchema } from "./benchRegistrySchema.js";
 import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { createBenchArtifactAsync } from "./benchArtifactAsync.js";
 import { createBenchComparisonAsync } from "./benchComparisonAsync.js";
@@ -15,6 +17,7 @@ import { createBenchComparison } from "./benchComparer.js";
 import { browseBenchRegistry, importBenchFromRegistry } from "./benchRegistryClient.js";
 import { publishBenchToRegistry } from "./benchRegistryServer.js";
 import {
+  benchImportsRegistriesPath, loadBenchRegistriesConfigAsync,
   benchComparisonLatestPath,
   initBenchPolicy,
   loadBenchComparison,
@@ -189,18 +192,31 @@ export async function benchRegistryBrowseForApi(params: {
   workspace: string;
   registryId: string;
   query?: string;
-}) {
+}, options: OrgPairsOptions = {}) {
   const { workspace: explicitWorkspace, registryId, query } = params;
   const workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
-  const config = loadBenchRegistriesConfig(workspace);
+  const actor = options.beforePublish, inputs = options.assertInputsCurrent, path = benchImportsRegistriesPath(workspace);
+  actor?.(); inputs?.();
+  // Existing browse reads do not acquire a signer or require an unrelated sidecar; retain the exact used body.
+  const initial = pathExists(path) ? readFileSync(path) : null;
+  const config = initial === null
+    ? await loadBenchRegistriesConfigAsync(workspace, { beforePublish: actor, assertInputsCurrent: inputs })
+    : benchRegistryConfigSchema.parse(YAML.parse(initial.toString("utf8")) as unknown);
+  const selected = initial ?? Buffer.from(YAML.stringify(config));
+  const current = () => { actor?.(); inputs?.();
+    if (!pathExists(path) || !readFileSync(path).equals(selected)) throw new Error("selected bench registry configuration changed during browse; retry"); };
+  current();
   const entry = config.benchRegistries.registries.find((row) => row.id === registryId);
-  if (!entry) {
-    throw new Error(`bench registry not configured: ${registryId}`);
+  if (!entry) throw new Error(`bench registry not configured: ${registryId}`);
+  let result: Awaited<ReturnType<typeof browseBenchRegistry>>;
+  try {
+    result = await withWorkspaceScope(workspace, () => browseBenchRegistry({ base: entry.type === "file" ? resolve(workspace, entry.base) : entry.base, query }));
+  } catch (cause) {
+    // Recheck the actual retained actor before a failed network read can become an HTTP response.
+    try { actor?.(); } catch (refusal) { throw new Error("bench registry browse authority refused", { cause: new AggregateError([cause, refusal]) }); }
+    throw cause;
   }
-  return withWorkspaceScope(workspace, () => browseBenchRegistry({
-    base: entry.type === "file" ? resolve(workspace, entry.base) : entry.base,
-    query
-  }));
+  current(); return result;
 }
 
 export async function benchImportForApi(params: {

@@ -7423,7 +7423,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           registryId,
           query
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (browsed === null) return;
         json(res, 200, browsed);
         return;
       }
